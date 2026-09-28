@@ -85,3 +85,24 @@ describe('validateName', () => {
     expect(validateName('gcp', 'service_account', 'AcMex-Billing-trade-prd-kr-sa_sync').suggestedName).toBe('billing-trade-prd-kr-sasync');
   });
 });
+
+describe('1단계 최종 리뷰 고침', () => {
+  it('I-1: rule.patternFlags 를 함께 내보내 wire 쪽에서 같은 정규식을 다시 만들 수 있다', () => {
+    const rg = generate(ctx, ['azure']).azure?.resource_group;
+    expect(rg?.rule.patternFlags).toBe('u');
+    const re = new RegExp(rg!.rule.pattern, rg!.rule.patternFlags);
+    expect(re.test('개발-1')).toBe(true);
+    expect(re.test(rg!.name)).toBe(true);
+  });
+  it('m-3: GCS 버킷은 연속 점(빈 구성요소)을 거부한다 · S3 도 거부한다', () => {
+    expect(validateName('gcp', 'storage_bucket', 'a..b').valid).toBe(false);
+    expect(validateName('gcp', 'storage_bucket', 'a.b').valid).toBe(true);
+    expect(validateName('aws', 's3_bucket', 'a..b').valid).toBe(false);
+  });
+  it('m-2: 리소스 그룹은 보조 평면 글자(U+10000 이상)를 거부하고 BMP 글자는 받는다', () => {
+    expect(validateName('azure', 'resource_group', 'rg-𝔸').valid).toBe(false);
+    expect(validateName('azure', 'resource_group', '𝔸').valid).toBe(false);
+    expect(validateName('azure', 'resource_group', '개발').valid).toBe(true);
+    expect(validateName('azure', 'resource_group', 'rg-개발-1').valid).toBe(true);
+  });
+});

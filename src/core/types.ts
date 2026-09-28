@@ -64,7 +64,8 @@ export interface NameResult {
   original: string;           // 정제 전 · 축소 전 조립 이름
   violations: string[];       // valid:false 일 때 이유(한국어)
   steps: string[];            // 축소 · 변환 기록 ('region 생략' · 'trade→trd' · '균등 축소 B=7' · '하이픈 제거')
-  rule: { minLength: number; maxLength: number; pattern: string; allowed: Allowed; docUrl: string; note?: string };
+  // pattern 은 RegExp.source, patternFlags 는 RegExp.flags — 소비자는 new RegExp(pattern, patternFlags) 로 다시 만든다 (리소스 그룹의 \p{L} 은 'u' 가 없으면 리터럴 p 가 된다)
+  rule: { minLength: number; maxLength: number; pattern: string; patternFlags: string; allowed: Allowed; docUrl: string; note?: string };
 }
 
 export type GenerateOutput = Partial<Record<Provider, Record<string, NameResult>>>;

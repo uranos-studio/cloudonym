@@ -73,7 +73,7 @@ export const RULES: Record<string, ResourceRule> = {
     displayName: 'Cloud Storage Bucket', slug: 'bucket', minLength: 3, maxLength: 63,
     pattern: /^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true,
-    forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle'], ipv4: true },
+    forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle', '..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'global', docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
     note: '점이 있으면 222자까지 허용되나 엔진은 점을 만들지 않으므로 63 으로 둔다 (보수적 · D20)',
@@ -138,7 +138,8 @@ export const RULES: Record<string, ResourceRule> = {
     id: 'azure.resource_group', provider: 'azure', resourceType: 'resource_group',
     displayName: 'Resource Group', slug: 'rg', minLength: 1, maxLength: 90,
     // 끝 점 불가를 pattern 이 표현한다 · 숫자는 DecimalDigitNumber(Nd)만 — 문서가 UnicodeCategory 로 한정한다
-    pattern: /^[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
+    // 보조 평면(U+10000 이상)은 앞보기로 거부한다 — .NET Char.IsLetterOrDigit(char) 는 서로게이트 쌍을 글자로 보지 않는다 (보수적 · D20)
+    pattern: /^(?!.*[\u{10000}-\u{10FFFF}])[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
     scope: 'subscription', docUrl: `${AZURE_RULES}#microsoftresources`,

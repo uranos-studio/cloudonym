@@ -24,7 +24,7 @@ function generateOne(ctx: NamingContext, rule: ResourceRule): NameResult {
     ruleId: rule.id, resourceType: rule.resourceType, displayName: rule.displayName,
     original: compose(raw, rule.template, rule.separator),
     isTransformed: transformed,
-    rule: { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, allowed: rule.allowed, docUrl: rule.docUrl,
+    rule: { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
             ...(rule.note !== undefined ? { note: rule.note } : {}) },
   };
 
