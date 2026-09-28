@@ -122,6 +122,16 @@ describe('Worker 응답 보안 헤더 (보안 리뷰 L-2) — secureHeaders', ()
     hasSecure((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(20 * 1024) } }))).res, '413');
     hasSecure((await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: fakeLimiter('deny').limiter })).res, '429');
   });
+  it('500(onError) 에도 싣는다 · HSTS 는 Worker 가 내지 않는다(존 설정에서 한 곳으로 켠다)', async () => {
+    // ExecutionContext 없이 부르면 c.executionCtx 가 던져 500 이 된다 — root onError(/llms.txt) 와 v1 onError(/v1/generate) 둘 다
+    const root = await app.request('/llms.txt', undefined, {});
+    const sub = await app.request('/v1/generate', jsonPost({ context: ctx }), {});
+    for (const [label, res] of [['root', root], ['v1', sub]] as const) {
+      expect(res.status, label).toBe(500);
+      hasSecure(res, label);
+      expect(res.headers.get('Strict-Transport-Security'), label).toBeNull();
+    }
+  });
   it('/llms.txt 는 보안 헤더와 함께 Cache-Control · CORS · text/plain 을 그대로 낸다', async () => {
     const { res } = await req(app, '/llms.txt');
     hasSecure(res, 'llms');
