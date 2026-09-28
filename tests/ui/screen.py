@@ -1,13 +1,15 @@
 """개발 3단계 화면 시험 (Task 3-4) — Playwright(Python) 로 다섯 시나리오를 재고 스크린샷을 남긴다.
 
 실행(저장소 루트):
-  PORT=5199 python3 path/to/with_server.py \
+  PORT=5199; python3 path/to/with_server.py \
     --server "npm run dev -- --port ${PORT} --strictPort" --port ${PORT} -- \
     uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://localhost:${PORT} docs/screenshots
 
 playwright 는 1.63.0 으로 고정한다 — 이 기계의 ~/Library/Caches/ms-playwright/chromium-1243 을 그대로 쓴다(다른 버전은 브라우저 다운로드가 필요하다).
+zsh 에서 `PORT=5199 python3 … ${PORT}` 처럼 한 문장에 두면 `${PORT}` 가 먼저 빈 값으로 펼쳐진다 — `PORT=5199;` 를 따로 둔다.
 단언이 하나라도 틀리면 non-zero 로 끝난다(실패를 성공으로 보고하지 않는다).
 """
+import base64
 import json
 import sys
 import time
@@ -22,6 +24,37 @@ OUT.mkdir(parents=True, exist_ok=True)
 # ⑴ 의 입력 — 기본값(acmex · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
 INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prd', 'region': 'kr'}
 SA = '[data-rule="gcp.service_account"]'
+# 같은 탭 공유 URL 이동(I-2)의 입력 — INPUT 과 다섯 값이 모두 다르다
+OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'jp'}
+
+
+def state_hash(ctx):
+    """encodeState 와 같은 꼴 — 고정 순서 JSON(공백 없음) · UTF-8 · Base64url · 패딩 없음"""
+    raw = json.dumps({k: ctx[k] for k in ('owner', 'system', 'purpose', 'env', 'region')}, separators=(',', ':'), ensure_ascii=False)
+    return '#state=' + base64.urlsafe_b64encode(raw.encode()).rstrip(b'=').decode()
+
+
+# select 의 선택지 글자가 상자 안에 다 들어가는가 — select 는 scrollWidth 가 넘침을 드러내지 않아 글자 폭을 canvas 로 잰다
+# 쓸 수 있는 폭 = clientWidth - 좌우 padding - 화살표 몫 24px
+SELECT_FIT_JS = '''() => {
+  const ctx = document.createElement('canvas').getContext('2d');
+  const out = [];
+  for (const sel of document.querySelectorAll('#field-env, #field-region')) {
+    const cs = getComputedStyle(sel);
+    ctx.font = cs.font;
+    const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24;
+    for (const o of sel.options) {
+      const w = ctx.measureText(o.text).width;
+      if (w > avail) out.push(`${sel.id} 「${o.text}」 ${w.toFixed(1)}px > ${avail.toFixed(1)}px`);
+    }
+  }
+  return out;
+}'''
+
+
+def assert_selects_fit(page, width):
+    clipped = page.evaluate(SELECT_FIT_JS)
+    assert clipped == [], f'폭 {width}px 에서 select 글자가 잘린다: {clipped}'
 
 
 def goto_ready(page, url):
@@ -82,6 +115,7 @@ with sync_playwright() as p:
     page.keyboard.press('ArrowLeft')
     expect(page.locator('#tab-all')).to_have_attribute('aria-selected', 'true')
     expect(page.locator('[data-provider]')).to_have_count(3)
+    assert_selects_fit(page, 1280)
     page.screenshot(path=str(OUT / '01-desktop-light.png'), full_page=True)
     share_url = page.url
     assert '#state=' in share_url, share_url
@@ -116,6 +150,31 @@ with sync_playwright() as p:
     assert sent2 == ['ui_visit'], f'복원 로드는 ui_visit 1회뿐이어야 한다(첫 화면은 ui_generate 를 세지 않는다): {sent2}'
     ctx2.close()
 
+    # ── ⑹ 같은 탭에서 공유 URL 로 이동(hash 만 바뀐다) → 폼이 따라온다 · ui_generate 를 세지 않는다 · 깨진 hash 는 지금 상태로 되돌린다 (I-2) ──
+    generated_before = sent.count('ui_generate')
+    other_hash = state_hash(OTHER)
+    page.evaluate('h => { location.hash = h; }', other_hash)
+    for key, val in OTHER.items():
+        expect(page.locator(f'#field-{key}')).to_have_value(val)
+    expect(page.locator(f'{SA} [data-name]')).not_to_have_text('payments-ledger-prd-sa-sync')
+    page.wait_for_timeout(1300)
+    assert sent.count('ui_generate') == generated_before, f'hash 이동 복원이 ui_generate 를 셌다: {sent}'
+    assert page.evaluate('location.hash') == other_hash, (page.evaluate('location.hash'), other_hash)
+    page.evaluate("() => { location.hash = '#state=!!!'; }")
+    page.wait_for_function('h => location.hash === h', arg=other_hash)
+    expect(page.locator('#field-owner')).to_have_value(OTHER['owner'])
+    fill_five(page, INPUT)
+    expect(sa.locator('[data-name]')).to_have_text('payments-ledger-prd-sa-sync')
+
+    # ── ⑺ 라벨 한도 위반(GCP 63자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 (I-1) ──
+    page.fill('#field-owner', 'o' * 70)
+    expect(page.locator('[data-copy="tags-json"]')).to_be_disabled()
+    expect(page.locator('[data-json-blocked]')).to_be_visible()
+    expect(page.locator('[data-copy="terraform"]')).to_be_enabled()
+    page.fill('#field-owner', INPUT['owner'])
+    expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
+    expect(page.locator('[data-json-blocked]')).to_have_count(0)
+
     # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 (Review Focus 4) ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
         ctx3 = browser.new_context(viewport={'width': 1280, 'height': 900})
@@ -135,12 +194,16 @@ with sync_playwright() as p:
     expect(sa).to_contain_text('FAIL')
     expect(sa.locator('[data-violations]')).to_contain_text('system 이 정제 뒤 비었다')
     expect(sa.locator('[data-name]')).to_have_text('—')
+    # 정제 뒤 빈 값의 변환 줄(「system: 매매→」)은 숨긴다 — 위반 이유가 이미 말한다 (M-2)
+    expect(sa.locator('[data-steps]')).to_have_count(0)
+    assert '→' not in sa.inner_text(), sa.inner_text()
     expect(sa.locator('button[data-copy]')).to_be_disabled()
     expect(page.locator('[data-provider="gcp"] [data-pass-count]')).to_have_text('0/7 PASS')
     page.click('[data-copy="terraform"]')
     hcl_bad = page.evaluate('navigator.clipboard.readText()')
     assert '  # INVALID: gcp_service_account — system 이 정제 뒤 비었다\n' in hcl_bad, hcl_bad
     assert 'gcp_service_account =' not in hcl_bad
+    sa.scroll_into_view_if_needed()
     page.screenshot(path=str(OUT / '04-fail-card.png'), full_page=False)
 
     # ── 폭 360px · 다크 모드 스크린샷 (가로 스크롤 없음) ──
@@ -148,6 +211,7 @@ with sync_playwright() as p:
     page.set_viewport_size({'width': 360, 'height': 800})
     page.wait_for_timeout(300)
     assert page.evaluate('document.documentElement.scrollWidth') <= 360, page.evaluate('document.documentElement.scrollWidth')
+    assert_selects_fit(page, 360)
     page.screenshot(path=str(OUT / '02-mobile-360.png'), full_page=True)
     ctx1.close()
 
@@ -162,4 +226,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⑸ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⑺ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
