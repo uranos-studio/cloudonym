@@ -54,3 +54,19 @@ describe('LABEL_LIMITS', () => {
     }
   });
 });
+
+describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
+  it('S3 금지 접미사에 -an 이 있다 (계정 지역 네임스페이스 전용)', () => {
+    expect(RULES['aws.s3_bucket'].forbidden?.suffixes).toContain('-an');
+  });
+  it('AKS Linux 노드풀 예약 이름 aksmanagedap 을 막는다', () => {
+    expect(RULES['azure.aks_nodepool_linux'].forbidden?.exact).toContain('aksmanagedap');
+  });
+  it('리소스 그룹 pattern 은 십진 숫자(Nd)만 받는다', () => {
+    const p = RULES['azure.resource_group'].pattern;
+    expect(p.test('개발-1')).toBe(true);
+    expect(p.test('rg-٣')).toBe(true); // U+0663 Nd
+    expect(p.test('rg-²')).toBe(false); // U+00B2 No
+    expect(p.test('rg-Ⅻ')).toBe(false); // U+216B Nl
+  });
+});

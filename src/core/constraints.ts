@@ -1,13 +1,12 @@
 // CSP 리소스 이름 규칙 표 (D9 · D14 · D18 · D19 · D20)
-// 이 단계(Task 1-1)에서는 계획의 규칙 표 값을 옮기기만 한다 — 공식 문서 대조는 Task 1-2.
+// 값은 Task 1-2 에서 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
 // pattern · forbidden · 길이 = CSP 물리 규칙(검증), allowed = 우리가 생성할 때 쓰는 문자 집합.
 import type { Provider, ResourceRule } from './types';
 import { lookup } from './dict';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
-const GCP_VPC = 'https://docs.cloud.google.com/vpc/docs/create-modify-vpc-networks';
-const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq';
+const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
 
 /** RFC 1035 라벨 — GCP compute_instance · vpc_network · subnet */
 const RFC1035 = /^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$/;
@@ -25,7 +24,8 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     forbidden: { contains: ['google', 'ssl'] },
     template: ['owner', 'system', 'purpose', 'env'], optional: ['owner'],
-    scope: 'global', docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects',
+    scope: 'global', docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
+    // undefined · null 은 문서가 "Avoid"(권고)라 적었다 — 금지가 아니므로 넣지 않는다
   },
   'gcp.service_account': {
     id: 'gcp.service_account', provider: 'gcp', resourceType: 'service_account',
@@ -33,7 +33,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['owner', 'system', 'purpose', 'env', 'region', 'slug', 'role'], optional: ['region', 'owner'],
-    scope: 'project', docUrl: 'https://docs.cloud.google.com/iam/docs/service-accounts-create',
+    scope: 'project', docUrl: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create',
   },
   'gcp.compute_instance': {
     id: 'gcp.compute_instance', provider: 'gcp', resourceType: 'compute_instance',
@@ -49,7 +49,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'slug', 'seq'], optional: [],
-    scope: 'project', docUrl: GCP_VPC,
+    scope: 'project', docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/networks#Network.FIELDS.name',
   },
   'gcp.subnet': {
     id: 'gcp.subnet', provider: 'gcp', resourceType: 'subnet',
@@ -57,7 +57,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'region', docUrl: GCP_VPC,
+    scope: 'region', docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/subnetworks#Subnetwork.FIELDS.name',
   },
   'gcp.cloud_sql_instance': {
     id: 'gcp.cloud_sql_instance', provider: 'gcp', resourceType: 'cloud_sql_instance',
@@ -66,7 +66,7 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
     scope: 'project', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/instance-settings',
-    note: 'project-id:instance-id 합이 98자 — 최장 project ID 30 을 뺀 보수적 상한 (D20)',
+    note: 'project-id:instance-id 합이 98자 — 최장 project ID 30 을 뺀 보수적 상한 · 끝 영숫자 요구는 문서 근거 없는 보수적 한도 (D20)',
   },
   'gcp.storage_bucket': {
     id: 'gcp.storage_bucket', provider: 'gcp', resourceType: 'storage_bucket',
@@ -76,6 +76,7 @@ export const RULES: Record<string, ResourceRule> = {
     forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'global', docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
+    note: '점이 있으면 222자까지 허용되나 엔진은 점을 만들지 않으므로 63 으로 둔다 (보수적 · D20)',
   },
 
   // ─── AWS ───────────────────────────────────────────────
@@ -84,9 +85,10 @@ export const RULES: Record<string, ResourceRule> = {
     displayName: 'S3 Bucket', slug: 'bucket', minLength: 3, maxLength: 63,
     pattern: /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true,
-    forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3'], contains: ['..'], ipv4: true },
+    forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'global', docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
+    note: '-an 접미사는 계정 지역 네임스페이스 버킷 전용 — 일반 이름에는 쓸 수 없다',
   },
   'aws.iam_role': {
     id: 'aws.iam_role', provider: 'aws', resourceType: 'iam_role',
@@ -135,8 +137,8 @@ export const RULES: Record<string, ResourceRule> = {
   'azure.resource_group': {
     id: 'azure.resource_group', provider: 'azure', resourceType: 'resource_group',
     displayName: 'Resource Group', slug: 'rg', minLength: 1, maxLength: 90,
-    // 끝 점 불가를 pattern 이 표현한다
-    pattern: /^[\p{L}\p{N}_().-]*[\p{L}\p{N}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
+    // 끝 점 불가를 pattern 이 표현한다 · 숫자는 DecimalDigitNumber(Nd)만 — 문서가 UnicodeCategory 로 한정한다
+    pattern: /^[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
     scope: 'subscription', docUrl: `${AZURE_RULES}#microsoftresources`,
@@ -212,7 +214,7 @@ export const RULES: Record<string, ResourceRule> = {
     displayName: 'AKS Node Pool (Linux)', slug: 'np', minLength: 1, maxLength: 12,
     pattern: /^[a-z][a-z0-9]{0,11}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
-    // forbidden.exact(예약 이름)는 Task 1-2 가 FAQ 에서 그대로 옮긴다
+    forbidden: { exact: ['aksmanagedap'] }, // FAQ: AKS 시스템 구성요소 예약 이름
     template: ['slug', 'purpose', 'env'], optional: [],
     scope: 'resource_group', docUrl: AKS_FAQ,
   },
@@ -226,11 +228,12 @@ export const RULES: Record<string, ResourceRule> = {
   },
 };
 
-/** 태그 · 라벨의 키 · 값 길이 한도 (Task 1-2 가 문서로 대조한다) */
+/** 태그 · 라벨의 키 · 값 길이 한도 (Task 1-2 에서 문서로 대조했다)
+ *  Azure 스토리지 계정만 키 128 — 엔진의 태그 키는 고정 다섯(11자 이하)이라 적용하지 않는다 (docs/decisions.md) */
 export const LABEL_LIMITS: Record<Provider, { key: number; value: number; docUrl: string }> = {
-  aws: { key: 128, value: 256, docUrl: 'https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html' },
-  azure: { key: 512, value: 256, docUrl: 'https://learn.microsoft.com/azure/azure-resource-manager/management/tag-resources' },
-  gcp: { key: 63, value: 63, docUrl: 'https://cloud.google.com/resource-manager/docs/labels-overview' },
+  aws: { key: 128, value: 256, docUrl: 'https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions' },
+  azure: { key: 512, value: 256, docUrl: 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources#limitations' },
+  gcp: { key: 63, value: 63, docUrl: 'https://docs.cloud.google.com/resource-manager/docs/labels-overview#requirements' },
 };
 
 export function rulesFor(provider: Provider): ResourceRule[] {
