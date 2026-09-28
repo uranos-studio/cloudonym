@@ -60,18 +60,40 @@ describe('shareUrl', () => {
   });
 });
 
-describe('decodeState 길이 상한 (보안 리뷰 L-5)', () => {
-  it('필드 상한은 API 와 같은 1024 · hash 전체 상한은 4096', () => {
-    expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS);
-    expect(MAX_HASH_CHARS).toBe(4096);
-  });
+describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
+  const at = (s: string): NamingContext => ({ owner: s, system: s, purpose: s, env: 'prd', region: 'global' });
+  const hashOf = (c: NamingContext) => `#${'state'}=${encodeState(c)}`;
+  it('필드 상한은 API 와 같은 1024', () => expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS));
   it('필드 하나가 1024자를 넘으면 undefined(기본값) · 딱 1024자는 받는다', () => {
     expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1025) })}`)).toBeUndefined();
     expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1024) })}`)?.owner).toBe('a'.repeat(1024));
   });
-  it('hash 가 4096자를 넘으면 디코딩하지 않고 undefined', () => {
-    const big = `#state=${encodeState(ctx)}${'A'.repeat(4096)}`;
-    expect(big.length).toBeGreaterThan(MAX_HASH_CHARS);
+  it.each([
+    ['ASCII 1024자 × 3', 'a'.repeat(1024)],
+    ['한글(UTF-8 3바이트) 1024자 × 3', '가'.repeat(1024)],
+    ['보조 평면(UTF-8 4바이트 · UTF-16 2단위) 512자 × 3', '😀'.repeat(512)],
+    ['제어 문자(JSON 이 \\uXXXX 6바이트로 적는다) 1024자 × 3', '\u0001'.repeat(1024)],
+  ])('필드마다 상한까지 채운 문맥도 왕복한다 — %s', (_label, s) => {
+    const c = at(s);
+    const h = hashOf(c);
+    expect(h.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
+    expect(decodeState(h)).toEqual(c);
+  });
+  it('hash 상한은 최악 입력(필드당 6바이트 × 1024 × 3 · region global)의 표준 Base64(패딩 포함) 길이와 같다', () => {
+    const worst = at('\u0001'.repeat(1024));
+    const url = hashOf(worst);
+    const padded = `#state=${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(worst))))}`;
+    expect(url.length).toBe(24673);
+    expect(padded.length).toBe(24675);
+    expect(MAX_HASH_CHARS).toBe(padded.length);
+    expect(decodeState(padded)).toEqual(worst);
+  });
+  it('상한을 한 글자라도 넘으면 내용이 멀쩡해도 디코딩하지 않고 undefined', () => {
+    // env 별칭 production 은 parseContext 가 prd 로 받는 값이다 — 상한이 없다면 풀린다
+    const over = `#state=${b64({ ...at('\u0001'.repeat(1024)), env: 'production' })}`;
+    expect(over.length).toBeGreaterThan(MAX_HASH_CHARS);
+    expect(decodeState(over)).toBeUndefined();
+    const big = `#state=${encodeState(ctx)}${'A'.repeat(MAX_HASH_CHARS)}`;
     expect(decodeState(big)).toBeUndefined();
   });
 });

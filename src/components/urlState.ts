@@ -5,8 +5,14 @@ import type { NamingContext, RawContext } from '../core/types';
 export const HASH_KEY = 'state';
 /** 필드 하나의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다 (보안 리뷰 L-5) */
 export const MAX_FIELD_CHARS = 1024;
-/** hash 전체 상한 — 정상 공유 URL 은 수백 자다. 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게) */
-export const MAX_HASH_CHARS = 4096;
+/** JSON 이 UTF-16 코드 유닛 하나를 적는 최대 바이트 — 제어 문자 · 짝 없는 서로게이트는 `\uXXXX` 6바이트다 (한글 3 · 보조 평면 2단위에 4) */
+const MAX_JSON_BYTES_PER_UNIT = 6;
+/** 다섯 필드 중 자유 입력 셋(owner · system · purpose)이 모두 상한일 때의 JSON 바이트 — 뼈대 67바이트는 env `prd` · region `global`(가장 긴 정규 값) 기준 */
+const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prd', region: 'global' }).length
+  + 3 * MAX_FIELD_CHARS * MAX_JSON_BYTES_PER_UNIT;
+/** hash 전체 상한 — 화면 · API 가 받는 모든 입력(필드당 1024자 · 아무 유니코드)이 왕복하도록 최악 JSON 의
+ *  표준 Base64(패딩 포함) 길이에 `#state=` 를 더한 값(24675). 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게 · codex P2) */
+export const MAX_HASH_CHARS = `#${HASH_KEY}=`.length + Math.ceil(MAX_JSON_BYTES / 3) * 4;
 
 function toBase64Url(bytes: Uint8Array): string {
   let bin = '';
