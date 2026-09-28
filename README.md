@@ -143,6 +143,27 @@ npm run deploy     # build, then wrangler deploy (needs `npx wrangler login`)
 
 Local secrets go in `.dev.vars` (template: `.dev.vars.example`). More detail — including running the built Worker with `wrangler dev` — is in [docs/개발환경.md](docs/개발환경.md).
 
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) — every commit is signed off under the [DCO](DCO) (`git commit -s`). Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
+## Project Status
+
+Cloudonym is an independent open-source project created and maintained
+by Sungjae Yun.
+
+It is not affiliated with, sponsored by, or developed on behalf of any
+current or former employer.
+
+## License
+
+Copyright 2026 Sungjae Yun.
+
+Licensed under the Apache License, Version 2.0.
+See the LICENSE file for details.
+
+[LICENSE](LICENSE) · [NOTICE](NOTICE). The Apache License 2.0 covers the code only — the Cloudonym name and logo are covered by a separate [trademark policy](TRADEMARKS.md).
+
 ---
 
 ## 한국어
@@ -199,3 +220,15 @@ Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.**
 ### 로컬 개발
 
 Node 는 `.nvmrc`(22)를 따른다. 명령은 위 [Local development](#local-development) 와 같고, 정본은 `package.json` `scripts` · 자세한 내용은 [docs/개발환경.md](docs/개발환경.md) 다.
+
+### 기여 · 보안
+
+기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md) 다 — 모든 commit 에 [DCO](DCO) 서명(`git commit -s`)을 단다. 취약점은 [SECURITY.md](SECURITY.md) 대로 비공개로 신고한다.
+
+### 프로젝트 상태
+
+Cloudonym 은 Sungjae Yun 이 만들고 관리하는 독립 오픈소스 프로젝트다. 현재 · 이전 어느 고용주와도 관계가 없고, 후원을 받지 않으며, 고용주를 위해 개발한 것이 아니다.
+
+### 라이선스
+
+Copyright 2026 Sungjae Yun. Apache License 2.0 으로 배포한다 — 전문은 [LICENSE](LICENSE), 고지는 [NOTICE](NOTICE) 다. 라이선스는 코드에만 적용되고, Cloudonym 이름과 로고는 별도의 [상표 정책](TRADEMARKS.md)을 따른다.
