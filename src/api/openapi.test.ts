@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
-import { req, jsonPost, json } from './test-support';
+import { req, jsonPost, beaconPost, json } from './test-support';
 
 // openapi.json 을 읽는 데 필요한 만큼만 타입을 둔다
 interface Schema { type?: string; maxLength?: number; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema; $ref?: string }
@@ -33,9 +33,14 @@ describe('public/openapi.json — 형식', () => {
     expect(ctx['region']!.enum).toBeUndefined();
     expect(JSON.stringify(spec)).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
   });
-  it('세 경로가 있고 각각 200 · 400 · 413 응답을 정의한다 (413 = 본문 16KB 초과 · 최종 리뷰 I-1)', () => {
+  it('세 경로가 있고 200 · 400 · 413 · 429 를, /events 는 403 도 정의한다 (413 = 본문 16KB 초과 · 최종 리뷰 I-1 · 429 · 403 = 보안 리뷰 M-1 · M-2)', () => {
     expect(keys(spec.paths)).toEqual(['/events', '/generate', '/validate']);
-    for (const p of keys(spec.paths)) expect(keys(spec.paths[p]!.post.responses), p).toEqual(['200', '400', '413']);
+    for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post.responses), p).toEqual(['200', '400', '413', '429']);
+    expect(keys(spec.paths['/events']!.post.responses)).toEqual(['200', '400', '403', '413', '429']);
+    for (const p of keys(spec.paths)) {
+      const r429 = spec.paths[p]!.post.responses['429'] as { headers?: Record<string, { schema: Schema }> };
+      expect(r429.headers?.['Retry-After']?.schema.type, p).toBe('integer');
+    }
   });
   it('문자열 입력 필드에 maxLength 1024 (최종 리뷰 I-1)', () => {
     const ctxProps = schemas['GenerateRequest']!.properties!['context']!.properties!;
@@ -71,7 +76,7 @@ describe('계약 시험 — example 요청의 응답 키 집합이 스키마와 
     expect(keys(ok)).toEqual(required('ValidateResponse').sort());
   });
   it('/events', async () => {
-    const body = await json((await req(app, '/v1/events', jsonPost(exampleOf('/events')))).res);
+    const body = await json((await req(app, '/v1/events', beaconPost(exampleOf('/events')))).res);
     expect(keys(body)).toEqual(props('EventResponse'));
   });
   it('400 응답은 ErrorResponse 에 맞는다 (supported 있는 것과 없는 것)', async () => {

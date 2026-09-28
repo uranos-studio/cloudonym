@@ -66,7 +66,7 @@ Response of `/v1/validate` (violation messages are in Korean):
 { "valid": false, "violations": ["허용 형식(^[a-z0-9]{3,24}$)에 맞지 않는다"], "suggested_name": "stpaymentsprd" }
 ```
 
-A malformed request returns `400` with `{ "success": false, "errors": [...] }` (plus `supported` when a provider or resource type is unknown). Bodies over 16 KB return `413`.
+A malformed request returns `400` with `{ "success": false, "errors": [...] }` (plus `supported` when a provider or resource type is unknown). Bodies over 16 KB return `413`. Each client IP may send 60 requests per 60 seconds (POST `/v1/*` and GET `/llms.txt` together); over that you get `429` with `Retry-After: 60`.
 
 ## AI-agent integration
 
@@ -189,7 +189,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
   -d '{"provider":"azure","resource_type":"storage_account","name":"St-Payments-Prd"}'
 ```
 
-`providers` 는 생략할 수 있다(기본은 셋 다). 요청이 잘못되면 `400` 과 `{ "success": false, "errors": [...] }`, 본문이 16KB 를 넘으면 `413` 이다.
+`providers` 는 생략할 수 있다(기본은 셋 다). 요청이 잘못되면 `400` 과 `{ "success": false, "errors": [...] }`, 본문이 16KB 를 넘으면 `413` 이다. 클라이언트 IP 하나가 60초에 60건(POST `/v1/*` 와 GET `/llms.txt` 합산)을 넘으면 `429` 와 `Retry-After: 60` 을 받는다.
 
 ### AI 에이전트 연동
 

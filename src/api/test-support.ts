@@ -47,3 +47,21 @@ export function fakeKv(mode: 'ok' | 'throw' | 'hang' = 'ok'): { kv: KVNamespace;
   };
   return { kv: kv as unknown as KVNamespace, store };
 }
+
+/** 화면 비콘과 같은 요청 — 브라우저가 붙이는 Sec-Fetch-Site: same-origin 을 싣는다. /v1/events 는 이 헤더가 없으면 403 이다 (보안 리뷰 M-2) */
+export function beaconPost(body: unknown, headers: Record<string, string> = {}): RequestInit {
+  return { method: 'POST', headers: { 'content-type': 'text/plain;charset=UTF-8', 'sec-fetch-site': 'same-origin', ...headers }, body: JSON.stringify(body) };
+}
+
+/** 가짜 Rate Limiting 바인딩 — mode: ok(통과) · deny(초과) · throw(limit 이 던진다). 받은 key 를 모은다 */
+export function fakeLimiter(mode: 'ok' | 'deny' | 'throw' = 'ok'): { limiter: RateLimit; keys: string[] } {
+  const keys: string[] = [];
+  const limiter = {
+    limit: ({ key }: { key: string }): Promise<{ success: boolean }> => {
+      keys.push(key);
+      if (mode === 'throw') return Promise.reject(new Error('limiter 실패'));
+      return Promise.resolve({ success: mode === 'ok' });
+    },
+  };
+  return { limiter: limiter as unknown as RateLimit, keys };
+}

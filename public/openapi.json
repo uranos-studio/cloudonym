@@ -38,6 +38,11 @@
           "413": {
             "description": "Request body is larger than 16 KB",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
+            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       }
@@ -68,6 +73,11 @@
           "413": {
             "description": "Request body is larger than 16 KB",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
+            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
       }
@@ -75,7 +85,7 @@
     "/events": {
       "post": {
         "summary": "Web UI usage beacon",
-        "description": "Counts a UI event. No context values are accepted or stored. Intended for the Cloudonym web page, not for agents.",
+        "description": "Counts a UI event. No context values are accepted or stored. Only for the Cloudonym web page: requests without Sec-Fetch-Site: same-origin are rejected with 403, and there is no CORS.",
         "operationId": "recordEvent",
         "requestBody": {
           "required": true,
@@ -95,8 +105,17 @@
             "description": "Unknown event, or event is longer than 1024 characters",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           },
+          "403": {
+            "description": "Not sent by the Cloudonym web page: Sec-Fetch-Site is missing or not same-origin. This endpoint accepts only the page's own beacons and sends no CORS headers",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
           "413": {
             "description": "Request body is larger than 16 KB",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
+            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }

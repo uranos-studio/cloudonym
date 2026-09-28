@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, json } from './test-support';
+import { req, jsonPost, beaconPost, json } from './test-support';
 
 // 2단계 최종 리뷰 I-1 (본문 · 필드 상한) · I-2 (500 도 ErrorResponse 꼴)
 const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
@@ -18,7 +18,7 @@ describe('본문 16KB 상한 (I-1) — 413 · ErrorResponse 꼴', () => {
     expect(await json(res)).toEqual({ success: false, errors: ['본문이 16KB 를 넘는다'] });
   });
   it('20KB 본문 (content-length 없음 · 스트림을 읽다가 넘음) → 역시 413 — 400 「JSON 아님」으로 나뉘지 않는다', async () => {
-    const { res } = await req(app, '/v1/events', jsonPost({ event: 'ui_visit', pad: 'x'.repeat(20 * 1024) }));
+    const { res } = await req(app, '/v1/events', beaconPost({ event: 'ui_visit', pad: 'x'.repeat(20 * 1024) }));
     expect(res.status).toBe(413);
     expect(await json(res)).toEqual({ success: false, errors: ['본문이 16KB 를 넘는다'] });
   });
@@ -66,7 +66,7 @@ describe('필드 1024자 상한 (I-1) — 본문 상한과 별개로 400', () =>
     expect(p).toEqual({ success: false, errors: ['provider: 1024자를 넘는다'] });
     const r = await json((await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: long, name: 'x' }))).res);
     expect(r).toEqual({ success: false, errors: ['resource_type: 1024자를 넘는다'] });
-    const e = await json((await req(app, '/v1/events', jsonPost({ event: long }))).res);
+    const e = await json((await req(app, '/v1/events', beaconPost({ event: long }))).res);
     expect(e).toEqual({ success: false, errors: ['event: 1024자를 넘는다'] });
   });
 });
