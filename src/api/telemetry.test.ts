@@ -163,3 +163,15 @@ describe('logTelemetry', () => {
     expect(store.get('stats:api_generate:2026-09-29')).toBe('1');
   });
 });
+
+describe('Axiom 에 싣는 User-Agent (보안 리뷰 L-4)', () => {
+  it('256자로 자르고 제어 문자를 지운다 — 판정(is_ai_agent)도 자른 값으로 한다', async () => {
+    const { fetchFn, calls } = fakeFetch();
+    const ua = `Claude\n\r\u0000${'x'.repeat(1000)}`;
+    await logTelemetry(source({ AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }, ua), 'api_generate', {}, { now: NOW, fetchFn });
+    const sent = JSON.parse(calls[0]!.init.body)[0];
+    expect(sent.user_agent).toHaveLength(256);
+    expect(sent.user_agent).toMatch(/^Claudex+$/);
+    expect(sent.is_ai_agent).toBe(true);
+  });
+});

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { decodeState, encodeState, shareUrl } from './urlState';
+import { decodeState, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } from './urlState';
+import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import type { NamingContext } from '../core/types';
 
 const ctx: NamingContext = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
@@ -56,5 +57,21 @@ describe('shareUrl', () => {
     const url = shareUrl(ctx, 'http://localhost:5173/');
     expect(url.startsWith('http://localhost:5173/#state=')).toBe(true);
     expect(decodeState(new URL(url).hash)).toEqual(ctx);
+  });
+});
+
+describe('decodeState 길이 상한 (보안 리뷰 L-5)', () => {
+  it('필드 상한은 API 와 같은 1024 · hash 전체 상한은 4096', () => {
+    expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS);
+    expect(MAX_HASH_CHARS).toBe(4096);
+  });
+  it('필드 하나가 1024자를 넘으면 undefined(기본값) · 딱 1024자는 받는다', () => {
+    expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1025) })}`)).toBeUndefined();
+    expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1024) })}`)?.owner).toBe('a'.repeat(1024));
+  });
+  it('hash 가 4096자를 넘으면 디코딩하지 않고 undefined', () => {
+    const big = `#state=${encodeState(ctx)}${'A'.repeat(4096)}`;
+    expect(big.length).toBeGreaterThan(MAX_HASH_CHARS);
+    expect(decodeState(big)).toBeUndefined();
   });
 });

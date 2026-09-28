@@ -67,4 +67,13 @@ describe('hclString', () => {
   ])('%j → %s', (input, expected) => {
     expect(hclString(input)).toBe(expected);
   });
+  it('제어 · 양방향 · 폭 없는 문자는 \\uXXXX 로 적는다 — 보이는 것과 다른 순서로 렌더되지 않는다 (보안 리뷰 L-5)', () => {
+    expect(hclString('a\u202Eb')).toBe('"a\\u202Eb"');
+    expect(hclString('\u2066x\u2069')).toBe('"\\u2066x\\u2069"');
+    expect(hclString('a\u200Bb\uFEFF')).toBe('"a\\u200Bb\\uFEFF"');
+    expect(hclString('a\tb\u0000\u007F\u0085')).toBe('"a\\u0009b\\u0000\\u007F\\u0085"');
+    expect(hclString('\u061C\u2028')).toBe('"\\u061C\\u2028"');
+    // 역슬래시 이스케이프 뒤에 바꾸므로 넣은 \\u 가 다시 두 겹이 되지 않는다 · 한글은 그대로
+    expect(hclString('\\\u202E개발')).toBe('"\\\\\\u202E개발"');
+  });
 });

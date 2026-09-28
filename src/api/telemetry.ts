@@ -11,6 +11,15 @@ export type FormatParts = (d: Date) => Intl.DateTimeFormatPart[];
 /** 시험이 시계 · fetch · 시각 포매터를 주입하는 자리 — 운영 코드는 넘기지 않는다 */
 export interface TelemetryDeps { now?: Date; fetchFn?: FetchLike; formatParts?: FormatParts }
 
+/** Axiom 에 싣는 UA 상한 — 수 KB 짜리 UA 로 수집량을 부풀리지 못하게 (보안 리뷰 L-4) */
+export const MAX_USER_AGENT_CHARS = 256;
+// oxlint-disable-next-line no-control-regex -- 제어 문자를 찾는 것이 이 정규식의 목적이다
+const CONTROL_CHARS = /[\u0000-\u001F\u007F]/g;
+/** 제어 문자를 지우고 256자로 자른다. 없으면 'unknown' */
+export function cleanUserAgent(raw: string | undefined): string {
+  return (raw ?? 'unknown').replace(CONTROL_CHARS, '').slice(0, MAX_USER_AGENT_CHARS);
+}
+
 /** ① 의 UA 정규식 그대로 (D17) */
 export const AI_AGENT_UA = /Cursor|Windsurf|Claude|GPTBot|Copilot/i;
 export function isAiAgent(userAgent: string): boolean {
@@ -86,7 +95,7 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
   try {
     const now = deps.now ?? new Date();
     const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
-    const userAgent = c.req.header('user-agent') ?? 'unknown';
+    const userAgent = cleanUserAgent(c.req.header('user-agent'));
     const ai = isAiAgent(userAgent);
     const { day, time } = kstStamp(now, deps.formatParts);
     const { CLOUDONYM_KV: kv, AXIOM_API_KEY: apiKey, AXIOM_DATASET: dataset } = c.env;

@@ -3,6 +3,10 @@ import { parseContext } from '../core/engine';
 import type { NamingContext, RawContext } from '../core/types';
 
 export const HASH_KEY = 'state';
+/** 필드 하나의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다 (보안 리뷰 L-5) */
+export const MAX_FIELD_CHARS = 1024;
+/** hash 전체 상한 — 정상 공유 URL 은 수백 자다. 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게) */
+export const MAX_HASH_CHARS = 4096;
 
 function toBase64Url(bytes: Uint8Array): string {
   let bin = '';
@@ -27,8 +31,9 @@ export function encodeState(ctx: NamingContext): string {
   return toBase64Url(new TextEncoder().encode(json));
 }
 
-/** `#state=…` · `state=…` 를 받는다. 디코딩 · JSON · 모양 · parseContext 중 하나라도 실패하면 undefined */
+/** `#state=…` · `state=…` 를 받는다. 길이 상한 · 디코딩 · JSON · 모양 · parseContext 중 하나라도 실패하면 undefined */
 export function decodeState(hash: string): NamingContext | undefined {
+  if (hash.length > MAX_HASH_CHARS) return undefined;
   const m = new RegExp(`^#?${HASH_KEY}=(.*)$`).exec(hash);
   if (!m) return undefined;
   const bytes = fromBase64Url(m[1] ?? '');
@@ -40,6 +45,7 @@ export function decodeState(hash: string): NamingContext | undefined {
     return undefined;
   }
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
+  if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   const parsed = parseContext(raw as RawContext);
   return parsed.ok ? parsed.context : undefined;
 }
