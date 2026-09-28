@@ -135,3 +135,34 @@ describe('Worker 응답 보안 헤더 (보안 리뷰 L-2) — secureHeaders', ()
     expect(res.headers.get('Access-Control-Allow-Methods')).toBe('GET,POST,OPTIONS');
   });
 });
+
+describe('정적 UI 보안 헤더 (보안 리뷰 L-1) — public/_headers', () => {
+  const text = readFileSync(join(import.meta.dirname, '../../public/_headers'), 'utf-8');
+  /** 규칙 이름(/* 등) → 헤더 줄들 */
+  const rules = new Map<string, string[]>();
+  let current = '';
+  for (const line of text.split('\n')) {
+    if (line.startsWith('#') || line.trim() === '') continue;
+    if (!line.startsWith(' ')) { current = line.trim(); rules.set(current, []); continue; }
+    rules.get(current)!.push(line.trim());
+  }
+  const all = rules.get('/*') ?? [];
+  const header = (name: string) => all.find((l) => l.toLowerCase().startsWith(`${name.toLowerCase()}:`))?.slice(name.length + 1).trim();
+  it('/* 에 CSP(self 만 · frame-ancestors none · object-src none) · nosniff · DENY · Referrer-Policy', () => {
+    const csp = header('Content-Security-Policy') ?? '';
+    for (const d of ["default-src 'self'", "script-src 'self'", "style-src 'self'", "connect-src 'self'", "object-src 'none'", "base-uri 'none'", "frame-ancestors 'none'"]) expect(csp, d).toContain(d);
+    expect(csp).not.toMatch(/unsafe-inline|unsafe-eval|\*/);
+    expect(header('X-Content-Type-Options')).toBe('nosniff');
+    expect(header('X-Frame-Options')).toBe('DENY');
+    expect(header('Referrer-Policy')).toBe('strict-origin-when-cross-origin');
+  });
+  it('Permissions-Policy 가 클립보드 쓰기를 막지 않는다 — 복사 버튼이 화면 기능이다', () => {
+    expect(header('Permissions-Policy')).not.toMatch(/clipboard/);
+  });
+  it('/openapi.json 의 CORS 는 그대로 · index.html 에 인라인 스크립트 · 스타일이 없다(CSP self 가 성립하는 전제)', () => {
+    expect(rules.get('/openapi.json')).toEqual(['Access-Control-Allow-Origin: *']);
+    const html = readFileSync(join(import.meta.dirname, '../../index.html'), 'utf-8');
+    expect(html).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/);
+    expect(html).not.toMatch(/<style\b|\sstyle=/);
+  });
+});
