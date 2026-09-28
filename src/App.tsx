@@ -63,6 +63,28 @@ function App() {
     scheduleGenerate();
   }, [stateKey, scheduleGenerate]);
 
+  // 같은 탭에서 공유 URL 로 이동(주소창에 붙여 Enter) — 브라우저는 hash 만 바꾸고 다시 불러오지 않는다
+  // 온전한 hash 면 폼을 그것으로 바꾼다. 사용자가 만든 문맥이 아니므로 lastSentKey 를 먼저 맞춰 ui_generate 를 세지 않는다(첫 로드 복원과 같은 규칙)
+  // 깨진 hash 면 화면은 그대로 두고 주소창을 지금 상태로 되돌린다 — 깨진 값이 다시 공유되지 않게. replaceState 는 hashchange 를 내지 않는다
+  const currentKey = useRef(stateKey);
+  useEffect(() => {
+    currentKey.current = stateKey;
+  }, [stateKey]);
+  useEffect(() => {
+    const onHashChange = () => {
+      const decoded = decodeState(window.location.hash);
+      if (decoded) {
+        lastSentKey.current = encodeState(decoded);
+        setForm(decoded);
+        return;
+      }
+      const key = currentKey.current;
+      window.history.replaceState(null, '', key ? `#state=${key}` : window.location.pathname + window.location.search);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   const visible: Provider[] = tab === 'all' ? [...PROVIDERS] : [tab];
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
