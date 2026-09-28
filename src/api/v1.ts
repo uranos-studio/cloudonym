@@ -2,10 +2,10 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import type { App } from './env';
-import { generate } from '../core/engine';
+import { generate, validateName } from '../core/engine';
 import { labelsFor } from '../core/labels';
-import { parseGenerateBody } from './schemas';
-import { toWireGenerate, type ProviderResult } from './serialize';
+import { parseGenerateBody, parseValidateBody } from './schemas';
+import { toWireGenerate, toWireValidate, type ProviderResult } from './serialize';
 
 export const v1 = new Hono<App>();
 v1.use('*', cors({ origin: '*', allowMethods: ['GET', 'POST', 'OPTIONS'] }));
@@ -31,4 +31,14 @@ v1.post('/generate', async (c) => {
   const out = generate(context, providers);
   const results: ProviderResult[] = providers.map((p) => ({ provider: p, names: out[p] ?? {}, labels: labelsFor(context, p) }));
   return c.json(toWireGenerate(results, transformed));
+});
+
+v1.post('/validate', async (c) => {
+  const read = await readJson(c);
+  if (!read.ok) return c.json(NOT_JSON, 400);
+  const parsed = parseValidateBody(read.body);
+  if (!parsed.ok) return c.json(parsed.body, 400);
+  const { provider, resourceType, name } = parsed.value;
+  const result = validateName(provider, resourceType, name);
+  return c.json(toWireValidate(result));
 });
