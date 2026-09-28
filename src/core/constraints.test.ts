@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL } from './constraints';
+import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL } from './constraints';
 import { PROVIDERS } from './types';
 
 describe('RULES 표 무결성', () => {
@@ -65,6 +65,12 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
   });
   it('AKS Linux 노드풀 예약 이름 aksmanagedap 을 막는다', () => {
     expect(RULES['azure.aks_nodepool_linux'].forbidden?.exact).toContain('aksmanagedap');
+  });
+  it('codex P1: Windows VM 의 숫자만 금지는 Windows ComputerName 문서가 근거이고 note 에 그 URL 이 실린다', () => {
+    expect(WINDOWS_COMPUTER_NAME_DOC_URL).toMatch(/^https:\/\/learn\.microsoft\.com\/en-us\/windows-hardware\/.*computername$/);
+    expect(RULES['azure.virtual_machine_windows'].note).toContain(WINDOWS_COMPUTER_NAME_DOC_URL);
+    expect(RULES['azure.virtual_machine_windows'].pattern.test('12345')).toBe(false);
+    expect(RULES['azure.virtual_machine'].note ?? '').not.toContain(WINDOWS_COMPUTER_NAME_DOC_URL);
   });
   it('리소스 그룹 pattern 은 십진 숫자(Nd)만 받는다', () => {
     const p = RULES['azure.resource_group'].pattern;

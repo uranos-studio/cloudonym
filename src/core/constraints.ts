@@ -14,6 +14,10 @@ const RFC1035 = /^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$/;
 const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
 const AWS_NAME_TAG_NOTE = '태그 값 — UTF-16 길이로 잰다 (D20)';
 const AZURE_VM_NOTE = '호스트명 규칙 · ARM 이 허용하는 다른 기호는 거부될 수 있다 (D20)';
+/** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다 (codex P1).
+ *  Azure 이름 규칙 쪽(#microsoftcompute)에는 이 문장이 없어 Windows VM 규칙의 두 번째 근거로 note 에 싣는다 */
+export const WINDOWS_COMPUTER_NAME_DOC_URL = 'https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-computername';
+const AZURE_VM_WINDOWS_NOTE = `${AZURE_VM_NOTE} · 숫자로만 된 이름은 쓸 수 없다 (${WINDOWS_COMPUTER_NAME_DOC_URL})`;
 
 export const RULES: Record<string, ResourceRule> = {
   // ─── GCP ───────────────────────────────────────────────
@@ -181,11 +185,11 @@ export const RULES: Record<string, ResourceRule> = {
   'azure.virtual_machine_windows': {
     id: 'azure.virtual_machine_windows', provider: 'azure', resourceType: 'virtual_machine_windows',
     displayName: 'Virtual Machine (Windows)', slug: 'vm', minLength: 1, maxLength: 15,
-    // Windows 호스트명은 점 불가
-    pattern: /^[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    // Windows 호스트명은 점 불가 · 숫자로만 된 이름 불가(앞보기 · WINDOWS_COMPUTER_NAME_DOC_URL)
+    pattern: /^(?![0-9]+$)[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: AZURE_VM_NOTE,
+    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: AZURE_VM_WINDOWS_NOTE,
   },
   'azure.virtual_network': {
     id: 'azure.virtual_network', provider: 'azure', resourceType: 'virtual_network',

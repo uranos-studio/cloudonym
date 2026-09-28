@@ -48,6 +48,13 @@ describe('checkName', () => {
     expect(checkName('rg_(1)', rg)).toEqual([]);
   });
   it('한 글자 이름을 허용하는 규칙(Azure SQL)은 a 가 유효', () => expect(checkName('a', sql)).toEqual([]));
+  it('codex P1: Windows VM 은 숫자로만 된 이름이 pattern 위반 · Linux VM 은 유효', () => {
+    const win = getRule('azure', 'virtual_machine_windows')!;
+    const linux = getRule('azure', 'virtual_machine')!;
+    expect(checkName('12345', win)).toEqual([expect.stringContaining('허용 형식(')]);
+    expect(checkName('vm12345', win)).toEqual([]);
+    expect(checkName('12345', linux)).toEqual([]);
+  });
 
   // ─── 원장 판정 M2 · forbidden 전 필드 ───
   it('S3 새 접미사 -an 은 위반', () => expect(checkName('x-an', s3)).toEqual(['금지 접미사 「-an」']));

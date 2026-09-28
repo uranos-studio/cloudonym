@@ -111,4 +111,18 @@ describe('1단계 최종 리뷰 고침', () => {
       expect(validateName('azure', t, 'vm-web-01').valid, `${t} vm-web-01`).toBe(true);
     }
   });
+  it('codex P1: Windows VM 은 숫자로만 된 이름(12345)을 거부한다 — Linux VM 은 문서 근거가 없어 그대로 받는다', () => {
+    expect(validateName('azure', 'virtual_machine_windows', '12345').valid).toBe(false);
+    expect(validateName('azure', 'virtual_machine_windows', '1').valid).toBe(false);
+    expect(validateName('azure', 'virtual_machine_windows', '123456789012345').valid).toBe(false);
+    expect(validateName('azure', 'virtual_machine_windows', '1234a').valid).toBe(true);
+    expect(validateName('azure', 'virtual_machine_windows', '12-34').valid).toBe(true);
+    expect(validateName('azure', 'virtual_machine', '12345').valid).toBe(true);
+  });
+  it('codex P1: 숫자만 넣어도 generate 의 Windows VM 이름은 숫자만으로 되지 않는다 (slug vm 이 늘 든다)', () => {
+    const w = generate({ owner: '1', system: '12', purpose: '34', env: 'prd', region: 'kr' }, ['azure']).azure!.virtual_machine_windows;
+    expect(w.valid).toBe(true);
+    expect(w.name).not.toMatch(/^\d+$/);
+    expect(validateName('azure', 'virtual_machine_windows', w.name).valid).toBe(true);
+  });
 });
