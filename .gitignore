@@ -33,3 +33,9 @@ dist-ssr
 # 에이전트 작업 상태 (커밋하지 않는다)
 .omc/
 .superpowers/
+
+# Terraform 예제 — 잠금 파일(.terraform.lock.hcl)은 커밋한다
+examples/terraform/.terraform/
+examples/terraform/*.tfvars
+examples/terraform/*.tfstate
+examples/terraform/*.tfstate.*
