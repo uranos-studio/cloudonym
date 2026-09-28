@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* 다크 모드는 prefers-color-scheme (Tailwind v4 기본 dark: 변형). 폼 컨트롤 · 스크롤바도 따라오게 color-scheme 을 준다 */
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+  }
+}
