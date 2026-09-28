@@ -4,7 +4,9 @@ import { describe, it, expect } from 'vitest';
 // node:fs 는 tsconfig.app.json(브라우저 타입 · node 없음)이 거부하므로 Vite 의 ?raw 글롭으로 소스를 읽는다
 const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
-const IMPORT = /^\s*import\s+(?:type\s+)?(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/gm;
+// import/export 의 from '...' · 부수효과 import '...' · 동적 import('...') · require('...') — src/core/boundary.test.ts 와 같은 검사식
+const STATIC_RE = /(?:import|export)(?:[^'"]*from)?\s+['"]([^'"]+)['"]/g;
+const CALL_RE = /\b(?:import|require)\s*\(\s*['"]([^'"]+)['"]/g;
 const ALLOWED = [
   /^react$/,
   /^lucide-react$/,
@@ -14,7 +16,9 @@ const ALLOWED = [
 const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict)/;
 
 function specifiers(src: string): string[] {
-  return [...src.matchAll(IMPORT)].map((m) => m[1] ?? '');
+  const out: string[] = [];
+  for (const re of [STATIC_RE, CALL_RE]) for (const m of src.matchAll(re)) out.push(m[1] ?? '');
+  return out;
 }
 
 describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모듈을 들여오지 않는다', () => {
@@ -30,6 +34,10 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
     expect(specs).toEqual(['../core/truncate', '../core/constraints', 'hono']);
     expect(specs.filter((s) => ALLOWED.some((re) => re.test(s)))).toEqual([]);
     expect(specs.filter((s) => INTERNAL.test(s))).toHaveLength(2);
+    // 우회 꼴 — 재수출 · 동적 import · 부수효과 import 도 잡는다 (core 경계 시험과 같은 검사식 · 3단계 최종 리뷰 이월 minor)
+    const sneaky = "export { fit } from '../core/truncate';\nexport * from '../core/validate';\nconst m = await import('../core/constraints');\nimport '../core/dict';";
+    expect(specifiers(sneaky)).toEqual(['../core/truncate', '../core/validate', '../core/dict', '../core/constraints']);
+    expect(specifiers(sneaky).filter((s) => INTERNAL.test(s))).toHaveLength(4);
     const ok = "import { useState } from 'react';\nimport type { NameResult } from '../core/types';\nimport { generate } from './core/engine';\nimport { ResultCard } from './components/ResultCard';\nimport { Copy } from 'lucide-react';";
     expect(specifiers(ok).every((s) => ALLOWED.some((re) => re.test(s)))).toBe(true);
   });
