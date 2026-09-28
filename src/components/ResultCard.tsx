@@ -1,6 +1,7 @@
 // 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
 import { CopyButton } from './CopyButton';
+import { visibleSteps } from './steps';
 import type { NameResult } from '../core/types';
 
 const CARD =
@@ -9,7 +10,7 @@ const CARD =
 
 export function ResultCard({ result: r }: { result: NameResult }) {
   const id = `card-${r.ruleId.replace('.', '-')}`;
-  const stepsText = r.steps.join(' · ');
+  const stepsText = visibleSteps(r.steps).join(' · ');
   // aria-invalid 는 폼 위젯 역할에만 허용된다 — 카드는 data-valid 로 상태를 들고 PASS/FAIL 글자가 뜻을 전한다
   return (
     <article data-rule={r.ruleId} data-valid={r.valid} aria-labelledby={`${id}-title`} className={CARD}>
