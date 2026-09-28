@@ -1,0 +1,41 @@
+import { describe, it, expect } from 'vitest';
+import { normalizeToken, canonicalEnv, canonicalRegion } from './normalize';
+
+describe('normalizeToken', () => {
+  it('TC-AWS-01 대문자 → 소문자, 경계 하이픈 제거', () => {
+    expect(normalizeToken('Billing-Trade-PRD-', 'lower-digit-hyphen')).toEqual({ value: 'billing-trade-prd', changed: true });
+  });
+  it('TC-COM-01 연속 하이픈 → 하나', () => {
+    expect(normalizeToken('billing--trade', 'lower-digit-hyphen').value).toBe('billing-trade');
+  });
+  it('TC-AZ-01 lower-digit 는 하이픈 · 언더스코어를 지운다', () => {
+    expect(normalizeToken('st-web_prod', 'lower-digit')).toEqual({ value: 'stwebprod', changed: true });
+  });
+  it('공백 · 유니코드는 지우고, 빈 결과는 빈 문자열로 돌려준다', () => {
+    expect(normalizeToken(' 매매 ', 'lower-digit-hyphen').value).toBe('');
+    expect(normalizeToken('a b', 'lower-digit-hyphen').value).toBe('a-b');
+  });
+  it('바뀐 것이 없으면 changed:false', () => {
+    expect(normalizeToken('trade', 'lower-digit-hyphen')).toEqual({ value: 'trade', changed: false });
+  });
+  it('alnum 계열은 대소문자를 유지한다', () => {
+    expect(normalizeToken('Web-App', 'alnum-hyphen').value).toBe('Web-App');
+  });
+});
+
+describe('canonicalEnv (TC-COM-02)', () => {
+  it.each([['production', 'prd'], ['prod', 'prd'], ['real', 'prd'], ['PRD', 'prd'], ['staging', 'stg'], ['sandbox', 'sbx']])('%s → %s', (i, o) => {
+    expect(canonicalEnv(i)).toBe(o);
+  });
+  it('모르는 값 · 상속 프로퍼티는 undefined', () => {
+    expect(canonicalEnv('qa')).toBeUndefined();
+    expect(canonicalEnv('constructor')).toBeUndefined();
+  });
+});
+
+describe('canonicalRegion', () => {
+  it.each([['korea', 'kr'], ['koreacentral', 'kr'], ['asia-northeast3', 'kr'], ['us-east-1', 'us'], ['GLOBAL', 'global']])('%s → %s', (i, o) => {
+    expect(canonicalRegion(i)).toBe(o);
+  });
+  it('상속 프로퍼티는 undefined', () => expect(canonicalRegion('__proto__')).toBeUndefined());
+});
