@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cloudonym API",
+    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "/v1", "description": "Same host as this document (Cloudflare Worker)" }
+  ],
+  "paths": {
+    "/generate": {
+      "post": {
+        "summary": "Generate cloud resource names",
+        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated.",
+        "operationId": "generateNames",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenerateRequest" },
+              "example": {
+                "context": { "owner": "acmex", "system": "billing", "purpose": "trade", "env": "prd", "region": "kr" },
+                "providers": ["gcp", "azure"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated names and labels",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenerateResponse" } } }
+          },
+          "400": {
+            "description": "Body is not JSON, context is invalid, or providers is not a non-empty array of supported providers",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/validate": {
+      "post": {
+        "summary": "Validate an existing resource name",
+        "description": "Checks a name against the provider's physical constraints (length, pattern, documented reserved words). When the name is invalid and a fix is possible, suggested_name is included.",
+        "operationId": "validateName",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ValidateRequest" },
+              "example": { "provider": "gcp", "resource_type": "service_account", "name": "acmex-billing-trade-prd-kr-sa-sync" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidateResponse" } } }
+          },
+          "400": {
+            "description": "Unknown provider or resource_type (supported lists the accepted values), or name is not a string",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/events": {
+      "post": {
+        "summary": "Web UI usage beacon",
+        "description": "Counts a UI event. No context values are accepted or stored. Intended for the Cloudonym web page, not for agents.",
+        "operationId": "recordEvent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EventRequest" },
+              "example": { "event": "ui_visit" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event accepted",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventResponse" } } }
+          },
+          "400": {
+            "description": "Unknown event",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GenerateRequest": {
+        "type": "object",
+        "required": ["context"],
+        "properties": {
+          "context": {
+            "type": "object",
+            "required": ["owner", "system", "purpose", "env", "region"],
+            "properties": {
+              "owner": { "type": "string", "example": "acmex" },
+              "system": { "type": "string", "example": "billing" },
+              "purpose": { "type": "string", "example": "trade" },
+              "env": {
+                "type": "string",
+                "description": "Canonical: prd, stg, dev, sbx. Common aliases are accepted and normalised (production, prod, live -> prd; staging -> stg; development -> dev; sandbox -> sbx).",
+                "example": "prd"
+              },
+              "region": {
+                "type": "string",
+                "description": "Canonical: kr, us, jp, eu, global. Provider region codes are accepted and normalised (asia-northeast3, ap-northeast-2, koreacentral -> kr; us-east-1, us-central1, eastus -> us; ap-northeast-1, asia-northeast1, japaneast -> jp; eu-west-1, europe-west1, westeurope -> eu).",
+                "example": "kr"
+              }
+            }
+          },
+          "providers": {
+            "type": "array",
+            "description": "Omit for all three. Must be non-empty when present.",
+            "items": { "type": "string", "enum": ["aws", "gcp", "azure"] },
+            "example": ["gcp", "aws", "azure"]
+          }
+        }
+      },
+      "GenerateResponse": {
+        "type": "object",
+        "required": ["success", "data", "metadata"],
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "data": {
+            "type": "object",
+            "description": "provider -> resource_type -> ResourceItem. The provider set equals the requested providers.",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/components/schemas/ResourceItem" }
+            }
+          },
+          "metadata": { "$ref": "#/components/schemas/GenerateMetadata" }
+        }
+      },
+      "GenerateMetadata": {
+        "type": "object",
+        "required": ["generated_labels", "label_violations", "label_transformed", "transformed"],
+        "properties": {
+          "generated_labels": {
+            "type": "object",
+            "description": "provider -> standard tags/labels (owner, system, purpose, environment, managed_by)",
+            "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } }
+          },
+          "label_violations": {
+            "type": "object",
+            "description": "provider -> label values over the provider's limit (values are never truncated)",
+            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+          },
+          "label_transformed": {
+            "type": "object",
+            "description": "provider -> label values changed to fit the provider's character rules (GCP)",
+            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+          },
+          "transformed": {
+            "type": "array",
+            "description": "Context values normalised from aliases, e.g. 'env: production->prd'",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "ResourceItem": {
+        "type": "object",
+        "required": ["name", "valid", "is_truncated", "is_transformed", "original", "violations", "reason", "rule"],
+        "properties": {
+          "name": { "type": "string", "description": "Final name. Empty when a required token became empty after normalisation.", "example": "billing-trade-prd-sa-sync" },
+          "valid": { "type": "boolean", "example": true },
+          "is_truncated": { "type": "boolean", "description": "Optional tokens were dropped or tokens were shortened to fit", "example": true },
+          "is_transformed": { "type": "boolean", "description": "Characters were changed by normalisation or separators were removed", "example": false },
+          "original": { "type": "string", "description": "Name assembled before normalisation and shortening", "example": "acmex-billing-trade-prd-kr-sa-sync" },
+          "violations": { "type": "array", "items": { "type": "string" }, "description": "Why the name is invalid (empty when valid)" },
+          "reason": { "type": "string", "description": "Shortening and transformation steps joined with ' · ' (empty when none)", "example": "region 생략 · owner 생략" },
+          "rule": { "$ref": "#/components/schemas/RuleInfo" }
+        }
+      },
+      "RuleInfo": {
+        "type": "object",
+        "required": ["min_length", "max_length", "pattern", "pattern_flags", "allowed", "doc_url"],
+        "properties": {
+          "min_length": { "type": "integer", "example": 6 },
+          "max_length": { "type": "integer", "example": 30 },
+          "pattern": { "type": "string", "description": "Provider's physical rule (regular expression source). Rebuild with new RegExp(pattern, pattern_flags).", "example": "^[a-z][a-z0-9-]{4,28}[a-z0-9]$" },
+          "pattern_flags": { "type": "string", "description": "RegExp flags for pattern ('u' for Unicode classes, else empty)", "example": "" },
+          "allowed": { "type": "string", "description": "Character set Cloudonym uses when generating (house style)", "example": "lower-digit-hyphen" },
+          "doc_url": { "type": "string", "description": "Official document the numbers come from" },
+          "note": { "type": "string", "description": "Present when the limit is deliberately conservative" }
+        }
+      },
+      "ValidateRequest": {
+        "type": "object",
+        "required": ["provider", "resource_type", "name"],
+        "properties": {
+          "provider": { "type": "string", "enum": ["aws", "gcp", "azure"], "example": "gcp" },
+          "resource_type": { "type": "string", "description": "One of the provider's resource types; an unknown value returns 400 with the supported list", "example": "service_account" },
+          "name": { "type": "string", "example": "acmex-billing-trade-prd-kr-sa-sync" }
+        }
+      },
+      "ValidateResponse": {
+        "type": "object",
+        "required": ["valid", "violations"],
+        "properties": {
+          "valid": { "type": "boolean", "example": false },
+          "violations": { "type": "array", "items": { "type": "string" }, "example": ["길이 34자 — 최대 30자"] },
+          "suggested_name": { "type": "string", "description": "Present only when the name is invalid and a fix is possible", "example": "billing-trade-prd-kr-sa-sync" }
+        }
+      },
+      "EventRequest": {
+        "type": "object",
+        "required": ["event"],
+        "properties": {
+          "event": { "type": "string", "enum": ["ui_visit", "ui_generate", "ui_copy"], "example": "ui_visit" }
+        }
+      },
+      "EventResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": { "ok": { "type": "boolean", "example": true } }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["success", "errors"],
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "errors": { "type": "array", "items": { "type": "string" }, "example": ["env: qa 는 지원하지 않는다 (prd·stg·dev·sbx)"] },
+          "supported": { "type": "array", "items": { "type": "string" }, "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown" }
+        }
+      }
+    }
+  }
+}

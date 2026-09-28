@@ -9,8 +9,8 @@
 	"compatibility_date": "2026-09-25",
 	"assets": {
 		"not_found_handling": "single-page-application",
-		// /v1/* 는 탐색 요청이어도 Worker(Hono)가 먼저 받는다
-		"run_worker_first": ["/v1/*"]
+		// /v1/* 와 /llms.txt 는 탐색 요청이어도 Worker(Hono)가 먼저 받는다
+		"run_worker_first": ["/v1/*", "/llms.txt"]
 	},
 	"observability": {
 		"enabled": true
