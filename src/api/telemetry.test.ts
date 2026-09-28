@@ -123,6 +123,39 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
+  it('meta 가 _time · kst_day · event 를 덮어쓰지 못한다 — 서버 값이 이긴다 (이월 6)', async () => {
+    const { fetchFn, calls } = fakeFetch();
+    await logTelemetry(source({ AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }), 'api_validate', { _time: 'x', kst_day: 'x', event: 'x', is_ai_agent: true, provider: 'gcp' }, { now: NOW, fetchFn });
+    const [row] = JSON.parse(calls[0]!.init.body) as Record<string, unknown>[];
+    expect(row).toMatchObject({ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'api_validate', is_ai_agent: false, provider: 'gcp' });
+  });
+  it('formatToParts 에 부분이 빠지면 실패로 친다 — console.error 뒤 KV · Axiom 을 건너뛴다 (「--T::」 를 보내지 않는다 · 이월 7)', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { kv, store } = fakeKv();
+      const { fetchFn, calls } = fakeFetch();
+      await expect(logTelemetry(source({ CLOUDONYM_KV: kv, AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }), 'x', {}, { now: NOW, fetchFn, formatParts: () => [] })).resolves.toBeUndefined();
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(store.size).toBe(0);
+      expect(calls).toHaveLength(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+  it('어떤 오류도 밖으로 내지 않는다 — 잘못된 시각(RangeError)도 resolve (최종 리뷰 M-3)', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { kv, store } = fakeKv();
+      await expect(logTelemetry(source({ CLOUDONYM_KV: kv }), 'x', {}, { now: new Date(Number.NaN) })).resolves.toBeUndefined();
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(store.size).toBe(0);
+      const throwing: TelemetrySource = { env: {}, req: { header: () => { throw new Error('header'); } } };
+      await expect(logTelemetry(throwing, 'x', {}, { now: NOW })).resolves.toBeUndefined();
+      expect(spy).toHaveBeenCalledTimes(2);
+    } finally {
+      spy.mockRestore();
+    }
+  });
   it('KV 값이 깨졌으면(숫자가 아니면) 0 에서 다시 센다 — NaN 을 저장하지 않는다 (L-2)', async () => {
     const { kv, store } = fakeKv();
     store.set('stats:api_generate:2026-09-29', 'abc');

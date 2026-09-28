@@ -6,8 +6,10 @@ export interface TelemetrySource { env: Bindings; req: { header: (name: string) 
 /** fetch 응답에서 쓰는 부분만 — 전역 Response 가 이것을 만족한다. fetch 는 HTTP 오류에 reject 하지 않으므로 ok · status 를 직접 본다 (challenge M-2) */
 export interface FetchResponseLike { ok: boolean; status: number; text: () => Promise<string> }
 export type FetchLike = (url: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<FetchResponseLike>;
-/** 시험이 시계와 fetch 를 주입하는 자리 — 운영 코드는 넘기지 않는다 */
-export interface TelemetryDeps { now?: Date; fetchFn?: FetchLike }
+/** formatToParts 꼴 — 시험이 부분이 빠진 결과를 주입한다 */
+export type FormatParts = (d: Date) => Intl.DateTimeFormatPart[];
+/** 시험이 시계 · fetch · 시각 포매터를 주입하는 자리 — 운영 코드는 넘기지 않는다 */
+export interface TelemetryDeps { now?: Date; fetchFn?: FetchLike; formatParts?: FormatParts }
 
 /** ① 의 UA 정규식 그대로 (D17) */
 export const AI_AGENT_UA = /Cursor|Windsurf|Claude|GPTBot|Copilot/i;
@@ -19,10 +21,15 @@ const KST = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
 });
 
-/** KST 일자 키와 +09:00 타임스탬프 — formatToParts 의 부분값으로 조립한다 (format() 의 구분 문자는 ICU 버전마다 다를 수 있다) */
-export function kstStamp(now: Date): { day: string; time: string } {
-  const parts = KST.formatToParts(now);
-  const get = (type: Intl.DateTimeFormatPartTypes): string => parts.find((p) => p.type === type)?.value ?? '';
+/** KST 일자 키와 +09:00 타임스탬프 — formatToParts 의 부분값으로 조립한다 (format() 의 구분 문자는 ICU 버전마다 다를 수 있다).
+ *  부분이 하나라도 없으면 던진다 — 빈값으로 「--T::」 를 만들어 보내지 않는다. 잘못된 시각은 formatToParts 가 RangeError 를 던진다 */
+export function kstStamp(now: Date, formatParts: FormatParts = (d) => KST.formatToParts(d)): { day: string; time: string } {
+  const parts = formatParts(now);
+  const get = (type: Intl.DateTimeFormatPartTypes): string => {
+    const value = parts.find((p) => p.type === type)?.value;
+    if (!value) throw new Error(`KST 시각에 ${type} 부분이 없다`);
+    return value;
+  };
   const day = `${get('year')}-${get('month')}-${get('day')}`;
   return { day, time: `${day}T${get('hour')}:${get('minute')}:${get('second')}+09:00` };
 }
@@ -75,19 +82,25 @@ async function sendAxiom(fetchFn: FetchLike, apiKey: string, dataset: string, pa
 }
 
 export async function logTelemetry(c: TelemetrySource, event: string, meta: Record<string, unknown> = {}, deps: TelemetryDeps = {}): Promise<void> {
-  const now = deps.now ?? new Date();
-  const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
-  const userAgent = c.req.header('user-agent') ?? 'unknown';
-  const ai = isAiAgent(userAgent);
-  const { day, time } = kstStamp(now);
-  const { CLOUDONYM_KV: kv, AXIOM_API_KEY: apiKey, AXIOM_DATASET: dataset } = c.env;
+  // 몸통 전체를 try 로 감싼다 — waitUntil 로 넘긴 Promise 가 reject 하지 않는다 (최종 리뷰 M-3)
+  try {
+    const now = deps.now ?? new Date();
+    const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
+    const userAgent = c.req.header('user-agent') ?? 'unknown';
+    const ai = isAiAgent(userAgent);
+    const { day, time } = kstStamp(now, deps.formatParts);
+    const { CLOUDONYM_KV: kv, AXIOM_API_KEY: apiKey, AXIOM_DATASET: dataset } = c.env;
 
-  // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다 (challenge L-3). 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
-  const parts: Promise<void>[] = [];
-  if (kv) parts.push(countKv(kv, event, day, ai));
-  if (apiKey && dataset) {
-    // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다 (challenge M-3)
-    parts.push(sendAxiom(fetchFn, apiKey, dataset, [{ _time: time, kst_day: day, event, user_agent: userAgent, is_ai_agent: ai, ...meta }]));
+    // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다 (challenge L-3). 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
+    const parts: Promise<void>[] = [];
+    if (kv) parts.push(countKv(kv, event, day, ai));
+    if (apiKey && dataset) {
+      // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다 (challenge M-3).
+      // meta 를 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · user_agent · is_ai_agent)을 meta 가 덮어쓰지 못한다
+      parts.push(sendAxiom(fetchFn, apiKey, dataset, [{ ...meta, _time: time, kst_day: day, event, user_agent: userAgent, is_ai_agent: ai }]));
+    }
+    await Promise.allSettled(parts);
+  } catch (e) {
+    console.error('텔레메트리 실패:', e);
   }
-  await Promise.allSettled(parts);
 }
