@@ -5,7 +5,7 @@ import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 
 // openapi.json 을 읽는 데 필요한 만큼만 타입을 둔다
-interface Schema { type?: string; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema; $ref?: string }
+interface Schema { type?: string; maxLength?: number; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema; $ref?: string }
 interface Operation { requestBody: { content: Record<string, { example: unknown; schema: Schema }> }; responses: Record<string, unknown> }
 interface Spec { openapi: string; servers: { url: string }[]; paths: Record<string, { post: Operation }>; components: { schemas: Record<string, Schema> } }
 
@@ -33,9 +33,15 @@ describe('public/openapi.json — 형식', () => {
     expect(ctx['region']!.enum).toBeUndefined();
     expect(JSON.stringify(spec)).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
   });
-  it('세 경로가 있고 각각 200 · 400 응답을 정의한다', () => {
+  it('세 경로가 있고 각각 200 · 400 · 413 응답을 정의한다 (413 = 본문 16KB 초과 · 최종 리뷰 I-1)', () => {
     expect(keys(spec.paths)).toEqual(['/events', '/generate', '/validate']);
-    for (const p of keys(spec.paths)) expect(keys(spec.paths[p]!.post.responses), p).toEqual(['200', '400']);
+    for (const p of keys(spec.paths)) expect(keys(spec.paths[p]!.post.responses), p).toEqual(['200', '400', '413']);
+  });
+  it('문자열 입력 필드에 maxLength 1024 (최종 리뷰 I-1)', () => {
+    const ctxProps = schemas['GenerateRequest']!.properties!['context']!.properties!;
+    for (const f of ['owner', 'system', 'purpose', 'env', 'region']) expect(ctxProps[f]!.maxLength, f).toBe(1024);
+    for (const f of ['provider', 'resource_type', 'name']) expect(schemas['ValidateRequest']!.properties![f]!.maxLength, f).toBe(1024);
+    expect(schemas['EventRequest']!.properties!['event']!.maxLength).toBe(1024);
   });
 });
 
@@ -75,6 +81,14 @@ describe('계약 시험 — example 요청의 응답 키 집합이 스키마와 
     const withSupported = await json((await req(app, '/v1/validate', jsonPost({ provider: 'oci', resource_type: 'x', name: 'y' }))).res);
     fits(withSupported, 'ErrorResponse');
     expect(keys(withSupported)).toEqual(props('ErrorResponse'));
+  });
+  it('413 응답도 ErrorResponse 에 맞는다', async () => {
+    const big = { context: { owner: 'a'.repeat(20 * 1024), system: 'b', purpose: 'c', env: 'prd', region: 'kr' } };
+    const { res } = await req(app, '/v1/generate', jsonPost(big));
+    expect(res.status).toBe(413);
+    const body = await json(res);
+    fits(body, 'ErrorResponse');
+    expect(keys(body)).toEqual(['errors', 'success']);
   });
 });
 

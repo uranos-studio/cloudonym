@@ -32,7 +32,11 @@
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenerateResponse" } } }
           },
           "400": {
-            "description": "Body is not JSON, context is invalid, or providers is not a non-empty array of supported providers",
+            "description": "Body is not JSON, context is invalid (including a value longer than 1024 characters), or providers is not a non-empty array of supported providers",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "413": {
+            "description": "Request body is larger than 16 KB",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
@@ -58,7 +62,11 @@
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidateResponse" } } }
           },
           "400": {
-            "description": "Unknown provider or resource_type (supported lists the accepted values), or name is not a string",
+            "description": "Unknown provider or resource_type (supported lists the accepted values), name is not a string, or a field is longer than 1024 characters",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "413": {
+            "description": "Request body is larger than 16 KB",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
@@ -84,7 +92,11 @@
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventResponse" } } }
           },
           "400": {
-            "description": "Unknown event",
+            "description": "Unknown event, or event is longer than 1024 characters",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "413": {
+            "description": "Request body is larger than 16 KB",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
           }
         }
@@ -101,16 +113,18 @@
             "type": "object",
             "required": ["owner", "system", "purpose", "env", "region"],
             "properties": {
-              "owner": { "type": "string", "example": "acmex" },
-              "system": { "type": "string", "example": "billing" },
-              "purpose": { "type": "string", "example": "trade" },
+              "owner": { "type": "string", "maxLength": 1024, "example": "acmex" },
+              "system": { "type": "string", "maxLength": 1024, "example": "billing" },
+              "purpose": { "type": "string", "maxLength": 1024, "example": "trade" },
               "env": {
                 "type": "string",
+                "maxLength": 1024,
                 "description": "Canonical: prd, stg, dev, sbx. Common aliases are accepted and normalised (production, prod, live -> prd; staging -> stg; development -> dev; sandbox -> sbx).",
                 "example": "prd"
               },
               "region": {
                 "type": "string",
+                "maxLength": 1024,
                 "description": "Canonical: kr, us, jp, eu, global. Provider region codes are accepted and normalised (asia-northeast3, ap-northeast-2, koreacentral -> kr; us-east-1, us-central1, eastus -> us; ap-northeast-1, asia-northeast1, japaneast -> jp; eu-west-1, europe-west1, westeurope -> eu).",
                 "example": "kr"
               }
@@ -197,9 +211,9 @@
         "type": "object",
         "required": ["provider", "resource_type", "name"],
         "properties": {
-          "provider": { "type": "string", "enum": ["aws", "gcp", "azure"], "example": "gcp" },
-          "resource_type": { "type": "string", "description": "One of the provider's resource types; an unknown value returns 400 with the supported list", "example": "service_account" },
-          "name": { "type": "string", "example": "acmex-billing-trade-prd-kr-sa-sync" }
+          "provider": { "type": "string", "maxLength": 1024, "enum": ["aws", "gcp", "azure"], "example": "gcp" },
+          "resource_type": { "type": "string", "maxLength": 1024, "description": "One of the provider's resource types; an unknown value returns 400 with the supported list", "example": "service_account" },
+          "name": { "type": "string", "maxLength": 1024, "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).", "example": "acmex-billing-trade-prd-kr-sa-sync" }
         }
       },
       "ValidateResponse": {
@@ -215,7 +229,7 @@
         "type": "object",
         "required": ["event"],
         "properties": {
-          "event": { "type": "string", "enum": ["ui_visit", "ui_generate", "ui_copy"], "example": "ui_visit" }
+          "event": { "type": "string", "maxLength": 1024, "enum": ["ui_visit", "ui_generate", "ui_copy"], "example": "ui_visit" }
         }
       },
       "EventResponse": {

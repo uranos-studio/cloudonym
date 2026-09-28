@@ -29,7 +29,9 @@ function constraintLine(rule: ResourceRule): string {
         ...(f.ipv4 ? ['no IPv4 form'] : []),
       ].join('; ')
     : '';
-  const bits = [`${rule.minLength}-${rule.maxLength} chars`, `pattern \`${rule.pattern.source}\``];
+  // 플래그가 있으면 같이 적는다 — \p{L} · \u{…} 는 u 없이는 다른 뜻이 된다 (최종 리뷰 I-3)
+  const flags = rule.pattern.flags ? ` (flags: ${rule.pattern.flags})` : '';
+  const bits = [`${rule.minLength}-${rule.maxLength} chars`, `pattern \`${rule.pattern.source}\`${flags}`];
   if (rule.noConsecutiveSeparator) bits.push('no consecutive separators');
   if (forbidden) bits.push(`forbidden: ${forbidden}`);
   if (rule.note) bits.push(`note: ${rule.note}`);

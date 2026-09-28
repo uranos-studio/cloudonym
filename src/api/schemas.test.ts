@@ -52,3 +52,26 @@ describe('parseEventBody', () => {
     expect(parseEventBody(null)).toMatchObject({ ok: false });
   });
 });
+
+describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400 (최종 리뷰 I-2)', () => {
+  const evil = { toString: 1 };
+  it('provider · resource_type 자리 → ok:false', () => {
+    const p = parseValidateBody({ provider: evil, resource_type: 'x', name: 'y' });
+    expect(p).toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: {"toString":1}'], supported: ['aws', 'gcp', 'azure'] } });
+    const r = parseValidateBody({ provider: 'aws', resource_type: evil, name: 'y' });
+    expect(r).toMatchObject({ ok: false, body: { success: false, errors: ['지원하지 않는 resource_type: {"toString":1}'] } });
+  });
+  it('providers 원소 자리 → ok:false', () => {
+    expect(parseGenerateBody({ context: ctx, providers: ['gcp', evil] }))
+      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: {"toString":1}'], supported: ['aws', 'gcp', 'azure'] } });
+  });
+  it('event 자리 → ok:false', () => {
+    expect(parseEventBody({ event: evil }))
+      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 event: {"toString":1}'], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
+  });
+  it('오류 문구에 넣는 값은 80자까지 — 긴 배열 원소를 되돌려 주지 않는다', () => {
+    const r = parseGenerateBody({ context: ctx, providers: ['x'.repeat(500)] });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.body.errors[0]!.length).toBeLessThanOrEqual('지원하지 않는 provider: '.length + 81);
+  });
+});
