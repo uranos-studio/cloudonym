@@ -172,7 +172,8 @@ export const RULES: Record<string, ResourceRule> = {
   'azure.virtual_machine': {
     id: 'azure.virtual_machine', provider: 'azure', resourceType: 'virtual_machine',
     displayName: 'Virtual Machine (Linux)', slug: 'vm', minLength: 1, maxLength: 64,
-    pattern: /^[A-Za-z0-9]([A-Za-z0-9.-]{0,62}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    // 문서가 모순(금지 문자에 `.` · Linux 는 「끝에만」 점 불가)이라 점을 전부 거부한다 (보수적 · D20)
+    pattern: /^[A-Za-z0-9]([A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
     scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: AZURE_VM_NOTE,

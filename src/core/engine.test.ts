@@ -105,4 +105,10 @@ describe('1단계 최종 리뷰 고침', () => {
     expect(validateName('azure', 'resource_group', '개발').valid).toBe(true);
     expect(validateName('azure', 'resource_group', 'rg-개발-1').valid).toBe(true);
   });
+  it('m-1: Azure VM(Linux · Windows)은 이름 어디에서도 점을 거부한다 — 문서 모순이라 보수적으로', () => {
+    for (const t of ['virtual_machine', 'virtual_machine_windows']) {
+      expect(validateName('azure', t, 'a.b').valid, `${t} a.b`).toBe(false);
+      expect(validateName('azure', t, 'vm-web-01').valid, `${t} vm-web-01`).toBe(true);
+    }
+  });
 });
