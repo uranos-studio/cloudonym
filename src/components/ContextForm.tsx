@@ -24,9 +24,9 @@ const REGIONS: ReadonlyArray<{ value: Region; label: string }> = [
 const LABEL = 'block text-sm font-medium text-zinc-800 dark:text-zinc-200';
 const HINT = 'ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400';
 const CONTROL =
-  'mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 ' +
+  'mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-500 ' +
   'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600 ' +
-  'aria-invalid:border-rose-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus-visible:outline-indigo-400';
+  'aria-invalid:border-rose-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-400 dark:focus-visible:outline-indigo-400';
 
 interface Props {
   value: NamingContext;
@@ -74,7 +74,8 @@ export function ContextForm({ value, errors, onChange }: Props) {
           </div>
         );
       })}
-      <div className="grid grid-cols-2 gap-3">
+      {/* 옆 열(22rem)과 360px 에서 둘을 나란히 두면 「prd — Production」이 잘린다 — 넓은 한 열(sm~lg)에서만 나란히 */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div>
           <label htmlFor="field-env" className={LABEL}>Environment</label>
           {/* 옵션은 정본 값만 — select 값은 항상 Env 다 */}
