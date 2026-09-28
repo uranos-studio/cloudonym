@@ -27,11 +27,17 @@ terraform {
 
 variable "cloudonym_api_url" {
   type        = string
-  description = "Base URL of a Cloudonym deployment, without a trailing slash and without /v1 (for example the URL printed by `npm run dev`, or your own workers.dev / custom domain). There is no default: set it in terraform.tfvars or with -var."
+  description = "Base URL of a Cloudonym deployment, without a trailing slash and without /v1 (your own workers.dev / custom domain over https://, or for local development the http://localhost:PORT URL printed by `npm run dev`). There is no default: set it in terraform.tfvars or with -var."
 
+  # https:// only, except plain http:// to localhost / 127.0.0.1 for local development.
+  # Over plain http an on-path attacker could rewrite the response and put a name or label of their choosing on the resource.
+  # The host is anchored (optional :port, then / or end) so http://localhost.example.com does not pass.
   validation {
-    condition     = can(regex("^https?://[^/]+(/.*[^/])?$", var.cloudonym_api_url))
-    error_message = "cloudonym_api_url must start with http:// or https:// and must not end with a slash."
+    condition = (
+      can(regex("^https://[^/]+(/.*[^/])?$", var.cloudonym_api_url)) ||
+      can(regex("^http://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?(/.*[^/])?$", var.cloudonym_api_url))
+    )
+    error_message = "cloudonym_api_url must start with https:// (plain http:// is allowed only for localhost or 127.0.0.1) and must not end with a slash."
   }
 }
 
