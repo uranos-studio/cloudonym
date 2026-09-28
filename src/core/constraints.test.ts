@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RULES, rulesFor, getRule, LABEL_LIMITS } from './constraints';
+import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL } from './constraints';
 import { PROVIDERS } from './types';
 
 describe('RULES 표 무결성', () => {
@@ -52,6 +52,10 @@ describe('LABEL_LIMITS', () => {
       expect(l.value).toBeGreaterThan(0);
       expect(l.docUrl).toMatch(/^https:\/\//);
     }
+  });
+  it('AWS 태그 값 문자 규칙의 docUrl 은 태그 한도와 같은 쪽의 #tag-conventions 다', () => {
+    expect(AWS_TAG_VALUE_DOC_URL).toBe(LABEL_LIMITS.aws.docUrl);
+    expect(AWS_TAG_VALUE_DOC_URL).toMatch(/^https:\/\/docs\.aws\.amazon\.com\/.*#tag-conventions$/);
   });
 });
 
