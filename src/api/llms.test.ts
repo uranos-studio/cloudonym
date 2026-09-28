@@ -55,6 +55,16 @@ describe('GET /llms.txt — Worker 라우트 (D17)', () => {
     expect(res.headers.get('cache-control')).toBe('public, max-age=86400');
     expect(res.headers.get('content-type')).toMatch(/^text\/plain/i);
   });
+  it('HEAD /llms.txt 는 llms_txt_accessed 를 세지 않는다 — 헤더는 GET 과 같다', async () => {
+    const { kv, store } = fakeKv();
+    const { res, promises } = await req(app, '/llms.txt', { method: 'HEAD' }, { CLOUDONYM_KV: kv });
+    const { res: getRes } = await req(app, '/llms.txt');
+    expect(promises).toHaveLength(0);
+    expect(store.size).toBe(0);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toBe(getRes.headers.get('content-type'));
+    expect(res.headers.get('cache-control')).toBe(getRes.headers.get('cache-control'));
+  });
   it('wrangler.jsonc run_worker_first 에 /llms.txt 가 있다', () => {
     const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
     expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/llms\.txt"/);

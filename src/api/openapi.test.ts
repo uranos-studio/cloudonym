@@ -77,3 +77,11 @@ describe('계약 시험 — example 요청의 응답 키 집합이 스키마와 
     expect(keys(withSupported)).toEqual(props('ErrorResponse'));
   });
 });
+
+describe('public/_headers — 정적 /openapi.json 에 CORS (Workers Static Assets _headers)', () => {
+  it('/openapi.json 규칙 아래 들여쓴 Access-Control-Allow-Origin: * 가 있다', () => {
+    const raw = readFileSync(join(import.meta.dirname, '../../public/_headers'), 'utf-8');
+    // 형식: URL 줄 다음에 들여쓴 「이름: 값」 줄 (https://developers.cloudflare.com/workers/static-assets/headers/)
+    expect(raw).toMatch(/^\/openapi\.json\n[ \t]+Access-Control-Allow-Origin: \*$/m);
+  });
+});

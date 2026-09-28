@@ -1,0 +1,4 @@
+# Workers Static Assets 헤더 — Worker 가 만든 응답(/v1/* · /llms.txt)에는 적용되지 않는다
+# https://developers.cloudflare.com/workers/static-assets/headers/
+/openapi.json
+  Access-Control-Allow-Origin: *

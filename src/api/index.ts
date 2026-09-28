@@ -13,7 +13,8 @@ export const app = new Hono<App>();
 
 // Worker 라우트로 서빙한다 (D17) — 카운터와 Cache-Control 을 코드에서 건다
 app.get('/llms.txt', (c) => {
-  c.executionCtx.waitUntil(logTelemetry(c, 'llms_txt_accessed'));
+  // Hono 는 HEAD 를 GET 핸들러로 보낸다 — HEAD(curl -I · 헬스 검사)는 읽은 것이 아니므로 세지 않는다. 헤더는 GET 과 같다
+  if (c.req.method !== 'HEAD') c.executionCtx.waitUntil(logTelemetry(c, 'llms_txt_accessed'));
   return c.text(LLMS_TEXT, 200, { 'Cache-Control': 'public, max-age=86400' });
 });
 
