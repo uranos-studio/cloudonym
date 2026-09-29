@@ -26,7 +26,9 @@ function constraintLine(rule: ResourceRule): string {
         ...(f.suffixes ? [`suffixes ${f.suffixes.join(' ')}`] : []),
         ...(f.contains ? [`contains ${f.contains.join(' ')}`] : []),
         ...(f.exact ? [`exact ${f.exact.join(' ')}`] : []),
+        ...(f.words ? [`words ${f.words.join(' ')} (as a word: not next to a letter)`] : []),
         ...(f.ipv4 ? ['no IPv4 form'] : []),
+        ...(f.ignoreCase ? ['case-insensitive'] : []),
       ].join('; ')
     : '';
   // 플래그가 있으면 같이 적는다 — \p{L} · \u{…} 는 u 없이는 다른 뜻이 된다 (최종 리뷰 I-3)

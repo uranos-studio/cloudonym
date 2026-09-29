@@ -125,4 +125,14 @@ describe('1단계 최종 리뷰 고침', () => {
     expect(w.name).not.toMatch(/^\d+$/);
     expect(validateName('azure', 'virtual_machine_windows', w.name).valid).toBe(true);
   });
+  it('Azure 예약어: system 이 windows 면 Storage Account 는 이름을 바꾸지 않고 valid:false', () => {
+    const st = generate({ ...ctx, system: 'windows' }, ['azure']).azure!.storage_account;
+    expect(st).toMatchObject({ valid: false, name: 'stwindowstradeprd', violations: ['금지 문자열 「windows」 포함'] });
+  });
+  it('Azure 예약어: /v1/validate 경로 — microsoft123 Storage Account 는 무효', () => {
+    const r = validateName('azure', 'storage_account', 'microsoft123');
+    expect(r.valid).toBe(false);
+    expect(r.suggestedName ?? '').not.toMatch(/microsoft/);
+    expect(validateName('azure', 'storage_account', 'stbilling01').valid).toBe(true);
+  });
 });

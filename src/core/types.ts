@@ -27,6 +27,8 @@ export interface Forbidden {
   suffixes?: string[];
   contains?: string[];      // 어디에든 있으면 안 된다
   exact?: string[];         // 이 이름 자체가 금지
+  words?: string[];         // 단어로 쓰면 안 된다 — 이름 안에서 앞뒤가 영문 글자가 아닌 자리(이름 끝 포함)에 있으면 위반
+  ignoreCase?: boolean;     // 위 목록 전부를 대소문자 없이 본다 (목록은 소문자로 적는다)
   ipv4?: boolean;           // 192.168.0.1 꼴 금지 (S3 · GCS)
 }
 
@@ -48,7 +50,7 @@ export interface ResourceRule {
   endsWithAlnum: boolean;
   template: Token[];          // 조립 순서 — 예: ['system','purpose','env','slug','role']
   optional: Token[];          // 축소 1단계에서 적힌 순서대로 떼는 토큰. template 에 있는 것만
-  scope: 'global' | 'account' | 'region' | 'project' | 'zone' | 'subscription' | 'resource_group';
+  scope: 'global' | 'account' | 'region' | 'project' | 'zone' | 'subscription' | 'resource_group' | 'virtual_network' | 'managed_cluster';
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
   note?: string;              // 보수적 한도 등 설명 (D20)
 }

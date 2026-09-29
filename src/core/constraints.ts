@@ -1,7 +1,7 @@
 // CSP 리소스 이름 규칙 표 (D9 · D14 · D18 · D19 · D20)
 // 값은 Task 1-2 에서 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
 // pattern · forbidden · 길이 = CSP 물리 규칙(검증), allowed = 우리가 생성할 때 쓰는 문자 집합.
-import type { Provider, ResourceRule } from './types';
+import type { Forbidden, Provider, ResourceRule } from './types';
 import { lookup } from './dict';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
@@ -17,6 +17,25 @@ const AZURE_VM_NOTE = '호스트명 규칙 · ARM 이 허용하는 다른 기호
 /** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다 (codex P1).
  *  Azure 이름 규칙 쪽(#microsoftcompute)에는 이 문장이 없어 Windows VM 규칙의 두 번째 근거로 note 에 싣는다 */
 export const WINDOWS_COMPUTER_NAME_DOC_URL = 'https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-computername';
+/** Azure 예약어 · 상표 — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words".
+ *  ① 목록 38개는 단어로 금지 ② MICROSOFT · WINDOWS 는 부분 문자열로도 금지 ③ LOGIN 은 앞에서만 금지.
+ *  「단어」의 정의가 문서에 없어 보수적으로 읽는다 — 앞뒤가 영문 글자가 아니면(숫자 · 기호 · 이름 끝) 단어로 본다.
+ *  그래서 azure123 · kv-azure-prd 는 위반, myazurestore 는 통과다. 대소문자는 가리지 않는다 (docs/decisions.md 2026-09-29) */
+export const AZURE_RESERVED_DOC_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name';
+const AZURE_RESERVED: Forbidden = {
+  words: [
+    'access', 'app_code', 'app_themes', 'app_data', 'app_globalresources', 'app_localresources', 'app_webreferences', 'app_browsers',
+    'azure', 'bing', 'bizspark', 'biztalk', 'cortana', 'directx', 'dotnet', 'dynamics', 'excel', 'exchange', 'forefront', 'groove',
+    'hololens', 'hyperv', 'kinect', 'lync', 'msdn', 'o365', 'office', 'office365', 'onedrive', 'onenote', 'outlook', 'powerpoint',
+    'sharepoint', 'skype', 'visio', 'visualstudio', 'web.config', 'xbox',
+  ],
+  contains: ['microsoft', 'windows'],
+  prefixes: ['login'],
+  ignoreCase: true,
+};
+const AZURE_RESERVED_NOTE = `예약어 · 상표 금지 (${AZURE_RESERVED_DOC_URL})`;
+/** VM · AKS 노드풀은 리소스 자체에 공개 엔드포인트가 없어 문서가 걸리는지 모호하다 — 보수적으로 건다 (D20) */
+const AZURE_RESERVED_AMBIGUOUS_NOTE = `예약어 · 상표 금지 — 공개 엔드포인트가 없어 적용 여부가 모호해 보수적으로 건다 (${AZURE_RESERVED_DOC_URL} · D20)`;
 const AZURE_VM_WINDOWS_NOTE = `${AZURE_VM_NOTE} · 숫자로만 된 이름은 쓸 수 없다 (${WINDOWS_COMPUTER_NAME_DOC_URL})`;
 
 export const RULES: Record<string, ResourceRule> = {
@@ -152,18 +171,18 @@ export const RULES: Record<string, ResourceRule> = {
     id: 'azure.storage_account', provider: 'azure', resourceType: 'storage_account',
     displayName: 'Storage Account', slug: 'st', minLength: 3, maxLength: 24,
     pattern: /^[a-z0-9]{3,24}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
-    startsWithLetter: false, endsWithAlnum: true,
+    startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftstorage`,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftstorage`, note: AZURE_RESERVED_NOTE,
   },
   'azure.key_vault': {
     id: 'azure.key_vault', provider: 'azure', resourceType: 'key_vault',
     displayName: 'Key Vault', slug: 'kv', minLength: 3, maxLength: 24,
     pattern: /^[a-zA-Z][a-zA-Z0-9-]{1,22}[a-zA-Z0-9]$/, noConsecutiveSeparator: true,
     allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
-    startsWithLetter: true, endsWithAlnum: true,
+    startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftkeyvault`,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftkeyvault`, note: AZURE_RESERVED_NOTE,
   },
   'azure.managed_identity': {
     id: 'azure.managed_identity', provider: 'azure', resourceType: 'managed_identity',
@@ -178,18 +197,18 @@ export const RULES: Record<string, ResourceRule> = {
     displayName: 'Virtual Machine (Linux)', slug: 'vm', minLength: 1, maxLength: 64,
     // 문서가 모순(금지 문자에 `.` · Linux 는 「끝에만」 점 불가)이라 점을 전부 거부한다 (보수적 · D20)
     pattern: /^[A-Za-z0-9]([A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
-    startsWithLetter: false, endsWithAlnum: true,
+    startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: AZURE_VM_NOTE,
+    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: `${AZURE_VM_NOTE} · ${AZURE_RESERVED_AMBIGUOUS_NOTE}`,
   },
   'azure.virtual_machine_windows': {
     id: 'azure.virtual_machine_windows', provider: 'azure', resourceType: 'virtual_machine_windows',
     displayName: 'Virtual Machine (Windows)', slug: 'vm', minLength: 1, maxLength: 15,
     // Windows 호스트명은 점 불가 · 숫자로만 된 이름 불가(앞보기 · WINDOWS_COMPUTER_NAME_DOC_URL)
     pattern: /^(?![0-9]+$)[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
-    startsWithLetter: false, endsWithAlnum: true,
+    startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: AZURE_VM_WINDOWS_NOTE,
+    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: `${AZURE_VM_WINDOWS_NOTE} · ${AZURE_RESERVED_AMBIGUOUS_NOTE}`,
   },
   'azure.virtual_network': {
     id: 'azure.virtual_network', provider: 'azure', resourceType: 'virtual_network',
@@ -205,32 +224,32 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-zA-Z0-9]([\w.-]{0,78}[a-zA-Z0-9_])?$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftnetwork`,
+    scope: 'virtual_network', docUrl: `${AZURE_RULES}#microsoftnetwork`,
   },
   'azure.sql_server': {
     id: 'azure.sql_server', provider: 'azure', resourceType: 'sql_server',
     displayName: 'SQL Server', slug: 'sql', minLength: 1, maxLength: 63,
     pattern: /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
-    startsWithLetter: false, endsWithAlnum: true,
+    startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftsql`,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftsql`, note: AZURE_RESERVED_NOTE,
   },
   'azure.aks_nodepool_linux': {
     id: 'azure.aks_nodepool_linux', provider: 'azure', resourceType: 'aks_nodepool_linux',
     displayName: 'AKS Node Pool (Linux)', slug: 'np', minLength: 1, maxLength: 12,
     pattern: /^[a-z][a-z0-9]{0,11}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
-    forbidden: { exact: ['aksmanagedap'] }, // FAQ: AKS 시스템 구성요소 예약 이름
+    forbidden: { ...AZURE_RESERVED, exact: ['aksmanagedap'] }, // FAQ: AKS 시스템 구성요소 예약 이름
     template: ['slug', 'purpose', 'env'], optional: [],
-    scope: 'resource_group', docUrl: AKS_FAQ,
+    scope: 'managed_cluster', docUrl: AKS_FAQ, note: AZURE_RESERVED_AMBIGUOUS_NOTE,
   },
   'azure.aks_nodepool_windows': {
     id: 'azure.aks_nodepool_windows', provider: 'azure', resourceType: 'aks_nodepool_windows',
     displayName: 'AKS Node Pool (Windows)', slug: 'np', minLength: 1, maxLength: 6,
     pattern: /^[a-z][a-z0-9]{0,5}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
-    startsWithLetter: true, endsWithAlnum: true,
+    startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'purpose'], optional: [],
-    scope: 'resource_group', docUrl: AKS_FAQ,
+    scope: 'managed_cluster', docUrl: AKS_FAQ, note: AZURE_RESERVED_AMBIGUOUS_NOTE,
   },
 };
 

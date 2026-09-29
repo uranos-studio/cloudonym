@@ -24,6 +24,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     for (const r of rules) expect(text, r.id).toContain(`docs: ${r.docUrl}`);
     expect(text).toContain('- `aws.s3_bucket` (S3 Bucket): 3-63 chars');
     expect(text).toContain('forbidden: prefixes xn-- sthree- amzn-s3-demo-');
+    const st = lines.find((l) => l.startsWith('- `azure.storage_account` ('))!;
+    expect(st).toMatch(/forbidden: prefixes login; contains microsoft windows; words access [^;]* azure /);
+    expect(st).toContain('case-insensitive');
   });
   it('허용값 절은 ENV_ALIASES · REGION_ALIASES 의 표준값과 별칭', () => {
     expect(text).toContain('- `prd` — aliases: prod, production, real, live');

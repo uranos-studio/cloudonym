@@ -56,6 +56,43 @@ describe('checkName', () => {
     expect(checkName('12345', linux)).toEqual([]);
   });
 
+  // ─── Azure 예약어 (AZURE_RESERVED_DOC_URL) ───
+  it('Azure 예약어: MICROSOFT · WINDOWS 는 이름 어디에 있어도 위반 (대소문자 무관)', () => {
+    expect(checkName('microsoft123', st)).toEqual(['금지 문자열 「microsoft」 포함']);
+    expect(checkName('stwindowsprd', st)).toEqual(['금지 문자열 「windows」 포함']);
+    expect(checkName('kv-MicroSoft-prd', kv)).toEqual(['금지 문자열 「microsoft」 포함']);
+  });
+  it('Azure 예약어: 단어(이름 전체 · 앞뒤가 영문이 아닌 조각)로 쓰면 위반', () => {
+    expect(checkName('azure', st)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('azure123', st)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('kv-Azure-prd', kv)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('sql-xbox', sql)).toEqual(['금지 단어 「xbox」']);
+    expect(checkName('o365', sql)).toEqual(['금지 단어 「o365」']);
+  });
+  it('Azure 예약어: 다른 단어 안에 든 예약어는 위반이 아니다 (단어만 금지)', () => {
+    expect(checkName('myazurestore', st)).toEqual([]);
+    expect(checkName('staccessprd', st)).toEqual([]);
+  });
+  it('Azure 예약어: LOGIN 은 앞에서만 위반', () => {
+    expect(checkName('loginprd', st)).toEqual(['금지 접두사 「login」']);
+    expect(checkName('LOGIN-kv', kv)).toEqual(['금지 접두사 「login」']);
+    expect(checkName('stloginprd', st)).toEqual([]);
+  });
+  it('Azure 예약어: 평범한 이름은 그대로 유효', () => {
+    expect(checkName('stbillingtradeprd', st)).toEqual([]);
+    expect(checkName('kv-billing-prd', kv)).toEqual([]);
+  });
+  it('Azure 예약어: 공개 엔드포인트가 없는 규칙(리소스 그룹)에는 걸지 않는다', () => {
+    expect(checkName('rg-azure-windows', rg)).toEqual([]);
+  });
+  it('Azure 예약어: VM · AKS 노드풀에도 건다 (보수적)', () => {
+    expect(checkName('windows01', getRule('azure', 'virtual_machine_windows')!)).toEqual(['금지 문자열 「windows」 포함']);
+    expect(checkName('vm-azure-01', getRule('azure', 'virtual_machine')!)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('azure', aksLinux)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('azure', getRule('azure', 'aks_nodepool_windows')!)).toEqual(['금지 단어 「azure」']);
+    expect(checkName('aksmanagedap', aksLinux)).toEqual(['금지 이름 「aksmanagedap」']);
+  });
+
   // ─── 원장 판정 M2 · forbidden 전 필드 ───
   it('S3 새 접미사 -an 은 위반', () => expect(checkName('x-an', s3)).toEqual(['금지 접미사 「-an」']));
   it('AKS Linux 노드풀 예약 이름 aksmanagedap 은 위반 (exact) — 그 이름을 포함할 뿐인 것은 아니다', () => {

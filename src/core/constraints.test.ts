@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL } from './constraints';
+import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL } from './constraints';
 import { PROVIDERS } from './types';
 
 describe('RULES 표 무결성', () => {
@@ -78,5 +78,33 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
     expect(p.test('rg-٣')).toBe(true); // U+0663 Nd
     expect(p.test('rg-²')).toBe(false); // U+00B2 No
     expect(p.test('rg-Ⅻ')).toBe(false); // U+216B Nl
+  });
+  it('Azure 예약어는 공개 엔드포인트가 있거나 모호한 규칙에만 걸리고 note 에 근거 URL 이 실린다', () => {
+    expect(AZURE_RESERVED_DOC_URL).toBe('https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name');
+    const on = ['storage_account', 'key_vault', 'sql_server', 'virtual_machine', 'virtual_machine_windows', 'aks_nodepool_linux', 'aks_nodepool_windows'];
+    for (const r of rulesFor('azure')) {
+      const has = (r.forbidden?.words ?? []).includes('azure');
+      expect(has, r.id).toBe(on.includes(r.resourceType));
+      if (has) {
+        expect(r.forbidden?.contains, r.id).toEqual(expect.arrayContaining(['microsoft', 'windows']));
+        expect(r.forbidden?.prefixes, r.id).toContain('login');
+        expect(r.forbidden?.ignoreCase, r.id).toBe(true);
+        expect(r.note, r.id).toContain(AZURE_RESERVED_DOC_URL);
+      }
+    }
+  });
+  it('ignoreCase 규칙의 금지 목록은 전부 소문자다 — validate 가 이름만 소문자로 바꾸므로', () => {
+    for (const r of Object.values(RULES)) {
+      const f = r.forbidden;
+      if (!f?.ignoreCase) continue;
+      for (const v of [...(f.prefixes ?? []), ...(f.suffixes ?? []), ...(f.contains ?? []), ...(f.exact ?? []), ...(f.words ?? [])]) {
+        expect(v, `${r.id} ${v}`).toBe(v.toLowerCase());
+      }
+    }
+  });
+  it('Azure 서브넷 scope 는 virtual_network · AKS 노드풀 scope 는 managed_cluster', () => {
+    expect(RULES['azure.subnet'].scope).toBe('virtual_network');
+    expect(RULES['azure.aks_nodepool_linux'].scope).toBe('managed_cluster');
+    expect(RULES['azure.aks_nodepool_windows'].scope).toBe('managed_cluster');
   });
 });
