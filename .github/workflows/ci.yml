@@ -33,3 +33,15 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+
+      # 규칙 버전 대조 (D26) — main 의 지문 파일과 비교해 revision 을 안 올린 규칙 변경 · 규칙 변경 없는 revision 을 막는다.
+      # checkout 은 얕은 clone 이라 main 을 따로 받는다. main 에 파일이 없으면(첫 도입) 통과한다
+      - name: rules revision
+        run: |
+          git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+          if git cat-file -e origin/main:src/core/rules-fingerprint.json 2>/dev/null; then
+            git show origin/main:src/core/rules-fingerprint.json > "${RUNNER_TEMP}/base-rules-fingerprint.json"
+            node scripts/check-rules-revision.mjs "${RUNNER_TEMP}/base-rules-fingerprint.json" src/core/rules-fingerprint.json
+          else
+            node scripts/check-rules-revision.mjs src/core/rules-fingerprint.json
+          fi
