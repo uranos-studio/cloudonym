@@ -112,11 +112,7 @@ describe('규칙 버전 · 지문 (D26)', () => {
     // 정규식 안의 // 와 템플릿 안의 /* 를 주석으로 읽어 뒤를 삼키지 않는다
     expect(normalizeSource('const a = /\\/\\//; const b = 1;')).toContain('b');
     expect(normalizeSource('const a = `/* ${x} */`; const b = 1;')).toContain('b');
-    // 실제 파일 — validate.ts 의 IPV4 정규식을 {2,3} 으로 바꾸면 지문이 바뀐다 (리뷰 M1 의 변이)
-    const validateSrc = readFileSync(join(import.meta.dirname, 'validate.ts'), 'utf-8');
-    const mutated = validateSrc.replace('(\\.\\d{1,3}){3}$/', '(\\.\\d{1,3}){2,3}$/');
-    expect(mutated).not.toBe(validateSrc);
-    expect(normalizeSource(mutated)).not.toBe(normalizeSource(validateSrc));
+    // 위 src 의 {3}→{2,3} 이 리뷰 M1 의 변이다 — 실제 validate.ts 글자에 묶지 않는다(정규식을 고치면 이 시험이 엉뚱하게 깨진다)
     expect(Object.keys(currentParts().sources)).toEqual(expect.arrayContaining(['validate.ts', 'engine.ts', 'constraints.ts', 'truncate.ts']));
     expect(Object.keys(currentParts().sources)).not.toContain('revision.ts');
   });
