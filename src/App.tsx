@@ -16,7 +16,7 @@ import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
 /** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다 */
-const DEFAULT_CONTEXT: NamingContext = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
 type Tab = 'all' | Provider;
 const TABS: ReadonlyArray<{ id: Tab; label: string }> = [

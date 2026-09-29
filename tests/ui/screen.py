@@ -26,7 +26,7 @@ BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
 
-# ⑴ 의 입력 — 기본값(acmex · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
+# ⑴ 의 입력 — 기본값(platform · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
 INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prd', 'region': 'kr'}
 SA = '[data-rule="gcp.service_account"]'
 # 같은 탭 공유 URL 이동(I-2)의 입력 — INPUT 과 다섯 값이 모두 다르다
@@ -219,7 +219,7 @@ with sync_playwright() as p:
         page3.on('pageerror', lambda e: errors.append(str(e)))
         goto_ready(page3, BASE + '/' + broken)
         expect(page3.locator('h1')).to_have_text('Cloudonym')
-        expect(page3.locator('#field-owner')).to_have_value('acmex')
+        expect(page3.locator('#field-owner')).to_have_value('platform')
         expect(page3.locator('[data-rule="gcp.service_account"] [data-name]')).to_have_text('billing-trade-prd-sa-sync')
         # 깨진 hash 는 기본 상태의 hash 로 바뀐다 — 다시 공유해도 깨진 값이 퍼지지 않는다
         assert page3.evaluate('location.hash').startswith('#state=eyJ'), page3.evaluate('location.hash')
