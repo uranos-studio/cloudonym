@@ -5,9 +5,11 @@ import { buildLlmsText, formulaOf } from './llms';
 import { RULES } from '../core/constraints';
 import { app } from './index';
 import { req, fakeKv } from './test-support';
+import { VERSION } from '../version';
+import { en } from '../messages/en';
 
 const rules = Object.values(RULES);
-const text = buildLlmsText(rules);
+const text = buildLlmsText(rules, VERSION);
 const lines = text.split('\n');
 
 describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
@@ -40,6 +42,28 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(flagged.map((r) => r.id)).toEqual(['azure.resource_group']);
     const s3 = lines.find((l) => l.startsWith('- `aws.s3_bucket` ('))!;
     expect(s3).not.toContain('(flags:');
+  });
+  it('제목 아래 엔진 · 규칙 버전 한 줄 (D26)', () => {
+    expect(lines[2]).toBe(`> Engine ${VERSION.engine} · rules revision ${VERSION.rules}`);
+  });
+  it('What PASS means 절 — 문장은 사전의 ui.pass_meaning 그대로 (D28)', () => {
+    const at = lines.indexOf('## What PASS means');
+    expect(at).toBeGreaterThan(0);
+    expect(lines[at + 2]).toBe(en.ui.pass_meaning);
+  });
+  it('규칙 설명(note)은 사전이 만든 영어 · 여러 개면 「; 」로 잇는다 · 한글 0', () => {
+    const win = lines.find((l) => l.startsWith('- `azure.virtual_machine_windows` ('))!;
+    expect(win).toContain('note: Follows the host-name rule');
+    expect(win).toContain('; A name made only of digits is not allowed (https://learn.microsoft.com/');
+    const vpc = lines.find((l) => l.startsWith('- `aws.vpc` ('))!;
+    expect(vpc).toContain('(VPC (Name tag))');
+    expect(/\p{Script=Hangul}/u.test(text)).toBe(false);
+  });
+  it('API 절에 rules_version · version · 실패 꼴 · health', () => {
+    expect(text).toContain('"rules_version"?: string');
+    expect(text).toContain('`version: { engine, rules }`');
+    expect(text).toContain('409 `request.rules_version_mismatch`');
+    expect(text).toContain('`GET /v1/health`');
   });
   it('D19 문장이 있고 우리 도메인을 박지 않는다', () => {
     expect(text).toContain("does not replace the provider's final verdict");

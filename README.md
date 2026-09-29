@@ -30,6 +30,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
+  "version": { "engine": "0.1.0", "rules": "2026-09-29.1" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -39,14 +40,15 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
         "is_transformed": false,
         "original": "payments-batch-prd-kr-vm-01",
         "violations": [],
-        "reason": "",
+        "steps": [],
         "rule": {
           "min_length": 1,
           "max_length": 63,
           "pattern": "^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$",
           "pattern_flags": "",
           "allowed": "lower-digit-hyphen",
-          "doc_url": "https://docs.cloud.google.com/compute/docs/naming-resources"
+          "doc_url": "https://docs.cloud.google.com/compute/docs/naming-resources",
+          "notes": []
         }
       }
     }
@@ -55,23 +57,38 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
     "generated_labels": { "gcp": { "owner": "platform", "system": "payments", "purpose": "batch", "environment": "prd", "managed_by": "cloudonym" } },
     "label_violations": { "gcp": [] },
     "label_transformed": { "gcp": [] },
-    "transformed": ["env: prod→prd"]
+    "transformed": [
+      { "code": "context.normalized", "field": "env", "params": { "from": "prod", "to": "prd" }, "message": "env 'prod' normalised to 'prd'" }
+    ]
   }
 }
 ```
 
-Response of `/v1/validate` (violation messages are in Korean):
+Response of `/v1/validate`:
 
 ```json
-{ "valid": false, "violations": ["허용 형식(^[a-z0-9]{3,24}$)에 맞지 않는다"], "suggested_name": "stpaymentsprd" }
+{
+  "valid": false,
+  "version": { "engine": "0.1.0", "rules": "2026-09-29.1" },
+  "violations": [
+    { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9]{3,24}$" }, "message": "Does not match the allowed pattern ^[a-z0-9]{3,24}$" }
+  ],
+  "suggested_name": "stpaymentsprd"
+}
 ```
 
-A malformed request returns `400` with `{ "success": false, "errors": [...] }` (plus `supported` when a provider or resource type is unknown). Bodies over 16 KB return `413`. Each client IP may send 60 requests per 60 seconds (POST `/v1/*` and GET `/llms.txt` together); over that you get `429` with `Retry-After: 60`.
+**Messages.** `violations`, `steps`, `rule.notes`, `metadata.transformed`, `label_violations`, `label_transformed` and `errors` are all lists of `{ code, field?, params?, message }`. Branch on `code` (stable); show `message` (English, may be reworded between releases) to people. `params` holds the values used in the message. `jq '.violations[].message'` prints the reasons.
+
+**Errors.** Every failure has the same shape — `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }` (`supported` when a provider, resource type or event is unknown). `400` malformed request, `409` `rules_version` mismatch, `413` body over 16 KB, `429` over 60 requests per 60 seconds per client IP (POST `/v1/*` and GET `/llms.txt` together, with `Retry-After: 60`), `500` unexpected error. `GET /v1/health` returns `{ "ok": true, "version": { … } }`.
+
+**What PASS means.** PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.
+
+**Version and name stability.** Every response carries `version: { engine, rules }`. `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
 
 ## AI-agent integration
 
-- **`GET /llms.txt`** — naming formulas, canonical values with aliases, every rule's length · pattern · forbidden words · doc link, and the API summary. It is built from the rule table at request time, so it never drifts from the engine.
-- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/validate` and `/v1/events`.
+- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, every rule's length · pattern · forbidden words · notes · doc link, what PASS means, and the API summary. It is built from the rule table, so it never drifts from the engine.
+- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/validate`, `/v1/events` and `/v1/health`, including every error status. The test suite validates real responses against it.
 
 Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relative to the host that served it.
 
@@ -123,7 +140,7 @@ Cloudonym does **not** replace the provider's final verdict. Decision numbers (D
 
 ## Terraform example
 
-[examples/terraform/](examples/terraform/README.md) calls `/v1/generate` from a `data "http"` block and creates a `google_compute_instance` with the returned name and labels. `apply` is blocked unless `valid` is `true` and there are no label violations.
+[examples/terraform/](examples/terraform/README.md) calls `/v1/generate` from a `data "http"` block and creates a `google_compute_instance` with the returned name and labels. `apply` is blocked unless `valid` is `true` and there are no label violations. `ignore_changes = [name]` keeps an existing VM's name when the rules change, `rules_version` turns a rules change into a 409, and `pinned` skips the API with the name you already created. `instance_name` is the VM's real name; `cloudonym_candidate_name` is what the API proposes now.
 
 ## Local development
 
@@ -189,12 +206,17 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
   -d '{"provider":"azure","resource_type":"storage_account","name":"St-Payments-Prd"}'
 ```
 
-`providers` 는 생략할 수 있다(기본은 셋 다). 요청이 잘못되면 `400` 과 `{ "success": false, "errors": [...] }`, 본문이 16KB 를 넘으면 `413` 이다. 클라이언트 IP 하나가 60초에 60건(POST `/v1/*` 와 GET `/llms.txt` 합산)을 넘으면 `429` 와 `Retry-After: 60` 을 받는다.
+`providers` 는 생략할 수 있다(기본은 셋 다).
+
+- **메시지** — `violations` · `steps` · `rule.notes` · `metadata.transformed` · 라벨 위반 · 라벨 변환 · `errors` 는 전부 `{ code, field?, params?, message }` 목록이다. 분기는 `code`(바뀌지 않는다)로, 사람에게는 `message`(영어 · 문구는 다듬어질 수 있다)를 보인다
+- **오류** — 모든 실패가 `{ "success": false, "errors": [...], "supported"?: [...] }` 한 꼴이다. `400` 요청 모양 오류 · `409` `rules_version` 불일치 · `413` 본문 16KB 초과 · `429` 클라이언트 IP 당 60초 60건 초과(POST `/v1/*` 와 GET `/llms.txt` 합산 · `Retry-After: 60`) · `500` 내부 오류. `GET /v1/health` 는 `{ "ok": true, "version": {…} }`
+- **PASS 의 뜻** — 이 규칙 버전의 이름 검사(길이 · 형식 · 예약어)를 통과했다는 뜻이다. 그 이름을 쓸 수 있다는 뜻이 아니다 — 고유성 · 권한 · 할당량 · 조직 정책은 검사하지 않고, 축소 때문에 서로 다른 문맥이 같은 이름이 될 수 있다
+- **버전 · 이름 안정성** — 모든 응답에 `version: { engine, rules }` 가 실린다. `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
 
 ### AI 에이전트 연동
 
-- **`GET /llms.txt`** — 이름 공식 · 표준값과 별칭 · 규칙마다 길이 · pattern · 금지어 · 문서 링크 · API 요약. 요청 때 규칙 표에서 만들므로 엔진과 어긋나지 않는다
-- **`GET /openapi.json`** — `/v1/generate` · `/v1/validate` · `/v1/events` 의 OpenAPI 3.0.3
+- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · PASS 의 뜻 · API 요약. 규칙 표에서 만들므로 엔진과 어긋나지 않는다
+- **`GET /openapi.json`** — `/v1/generate` · `/v1/validate` · `/v1/events` · `/v1/health` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
 
 ### 지원 리소스
 
@@ -215,7 +237,7 @@ Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.** 결
 
 ### Terraform 예제
 
-[examples/terraform/](examples/terraform/README.md) — `data "http"` 로 `/v1/generate` 를 불러 받은 이름 · 라벨로 `google_compute_instance` 를 만든다. `valid` 가 `true` 이고 라벨 위반이 없을 때만 apply 된다.
+[examples/terraform/](examples/terraform/README.md) — `data "http"` 로 `/v1/generate` 를 불러 받은 이름 · 라벨로 `google_compute_instance` 를 만든다. `valid` 가 `true` 이고 라벨 위반이 없을 때만 apply 된다. `ignore_changes = [name]` 이 규칙이 바뀌어도 기존 VM 이름을 지키고, `rules_version` 은 규칙 변경을 409 로 알리고, `pinned` 는 이미 만든 이름으로 API 를 건너뛴다.
 
 ### 로컬 개발
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseEventBody, parseGenerateBody, parseValidateBody } from './schemas';
+import { RULES_REVISION } from '../core/revision';
 
 const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
@@ -13,19 +14,19 @@ describe('parseGenerateBody', () => {
     expect(r.ok && r.value.providers).toEqual(['aws', 'gcp', 'azure']);
   });
   it('객체가 아닌 본문 · context 없음 · context null → 400 본문', () => {
-    expect(parseGenerateBody('x')).toEqual({ ok: false, body: { success: false, errors: ['본문은 JSON 객체여야 한다'] } });
-    expect(parseGenerateBody({})).toEqual({ ok: false, body: { success: false, errors: ['context 는 객체여야 한다'] } });
+    expect(parseGenerateBody('x')).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.body_not_object' }] } });
+    expect(parseGenerateBody({})).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.context_not_object' }] } });
     expect(parseGenerateBody({ context: null })).toMatchObject({ ok: false });
   });
   it('providers 배열 아님 · 빈 배열 · 모르는 값 → supported 셋', () => {
     const supported = ['aws', 'gcp', 'azure'];
-    expect(parseGenerateBody({ context: ctx, providers: 'gcp' })).toEqual({ ok: false, body: { success: false, errors: ['providers 는 배열이어야 한다'], supported } });
-    expect(parseGenerateBody({ context: ctx, providers: [] })).toEqual({ ok: false, body: { success: false, errors: ['providers 가 비어 있다'], supported } });
-    expect(parseGenerateBody({ context: ctx, providers: ['oci', 1] })).toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: oci, 1'], supported } });
+    expect(parseGenerateBody({ context: ctx, providers: 'gcp' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.providers_not_array' }], supported } });
+    expect(parseGenerateBody({ context: ctx, providers: [] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.providers_empty' }], supported } });
+    expect(parseGenerateBody({ context: ctx, providers: ['oci', 1] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'providers[0]', params: { value: 'oci' } }, { code: 'request.value_unsupported', field: 'providers[1]', params: { value: '1' } }], supported } });
   });
   it('parseContext 의 오류를 그대로 전달한다 (owner → region 순서)', () => {
     const r = parseGenerateBody({ context: { ...ctx, owner: '', region: 'mars' } });
-    expect(r).toEqual({ ok: false, body: { success: false, errors: ['owner: 비어 있다', 'region: mars 는 지원하지 않는다 (kr·us·jp·eu·global)'] } });
+    expect(r).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: ['kr', 'us', 'jp', 'eu', 'global'] } }] } });
   });
 });
 
@@ -36,11 +37,11 @@ describe('parseValidateBody', () => {
   });
   it('모르는 provider · resource_type · 문자열 아닌 name → 400 + supported (Review Focus 5)', () => {
     expect(parseValidateBody({ provider: 'oci', resource_type: 'x', name: 'x' }))
-      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: oci'], supported: ['aws', 'gcp', 'azure'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported: ['aws', 'gcp', 'azure'] } });
     expect(parseValidateBody({ provider: 'aws', resource_type: 'nope', name: 'x' }))
-      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 resource_type: nope'], supported: ['s3_bucket', 'iam_role', 'vpc', 'subnet', 'ec2_instance', 'rds_instance'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: 'nope' } }], supported: ['s3_bucket', 'iam_role', 'vpc', 'subnet', 'ec2_instance', 'rds_instance'] } });
     expect(parseValidateBody({ provider: 'aws', resource_type: 's3_bucket', name: 3 }))
-      .toEqual({ ok: false, body: { success: false, errors: ['name 은 문자열이어야 한다'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_not_string', field: 'name' }] } });
   });
 });
 
@@ -48,7 +49,7 @@ describe('parseEventBody', () => {
   it('셋만 받는다 — 그 외 400 + supported', () => {
     for (const e of ['ui_visit', 'ui_generate', 'ui_copy']) expect(parseEventBody({ event: e })).toEqual({ ok: true, value: e });
     expect(parseEventBody({ event: 'api_generate' }))
-      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 event: api_generate'], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'api_generate' } }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
     expect(parseEventBody(null)).toMatchObject({ ok: false });
   });
 });
@@ -57,21 +58,45 @@ describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400 (최
   const evil = { toString: 1 };
   it('provider · resource_type 자리 → ok:false', () => {
     const p = parseValidateBody({ provider: evil, resource_type: 'x', name: 'y' });
-    expect(p).toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: {"toString":1}'], supported: ['aws', 'gcp', 'azure'] } });
+    expect(p).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: '{"toString":1}' } }], supported: ['aws', 'gcp', 'azure'] } });
     const r = parseValidateBody({ provider: 'aws', resource_type: evil, name: 'y' });
-    expect(r).toMatchObject({ ok: false, body: { success: false, errors: ['지원하지 않는 resource_type: {"toString":1}'] } });
+    expect(r).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: '{"toString":1}' } }] } });
   });
   it('providers 원소 자리 → ok:false', () => {
     expect(parseGenerateBody({ context: ctx, providers: ['gcp', evil] }))
-      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 provider: {"toString":1}'], supported: ['aws', 'gcp', 'azure'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: '{"toString":1}' } }], supported: ['aws', 'gcp', 'azure'] } });
   });
   it('event 자리 → ok:false', () => {
     expect(parseEventBody({ event: evil }))
-      .toEqual({ ok: false, body: { success: false, errors: ['지원하지 않는 event: {"toString":1}'], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: '{"toString":1}' } }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
   });
-  it('오류 문구에 넣는 값은 80자까지 — 긴 배열 원소를 되돌려 주지 않는다', () => {
+  it('오류 params 에 넣는 값은 80자까지 — 긴 배열 원소를 되돌려 주지 않는다', () => {
     const r = parseGenerateBody({ context: ctx, providers: ['x'.repeat(500)] });
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.body.errors[0]!.length).toBeLessThanOrEqual('지원하지 않는 provider: '.length + 81);
+    if (!r.ok) expect(r.rejection.errors[0]).toEqual({ code: 'request.value_unsupported', field: 'providers[0]', params: { value: `${'x'.repeat(80)}…` } });
+  });
+});
+
+describe('rules_version (D27 ⑴)', () => {
+  const current = RULES_REVISION;
+  it('없거나 undefined 면 통과 · 지금 버전과 같으면 통과', () => {
+    expect(parseGenerateBody({ context: ctx }).ok).toBe(true);
+    expect(parseGenerateBody({ context: ctx, rules_version: current }).ok).toBe(true);
+    expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x', rules_version: current }).ok).toBe(true);
+  });
+  it('다르면 409 · 빈 문자열도 다르므로 409', () => {
+    for (const v of ['2026-09-15.1', '']) {
+      expect(parseGenerateBody({ context: ctx, rules_version: v }))
+        .toEqual({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch', params: { requested: v, current } }] } });
+    }
+    expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x', rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409 } });
+  });
+  it('문자열이 아니면(null · 숫자 · 객체) 400 · 1024자 넘으면 400', () => {
+    for (const v of [null, 1, { a: 1 }]) {
+      expect(parseGenerateBody({ context: ctx, rules_version: v }))
+        .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_not_string', field: 'rules_version' }] } });
+    }
+    expect(parseGenerateBody({ context: ctx, rules_version: 'x'.repeat(1025) }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'rules_version', params: { max: 1024 } }] } });
   });
 });

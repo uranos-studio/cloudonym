@@ -1,5 +1,7 @@
 // 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류 문구는 parseContext 가 준 것을 그대로 보인다
-import type { Env, NamingContext, Region } from '../core/types';
+import type { CoreMessage, Env, NamingContext, Region } from '../core/types';
+import { format } from '../messages/catalog';
+import { en } from '../messages/en';
 
 type TextKey = 'owner' | 'system' | 'purpose';
 const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; placeholder: string }> = [
@@ -30,13 +32,16 @@ const CONTROL =
 
 interface Props {
   value: NamingContext;
-  /** parseContext 의 errors — `owner: 비어 있다` 꼴. 필드 접두사로 나눠 보인다 */
-  errors: string[];
+  /** parseContext 의 errors — 메시지 코드. field 로 나눠 보인다 */
+  errors: CoreMessage[];
   onChange: (next: NamingContext) => void;
 }
 
 export function ContextForm({ value, errors, onChange }: Props) {
-  const errorFor = (key: string) => errors.find((e) => e.startsWith(`${key}:`));
+  const errorFor = (key: string) => {
+    const e = errors.find((m) => 'field' in m && m.field === key);
+    return e ? format(e, en) : undefined;
+  };
   const setText = (key: TextKey, text: string) => {
     const next = { ...value };
     next[key] = text;

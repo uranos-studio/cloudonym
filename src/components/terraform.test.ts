@@ -8,7 +8,7 @@ const ctx: NamingContext = { owner: 'acmex', system: 'billing', purpose: 'trade'
 const stub = (over: Partial<NameResult>): NameResult => ({
   ruleId: 'gcp.service_account', resourceType: 'service_account', displayName: 'Service Account', name: 'x', valid: true,
   isTruncated: false, isTransformed: false, original: 'x', violations: [], steps: [],
-  rule: { minLength: 6, maxLength: 30, pattern: '^x$', patternFlags: '', allowed: 'lower-digit-hyphen', docUrl: 'https://example.invalid' },
+  rule: { minLength: 6, maxLength: 30, pattern: '^x$', patternFlags: '', allowed: 'lower-digit-hyphen', docUrl: 'https://example.invalid', notes: [] },
   ...over,
 });
 const noLabels: LabelSet = { labels: {}, violations: [], transformed: [] };
@@ -30,16 +30,16 @@ describe('toTerraformLocals', () => {
     expect(hcl.indexOf('# gcp')).toBeLessThan(hcl.indexOf('# azure'));
   });
   it('valid:false 항목은 # INVALID: 주석으로만 나온다 — 값 줄이 없다', () => {
-    const out: GenerateOutput = { gcp: { service_account: stub({ name: '', valid: false, violations: ['system 이 정제 뒤 비었다'] }), project_id: stub({ ruleId: 'gcp.project_id', resourceType: 'project_id', name: 'acmex-billing-trade-prd' }) } };
+    const out: GenerateOutput = { gcp: { service_account: stub({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'system' }] }), project_id: stub({ ruleId: 'gcp.project_id', resourceType: 'project_id', name: 'acmex-billing-trade-prd' }) } };
     const hcl = toTerraformLocals(out, { gcp: noLabels });
-    expect(hcl).toContain('  # INVALID: gcp_service_account — system 이 정제 뒤 비었다\n');
+    expect(hcl).toContain("  # INVALID: gcp_service_account — Required token 'system' is empty after normalisation\n");
     expect(hcl).not.toMatch(/^\s*gcp_service_account\s*=/m);
     expect(hcl).toContain('  gcp_project_id = "acmex-billing-trade-prd"\n');
   });
   it('라벨 한도 위반이 있으면 라벨 블록 대신 # INVALID: 주석', () => {
-    const bad: LabelSet = { labels: { owner: 'x'.repeat(300) }, violations: ['owner 값 300자 — 최대 256자'], transformed: [] };
+    const bad: LabelSet = { labels: { owner: 'x'.repeat(300) }, violations: [{ code: 'label.too_long', field: 'owner', params: { actual: 300, max: 256 } }], transformed: [] };
     const hcl = toTerraformLocals({ aws: { s3_bucket: stub({ ruleId: 'aws.s3_bucket', resourceType: 's3_bucket', name: 'b' }) } }, { aws: bad });
-    expect(hcl).toContain('  # INVALID: aws_tags — owner 값 300자 — 최대 256자\n');
+    expect(hcl).toContain("  # INVALID: aws_tags — Label 'owner' is 300 characters long; the maximum is 256\n");
     expect(hcl).not.toContain('aws_tags = {');
   });
   it('요청에 없는 provider 는 나오지 않는다 · 빈 입력이면 locals {\\n}\\n', () => {

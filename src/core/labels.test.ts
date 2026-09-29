@@ -9,21 +9,21 @@ describe('labelsFor', () => {
   });
   it('TC-AWS-02 값 한도 초과는 자르지 않고 violations (AWS 256 · Azure 256 · GCP 63)', () => {
     const big = { ...ctx, owner: 'a'.repeat(257) };
-    expect(labelsFor(big, 'aws').violations).toEqual(['owner 값 257자 — 최대 256자']);
-    expect(labelsFor(big, 'azure').violations).toEqual(['owner 값 257자 — 최대 256자']);
-    expect(labelsFor({ ...ctx, owner: 'a'.repeat(64) }, 'gcp').violations).toEqual(['owner 값 64자 — 최대 63자']);
+    expect(labelsFor(big, 'aws').violations).toEqual([{ code: 'label.too_long', field: 'owner', params: { actual: 257, max: 256 } }]);
+    expect(labelsFor(big, 'azure').violations).toEqual([{ code: 'label.too_long', field: 'owner', params: { actual: 257, max: 256 } }]);
+    expect(labelsFor({ ...ctx, owner: 'a'.repeat(64) }, 'gcp').violations).toEqual([{ code: 'label.too_long', field: 'owner', params: { actual: 64, max: 63 } }]);
   });
   it('GCP 는 라벨 값 규격으로 바꾸고 기록한다 — 한글 · 숫자 시작은 유효 (D21)', () => {
     const r = labelsFor({ ...ctx, owner: 'Ac.Mex' }, 'gcp');
     expect(r.labels.owner).toBe('acmex');
-    expect(r.transformed).toEqual(['owner: Ac.Mex→acmex']);
+    expect(r.transformed).toEqual([{ code: 'label.normalized', field: 'owner', params: { from: 'Ac.Mex', to: 'acmex' } }]);
     expect(labelsFor({ ...ctx, owner: '개발' }, 'gcp')).toMatchObject({ labels: { owner: '개발' }, transformed: [] });
     expect(labelsFor({ ...ctx, owner: '123' }, 'gcp').violations).toEqual([]);
   });
   it('AWS 태그 값 문자 집합 — 문서 밖 문자는 자르지 않고 violations (결정 2026-09-29 · 보안 리뷰 M-3)', () => {
     const r = labelsFor({ ...ctx, owner: 'team#1<x>' }, 'aws');
     expect(r.labels.owner).toBe('team#1<x>');
-    expect(r.violations).toEqual(['owner 값에 AWS 태그가 허용하지 않는 문자가 있다 — 글자 · 숫자 · 공백 · _ . : / = + - @ 만 쓴다']);
+    expect(r.violations).toEqual([{ code: 'label.aws_invalid_chars', field: 'owner' }]);
     expect(r.transformed).toEqual([]);
   });
   it('AWS 태그 값 — 문서가 허용하는 기호 · 공백 · 한글 · 악센트 글자는 위반이 아니다', () => {

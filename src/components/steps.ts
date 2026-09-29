@@ -1,7 +1,8 @@
-// 카드에 보일 변환 · 축약 줄 — 엔진 steps 는 바꾸지 않고 화면에서만 거른다
-// `system: 매매→` 처럼 정제 뒤 빈 값은 위반 이유(「system 이 정제 뒤 비었다」)가 이미 말하므로 화살표만 남은 줄을 숨긴다
+// 카드에 보일 변환 · 축약 단계 — 엔진 steps 는 바꾸지 않고 화면에서만 거른다
+// 정제 뒤 빈 값이 된 토큰의 변환(step.normalized 의 to 가 '')은 위반 이유(name.token_empty)가 이미 말하므로 숨긴다
+import type { CoreMessage } from '../core/types';
 
-/** 대상이 빈 변환 줄(`→` 로 끝남)을 뺀다. 정제된 값은 ASCII 라 화살표로 끝날 수 없다 */
-export function visibleSteps(steps: readonly string[]): string[] {
-  return steps.filter((s) => !s.endsWith('→'));
+/** 대상이 빈 변환 단계를 뺀다 */
+export function visibleSteps(steps: readonly CoreMessage[]): CoreMessage[] {
+  return steps.filter((s) => !(s.code === 'step.normalized' && s.params.to === ''));
 }

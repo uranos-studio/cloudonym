@@ -12,6 +12,8 @@ const ALLOWED = [
   /^lucide-react$/,
   /^(?:\.\.?\/)+core\/(?:engine|labels|types)$/,   // 엔진 공개 API 셋
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
+  /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
+  /^\.\.?\/version$/,                               // 결과에 싣는 버전 (D26)
 ];
 const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict)/;
 

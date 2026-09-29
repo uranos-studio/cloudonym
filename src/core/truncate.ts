@@ -1,11 +1,12 @@
 import { MIN_TOKEN, PROTECTED, type ResourceRule, type Token } from './types';
+import type { CoreMessage } from './messages';
 import { compose } from './compose';
 import { elementBudget, shorten } from './shorten';
 
 type Values = Partial<Record<Token, string>>;
 
 export function fit(input: Values, rule: ResourceRule) {
-  const steps: string[] = [];
+  const steps: CoreMessage[] = [];
   const values: Values = { ...input };
   const name = () => compose(values, rule.template, rule.separator);
   // 가변 토큰 = 입력에 값이 있고(정제로 빈 '' 은 제외) 1단계에서 떼지 않은 비보호 토큰 (원장 판정 M1)
@@ -26,7 +27,7 @@ export function fit(input: Values, rule: ResourceRule) {
   for (const t of rule.optional) {
     if (!values[t]) continue;
     delete values[t];
-    steps.push(`${t} 생략`);
+    steps.push({ code: 'step.token_dropped', field: t });
     if (name().length <= rule.maxLength) return done();
   }
 
@@ -35,7 +36,7 @@ export function fit(input: Values, rule: ResourceRule) {
   const variable = present.filter((t) => !PROTECTED.includes(t));
   for (const t of variable) {
     const s = shorten(values[t]!);
-    if (s !== values[t]) { steps.push(`${values[t]}→${s}`); values[t] = s; }
+    if (s !== values[t]) { steps.push({ code: 'step.abbreviated', field: t, params: { from: values[t]!, to: s } }); values[t] = s; }
   }
   if (name().length <= rule.maxLength) return done();
 
@@ -47,6 +48,6 @@ export function fit(input: Values, rule: ResourceRule) {
   for (const t of variable) {
     if (values[t]!.length > budget) values[t] = values[t]!.slice(0, budget).replace(/^-+|-+$/g, '');
   }
-  steps.push(`균등 축소 B=${budget}`);
+  steps.push({ code: 'step.budget_shortened', params: { budget } });
   return done();                                        // 3단계 — 불변조건이 깨지면 fits:false
 }

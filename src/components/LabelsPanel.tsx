@@ -3,6 +3,8 @@ import { CopyButton } from './CopyButton';
 import { toTerraformLocals } from './terraform';
 import { labelsJsonBlocked } from './labelsGate';
 import type { GenerateOutput, LabelSet, Provider } from '../core/types';
+import { format } from '../messages/catalog';
+import { en } from '../messages/en';
 
 interface Props {
   providers: Provider[];
@@ -23,8 +25,8 @@ export function LabelsPanel({ providers, output, labels }: Props) {
     if (!set) continue;
     view[p] = set.labels;
     pickedLabels[p] = set;
-    transformed.push(...set.transformed.map((t) => `${p} · ${t}`));
-    violations.push(...set.violations.map((v) => `${p} · ${v}`));
+    transformed.push(...set.transformed.map((t) => `${p} · ${format(t, en)}`));
+    violations.push(...set.violations.map((v) => `${p} · ${format(v, en)}`));
   }
   const json = JSON.stringify(view, null, 2);
   const hcl = toTerraformLocals(picked, pickedLabels);

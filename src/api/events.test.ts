@@ -20,7 +20,7 @@ describe('POST /v1/events (D17 비콘)', () => {
   it('모르는 event → 400 + supported · 카운터를 올리지 않는다', async () => {
     const { res, promises } = await req(app, '/v1/events', beaconPost({ event: 'api_generate' }));
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: ['지원하지 않는 event: api_generate'], supported: ['ui_visit', 'ui_generate', 'ui_copy'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'api_generate' }, message: "Unsupported event 'api_generate'" }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] });
     expect(promises).toHaveLength(0);
   });
   it('본문이 JSON 이 아니면 400 · sendBeacon 의 text/plain 본문은 읽힌다', async () => {

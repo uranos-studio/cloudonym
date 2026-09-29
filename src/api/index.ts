@@ -5,12 +5,13 @@ import type { App } from './env';
 import { v1 } from './v1';
 import { RULES } from '../core/constraints';
 import { buildLlmsText } from './llms';
+import { VERSION } from '../version';
 import { logTelemetry } from './telemetry';
 import { internalError } from './errors';
 import { overLimit, tooManyRequests } from './ratelimit';
 
 // 모듈 로드 때 한 번 만든다 — 요청마다 만들지 않는다
-const LLMS_TEXT = buildLlmsText(Object.values(RULES));
+const LLMS_TEXT = buildLlmsText(Object.values(RULES), VERSION);
 
 export const app = new Hono<App>();
 app.onError(internalError);

@@ -2,6 +2,7 @@
 // 값은 Task 1-2 에서 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
 // pattern · forbidden · 길이 = CSP 물리 규칙(검증), allowed = 우리가 생성할 때 쓰는 문자 집합.
 import type { Forbidden, Provider, ResourceRule } from './types';
+import type { CoreMessage } from './messages';
 import { lookup } from './dict';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
@@ -12,8 +13,8 @@ const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kube
 const RFC1035 = /^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$/;
 /** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
 const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
-const AWS_NAME_TAG_NOTE = '태그 값 — UTF-16 길이로 잰다 (D20)';
-const AZURE_VM_NOTE = '호스트명 규칙 · ARM 이 허용하는 다른 기호는 거부될 수 있다 (D20)';
+const AWS_NAME_TAG_NOTE: CoreMessage = { code: 'note.aws_tag_utf16_length' };
+const AZURE_VM_NOTE: CoreMessage = { code: 'note.azure_vm_hostname_rule' };
 /** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다 (codex P1).
  *  Azure 이름 규칙 쪽(#microsoftcompute)에는 이 문장이 없어 Windows VM 규칙의 두 번째 근거로 note 에 싣는다 */
 export const WINDOWS_COMPUTER_NAME_DOC_URL = 'https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-computername';
@@ -33,10 +34,10 @@ const AZURE_RESERVED: Forbidden = {
   prefixes: ['login'],
   ignoreCase: true,
 };
-const AZURE_RESERVED_NOTE = `예약어 · 상표 금지 (${AZURE_RESERVED_DOC_URL})`;
+const AZURE_RESERVED_NOTE: CoreMessage = { code: 'note.azure_reserved', params: { doc_url: AZURE_RESERVED_DOC_URL } };
 /** VM · AKS 노드풀은 리소스 자체에 공개 엔드포인트가 없어 문서가 걸리는지 모호하다 — 보수적으로 건다 (D20) */
-const AZURE_RESERVED_AMBIGUOUS_NOTE = `예약어 · 상표 금지 — 공개 엔드포인트가 없어 적용 여부가 모호해 보수적으로 건다 (${AZURE_RESERVED_DOC_URL} · D20)`;
-const AZURE_VM_WINDOWS_NOTE = `${AZURE_VM_NOTE} · 숫자로만 된 이름은 쓸 수 없다 (${WINDOWS_COMPUTER_NAME_DOC_URL})`;
+const AZURE_RESERVED_AMBIGUOUS_NOTE: CoreMessage = { code: 'note.azure_reserved_ambiguous', params: { doc_url: AZURE_RESERVED_DOC_URL } };
+const WINDOWS_NO_ALL_DIGITS_NOTE: CoreMessage = { code: 'note.windows_no_all_digits', params: { doc_url: WINDOWS_COMPUTER_NAME_DOC_URL } };
 
 export const RULES: Record<string, ResourceRule> = {
   // ─── GCP ───────────────────────────────────────────────
@@ -89,7 +90,7 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
     scope: 'project', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/instance-settings',
-    note: 'project-id:instance-id 합이 98자 — 최장 project ID 30 을 뺀 보수적 상한 · 끝 영숫자 요구는 문서 근거 없는 보수적 한도 (D20)',
+    notes: [{ code: 'note.cloud_sql_combined_limit' }],
   },
   'gcp.storage_bucket': {
     id: 'gcp.storage_bucket', provider: 'gcp', resourceType: 'storage_bucket',
@@ -99,7 +100,7 @@ export const RULES: Record<string, ResourceRule> = {
     forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle', '..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'global', docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
-    note: '점이 있으면 222자까지 허용되나 엔진은 점을 만들지 않으므로 63 으로 둔다 (보수적 · D20)',
+    notes: [{ code: 'note.gcs_dotted_names_222' }],
   },
 
   // ─── AWS ───────────────────────────────────────────────
@@ -111,7 +112,7 @@ export const RULES: Record<string, ResourceRule> = {
     forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'global', docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
-    note: '-an 접미사는 계정 지역 네임스페이스 버킷 전용 — 일반 이름에는 쓸 수 없다',
+    notes: [{ code: 'note.s3_an_suffix' }],
   },
   'aws.iam_role': {
     id: 'aws.iam_role', provider: 'aws', resourceType: 'iam_role',
@@ -123,27 +124,27 @@ export const RULES: Record<string, ResourceRule> = {
   },
   'aws.vpc': {
     id: 'aws.vpc', provider: 'aws', resourceType: 'vpc',
-    displayName: 'VPC (Name 태그)', slug: 'vpc', minLength: 1, maxLength: 256,
+    displayName: 'VPC (Name tag)', slug: 'vpc', minLength: 1, maxLength: 256,
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'region', docUrl: AWS_TAGS, note: AWS_NAME_TAG_NOTE,
+    scope: 'region', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.subnet': {
     id: 'aws.subnet', provider: 'aws', resourceType: 'subnet',
-    displayName: 'Subnet (Name 태그)', slug: 'subnet', minLength: 1, maxLength: 256,
+    displayName: 'Subnet (Name tag)', slug: 'subnet', minLength: 1, maxLength: 256,
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'zone', docUrl: AWS_TAGS, note: AWS_NAME_TAG_NOTE,
+    scope: 'zone', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.ec2_instance': {
     id: 'aws.ec2_instance', provider: 'aws', resourceType: 'ec2_instance',
-    displayName: 'EC2 Instance (Name 태그)', slug: 'vm', minLength: 1, maxLength: 256,
+    displayName: 'EC2 Instance (Name tag)', slug: 'vm', minLength: 1, maxLength: 256,
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'zone', docUrl: AWS_TAGS, note: AWS_NAME_TAG_NOTE,
+    scope: 'zone', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.rds_instance': {
     id: 'aws.rds_instance', provider: 'aws', resourceType: 'rds_instance',
@@ -173,7 +174,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z0-9]{3,24}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftstorage`, note: AZURE_RESERVED_NOTE,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftstorage`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.key_vault': {
     id: 'azure.key_vault', provider: 'azure', resourceType: 'key_vault',
@@ -182,7 +183,7 @@ export const RULES: Record<string, ResourceRule> = {
     allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftkeyvault`, note: AZURE_RESERVED_NOTE,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftkeyvault`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.managed_identity': {
     id: 'azure.managed_identity', provider: 'azure', resourceType: 'managed_identity',
@@ -199,7 +200,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[A-Za-z0-9]([A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: `${AZURE_VM_NOTE} · ${AZURE_RESERVED_AMBIGUOUS_NOTE}`,
+    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.virtual_machine_windows': {
     id: 'azure.virtual_machine_windows', provider: 'azure', resourceType: 'virtual_machine_windows',
@@ -208,7 +209,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^(?![0-9]+$)[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, note: `${AZURE_VM_WINDOWS_NOTE} · ${AZURE_RESERVED_AMBIGUOUS_NOTE}`,
+    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, WINDOWS_NO_ALL_DIGITS_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.virtual_network': {
     id: 'azure.virtual_network', provider: 'azure', resourceType: 'virtual_network',
@@ -232,7 +233,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftsql`, note: AZURE_RESERVED_NOTE,
+    scope: 'global', docUrl: `${AZURE_RULES}#microsoftsql`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.aks_nodepool_linux': {
     id: 'azure.aks_nodepool_linux', provider: 'azure', resourceType: 'aks_nodepool_linux',
@@ -241,7 +242,7 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     forbidden: { ...AZURE_RESERVED, exact: ['aksmanagedap'] }, // FAQ: AKS 시스템 구성요소 예약 이름
     template: ['slug', 'purpose', 'env'], optional: [],
-    scope: 'managed_cluster', docUrl: AKS_FAQ, note: AZURE_RESERVED_AMBIGUOUS_NOTE,
+    scope: 'managed_cluster', docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.aks_nodepool_windows': {
     id: 'azure.aks_nodepool_windows', provider: 'azure', resourceType: 'aks_nodepool_windows',
@@ -249,7 +250,7 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z][a-z0-9]{0,5}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'purpose'], optional: [],
-    scope: 'managed_cluster', docUrl: AKS_FAQ, note: AZURE_RESERVED_AMBIGUOUS_NOTE,
+    scope: 'managed_cluster', docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
 };
 

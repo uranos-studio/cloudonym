@@ -6,7 +6,7 @@ import { RATE_LIMIT } from './ratelimit';
 import { req, jsonPost, beaconPost, json, fakeKv, fakeLimiter } from './test-support';
 
 const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
-const TOO_MANY = { success: false, errors: ['요청이 너무 많다 — 60초 뒤에 다시 보낸다'] };
+const TOO_MANY = { success: false, errors: [{ code: 'request.rate_limited', params: { retry_after: 60 }, message: 'Too many requests; retry after 60 seconds' }] };
 const ip = (h: Record<string, string> = {}) => ({ 'cf-connecting-ip': '203.0.113.7', ...h });
 
 describe('요청 제한 (보안 리뷰 M-1) — Rate Limiting 바인딩 API_LIMITER, 클라이언트 IP 당', () => {
@@ -76,7 +76,7 @@ describe('요청 제한 (보안 리뷰 M-1) — Rate Limiting 바인딩 API_LIMI
 });
 
 describe('/v1/events 는 화면(같은 출처)만 받는다 (보안 리뷰 M-2)', () => {
-  const FORBIDDEN = { success: false, errors: ['화면(같은 출처)에서 보낸 요청만 받는다'] };
+  const FORBIDDEN = { success: false, errors: [{ code: 'request.same_origin_only', message: 'Only same-origin requests from the Cloudonym page are accepted' }] };
   for (const site of [undefined, 'cross-site', 'same-site', 'none']) {
     it(`Sec-Fetch-Site ${site ?? '없음(curl 등)'} → 403 · 카운터를 올리지 않는다`, async () => {
       const { kv, store } = fakeKv();

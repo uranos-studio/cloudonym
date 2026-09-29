@@ -66,11 +66,11 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
   it('AKS Linux 노드풀 예약 이름 aksmanagedap 을 막는다', () => {
     expect(RULES['azure.aks_nodepool_linux'].forbidden?.exact).toContain('aksmanagedap');
   });
-  it('codex P1: Windows VM 의 숫자만 금지는 Windows ComputerName 문서가 근거이고 note 에 그 URL 이 실린다', () => {
+  it('codex P1: Windows VM 의 숫자만 금지는 Windows ComputerName 문서가 근거이고 notes 에 그 URL 이 실린다', () => {
     expect(WINDOWS_COMPUTER_NAME_DOC_URL).toMatch(/^https:\/\/learn\.microsoft\.com\/en-us\/windows-hardware\/.*computername$/);
-    expect(RULES['azure.virtual_machine_windows'].note).toContain(WINDOWS_COMPUTER_NAME_DOC_URL);
+    expect(RULES['azure.virtual_machine_windows'].notes).toContainEqual({ code: 'note.windows_no_all_digits', params: { doc_url: WINDOWS_COMPUTER_NAME_DOC_URL } });
     expect(RULES['azure.virtual_machine_windows'].pattern.test('12345')).toBe(false);
-    expect(RULES['azure.virtual_machine'].note ?? '').not.toContain(WINDOWS_COMPUTER_NAME_DOC_URL);
+    expect(JSON.stringify(RULES['azure.virtual_machine'].notes ?? [])).not.toContain(WINDOWS_COMPUTER_NAME_DOC_URL);
   });
   it('리소스 그룹 pattern 은 십진 숫자(Nd)만 받는다', () => {
     const p = RULES['azure.resource_group'].pattern;
@@ -79,7 +79,7 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
     expect(p.test('rg-²')).toBe(false); // U+00B2 No
     expect(p.test('rg-Ⅻ')).toBe(false); // U+216B Nl
   });
-  it('Azure 예약어는 공개 엔드포인트가 있거나 모호한 규칙에만 걸리고 note 에 근거 URL 이 실린다', () => {
+  it('Azure 예약어는 공개 엔드포인트가 있거나 모호한 규칙에만 걸리고 notes 에 근거 URL 이 실린다', () => {
     expect(AZURE_RESERVED_DOC_URL).toBe('https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name');
     const on = ['storage_account', 'key_vault', 'sql_server', 'virtual_machine', 'virtual_machine_windows', 'aks_nodepool_linux', 'aks_nodepool_windows'];
     for (const r of rulesFor('azure')) {
@@ -89,7 +89,7 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
         expect(r.forbidden?.contains, r.id).toEqual(expect.arrayContaining(['microsoft', 'windows']));
         expect(r.forbidden?.prefixes, r.id).toContain('login');
         expect(r.forbidden?.ignoreCase, r.id).toBe(true);
-        expect(r.note, r.id).toContain(AZURE_RESERVED_DOC_URL);
+        expect(r.notes?.map((n) => ('params' in n ? n.params : undefined)), r.id).toContainEqual({ doc_url: AZURE_RESERVED_DOC_URL });
       }
     }
   });
@@ -106,5 +106,16 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
     expect(RULES['azure.subnet'].scope).toBe('virtual_network');
     expect(RULES['azure.aks_nodepool_linux'].scope).toBe('managed_cluster');
     expect(RULES['azure.aks_nodepool_windows'].scope).toBe('managed_cluster');
+  });
+});
+
+describe('표시 이름 · notes (D24 · 문구 코드화)', () => {
+  it('모든 displayName 에 한글이 없다 — 규칙 표의 표시 이름은 데이터라 영어로 둔다', () => {
+    const hangul = /\p{Script=Hangul}/u;
+    expect(hangul.test('힣') && hangul.test('ㄱ') && !hangul.test('A')).toBe(true); // 검사기 자체
+    expect(Object.values(RULES).filter((r) => hangul.test(r.displayName)).map((r) => r.id)).toEqual([]);
+  });
+  it('Windows VM 의 notes 는 호스트명 · 숫자만 금지 · 예약어(모호) 세 코드', () => {
+    expect(RULES['azure.virtual_machine_windows'].notes?.map((n) => n.code)).toEqual(['note.azure_vm_hostname_rule', 'note.windows_no_all_digits', 'note.azure_reserved_ambiguous']);
   });
 });

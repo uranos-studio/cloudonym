@@ -3,6 +3,7 @@
 // 공식 문서는 IP 를 키로 권하지 않는다(NAT 뒤 여러 사용자가 한 IP 를 나눈다). 무인증 공개 API 라 다른 식별자가 없어 IP 로 간다 — 한도를 넉넉히 잡는 까닭이다
 import type { Context, MiddlewareHandler } from 'hono';
 import type { App } from './env';
+import { fail } from './errors';
 
 /** wrangler.jsonc 의 ratelimits.simple 과 같아야 한다 — security.test 가 둘을 대어 본다 */
 export const RATE_LIMIT = { limit: 60, period: 60 } as const;
@@ -21,9 +22,9 @@ export async function overLimit(c: Context<App>): Promise<boolean> {
   }
 }
 
-/** 429 — ErrorResponse 꼴 + Retry-After(초). headers 로 CORS 등을 더 싣는다 */
+/** 429 — fail() 꼴 + Retry-After(초). headers 로 CORS 등을 더 싣는다 */
 export function tooManyRequests(c: Context<App>, headers: Record<string, string> = {}): Response {
-  return c.json({ success: false, errors: [`요청이 너무 많다 — ${RATE_LIMIT.period}초 뒤에 다시 보낸다`] }, 429, { 'Retry-After': String(RATE_LIMIT.period), ...headers });
+  return fail(c, 429, [{ code: 'request.rate_limited', params: { retry_after: RATE_LIMIT.period } }], {}, { 'Retry-After': String(RATE_LIMIT.period), ...headers });
 }
 
 /** /v1/* 미들웨어 — POST 만 센다. GET /v1/health · OPTIONS preflight 는 세지 않는다 */

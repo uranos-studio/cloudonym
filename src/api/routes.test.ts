@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
 import { req, jsonPost, json } from './test-support';
+import { VERSION } from '../version';
 
 const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const post = (body: unknown) => req(app, '/v1/generate', jsonPost(body));
@@ -18,10 +19,10 @@ describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
     expect(res.headers.get('Access-Control-Allow-Methods')).toBe('GET,POST,OPTIONS');
   });
-  it('GET /v1/health → { ok: true }', async () => {
+  it('GET /v1/health → { ok: true, version }', async () => {
     const { res } = await req(app, '/v1/health');
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true });
+    expect(await res.json()).toEqual({ ok: true, version: VERSION });
   });
   it('GET /v1/generate 는 404 (POST 만)', async () => {
     const { res } = await req(app, '/v1/generate');
@@ -35,12 +36,18 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(res.status).toBe(200);
     const body = await json(res);
     expect(body.success).toBe(true);
+    expect(body.version).toEqual(VERSION);
     expect(body.data.gcp.service_account).toEqual({
       name: 'billing-trade-prd-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'acmex-billing-trade-prd-kr-sa-sync', violations: [], reason: 'region 생략 · owner 생략',
-      rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create' },
+      original: 'acmex-billing-trade-prd-kr-sa-sync', violations: [],
+      steps: [
+        { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
+        { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
+      ],
+      rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
-    expect(body.data.azure.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, is_transformed: true, reason: '하이픈 제거' });
+    expect(body.data.azure.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, is_transformed: true, steps: [{ code: 'step.separator_removed', message: 'Removed hyphens (this rule allows no separator)' }] });
+    expect(body.data.azure.storage_account.rule.notes).toEqual([expect.objectContaining({ code: 'note.azure_reserved', params: { doc_url: expect.stringContaining('learn.microsoft.com') } })]);
     expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'acmex', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
     expect(body.metadata).toMatchObject({ label_violations: { gcp: [], azure: [] }, label_transformed: { gcp: [], azure: [] }, transformed: [] });
   });
@@ -61,32 +68,47 @@ describe('POST /v1/generate (D15 wire)', () => {
   });
   it('env · region 별칭은 통과하고 metadata.transformed 에 남는다 (TC-COM-02)', async () => {
     const body = await json((await post({ context: { ...ctx, env: 'production', region: 'asia-northeast3' }, providers: ['gcp'] })).res);
-    expect(body.metadata.transformed).toEqual(['env: production→prd', 'region: asia-northeast3→kr']);
+    expect(body.metadata.transformed).toEqual([
+      { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prd' }, message: "env 'production' normalised to 'prd'" },
+      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'kr' }, message: "region 'asia-northeast3' normalised to 'kr'" },
+    ]);
     expect(body.data.gcp.service_account.name).toBe('billing-trade-prd-sa-sync');
   });
   it('잘못된 env → 400 { success:false, errors }', async () => {
     const { res } = await post({ context: { ...ctx, env: 'qa' } });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: ['env: qa 는 지원하지 않는다 (prd·stg·dev·sbx)'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prd', 'stg', 'dev', 'sbx'] }, message: "env 'qa' is not supported (prd, stg, dev, sbx)" }] });
   });
   it('본문이 JSON 이 아니면 400', async () => {
     const { res } = await req(app, '/v1/generate', { method: 'POST', body: 'not json' });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: ['본문이 JSON 이 아니다'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.body_not_json', message: 'Request body is not JSON' }] });
   });
   it('providers 가 빈 배열 · 배열 아님 · 모르는 값이면 400 + supported', async () => {
     const empty = await post({ context: ctx, providers: [] });
     expect(empty.res.status).toBe(400);
-    expect(await empty.res.json()).toEqual({ success: false, errors: ['providers 가 비어 있다'], supported: ['aws', 'gcp', 'azure'] });
+    expect(await empty.res.json()).toEqual({ success: false, errors: [{ code: 'request.providers_empty', message: "'providers' is empty" }], supported: ['aws', 'gcp', 'azure'] });
     const notArray = await post({ context: ctx, providers: 'gcp' });
     expect(notArray.res.status).toBe(400);
     const unknown = await post({ context: ctx, providers: ['gcp', 'oci'] });
     expect(unknown.res.status).toBe(400);
-    expect(await unknown.res.json()).toMatchObject({ errors: ['지원하지 않는 provider: oci'], supported: ['aws', 'gcp', 'azure'] });
+    expect(await unknown.res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'oci' }, message: "Unsupported providers[1] 'oci'" }], supported: ['aws', 'gcp', 'azure'] });
   });
   it('context 가 없거나 null 이면 400 (500 이 아니다)', async () => {
     expect((await post({})).res.status).toBe(400);
     expect((await post({ context: null })).res.status).toBe(400);
     expect((await post([])).res.status).toBe(400);
+  });
+});
+
+describe('rules_version 핀 (D27 ⑴)', () => {
+  it('지금 버전이면 200 · 다르면 409 request.rules_version_mismatch', async () => {
+    expect((await post({ context: ctx, rules_version: VERSION.rules })).res.status).toBe(200);
+    const { res } = await post({ context: ctx, rules_version: '2026-09-15.1' });
+    expect(res.status).toBe(409);
+    const body = await json(res);
+    expect(body.success).toBe(false);
+    expect(body.errors).toEqual([expect.objectContaining({ code: 'request.rules_version_mismatch', params: { requested: '2026-09-15.1', current: VERSION.rules } })]);
+    expect(body.errors[0].message).toContain('pinned mode');
   });
 });

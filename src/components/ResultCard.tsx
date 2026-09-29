@@ -3,6 +3,8 @@ import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';
 import type { NameResult } from '../core/types';
+import { format } from '../messages/catalog';
+import { en } from '../messages/en';
 
 const CARD =
   'flex flex-col gap-2 rounded-lg border bg-white p-3 shadow-xs dark:bg-zinc-900 ' +
@@ -10,7 +12,7 @@ const CARD =
 
 export function ResultCard({ result: r }: { result: NameResult }) {
   const id = `card-${r.ruleId.replace('.', '-')}`;
-  const stepsText = visibleSteps(r.steps).join(' · ');
+  const stepsText = visibleSteps(r.steps).map((m) => format(m, en)).join(' · ');
   // aria-invalid 는 폼 위젯 역할에만 허용된다 — 카드는 data-valid 로 상태를 들고 PASS/FAIL 글자가 뜻을 전한다
   return (
     <article data-rule={r.ruleId} data-valid={r.valid} aria-labelledby={`${id}-title`} className={CARD}>
@@ -35,7 +37,7 @@ export function ResultCard({ result: r }: { result: NameResult }) {
       )}
       {!r.valid && (
         <ul data-violations className="list-disc space-y-0.5 pl-5 text-xs text-rose-700 dark:text-rose-300">
-          {r.violations.map((v) => <li key={v}>{v}</li>)}
+          {r.violations.map((v) => format(v, en)).map((v) => <li key={v}>{v}</li>)}
         </ul>
       )}
 
@@ -48,7 +50,7 @@ export function ResultCard({ result: r }: { result: NameResult }) {
           </a>
         </p>
         <p className="break-all">검증 <code className="font-mono">/{r.rule.pattern}/{r.rule.patternFlags}</code></p>
-        {r.rule.note && <p className="mt-1">{r.rule.note}</p>}
+        {r.rule.notes.length > 0 && <p className="mt-1">{r.rule.notes.map((m) => format(m, en)).join(' · ')}</p>}
       </footer>
     </article>
   );

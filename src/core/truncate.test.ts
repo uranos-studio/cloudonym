@@ -9,7 +9,7 @@ describe('fit — 3단계 축소', () => {
     const rule = getRule('gcp', 'service_account')!;
     const ctx = { owner: 'example', system: 'antigravity', purpose: 'sync', env: 'prd', region: 'kr' } as const;
     const r = fit(tokenValues(ctx, rule), rule);      // example-antigravity-sync-prd-kr-sa-sync = 39자
-    expect(r).toMatchObject({ fits: true, truncated: true, name: 'antigravity-sync-prd-sa-sync', steps: ['region 생략', 'owner 생략'] });
+    expect(r).toMatchObject({ fits: true, truncated: true, name: 'antigravity-sync-prd-sa-sync', steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }] });
     expect(r.name.length).toBe(28);
   });
   it('① 예시: 34자 SA → region 만 떼면 31, owner 까지 떼면 25', () => {
@@ -26,7 +26,7 @@ describe('fit — 3단계 축소', () => {
     const rule = getRule('azure', 'aks_nodepool_windows')!;   // template [slug, purpose] · max 6 · separator ''
     const ctx = { owner: 'x', system: 'y', purpose: 'production', env: 'prd', region: 'kr' } as const;
     const r = fit(tokenValues(ctx, rule), rule);              // 고정 = np(2) 만. seq·role 은 template 에 없다
-    expect(r).toMatchObject({ fits: true, name: 'npprod', steps: ['균등 축소 B=4'] });
+    expect(r).toMatchObject({ fits: true, name: 'npprod', steps: [{ code: 'step.budget_shortened', params: { budget: 4 } }] });
   });
   it('env 는 보호 토큰 — Windows VM 15자에서도 prd 가 남는다 (D13)', () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;
@@ -52,7 +52,7 @@ describe('fit — 3단계 축소', () => {
     const tiny: ResourceRule = { ...getRule('gcp', 'compute_instance')!, id: 'test.tiny', maxLength: 5, slug: 'abc', template: ['slug', 'system'], optional: [] };
     const r = fit({ slug: 'abc', system: 'xyz' }, tiny);     // abc-xyz 7자 · 고정 3 · 구분자 1 · B=1
     expect(r).toMatchObject({ fits: false, name: 'abc-xyz' });
-    expect(r.steps).not.toContain('균등 축소 B=1');
+    expect(r.steps).not.toContainEqual({ code: 'step.budget_shortened', params: { budget: 1 } });
   });
   it('불변조건: 정제 안 된 입력(a-)도 fits:false 로 잡는다', () => {
     const rule = getRule('azure', 'key_vault')!;

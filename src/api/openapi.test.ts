@@ -1,27 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
+import Ajv from 'ajv';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
-import { req, jsonPost, beaconPost, json } from './test-support';
+import { req, jsonPost, json, collectSamples, type Sample } from './test-support';
+import { VERSION } from '../version';
+import { en } from '../messages/en';
 
 // openapi.json 을 읽는 데 필요한 만큼만 타입을 둔다
-interface Schema { type?: string; maxLength?: number; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema; $ref?: string }
+interface Schema { type?: string; maxLength?: number; description?: string; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema | boolean; $ref?: string }
 interface Operation { requestBody: { content: Record<string, { example: unknown; schema: Schema }> }; responses: Record<string, unknown> }
-interface Spec { openapi: string; servers: { url: string }[]; paths: Record<string, { post: Operation }>; components: { schemas: Record<string, Schema> } }
+interface Spec { openapi: string; info: { version: string; description: string }; servers: { url: string }[]; paths: Record<string, { post?: Operation; get?: Operation }>; components: { schemas: Record<string, Schema> } }
 
 const spec = JSON.parse(readFileSync(join(import.meta.dirname, '../../public/openapi.json'), 'utf-8')) as Spec;
 const schemas = spec.components.schemas;
-const props = (name: string): string[] => Object.keys(schemas[name]!.properties!).sort();
-const required = (name: string): string[] => schemas[name]!.required ?? [];
-const exampleOf = (path: string): unknown => spec.paths[path]!.post.requestBody.content['application/json']!.example;
+const exampleOf = (path: string): unknown => spec.paths[path]!.post!.requestBody.content['application/json']!.example;
 const keys = (o: object): string[] => Object.keys(o).sort();
-/** 응답 키 ⊆ properties 이고 required ⊆ 응답 키 */
-function fits(o: object, name: string): void {
-  const k = keys(o);
-  expect(k.filter((x) => !props(name).includes(x)), `${name} 에 없는 키`).toEqual([]);
-  expect(required(name).filter((x) => !k.includes(x)), `${name} 의 required 가 응답에 없다`).toEqual([]);
-}
-
 describe('public/openapi.json — 형식', () => {
   it('3.0.3 · servers 는 상대 /v1 · providers enum 셋(oci 없음 · D8) · env/region 은 enum 이 아닌 string', () => {
     expect(spec.openapi).toBe('3.0.3');
@@ -33,12 +27,13 @@ describe('public/openapi.json — 형식', () => {
     expect(ctx['region']!.enum).toBeUndefined();
     expect(JSON.stringify(spec)).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
   });
-  it('세 경로가 있고 200 · 400 · 413 · 429 를, /events 는 403 도 정의한다 (413 = 본문 16KB 초과 · 최종 리뷰 I-1 · 429 · 403 = 보안 리뷰 M-1 · M-2)', () => {
-    expect(keys(spec.paths)).toEqual(['/events', '/generate', '/validate']);
-    for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post.responses), p).toEqual(['200', '400', '413', '429']);
-    expect(keys(spec.paths['/events']!.post.responses)).toEqual(['200', '400', '403', '413', '429']);
-    for (const p of keys(spec.paths)) {
-      const r429 = spec.paths[p]!.post.responses['429'] as { headers?: Record<string, { schema: Schema }> };
+  it('네 경로 — generate · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500 (D25)', () => {
+    expect(keys(spec.paths)).toEqual(['/events', '/generate', '/health', '/validate']);
+    for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
+    expect(keys(spec.paths['/events']!.post!.responses)).toEqual(['200', '400', '403', '413', '429', '500']);
+    expect(keys(spec.paths['/health']!.get!.responses)).toEqual(['200', '500']);
+    for (const p of ['/events', '/generate', '/validate']) {
+      const r429 = spec.paths[p]!.post!.responses['429'] as { headers?: Record<string, { schema: Schema }> };
       expect(r429.headers?.['Retry-After']?.schema.type, p).toBe('integer');
     }
   });
@@ -47,53 +42,85 @@ describe('public/openapi.json — 형식', () => {
     for (const f of ['owner', 'system', 'purpose', 'env', 'region']) expect(ctxProps[f]!.maxLength, f).toBe(1024);
     for (const f of ['provider', 'resource_type', 'name']) expect(schemas['ValidateRequest']!.properties![f]!.maxLength, f).toBe(1024);
     expect(schemas['EventRequest']!.properties!['event']!.maxLength).toBe(1024);
+    for (const r of ['GenerateRequest', 'ValidateRequest']) expect(schemas[r]!.properties!['rules_version']!.maxLength, r).toBe(1024);
+  });
+  it('info.version = package.json version (D26)', () => {
+    const pkg = JSON.parse(readFileSync(join(import.meta.dirname, '../../package.json'), 'utf-8')) as { version: string };
+    expect(spec.info.version).toBe(pkg.version);
+    expect(spec.info.version).toBe(VERSION.engine);
+  });
+  it('valid 설명 · info 설명에 PASS 의 뜻이 사전과 같은 문장으로 있다 (D28)', () => {
+    expect(schemas['ResourceItem']!.properties!['valid']!.description).toBe(en.ui.pass_meaning);
+    expect(schemas['ValidateResponse']!.properties!['valid']!.description).toBe(en.ui.pass_meaning);
+    expect(spec.info.description).toContain(en.ui.pass_meaning);
+    // README 도 같은 문장을 옮겨 적는다 — 네 곳(화면 · llms.txt · openapi.json · README)이 어긋나지 않게
+    expect(readFileSync(join(import.meta.dirname, '../../README.md'), 'utf-8')).toContain(en.ui.pass_meaning);
+  });
+  it('명세 전체에 한글 0 · reason · note 없음 (steps · notes 로 바뀌었다)', () => {
+    const raw = JSON.stringify(spec);
+    expect(/\p{Script=Hangul}/u.test(raw)).toBe(false);
+    expect(schemas['ResourceItem']!.properties!['reason']).toBeUndefined();
+    expect(schemas['RuleInfo']!.properties!['note']).toBeUndefined();
   });
 });
 
-describe('계약 시험 — example 요청의 응답 키 집합이 스키마와 같다', () => {
-  it('/generate', async () => {
-    const { res } = await req(app, '/v1/generate', jsonPost(exampleOf('/generate')));
-    expect(res.status).toBe(200);
-    const body = await json(res);
-    expect(keys(body)).toEqual(props('GenerateResponse'));
-    expect(keys(body.metadata)).toEqual(props('GenerateMetadata'));
-    let items = 0;
-    for (const perProvider of Object.values(body.data as Record<string, Record<string, object>>)) {
-      for (const item of Object.values(perProvider)) {
-        fits(item, 'ResourceItem');
-        fits((item as { rule: object }).rule, 'RuleInfo');
-        items++;
-      }
+describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다 (ajv · D25 · codex #8)', () => {
+  // OpenAPI 3.0 의 example 키워드 때문에 strict:false. 명세 전체를 한 스키마로 넣고 #/components/schemas/X 를 그 안에서 찾는다
+  const ajv = new Ajv({ strict: false, allErrors: true });
+  ajv.addSchema({ $id: 'openapi', components: spec.components }, 'openapi');
+  const validatorFor = (name: string) => ajv.getSchema(`openapi#/components/schemas/${name}`)!;
+  /** 경로 · 메서드 · 상태 코드의 응답 스키마 이름 — /llms.txt 는 명세 밖이라 ErrorResponse 로 본다 */
+  function schemaNameOf(method: string, path: string, status: number): string {
+    if (path === '/llms.txt') return 'ErrorResponse';
+    const op = spec.paths[path.replace(/^\/v1/, '')]![method.toLowerCase() as 'get' | 'post']!;
+    const r = op.responses[String(status)] as { content?: Record<string, { schema: Schema }> } | undefined;
+    expect(r, `${method} ${path} ${status} 가 명세에 없다`).toBeDefined();
+    return r!.content!['application/json']!.schema.$ref!.split('/').pop()!;
+  }
+  let samples: Sample[] = [];
+  beforeAll(async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try { samples = await collectSamples(app, VERSION.rules); } finally { spy.mockRestore(); }
+  });
+
+  it('검사기 자체 — 키를 더하거나 · params 값 타입이 틀리거나 · message 가 없으면 거부한다', () => {
+    const ok = { valid: true, version: VERSION, violations: [] };
+    expect(validatorFor('ValidateResponse')(ok)).toBe(true);
+    expect(validatorFor('ValidateResponse')({ ...ok, reason: '' })).toBe(false);
+    expect(validatorFor('ValidateResponse')({ ...ok, violations: ['x'] })).toBe(false);
+    expect(validatorFor('ValidateResponse')({ ...ok, violations: [{ code: 'name.empty' }] })).toBe(false);
+    expect(validatorFor('ValidateResponse')({ ...ok, violations: [{ code: 'name.too_long', params: { max: { n: 1 } }, message: 'x' }] })).toBe(false);
+    expect(validatorFor('ErrorResponse')({ success: false, errors: [] })).toBe(false);
+    expect(validatorFor('HealthResponse')({ ok: true })).toBe(false);
+  });
+
+  it('표본이 모든 상태 코드(200 · 400 · 403 · 409 · 413 · 429 · 500)를 덮는다', () => {
+    expect([...new Set(samples.map((x) => x.status))].sort()).toEqual([200, 400, 403, 409, 413, 429, 500]);
+  });
+
+  it('모든 표본 응답이 그 상태 코드의 스키마에 맞는다', () => {
+    const failures: string[] = [];
+    for (const x of samples) {
+      const v = validatorFor(schemaNameOf(x.method, x.path, x.status));
+      if (!v(x.body)) failures.push(`${x.id} (${x.status}): ${ajv.errorsText(v.errors)}`);
     }
-    expect(items).toBe(18);   // gcp 7 + azure 11
+    expect(failures).toEqual([]);
   });
-  it('/validate — 무효 예시에는 suggested_name 이 있고 유효 이름에는 없다', async () => {
-    const body = await json((await req(app, '/v1/validate', jsonPost(exampleOf('/validate')))).res);
-    fits(body, 'ValidateResponse');
-    expect(keys(body)).toEqual(props('ValidateResponse'));
-    const ok = await json((await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: 'project_id', name: 'billing-trade-prd' }))).res);
-    fits(ok, 'ValidateResponse');
-    expect(keys(ok)).toEqual(required('ValidateResponse').sort());
+
+  it('rules_version 다섯 경우 — null · 숫자 · 객체 · 1025자는 400, 빈 문자열은 409 (명세의 상태 코드)', () => {
+    const status = (id: string) => samples.find((x) => x.id === id)!.status;
+    expect(['400-rules-version-null', '400-rules-version-number', '400-rules-version-object', '400-rules-version-too-long'].map(status)).toEqual([400, 400, 400, 400]);
+    expect(status('409-rules-version-empty')).toBe(409);
+    for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(expect.arrayContaining(['400', '409']));
   });
-  it('/events', async () => {
-    const body = await json((await req(app, '/v1/events', beaconPost(exampleOf('/events')))).res);
-    expect(keys(body)).toEqual(props('EventResponse'));
-  });
-  it('400 응답은 ErrorResponse 에 맞는다 (supported 있는 것과 없는 것)', async () => {
-    const noSupported = await json((await req(app, '/v1/generate', jsonPost({ context: { owner: 'a', system: 'b', purpose: 'c', env: 'qa', region: 'kr' } }))).res);
-    fits(noSupported, 'ErrorResponse');
-    expect(keys(noSupported)).toEqual(['errors', 'success']);
-    const withSupported = await json((await req(app, '/v1/validate', jsonPost({ provider: 'oci', resource_type: 'x', name: 'y' }))).res);
-    fits(withSupported, 'ErrorResponse');
-    expect(keys(withSupported)).toEqual(props('ErrorResponse'));
-  });
-  it('413 응답도 ErrorResponse 에 맞는다', async () => {
-    const big = { context: { owner: 'a'.repeat(20 * 1024), system: 'b', purpose: 'c', env: 'prd', region: 'kr' } };
-    const { res } = await req(app, '/v1/generate', jsonPost(big));
-    expect(res.status).toBe(413);
-    const body = await json(res);
-    fits(body, 'ErrorResponse');
-    expect(keys(body)).toEqual(['errors', 'success']);
+
+  it('example 요청은 200 이고 /generate example 은 18 항목(gcp 7 + azure 11)', async () => {
+    const body = await json((await req(app, '/v1/generate', jsonPost(exampleOf('/generate')))).res);
+    expect(validatorFor('GenerateResponse')(body)).toBe(true);
+    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(18);
+    const v = await json((await req(app, '/v1/validate', jsonPost(exampleOf('/validate')))).res);
+    expect(validatorFor('ValidateResponse')(v)).toBe(true);
+    expect(v.suggested_name).toBeDefined();
   });
 });
 

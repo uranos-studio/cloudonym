@@ -1,5 +1,7 @@
 // GenerateOutput → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다 (L3)
 import { PROVIDERS, type GenerateOutput, type LabelSet, type Provider } from '../core/types';
+import { format, type Catalog } from '../messages/catalog';
+import { en } from '../messages/en';
 
 /** CSP 가 부르는 이름대로 — AWS · Azure 는 tags, GCP 는 labels */
 const LABEL_WORD: Record<Provider, string> = { aws: 'tags', gcp: 'labels', azure: 'tags' };
@@ -28,7 +30,8 @@ export function hclString(value: string): string {
  * `valid:false` 인 항목은 값 없이 `# INVALID:` 주석으로만 나온다 — 무효한 이름을 변수로 내주지 않는다.
  * 라벨도 한도 위반이 있으면 블록 대신 `# INVALID:` 주석이다. provider 순서는 PROVIDERS, 리소스 순서는 엔진이 준 순서(규칙 표 순서)
  */
-export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Provider, LabelSet>>): string {
+export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Provider, LabelSet>>, catalog: Catalog = en): string {
+  const reasons = (ms: LabelSet['violations']) => ms.map((m) => format(m, catalog)).join(' · ');
   const lines: string[] = ['locals {'];
   for (const p of PROVIDERS) {
     const names = out[p];
@@ -37,13 +40,13 @@ export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Pr
     for (const [type, r] of Object.entries(names)) {
       const key = `${p}_${type}`;
       if (r.valid) lines.push(`  ${key} = ${hclString(r.name)}`);
-      else lines.push(`  # INVALID: ${key} — ${r.violations.join(' · ')}`);
+      else lines.push(`  # INVALID: ${key} — ${reasons(r.violations)}`);
     }
     const set = labels[p];
     if (set) {
       const key = `${p}_${LABEL_WORD[p]}`;
       if (set.violations.length > 0) {
-        lines.push(`  # INVALID: ${key} — ${set.violations.join(' · ')}`);
+        lines.push(`  # INVALID: ${key} — ${reasons(set.violations)}`);
       } else {
         lines.push(`  ${key} = {`);
         for (const [k, v] of Object.entries(set.labels)) lines.push(`    ${k} = ${hclString(v)}`);

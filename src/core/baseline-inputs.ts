@@ -102,3 +102,23 @@ export function coreBaseline() {
   });
   return { contexts, validate };
 }
+
+/** 규칙 지문(revision.test)용 — 기준선 입력의 위반 · 라벨 위반 · 파싱 오류를 개수가 아니라 코드 목록으로 담는다.
+ *  같은 개수에서 다른 이유로 바뀌는 변경도 지문이 잡는다. 문장은 담지 않는다 (문장은 사전 몫이다) */
+export function coreBaselineCodes() {
+  const codes = (ms: readonly { code: string }[]) => ms.map((m) => m.code);
+  const contexts = BASELINE_CONTEXTS.map(({ id, raw }) => {
+    const parsed = parseContext(raw);
+    if (!parsed.ok) return { id, errors: codes(parsed.errors) };
+    const out = generate(parsed.context);
+    const names: Record<string, Record<string, string[]>> = {};
+    const labels: Record<string, string[]> = {};
+    for (const p of PROVIDERS) {
+      names[p] = Object.fromEntries(Object.entries(out[p] ?? {}).map(([type, r]) => [type, codes(r.violations)]));
+      labels[p] = codes(labelsFor(parsed.context, p).violations);
+    }
+    return { id, names, labels };
+  });
+  const validate = baselineValidateCases().map((c) => codes(validateName(c.provider, c.resourceType, c.name).violations));
+  return { contexts, validate };
+}

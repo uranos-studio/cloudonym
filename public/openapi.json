@@ -2,26 +2,40 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state.",
-    "version": "1.0.0"
+    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Every response carries version { engine, rules }. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "version": "0.1.0"
   },
   "servers": [
-    { "url": "/v1", "description": "Same host as this document (Cloudflare Worker)" }
+    {
+      "url": "/v1",
+      "description": "Same host as this document (Cloudflare Worker)"
+    }
   ],
   "paths": {
     "/generate": {
       "post": {
         "summary": "Generate cloud resource names",
-        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated.",
+        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated. Every violation, step and note is a Message: branch on code, show message to people.",
         "operationId": "generateNames",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/GenerateRequest" },
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequest"
+              },
               "example": {
-                "context": { "owner": "acmex", "system": "billing", "purpose": "trade", "env": "prd", "region": "kr" },
-                "providers": ["gcp", "azure"]
+                "context": {
+                  "owner": "acmex",
+                  "system": "billing",
+                  "purpose": "trade",
+                  "env": "prd",
+                  "region": "kr"
+                },
+                "providers": [
+                  "gcp",
+                  "azure"
+                ]
               }
             }
           }
@@ -29,20 +43,72 @@
         "responses": {
           "200": {
             "description": "Generated names and labels",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenerateResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Body is not JSON, context is invalid (including a value longer than 1024 characters), or providers is not a non-empty array of supported providers",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Body is not JSON or not an object, context is invalid (including a value longer than 1024 characters), providers is not a non-empty array of supported providers, or rules_version is not a string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "rules_version was sent and differs from the current rules revision (request.rules_version_mismatch; params.requested and params.current). The API never serves an old rules revision: re-run without rules_version to use the current rules, or keep using the names you already created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "413": {
-            "description": "Request body is larger than 16 KB",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
-            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -50,34 +116,92 @@
     "/validate": {
       "post": {
         "summary": "Validate an existing resource name",
-        "description": "Checks a name against the provider's physical constraints (length, pattern, documented reserved words). When the name is invalid and a fix is possible, suggested_name is included.",
+        "description": "Checks a name against the provider's physical constraints (length, pattern, documented reserved words). When the name is invalid and a fix is possible, suggested_name is included. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
         "operationId": "validateName",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ValidateRequest" },
-              "example": { "provider": "gcp", "resource_type": "service_account", "name": "acmex-billing-trade-prd-kr-sa-sync" }
+              "schema": {
+                "$ref": "#/components/schemas/ValidateRequest"
+              },
+              "example": {
+                "provider": "gcp",
+                "resource_type": "service_account",
+                "name": "acmex-billing-trade-prd-kr-sa-sync"
+              }
             }
           }
         },
         "responses": {
           "200": {
             "description": "Validation result",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidateResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Unknown provider or resource_type (supported lists the accepted values), name is not a string, or a field is longer than 1024 characters",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Unknown provider or resource_type (supported lists the accepted values), name or rules_version is not a string, or a field is longer than 1024 characters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "rules_version was sent and differs from the current rules revision (request.rules_version_mismatch; params.requested and params.current). The API never serves an old rules revision: re-run without rules_version to use the current rules, or keep using the names you already created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "413": {
-            "description": "Request body is larger than 16 KB",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
-            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -91,32 +215,113 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/EventRequest" },
-              "example": { "event": "ui_visit" }
+              "schema": {
+                "$ref": "#/components/schemas/EventRequest"
+              },
+              "example": {
+                "event": "ui_visit"
+              }
             }
           }
         },
         "responses": {
           "200": {
             "description": "Event accepted",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Unknown event, or event is longer than 1024 characters",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Not sent by the Cloudonym web page: Sec-Fetch-Site is missing or not same-origin. This endpoint accepts only the page's own beacons and sends no CORS headers",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Not sent by the Cloudonym web page (request.same_origin_only): Sec-Fetch-Site is missing or not same-origin. This endpoint accepts only the page's own beacons and sends no CORS headers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "413": {
-            "description": "Request body is larger than 16 KB",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After",
-            "headers": { "Retry-After": { "description": "Seconds to wait before retrying", "schema": { "type": "integer", "example": 60 } } },
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check and version",
+        "description": "Always 200 while the Worker is up. Not rate limited.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Service is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -126,15 +331,35 @@
     "schemas": {
       "GenerateRequest": {
         "type": "object",
-        "required": ["context"],
+        "required": [
+          "context"
+        ],
         "properties": {
           "context": {
             "type": "object",
-            "required": ["owner", "system", "purpose", "env", "region"],
+            "required": [
+              "owner",
+              "system",
+              "purpose",
+              "env",
+              "region"
+            ],
             "properties": {
-              "owner": { "type": "string", "maxLength": 1024, "example": "acmex" },
-              "system": { "type": "string", "maxLength": 1024, "example": "billing" },
-              "purpose": { "type": "string", "maxLength": 1024, "example": "trade" },
+              "owner": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "acmex"
+              },
+              "system": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "billing"
+              },
+              "purpose": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "trade"
+              },
               "env": {
                 "type": "string",
                 "maxLength": 1024,
@@ -152,117 +377,461 @@
           "providers": {
             "type": "array",
             "description": "Omit for all three. Must be non-empty when present.",
-            "items": { "type": "string", "enum": ["aws", "gcp", "azure"] },
-            "example": ["gcp", "aws", "azure"]
+            "items": {
+              "type": "string",
+              "enum": [
+                "aws",
+                "gcp",
+                "azure"
+              ]
+            },
+            "example": [
+              "gcp",
+              "aws",
+              "azure"
+            ]
+          },
+          "rules_version": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Optional pin to a rules revision (YYYY-MM-DD.N). If it differs from the current revision the API answers 409 instead of returning names that may differ. Not a string -> 400.",
+            "example": "2026-09-29.1"
           }
         }
       },
       "GenerateResponse": {
         "type": "object",
-        "required": ["success", "data", "metadata"],
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "version",
+          "data",
+          "metadata"
+        ],
         "properties": {
-          "success": { "type": "boolean", "example": true },
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          },
           "data": {
             "type": "object",
             "description": "provider -> resource_type -> ResourceItem. The provider set equals the requested providers.",
             "additionalProperties": {
               "type": "object",
-              "additionalProperties": { "$ref": "#/components/schemas/ResourceItem" }
+              "additionalProperties": {
+                "$ref": "#/components/schemas/ResourceItem"
+              }
             }
           },
-          "metadata": { "$ref": "#/components/schemas/GenerateMetadata" }
+          "metadata": {
+            "$ref": "#/components/schemas/GenerateMetadata"
+          }
         }
       },
       "GenerateMetadata": {
         "type": "object",
-        "required": ["generated_labels", "label_violations", "label_transformed", "transformed"],
+        "additionalProperties": false,
+        "required": [
+          "generated_labels",
+          "label_violations",
+          "label_transformed",
+          "transformed"
+        ],
         "properties": {
           "generated_labels": {
             "type": "object",
             "description": "provider -> standard tags/labels (owner, system, purpose, environment, managed_by)",
-            "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } }
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
           },
           "label_violations": {
             "type": "object",
-            "description": "provider -> label values over the provider's limit (values are never truncated)",
-            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+            "description": "provider -> label values over the provider's limit or with characters the provider rejects (values are never truncated)",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
           },
           "label_transformed": {
             "type": "object",
             "description": "provider -> label values changed to fit the provider's character rules (GCP)",
-            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
           },
           "transformed": {
             "type": "array",
-            "description": "Context values normalised from aliases, e.g. 'env: production->prd'",
-            "items": { "type": "string" }
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Context values normalised from aliases (context.normalized, e.g. env 'production' -> 'prd')"
           }
         }
       },
       "ResourceItem": {
         "type": "object",
-        "required": ["name", "valid", "is_truncated", "is_transformed", "original", "violations", "reason", "rule"],
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "valid",
+          "is_truncated",
+          "is_transformed",
+          "original",
+          "violations",
+          "steps",
+          "rule"
+        ],
         "properties": {
-          "name": { "type": "string", "description": "Final name. Empty when a required token became empty after normalisation.", "example": "billing-trade-prd-sa-sync" },
-          "valid": { "type": "boolean", "example": true },
-          "is_truncated": { "type": "boolean", "description": "Optional tokens were dropped or tokens were shortened to fit", "example": true },
-          "is_transformed": { "type": "boolean", "description": "Characters were changed by normalisation or separators were removed", "example": false },
-          "original": { "type": "string", "description": "Name assembled before normalisation and shortening", "example": "acmex-billing-trade-prd-kr-sa-sync" },
-          "violations": { "type": "array", "items": { "type": "string" }, "description": "Why the name is invalid (empty when valid)" },
-          "reason": { "type": "string", "description": "Shortening and transformation steps joined with ' · ' (empty when none)", "example": "region 생략 · owner 생략" },
-          "rule": { "$ref": "#/components/schemas/RuleInfo" }
+          "name": {
+            "type": "string",
+            "description": "Final name. Empty when a required token became empty after normalisation.",
+            "example": "billing-trade-prd-sa-sync"
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+            "example": true
+          },
+          "is_truncated": {
+            "type": "boolean",
+            "description": "Optional tokens were dropped or tokens were shortened to fit",
+            "example": true
+          },
+          "is_transformed": {
+            "type": "boolean",
+            "description": "Characters were changed by normalisation or separators were removed",
+            "example": false
+          },
+          "original": {
+            "type": "string",
+            "description": "Name assembled before normalisation and shortening",
+            "example": "acmex-billing-trade-prd-kr-sa-sync"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Why the name is invalid (empty when valid)"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Shortening and transformation steps in order (step.token_dropped, step.abbreviated, step.budget_shortened, step.normalized, step.separator_removed)"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/RuleInfo"
+          }
         }
       },
       "RuleInfo": {
         "type": "object",
-        "required": ["min_length", "max_length", "pattern", "pattern_flags", "allowed", "doc_url"],
+        "required": [
+          "min_length",
+          "max_length",
+          "pattern",
+          "pattern_flags",
+          "allowed",
+          "doc_url",
+          "notes"
+        ],
         "properties": {
-          "min_length": { "type": "integer", "example": 6 },
-          "max_length": { "type": "integer", "example": 30 },
-          "pattern": { "type": "string", "description": "Provider's physical rule (regular expression source). Rebuild with new RegExp(pattern, pattern_flags).", "example": "^[a-z][a-z0-9-]{4,28}[a-z0-9]$" },
-          "pattern_flags": { "type": "string", "description": "RegExp flags for pattern ('u' for Unicode classes, else empty)", "example": "" },
-          "allowed": { "type": "string", "description": "Character set Cloudonym uses when generating (house style)", "example": "lower-digit-hyphen" },
-          "doc_url": { "type": "string", "description": "Official document the numbers come from" },
-          "note": { "type": "string", "description": "Present when the limit is deliberately conservative" }
+          "min_length": {
+            "type": "integer",
+            "example": 6
+          },
+          "max_length": {
+            "type": "integer",
+            "example": 30
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Provider's physical rule (regular expression source). Rebuild with new RegExp(pattern, pattern_flags).",
+            "example": "^[a-z][a-z0-9-]{4,28}[a-z0-9]$"
+          },
+          "pattern_flags": {
+            "type": "string",
+            "description": "RegExp flags for pattern ('u' for Unicode classes, else empty)",
+            "example": ""
+          },
+          "allowed": {
+            "type": "string",
+            "description": "Character set Cloudonym uses when generating (house style)",
+            "example": "lower-digit-hyphen"
+          },
+          "doc_url": {
+            "type": "string",
+            "description": "Official document the numbers come from"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Notes on the rule, e.g. where a limit is deliberately conservative or reserved words apply (note.* codes). Always present, may be empty"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Message": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "description": "One reason, step, note or error. code is stable for machines; message is English text for people and may change between releases.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z]+\\.[a-z_0-9]+$",
+            "example": "name.too_long"
+          },
+          "field": {
+            "type": "string",
+            "description": "Context field (owner ...), token name, label key or request field (provider, providers[1], rules_version ...) the message is about",
+            "example": "owner"
+          },
+          "params": {
+            "type": "object",
+            "description": "Values used in message. User values (from, to, value) are display strings: trimmed to 80 characters in request errors, non-strings shown as JSON",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "example": {
+              "actual": 34,
+              "max": 30
+            }
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "example": "Name is 34 characters long; the maximum is 30"
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "engine",
+          "rules"
+        ],
+        "description": "engine = Cloudonym engine version; rules = rules revision (YYYY-MM-DD.N). A different rules revision may give a different name, verdict, suggestion or label for the same input.",
+        "properties": {
+          "engine": {
+            "type": "string",
+            "example": "0.1.0"
+          },
+          "rules": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}\\.\\d+$",
+            "example": "2026-09-29.1"
+          }
         }
       },
       "ValidateRequest": {
         "type": "object",
-        "required": ["provider", "resource_type", "name"],
+        "required": [
+          "provider",
+          "resource_type",
+          "name"
+        ],
         "properties": {
-          "provider": { "type": "string", "maxLength": 1024, "enum": ["aws", "gcp", "azure"], "example": "gcp" },
-          "resource_type": { "type": "string", "maxLength": 1024, "description": "One of the provider's resource types; an unknown value returns 400 with the supported list", "example": "service_account" },
-          "name": { "type": "string", "maxLength": 1024, "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).", "example": "acmex-billing-trade-prd-kr-sa-sync" }
+          "provider": {
+            "type": "string",
+            "maxLength": 1024,
+            "enum": [
+              "aws",
+              "gcp",
+              "azure"
+            ],
+            "example": "gcp"
+          },
+          "resource_type": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "One of the provider's resource types; an unknown value returns 400 with the supported list",
+            "example": "service_account"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).",
+            "example": "acmex-billing-trade-prd-kr-sa-sync"
+          },
+          "rules_version": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Optional pin to a rules revision (YYYY-MM-DD.N). If it differs from the current revision the API answers 409 instead of returning names that may differ. Not a string -> 400.",
+            "example": "2026-09-29.1"
+          }
         }
       },
       "ValidateResponse": {
         "type": "object",
-        "required": ["valid", "violations"],
+        "additionalProperties": false,
+        "required": [
+          "valid",
+          "version",
+          "violations"
+        ],
         "properties": {
-          "valid": { "type": "boolean", "example": false },
-          "violations": { "type": "array", "items": { "type": "string" }, "example": ["길이 34자 — 최대 30자"] },
-          "suggested_name": { "type": "string", "description": "Present only when the name is invalid and a fix is possible", "example": "billing-trade-prd-kr-sa-sync" }
+          "valid": {
+            "type": "boolean",
+            "description": "PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+            "example": false
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "example": [
+              {
+                "code": "name.too_long",
+                "params": {
+                  "actual": 34,
+                  "max": 30
+                },
+                "message": "Name is 34 characters long; the maximum is 30"
+              }
+            ]
+          },
+          "suggested_name": {
+            "type": "string",
+            "description": "Present only when the name is invalid and a fix is possible",
+            "example": "billing-trade-prd-kr-sa-sync"
+          }
         }
       },
       "EventRequest": {
         "type": "object",
-        "required": ["event"],
+        "required": [
+          "event"
+        ],
         "properties": {
-          "event": { "type": "string", "maxLength": 1024, "enum": ["ui_visit", "ui_generate", "ui_copy"], "example": "ui_visit" }
+          "event": {
+            "type": "string",
+            "maxLength": 1024,
+            "enum": [
+              "ui_visit",
+              "ui_generate",
+              "ui_copy"
+            ],
+            "example": "ui_visit"
+          }
         }
       },
       "EventResponse": {
         "type": "object",
-        "required": ["ok"],
-        "properties": { "ok": { "type": "boolean", "example": true } }
+        "required": [
+          "ok"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ok",
+          "version"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          }
+        }
       },
       "ErrorResponse": {
         "type": "object",
-        "required": ["success", "errors"],
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "errors"
+        ],
+        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape",
         "properties": {
-          "success": { "type": "boolean", "example": false },
-          "errors": { "type": "array", "items": { "type": "string" }, "example": ["env: qa 는 지원하지 않는다 (prd·stg·dev·sbx)"] },
-          "supported": { "type": "array", "items": { "type": "string" }, "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown" }
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "minItems": 1,
+            "example": [
+              {
+                "code": "context.value_unsupported",
+                "field": "env",
+                "params": {
+                  "value": "qa",
+                  "supported": [
+                    "prd",
+                    "stg",
+                    "dev",
+                    "sbx"
+                  ]
+                },
+                "message": "env 'qa' is not supported (prd, stg, dev, sbx)"
+              }
+            ]
+          },
+          "supported": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown"
+          }
         }
       }
     }

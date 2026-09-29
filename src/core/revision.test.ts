@@ -10,7 +10,7 @@ import { RULES, LABEL_LIMITS, AWS_TAG_VALUE } from './constraints';
 import { SHORT_WORDS } from './shorten';
 import { ENV_ALIASES, REGION_ALIASES } from './normalize';
 import { MIN_TOKEN, PROTECTED } from './types';
-import { coreBaseline } from './baseline-inputs';
+import { coreBaseline, coreBaselineCodes } from './baseline-inputs';
 
 const FILE = join(import.meta.dirname, 'rules-fingerprint.json');
 const HINT = '같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라졌다 — RULES_REVISION 을 올리고 UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts 로 파일을 다시 쓴다';
@@ -25,10 +25,10 @@ function canonical(v: unknown): unknown {
   return v;
 }
 
-/** 규칙 데이터 — displayName · note 는 뺀다. 표시용 문구라 이름 · 판정에 관여하지 않고, 문구 이관 때 바뀐다 */
+/** 규칙 데이터 — displayName · notes 는 뺀다. 표시용 문구라 이름 · 판정에 관여하지 않고, 문구 이관 때 바뀐다 */
 function rulesData() {
   return Object.keys(RULES).sort().map((id) => {
-    const { displayName: _d, note: _n, ...rest } = RULES[id]!;
+    const { displayName: _d, notes: _n, ...rest } = RULES[id]!;
     return rest;
   });
 }
@@ -41,7 +41,7 @@ function currentParts() {
   return {
     rules: rulesData(), shortWords: SHORT_WORDS, envAliases: ENV_ALIASES, regionAliases: REGION_ALIASES,
     protected: PROTECTED, minToken: MIN_TOKEN, labelLimits: LABEL_LIMITS, awsTagValue: AWS_TAG_VALUE,
-    outputs: coreBaseline(),
+    outputs: coreBaseline(), violationCodes: coreBaselineCodes(),
   };
 }
 

@@ -8,7 +8,7 @@ describe('generate', () => {
     const out = generate(ctx, ['gcp', 'azure']);
     expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prd-sa-sync', valid: true, isTruncated: true, original: 'acmex-billing-trade-prd-kr-sa-sync' });
     expect(out.azure?.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, isTransformed: true });
-    expect(out.azure?.storage_account.steps).toContain('하이픈 제거');
+    expect(out.azure?.storage_account.steps).toContainEqual({ code: 'step.separator_removed' });
     expect(out.aws).toBeUndefined();
   });
   it('providers 를 안 주면 셋 다', () => expect(Object.keys(generate(ctx)).sort()).toEqual(['aws', 'azure', 'gcp']));
@@ -18,19 +18,19 @@ describe('generate', () => {
   });
   it('정제 뒤 빈 필수 토큰은 valid:false 이고 이름을 만들지 않는다 (Review Focus 1)', () => {
     const out = generate({ ...ctx, system: '매매' }, ['azure']);
-    expect(out.azure?.storage_account).toMatchObject({ valid: false, name: '', violations: ['system 이 정제 뒤 비었다'] });
+    expect(out.azure?.storage_account).toMatchObject({ valid: false, name: '', violations: [{ code: 'name.token_empty', field: 'system' }] });
   });
   it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유 (Review Focus 2)', () => {
     const vm = generate({ ...ctx, system: '3tier' }, ['gcp']).gcp!.compute_instance;
-    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prd-kr-vm-01', violations: ['첫 글자는 영문이어야 한다'] });
+    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prd-kr-vm-01', violations: [{ code: 'name.first_not_letter' }] });
   });
   it('긴 owner 는 optional 생략으로 들어간다', () => {
     const p = generate({ ...ctx, owner: 'a'.repeat(40) }, ['gcp']).gcp!.project_id;   // owner 생략 → billing-trade-prd
-    expect(p).toMatchObject({ valid: true, isTruncated: true, steps: ['owner 생략'] });
+    expect(p).toMatchObject({ valid: true, isTruncated: true, steps: [{ code: 'step.token_dropped', field: 'owner' }] });
   });
   it('축소가 실패하면 valid:false + 이유', () => {
     const w = generate({ ...ctx, system: 'a-long', purpose: 'longpurpose' }, ['azure']).azure!.virtual_machine_windows;
-    expect(w).toMatchObject({ valid: false, violations: ['축소로도 15자 안에 들어가지 않는다'] });
+    expect(w).toMatchObject({ valid: false, violations: [{ code: 'name.cannot_fit', params: { max: 15 } }] });
   });
   it('rule 메타데이터에 물리 규칙과 생성 규칙이 둘 다 있다 (D14)', () => {
     const s3 = generate(ctx, ['aws']).aws!.s3_bucket;
@@ -41,7 +41,7 @@ describe('generate', () => {
     const out = generate({ ...ctx, owner: '홍길동' }, ['gcp']).gcp!;
     for (const r of rulesFor('gcp')) expect(out[r.resourceType], r.id).toMatchObject({ valid: true, violations: [] });
     expect(out.project_id).toMatchObject({ name: 'billing-trade-prd', isTransformed: true });
-    expect(out.project_id.steps).toContain('owner: 홍길동→');
+    expect(out.project_id.steps).toContainEqual({ code: 'step.normalized', field: 'owner', params: { from: '홍길동', to: '' } });
   });
   it('한 글자 system 은 축소 대상이 아니다 — GCP compute_instance 유효', () => {
     expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prd-kr-vm-01', valid: true });
@@ -50,23 +50,23 @@ describe('generate', () => {
 
 describe('parseContext', () => {
   it('빈 purpose 는 막는다', () => {
-    expect(parseContext({ ...ctx, purpose: ' ' })).toMatchObject({ ok: false, errors: ['purpose: 비어 있다'] });
+    expect(parseContext({ ...ctx, purpose: ' ' })).toMatchObject({ ok: false, errors: [{ code: 'context.empty', field: 'purpose' }] });
   });
   it('TC-COM-02 env 별칭은 변환 기록과 함께 통과', () => {
-    expect(parseContext({ ...ctx, env: 'production' })).toMatchObject({ ok: true, context: { env: 'prd' }, transformed: ['env: production→prd'] });
+    expect(parseContext({ ...ctx, env: 'production' })).toMatchObject({ ok: true, context: { env: 'prd' }, transformed: [{ code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prd' } }] });
   });
   it('모르는 env · 문자열 아닌 값', () => {
-    expect(parseContext({ ...ctx, env: 'qa' })).toMatchObject({ ok: false, errors: ['env: qa 는 지원하지 않는다 (prd·stg·dev·sbx)'] });
+    expect(parseContext({ ...ctx, env: 'qa' })).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prd', 'stg', 'dev', 'sbx'] } }] });
     expect(parseContext({ ...ctx, owner: 3 })).toMatchObject({ ok: false });
   });
   it('모르는 region 문구와 필드 순서 (원장 판정 n8)', () => {
-    expect(parseContext({ ...ctx, region: 'mars', owner: '' })).toEqual({ ok: false, errors: ['owner: 비어 있다', 'region: mars 는 지원하지 않는다 (kr·us·jp·eu·global)'] });
+    expect(parseContext({ ...ctx, region: 'mars', owner: '' })).toEqual({ ok: false, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: ['kr', 'us', 'jp', 'eu', 'global'] } }] });
   });
 });
 
 describe('validateName', () => {
   it('이유와 제안을 준다 (앞 토큰부터 뗀다)', () => {
-    expect(validateName('gcp', 'service_account', 'acmex-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: ['길이 34자 — 최대 30자'], suggestedName: 'billing-trade-prd-kr-sa-sync' });
+    expect(validateName('gcp', 'service_account', 'acmex-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: [{ code: 'name.too_long', params: { actual: 34, max: 30 } }], suggestedName: 'billing-trade-prd-kr-sa-sync' });
   });
   it('정제만으로 되면 그 값을 제안', () => {
     expect(validateName('azure', 'storage_account', 'st-web-prod')).toMatchObject({ valid: false, suggestedName: 'stwebprod' });
@@ -75,7 +75,7 @@ describe('validateName', () => {
     expect(validateName('azure', 'storage_account', 'st' + 'a'.repeat(23)).suggestedName).toBeUndefined();
   });
   it('모르는 resource_type 은 violations 하나로 알린다 (Review Focus 5)', () => {
-    expect(validateName('gcp', 'nope', 'x').violations[0]).toMatch(/^지원하는 유형: /);
+    expect(validateName('gcp', 'nope', 'x').violations[0]).toMatchObject({ code: 'rule.unknown_resource_type', params: { provider: 'gcp' } });
   });
   it('유효한 이름은 제안 없이 valid:true', () => {
     expect(validateName('gcp', 'service_account', 'billing-trade-prd-sa-sync')).toEqual({ valid: true, violations: [] });
@@ -127,7 +127,7 @@ describe('1단계 최종 리뷰 고침', () => {
   });
   it('Azure 예약어: system 이 windows 면 Storage Account 는 이름을 바꾸지 않고 valid:false', () => {
     const st = generate({ ...ctx, system: 'windows' }, ['azure']).azure!.storage_account;
-    expect(st).toMatchObject({ valid: false, name: 'stwindowstradeprd', violations: ['금지 문자열 「windows」 포함'] });
+    expect(st).toMatchObject({ valid: false, name: 'stwindowstradeprd', violations: [{ code: 'name.forbidden_substring', params: { value: 'windows' } }] });
   });
   it('Azure 예약어: /v1/validate 경로 — microsoft123 Storage Account 는 무효', () => {
     const r = validateName('azure', 'storage_account', 'microsoft123');

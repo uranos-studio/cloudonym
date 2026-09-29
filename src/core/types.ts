@@ -1,4 +1,6 @@
 // 엔진 공개 타입 — 이후 모듈(normalize · compose · truncate · validate · engine · labels)이 이 이름을 쓴다
+import type { CoreMessage } from './messages';
+export type { CoreMessage };
 
 export type Provider = 'aws' | 'gcp' | 'azure';
 export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
@@ -52,7 +54,7 @@ export interface ResourceRule {
   optional: Token[];          // 축소 1단계에서 적힌 순서대로 떼는 토큰. template 에 있는 것만
   scope: 'global' | 'account' | 'region' | 'project' | 'zone' | 'subscription' | 'resource_group' | 'virtual_network' | 'managed_cluster';
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
-  note?: string;              // 보수적 한도 등 설명 (D20)
+  notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
 }
 
 export interface NameResult {
@@ -64,16 +66,16 @@ export interface NameResult {
   isTruncated: boolean;       // 축소 1·2단계를 거쳤다
   isTransformed: boolean;     // 정제에서 문자가 바뀌었거나 구분자가 빠졌다 (D15)
   original: string;           // 정제 전 · 축소 전 조립 이름
-  violations: string[];       // valid:false 일 때 이유(한국어)
-  steps: string[];            // 축소 · 변환 기록 ('region 생략' · 'trade→trd' · '균등 축소 B=7' · '하이픈 제거')
+  violations: CoreMessage[];  // valid:false 일 때 이유 (D23)
+  steps: CoreMessage[];       // 축소 · 변환 기록 (step.token_dropped · step.abbreviated · step.budget_shortened · step.separator_removed · step.normalized)
   // pattern 은 RegExp.source, patternFlags 는 RegExp.flags — 소비자는 new RegExp(pattern, patternFlags) 로 다시 만든다 (리소스 그룹의 \p{L} 은 'u' 가 없으면 리터럴 p 가 된다)
-  rule: { minLength: number; maxLength: number; pattern: string; patternFlags: string; allowed: Allowed; docUrl: string; note?: string };
+  rule: { minLength: number; maxLength: number; pattern: string; patternFlags: string; allowed: Allowed; docUrl: string; notes: CoreMessage[] };
 }
 
 export type GenerateOutput = Partial<Record<Provider, Record<string, NameResult>>>;
 
 export interface LabelSet {
   labels: Record<string, string>;
-  violations: string[];       // 키·값 한도 초과 (TC-AWS-02)
-  transformed: string[];      // GCP 규격으로 바꾼 값 ('owner: Ac.Mex→acmex')
+  violations: CoreMessage[];  // 키·값 한도 초과 (TC-AWS-02)
+  transformed: CoreMessage[]; // GCP 규격으로 바꾼 값 (label.normalized)
 }
