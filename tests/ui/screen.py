@@ -1,12 +1,14 @@
 """개발 3단계 화면 시험 (Task 3-4) — Playwright(Python) 로 다섯 시나리오를 재고 스크린샷을 남긴다.
 
-실행(저장소 루트):
-  PORT=5199; python3 path/to/with_server.py \
-    --server "npm run dev -- --port ${PORT} --strictPort" --port ${PORT} -- \
-    uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://localhost:${PORT} docs/screenshots
+실행(저장소 루트) — 터미널 둘:
+  ① npm run dev -- --port 5199 --strictPort
+  ② uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://localhost:5199 docs/screenshots
 
-playwright 는 1.63.0 으로 고정한다 — 이 기계의 ~/Library/Caches/ms-playwright/chromium-1243 을 그대로 쓴다(다른 버전은 브라우저 다운로드가 필요하다).
-zsh 에서 `PORT=5199 python3 … ${PORT}` 처럼 한 문장에 두면 `${PORT}` 가 먼저 빈 값으로 펼쳐진다 — `PORT=5199;` 를 따로 둔다.
+①이 뜬 뒤(`curl -s http://localhost:5199/v1/health` → {"ok":true}) ②를 돌리고, 끝나면 ①을 멈춘다.
+서버를 띄우고 내리는 일을 한 번에 하려면 Anthropic webapp-testing 스킬의 with_server.py 를 쓸 수 있다
+(`python3 path/to/with_server.py --server "npm run dev -- --port 5199 --strictPort" --port 5199 -- <② 명령>`).
+
+playwright 는 1.63.0 으로 고정한다 — 다른 버전은 맞는 Chromium 을 새로 받아야 한다(`uv run --with "playwright==1.63.0" playwright install chromium`).
 단언이 하나라도 틀리면 non-zero 로 끝난다(실패를 성공으로 보고하지 않는다).
 """
 import base64

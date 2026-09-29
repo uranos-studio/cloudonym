@@ -110,7 +110,7 @@ Tag/label limits (key · value): AWS 128 · 256, Azure 512 · 256, GCP 63 · 63.
 
 ## Limitations
 
-Cloudonym does **not** replace the provider's final verdict.
+Cloudonym does **not** replace the provider's final verdict. Decision numbers (D16, D19, D20) refer to [docs/decisions.md](docs/decisions.md).
 
 1. **Only known reserved words** (decision D19). `forbidden` holds only strings the official documents state explicitly (e.g. `google`, `g00gle`, `goog` prefix for GCS). Other look-alike spellings and trademarks are not checked.
 2. **Conservative limits** (D20). Where a document is ambiguous or a limit spans several fields, the engine is stricter than the provider — it may reject a valid name, but it must never mark an invalid one valid:
@@ -141,7 +141,7 @@ npm run preview    # build, then vite preview
 npm run deploy     # build, then wrangler deploy (needs `npx wrangler login`)
 ```
 
-Local secrets go in `.dev.vars` (template: `.dev.vars.example`). More detail — including running the built Worker with `wrangler dev` — is in [docs/개발환경.md](docs/개발환경.md).
+Local secrets go in `.dev.vars` (template: `.dev.vars.example`). To run the last build (not the sources) locally, use `npm run build && npx wrangler dev --port 8799` — `wrangler dev` serves `dist/cloudonym/`, so run the build first or you will see stale code. Production secrets are set with `npx wrangler secret put AXIOM_API_KEY`.
 
 ## Contributing and security
 
@@ -202,7 +202,7 @@ GCP 7 · AWS 6 · Azure 11, 모두 **24개** 규칙이다. 표와 공식 문서 
 
 ### 한계
 
-Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.**
+Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.** 결정 번호(D16 · D19 · D20)는 [docs/decisions.md](docs/decisions.md) 에 있다.
 
 1. **알려진 예약어만 검사한다** (D19) — 공식 문서에 명시된 문자열(`google` · `g00gle` · GCS 의 `goog` 접두 등)만 막는다. 그 밖의 유사 철자와 상표는 보지 않는다
 2. **한도를 보수적으로 잡는다** (D20) — 유효한 이름을 거부할 수는 있어도 무효를 유효로 표시하지는 않는 쪽으로 간다
@@ -219,7 +219,7 @@ Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.**
 
 ### 로컬 개발
 
-Node 는 `.nvmrc`(22)를 따른다. 명령은 위 [Local development](#local-development) 와 같고, 정본은 `package.json` `scripts` · 자세한 내용은 [docs/개발환경.md](docs/개발환경.md) 다.
+Node 는 `.nvmrc`(22)를 따른다. 명령은 위 [Local development](#local-development) 와 같고, 정본은 `package.json` `scripts` 다. 빌드 산출물을 로컬에서 돌리려면 `npm run build && npx wrangler dev --port 8799`(빌드 없이 돌리면 옛 코드를 본다).
 
 ### 기여 · 보안
 

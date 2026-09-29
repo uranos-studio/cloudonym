@@ -25,7 +25,7 @@ All four must pass before you open a pull request. Add or update tests for any b
 
 ## Rules the code must follow
 
-- **Every naming limit cites the provider's official documentation.** A length, pattern or forbidden word in `src/core/constraints.ts` needs a `docUrl` pointing to the official AWS, Google Cloud or Microsoft Azure document that states it. Rules without an official source are not accepted.
+- **Every naming limit cites the provider's official documentation.** A length, pattern or forbidden word in `src/core/constraints.ts` needs a `docUrl` pointing to the official AWS, Google Cloud or Microsoft Azure document that states it. Rules without an official source are not accepted. Where a document is ambiguous, the limit is set conservatively and recorded in [docs/decisions.md](docs/decisions.md) — see the existing D numbers there.
 - **Never mark an invalid name valid.** If a name cannot be shortened to fit, the engine returns `valid: false` with a reason instead of truncating it into something the provider would reject. When a document is ambiguous, choose the stricter limit.
 - **`src/core/` stays pure** — it imports only its own modules (`./…`), no npm packages and nothing from `src/api/` or `src/components/`. The API and the UI only call the engine; naming logic does not live there.
 
@@ -56,6 +56,6 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 
 - **issue · PR 모두 환영한다.** 큰 변경(새 provider · 새 리소스 · API 변경)은 issue 로 먼저 방향을 맞춘다. 보안 문제는 [SECURITY.md](SECURITY.md) 를 따른다
 - **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` 넷을 통과시킨 뒤 PR 을 연다
-- **규칙 숫자에는 CSP 공식 문서 URL(`docUrl`)이 붙는다.** 출처 없는 길이 · 정규식은 받지 않는다. 무효인 이름을 유효로 표시하지 않는다
+- **규칙 숫자에는 CSP 공식 문서 URL(`docUrl`)이 붙는다.** 출처 없는 길이 · 정규식은 받지 않는다. 무효인 이름을 유효로 표시하지 않는다 — 문서가 모호하면 보수적으로 잡고 [docs/decisions.md](docs/decisions.md) 에 적는다
 - **모든 commit 에 `git commit -s` 로 서명한다** — CLA 대신 [DCO](DCO) 를 쓴다
 - **기여물은 Apache License 2.0 §5 에 따라 같은 조건으로 제공된다**(inbound = outbound)
