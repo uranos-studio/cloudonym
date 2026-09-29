@@ -1,7 +1,8 @@
 // GenerateOutput → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다 (L3)
 import { PROVIDERS, type GenerateOutput, type LabelSet, type Provider } from '../core/types';
-import { format, type Catalog } from '../messages/catalog';
+import { fillUi, format, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
+import type { Version } from '../version';
 
 /** CSP 가 부르는 이름대로 — AWS · Azure 는 tags, GCP 는 labels */
 const LABEL_WORD: Record<Provider, string> = { aws: 'tags', gcp: 'labels', azure: 'tags' };
@@ -28,11 +29,15 @@ export function hclString(value: string): string {
 
 /**
  * `valid:false` 인 항목은 값 없이 `# INVALID:` 주석으로만 나온다 — 무효한 이름을 변수로 내주지 않는다.
- * 라벨도 한도 위반이 있으면 블록 대신 `# INVALID:` 주석이다. provider 순서는 PROVIDERS, 리소스 순서는 엔진이 준 순서(규칙 표 순서)
+ * 라벨도 한도 위반이 있으면 블록 대신 `# INVALID:` 주석이다. provider 순서는 PROVIDERS, 리소스 순서는 엔진이 준 순서(규칙 표 순서).
+ * version 을 넘기면 `locals {` 앞에 엔진 · 규칙 버전과 PASS 의 뜻을 주석 두 줄로 적는다 (D26 · D28)
  */
-export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Provider, LabelSet>>, catalog: Catalog = en): string {
+export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Provider, LabelSet>>, catalog: Catalog = en, version?: Version): string {
   const reasons = (ms: LabelSet['violations']) => ms.map((m) => format(m, catalog)).join(' · ');
-  const lines: string[] = ['locals {'];
+  const header = version
+    ? [`# ${fillUi(catalog, 'terraform_header_version', version)}`, `# ${fillUi(catalog, 'terraform_header_pass')}`]
+    : [];
+  const lines: string[] = [...header, 'locals {'];
   for (const p of PROVIDERS) {
     const names = out[p];
     if (!names) continue;

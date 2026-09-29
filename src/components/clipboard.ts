@@ -1,10 +1,13 @@
 // 클립보드 복사 — navigator.clipboard 는 보안 컨텍스트(HTTPS · localhost)에서만 있고 권한이 없으면 거부한다. 결과를 셋으로 돌려주고 화면이 안내 문구를 고른다
+import { en } from '../messages/en';
+
 export type CopyResult = 'copied' | 'unavailable' | 'failed';
 
+/** 안내 문구는 사전이 정본이다 (D24) */
 export const COPY_MESSAGE: Record<CopyResult, string> = {
-  copied: '복사했습니다',
-  unavailable: '클립보드를 쓸 수 없습니다 — HTTPS 로 열거나 값을 직접 선택해 복사하세요',
-  failed: '복사 권한이 없습니다 — 값을 직접 선택해 복사하세요',
+  copied: en.ui.copy_done,
+  unavailable: en.ui.copy_unavailable,
+  failed: en.ui.copy_failed,
 };
 
 type Writer = Pick<Clipboard, 'writeText'>;

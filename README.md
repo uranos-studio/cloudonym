@@ -10,7 +10,8 @@ Multi-cloud resource naming engine for **AWS · GCP · Azure**. From five contex
 
 1. Type **Owner · System · Purpose**, pick **Environment** and **Region** — names are regenerated as you type.
 2. Each card shows the name, `PASS`/`FAIL`, and why it was shortened or transformed (e.g. dropped `region`, removed hyphens).
-3. Copy a name with its button, copy the tags/labels as **JSON** or **Terraform**, or share the whole form with **공유 URL** (state lives in the URL hash).
+3. Copy a name with its button, copy the tags/labels as **JSON** or **Terraform**, or share the whole form with **Share URL** (state lives in the URL hash). The JSON copy is `{ "version": {…}, "labels": {…} }` and the Terraform copy starts with a comment carrying the engine and rules versions.
+4. Under the tabs, one line says what **PASS** means (it is not an availability or uniqueness check — see **What PASS means** under [API in three lines](#api-in-three-lines)). The footer shows the engine and rules versions; a share link made with older rules shows a notice until you edit the form.
 
 Allowed values — env: `prd` · `stg` · `dev` · `sbx` (aliases such as `prod`, `staging` are accepted) · region: `kr` · `us` · `jp` · `eu` · `global` (aliases such as `asia-northeast3`, `ap-northeast-2`, `koreacentral` are accepted). The full alias list is in `/llms.txt`.
 
@@ -191,7 +192,8 @@ See the LICENSE file for details.
 
 1. **Owner · System · Purpose** 를 적고 **Environment** · **Region** 을 고른다 — 입력하는 대로 이름이 다시 만들어진다
 2. 카드마다 이름 · `PASS`/`FAIL` · 줄이거나 바꾼 이유(`region` 생략 · 하이픈 제거 등)가 나온다
-3. 이름은 복사 버튼으로, 태그 · 라벨은 **JSON** · **Terraform** 으로 복사하고, **공유 URL** 로 입력 전체를 넘긴다(상태는 URL hash 에 있다)
+3. 이름은 복사 버튼으로, 태그 · 라벨은 **JSON** · **Terraform** 으로 복사하고, **Share URL** 로 입력 전체를 넘긴다(상태는 URL hash 에 있다). JSON 은 `{ "version": {…}, "labels": {…} }` 꼴이고 Terraform 은 첫 줄 주석에 엔진 · 규칙 버전이 있다
+4. 탭 아래 한 줄이 **PASS** 의 뜻을 말한다(쓸 수 있는지 · 고유한지는 검사하지 않는다). 꼬리말에 엔진 · 규칙 버전이 있고, 옛 규칙으로 만든 공유 링크는 폼을 고칠 때까지 안내를 보인다
 
 허용값 — env: `prd` · `stg` · `dev` · `sbx`(`prod` · `staging` 같은 별칭도 받는다) · region: `kr` · `us` · `jp` · `eu` · `global`(`asia-northeast3` · `ap-northeast-2` · `koreacentral` 같은 별칭도 받는다). 별칭 전체는 `/llms.txt` 에 있다.
 

@@ -20,6 +20,10 @@ export const UI_KEYS = [
   // LabelsPanel
   'copy_tags_json_label', 'copy_tags_json_blocked_label', 'copy_terraform_label', 'tags_json_blocked',
   'label_transformed_prefix', 'label_violation_prefix',
+  // ProviderSection
+  'provider_name_aws', 'provider_name_gcp', 'provider_name_azure',
+  // Terraform 내보내기 첫 줄 주석 (D26)
+  'terraform_header_version', 'terraform_header_pass',
   // clipboard
   'copy_done', 'copy_unavailable', 'copy_failed',
   // index.html

@@ -1,13 +1,13 @@
-// 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류 문구는 parseContext 가 준 것을 그대로 보인다
+// 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
 import type { CoreMessage, Env, NamingContext, Region } from '../core/types';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
 
 type TextKey = 'owner' | 'system' | 'purpose';
 const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; placeholder: string }> = [
-  { key: 'owner', label: 'Owner', hint: '소유자 · 조직', placeholder: '예: acmex' },
-  { key: 'system', label: 'System', hint: '시스템 · 서비스', placeholder: '예: billing' },
-  { key: 'purpose', label: 'Purpose', hint: '목적 · 워크로드', placeholder: '예: trade' },
+  { key: 'owner', label: 'Owner', hint: en.ui.field_owner_hint, placeholder: en.ui.field_owner_placeholder },
+  { key: 'system', label: 'System', hint: en.ui.field_system_hint, placeholder: en.ui.field_system_placeholder },
+  { key: 'purpose', label: 'Purpose', hint: en.ui.field_purpose_hint, placeholder: en.ui.field_purpose_placeholder },
 ];
 const ENVS: ReadonlyArray<{ value: Env; label: string }> = [
   { value: 'prd', label: 'prd — Production' },
@@ -20,7 +20,7 @@ const REGIONS: ReadonlyArray<{ value: Region; label: string }> = [
   { value: 'us', label: 'us — United States' },
   { value: 'jp', label: 'jp — Japan' },
   { value: 'eu', label: 'eu — Europe' },
-  { value: 'global', label: 'global — 전역' },
+  { value: 'global', label: en.ui.region_global_label },
 ];
 
 const LABEL = 'block text-sm font-medium text-zinc-800 dark:text-zinc-200';
@@ -38,7 +38,7 @@ interface Props {
 }
 
 export function ContextForm({ value, errors, onChange }: Props) {
-  const errorFor = (key: string) => {
+  const errorFor = (key: TextKey) => {
     const e = errors.find((m) => 'field' in m && m.field === key);
     return e ? format(e, en) : undefined;
   };
@@ -51,7 +51,7 @@ export function ContextForm({ value, errors, onChange }: Props) {
   return (
     <form aria-labelledby="ctx-title" onSubmit={(e) => e.preventDefault()} className="space-y-4">
       <h2 id="ctx-title" className="text-base font-semibold">
-        Naming Context <span className={HINT}>다섯 값을 넣으면 바로 다시 만듭니다</span>
+        {en.ui.form_title} <span className={HINT}>{en.ui.form_hint}</span>
       </h2>
       {TEXT_FIELDS.map((f) => {
         const id = `field-${f.key}`;

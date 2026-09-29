@@ -5,16 +5,18 @@ import type { NamingContext } from '../core/types';
 
 const ctx: NamingContext = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
+/** 문맥만 — v 를 보지 않는 시험용 */
+const ctxOf = (hash: string) => decodeState(hash)?.context;
 
 describe('encodeState — Base64url', () => {
   it('왕복이 같다 · 출력에 + / = 가 없다', () => {
     const encoded = encodeState(ctx);
     expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
-    expect(decodeState(`#state=${encoded}`)).toEqual(ctx);
+    expect(ctxOf(`#state=${encoded}`)).toEqual(ctx);
   });
   it('한글 owner 도 왕복이 같다 (UTF-8 · btoa 의 Latin1 한계를 넘는다)', () => {
     const ko: NamingContext = { ...ctx, owner: '홍길동' };
-    expect(decodeState(`#state=${encodeState(ko)}`)).toEqual(ko);
+    expect(ctxOf(`#state=${encodeState(ko)}`)).toEqual(ko);
   });
   it('필드 순서가 달라도 같은 문자열 — 다섯 필드만 고정 순서로 담는다', () => {
     const shuffled = { region: 'kr', env: 'prd', purpose: 'trade', system: 'billing', owner: 'acmex', extra: 'x' } as unknown as NamingContext;
@@ -36,19 +38,19 @@ describe('decodeState — 깨진 hash 는 전부 undefined (Review Focus 4)', ()
     ['#other=abc', '다른 키'],
     ['#state=', '값이 비었다'],
   ])('%s → undefined (%s)', (hash) => {
-    expect(decodeState(hash)).toBeUndefined();
+    expect(ctxOf(hash)).toBeUndefined();
   });
   it('① 예시처럼 표준 Base64(패딩 없음 · + /)도 받는다', () => {
     const std = btoa(JSON.stringify(ctx)).replace(/=+$/, '');
-    expect(decodeState(`#state=${std}`)).toEqual(ctx);
+    expect(ctxOf(`#state=${std}`)).toEqual(ctx);
     // 표준 Base64 의 + 와 / 가 들어가는 값
     const plus: NamingContext = { ...ctx, owner: '>>>???' };
     const stdPlus = btoa(JSON.stringify(plus));
     expect(stdPlus).toMatch(/[+/]/);
-    expect(decodeState(`state=${stdPlus}`)).toEqual(plus);
+    expect(ctxOf(`state=${stdPlus}`)).toEqual(plus);
   });
   it('별칭은 parseContext 가 정규화한다 — production · korea → prd · kr', () => {
-    expect(decodeState(`#state=${b64({ ...ctx, env: 'production', region: 'korea' })}`)).toEqual(ctx);
+    expect(ctxOf(`#state=${b64({ ...ctx, env: 'production', region: 'korea' })}`)).toEqual(ctx);
   });
 });
 
@@ -56,17 +58,19 @@ describe('shareUrl', () => {
   it('base 뒤에 #state= 를 붙인다 · 그 URL 의 hash 가 다시 풀린다', () => {
     const url = shareUrl(ctx, 'http://localhost:5173/');
     expect(url.startsWith('http://localhost:5173/#state=')).toBe(true);
-    expect(decodeState(new URL(url).hash)).toEqual(ctx);
+    expect(ctxOf(new URL(url).hash)).toEqual(ctx);
   });
 });
 
 describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
   const at = (s: string): NamingContext => ({ owner: s, system: s, purpose: s, env: 'prd', region: 'global' });
-  const hashOf = (c: NamingContext) => `#${'state'}=${encodeState(c)}`;
+  /** 가장 긴 v — N 두 자리 */
+  const V = '2099-12-31.99';
+  const hashOf = (c: NamingContext) => `#${'state'}=${encodeState(c, V)}`;
   it('필드 상한은 API 와 같은 1024', () => expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS));
   it('필드 하나가 1024자를 넘으면 undefined(기본값) · 딱 1024자는 받는다', () => {
-    expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1025) })}`)).toBeUndefined();
-    expect(decodeState(`#state=${b64({ ...ctx, owner: 'a'.repeat(1024) })}`)?.owner).toBe('a'.repeat(1024));
+    expect(ctxOf(`#state=${b64({ ...ctx, owner: 'a'.repeat(1025) })}`)).toBeUndefined();
+    expect(ctxOf(`#state=${b64({ ...ctx, owner: 'a'.repeat(1024) })}`)?.owner).toBe('a'.repeat(1024));
   });
   it.each([
     ['ASCII 1024자 × 3', 'a'.repeat(1024)],
@@ -77,23 +81,43 @@ describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
     const c = at(s);
     const h = hashOf(c);
     expect(h.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
-    expect(decodeState(h)).toEqual(c);
+    expect(ctxOf(h)).toEqual(c);
   });
-  it('hash 상한은 최악 입력(필드당 6바이트 × 1024 × 3 · region global)의 표준 Base64(패딩 포함) 길이와 같다', () => {
+  it('hash 상한은 최악 입력(필드당 6바이트 × 1024 × 3 · region global · v 13자)의 표준 Base64(패딩 포함) 길이와 같다', () => {
     const worst = at('\u0001'.repeat(1024));
     const url = hashOf(worst);
-    const padded = `#state=${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(worst))))}`;
-    expect(url.length).toBe(24673);
-    expect(padded.length).toBe(24675);
+    const padded = `#state=${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({ ...worst, v: V }))))}`;
+    expect(url.length).toBe(24699); // 18519 바이트는 3 의 배수라 패딩이 없다
+    expect(padded.length).toBe(24699);
     expect(MAX_HASH_CHARS).toBe(padded.length);
-    expect(decodeState(padded)).toEqual(worst);
+    expect(decodeState(padded)).toEqual({ context: worst, rulesVersion: V });
   });
   it('상한을 한 글자라도 넘으면 내용이 멀쩡해도 디코딩하지 않고 undefined', () => {
     // env 별칭 production 은 parseContext 가 prd 로 받는 값이다 — 상한이 없다면 풀린다
-    const over = `#state=${b64({ ...at('\u0001'.repeat(1024)), env: 'production' })}`;
+    const over = `#state=${b64({ ...at('\u0001'.repeat(1024)), env: 'production', v: V })}`;
     expect(over.length).toBeGreaterThan(MAX_HASH_CHARS);
-    expect(decodeState(over)).toBeUndefined();
+    expect(ctxOf(over)).toBeUndefined();
     const big = `#state=${encodeState(ctx)}${'A'.repeat(MAX_HASH_CHARS)}`;
-    expect(decodeState(big)).toBeUndefined();
+    expect(ctxOf(big)).toBeUndefined();
+  });
+});
+
+describe('규칙 버전 v (D26 · D27 ⑵)', () => {
+  it('v 는 마지막 키로 붙고 왕복한다', () => {
+    const encoded = encodeState(ctx, '2026-09-29.1');
+    const json = new TextDecoder().decode(Uint8Array.from(atob(encoded.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (encoded.length % 4)) % 4)), (c) => c.charCodeAt(0)));
+    expect(Object.keys(JSON.parse(json) as object)).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'v']);
+    expect(decodeState(`#state=${encoded}`)).toEqual({ context: ctx, rulesVersion: '2026-09-29.1' });
+  });
+  it('v 가 없는 옛 hash 도 열린다 — rulesVersion 없음', () => {
+    expect(decodeState(`#state=${encodeState(ctx)}`)).toEqual({ context: ctx });
+  });
+  it.each([['2026-09-29'], ['v1'], ['2026-9-29.1'], ['2026-09-29.1 '], [''], [42], [null]])('꼴이 틀린 v(%j)는 무시한다 — 문맥은 그대로 열린다', (v) => {
+    const decoded = decodeState(`#state=${b64({ ...ctx, v })}`);
+    expect(decoded).toEqual({ context: ctx });
+  });
+  it('shareUrl 은 넘긴 버전을 담는다', () => {
+    const url = shareUrl(ctx, 'http://localhost:5173/', '2026-09-29.1');
+    expect(decodeState(new URL(url).hash)?.rulesVersion).toBe('2026-09-29.1');
   });
 });

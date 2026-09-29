@@ -3,7 +3,7 @@ import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';
 import type { NameResult } from '../core/types';
-import { format } from '../messages/catalog';
+import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 
 const CARD =
@@ -26,13 +26,13 @@ export function ResultCard({ result: r }: { result: NameResult }) {
       <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-2 dark:bg-zinc-950">
         <code data-name className="min-w-0 break-all font-mono text-sm text-zinc-900 dark:text-zinc-100">{r.name || '—'}</code>
         {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 (L3) */}
-        <CopyButton text={r.name} label={r.valid ? `${r.displayName} 이름 복사` : '유효하지 않은 이름은 복사할 수 없습니다'} disabled={!r.valid} copyKey={`name:${r.ruleId}`} />
+        <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: r.displayName }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${r.ruleId}`} />
       </div>
 
       {stepsText && (
         <p data-steps className="flex items-start gap-1.5 text-xs text-amber-800 dark:text-amber-300">
           {r.isTruncated ? <TriangleAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" /> : <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />}
-          <span>{r.isTruncated ? '축약' : '변환'} — {stepsText}{r.isTruncated && ` (원래 ${r.original.length}자)`}</span>
+          <span>{r.isTruncated ? en.ui.shortened : en.ui.transformed} — {stepsText}{r.isTruncated && ` ${fillUi(en, 'originally_chars', { n: r.original.length })}`}</span>
         </p>
       )}
       {!r.valid && (
@@ -43,13 +43,13 @@ export function ResultCard({ result: r }: { result: NameResult }) {
 
       <footer className="mt-auto border-t border-zinc-100 pt-2 text-[11px] leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
         <p>
-          길이 {r.rule.minLength}–{r.rule.maxLength} · 생성 문자 <code className="font-mono">{r.rule.allowed}</code>
+          {fillUi(en, 'length_range', { min: r.rule.minLength, max: r.rule.maxLength })} · {en.ui.generation_charset} <code className="font-mono">{r.rule.allowed}</code>
           {' · '}
           <a href={r.rule.docUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-indigo-700 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-300">
-            공식 문서<ExternalLink aria-hidden="true" className="size-3" />
+            {en.ui.official_doc}<ExternalLink aria-hidden="true" className="size-3" />
           </a>
         </p>
-        <p className="break-all">검증 <code className="font-mono">/{r.rule.pattern}/{r.rule.patternFlags}</code></p>
+        <p className="break-all">{en.ui.validation} <code className="font-mono">/{r.rule.pattern}/{r.rule.patternFlags}</code></p>
         {r.rule.notes.length > 0 && <p className="mt-1">{r.rule.notes.map((m) => format(m, en)).join(' · ')}</p>}
       </footer>
     </article>

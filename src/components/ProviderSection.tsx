@@ -1,8 +1,9 @@
 // CSP 하나의 결과 카드 묶음 — 제목 · PASS 수 · 카드 격자. 순서는 엔진이 준 순서(규칙 표 순서)
 import { ResultCard } from './ResultCard';
 import type { NameResult, Provider } from '../core/types';
+import { en } from '../messages/en';
 
-const PROVIDER_NAME: Record<Provider, string> = { aws: 'Amazon Web Services', gcp: 'Google Cloud', azure: 'Microsoft Azure' };
+const PROVIDER_NAME: Record<Provider, string> = { aws: en.ui.provider_name_aws, gcp: en.ui.provider_name_gcp, azure: en.ui.provider_name_azure };
 
 export function ProviderSection({ provider, names }: { provider: Provider; names: Record<string, NameResult> }) {
   const results = Object.values(names);
