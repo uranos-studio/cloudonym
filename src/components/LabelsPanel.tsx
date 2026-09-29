@@ -1,6 +1,7 @@
 // 태그 · 라벨 JSON 과 내보내기 — 보이는 provider 만 담는다. 복사 둘: 태그 JSON · Terraform locals (이름 + 태그)
 import { CopyButton } from './CopyButton';
 import { toTerraformLocals } from './terraform';
+import { labelsJsonBlocked } from './labelsGate';
 import type { GenerateOutput, LabelSet, Provider } from '../core/types';
 
 interface Props {
@@ -28,7 +29,7 @@ export function LabelsPanel({ providers, output, labels }: Props) {
   const json = JSON.stringify(view, null, 2);
   const hcl = toTerraformLocals(picked, pickedLabels);
   // 한도를 넘은 값은 CSP 가 거부한다 — Terraform 이 `# INVALID:` 로 바꾸듯 JSON 도 내보내지 않는다 (L3 「무효를 유효로 내지 않는다」)
-  const jsonBlocked = violations.length > 0;
+  const jsonBlocked = labelsJsonBlocked(providers, labels);
 
   return (
     <section aria-labelledby="labels-title" className="space-y-3">
