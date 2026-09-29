@@ -31,7 +31,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-09-29.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-09-29.2" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -70,7 +70,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-09-29.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-09-29.2" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9]{3,24}$" }, "message": "Does not match the allowed pattern ^[a-z0-9]{3,24}$" }
   ],

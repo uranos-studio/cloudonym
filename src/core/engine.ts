@@ -26,7 +26,8 @@ function generateOne(ctx: NamingContext, rule: ResourceRule): NameResult {
     original: compose(raw, rule.template, rule.separator),
     isTransformed: transformed,
     rule: { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
-            notes: rule.notes ?? [] },
+            // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게 (리뷰 Q3)
+            notes: (rule.notes ?? []).map((m) => structuredClone(m)) },
   };
 
   // Review Focus 1 — 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다

@@ -135,4 +135,11 @@ describe('1단계 최종 리뷰 고침', () => {
     expect(r.suggestedName ?? '').not.toMatch(/microsoft/);
     expect(validateName('azure', 'storage_account', 'stbilling01').valid).toBe(true);
   });
+  it('결과의 rule.notes 를 고쳐도 규칙 표는 그대로다 — 참조가 아니라 사본 (리뷰 Q3)', () => {
+    const first = generate(ctx, ['gcp']).gcp!.cloud_sql_instance!;
+    expect(first.rule.notes.length).toBeGreaterThan(0);
+    first.rule.notes.push({ code: 'note.s3_an_suffix' });
+    (first.rule.notes[0] as { code: string }).code = 'x.changed';
+    expect(generate(ctx, ['gcp']).gcp!.cloud_sql_instance!.rule.notes).toEqual([{ code: 'note.cloud_sql_combined_limit' }]);
+  });
 });
