@@ -2,7 +2,7 @@
 #
 # 1. POST the five context values to Cloudonym's /v1/generate
 # 2. Use the generated GCP VM name and labels on google_compute_instance
-# 3. Block apply unless the name is valid and the labels have no violations
+# 3. Block apply unless the name is valid and the labels have no violations (API mode only - pinned values are not checked)
 # 4. Keep the name stable: once the VM exists its name is never changed by a later rules revision
 #    (lifecycle ignore_changes), and var.pinned skips the API entirely
 #
@@ -58,7 +58,7 @@ variable "pinned" {
     name   = string
     labels = map(string)
   })
-  description = "Name and labels you already created. When set, Cloudonym is not called at all (the http data source has count = 0) - the recovery path after a 409 or when the API is unreachable."
+  description = "Name and labels you already created. When set, Cloudonym is not called at all (the http data source has count = 0) - the recovery path after a 409 or when the API is unreachable. Pinned values are NOT checked by Cloudonym: the example makes no validity claim for them."
   default     = null
 }
 
@@ -171,8 +171,9 @@ locals {
   #   data.gcp.compute_instance.{name, valid, violations, steps}
   #   metadata.generated_labels.gcp             (map of label key -> value)
   #   metadata.label_violations.gcp             (list of { code, field, params, message }; empty when all labels are valid)
+  # Pinned mode makes no validity claim: nothing checked the pinned name, so vm_valid is null there, not true
   vm_name          = var.pinned != null ? var.pinned.name : local.api.data.gcp.compute_instance.name
-  vm_valid         = var.pinned != null ? true : local.api.data.gcp.compute_instance.valid
+  vm_valid         = var.pinned != null ? null : local.api.data.gcp.compute_instance.valid
   labels           = var.pinned != null ? var.pinned.labels : tomap(local.api.metadata.generated_labels.gcp)
   name_violations  = var.pinned != null ? [] : [for v in local.api.data.gcp.compute_instance.violations : v.message]
   label_violations = var.pinned != null ? [] : [for v in local.api.metadata.label_violations.gcp : v.message]
@@ -204,9 +205,12 @@ resource "google_compute_instance" "this" {
     ignore_changes = [name]
 
     # Cloudonym never truncates silently: an invalid name comes back with valid = false and the reasons.
+    # API mode only - in pinned mode Cloudonym is not called, so this check does not apply (the pinned name is yours to vouch for).
+    # ignore_changes does not skip this: in API mode the precondition still evaluates the NEW candidate name on every plan,
+    # so a later rules revision that rejects the context blocks apply even though the existing VM keeps its old name.
     precondition {
-      condition     = local.vm_valid == true && length(local.label_violations) == 0
-      error_message = "Cloudonym refused this context. name=\"${local.vm_name}\" valid=${local.vm_valid} name_violations=${jsonencode(local.name_violations)} label_violations=${jsonencode(local.label_violations)}"
+      condition     = var.pinned != null || (local.vm_valid == true && length(local.label_violations) == 0)
+      error_message = "Cloudonym refused this context. name=\"${local.vm_name}\" valid=${jsonencode(local.vm_valid)} name_violations=${jsonencode(local.name_violations)} label_violations=${jsonencode(local.label_violations)}"
     }
   }
 }
@@ -219,6 +223,11 @@ output "instance_name" {
 output "instance_labels" {
   description = "Labels applied to the VM."
   value       = local.labels
+}
+
+output "cloudonym_valid" {
+  description = "Cloudonym's verdict on the candidate name (true / false). null in pinned mode: pinned names are not checked by Cloudonym."
+  value       = local.vm_valid
 }
 
 output "cloudonym_candidate_name" {
