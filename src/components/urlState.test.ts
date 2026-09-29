@@ -112,7 +112,7 @@ describe('규칙 버전 v (D26 · D27 ⑵)', () => {
   it('v 가 없는 옛 hash 도 열린다 — rulesVersion 없음', () => {
     expect(decodeState(`#state=${encodeState(ctx)}`)).toEqual({ context: ctx });
   });
-  it.each([['2026-09-29'], ['v1'], ['2026-9-29.1'], ['2026-09-29.1 '], [''], [42], [null]])('꼴이 틀린 v(%j)는 무시한다 — 문맥은 그대로 열린다', (v) => {
+  it.each([['2026-09-29'], ['v1'], ['2026-9-29.1'], ['2026-09-29.1 '], ['2026-09-29.100'], [''], [42], [null]])('꼴이 틀린 v(%j)는 무시한다 — 문맥은 그대로 열린다', (v) => {
     const decoded = decodeState(`#state=${b64({ ...ctx, v })}`);
     expect(decoded).toEqual({ context: ctx });
   });

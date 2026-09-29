@@ -5,7 +5,7 @@ import { parseContext } from '../core/engine';
 import { RULES_REVISION } from '../core/revision';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
-import type { Message } from '../messages/catalog';
+import { escapeInvisible, type Message } from '../messages/catalog';
 
 /** 거부 — 상태 코드와 메시지 코드. 응답 본문은 라우터가 fail() 로 만든다 (D25) */
 export interface Rejection { status: 400 | 409; errors: Message[]; supported?: string[] }
@@ -44,12 +44,13 @@ function checkRulesVersion(body: Record<string, unknown>): { ok: false; rejectio
   if (typeof v !== 'string') return reject([{ code: 'request.field_not_string', field: 'rules_version' }]);
   if (v.length > MAX_FIELD_CHARS) return reject(tooLong({ rules_version: v }));
   if (v !== RULES_REVISION) {
-    return reject([{ code: 'request.rules_version_mismatch', params: { requested: v, current: RULES_REVISION } }], undefined, 409);
+    // requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다. 문장(message)에는 넣지 않는다 (리뷰 S1)
+    return reject([{ code: 'request.rules_version_mismatch', params: { requested: describe(v), current: RULES_REVISION } }], undefined, 409);
   }
   return undefined;
 }
 
-/** 오류 params 에 넣을 표시용 값 — 80자까지. String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다(최종 리뷰 I-2) */
+/** 오류 params 에 넣을 표시용 값 — 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 80자까지 (리뷰 S2). String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다(최종 리뷰 I-2) */
 function describe(v: unknown): string {
   let text: string;
   if (typeof v === 'string') text = v;
@@ -60,6 +61,7 @@ function describe(v: unknown): string {
       text = typeof v;
     }
   }
+  text = escapeInvisible(text);
   return text.length > 80 ? `${text.slice(0, 80)}…` : text;
 }
 

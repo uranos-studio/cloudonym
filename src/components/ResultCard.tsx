@@ -3,7 +3,7 @@ import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';
 import type { NameResult } from '../core/types';
-import { fillUi, format } from '../messages/catalog';
+import { fillUi, format, formatNotes } from '../messages/catalog';
 import { en } from '../messages/en';
 
 const CARD =
@@ -50,7 +50,7 @@ export function ResultCard({ result: r }: { result: NameResult }) {
           </a>
         </p>
         <p className="break-all">{en.ui.validation} <code className="font-mono">/{r.rule.pattern}/{r.rule.patternFlags}</code></p>
-        {r.rule.notes.length > 0 && <p className="mt-1">{r.rule.notes.map((m) => format(m, en)).join(' · ')}</p>}
+        {r.rule.notes.length > 0 && <p className="mt-1">{formatNotes(r.rule.notes, en)}</p>}
       </footer>
     </article>
   );

@@ -1,7 +1,7 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
 import type { Provider, ResourceRule, Token } from '../core/types';
 import { ENV_ALIASES, REGION_ALIASES } from '../core/normalize';
-import { format, type Catalog } from '../messages/catalog';
+import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
 
@@ -40,7 +40,7 @@ function constraintLine(rule: ResourceRule, catalog: Catalog): string {
   if (rule.noConsecutiveSeparator) bits.push('no consecutive separators');
   if (forbidden) bits.push(`forbidden: ${forbidden}`);
   // 설명은 코드로 싣고 문장은 사전이 만든다 (D23) — 여러 개면 「; 」로 잇는다
-  if (rule.notes && rule.notes.length > 0) bits.push(`note: ${rule.notes.map((m) => format(m, catalog)).join('; ')}`);
+  if (rule.notes && rule.notes.length > 0) bits.push(`note: ${formatNotes(rule.notes, catalog)}`);
   bits.push(`docs: ${rule.docUrl}`);
   return `- \`${rule.id}\` (${rule.displayName}): ${bits.join(' · ')}`;
 }
@@ -83,9 +83,9 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
     '',
-    'Every response carries `version: { engine, rules }`. `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
+    'Successful responses of `/v1/generate`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
-    'Every failure (400, 403, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`.',
+    'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',
     '',
     'Paths are relative to the host that served this file.',
   );

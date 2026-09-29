@@ -7,8 +7,8 @@ export const HASH_KEY = 'state';
 export const MAX_FIELD_CHARS = 1024;
 /** JSON 이 UTF-16 코드 유닛 하나를 적는 최대 바이트 — 제어 문자 · 짝 없는 서로게이트는 `\uXXXX` 6바이트다 (한글 3 · 보조 평면 2단위에 4) */
 const MAX_JSON_BYTES_PER_UNIT = 6;
-/** 규칙 버전 꼴 `YYYY-MM-DD.N` (D26) — 이 꼴이 아닌 `v` 는 없는 것으로 본다 */
-const RULES_VERSION_RE = /^\d{4}-\d{2}-\d{2}\.\d+$/;
+/** 규칙 버전 꼴 `YYYY-MM-DD.N` (D26) — 이 꼴이 아닌 `v` 는 없는 것으로 본다. N 은 1~2자리 — 아래 V_PLACEHOLDER 가 13자를 잡아 두므로 그보다 긴 `v` 는 받지 않는다 (리뷰 L4) */
+const RULES_VERSION_RE = /^\d{4}-\d{2}-\d{2}\.\d{1,2}$/;
 /** 뼈대의 `v` 자리 — N 두 자리(`YYYY-MM-DD.NN` 13자)로 잡는다. 지금 규칙 버전의 길이를 쓰지 않는다 — 상한이 규칙 버전에 따라 움직이면 안 된다 */
 const V_PLACEHOLDER = '0000-00-00.00';
 /** 다섯 필드 중 자유 입력 셋(owner · system · purpose)이 모두 상한일 때의 JSON 바이트 — 뼈대는 env `prd` · region `global`(가장 긴 정규 값) · `v` 13자 기준 */

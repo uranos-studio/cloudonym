@@ -110,5 +110,31 @@ describe('rules_version 핀 (D27 ⑴)', () => {
     expect(body.success).toBe(false);
     expect(body.errors).toEqual([expect.objectContaining({ code: 'request.rules_version_mismatch', params: { requested: '2026-09-15.1', current: VERSION.rules } })]);
     expect(body.errors[0].message).toContain('pinned mode');
+    expect(body.errors[0].message).not.toContain('2026-09-15.1'); // 요청 값은 params 에만 (리뷰 S1)
+  });
+});
+
+describe('없는 경로 · 메서드 — 공통 실패 꼴 404 (리뷰 L1)', () => {
+  it.each([['GET', '/v1/generate'], ['GET', '/v1/nope'], ['POST', '/v1/nope'], ['DELETE', '/v1/validate']])('%s %s → 404 JSON request.not_found', async (method, path) => {
+    const { res } = await req(app, path, { method });
+    expect(res.status).toBe(404);
+    expect(res.headers.get('content-type')).toContain('application/json');
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.not_found', message: 'No such endpoint or method; see /openapi.json for the API' }] });
+  });
+});
+
+describe('되돌려 싣는 사용자 값의 보이지 않는 문자 (리뷰 S2)', () => {
+  it('value_unsupported 의 params · message 에 \\uXXXX 로 나온다', async () => {
+    const rlo = String.fromCodePoint(0x202e);
+    const { res } = await post({ context: ctx, providers: [`aws${rlo}x`] });
+    const body = await json(res);
+    expect(body.errors[0]).toMatchObject({ code: 'request.value_unsupported', params: { value: 'aws\\u202Ex' } });
+    expect(JSON.stringify(body)).not.toContain(rlo);
+  });
+  it('엔진 몫(context.value_unsupported)도 wire 에서 바뀐다', async () => {
+    const { res } = await post({ context: { ...ctx, env: `q${String.fromCodePoint(0x2066)}a` } });
+    const body = await json(res);
+    expect(JSON.stringify(body)).toContain('\\\\u2066');
+    expect(JSON.stringify(body)).not.toContain(String.fromCodePoint(0x2066));
   });
 });

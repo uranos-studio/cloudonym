@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Every response carries version { engine, rules }. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
     "version": "0.1.0"
   },
   "servers": [
@@ -610,7 +610,7 @@
           },
           "params": {
             "type": "object",
-            "description": "Values used in message. User values (from, to, value) are display strings: trimmed to 80 characters in request errors, non-strings shown as JSON",
+            "description": "Values used in message. User values (from, to, value) are display strings: trimmed to 80 characters in request errors, non-strings shown as JSON; control, bidirectional and zero-width characters are shown as \\uXXXX text in params and message",
             "additionalProperties": {
               "oneOf": [
                 {
@@ -830,7 +830,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown"
+            "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown, or when providers is not a non-empty array (request.providers_not_array, request.providers_empty)"
           }
         }
       }

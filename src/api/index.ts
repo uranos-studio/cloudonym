@@ -7,7 +7,7 @@ import { RULES } from '../core/constraints';
 import { buildLlmsText } from './llms';
 import { VERSION } from '../version';
 import { logTelemetry } from './telemetry';
-import { internalError } from './errors';
+import { fail, internalError } from './errors';
 import { overLimit, tooManyRequests } from './ratelimit';
 
 // 모듈 로드 때 한 번 만든다 — 요청마다 만들지 않는다
@@ -15,6 +15,8 @@ const LLMS_TEXT = buildLlmsText(Object.values(RULES), VERSION);
 
 export const app = new Hono<App>();
 app.onError(internalError);
+// 없는 경로 · 메서드(GET /v1/generate · /v1/nope)도 text/plain 이 아니라 공통 실패 꼴로 (리뷰 L1). Hono 는 하위 앱이 아니라 root 의 notFound 를 쓴다
+app.notFound((c) => fail(c, 404, [{ code: 'request.not_found' }]));
 // 모든 Worker 응답에 nosniff · X-Frame-Options 등 (보안 리뷰 L-2). _headers 는 Worker 응답에 적용되지 않는다.
 // 공개 CORS API 라 CORP 는 cross-origin — 기본값 same-origin 이면 다른 출처의 no-cors 읽기가 막힌다. CSP 는 JSON · text 응답이라 걸지 않는다(기본값도 없음).
 // HSTS 는 내지 않는다 — 기본값 includeSubDomains 가 커스텀 도메인 전체를 묶는다. 커스텀 도메인을 붙일 때 존 설정에서 한 곳으로 켠다(_headers 와 같은 방침)

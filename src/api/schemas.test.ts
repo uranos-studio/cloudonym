@@ -91,6 +91,12 @@ describe('rules_version (D27 ⑴)', () => {
     }
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x', rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409 } });
   });
+  it('requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다 (리뷰 S1 · S2)', () => {
+    const r = parseGenerateBody({ context: ctx, rules_version: 'y'.repeat(1024) });
+    expect(r).toEqual({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch', params: { requested: `${'y'.repeat(80)}…`, current } }] } });
+    const rlo = String.fromCodePoint(0x202e);
+    expect(parseGenerateBody({ context: ctx, rules_version: `a${rlo}b` })).toMatchObject({ rejection: { errors: [{ params: { requested: 'a\\u202Eb' } }] } });
+  });
   it('문자열이 아니면(null · 숫자 · 객체) 400 · 1024자 넘으면 400', () => {
     for (const v of [null, 1, { a: 1 }]) {
       expect(parseGenerateBody({ context: ctx, rules_version: v }))

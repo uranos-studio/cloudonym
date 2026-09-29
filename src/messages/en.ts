@@ -58,7 +58,8 @@ export const en: Catalog = {
     'request.field_not_string': (m) => `'${m.field}' must be a string`,
     'request.same_origin_only': () => 'Only same-origin requests from the Cloudonym page are accepted',
     'request.rate_limited': (m) => `Too many requests; retry after ${m.params.retry_after} seconds`,
-    'request.rules_version_mismatch': (m) => `Requested rules_version '${m.params.requested}' does not match the current rules revision '${m.params.current}'. Re-run without rules_version to use the current rules, or keep using the names you already created (see the Terraform example's pinned mode).`,
+    'request.rules_version_mismatch': (m) => `The requested rules_version does not match the current rules revision '${m.params.current}'. Re-run without rules_version to use the current rules, or keep using the names you already created (see the Terraform example's pinned mode).`,
+    'request.not_found': () => 'No such endpoint or method; see /openapi.json for the API',
     'server.internal_error': () => 'Internal error',
   },
   ui: {

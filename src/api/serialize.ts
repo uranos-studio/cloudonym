@@ -1,11 +1,11 @@
 // 코어(camelCase) → wire(snake_case) (D15 · D25). 이름 규칙 · 판정 로직은 여기 없다 — 필드 이름을 바꾸고 메시지 코드에 문장을 붙인다
 import type { LabelSet, NameResult, Provider } from '../core/types';
-import { format, type Catalog, type Message } from '../messages/catalog';
+import { displayMessage, format, type Catalog, type Message, type MessageCode } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
 
 /** 메시지 한 건 — code 는 기계가, message 는 사람이 읽는다. params 값은 표시용 문자열 · 숫자 · 문자열 배열 (D23) */
-export interface WireMessage { code: string; field?: string; params?: Record<string, string | number | string[]>; message: string }
+export interface WireMessage { code: MessageCode; field?: string; params?: Record<string, string | number | string[]>; message: string }
 
 export interface WireRule { min_length: number; max_length: number; pattern: string; pattern_flags: string; allowed: string; doc_url: string; notes: WireMessage[] }
 export interface WireName {
@@ -29,7 +29,9 @@ export interface WireValidate { valid: boolean; version: Version; violations: Wi
 export interface ProviderResult { provider: Provider; names: Record<string, NameResult>; labels: LabelSet }
 
 /** 키 순서는 code · field · params · message. field · params 가 없는 코드는 그 키도 없다 */
-export function toWireMessage(m: Message, catalog: Catalog = en): WireMessage {
+export function toWireMessage(raw: Message, catalog: Catalog = en): WireMessage {
+  // params 의 사용자 값은 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 싣는다 — message 도 같은 값으로 만든다 (리뷰 S2)
+  const m = displayMessage(raw);
   return {
     code: m.code,
     ...('field' in m ? { field: m.field } : {}),

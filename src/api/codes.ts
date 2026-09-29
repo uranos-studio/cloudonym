@@ -5,7 +5,7 @@ export const API_CODES = [
   'request.body_not_json', 'request.body_not_object', 'request.body_too_large', 'request.context_not_object',
   'request.field_too_long', 'request.providers_not_array', 'request.providers_empty', 'request.value_unsupported',
   'request.field_not_string', 'request.same_origin_only', 'request.rate_limited', 'request.rules_version_mismatch',
-  'server.internal_error',
+  'request.not_found', 'server.internal_error',
 ] as const;
 
 export type ApiMessage =
@@ -22,6 +22,8 @@ export type ApiMessage =
   | { code: 'request.same_origin_only' }
   | { code: 'request.rate_limited'; params: { retry_after: number } }
   | { code: 'request.rules_version_mismatch'; params: { requested: string; current: string } }
+  /** /v1 아래 없는 경로 · 메서드 (리뷰 L1). 경로를 되돌려 싣지 않는다 */
+  | { code: 'request.not_found' }
   | { code: 'server.internal_error' };
 
 export type ApiCode = ApiMessage['code'];
