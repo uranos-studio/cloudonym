@@ -19,6 +19,7 @@
 //   b — Name 태그. EC2 는 기존 aws.vpc 와 같은 규칙(아무 문자 1~256), 다른 서비스는 일반 태그 값 문자 규칙(좁다).
 //   통과 · 실패 예는 a 행마다 사람이 pattern 을 읽고 적은 것(PHYSICAL_CASES)이다 — 정규식에서 뽑지 않는다.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { sq, dq, idLit, intLit, boolLit } from './emit-ts.mjs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -260,8 +261,6 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
 }
 
 // ── 출력 ──────────────────────────────────────────────────────────
-const js = (v) => JSON.stringify(v);
-
 export function renderTs(result) {
   const out = [];
   out.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-aws-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
@@ -276,9 +275,9 @@ export function renderTs(result) {
   for (const r of result.rules) {
     if (r.kind === 'a') {
       const g = r.gen;
-      out.push(`  { kind: 'a', id: '${r.id}', displayName: ${js(r.displayName)}, entity: '${r.entity}', property: '${r.property}', scope: '${r.scope}', category: '${r.category}', slug: '${r.slug}', min: ${r.min}, max: ${r.max}, schemaPattern: ${js(r.schemaPattern)}, allowed: '${g.allowed}', separator: '${g.separator}', caseRule: '${g.caseRule}', startsWithLetter: ${g.startsWithLetter}, endsWithAlnum: ${g.endsWithAlnum}, noConsecutiveSeparator: ${g.noConsecutiveSeparator}, docUrl: '${r.docUrl}' },`);
+      out.push(`  { kind: 'a', id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, property: ${sq(r.property)}, scope: ${idLit(r.scope)}, category: ${sq(r.category)}, slug: ${sq(r.slug)}, min: ${intLit(r.min)}, max: ${intLit(r.max)}, schemaPattern: ${dq(r.schemaPattern)}, allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}, noConsecutiveSeparator: ${boolLit(g.noConsecutiveSeparator)}, docUrl: ${sq(r.docUrl)} },`);
     } else {
-      out.push(`  { kind: 'b', id: '${r.id}', displayName: ${js(r.displayName)}, entity: '${r.entity}', scope: '${r.scope}', category: '${r.category}', slug: '${r.slug}', tag: '${r.tag}' },`);
+      out.push(`  { kind: 'b', id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, scope: ${idLit(r.scope)}, category: ${sq(r.category)}, slug: ${sq(r.slug)}, tag: ${sq(r.tag)} },`);
     }
   }
   out.push('];');

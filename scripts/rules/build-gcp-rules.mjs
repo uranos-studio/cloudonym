@@ -18,6 +18,7 @@
 // 다른 API 는 create 메서드의 `…Id` 인자 설명 안의 정규식만 — 아래 문법(regexInDescription)을 통과해야 한다.
 // 문법 밖이면 넣지 않는다(spanner 의 `a-z*[a-z0-9]` 처럼 컴파일은 되지만 대괄호가 깨진 꼴을 막는다).
 import { readFileSync, writeFileSync } from 'node:fs';
+import { sq, dq, idLit, intLit, metaToken, METHOD_RE } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
 import { parseComputeDiscovery, RFC1035_PATTERN } from './intake-gcp-discovery.mjs';
 
@@ -212,23 +213,21 @@ export function build({ compute, kms, anchors, existing }) {
 }
 
 // ── 출력 ──────────────────────────────────────────────────────────
-const js = (v) => JSON.stringify(v);
-
 export function renderTs(result, meta) {
   const L = [];
   L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-gcp-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
-  L.push(`// 출처: Compute 디스커버리 revision ${meta.computeRevision} · Cloud KMS 디스커버리 revision ${meta.kmsRevision}.`);
+  L.push(`// 출처: Compute 디스커버리 revision ${metaToken(meta.computeRevision)} · Cloud KMS 디스커버리 revision ${metaToken(meta.kmsRevision)}.`);
   L.push('// pattern 은 원문 그대로(compute name.pattern · KMS 설명 문장 안 정규식)이고 rules/gcp.ts 가 ^(?:…)$ 로 감싼다.');
   L.push("import type { ResourceRule } from '../types';");
   L.push("import type { ScopeDef } from '../scopes';");
   L.push('');
-  L.push(`export type GcpIntakeScopeId =\n${result.scopes.map((s) => `  | '${s.id}'`).join('\n')};`);
+  L.push(`export type GcpIntakeScopeId =\n${result.scopes.map((s) => `  | ${idLit(s.id)}`).join('\n')};`);
   L.push('');
   L.push('/** KMS 범위 — 생성 메서드 설명의 「unique within a location」 · 「unique within a KeyRing」 */');
   L.push('export const GCP_INTAKE_SCOPES: Record<GcpIntakeScopeId, ScopeDef> = {');
   for (const s of result.scopes) {
-    const rid = s.ruleId ? `, ruleId: '${s.ruleId}'` : '';
-    L.push(`  '${s.id}': { id: '${s.id}', provider: 'gcp', displayName: ${js(s.displayName)}, parent: '${s.parent}'${rid}, docUrl: '${s.docUrl}' },`);
+    const rid = s.ruleId ? `, ruleId: ${idLit(s.ruleId)}` : '';
+    L.push(`  ${idLit(s.id)}: { id: ${idLit(s.id)}, provider: 'gcp', displayName: ${dq(s.displayName)}, parent: ${idLit(s.parent)}${rid}, docUrl: ${sq(s.docUrl)} },`);
   }
   L.push('};');
   L.push('');
@@ -237,8 +236,8 @@ export function renderTs(result, meta) {
   L.push('');
   L.push('export const GCP_INTAKE_ROWS: Row[] = [');
   for (const r of result.rules) {
-    const u = r.uniquenessDocUrl ? `, uniquenessDocUrl: '${r.uniquenessDocUrl}'` : '';
-    L.push(`  { id: '${r.id}', displayName: ${js(r.displayName)}, entity: '${r.entity}', scope: '${r.scope}', method: '${r.method}', min: ${r.min}, max: ${r.max}, pattern: ${js(r.pattern)}, chars: '${r.chars}', slug: '${r.slug}', category: '${r.category}', docUrl: '${r.docUrl}'${u} },`);
+    const u = r.uniquenessDocUrl ? `, uniquenessDocUrl: ${sq(r.uniquenessDocUrl)}` : '';
+    L.push(`  { id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, scope: ${idLit(r.scope)}, method: ${idLit(r.method, METHOD_RE)}, min: ${intLit(r.min)}, max: ${intLit(r.max)}, pattern: ${dq(r.pattern)}, chars: ${sq(r.chars)}, slug: ${sq(r.slug)}, category: ${sq(r.category)}, docUrl: ${sq(r.docUrl)}${u} },`);
   }
   L.push('];');
   return `${L.join('\n')}\n`;

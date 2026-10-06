@@ -15,6 +15,7 @@
 // 원칙: 원문 문장 하나하나를 아래 문법으로만 읽는다. 문법 밖 문장이 나오면 멈춘다(추측해 넓히지 않는다).
 // 통과 · 실패 예는 정규식이 아니라 같은 문장 해석에서 문자열을 직접 짜서 만든다 — 정규식 조립 실수를 잡는다.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { sq, dq, idLit, intLit, boolLit, regexLit, metaToken } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
 
 export const AZURE_RULES_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
@@ -428,13 +429,11 @@ export function build(intake, caf, existing) {
 }
 
 // ── 출력 ──────────────────────────────────────────────────────────
-const js = (v) => JSON.stringify(v);
-
 export function renderTs(result, meta) {
   const { rules, scopes, charClasses } = result;
   const L = [];
   L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-azure-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
-  L.push(`// 출처: resource-name-rules 원문 커밋 ${meta.commit} (ms.date ${meta.msDate}) · 접두 약어는 Microsoft CAF 약어 쪽(없으면 docs/azure-intake-held.md 의 규칙).`);
+  L.push(`// 출처: resource-name-rules 원문 커밋 ${metaToken(meta.commit)} (ms.date ${metaToken(meta.msDate)}) · 접두 약어는 Microsoft CAF 약어 쪽(없으면 docs/azure-intake-held.md 의 규칙).`);
   L.push('// 문자 규칙 표의 키는 원문 「Valid Characters」 칸 그대로다 — 원문 → 정규식이 리뷰 자리다. 길이는 minLength · maxLength 가 센다(validate.ts).');
   L.push("import type { Allowed, ResourceRule } from '../types';");
   L.push("import type { ScopeDef } from '../scopes';");
@@ -447,17 +446,18 @@ export function renderTs(result, meta) {
     const ncs = c.spec.noDoubleHyphen ? ', noConsecutiveSeparator: true' : '';
     // 금지형(Can't use … control characters)은 \p{Cc} 를 쓰려고 u 플래그 — U+0080-009F 도 거부한다(문서보다 넓게 · 보수적)
     const flags = c.pattern.includes('\\p{') ? 'u' : '';
-    L.push(`  ${c.key}: { raw: ${js(raw)}, pattern: /${c.pattern}/${flags}, allowed: '${g.allowed}', separator: '${g.separator}', caseRule: '${g.caseRule}', startsWithLetter: ${g.startsWithLetter}, endsWithAlnum: ${g.endsWithAlnum}${ncs} },`);
+    if (!/^C[0-9]+$/.test(c.key)) throw new Error(`문자 규칙 키 꼴이 아니다: ${c.key}`);
+    L.push(`  ${c.key}: { raw: ${dq(raw)}, pattern: ${regexLit(c.pattern, flags)}, allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}${ncs} },`);
   }
   L.push('};');
   L.push('');
-  L.push(`export type AzureIntakeScopeId =\n${scopes.map((s) => `  | '${s.id}'`).join('\n')};`);
+  L.push(`export type AzureIntakeScopeId =\n${scopes.map((s) => `  | ${idLit(s.id)}`).join('\n')};`);
   L.push('');
   L.push('/** 부모 리소스 범위 — 표의 Scope 칸이 부모 리소스 이름이다. parent 는 부모 행의 Scope, ruleId 는 부모 규칙(이번에 등록했을 때만) */');
   L.push('export const AZURE_INTAKE_SCOPES: Record<AzureIntakeScopeId, ScopeDef> = {');
   for (const s of scopes) {
-    const rid = s.ruleId ? `, ruleId: '${s.ruleId}'` : '';
-    L.push(`  '${s.id}': { id: '${s.id}', provider: 'azure', displayName: ${js(s.displayName)}, parent: '${s.parent}'${rid}, docUrl: '${AZURE_RULES_URL}#${s.anchor}' },`);
+    const rid = s.ruleId ? `, ruleId: ${idLit(s.ruleId)}` : '';
+    L.push(`  ${idLit(s.id)}: { id: ${idLit(s.id)}, provider: 'azure', displayName: ${dq(s.displayName)}, parent: ${idLit(s.parent)}${rid}, docUrl: ${sq(`${AZURE_RULES_URL}#${s.anchor}`)} },`);
   }
   L.push('};');
   L.push('');
@@ -466,7 +466,7 @@ export function renderTs(result, meta) {
   L.push('');
   L.push('export const AZURE_INTAKE_ROWS: Row[] = [');
   for (const r of rules) {
-    L.push(`  { id: '${r.id}', displayName: ${js(r.displayName)}, entity: '${r.entity}', scope: '${r.scope}', anchor: '${r.row.anchor}', min: ${r.min}, max: ${r.max}, chars: '${r.cls}', slug: '${r.slug}', category: '${r.category}'${r.reserved ? ', reserved: true' : ''} },`);
+    L.push(`  { id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, scope: ${idLit(r.scope)}, anchor: ${sq(r.row.anchor)}, min: ${intLit(r.min)}, max: ${intLit(r.max)}, chars: ${sq(r.cls)}, slug: ${sq(r.slug)}, category: ${sq(r.category)}${r.reserved ? ', reserved: true' : ''} },`);
   }
   L.push('];');
   L.push('');
