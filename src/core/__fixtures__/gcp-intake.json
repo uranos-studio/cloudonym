@@ -1,0 +1,1012 @@
+{
+ "sources": {
+  "compute": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+  "cloudkms": "https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest"
+ },
+ "revisions": {
+  "computeRevision": "20260922",
+  "kmsRevision": "20261001"
+ },
+ "license": "Fields quoted from Google API discovery documents for transcription tests.",
+ "rows": [
+  {
+   "api": "compute",
+   "method": "compute.addresses.insert",
+   "resource": "addresses",
+   "schema": "Address",
+   "path": "projects/{project}/regions/{region}/addresses",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character\nmust be a lowercase letter, and all following characters (except for the\nlast character) must be a dash, lowercase letter, or digit. The last\ncharacter must be a lowercase letter or digit."
+  },
+  {
+   "api": "compute",
+   "method": "compute.autoscalers.insert",
+   "resource": "autoscalers",
+   "schema": "Autoscaler",
+   "path": "projects/{project}/zones/{zone}/autoscalers",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.backendBuckets.insert",
+   "resource": "backendBuckets",
+   "schema": "BackendBucket",
+   "path": "projects/{project}/global/backendBuckets",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.backendServices.insert",
+   "resource": "backendServices",
+   "schema": "BackendService",
+   "path": "projects/{project}/global/backendServices",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.crossSiteNetworks.insert",
+   "resource": "crossSiteNetworks",
+   "schema": "CrossSiteNetwork",
+   "path": "projects/{project}/global/crossSiteNetworks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.disks.insert",
+   "resource": "disks",
+   "schema": "Disk",
+   "path": "projects/{project}/zones/{zone}/disks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.externalVpnGateways.insert",
+   "resource": "externalVpnGateways",
+   "schema": "ExternalVpnGateway",
+   "path": "projects/{project}/global/externalVpnGateways",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.firewallPolicies.insert",
+   "resource": "firewallPolicies",
+   "schema": "FirewallPolicy",
+   "path": "locations/global/firewallPolicies",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource. For Organization Firewall Policies it's a\n[Output Only] numeric ID allocated by Google Cloud which uniquely\nidentifies the Organization Firewall Policy."
+  },
+  {
+   "api": "compute",
+   "method": "compute.firewalls.insert",
+   "resource": "firewalls",
+   "schema": "Firewall",
+   "path": "projects/{project}/global/firewalls",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character\nmust be a lowercase letter, and all following characters (except for the\nlast character) must be a dash, lowercase letter, or digit. The last\ncharacter must be a lowercase letter or digit."
+  },
+  {
+   "api": "compute",
+   "method": "compute.forwardingRules.insert",
+   "resource": "forwardingRules",
+   "schema": "ForwardingRule",
+   "path": "projects/{project}/regions/{region}/forwardingRules",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash.\n\nFor Private Service Connect forwarding rules that forward traffic to Google\nAPIs, the forwarding rule name must be a 1-20 characters string with\nlowercase letters and numbers and must start with a letter.\n\nFor global external Passthrough Network Load Balancer forwarding rules, the\nforwarding rule name must be 1-43 characters long. For each global external\nPassthrough Network Load Balancer forwarding rule (a parent forwarding\nrule) that you create, Google Cloud generates two output-only child\nforwarding rules that are named by concatenating the parent forwarding rule\nname with the `-ag0` and `-ag1` suffixes, respectively. Refer to theavailabilityGroup field for further details."
+  },
+  {
+   "api": "compute",
+   "method": "compute.futureReservations.insert",
+   "resource": "futureReservations",
+   "schema": "FutureReservation",
+   "path": "projects/{project}/zones/{zone}/futureReservations",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.globalAddresses.insert",
+   "resource": "globalAddresses",
+   "schema": "Address",
+   "path": "projects/{project}/global/addresses",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character\nmust be a lowercase letter, and all following characters (except for the\nlast character) must be a dash, lowercase letter, or digit. The last\ncharacter must be a lowercase letter or digit."
+  },
+  {
+   "api": "compute",
+   "method": "compute.globalForwardingRules.insert",
+   "resource": "globalForwardingRules",
+   "schema": "ForwardingRule",
+   "path": "projects/{project}/global/forwardingRules",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash.\n\nFor Private Service Connect forwarding rules that forward traffic to Google\nAPIs, the forwarding rule name must be a 1-20 characters string with\nlowercase letters and numbers and must start with a letter.\n\nFor global external Passthrough Network Load Balancer forwarding rules, the\nforwarding rule name must be 1-43 characters long. For each global external\nPassthrough Network Load Balancer forwarding rule (a parent forwarding\nrule) that you create, Google Cloud generates two output-only child\nforwarding rules that are named by concatenating the parent forwarding rule\nname with the `-ag0` and `-ag1` suffixes, respectively. Refer to theavailabilityGroup field for further details."
+  },
+  {
+   "api": "compute",
+   "method": "compute.globalNetworkEndpointGroups.insert",
+   "resource": "globalNetworkEndpointGroups",
+   "schema": "NetworkEndpointGroup",
+   "path": "projects/{project}/global/networkEndpointGroups",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.globalPublicDelegatedPrefixes.insert",
+   "resource": "globalPublicDelegatedPrefixes",
+   "schema": "PublicDelegatedPrefix",
+   "path": "projects/{project}/global/publicDelegatedPrefixes",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.globalVmExtensionPolicies.insert",
+   "resource": "globalVmExtensionPolicies",
+   "schema": "GlobalVmExtensionPolicy",
+   "path": "projects/{project}/global/vmExtensionPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.healthChecks.insert",
+   "resource": "healthChecks",
+   "schema": "HealthCheck",
+   "path": "projects/{project}/global/healthChecks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nFor example, a name that is 1-63 characters long, matches the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`, and otherwise complies with\nRFC1035. This regular expression describes a name where the first\ncharacter is a lowercase letter, and all following characters are a dash,\nlowercase letter, or digit, except the last character, which isn't a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.httpHealthChecks.insert",
+   "resource": "httpHealthChecks",
+   "schema": "HttpHealthCheck",
+   "path": "projects/{project}/global/httpHealthChecks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.httpsHealthChecks.insert",
+   "resource": "httpsHealthChecks",
+   "schema": "HttpsHealthCheck",
+   "path": "projects/{project}/global/httpsHealthChecks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.images.insert",
+   "resource": "images",
+   "schema": "Image",
+   "path": "projects/{project}/global/images",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instanceGroupManagerResizeRequests.insert",
+   "resource": "instanceGroupManagerResizeRequests",
+   "schema": "InstanceGroupManagerResizeRequest",
+   "path": "projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/resizeRequests",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of this resize request. The name must be 1-63 characters\nlong, and comply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instanceGroupManagers.insert",
+   "resource": "instanceGroupManagers",
+   "schema": "InstanceGroupManager",
+   "path": "projects/{project}/zones/{zone}/instanceGroupManagers",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the managed instance group. The name must be 1-63 characters\nlong, and comply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instanceGroups.insert",
+   "resource": "instanceGroups",
+   "schema": "InstanceGroup",
+   "path": "projects/{project}/zones/{zone}/instanceGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the instance group. The name must be 1-63 characters\nlong, and comply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instances.insert",
+   "resource": "instances",
+   "schema": "Instance",
+   "path": "projects/{project}/zones/{zone}/instances",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instanceTemplates.insert",
+   "resource": "instanceTemplates",
+   "schema": "InstanceTemplate",
+   "path": "projects/{project}/global/instanceTemplates",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instantSnapshotGroups.insert",
+   "resource": "instantSnapshotGroups",
+   "schema": "InstantSnapshotGroup",
+   "path": "projects/{project}/zones/{zone}/instantSnapshotGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Identifier. Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.instantSnapshots.insert",
+   "resource": "instantSnapshots",
+   "schema": "InstantSnapshot",
+   "path": "projects/{project}/zones/{zone}/instantSnapshots",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.interconnectAttachmentGroups.insert",
+   "resource": "interconnectAttachmentGroups",
+   "schema": "InterconnectAttachmentGroup",
+   "path": "projects/{project}/global/interconnectAttachmentGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.interconnectAttachments.insert",
+   "resource": "interconnectAttachments",
+   "schema": "InterconnectAttachment",
+   "path": "projects/{project}/regions/{region}/interconnectAttachments",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.interconnectGroups.insert",
+   "resource": "interconnectGroups",
+   "schema": "InterconnectGroup",
+   "path": "projects/{project}/global/interconnectGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.interconnects.insert",
+   "resource": "interconnects",
+   "schema": "Interconnect",
+   "path": "projects/{project}/global/interconnects",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.licenses.insert",
+   "resource": "licenses",
+   "schema": "License",
+   "path": "projects/{project}/global/licenses",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. The name must be 1-63 characters long and\ncomply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.machineImages.insert",
+   "resource": "machineImages",
+   "schema": "MachineImage",
+   "path": "projects/{project}/global/machineImages",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.networkAttachments.insert",
+   "resource": "networkAttachments",
+   "schema": "NetworkAttachment",
+   "path": "projects/{project}/regions/{region}/networkAttachments",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.networkEdgeSecurityServices.insert",
+   "resource": "networkEdgeSecurityServices",
+   "schema": "NetworkEdgeSecurityService",
+   "path": "projects/{project}/regions/{region}/networkEdgeSecurityServices",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.networkEndpointGroups.insert",
+   "resource": "networkEndpointGroups",
+   "schema": "NetworkEndpointGroup",
+   "path": "projects/{project}/zones/{zone}/networkEndpointGroups",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.networkFirewallPolicies.insert",
+   "resource": "networkFirewallPolicies",
+   "schema": "FirewallPolicy",
+   "path": "projects/{project}/global/firewallPolicies",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource. For Organization Firewall Policies it's a\n[Output Only] numeric ID allocated by Google Cloud which uniquely\nidentifies the Organization Firewall Policy."
+  },
+  {
+   "api": "compute",
+   "method": "compute.networks.insert",
+   "resource": "networks",
+   "schema": "Network",
+   "path": "projects/{project}/global/networks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character must be a\nlowercase letter, and all following characters (except for the last\ncharacter) must be a dash, lowercase letter, or digit. The last character\nmust be a lowercase letter or digit."
+  },
+  {
+   "api": "compute",
+   "method": "compute.nodeGroups.insert",
+   "resource": "nodeGroups",
+   "schema": "NodeGroup",
+   "path": "projects/{project}/zones/{zone}/nodeGroups",
+   "pattern": null,
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.nodeTemplates.insert",
+   "resource": "nodeTemplates",
+   "schema": "NodeTemplate",
+   "path": "projects/{project}/regions/{region}/nodeTemplates",
+   "pattern": null,
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.organizationSecurityPolicies.insert",
+   "resource": "organizationSecurityPolicies",
+   "schema": "SecurityPolicy",
+   "path": "locations/global/securityPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.packetMirrorings.insert",
+   "resource": "packetMirrorings",
+   "schema": "PacketMirroring",
+   "path": "projects/{project}/regions/{region}/packetMirrorings",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.publicAdvertisedPrefixes.insert",
+   "resource": "publicAdvertisedPrefixes",
+   "schema": "PublicAdvertisedPrefix",
+   "path": "projects/{project}/global/publicAdvertisedPrefixes",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.publicDelegatedPrefixes.insert",
+   "resource": "publicDelegatedPrefixes",
+   "schema": "PublicDelegatedPrefix",
+   "path": "projects/{project}/regions/{region}/publicDelegatedPrefixes",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionAutoscalers.insert",
+   "resource": "regionAutoscalers",
+   "schema": "Autoscaler",
+   "path": "projects/{project}/regions/{region}/autoscalers",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionBackendBuckets.insert",
+   "resource": "regionBackendBuckets",
+   "schema": "BackendBucket",
+   "path": "projects/{project}/regions/{region}/backendBuckets",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionBackendServices.insert",
+   "resource": "regionBackendServices",
+   "schema": "BackendService",
+   "path": "projects/{project}/regions/{region}/backendServices",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionCommitments.insert",
+   "resource": "regionCommitments",
+   "schema": "Commitment",
+   "path": "projects/{project}/regions/{region}/commitments",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the commitment. You must specify a name when you purchase the\ncommitment. The name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionCompositeHealthChecks.insert",
+   "resource": "regionCompositeHealthChecks",
+   "schema": "CompositeHealthCheck",
+   "path": "projects/{project}/regions/{region}/compositeHealthChecks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionDisks.insert",
+   "resource": "regionDisks",
+   "schema": "Disk",
+   "path": "projects/{project}/regions/{region}/disks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionHealthAggregationPolicies.insert",
+   "resource": "regionHealthAggregationPolicies",
+   "schema": "HealthAggregationPolicy",
+   "path": "projects/{project}/regions/{region}/healthAggregationPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionHealthChecks.insert",
+   "resource": "regionHealthChecks",
+   "schema": "HealthCheck",
+   "path": "projects/{project}/regions/{region}/healthChecks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nFor example, a name that is 1-63 characters long, matches the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`, and otherwise complies with\nRFC1035. This regular expression describes a name where the first\ncharacter is a lowercase letter, and all following characters are a dash,\nlowercase letter, or digit, except the last character, which isn't a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionHealthCheckServices.insert",
+   "resource": "regionHealthCheckServices",
+   "schema": "HealthCheckService",
+   "path": "projects/{project}/regions/{region}/healthCheckServices",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. The name must be 1-63 characters long, and comply\nwith RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression\n`[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character\nmust be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a\ndash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionHealthSources.insert",
+   "resource": "regionHealthSources",
+   "schema": "HealthSource",
+   "path": "projects/{project}/regions/{region}/healthSources",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionInstanceGroupManagerResizeRequests.insert",
+   "resource": "regionInstanceGroupManagerResizeRequests",
+   "schema": "InstanceGroupManagerResizeRequest",
+   "path": "projects/{project}/regions/{region}/instanceGroupManagers/{instanceGroupManager}/resizeRequests",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of this resize request. The name must be 1-63 characters\nlong, and comply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionInstanceGroupManagers.insert",
+   "resource": "regionInstanceGroupManagers",
+   "schema": "InstanceGroupManager",
+   "path": "projects/{project}/regions/{region}/instanceGroupManagers",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the managed instance group. The name must be 1-63 characters\nlong, and comply withRFC1035."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionInstanceTemplates.insert",
+   "resource": "regionInstanceTemplates",
+   "schema": "InstanceTemplate",
+   "path": "projects/{project}/regions/{region}/instanceTemplates",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionInstantSnapshotGroups.insert",
+   "resource": "regionInstantSnapshotGroups",
+   "schema": "InstantSnapshotGroup",
+   "path": "projects/{project}/regions/{region}/instantSnapshotGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Identifier. Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionInstantSnapshots.insert",
+   "resource": "regionInstantSnapshots",
+   "schema": "InstantSnapshot",
+   "path": "projects/{project}/regions/{region}/instantSnapshots",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionNetworkEndpointGroups.insert",
+   "resource": "regionNetworkEndpointGroups",
+   "schema": "NetworkEndpointGroup",
+   "path": "projects/{project}/regions/{region}/networkEndpointGroups",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionNetworkFirewallPolicies.insert",
+   "resource": "regionNetworkFirewallPolicies",
+   "schema": "FirewallPolicy",
+   "path": "projects/{project}/regions/{region}/firewallPolicies",
+   "pattern": null,
+   "readOnly": false,
+   "description": "Name of the resource. For Organization Firewall Policies it's a\n[Output Only] numeric ID allocated by Google Cloud which uniquely\nidentifies the Organization Firewall Policy."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionNotificationEndpoints.insert",
+   "resource": "regionNotificationEndpoints",
+   "schema": "NotificationEndpoint",
+   "path": "projects/{project}/regions/{region}/notificationEndpoints",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionSecurityPolicies.insert",
+   "resource": "regionSecurityPolicies",
+   "schema": "SecurityPolicy",
+   "path": "projects/{project}/regions/{region}/securityPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionSnapshots.insert",
+   "resource": "regionSnapshots",
+   "schema": "Snapshot",
+   "path": "projects/{project}/regions/{region}/snapshots",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionSslCertificates.insert",
+   "resource": "regionSslCertificates",
+   "schema": "SslCertificate",
+   "path": "projects/{project}/regions/{region}/sslCertificates",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionSslPolicies.insert",
+   "resource": "regionSslPolicies",
+   "schema": "SslPolicy",
+   "path": "projects/{project}/regions/{region}/sslPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. The name must be 1-63 characters long, and comply\nwith RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression\n`[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character\nmust be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a\ndash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionTargetHttpProxies.insert",
+   "resource": "regionTargetHttpProxies",
+   "schema": "TargetHttpProxy",
+   "path": "projects/{project}/regions/{region}/targetHttpProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionTargetHttpsProxies.insert",
+   "resource": "regionTargetHttpsProxies",
+   "schema": "TargetHttpsProxy",
+   "path": "projects/{project}/regions/{region}/targetHttpsProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionTargetTcpProxies.insert",
+   "resource": "regionTargetTcpProxies",
+   "schema": "TargetTcpProxy",
+   "path": "projects/{project}/regions/{region}/targetTcpProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.regionUrlMaps.insert",
+   "resource": "regionUrlMaps",
+   "schema": "UrlMap",
+   "path": "projects/{project}/regions/{region}/urlMaps",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.reservations.insert",
+   "resource": "reservations",
+   "schema": "Reservation",
+   "path": "projects/{project}/zones/{zone}/reservations",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.resourcePolicies.insert",
+   "resource": "resourcePolicies",
+   "schema": "ResourcePolicy",
+   "path": "projects/{project}/regions/{region}/resourcePolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The resource name must be 1-63 characters long, and comply\nwithRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.rolloutPlans.insert",
+   "resource": "rolloutPlans",
+   "schema": "RolloutPlan",
+   "path": "projects/{project}/global/rolloutPlans",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.routers.insert",
+   "resource": "routers",
+   "schema": "Router",
+   "path": "projects/{project}/regions/{region}/routers",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.routes.insert",
+   "resource": "routes",
+   "schema": "Route",
+   "path": "projects/{project}/global/routes",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`. The first character must be a\nlowercase letter, and all following characters (except for the last\ncharacter) must be a dash, lowercase letter, or digit. The last character\nmust be a lowercase letter or digit."
+  },
+  {
+   "api": "compute",
+   "method": "compute.securityPolicies.insert",
+   "resource": "securityPolicies",
+   "schema": "SecurityPolicy",
+   "path": "projects/{project}/global/securityPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.serviceAttachments.insert",
+   "resource": "serviceAttachments",
+   "schema": "ServiceAttachment",
+   "path": "projects/{project}/regions/{region}/serviceAttachments",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.snapshots.insert",
+   "resource": "snapshots",
+   "schema": "Snapshot",
+   "path": "projects/{project}/global/snapshots",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource; provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must be\na dash, lowercase letter, or digit, except the last character, which cannot\nbe a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.sslCertificates.insert",
+   "resource": "sslCertificates",
+   "schema": "SslCertificate",
+   "path": "projects/{project}/global/sslCertificates",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.sslPolicies.insert",
+   "resource": "sslPolicies",
+   "schema": "SslPolicy",
+   "path": "projects/{project}/global/sslPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. The name must be 1-63 characters long, and comply\nwith RFC1035. Specifically, the name must be 1-63 characters\nlong and match the regular expression\n`[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character\nmust be a lowercase letter, and all following characters must be a dash,\nlowercase letter, or digit, except the last character, which cannot be a\ndash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.storagePools.insert",
+   "resource": "storagePools",
+   "schema": "StoragePool",
+   "path": "projects/{project}/zones/{zone}/storagePools",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.subnetworks.insert",
+   "resource": "subnetworks",
+   "schema": "Subnetwork",
+   "path": "projects/{project}/regions/{region}/subnetworks",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "The name of the resource, provided by the client when initially creating\nthe resource. The name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetGrpcProxies.insert",
+   "resource": "targetGrpcProxies",
+   "schema": "TargetGrpcProxy",
+   "path": "projects/{project}/global/targetGrpcProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetHttpProxies.insert",
+   "resource": "targetHttpProxies",
+   "schema": "TargetHttpProxy",
+   "path": "projects/{project}/global/targetHttpProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetHttpsProxies.insert",
+   "resource": "targetHttpsProxies",
+   "schema": "TargetHttpsProxy",
+   "path": "projects/{project}/global/targetHttpsProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetInstances.insert",
+   "resource": "targetInstances",
+   "schema": "TargetInstance",
+   "path": "projects/{project}/zones/{zone}/targetInstances",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetPools.insert",
+   "resource": "targetPools",
+   "schema": "TargetPool",
+   "path": "projects/{project}/regions/{region}/targetPools",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetSslProxies.insert",
+   "resource": "targetSslProxies",
+   "schema": "TargetSslProxy",
+   "path": "projects/{project}/global/targetSslProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetTcpProxies.insert",
+   "resource": "targetTcpProxies",
+   "schema": "TargetTcpProxy",
+   "path": "projects/{project}/global/targetTcpProxies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.targetVpnGateways.insert",
+   "resource": "targetVpnGateways",
+   "schema": "TargetVpnGateway",
+   "path": "projects/{project}/regions/{region}/targetVpnGateways",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.urlMaps.insert",
+   "resource": "urlMaps",
+   "schema": "UrlMap",
+   "path": "projects/{project}/global/urlMaps",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.vpnGateways.insert",
+   "resource": "vpnGateways",
+   "schema": "VpnGateway",
+   "path": "projects/{project}/regions/{region}/vpnGateways",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.vpnTunnels.insert",
+   "resource": "vpnTunnels",
+   "schema": "VpnTunnel",
+   "path": "projects/{project}/regions/{region}/vpnTunnels",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.wireGroups.insert",
+   "resource": "wireGroups",
+   "schema": "WireGroup",
+   "path": "projects/{project}/global/crossSiteNetworks/{crossSiteNetwork}/wireGroups",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first\ncharacter must be a lowercase letter, and all following characters must\nbe a dash, lowercase letter, or digit, except the last character, which\ncannot be a dash."
+  },
+  {
+   "api": "compute",
+   "method": "compute.zoneVmExtensionPolicies.insert",
+   "resource": "zoneVmExtensionPolicies",
+   "schema": "VmExtensionPolicy",
+   "path": "projects/{project}/zones/{zone}/vmExtensionPolicies",
+   "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+   "readOnly": false,
+   "description": "Name of the resource. Provided by the client when the resource is created.\nThe name must be 1-63 characters long, and comply withRFC1035.\nSpecifically, the name must be 1-63 characters long and match the regular\nexpression `[a-z]([-a-z0-9]*[a-z0-9])?`\nwhich means the first character must be a lowercase letter, and all\nfollowing characters must be a dash, lowercase letter, or digit, except\nthe last character, which cannot be a dash."
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.ekmConnections.create",
+   "param": "ekmConnectionId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/ekmConnections",
+   "description": "Required. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`."
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.keyHandles.create",
+   "param": "keyHandleId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/keyHandles",
+   "description": "Optional. Id of the KeyHandle. Must be unique to the resource project and location. If not provided by the caller, a new UUID is used."
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.keyRings.create",
+   "param": "keyRingId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/keyRings",
+   "description": "Required. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`"
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.keyRings.cryptoKeys.create",
+   "param": "cryptoKeyId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/cryptoKeys",
+   "description": "Required. It must be unique within a KeyRing and match the regular expression `[a-zA-Z0-9_-]{1,63}`"
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.keyRings.importJobs.create",
+   "param": "importJobId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/keyRings/{keyRingsId}/importJobs",
+   "description": "Required. It must be unique within a KeyRing and match the regular expression `[a-zA-Z0-9_-]{1,63}`"
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.singleTenantHsmInstances.create",
+   "param": "singleTenantHsmInstanceId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/singleTenantHsmInstances",
+   "description": "Optional. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`."
+  },
+  {
+   "api": "cloudkms",
+   "method": "cloudkms.projects.locations.singleTenantHsmInstances.proposals.create",
+   "param": "singleTenantHsmInstanceProposalId",
+   "path": "v1/projects/{projectsId}/locations/{locationsId}/singleTenantHsmInstances/{singleTenantHsmInstancesId}/proposals",
+   "description": "Optional. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`."
+  }
+ ]
+}

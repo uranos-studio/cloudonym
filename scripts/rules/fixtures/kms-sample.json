@@ -1,0 +1,19 @@
+{
+  "kind": "discovery#restDescription",
+  "name": "cloudkms",
+  "version": "v1",
+  "revision": "20260101",
+  "resources": {
+    "projects": { "resources": { "locations": { "resources": {
+      "keyRings": {
+        "methods": { "create": { "id": "cloudkms.projects.locations.keyRings.create", "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/keyRings", "parameters": {
+          "parent": { "location": "path", "description": "Required." },
+          "keyRingId": { "location": "query", "description": "Required. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`" }
+        } } },
+        "resources": { "cryptoKeys": { "methods": { "create": { "id": "cloudkms.projects.locations.keyRings.cryptoKeys.create", "flatPath": "v1/x", "parameters": {
+          "cryptoKeyId": { "location": "query", "description": "Required. It must be unique within a KeyRing and match the regular expression `[a-zA-Z0-9_-]{1,63}`" }
+        } } } } }
+      }
+    } } } }
+  }
+}

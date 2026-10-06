@@ -1,0 +1,1384 @@
+{
+ "gcp.address": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.autoscaler": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.backend_bucket": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.backend_service": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.cross_site_network": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.external_vpn_gateway": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.forwarding_rule": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.future_reservation": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.global_address": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.global_forwarding_rule": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.global_public_delegated_prefix": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.global_vm_extension_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.health_check": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.http_health_check": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.https_health_check": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.image": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.instance_group_manager": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.instance_group": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.instance_template": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.instant_snapshot_group": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.instant_snapshot": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.interconnect_attachment_group": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.interconnect_attachment": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.interconnect_group": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.interconnect": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.license": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.machine_image": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.network_attachment": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.network_edge_security_service": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.packet_mirroring": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.public_advertised_prefix": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.public_delegated_prefix": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_autoscaler": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_backend_bucket": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_backend_service": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_commitment": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_composite_health_check": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_disk": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_health_aggregation_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_health_check": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_health_check_service": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_health_source": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_instance_group_manager": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_instance_template": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_instant_snapshot_group": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_instant_snapshot": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_notification_endpoint": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_security_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_snapshot": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_ssl_certificate": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_ssl_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_target_http_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_target_https_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_target_tcp_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.region_url_map": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.reservation": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.resource_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.rollout_plan": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.router": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.route": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.security_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.service_attachment": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.snapshot": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.ssl_certificate": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.ssl_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.storage_pool": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_grpc_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_http_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_https_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_instance": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_pool": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_ssl_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_tcp_proxy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.target_vpn_gateway": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.url_map": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.vpn_gateway": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.vpn_tunnel": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.zone_vm_extension_policy": {
+  "valid": [
+   "a",
+   "a1",
+   "web-01",
+   "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+  ],
+  "invalid": [
+   "1abc",
+   "-abc",
+   "abc-",
+   "Abc",
+   "a_b",
+   "a.b",
+   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ]
+ },
+ "gcp.kms_ekm_connection": {
+  "valid": [
+   "a",
+   "Key_Ring-01",
+   "9",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ],
+  "invalid": [
+   "key.ring",
+   "key ring",
+   "key/ring",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ]
+ },
+ "gcp.kms_key_ring": {
+  "valid": [
+   "a",
+   "Key_Ring-01",
+   "9",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ],
+  "invalid": [
+   "key.ring",
+   "key ring",
+   "key/ring",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ]
+ },
+ "gcp.kms_crypto_key": {
+  "valid": [
+   "a",
+   "Key_Ring-01",
+   "9",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ],
+  "invalid": [
+   "key.ring",
+   "key ring",
+   "key/ring",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ]
+ },
+ "gcp.kms_import_job": {
+  "valid": [
+   "a",
+   "Key_Ring-01",
+   "9",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ],
+  "invalid": [
+   "key.ring",
+   "key ring",
+   "key/ring",
+   "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+  ]
+ }
+}

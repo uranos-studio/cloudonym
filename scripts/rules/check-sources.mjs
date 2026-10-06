@@ -5,7 +5,7 @@
 // 사용:
 //   node scripts/rules/check-sources.mjs --lock docs/rule-sources.lock.json \
 //     --azure <resource-name-rules.md> --azure-html <게시 쪽 HTML> [--azure-commit <sha>] \
-//     --gcp <compute v1 discovery.json> --aws <CloudformationSchema.zip 을 푼 폴더> [--write]
+//     --gcp <compute v1 discovery.json> --gcp-kms <cloudkms v1 discovery.json> --aws <CloudformationSchema.zip 을 푼 폴더> [--write]
 //   --write  지금 입력으로 lock 을 새로 쓴다(사람이 diff 를 읽고 커밋한다)
 //
 // 판정 — exit 1 은 sha256 · counts 가 다를 때만이다. sha256 은 쪽 전체가 아니라 우리가 쓰는 칸만
@@ -28,6 +28,7 @@ export const AWS_NAMESPACES = [
 const URLS = {
   azure: 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/management/resource-name-rules.md',
   gcp: 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest',
+  gcpKms: 'https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest',
   aws: 'https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip',
 };
 
@@ -68,6 +69,30 @@ export function gcpDigest(jsonPath) {
   };
 }
 
+/** Cloud KMS — create 메서드의 …Id 인자 설명(들이기가 정규식 · 유일 범위를 읽는 문장) */
+export function gcpKmsDigest(jsonPath) {
+  const doc = JSON.parse(readFileSync(jsonPath, 'utf-8'));
+  const lines = [];
+  const walk = (resources) => {
+    for (const res of Object.values(resources ?? {})) {
+      const m = res.methods?.create;
+      if (m) {
+        for (const [param, p] of Object.entries(m.parameters ?? {})) {
+          if (p.location === 'query' && param.endsWith('Id')) lines.push([m.id, param, p.description].map(norm).join('\t'));
+        }
+      }
+      walk(res.resources);
+    }
+  };
+  walk(doc.resources);
+  return {
+    marker: { revision: doc.revision ?? null },
+    counts: { createIdParams: lines.length },
+    hashOf: 'create 메서드마다 method · …Id 인자 이름 · 그 설명, 정렬',
+    sha256: sha256(lines.sort()),
+  };
+}
+
 export function awsDigest(dir) {
   const lines = [];
   let types = 0;
@@ -103,6 +128,7 @@ export function buildLock(inputs, { azureCommit = null } = {}) {
         ...azureDigest(inputs.azure, inputs.azureHtml),
       },
       gcp: { url: URLS.gcp, fetchedAt: at, ...gcpDigest(inputs.gcp) },
+      gcpKms: { url: URLS.gcpKms, fetchedAt: at, ...gcpKmsDigest(inputs.gcpKms) },
       aws: { url: URLS.aws, namespaces: AWS_NAMESPACES, fetchedAt: at, ...awsDigest(inputs.aws) },
     },
   };
@@ -112,11 +138,12 @@ function compare(lock, inputs, azureCommit) {
   const now = {
     azure: azureDigest(inputs.azure, inputs.azureHtml),
     gcp: gcpDigest(inputs.gcp),
+    gcpKms: gcpKmsDigest(inputs.gcpKms),
     aws: awsDigest(inputs.aws),
   };
   const changed = [];
   const notices = [];
-  for (const key of ['azure', 'gcp', 'aws']) {
+  for (const key of ['azure', 'gcp', 'gcpKms', 'aws']) {
     const was = lock.sources?.[key];
     if (!was) {
       changed.push(`${key}: lock 에 없다`);
@@ -149,11 +176,11 @@ function main(argv) {
   const write = args.includes('--write');
   if (write) args.splice(args.indexOf('--write'), 1);
   const lockPath = take('--lock');
-  const inputs = { azure: take('--azure'), azureHtml: take('--azure-html'), gcp: take('--gcp'), aws: take('--aws') };
+  const inputs = { azure: take('--azure'), azureHtml: take('--azure-html'), gcp: take('--gcp'), gcpKms: take('--gcp-kms'), aws: take('--aws') };
   const azureCommit = take('--azure-commit');
   // --azure-html 도 필수다 — 빠지면 앵커를 재지 못한 채 통과할 수 있다
-  if (args.length > 0 || !lockPath || !inputs.azure || !inputs.azureHtml || !inputs.gcp || !inputs.aws) {
-    console.error('사용: node scripts/rules/check-sources.mjs --lock <json> --azure <md> --azure-html <html> [--azure-commit <sha>] --gcp <json> --aws <dir> [--write]');
+  if (args.length > 0 || !lockPath || !inputs.azure || !inputs.azureHtml || !inputs.gcp || !inputs.gcpKms || !inputs.aws) {
+    console.error('사용: node scripts/rules/check-sources.mjs --lock <json> --azure <md> --azure-html <html> [--azure-commit <sha>] --gcp <json> --gcp-kms <json> --aws <dir> [--write]');
     return 2;
   }
   if (write) {

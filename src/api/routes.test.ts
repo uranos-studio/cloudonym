@@ -3,6 +3,7 @@ import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 import { afterEach, vi } from 'vitest';
 import { VERSION } from '../version';
+import { rulesFor } from '../core/constraints';
 
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const post = (body: unknown) => req(app, '/v1/generate', jsonPost(body));
@@ -57,7 +58,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) {
       expect(Object.keys(part)).toEqual(['gcp']);
     }
-    expect(Object.keys(body.data.gcp)).toHaveLength(9);
+    expect(Object.keys(body.data.gcp)).toHaveLength(rulesFor('gcp').length);
   });
   it('providers 생략 → 셋 다 · 넷의 provider 집합이 같다', async () => {
     const body = await json((await post({ context: ctx })).res);

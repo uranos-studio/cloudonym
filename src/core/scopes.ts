@@ -4,9 +4,10 @@
 // children 순서 = 이 표의 순서. 각 행 위 주석이 docUrl 쪽에서 옮긴 근거 문장이다.
 import type { Provider } from './types';
 import { AZURE_INTAKE_SCOPES, type AzureIntakeScopeId } from './rules/azure-intake';
+import { GCP_INTAKE_SCOPES, type GcpIntakeScopeId } from './rules/gcp-intake';
 
 export type ScopeId =
-  | AzureIntakeScopeId | 'azure:region'
+  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId
   | 'aws:partition' | 'aws:account' | 'aws:region' | 'aws:vpc'
   | 'gcp:namespace' | 'gcp:project' | 'gcp:project_global' | 'gcp:project_region' | 'gcp:project_zone'
   | 'azure:global' | 'azure:subscription' | 'azure:resource_group' | 'azure:virtual_network' | 'azure:managed_cluster';
@@ -52,6 +53,8 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   'gcp:project_region': { id: 'gcp:project_region', provider: 'gcp', displayName: 'Region', parent: 'gcp:project', docUrl: GCP_COMPUTE_DISCOVERY },
   // zones/{zone}/disks · zones/{zone}/instances
   'gcp:project_zone': { id: 'gcp:project_zone', provider: 'gcp', displayName: 'Zone', parent: 'gcp:project', docUrl: GCP_COMPUTE_DISCOVERY },
+  // KMS 생성 메서드 설명 "It must be unique within a location" · "It must be unique within a KeyRing". 생성 파일 rules/gcp-intake.ts
+  ...GCP_INTAKE_SCOPES,
 
   // ─── AWS ───────────────────────────────────────────────
   // "each bucket name must be unique across all AWS accounts in all the AWS Regions within a partition."

@@ -48,14 +48,14 @@
   "resources": {
     "disks": {
       "methods": {
-        "insert": { "id": "compute.disks.insert", "request": { "$ref": "Disk" } },
+        "insert": { "id": "compute.disks.insert", "path": "projects/{project}/zones/{zone}/disks", "request": { "$ref": "Disk" } },
         "bulkInsert": { "id": "compute.disks.bulkInsert", "request": { "$ref": "Disk" } },
         "get": { "id": "compute.disks.get" }
       }
     },
     "regionDisks": {
       "methods": {
-        "insert": { "id": "compute.regionDisks.insert", "request": { "$ref": "Disk" } }
+        "insert": { "id": "compute.regionDisks.insert", "path": "projects/{project}/regions/{region}/disks", "request": { "$ref": "Disk" } }
       }
     },
     "nodeGroups": {
@@ -87,7 +87,7 @@
       "resources": {
         "children": {
           "methods": {
-            "insert": { "id": "compute.parents.children.insert", "request": { "$ref": "Nested" } }
+            "insert": { "id": "compute.parents.children.insert", "path": "projects/{project}/zones/{zone}/parents/{parent}/children", "request": { "$ref": "Nested" } }
           }
         }
       }

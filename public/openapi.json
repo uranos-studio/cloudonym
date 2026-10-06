@@ -865,6 +865,8 @@
               "gcp:project_global",
               "gcp:project_region",
               "gcp:project_zone",
+              "gcp:project_location",
+              "gcp:kms_key_ring",
               "azure:global",
               "azure:subscription",
               "azure:resource_group",

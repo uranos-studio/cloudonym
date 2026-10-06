@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { AZURE_INTAKE_ROWS } from './rules/azure-intake';
+import { GCP_INTAKE_ROWS } from './rules/gcp-intake';
 import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL, AWS_NAME_TAG } from './constraints';
 import { PROVIDERS } from './types';
 
@@ -177,8 +178,8 @@ describe('조사 11종 (Task 5) — 범위 · 부류 · 분류 · 근거', () =>
     expect(r!.docUrl).toMatch(/^https:\/\//);
     expect(r!.template).toContain('seq');
   });
-  it('규칙 수 — AWS 11 · GCP 9 · Azure 손 15 + 들인 행', () => {
-    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11, 9, 15 + AZURE_INTAKE_ROWS.length]);
+  it('규칙 수 — AWS 11 · GCP 손 9 + 들인 행 · Azure 손 15 + 들인 행', () => {
+    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11, 9 + GCP_INTAKE_ROWS.length, 15 + AZURE_INTAKE_ROWS.length]);
   });
   it('docUrl 은 숫자가 적힌 쪽의 앵커다', () => {
     expect(RULES['gcp.firewall_rule']!.docUrl).toBe('https://docs.cloud.google.com/compute/docs/reference/rest/v1/firewalls#Firewall.FIELDS.name');

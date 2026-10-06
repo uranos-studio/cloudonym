@@ -35,6 +35,18 @@
       "hashOf": "insert 메서드마다 method · schema · name.pattern · name.readOnly, 정렬",
       "sha256": "7474cf6e07e55cf0072b624291c5644beb59a984469f2675ad326b6badf37eea"
     },
+    "gcpKms": {
+      "url": "https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest",
+      "fetchedAt": "2026-10-06T18:11:00+09:00",
+      "marker": {
+        "revision": "20261001"
+      },
+      "counts": {
+        "createIdParams": 7
+      },
+      "hashOf": "create 메서드마다 method · …Id 인자 이름 · 그 설명, 정렬",
+      "sha256": "2438657e63b0cf34ca48a7a1d949b491afda9c17c48585c06b9f1e2892748dd2"
+    },
     "aws": {
       "url": "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip",
       "namespaces": [

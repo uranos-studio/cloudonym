@@ -1,12 +1,13 @@
 // GCP 규칙 표 — constraints.ts 가 aws · azure 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
-import type { ResourceRule } from '../types';
+import type { ResourceRule, Token } from '../types';
+import { GCP_INTAKE_ROWS } from './gcp-intake';
 
 /** Compute 디스커버리 문서 — insert.path 가 범위(global · regions/{region} · zones/{zone})를 준다 */
 const GCP_COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
 /** RFC 1035 라벨 — GCP compute_instance · vpc_network · subnet */
 const RFC1035 = /^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$/;
 
-export const GCP_RULES: Record<string, ResourceRule> = {
+const GCP_HAND_RULES: Record<string, ResourceRule> = {
   'gcp.project_id': {
     id: 'gcp.project_id', provider: 'gcp', resourceType: 'project_id',
     displayName: 'Project ID', slug: '', minLength: 6, maxLength: 30,
@@ -97,4 +98,32 @@ export const GCP_RULES: Record<string, ResourceRule> = {
     scope: 'gcp:project_zone', entity: 'compute.disks', category: 'compute', uniqueness: 'csp', uniquenessDocUrl: GCP_COMPUTE_DISCOVERY,
     docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/disks#Disk.FIELDS.name',
   },
+};
+
+// ─── 들인 행 (D43) — rules/gcp-intake.ts 의 행을 규칙으로 편다 ──────────────
+// 생성 꼴은 손으로 쓴 규칙을 따른다: 전역(global) 리소스는 vpc_network 꼴(region 없음), 지역 · 영역 · 위치 리소스는 subnet 꼴(region 선택).
+const GLOBAL_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'slug', 'seq'];
+const PLACED_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
+
+function fromIntakeRow(r: (typeof GCP_INTAKE_ROWS)[number]): ResourceRule {
+  const template = r.scope === 'gcp:project_global' ? GLOBAL_TEMPLATE : PLACED_TEMPLATE;
+  const rfc = r.chars === 'rfc1035';
+  return {
+    id: r.id, provider: 'gcp', resourceType: r.id.slice('gcp.'.length), displayName: r.displayName, slug: r.slug,
+    minLength: r.min, maxLength: r.max,
+    // 원문 정규식은 앵커가 없다 — 이름 전체에 맞도록 감싼다
+    pattern: new RegExp(`^(?:${r.pattern})$`),
+    allowed: rfc ? 'lower-digit-hyphen' : 'alnum-hyphen-underscore', separator: '-', caseRule: rfc ? 'lower' : 'any',
+    startsWithLetter: rfc, endsWithAlnum: rfc,
+    template, optional: template.includes('region') ? ['region'] : [],
+    scope: r.scope, entity: r.entity, category: r.category, uniqueness: 'csp',
+    ...(r.uniquenessDocUrl ? { uniquenessDocUrl: r.uniquenessDocUrl } : {}),
+    docUrl: r.docUrl,
+  };
+}
+
+/** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서 */
+export const GCP_RULES: Record<string, ResourceRule> = {
+  ...GCP_HAND_RULES,
+  ...Object.fromEntries(GCP_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
 };

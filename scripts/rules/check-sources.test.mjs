@@ -17,6 +17,7 @@ function inputs(dir) {
     azure: join(dir, 'azure.md'),
     azureHtml: fx('azure-sample.html'),
     gcp: join(dir, 'gcp.json'),
+    gcpKms: join(dir, 'kms.json'),
     aws: join(dir, 'aws'),
   };
 }
@@ -25,6 +26,7 @@ function setup() {
   const dir = mkdtempSync(join(tmpdir(), 'check-sources-'));
   cpSync(fx('azure-sample.md'), join(dir, 'azure.md'));
   cpSync(fx('gcp-sample.json'), join(dir, 'gcp.json'));
+  cpSync(fx('kms-sample.json'), join(dir, 'kms.json'));
   cpSync(fx('aws'), join(dir, 'aws'), { recursive: true });
   const lock = join(dir, 'lock.json');
   const w = run(dir, lock, ['--write', '--azure-commit', 'abc123']);
@@ -34,7 +36,7 @@ function setup() {
 
 function run(dir, lock, extra = []) {
   const i = inputs(dir);
-  return spawnSync(process.execPath, [script, '--lock', lock, '--azure', i.azure, '--azure-html', i.azureHtml, '--gcp', i.gcp, '--aws', i.aws, ...extra], { encoding: 'utf-8' });
+  return spawnSync(process.execPath, [script, '--lock', lock, '--azure', i.azure, '--azure-html', i.azureHtml, '--gcp', i.gcp, '--gcp-kms', i.gcpKms, '--aws', i.aws, ...extra], { encoding: 'utf-8' });
 }
 
 test('AWS 는 파일 이름이 아니라 typeName 으로 18개 네임스페이스를 고른다', () => {
@@ -60,7 +62,7 @@ test('--write 로 만든 lock 과 같은 입력이면 exit 0', () => {
   assert.equal(p.status, 0, p.stdout + p.stderr);
 });
 
-for (const src of ['azure', 'gcp', 'aws']) {
+for (const src of ['azure', 'gcp', 'gcpKms', 'aws']) {
   test(`lock 의 ${src} 해시 한 글자를 바꾸면 exit 1`, () => {
     const { dir, lock } = setup();
     const j = JSON.parse(readFileSync(lock, 'utf-8'));
@@ -108,16 +110,19 @@ test('입력이 빠지면 exit 2 — --azure-html 도 필수다', () => {
   assert.equal(p.status, 2);
   const { dir, lock } = setup();
   const i = inputs(dir);
-  const q = spawnSync(process.execPath, [script, '--lock', lock, '--azure', i.azure, '--gcp', i.gcp, '--aws', i.aws], { encoding: 'utf-8' });
+  const q = spawnSync(process.execPath, [script, '--lock', lock, '--azure', i.azure, '--gcp', i.gcp, '--gcp-kms', i.gcpKms, '--aws', i.aws], { encoding: 'utf-8' });
   assert.equal(q.status, 2);
+  const r = spawnSync(process.execPath, [script, '--lock', lock, '--azure', i.azure, '--azure-html', i.azureHtml, '--gcp', i.gcp, '--aws', i.aws], { encoding: 'utf-8' });
+  assert.equal(r.status, 2, '--gcp-kms 도 필수다');
 });
 
-test('buildLock 은 세 출처를 모두 담는다', () => {
+test('buildLock 은 네 출처를 모두 담는다', () => {
   const dir = mkdtempSync(join(tmpdir(), 'check-sources-b-'));
   cpSync(fx('azure-sample.md'), join(dir, 'azure.md'));
   cpSync(fx('gcp-sample.json'), join(dir, 'gcp.json'));
+  cpSync(fx('kms-sample.json'), join(dir, 'kms.json'));
   cpSync(fx('aws'), join(dir, 'aws'), { recursive: true });
   const l = buildLock(inputs(dir), { azureCommit: null });
-  assert.deepEqual(Object.keys(l.sources), ['azure', 'gcp', 'aws']);
+  assert.deepEqual(Object.keys(l.sources), ['azure', 'gcp', 'gcpKms', 'aws']);
   assert.equal(l.sources.aws.marker, null);
 });
