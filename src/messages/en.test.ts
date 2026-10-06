@@ -115,6 +115,15 @@ describe('영어 사전 (D24)', () => {
     }
   });
 
+  it('공유 URL 경고 — Base64 는 암호화가 아니어서 링크를 받은 사람이 입력값을 읽는다고 말하고, 민감한 값을 넣지 말라고 권한다', () => {
+    expect(en.ui.share_warning).toContain('Base64');
+    expect(en.ui.share_warning).toContain('not encrypted');
+    expect(en.ui.share_warning).toMatch(/anyone with the link can read/i);
+    expect(en.ui.share_warning).toMatch(/do not enter/i);
+    // 버튼의 접근성 이름 · 툴팁도 같은 사실을 짧게 싣는다
+    expect(en.ui.share_button_label).toContain('readable');
+  });
+
   it('params 가 문장에 들어간다', () => {
     expect(format(SAMPLES['name.too_long'], en)).toBe('Name is 34 characters long; the maximum is 30');
     expect(format(SAMPLES['step.abbreviated'], en)).toContain("'AAA' to 'BBB'");

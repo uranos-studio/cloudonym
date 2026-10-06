@@ -13,7 +13,7 @@ export const UI_KEYS = [
   'form_title', 'form_hint', 'field_owner_hint', 'field_system_hint', 'field_purpose_hint',
   'field_owner_placeholder', 'field_system_placeholder', 'field_purpose_placeholder', 'region_global_label',
   // App — 네 단계 (D42)
-  'tagline', 'nav_label', 'share_button', 'share_button_label', 'results_title',
+  'tagline', 'nav_label', 'share_button', 'share_button_label', 'share_warning', 'results_title',
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
   'step_cloud', 'step_context', 'step_resources', 'step_names', 'selection_dropped', 'switch_cloud_confirm',
   'sticky_summary', 'sticky_jump',

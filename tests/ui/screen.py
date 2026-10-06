@@ -156,6 +156,14 @@ def chip_count(page, cat):
     return int(page.locator(f'button[data-category="{cat}"]').inner_text().rsplit('(', 1)[1].rstrip(')'))
 
 
+def shot(pg, name, full_page=True):
+    """스크린샷 — 트리를 「선택만 보기」로 줄여 찍고 되돌린다. 펼친 트리 전체(수백 행)를 찍으면 README 에서 읽을 수 없다"""
+    pg.check('[data-selected-only]')
+    pg.evaluate('window.scrollTo(0, 0)')
+    pg.screenshot(path=str(OUT / name), full_page=full_page)
+    pg.uncheck('[data-selected-only]')
+
+
 def no_hangul(page):
     body_text = page.inner_text('body')
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
@@ -186,6 +194,12 @@ with sync_playwright() as p:
     expect(page.locator('[data-pass-meaning]')).to_contain_text('Generated names are not guaranteed unique')
     expect(page.locator('[data-version]')).to_have_text(f"Engine {VERSION['engine']} · rules {RULES}")
     expect(page.locator('[data-rules-mismatch]')).to_have_count(0)
+    # 공유 URL 경고 — hash 는 Base64(암호화 아님)라 링크를 받은 사람이 입력값을 읽는다 · 버튼 툴팁 · 접근성 이름도 같은 사실
+    expect(page.locator('[data-share-warning]')).to_have_text('The share link and the address bar hold your input as Base64, which is not encrypted — anyone with the link can read owner, system, purpose and the other values. Do not enter sensitive values such as internal company or project names.')
+    expect(page.locator('[data-share-warning]')).to_be_visible()
+    share_btn_label = 'Copy share URL — a link holding the current input in readable form (Base64, not encrypted)'
+    expect(page.locator('[data-copy="share-url"]')).to_have_attribute('title', share_btn_label)
+    expect(page.locator('[data-copy="share-url"]')).to_have_attribute('aria-label', share_btn_label)
     fill_five(page, INPUT)
     page.click('[data-cloud="gcp"]')
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
@@ -258,7 +272,7 @@ with sync_playwright() as p:
     assert_selects_fit(page, 1280)
     no_hangul(page)
     page.evaluate('window.scrollTo(0, 0)')
-    page.screenshot(path=str(OUT / '01-desktop-light.png'), full_page=True)
+    shot(page, '01-desktop-light.png')
     share_url = page.url
 
     # ── ⑸ 내보내기 셋 + 태그 JSON · 이름 복사 · 공유 URL ──
@@ -413,6 +427,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(300)
     assert page.evaluate('document.documentElement.scrollWidth') <= 360, page.evaluate('document.documentElement.scrollWidth')
     assert_selects_fit(page, 360)
+    expect(page.locator('[data-share-warning]')).to_be_visible()  # 좁은 화면에서도 경고가 보이고 가로 스크롤을 만들지 않는다(위 scrollWidth)
     bar = page.locator('[data-sticky-bar]')
     expect(bar).to_be_visible()
     expect(bar).to_contain_text('4 resources · 5 names')
@@ -423,7 +438,7 @@ with sync_playwright() as p:
     h = row(page, 'storage_account').evaluate('e => e.getBoundingClientRect().height')
     assert h >= 44, h
     page.evaluate('window.scrollTo(0, 0)')
-    page.screenshot(path=str(OUT / '02-mobile-360.png'), full_page=True)
+    shot(page, '02-mobile-360.png')
     page.set_viewport_size({'width': 1280, 'height': 900})
     expect(bar).to_be_hidden()  # 넓은 화면에는 고정 막대가 없다
     ctx1.close()
@@ -435,7 +450,8 @@ with sync_playwright() as p:
     expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
     bg = page4.evaluate('getComputedStyle(document.body).backgroundColor')
     assert bg not in ('rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)'), f'다크 모드 배경이 아니다: {bg}'
-    page4.screenshot(path=str(OUT / '03-desktop-dark.png'), full_page=True)
+    expect(page4.locator('[data-share-warning]')).to_be_visible()
+    shot(page4, '03-desktop-dark.png')
     dark.close()
 
     # ── ⑻ 옛 v 링크 → 안내 · 새로고침해도 안내와 옛 v 가 남는다 · Share URL 은 지금 버전 · 폼을 고치면 안내가 사라지고 v 가 지금 버전 (D27 ⑵) ──
