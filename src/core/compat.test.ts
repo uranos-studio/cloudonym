@@ -1,4 +1,4 @@
-// 호환 불변식 — 기본 문맥(baseline 의 base)에서 만드는 이름 24개를 문자열 리터럴로 고정한다.
+// 호환 불변식 — 기본 문맥(baseline 의 base)에서 만드는 이름 35개를(처음 24개 + 조사 11종 · Task 5) 문자열 리터럴로 고정한다.
 // 순번 · 역할을 항목 입력으로 받게 되어도(D30') 기본값(count 1 → 01 · role sync)이면 지금 출력과 글자 하나 다르지 않아야 한다.
 // baseline.json 은 UPDATE_BASELINE 으로 다시 쓸 수 있지만 이 파일은 손으로만 바뀐다 — 바뀌었다면 이름이 달라진 것이다
 import { describe, it, expect } from 'vitest';
@@ -14,6 +14,11 @@ const EXPECTED: Record<string, Record<string, string>> = {
     subnet: 'billing-trade-prd-kr-subnet-01',
     ec2_instance: 'billing-trade-prd-kr-vm-01',
     rds_instance: 'billing-trade-prd-kr-db-01',
+    internet_gateway: 'billing-trade-prd-kr-igw-01',
+    route_table: 'billing-trade-prd-kr-rt-01',
+    security_group: 'billing-trade-prd-kr-sg-01',
+    key_pair: 'billing-trade-prd-kr-key-01',
+    ebs_volume: 'billing-trade-prd-kr-vol-01',
   },
   gcp: {
     project_id: 'platform-billing-trade-prd',
@@ -23,6 +28,8 @@ const EXPECTED: Record<string, Record<string, string>> = {
     subnet: 'billing-trade-prd-kr-subnet-01',
     cloud_sql_instance: 'billing-trade-prd-kr-db-01',
     storage_bucket: 'platform-billing-trade-prd-bucket',
+    firewall_rule: 'billing-trade-prd-fw-01',
+    disk: 'billing-trade-prd-kr-disk-01',
   },
   azure: {
     resource_group: 'rg-billing-trade-prd',
@@ -36,17 +43,21 @@ const EXPECTED: Record<string, Record<string, string>> = {
     sql_server: 'billing-trade-prd-kr-sql-01',
     aks_nodepool_linux: 'nptradeprd',
     aks_nodepool_windows: 'nptrd',
+    public_ip: 'billing-trade-prd-kr-pip-01',
+    network_security_group: 'billing-trade-prd-kr-nsg-01',
+    network_interface: 'billing-trade-prd-kr-nic-01',
+    os_disk: 'billing-trade-prd-kr-osdisk-01',
   },
 };
 
-describe('호환 — 기본 문맥의 이름 24개 (리터럴)', () => {
+describe('호환 — 기본 문맥의 이름 35개 (리터럴)', () => {
   it('generate 의 이름 · 판정이 리터럴과 같다', () => {
     const parsed = parseContext(BASE);
     if (!parsed.ok) throw new Error('기본 문맥이 파싱되지 않는다');
     const out = generate(parsed.context);
     const actual = Object.fromEntries(Object.entries(out).map(([p, byType]) => [p, Object.fromEntries(Object.entries(byType!).map(([t, r]) => [t, r.name]))]));
     expect(actual).toEqual(EXPECTED);
-    expect(Object.values(EXPECTED).flatMap((byType) => Object.keys(byType))).toHaveLength(24);
+    expect(Object.values(EXPECTED).flatMap((byType) => Object.keys(byType))).toHaveLength(35);
     for (const byType of Object.values(out)) for (const r of Object.values(byType!)) expect(r.valid, r.ruleId).toBe(true);
   });
 });

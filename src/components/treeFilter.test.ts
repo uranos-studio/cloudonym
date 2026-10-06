@@ -32,7 +32,10 @@ describe('filterTree', () => {
     expect(filterTree(azure, { ...none, query: 'zzz-none' }, new Map())).toBeUndefined();
   });
   it('분류 칩 — 그 분류만', () => {
-    expect(ids(filterTree(azure, { ...none, category: 'networking' }, new Map()))).toEqual(['virtual_network', 'subnet']);
+    const got = ids(filterTree(azure, { ...none, category: 'networking' }, new Map()));
+    expect(got).toContain('virtual_network');
+    expect(got).toContain('subnet');
+    expect(new Set(got)).toEqual(new Set(rulesFor('azure').filter((r) => r.category === 'networking').map((r) => r.resourceType)));
   });
   it('선택만 보기 — 체크한 행과 그 조상만 · 검색과 함께 걸린다', () => {
     const picked = new Map([['key_vault', { count: 1 }], ['subnet', { count: 2 }]]);
@@ -45,7 +48,7 @@ describe('categoryCounts — 분류별 규칙 수 · 분류 순서', () => {
   it('Azure — 합이 규칙 수 · 0 인 분류는 없다', () => {
     const c = categoryCounts(azure);
     expect([...c.values()].reduce((a, b) => a + b, 0)).toBe(rulesFor('azure').length);
-    expect(c.get('networking')).toBe(2);
+    expect(c.get('networking')).toBe(rulesFor('azure').filter((r) => r.category === 'networking').length);
     expect([...c.values()].every((n) => n > 0)).toBe(true);
   });
 });

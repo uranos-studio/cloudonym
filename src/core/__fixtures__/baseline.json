@@ -69,6 +69,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -132,6 +177,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platform-billing-trade-prd-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -235,6 +298,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -342,6 +441,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -407,6 +551,24 @@
               "original": "개발-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -508,6 +670,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -615,6 +813,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -680,6 +923,24 @@
               "original": "Team \"A\" café-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -781,6 +1042,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -888,6 +1185,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -951,6 +1293,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platform-billing-trade-prd-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -1054,6 +1414,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -1161,6 +1557,51 @@
               "original": "windows-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "windows-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "windows-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "windows-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "windows-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "windows-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -1224,6 +1665,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platform-windows-trade-prd-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "windows-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "windows-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -1327,6 +1786,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "windows-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "windows-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "windows-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "windows-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -1434,6 +1929,51 @@
               "original": "google-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "google-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "google-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "google-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "google-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "google-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -1498,6 +2038,24 @@
               "isTransformed": false,
               "original": "platform-google-trade-prd-bucket",
               "violations": 1,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "google-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "google-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-disk-01",
+              "violations": 0,
               "steps": 0
             }
           },
@@ -1600,6 +2158,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "google-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "google-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "google-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "google-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -1707,6 +2301,51 @@
               "original": "azure-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "azure-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "azure-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "azure-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "azure-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "azure-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -1770,6 +2409,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platform-azure-trade-prd-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "azure-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "azure-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -1873,6 +2530,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "azure-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "azure-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "azure-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "azure-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -1980,6 +2673,51 @@
               "original": "매매-trade-prd-kr-db-01",
               "violations": 1,
               "steps": 1
+            },
+            "internet_gateway": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-igw-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "route_table": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-rt-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "security_group": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-sg-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "key_pair": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-key-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "ebs_volume": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-vol-01",
+              "violations": 1,
+              "steps": 1
             }
           },
           "gcp": {
@@ -2043,6 +2781,24 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "platform-매매-trade-prd-bucket",
+              "violations": 1,
+              "steps": 1
+            },
+            "firewall_rule": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-fw-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "disk": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-disk-01",
               "violations": 1,
               "steps": 1
             }
@@ -2146,6 +2902,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-pip-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "network_security_group": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-nsg-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "network_interface": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-nic-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "os_disk": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-osdisk-01",
+              "violations": 1,
+              "steps": 1
             }
           }
         },
@@ -2253,6 +3045,51 @@
               "original": "paymentsettlement-reconciliation-dev-global-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "paymentsettlement-reconciliation-dev-global-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "paymentsettlement-reconciliation-dev-global-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "paymentsettlement-reconciliation-dev-global-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "paymentsettlement-reconciliation-dev-global-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "paymentsettlement-reconciliation-dev-global-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -2316,6 +3153,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platformengineering-paymentsettlement-reconciliation-dev-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "paymentsettlement-reconciliation-dev-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "paymentsettlement-reconciliation-dev-global-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -2419,6 +3274,42 @@
               "original": "npreconciliation",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "paymentsettlement-reconciliation-dev-global-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "paymentsettlement-reconciliation-dev-global-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "paymentsettlement-reconciliation-dev-global-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "paymentsettlement-reconciliation-dev-global-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -2526,6 +3417,51 @@
               "original": "a-long-longpurpose-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "a-long-longpurpose-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "a-long-longpurpose-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "a-long-longpurpose-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "a-long-longpurpose-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "a-long-longpurpose-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -2589,6 +3525,24 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "platform-a-long-longpurpose-prd-bucket",
+              "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "a-long-longpurpose-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "a-long-longpurpose-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-disk-01",
               "violations": 0,
               "steps": 0
             }
@@ -2692,6 +3646,42 @@
               "original": "nplongpurpose",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "a-long-longpurpose-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "a-long-longpurpose-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "a-long-longpurpose-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "a-long-longpurpose-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -2799,6 +3789,51 @@
               "original": "3tier-trade-prd-kr-db-01",
               "violations": 1,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "3tier-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "3tier-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "3tier-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "3tier-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "3tier-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -2863,6 +3898,24 @@
               "isTransformed": false,
               "original": "platform-3tier-trade-prd-bucket",
               "violations": 0,
+              "steps": 0
+            },
+            "firewall_rule": {
+              "name": "3tier-trade-prd-fw-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-fw-01",
+              "violations": 1,
+              "steps": 0
+            },
+            "disk": {
+              "name": "3tier-trade-prd-kr-disk-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-disk-01",
+              "violations": 1,
               "steps": 0
             }
           },
@@ -2965,6 +4018,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "3tier-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "3tier-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "3tier-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "3tier-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -3072,6 +4161,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -3137,6 +4271,24 @@
               "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -3238,6 +4390,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -3345,6 +4533,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -3410,6 +4643,24 @@
               "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -3511,6 +4762,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -3618,6 +4905,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -3683,6 +5015,24 @@
               "original": "team#1-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -3784,6 +5134,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -3891,6 +5277,51 @@
               "original": "billing-trade-prd-kr-db-01",
               "violations": 0,
               "steps": 0
+            },
+            "internet_gateway": {
+              "name": "billing-trade-prd-kr-igw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-igw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "route_table": {
+              "name": "billing-trade-prd-kr-rt-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rt-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "security_group": {
+              "name": "billing-trade-prd-kr-sg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-sg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "key_pair": {
+              "name": "billing-trade-prd-kr-key-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-key-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "ebs_volume": {
+              "name": "billing-trade-prd-kr-vol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-vol-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "gcp": {
@@ -3956,6 +5387,24 @@
               "original": "In.Fra-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
+            },
+            "firewall_rule": {
+              "name": "billing-trade-prd-fw-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-fw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "disk": {
+              "name": "billing-trade-prd-kr-disk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-disk-01",
+              "violations": 0,
+              "steps": 0
             }
           },
           "azure": {
@@ -4057,6 +5506,42 @@
               "original": "nptrade",
               "violations": 0,
               "steps": 2
+            },
+            "public_ip": {
+              "name": "billing-trade-prd-kr-pip-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_security_group": {
+              "name": "billing-trade-prd-kr-nsg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nsg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "network_interface": {
+              "name": "billing-trade-prd-kr-nic-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-nic-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "os_disk": {
+              "name": "billing-trade-prd-kr-osdisk-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-osdisk-01",
+              "violations": 0,
+              "steps": 0
             }
           }
         },
@@ -4133,6 +5618,114 @@
       }
     ],
     "validate": [
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "ebs_volume",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
       {
         "provider": "aws",
         "resourceType": "ec2_instance",
@@ -4351,6 +5944,222 @@
       },
       {
         "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "internet_gateway",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "key_pair",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "aws",
         "resourceType": "rds_instance",
         "name": "",
         "known": true,
@@ -4456,6 +6265,114 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "route_table",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
       },
       {
         "provider": "aws",
@@ -4654,6 +6571,123 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "sg-abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "security_group",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
       },
       {
         "provider": "aws",
@@ -8470,6 +10504,438 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_interface",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "network_security_group",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "os_disk",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "public_ip",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
       },
       {
         "provider": "azure",
@@ -13657,6 +16123,222 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "disk",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "disk",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "firewall_rule",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "project_id",
         "name": "aaaaa",
         "known": true,
@@ -14389,6 +17071,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14402,6 +17089,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"platform-billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14419,6 +17108,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14445,6 +17138,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"개발\"",
           "system = \"billing\"",
@@ -14458,6 +17156,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"개발\"",
           "system = \"billing\"",
@@ -14475,6 +17175,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"개발\"",
           "system = \"billing\"",
@@ -14501,6 +17205,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "gcp_project_id = \"team-a-cafe-billing-trade-prd\"",
           "gcp_service_account = \"billing-trade-prd-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prd-kr-vm-01\"",
@@ -14508,6 +17217,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"team-a-cafe-billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"teamacafe\"",
           "system = \"billing\"",
@@ -14525,6 +17236,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"Team \\\"A\\\" café\"",
           "system = \"billing\"",
@@ -14553,6 +17268,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14566,6 +17286,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"platform-billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14583,6 +17305,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -14609,6 +17335,11 @@
           "aws_subnet = \"windows-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"windows-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"windows-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"windows-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"windows-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"windows-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"windows-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"windows-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"windows\"",
@@ -14622,6 +17353,8 @@
           "gcp_subnet = \"windows-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"windows-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"platform-windows-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"windows-trade-prd-fw-01\"",
+          "gcp_disk = \"windows-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"windows\"",
@@ -14635,6 +17368,10 @@
           "azure_subnet = \"windows-trade-prd-kr-snet-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"windows-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"windows-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"windows-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"windows-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"windows\"",
@@ -14666,6 +17403,11 @@
           "aws_subnet = \"google-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"google-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"google-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"google-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"google-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"google-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"google-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"google-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"google\"",
@@ -14677,6 +17419,8 @@
           "gcp_vpc_network = \"google-trade-prd-vpc-01\"",
           "gcp_subnet = \"google-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"google-trade-prd-kr-db-01\"",
+          "gcp_firewall_rule = \"google-trade-prd-fw-01\"",
+          "gcp_disk = \"google-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"google\"",
@@ -14694,6 +17438,10 @@
           "azure_sql_server = \"google-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"google-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"google-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"google-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"google-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"google\"",
@@ -14723,6 +17471,11 @@
           "aws_subnet = \"azure-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"azure-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"azure-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"azure-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"azure-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"azure-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"azure-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"azure-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"azure\"",
@@ -14736,6 +17489,8 @@
           "gcp_subnet = \"azure-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"azure-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"platform-azure-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"azure-trade-prd-fw-01\"",
+          "gcp_disk = \"azure-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"azure\"",
@@ -14750,6 +17505,10 @@
           "azure_subnet = \"azure-trade-prd-kr-snet-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"azure-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"azure-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"azure-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"azure-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"azure\"",
@@ -14802,6 +17561,11 @@
           "# INVALID: aws_subnet",
           "# INVALID: aws_ec2_instance",
           "# INVALID: aws_rds_instance",
+          "# INVALID: aws_internet_gateway",
+          "# INVALID: aws_route_table",
+          "# INVALID: aws_security_group",
+          "# INVALID: aws_key_pair",
+          "# INVALID: aws_ebs_volume",
           "# INVALID: gcp_project_id",
           "# INVALID: gcp_service_account",
           "# INVALID: gcp_compute_instance",
@@ -14809,6 +17573,8 @@
           "# INVALID: gcp_subnet",
           "# INVALID: gcp_cloud_sql_instance",
           "# INVALID: gcp_storage_bucket",
+          "# INVALID: gcp_firewall_rule",
+          "# INVALID: gcp_disk",
           "# INVALID: azure_resource_group",
           "# INVALID: azure_storage_account",
           "# INVALID: azure_key_vault",
@@ -14817,7 +17583,11 @@
           "# INVALID: azure_virtual_machine_windows",
           "# INVALID: azure_virtual_network",
           "# INVALID: azure_subnet",
-          "# INVALID: azure_sql_server"
+          "# INVALID: azure_sql_server",
+          "# INVALID: azure_public_ip",
+          "# INVALID: azure_network_security_group",
+          "# INVALID: azure_network_interface",
+          "# INVALID: azure_os_disk"
         ]
       },
       "labelsJsonBlocked": {
@@ -14837,6 +17607,11 @@
           "aws_subnet = \"paymentsettlement-reconciliation-dev-global-subnet-01\"",
           "aws_ec2_instance = \"paymentsettlement-reconciliation-dev-global-vm-01\"",
           "aws_rds_instance = \"paymentsettlement-reconciliation-dev-global-db-01\"",
+          "aws_internet_gateway = \"paymentsettlement-reconciliation-dev-global-igw-01\"",
+          "aws_route_table = \"paymentsettlement-reconciliation-dev-global-rt-01\"",
+          "aws_security_group = \"paymentsettlement-reconciliation-dev-global-sg-01\"",
+          "aws_key_pair = \"paymentsettlement-reconciliation-dev-global-key-01\"",
+          "aws_ebs_volume = \"paymentsettlement-reconciliation-dev-global-vol-01\"",
           "aws_tags = {",
           "owner = \"platformengineering\"",
           "system = \"paymentsettlement\"",
@@ -14850,6 +17625,8 @@
           "gcp_subnet = \"paymentsettlement-reconciliation-dev-global-subnet-01\"",
           "gcp_cloud_sql_instance = \"paymentsettlement-reconciliation-dev-global-db-01\"",
           "gcp_storage_bucket = \"platformengineering-paymentsettlement-reconciliation-dev-bucket\"",
+          "gcp_firewall_rule = \"paymentsettlement-reconciliation-dev-fw-01\"",
+          "gcp_disk = \"paymentsettlement-reconciliation-dev-global-disk-01\"",
           "gcp_labels = {",
           "owner = \"platformengineering\"",
           "system = \"paymentsettlement\"",
@@ -14867,6 +17644,10 @@
           "azure_sql_server = \"paymentsettlement-reconciliation-dev-global-sql-01\"",
           "azure_aks_nodepool_linux = \"npreconcidev\"",
           "azure_aks_nodepool_windows = \"npreco\"",
+          "azure_public_ip = \"paymentsettlement-reconciliation-dev-global-pip-01\"",
+          "azure_network_security_group = \"paymentsettlement-reconciliation-dev-global-nsg-01\"",
+          "azure_network_interface = \"paymentsettlement-reconciliation-dev-global-nic-01\"",
+          "azure_os_disk = \"paymentsettlement-reconciliation-dev-global-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platformengineering\"",
           "system = \"paymentsettlement\"",
@@ -14893,6 +17674,11 @@
           "aws_subnet = \"a-long-longpurpose-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"a-long-longpurpose-prd-kr-vm-01\"",
           "aws_rds_instance = \"a-long-longpurpose-prd-kr-db-01\"",
+          "aws_internet_gateway = \"a-long-longpurpose-prd-kr-igw-01\"",
+          "aws_route_table = \"a-long-longpurpose-prd-kr-rt-01\"",
+          "aws_security_group = \"a-long-longpurpose-prd-kr-sg-01\"",
+          "aws_key_pair = \"a-long-longpurpose-prd-kr-key-01\"",
+          "aws_ebs_volume = \"a-long-longpurpose-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"a-long\"",
@@ -14906,6 +17692,8 @@
           "gcp_subnet = \"a-long-longpurpose-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"a-long-longpurpose-prd-kr-db-01\"",
           "gcp_storage_bucket = \"platform-a-long-longpurpose-prd-bucket\"",
+          "gcp_firewall_rule = \"a-long-longpurpose-prd-fw-01\"",
+          "gcp_disk = \"a-long-longpurpose-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"a-long\"",
@@ -14922,6 +17710,10 @@
           "azure_sql_server = \"a-long-longpurpose-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nplongpurprd\"",
           "azure_aks_nodepool_windows = \"nplong\"",
+          "azure_public_ip = \"a-long-longpurpose-prd-kr-pip-01\"",
+          "azure_network_security_group = \"a-long-longpurpose-prd-kr-nsg-01\"",
+          "azure_network_interface = \"a-long-longpurpose-prd-kr-nic-01\"",
+          "azure_os_disk = \"a-long-longpurpose-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"a-long\"",
@@ -14949,6 +17741,11 @@
           "aws_vpc = \"3tier-trade-prd-kr-vpc-01\"",
           "aws_subnet = \"3tier-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"3tier-trade-prd-kr-vm-01\"",
+          "aws_internet_gateway = \"3tier-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"3tier-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"3tier-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"3tier-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"3tier-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"platform\"",
           "system = \"3tier\"",
@@ -14974,6 +17771,10 @@
           "azure_sql_server = \"3tier-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"3tier-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"3tier-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"3tier-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"3tier-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"platform\"",
           "system = \"3tier\"",
@@ -14987,7 +17788,9 @@
           "# INVALID: gcp_compute_instance",
           "# INVALID: gcp_vpc_network",
           "# INVALID: gcp_subnet",
-          "# INVALID: gcp_cloud_sql_instance"
+          "# INVALID: gcp_cloud_sql_instance",
+          "# INVALID: gcp_firewall_rule",
+          "# INVALID: gcp_disk"
         ]
       },
       "labelsJsonBlocked": {
@@ -15007,6 +17810,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\"",
           "system = \"billing\"",
@@ -15020,6 +17828,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "azure_resource_group = \"rg-billing-trade-prd\"",
           "azure_storage_account = \"stbillingtradeprd\"",
           "azure_key_vault = \"kv-billing-trade-prd\"",
@@ -15031,6 +17841,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\"",
           "system = \"billing\"",
@@ -15059,6 +17873,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "gcp_project_id = \"billing-trade-prd\"",
           "gcp_service_account = \"billing-trade-prd-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prd-kr-vm-01\"",
@@ -15066,6 +17885,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "azure_resource_group = \"rg-billing-trade-prd\"",
           "azure_storage_account = \"stbillingtradeprd\"",
           "azure_key_vault = \"kv-billing-trade-prd\"",
@@ -15076,7 +17897,11 @@
           "azure_subnet = \"billing-trade-prd-kr-snet-01\"",
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
-          "azure_aks_nodepool_windows = \"nptrd\""
+          "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\""
         ],
         "invalid": [
           "# INVALID: aws_tags",
@@ -15101,6 +17926,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "gcp_project_id = \"team1-billing-trade-prd\"",
           "gcp_service_account = \"billing-trade-prd-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prd-kr-vm-01\"",
@@ -15108,6 +17938,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"team1-billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"team1\"",
           "system = \"billing\"",
@@ -15125,6 +17957,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"team#1\"",
           "system = \"billing\"",
@@ -15153,6 +17989,11 @@
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
+          "aws_internet_gateway = \"billing-trade-prd-kr-igw-01\"",
+          "aws_route_table = \"billing-trade-prd-kr-rt-01\"",
+          "aws_security_group = \"billing-trade-prd-kr-sg-01\"",
+          "aws_key_pair = \"billing-trade-prd-kr-key-01\"",
+          "aws_ebs_volume = \"billing-trade-prd-kr-vol-01\"",
           "aws_tags = {",
           "owner = \"In.Fra\"",
           "system = \"billing\"",
@@ -15166,6 +18007,8 @@
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
           "gcp_storage_bucket = \"infra-billing-trade-prd-bucket\"",
+          "gcp_firewall_rule = \"billing-trade-prd-fw-01\"",
+          "gcp_disk = \"billing-trade-prd-kr-disk-01\"",
           "gcp_labels = {",
           "owner = \"infra\"",
           "system = \"billing\"",
@@ -15183,6 +18026,10 @@
           "azure_sql_server = \"billing-trade-prd-kr-sql-01\"",
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
+          "azure_public_ip = \"billing-trade-prd-kr-pip-01\"",
+          "azure_network_security_group = \"billing-trade-prd-kr-nsg-01\"",
+          "azure_network_interface = \"billing-trade-prd-kr-nic-01\"",
+          "azure_os_disk = \"billing-trade-prd-kr-osdisk-01\"",
           "azure_tags = {",
           "owner = \"In.Fra\"",
           "system = \"billing\"",

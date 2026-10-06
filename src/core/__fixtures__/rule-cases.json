@@ -1,0 +1,392 @@
+{
+  "gcp.project_id": {
+    "valid": [
+      "billing-prd-01"
+    ],
+    "invalid": [
+      "Billing-prd",
+      "short",
+      "1billing",
+      "billing-google-x",
+      "billing-prd-"
+    ]
+  },
+  "gcp.service_account": {
+    "valid": [
+      "billing-sa-sync"
+    ],
+    "invalid": [
+      "sa-1",
+      "Billing-sa",
+      "billing_sa_sync",
+      "1billing-sa"
+    ]
+  },
+  "gcp.compute_instance": {
+    "valid": [
+      "web-1",
+      "a"
+    ],
+    "invalid": [
+      "Web-1",
+      "1web",
+      "web-",
+      "web_1"
+    ]
+  },
+  "gcp.vpc_network": {
+    "valid": [
+      "web-1",
+      "a"
+    ],
+    "invalid": [
+      "Web-1",
+      "1web",
+      "web-",
+      "web_1"
+    ]
+  },
+  "gcp.subnet": {
+    "valid": [
+      "web-1",
+      "a"
+    ],
+    "invalid": [
+      "Web-1",
+      "1web",
+      "web-",
+      "web_1"
+    ]
+  },
+  "gcp.cloud_sql_instance": {
+    "valid": [
+      "billing-db-01"
+    ],
+    "invalid": [
+      "Billing-db",
+      "1db",
+      "db-",
+      "db_01"
+    ]
+  },
+  "gcp.storage_bucket": {
+    "valid": [
+      "billing-logs.archive",
+      "billing_logs"
+    ],
+    "invalid": [
+      "goog-billing",
+      "billing-google",
+      "192.168.5.4",
+      "billing..logs",
+      "Billing",
+      "ab"
+    ]
+  },
+  "gcp.firewall_rule": {
+    "valid": [
+      "allow-http-80"
+    ],
+    "invalid": [
+      "Allow-http",
+      "80-allow",
+      "allow-http-",
+      "allow_http"
+    ]
+  },
+  "gcp.disk": {
+    "valid": [
+      "web-boot-disk"
+    ],
+    "invalid": [
+      "Web-disk",
+      "1disk",
+      "disk-",
+      "disk.1"
+    ]
+  },
+  "aws.s3_bucket": {
+    "valid": [
+      "billing-logs-01",
+      "billing.logs"
+    ],
+    "invalid": [
+      "xn--billing",
+      "billing-s3alias",
+      "Billing-logs",
+      "192.168.5.4",
+      "ab",
+      "billing..logs"
+    ]
+  },
+  "aws.iam_role": {
+    "valid": [
+      "Billing_Role+=,.@-"
+    ],
+    "invalid": [
+      "billing role",
+      "billing/role",
+      "café"
+    ]
+  },
+  "aws.vpc": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "aws.subnet": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "aws.ec2_instance": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "aws.rds_instance": {
+    "valid": [
+      "Billing-db-01"
+    ],
+    "invalid": [
+      "1db",
+      "db-",
+      "db--01",
+      "db_01"
+    ]
+  },
+  "aws.internet_gateway": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "aws.route_table": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "aws.security_group": {
+    "valid": [
+      "my sg",
+      "web._-:/()#,@[]+=&;{}!$*",
+      "sgweb"
+    ],
+    "invalid": [
+      "sg-web",
+      "SG-web",
+      "web%sg",
+      "café"
+    ]
+  },
+  "aws.key_pair": {
+    "valid": [
+      "my key!@#",
+      "billing-prd-key"
+    ],
+    "invalid": [
+      "café",
+      "key\tpair",
+      ""
+    ]
+  },
+  "aws.ebs_volume": {
+    "valid": [
+      "Prod VPC #1 (main)",
+      "café-gw"
+    ],
+    "invalid": [
+      "",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "azure.resource_group": {
+    "valid": [
+      "rg-billing(prd)",
+      "rg_café.prd-1"
+    ],
+    "invalid": [
+      "rg-billing.",
+      "rg/billing",
+      "rg billing"
+    ]
+  },
+  "azure.storage_account": {
+    "valid": [
+      "stbilling01"
+    ],
+    "invalid": [
+      "st-billing",
+      "StBilling",
+      "st",
+      "azure123"
+    ]
+  },
+  "azure.key_vault": {
+    "valid": [
+      "kv-billing-prd"
+    ],
+    "invalid": [
+      "kv--billing",
+      "1kv-billing",
+      "kv-billing-",
+      "kv-azure-prd",
+      "kv"
+    ]
+  },
+  "azure.managed_identity": {
+    "valid": [
+      "id_billing-sync"
+    ],
+    "invalid": [
+      "-id-billing",
+      "id.billing",
+      "id"
+    ]
+  },
+  "azure.virtual_machine": {
+    "valid": [
+      "web-vm-01"
+    ],
+    "invalid": [
+      "web.vm",
+      "web-vm-",
+      "vm-azure-01",
+      "web_vm"
+    ]
+  },
+  "azure.virtual_machine_windows": {
+    "valid": [
+      "web-vm-01"
+    ],
+    "invalid": [
+      "12345",
+      "web-vm-012345678",
+      "web.vm",
+      "web-vm-"
+    ]
+  },
+  "azure.virtual_network": {
+    "valid": [
+      "vnet-billing_",
+      "v1"
+    ],
+    "invalid": [
+      "v",
+      "vnet.",
+      "_vnet"
+    ]
+  },
+  "azure.subnet": {
+    "valid": [
+      "snet.web_"
+    ],
+    "invalid": [
+      "snet.",
+      "-snet",
+      "snet web"
+    ]
+  },
+  "azure.sql_server": {
+    "valid": [
+      "sql-billing-01"
+    ],
+    "invalid": [
+      "SQL-billing",
+      "sql-",
+      "sql-azure-01",
+      "sql_billing"
+    ]
+  },
+  "azure.aks_nodepool_linux": {
+    "valid": [
+      "nptrade01"
+    ],
+    "invalid": [
+      "np-trade",
+      "1np",
+      "aksmanagedap",
+      "nptrade012345",
+      "Nptrade"
+    ]
+  },
+  "azure.aks_nodepool_windows": {
+    "valid": [
+      "nptrd"
+    ],
+    "invalid": [
+      "nptrade",
+      "Np1",
+      "1np"
+    ]
+  },
+  "azure.public_ip": {
+    "valid": [
+      "pip-web_",
+      "pip.web-01"
+    ],
+    "invalid": [
+      "pip-web.",
+      "_pip",
+      "pip web"
+    ]
+  },
+  "azure.network_security_group": {
+    "valid": [
+      "nsg-web_",
+      "nsg.web-01"
+    ],
+    "invalid": [
+      "nsg-web.",
+      "-nsg",
+      "nsg/web"
+    ]
+  },
+  "azure.network_interface": {
+    "valid": [
+      "abc_",
+      "nic.web-01"
+    ],
+    "invalid": [
+      "abc.",
+      "_nic",
+      "nic web"
+    ]
+  },
+  "azure.os_disk": {
+    "valid": [
+      "_disk",
+      "disk-",
+      "web-osdisk_01"
+    ],
+    "invalid": [
+      "a.b",
+      "disk web",
+      "disk/1"
+    ]
+  }
+}

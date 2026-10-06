@@ -34,7 +34,7 @@ describe('POST /v1/validate', () => {
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({
       success: false, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: 'nope' }, message: "Unsupported resource_type 'nope'" }],
-      supported: ['project_id', 'service_account', 'compute_instance', 'vpc_network', 'subnet', 'cloud_sql_instance', 'storage_bucket'],
+      supported: ['project_id', 'service_account', 'compute_instance', 'vpc_network', 'subnet', 'cloud_sql_instance', 'storage_bucket', 'firewall_rule', 'disk'],
     });
   });
   it('name 없음 → 400 · 본문이 JSON 이 아니면 400', async () => {

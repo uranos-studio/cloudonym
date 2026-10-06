@@ -124,7 +124,7 @@ describe('고유성 부류 · 분류 · 유일성 (D31 · D37 · D38)', () => {
   });
   it("uniqueness 'none' 인 규칙은 전부 AWS Name 태그다 — 그 역도 같다", () => {
     for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG);
-    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ec2_instance', 'aws.subnet', 'aws.vpc']);
+    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ebs_volume', 'aws.ec2_instance', 'aws.internet_gateway', 'aws.route_table', 'aws.subnet', 'aws.vpc']);
   });
   it('uniquenessDocUrl 이 있으면 https 이고 docUrl 과 다르다', () => {
     for (const r of Object.values(RULES)) {
@@ -150,5 +150,46 @@ describe('표시 이름 · notes (D24 · 문구 코드화)', () => {
   });
   it('Windows VM 의 notes 는 호스트명 · 숫자만 금지 · 예약어(모호) 세 코드', () => {
     expect(RULES['azure.virtual_machine_windows'].notes?.map((n) => n.code)).toEqual(['note.azure_vm_hostname_rule', 'note.windows_no_all_digits', 'note.azure_reserved_ambiguous']);
+  });
+});
+
+describe('조사 11종 (Task 5) — 범위 · 부류 · 분류 · 근거', () => {
+  const want: [string, string, string, string, 'csp' | 'none'][] = [
+    ['aws.internet_gateway', 'aws:region', 'ec2.internetGateway.NameTag', 'networking', 'none'],
+    ['aws.route_table', 'aws:vpc', 'ec2.routeTable.NameTag', 'networking', 'none'],
+    ['aws.ebs_volume', 'aws:region', 'ec2.volume.NameTag', 'storage', 'none'],
+    ['aws.security_group', 'aws:vpc', 'ec2.securityGroup', 'networking', 'csp'],
+    ['aws.key_pair', 'aws:region', 'ec2.keyPair', 'compute', 'csp'],
+    ['gcp.firewall_rule', 'gcp:project_global', 'compute.firewalls', 'networking', 'csp'],
+    ['gcp.disk', 'gcp:project_zone', 'compute.disks', 'compute', 'csp'],
+    ['azure.public_ip', 'azure:resource_group', 'Microsoft.Network/publicIPAddresses', 'networking', 'csp'],
+    ['azure.network_security_group', 'azure:resource_group', 'Microsoft.Network/networkSecurityGroups', 'networking', 'csp'],
+    ['azure.network_interface', 'azure:resource_group', 'Microsoft.Network/networkInterfaces', 'networking', 'csp'],
+    ['azure.os_disk', 'azure:resource_group', 'Microsoft.Compute/disks', 'compute', 'csp'],
+  ];
+  it.each(want)('%s — scope %s · entity %s · category %s · uniqueness %s', (id, scope, entity, category, uniqueness) => {
+    const r = RULES[id];
+    expect(r, id).toBeDefined();
+    expect({ scope: r!.scope, entity: r!.entity, category: r!.category, uniqueness: r!.uniqueness }).toEqual({ scope, entity, category, uniqueness });
+    expect(r!.docUrl).toMatch(/^https:\/\//);
+    expect(r!.template).toContain('seq');
+  });
+  it('규칙 수 — AWS 11 · GCP 9 · Azure 15 = 35', () => {
+    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11, 9, 15]);
+  });
+  it('docUrl 은 숫자가 적힌 쪽의 앵커다', () => {
+    expect(RULES['gcp.firewall_rule']!.docUrl).toBe('https://docs.cloud.google.com/compute/docs/reference/rest/v1/firewalls#Firewall.FIELDS.name');
+    expect(RULES['gcp.disk']!.docUrl).toBe('https://docs.cloud.google.com/compute/docs/reference/rest/v1/disks#Disk.FIELDS.name');
+    expect(RULES['aws.security_group']!.docUrl).toBe('https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateSecurityGroup.html');
+    expect(RULES['aws.key_pair']!.docUrl).toBe('https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateKeyPair.html');
+    for (const id of ['azure.public_ip', 'azure.network_security_group', 'azure.network_interface']) expect(RULES[id]!.docUrl, id).toMatch(/#microsoftnetwork$/);
+    expect(RULES['azure.os_disk']!.docUrl).toMatch(/#microsoftcompute$/);
+  });
+  it('보안 그룹의 금지 접두사는 소문자 sg- 하나이고 대소문자 없이 본다 · Azure 넷은 예약어를 걸지 않는다', () => {
+    expect(RULES['aws.security_group']!.forbidden).toEqual({ prefixes: ['sg-'], ignoreCase: true });
+    for (const id of ['azure.public_ip', 'azure.network_security_group', 'azure.network_interface', 'azure.os_disk']) expect(RULES[id]!.forbidden, id).toBeUndefined();
+  });
+  it('키 페어는 범위(리전)가 미확인이라는 note 를 싣는다', () => {
+    expect(RULES['aws.key_pair']!.notes?.map((n) => n.code)).toEqual(['note.aws_key_pair_scope_unconfirmed']);
   });
 });

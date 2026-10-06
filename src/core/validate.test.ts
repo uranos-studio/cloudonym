@@ -131,3 +131,68 @@ describe('checkName', () => {
     expect(checked).toBeGreaterThan(0);
   });
 });
+
+describe('조사 11종 — 경계 넷과 문서 문장의 판정 (Task 5)', () => {
+  const NEW = [
+    'aws.internet_gateway', 'aws.route_table', 'aws.security_group', 'aws.key_pair', 'aws.ebs_volume',
+    'gcp.firewall_rule', 'gcp.disk',
+    'azure.public_ip', 'azure.network_security_group', 'azure.network_interface', 'azure.os_disk',
+  ] as const;
+  const rule = (id: (typeof NEW)[number]) => {
+    const r = RULES[id];
+    if (!r) throw new Error(`규칙이 없다: ${id}`);
+    return r;
+  };
+  it.each(NEW)('%s — 빈 이름 · min · max · max+1', (id) => {
+    const r = rule(id);
+    expect(checkName('', r)).toEqual([{ code: 'name.empty' }]);
+    expect(checkName('a'.repeat(r.minLength), r), 'min').toEqual([]);
+    expect(checkName('a'.repeat(r.maxLength), r), 'max').toEqual([]);
+    expect(checkName('a'.repeat(r.maxLength + 1), r)).toContainEqual({ code: 'name.too_long', params: { actual: r.maxLength + 1, max: r.maxLength } });
+  });
+  it('Azure NIC · PIP · NSG — 끝 밑줄은 통과 · 끝 점과 밑줄 시작은 거부 ("End with alphanumeric or underscore")', () => {
+    for (const id of ['azure.network_interface', 'azure.public_ip', 'azure.network_security_group'] as const) {
+      expect(checkName('abc_', rule(id)), id).toEqual([]);
+      expect(checkName('a.b-c_d', rule(id)), id).toEqual([]);
+      expect(checkName('abc.', rule(id)), id).not.toEqual([]);
+      expect(checkName('_abc', rule(id)), id).not.toEqual([]);
+    }
+  });
+  it('Azure 디스크 — 점은 거부 · 시작 · 끝 규칙이 없어 _disk · disk- 는 통과 ("Alphanumerics, underscores, and hyphens")', () => {
+    const r = rule('azure.os_disk');
+    expect(checkName('a.b', r)).not.toEqual([]);
+    expect(checkName('_disk', r)).toEqual([]);
+    expect(checkName('disk-', r)).toEqual([]);
+  });
+  it('Azure 넷에는 예약어를 걸지 않는다 — 공개 이름이 리소스 이름이 아니다', () => {
+    for (const id of ['azure.public_ip', 'azure.network_security_group', 'azure.network_interface', 'azure.os_disk'] as const) expect(checkName('pip-azure-prd', rule(id)), id).toEqual([]);
+  });
+  it('보안 그룹 — sg- 로 시작하면 거부(대소문자 없이) · 공백과 문서의 기호는 통과 · 문서에 없는 기호는 거부', () => {
+    const r = rule('aws.security_group');
+    expect(checkName('sg-x', r)).toEqual([{ code: 'name.forbidden_prefix', params: { value: 'sg-' } }]);
+    expect(checkName('SG-x', r)).toEqual([{ code: 'name.forbidden_prefix', params: { value: 'sg-' } }]);
+    expect(checkName('my sg', r)).toEqual([]);
+    expect(checkName('web._-:/()#,@[]+=&;{}!$*', r)).toEqual([]);
+    expect(checkName('sgx-web', r)).toEqual([]);
+    for (const bad of ['a%b', 'a?b', 'a"b', "a'b", 'a\\b', 'a|b', 'a~b', 'a^b', 'a<b', 'a>b', 'aéb']) expect(checkName(bad, r), bad).not.toEqual([]);
+  });
+  it('키 페어 — 비 ASCII 거부 · 인쇄 가능한 ASCII 는 기호 · 공백까지 통과', () => {
+    const r = rule('aws.key_pair');
+    expect(checkName('café', r)).not.toEqual([]);
+    expect(checkName('key　pair', r)).not.toEqual([]);
+    expect(checkName('a\tb', r)).not.toEqual([]);
+    expect(checkName('my key!@#', r)).toEqual([]);
+  });
+  it('GCP 방화벽 · 디스크 — RFC 1035 (대문자 · 숫자 시작 · 끝 하이픈 거부)', () => {
+    for (const id of ['gcp.firewall_rule', 'gcp.disk'] as const) {
+      expect(checkName('web-allow-80', rule(id)), id).toEqual([]);
+      for (const bad of ['Web', '1web', 'web-', 'web_1', 'web.1']) expect(checkName(bad, rule(id)), `${id} ${bad}`).not.toEqual([]);
+    }
+  });
+  it('Name 태그 셋 — 아무 문자 1~256', () => {
+    for (const id of ['aws.internet_gateway', 'aws.route_table', 'aws.ebs_volume'] as const) {
+      expect(checkName('My gateway #1 é', rule(id)), id).toEqual([]);
+      expect(checkName('x'.repeat(257), rule(id)), id).not.toEqual([]);
+    }
+  });
+});

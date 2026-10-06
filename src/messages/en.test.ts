@@ -47,6 +47,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'note.gcs_dotted_names_222': { code: 'note.gcs_dotted_names_222' },
   'note.s3_an_suffix': { code: 'note.s3_an_suffix' },
   'note.gcp_vm_project_unique': { code: 'note.gcp_vm_project_unique' },
+  'note.aws_key_pair_scope_unconfirmed': { code: 'note.aws_key_pair_scope_unconfirmed' },
   'name.conflict': { code: 'name.conflict', params: { name: 'AAA', keys: ['CCC', 'DDD'] } },
   'selection.not_array': { code: 'selection.not_array' },
   'selection.empty': { code: 'selection.empty' },
@@ -83,7 +84,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(63);
+    expect(codes).toHaveLength(64);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

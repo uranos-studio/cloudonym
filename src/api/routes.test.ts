@@ -57,7 +57,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) {
       expect(Object.keys(part)).toEqual(['gcp']);
     }
-    expect(Object.keys(body.data.gcp)).toHaveLength(7);
+    expect(Object.keys(body.data.gcp)).toHaveLength(9);
   });
   it('providers 생략 → 셋 다 · 넷의 provider 집합이 같다', async () => {
     const body = await json((await post({ context: ctx })).res);

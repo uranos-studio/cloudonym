@@ -160,10 +160,10 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(expect.arrayContaining(['400', '409']));
   });
 
-  it('example 요청은 200 이고 /generate example 은 18 항목(gcp 7 + azure 11)', async () => {
+  it('example 요청은 200 이고 /generate example 은 24 항목(gcp 9 + azure 15)', async () => {
     const body = await json((await req(app, '/v1/generate', jsonPost(exampleOf('/generate')))).res);
     expect(validatorFor('GenerateResponse')(body)).toBe(true);
-    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(18);
+    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(24);
     const n = await json((await req(app, '/v1/names', jsonPost(exampleOf('/names')))).res);
     expect(validatorFor('NamesResponse')(n)).toBe(true);
     expect(n.data.azure.valid).toBe(true);

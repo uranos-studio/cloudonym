@@ -113,6 +113,26 @@ export const RULES: Record<string, ResourceRule> = {
     docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
     notes: [{ code: 'note.gcs_dotted_names_222' }],
   },
+  // 조사 11종 — "The name must be 1-63 characters long, and comply with RFC1035" (REST 참조 name 필드) · 디스커버리 Firewall.name · Disk.name pattern 이 RFC1035 와 같다
+  'gcp.firewall_rule': {
+    id: 'gcp.firewall_rule', provider: 'gcp', resourceType: 'firewall_rule',
+    displayName: 'VPC Firewall Rule', slug: 'fw', minLength: 1, maxLength: 63,
+    pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
+    startsWithLetter: true, endsWithAlnum: true,
+    // 전역 리소스(global/firewalls)라 region 토큰을 넣지 않는다 — vpc_network 와 같은 꼴
+    template: ['system', 'purpose', 'env', 'slug', 'seq'], optional: [],
+    scope: 'gcp:project_global', entity: 'compute.firewalls', category: 'networking', uniqueness: 'csp', uniquenessDocUrl: GCP_COMPUTE_DISCOVERY,
+    docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/firewalls#Firewall.FIELDS.name',
+  },
+  'gcp.disk': {
+    id: 'gcp.disk', provider: 'gcp', resourceType: 'disk',
+    displayName: 'Persistent Disk', slug: 'disk', minLength: 1, maxLength: 63,
+    pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
+    startsWithLetter: true, endsWithAlnum: true,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'gcp:project_zone', entity: 'compute.disks', category: 'compute', uniqueness: 'csp', uniquenessDocUrl: GCP_COMPUTE_DISCOVERY,
+    docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/disks#Disk.FIELDS.name',
+  },
 
   // ─── AWS ───────────────────────────────────────────────
   'aws.s3_bucket': {
@@ -172,6 +192,59 @@ export const RULES: Record<string, ResourceRule> = {
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
     scope: 'aws:region', entity: 'rds.dbInstance', category: 'database', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html',
     docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html',
+  },
+  // 조사 11종 — Name 태그 셋은 aws.vpc 와 같은 규칙에 slug 만 다르다
+  'aws.internet_gateway': {
+    id: 'aws.internet_gateway', provider: 'aws', resourceType: 'internet_gateway',
+    displayName: 'Internet Gateway (Name tag)', slug: 'igw', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'ec2.internetGateway.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.route_table': {
+    id: 'aws.route_table', provider: 'aws', resourceType: 'route_table',
+    displayName: 'Route Table (Name tag)', slug: 'rt', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.routeTable.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.security_group': {
+    id: 'aws.security_group', provider: 'aws', resourceType: 'security_group',
+    displayName: 'Security Group', slug: 'sg', minLength: 1, maxLength: 255,
+    // GroupName — "Names are case-insensitive and must be unique within the VPC." · "Up to 255 characters in length. Can't start with sg-."
+    // "Valid characters: a-z, A-Z, 0-9, spaces, and ._-:/()#,@[]+=&;{}!$*" (쪽의 HTML 을 글자 단위로 대어 봤다)
+    pattern: /^[A-Za-z0-9 ._\-:/()#,@[\]+=&;{}!$*]{1,255}$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    // 이름이 대소문자를 가리지 않으므로 SG- 도 sg- 로 보고 거부한다 (보수적 · D20)
+    forbidden: { prefixes: ['sg-'], ignoreCase: true },
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.securityGroup', category: 'networking', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateSecurityGroup.html',
+  },
+  'aws.key_pair': {
+    id: 'aws.key_pair', provider: 'aws', resourceType: 'key_pair',
+    displayName: 'EC2 Key Pair', slug: 'key', minLength: 1, maxLength: 255,
+    // KeyName — "A unique name for the key pair." · "Up to 255 ASCII characters". 제어 문자는 받지 않는다 — 인쇄 가능한 ASCII 만 (보수적 · D20)
+    pattern: /^[\x20-\x7E]{1,255}$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    // 유일 범위를 적은 문장이 없다 — 리전에 두되 note 로 미확인임을 싣는다
+    scope: 'aws:region', entity: 'ec2.keyPair', category: 'compute', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateKeyPair.html',
+    notes: [{ code: 'note.aws_key_pair_scope_unconfirmed' }],
+  },
+  'aws.ebs_volume': {
+    id: 'aws.ebs_volume', provider: 'aws', resourceType: 'ebs_volume',
+    displayName: 'EBS Volume (Name tag)', slug: 'vol', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'ec2.volume.NameTag', category: 'storage', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
 
   // ─── Azure ─────────────────────────────────────────────
@@ -279,6 +352,45 @@ export const RULES: Record<string, ResourceRule> = {
     template: ['slug', 'purpose'], optional: [],
     scope: 'azure:managed_cluster', entity: 'Microsoft.ContainerService/managedClusters/agentPools', category: 'containers', uniqueness: 'csp', uniquenessDocUrl: `${AZURE_RULES}#microsoftcontainerservice`,
     docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
+  },
+  // 조사 11종 — 이름 규칙 표의 행 그대로. 예약어는 걸지 않는다: 리소스 이름이 DNS 이름이 되지 않는다(Public IP 의 FQDN 은 별도 DNS 라벨 속성이 만든다)
+  // NIC · PIP · NSG — 1-80 · "Alphanumerics, underscores, periods, and hyphens. Start with alphanumeric. End with alphanumeric or underscore." (azure.subnet 과 같은 문장)
+  'azure.public_ip': {
+    id: 'azure.public_ip', provider: 'azure', resourceType: 'public_ip',
+    displayName: 'Public IP Address', slug: 'pip', minLength: 1, maxLength: 80,
+    pattern: /^[a-zA-Z0-9]([\w.-]{0,78}[a-zA-Z0-9_])?$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'azure:resource_group', entity: 'Microsoft.Network/publicIPAddresses', category: 'networking', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftnetwork`,
+  },
+  'azure.network_security_group': {
+    id: 'azure.network_security_group', provider: 'azure', resourceType: 'network_security_group',
+    displayName: 'Network Security Group', slug: 'nsg', minLength: 1, maxLength: 80,
+    pattern: /^[a-zA-Z0-9]([\w.-]{0,78}[a-zA-Z0-9_])?$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'azure:resource_group', entity: 'Microsoft.Network/networkSecurityGroups', category: 'networking', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftnetwork`,
+  },
+  'azure.network_interface': {
+    id: 'azure.network_interface', provider: 'azure', resourceType: 'network_interface',
+    displayName: 'Network Interface', slug: 'nic', minLength: 1, maxLength: 80,
+    pattern: /^[a-zA-Z0-9]([\w.-]{0,78}[a-zA-Z0-9_])?$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'azure:resource_group', entity: 'Microsoft.Network/networkInterfaces', category: 'networking', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftnetwork`,
+  },
+  // disks — 1-80 · "Alphanumerics, underscores, and hyphens" — 점 없음 · 시작 · 끝 규칙 없음(문서에 없는 것을 더하지 않는다)
+  'azure.os_disk': {
+    id: 'azure.os_disk', provider: 'azure', resourceType: 'os_disk',
+    displayName: 'Managed Disk (OS)', slug: 'osdisk', minLength: 1, maxLength: 80,
+    pattern: /^[a-zA-Z0-9_-]{1,80}$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'azure:resource_group', entity: 'Microsoft.Compute/disks', category: 'compute', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftcompute`,
   },
 };
 

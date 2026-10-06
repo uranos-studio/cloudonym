@@ -11,11 +11,14 @@ const rule = (t: string) => rulesFor('azure').find((r) => r.resourceType === t)!
 
 describe('treeRules · toItems — 순서는 트리 순서(범위 경로 → 규칙 표 순서 · 계획 §7-5)', () => {
   it('Azure 트리 순서 — Global 의 셋 → Subscription 의 RG → RG 안 → VNet 안 → Managed cluster 안', () => {
-    expect(treeRules(azure).map((r) => r.resourceType)).toEqual([
+    // 규칙이 늘어도 깨지지 않게 — 처음 24종의 Azure 11개가 이 상대 순서로 나오는지만 본다
+    const order = treeRules(azure).map((r) => r.resourceType);
+    const anchors = [
       'storage_account', 'key_vault', 'sql_server', 'resource_group',
       'managed_identity', 'virtual_machine', 'virtual_machine_windows', 'virtual_network',
       'subnet', 'aks_nodepool_linux', 'aks_nodepool_windows',
-    ]);
+    ];
+    expect(order.filter((t) => anchors.includes(t))).toEqual(anchors);
     expect(treeRules(azure)).toHaveLength(rulesFor('azure').length);
   });
   it('고른 순서와 무관하게 트리 순서로 낸다 · 값은 그대로', () => {

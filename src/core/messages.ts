@@ -20,7 +20,7 @@ export const MESSAGE_CODES = [
   // constraints.ts notes (9)
   'note.aws_tag_utf16_length', 'note.azure_vm_hostname_rule', 'note.azure_reserved', 'note.azure_reserved_ambiguous',
   'note.windows_no_all_digits', 'note.cloud_sql_combined_limit', 'note.gcs_dotted_names_222', 'note.s3_an_suffix',
-  'note.gcp_vm_project_unique',
+  'note.gcp_vm_project_unique', 'note.aws_key_pair_scope_unconfirmed',
   // conflict.ts (1)
   'name.conflict',
   // selection.ts (11)
@@ -67,6 +67,7 @@ export type CoreMessage =
   | { code: 'note.gcs_dotted_names_222' }
   | { code: 'note.s3_an_suffix' }
   | { code: 'note.gcp_vm_project_unique' }
+  | { code: 'note.aws_key_pair_scope_unconfirmed' }
   /** keys 는 충돌한 항목의 key(NameItem.key) — 처음 나온 순 */
   | { code: 'name.conflict'; params: { name: string; keys: string[] } }
   | { code: 'selection.not_array' }
