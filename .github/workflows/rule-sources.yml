@@ -1,4 +1,4 @@
-# 규칙 출처 감지 (D43 · 계획 §8-5) — 월 1회 원문을 받아 docs/rule-sources.lock.json 과 대어 본다.
+# 규칙 출처 감지 (D43) — 월 1회 원문을 받아 docs/rule-sources.lock.json 과 대어 본다.
 # 다르면 job 이 실패하고 issue 를 연다. 규칙을 고치거나 PR 을 만들지는 않는다 — 사람이 행을 읽고 판정한다.
 name: rule-sources
 
@@ -8,9 +8,9 @@ on:
     - cron: '0 18 1 * *'
   workflow_dispatch:
 
+# 외부 원문을 받는 job 에는 읽기 권한만 준다 — issue 를 여는 권한은 그 뒤 따로 도는 job 에만 둔다
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: rule-sources
@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -45,6 +47,8 @@ jobs:
           curl -fsSL --retry 3 -o "${SRC}/aws.zip" https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip
           unzip -q "${SRC}/aws.zip" -d "${SRC}/aws"
           commit="$(gh api 'repos/MicrosoftDocs/azure-docs/commits?path=articles/azure-resource-manager/management/resource-name-rules.md&per_page=1' --jq '.[0].sha')"
+          # GITHUB_ENV 에 넣기 전에 꼴을 본다 — 40자 16진 SHA 만 받는다
+          if [[ ! "${commit}" =~ ^[0-9a-f]{40}$ ]]; then echo "unexpected commit sha: ${commit:0:80}"; exit 1; fi
           echo "AZURE_COMMIT=${commit}" >> "${GITHUB_ENV}"
 
       - name: check sources
@@ -55,9 +59,17 @@ jobs:
             --azure "${SRC}/azure.md" --azure-html "${SRC}/azure.html" --azure-commit "${AZURE_COMMIT}" \
             --gcp "${SRC}/compute.json" --gcp-kms "${SRC}/cloudkms.json" --aws "${SRC}/aws"
 
-      # 실패하면(받기 실패 포함) issue 를 하나 연다. 같은 제목의 열린 issue 가 있으면 새로 열지 않는다
+  # check 가 실패하면(받기 실패 포함) issue 를 하나 연다. 같은 제목의 열린 issue 가 있으면 새로 열지 않는다
+  # 이 job 은 외부 원문을 받지 않고 저장소도 checkout 하지 않는다 — issues: write 는 여기에만 있다
+  report:
+    needs: check
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
       - name: open issue
-        if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
