@@ -82,7 +82,7 @@ test('손으로 넣은 타입 · 손 확인 사유 — 판정 표의 a 행이고
     assert.equal(t in EXISTING || t in HAND_REVIEWED, false, t);
     assert.match(MANUAL[t], /^aws\.[a-z0-9_]+$/);
   }
-  for (const [t, why] of Object.entries(HAND_REVIEWED)) assert.match(why, /^reviewed by hand — (not imported|unconfirmed) \(.+\)$/, t);
+  for (const [t, why] of Object.entries(HAND_REVIEWED)) assert.match(why, /^reviewed by hand — (not imported|unconfirmed|rule found, not added yet) \(.+\)$/, t);
 });
 
 test('손으로 넣은 타입은 건너뛰고 · 손 확인 타입은 사유가 바뀐다', () => {
