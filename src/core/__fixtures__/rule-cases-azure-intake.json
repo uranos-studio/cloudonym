@@ -306,7 +306,7 @@
    "ax-"
   ]
  },
- "azure.api_management_s_n_recipient_emails": {
+ "azure.api_mgmt_service_notifs_recipient_emails": {
   "valid": [
    "axz",
    "a",
@@ -500,7 +500,7 @@
    "axxxx-"
   ]
  },
- "azure.a_automation_accounts_certificates": {
+ "azure.automation_aa_certificates": {
   "valid": [
    "axz",
    "a",
@@ -512,7 +512,7 @@
    "ax "
   ]
  },
- "azure.a_automation_accounts_connections": {
+ "azure.automation_aa_connections": {
   "valid": [
    "axz",
    "a",
@@ -524,7 +524,7 @@
    "ax "
   ]
  },
- "azure.a_automation_accounts_credentials": {
+ "azure.automation_aa_credentials": {
   "valid": [
    "axz",
    "a",
@@ -1868,7 +1868,7 @@
    "ax-"
   ]
  },
- "azure.d_provisioning_services_certificates": {
+ "azure.devices_ps_certificates": {
   "valid": [
    "axz",
    "a",
@@ -2060,7 +2060,7 @@
    "ax-"
   ]
  },
- "azure.event_hub_n_e_authorization_rules": {
+ "azure.event_hub_ns_eventhubs_auth_rules": {
   "valid": [
    "axz",
    "a",
@@ -2219,7 +2219,7 @@
    "ax."
   ]
  },
- "azure.io_t_central_io_t_apps": {
+ "azure.iot_central_iot_apps": {
   "valid": [
    "axz",
    "az",
@@ -2271,7 +2271,7 @@
    "a!z"
   ]
  },
- "azure.k_clusters_databases_data_connections": {
+ "azure.kusto_clusters_dbs_data_connections": {
   "valid": [
    "axz",
    "a",
@@ -2285,7 +2285,7 @@
    "a!z"
   ]
  },
- "azure.k_clusters_databases_eventhubconnections": {
+ "azure.kusto_clusters_dbs_eventhubconnections": {
   "valid": [
    "axz",
    "a",
@@ -2600,7 +2600,7 @@
    "-xz"
   ]
  },
- "azure.m_mediaservices_live_events_live_outputs": {
+ "azure.mediaservices_live_events_live_outputs": {
   "valid": [
    "axz",
    "a",
@@ -3048,7 +3048,7 @@
    "axxx-"
   ]
  },
- "azure.network_fwafp": {
+ "azure.net_frontdoor_web_app_firewall_policies": {
   "valid": [
    "axz",
    "a",
@@ -3108,7 +3108,7 @@
    "ax-"
   ]
  },
- "azure.n_network_security_groups_security_rules": {
+ "azure.network_nsg_security_rules": {
   "valid": [
    "axz",
    "a",
@@ -3735,7 +3735,7 @@
    "-xz"
   ]
  },
- "azure.n_nh_authorization_rules": {
+ "azure.notif_hubs_ns_notif_hubs_auth_rules": {
   "valid": [
    "axz",
    "a",
@@ -3894,7 +3894,7 @@
    "ax-"
   ]
  },
- "azure.relay_n_hc_authorization_rules": {
+ "azure.relay_ns_hybrid_connections_auth_rules": {
   "valid": [
    "axz",
    "a",
@@ -3927,7 +3927,7 @@
    "ax-"
   ]
  },
- "azure.relay_n_wr_authorization_rules": {
+ "azure.relay_ns_wcf_relays_auth_rules": {
   "valid": [
    "axz",
    "a",
@@ -4053,7 +4053,7 @@
    "a!z"
   ]
  },
- "azure.s_locations_application_whitelistings": {
+ "azure.security_locs_app_whitelistings": {
   "valid": [
    "axz",
    "a",
@@ -4066,7 +4066,7 @@
    "a!z"
   ]
  },
- "azure.s_locations_jit_network_access_policies": {
+ "azure.security_locs_jit_net_access_policies": {
   "valid": [
    "axz",
    "a",
@@ -4260,7 +4260,7 @@
    "axx-"
   ]
  },
- "azure.signal_r_service_signal_r": {
+ "azure.signalr_service_signalr": {
   "valid": [
    "axz",
    "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
@@ -4365,7 +4365,7 @@
    "a--z"
   ]
  },
- "azure.s_storage_accounts_file_services_shares": {
+ "azure.storage_sa_fs_shares": {
   "valid": [
    "axz",
    "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",

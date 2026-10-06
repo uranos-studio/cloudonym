@@ -20,6 +20,7 @@
 //   통과 · 실패 예는 a 행마다 사람이 pattern 을 읽고 적은 것(PHYSICAL_CASES)이다 — 정규식에서 뽑지 않는다.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { sq, dq, idLit, intLit, boolLit } from './emit-ts.mjs';
+import { typeWords, typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -165,19 +166,19 @@ export function generationOf(raw) {
 }
 
 const words = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z])([A-Z][a-z])/g, '$1 $2').split(/[^A-Za-z0-9]+/).filter(Boolean);
-const snake = (s) => words(s).join('_').toLowerCase();
 const initials = (s) => words(s).map((w) => w[0].toLowerCase()).join('');
 /** 약어 — GCP · Azure 들이기와 같은 규칙: 낱말이 둘 이상이면 머리글자, 하나면 앞 세 글자 */
 export function slugOf(type) {
   const w = words(type).map((x) => x.toLowerCase());
   return w.length >= 2 ? w.map((x) => x[0]).join('') : w[0].slice(0, 3);
 }
-/** resourceType — 40자 이하 · AWS 안 유일: ① 네임스페이스(소문자 · ELB · API Gateway 는 줄임)_타입 ② 네임스페이스_타입 머리글자 */
+/** resourceType — 40자 이하 · AWS 안 유일 · 한 글자 토막 없음: ① 네임스페이스(소문자 · ELB · API Gateway 는 줄임)_타입
+ *  ② 같은 것의 낱말 약어(naming.mjs WORD_ABBREVIATIONS) ③ 네임스페이스_타입 머리글자. 낱말은 naming.mjs typeWords(IPv4 · IoT 를 한 낱말로) */
 const NS_SHORT = { ApiGateway: 'apigw', ApiGatewayV2: 'apigwv2', ElasticLoadBalancing: 'elb', ElasticLoadBalancingV2: 'elbv2' };
 export function resourceTypeOf(ns, type, used) {
   const n = NS_SHORT[ns] ?? ns.toLowerCase();
-  const c = [`${n}_${snake(type)}`, `${n}_${initials(type)}`];
-  return c.find((x) => x.length <= 40 && !used.has(x)) ?? null;
+  const c = [`${n}_${typeSnake(type)}`, `${n}_${abbreviateSnake(typeSnake(type))}`, `${n}_${initials(type)}`];
+  return c.find((x) => x.length <= 40 && !used.has(x) && !hasSingleLetterToken(x)) ?? null;
 }
 
 /** 범위 — 스키마에는 유일 범위 칸이 없다. IAM 은 계정(전역 서비스), Multi-Region Access Point 도 계정, 나머지 리전.
@@ -240,7 +241,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       if (!resourceType) { held.push({ src, reason: 'no unique resource type of 40 characters or fewer' }); continue; }
       used.add(resourceType);
       rules.push({
-        id: `aws.${resourceType}`, kind: 'a', typeName, property: t.property, displayName: `${ns} ${words(type).join(' ')}`,
+        id: `aws.${resourceType}`, kind: 'a', typeName, property: t.property, displayName: `${ns} ${typeWords(type).join(' ')}`,
         entity: typeName, scope: scopeOf('a', typeName, schema), category: t.category, slug: slugOf(type),
         min: prop.minLength ?? 1, max: prop.maxLength, schemaPattern: prop.pattern, gen: generationOf(prop.pattern), docUrl, cases,
       });
@@ -250,7 +251,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       used.add(resourceType);
       const ec2 = ns === 'EC2';
       rules.push({
-        id: `aws.${resourceType}`, kind: 'b', typeName, displayName: `${ns} ${words(type).join(' ')} (Name tag)`,
+        id: `aws.${resourceType}`, kind: 'b', typeName, displayName: `${ns} ${typeWords(type).join(' ')} (Name tag)`,
         entity: `${typeName}.NameTag`, scope: scopeOf('b', typeName, schema), category: t.category, slug: slugOf(type),
         tag: ec2 ? 'ec2' : 'general', cases: ec2 ? EC2_TAG_CASES : GENERAL_TAG_CASES,
       });

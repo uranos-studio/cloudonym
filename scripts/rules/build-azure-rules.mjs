@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { sq, dq, idLit, intLit, boolLit, regexLit, metaToken } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
+import { typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
 
 export const AZURE_RULES_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 export const CAF_URL = 'https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations';
@@ -288,7 +289,7 @@ const EXISTING_SCOPE_OF_PARENT = {
   'Microsoft.ContainerService/managedClusters': 'azure:managed_cluster',
 };
 
-const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/([A-Z])([A-Z][a-z])/g, '$1_$2').replace(/[^A-Za-z0-9]+/g, '_').toLowerCase().replace(/^_|_$/g, '');
+const snake = typeSnake; // naming.mjs — IoT · SignalR 같은 섞인 약어를 한 낱말로
 const words = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[^A-Za-z0-9]+/g, ' ').trim().toLowerCase().split(' ').filter(Boolean);
 
 /** 약어가 CAF 에 없을 때 — 끝 Entity 낱말이 둘 이상이면 머리글자, 하나면 앞 세 글자 (docs/azure-intake-held.md 에 적는다) */
@@ -317,13 +318,16 @@ export function cafAbbreviations(html) {
 const initials = (snakeWord) => snakeWord.split('_').map((w) => w[0]).join('');
 
 /** resourceType — 40자 이하 · Azure 안 유일(화면 hash 상한이 40 에 기댄다). 아래 후보 중 처음 맞는 것:
- *  ① 네임스페이스_경로 전체 ② 네임스페이스 머리글자_경로 ③ 네임스페이스_중간 머리글자_끝 ④ 경로 전체 ⑤ 중간 머리글자_끝 ⑥ 네임스페이스_전부 머리글자 */
+ *  ① 네임스페이스_경로 전체 ② 네임스페이스 머리글자_경로 ③ 네임스페이스_중간 머리글자_끝 ④ 경로 전체 ⑤ 중간 머리글자_끝 ⑥ 네임스페이스_전부 머리글자
+ *  순서: ① ② ③ → ①의 낱말 약어(naming.mjs) → ②의 낱말 약어 → ④ ⑤ ⑥ → ④의 낱말 약어. 네임스페이스를 남기는 후보를 먼저 본다.
+ *  한 글자 토막(`_a_`)이 생기는 후보는 고르지 않는다 — 한 낱말 머리글자는 한 글자다 */
 export function resourceTypeOf(ns, segs, used) {
   const n = snake(ns.replace(/^Microsoft\./, '').replace(/^DBfor/, 'Dbfor'));
   const parts = segs.map(snake);
   const mid = [...parts.slice(0, -1).map(initials), parts.at(-1)];
-  const candidates = [[n, ...parts], [initials(n), ...parts], [n, ...mid], parts, mid, [n, ...parts.slice(0, -1).map(initials), initials(parts.at(-1))]].map((c) => c.join('_'));
-  return candidates.find((c) => c.length <= 40 && !used.has(c)) ?? null;
+  const base = [[n, ...parts], [initials(n), ...parts], [n, ...mid], parts, mid, [n, ...parts.slice(0, -1).map(initials), initials(parts.at(-1))]].map((c) => c.join('_'));
+  const candidates = [base[0], base[1], base[2], abbreviateSnake(base[0]), abbreviateSnake(base[1]), base[3], base[4], base[5], abbreviateSnake(base[3])];
+  return candidates.find((c) => c.length <= 40 && !used.has(c) && !hasSingleLetterToken(c)) ?? null;
 }
 
 const CATEGORY = [

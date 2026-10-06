@@ -50,7 +50,10 @@ test('이름 — 40자 이하로 줄이고 · 겹치면 다음 후보 · 약어 
   const t = resourceTypeOf('EC2', 'LocalGatewayRouteTableVirtualInterfaceGroupAssociation', new Set());
   assert.ok(t.length <= 40, t);
   assert.equal(resourceTypeOf('ElasticLoadBalancingV2', 'Listener', new Set()), 'elbv2_listener');
-  assert.equal(resourceTypeOf('EC2', 'NatGateway', new Set(['ec2_nat_gateway'])), 'ec2_ng');
+  assert.equal(resourceTypeOf('EC2', 'NatGateway', new Set(['ec2_nat_gateway'])), 'ec2_nat_gw', '겹치면 낱말 약어');
+  assert.equal(resourceTypeOf('EC2', 'NatGateway', new Set(['ec2_nat_gateway', 'ec2_nat_gw'])), 'ec2_ng', '그것도 겹치면 머리글자');
+  assert.equal(resourceTypeOf('EC2', 'IPv4Pool', new Set()), 'ec2_ipv4_pool');
+  assert.equal(resourceTypeOf('EC2', 'Ab', new Set(['ec2_ab'])), null, '머리글자가 한 글자 토막이면 고르지 않는다');
   assert.equal(slugOf('NatGateway'), 'ng');
   assert.equal(slugOf('Key'), 'key');
 });
