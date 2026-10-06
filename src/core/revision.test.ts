@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import ts from 'typescript';
 import { RULES_REVISION } from './revision';
 import { RULES, LABEL_LIMITS, AWS_TAG_VALUE } from './constraints';
@@ -62,11 +62,20 @@ function normalizeSource(text: string): string {
   return tokens.join(' ');
 }
 
-/** src/core 의 비시험 소스(제외 둘 빼고) — 파일 이름 순. core 는 ./ 만 들여오므로(boundary.test.ts) 이것이 엔진 소스 전부다 */
+/** src/core 아래 비시험 소스 — 하위 폴더까지 재귀(rules/ 등) · __fixtures__ 제외 · 키는 src/core 기준 posix 상대 경로 */
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) return e.name === '__fixtures__' ? [] : sourceFiles(p);
+    return e.name.endsWith('.ts') && !e.name.endsWith('.test.ts') ? [p] : [];
+  });
+}
+
+/** src/core 의 비시험 소스(제외 둘 빼고) — 경로 순. core 는 src/core 안만 들여오므로(boundary.test.ts) 이것이 엔진 소스 전부다 */
 function coreSources(): Record<string, string> {
   const dir = import.meta.dirname;
-  const files = readdirSync(dir).filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts') && !SOURCE_EXCLUDE.has(f)).sort();
-  return Object.fromEntries(files.map((f) => [f, createHash('sha256').update(normalizeSource(readFileSync(join(dir, f), 'utf-8'))).digest('hex')]));
+  const rels = sourceFiles(dir).map((f) => relative(dir, f).split(sep).join('/')).filter((r) => !SOURCE_EXCLUDE.has(r)).sort();
+  return Object.fromEntries(rels.map((r) => [r, createHash('sha256').update(normalizeSource(readFileSync(join(dir, r), 'utf-8'))).digest('hex')]));
 }
 
 function fingerprintOf(parts: unknown): string {
@@ -118,6 +127,17 @@ describe('규칙 버전 · 지문 (D26)', () => {
     // 위 src 의 {3}→{2,3} 이 리뷰 M1 의 변이다 — 실제 validate.ts 글자에 묶지 않는다(정규식을 고치면 이 시험이 엉뚱하게 깨진다)
     expect(Object.keys(currentParts().sources)).toEqual(expect.arrayContaining(['validate.ts', 'engine.ts', 'constraints.ts', 'truncate.ts']));
     expect(Object.keys(currentParts().sources)).not.toContain('revision.ts');
+    // 하위 폴더 소스도 지문에 들어간다 — 재귀 수집 · __fixtures__ 제외 (계획 §15 codex #4)
+    const keys = Object.keys(currentParts().sources);
+    expect(keys.some((k) => k.startsWith('__fixtures__/'))).toBe(false);
+    expect(keys.filter((k) => k.includes('/')).length).toBeGreaterThan(0);
+  });
+
+  it('검사기 자체 시험 — 하위 파일 토큰 하나가 바뀌면 지문이 바뀐다', () => {
+    const base = currentParts();
+    const sub = Object.keys(base.sources).find((k) => k.includes('/'))!;
+    const changed = { ...base.sources, [sub]: createHash('sha256').update(`${normalizeSource(readFileSync(join(import.meta.dirname, sub), 'utf-8'))} x`).digest('hex') };
+    expect(fingerprintOf({ ...base, sources: changed })).not.toBe(fingerprint);
   });
 
   it('파일의 revision 이 RULES_REVISION 과 같다', () => {

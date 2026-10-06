@@ -1,0 +1,122 @@
+// AWS 규칙 표 — constraints.ts 가 gcp · azure 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
+import type { ResourceRule } from '../types';
+import type { CoreMessage } from '../messages';
+
+const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
+/** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
+export const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
+const AWS_NAME_TAG_NOTE: CoreMessage = { code: 'note.aws_tag_utf16_length' };
+
+export const AWS_RULES: Record<string, ResourceRule> = {
+  'aws.s3_bucket': {
+    id: 'aws.s3_bucket', provider: 'aws', resourceType: 's3_bucket',
+    displayName: 'S3 Bucket', slug: 'bucket', minLength: 3, maxLength: 63,
+    pattern: /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
+    startsWithLetter: false, endsWithAlnum: true,
+    forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..'], ipv4: true },
+    template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
+    scope: 'aws:partition', entity: 's3.bucket', category: 'storage', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
+    notes: [{ code: 'note.s3_an_suffix' }],
+  },
+  'aws.iam_role': {
+    id: 'aws.iam_role', provider: 'aws', resourceType: 'iam_role',
+    displayName: 'IAM Role', slug: 'role', minLength: 1, maxLength: 64,
+    pattern: /^[\w+=,.@-]{1,64}$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'slug', 'role'], optional: [],
+    scope: 'aws:account', entity: 'iam.role', category: 'identity', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html',
+    docUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html',
+  },
+  'aws.vpc': {
+    id: 'aws.vpc', provider: 'aws', resourceType: 'vpc',
+    displayName: 'VPC (Name tag)', slug: 'vpc', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'ec2.vpc.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.subnet': {
+    id: 'aws.subnet', provider: 'aws', resourceType: 'subnet',
+    displayName: 'Subnet (Name tag)', slug: 'subnet', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.subnet.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.ec2_instance': {
+    id: 'aws.ec2_instance', provider: 'aws', resourceType: 'ec2_instance',
+    displayName: 'EC2 Instance (Name tag)', slug: 'vm', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.instance.NameTag', category: 'compute', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.rds_instance': {
+    id: 'aws.rds_instance', provider: 'aws', resourceType: 'rds_instance',
+    displayName: 'RDS DB Instance', slug: 'db', minLength: 1, maxLength: 63,
+    // API 는 대문자를 받아 소문자로 저장한다 — 검증은 대소문자를 허용한다
+    pattern: /^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/, noConsecutiveSeparator: true,
+    allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: true, endsWithAlnum: true,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'rds.dbInstance', category: 'database', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html',
+    docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html',
+  },
+  // 조사 11종 — Name 태그 셋은 aws.vpc 와 같은 규칙에 slug 만 다르다
+  'aws.internet_gateway': {
+    id: 'aws.internet_gateway', provider: 'aws', resourceType: 'internet_gateway',
+    displayName: 'Internet Gateway (Name tag)', slug: 'igw', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'ec2.internetGateway.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.route_table': {
+    id: 'aws.route_table', provider: 'aws', resourceType: 'route_table',
+    displayName: 'Route Table (Name tag)', slug: 'rt', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.routeTable.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+  'aws.security_group': {
+    id: 'aws.security_group', provider: 'aws', resourceType: 'security_group',
+    displayName: 'Security Group', slug: 'sg', minLength: 1, maxLength: 255,
+    // GroupName — "Names are case-insensitive and must be unique within the VPC." · "Up to 255 characters in length. Can't start with sg-."
+    // "Valid characters: a-z, A-Z, 0-9, spaces, and ._-:/()#,@[]+=&;{}!$*" (쪽의 HTML 을 글자 단위로 대어 봤다)
+    pattern: /^[A-Za-z0-9 ._\-:/()#,@[\]+=&;{}!$*]{1,255}$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    // 이름이 대소문자를 가리지 않으므로 SG- 도 sg- 로 보고 거부한다 (보수적 · D20)
+    forbidden: { prefixes: ['sg-'], ignoreCase: true },
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:vpc', entity: 'ec2.securityGroup', category: 'networking', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateSecurityGroup.html',
+  },
+  'aws.key_pair': {
+    id: 'aws.key_pair', provider: 'aws', resourceType: 'key_pair',
+    displayName: 'EC2 Key Pair', slug: 'key', minLength: 1, maxLength: 255,
+    // KeyName — "A unique name for the key pair." · "Up to 255 ASCII characters". 제어 문자는 받지 않는다 — 인쇄 가능한 ASCII 만 (보수적 · D20)
+    pattern: /^[\x20-\x7E]{1,255}$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    // 유일 범위를 적은 문장이 없다 — 리전에 두되 note 로 미확인임을 싣는다
+    scope: 'aws:region', entity: 'ec2.keyPair', category: 'compute', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateKeyPair.html',
+    notes: [{ code: 'note.aws_key_pair_scope_unconfirmed' }],
+  },
+  'aws.ebs_volume': {
+    id: 'aws.ebs_volume', provider: 'aws', resourceType: 'ebs_volume',
+    displayName: 'EBS Volume (Name tag)', slug: 'vol', minLength: 1, maxLength: 256,
+    pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
+    startsWithLetter: false, endsWithAlnum: false,
+    template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
+    scope: 'aws:region', entity: 'ec2.volume.NameTag', category: 'storage', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+  },
+};
