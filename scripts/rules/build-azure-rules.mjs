@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { sq, dq, idLit, intLit, boolLit, regexLit, metaToken } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
+import { INVISIBLE_CLASS } from '../../src/core/invisible.mjs';
 import { scopeIdsFromSources, syncScopeEnum } from './openapi-scopes.mjs';
 import { typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
 
@@ -135,9 +136,8 @@ export function parseCharacters(raw) {
   return spec;
 }
 
-/** 「control characters」를 보수적으로 읽은 집합 — C0 · DEL · C1(\\p{Cc}) 에 ALM · 폭 없는 문자 · 양방향 제어 · BOM 을 더한다.
- *  src/core/display.ts INVISIBLE · rules/azure-manual.ts 의 손 규칙과 같은 집합이다(화면에서 다르게 보이는 이름을 막는다 — Trojan Source) */
-export const INVISIBLE_CLASS = '\\p{Cc}\\u061C\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF';
+/** 「control characters」를 보수적으로 읽은 집합 — 보이지 않는 글자 전부(기본 무시 문자 · Cc · Cf · 줄/문단 구분).
+ *  정의는 src/core/invisible.mjs 하나다 — display.ts · rules/azure-manual.ts 의 손 규칙과 같은 집합(화면에서 다르게 보이는 이름을 막는다 — Trojan Source) */
 const INVISIBLE_RE = new RegExp(`[${INVISIBLE_CLASS}]`, 'u');
 
 /** 이 문자를 쓸 수 있는가 (본문 기준) */
@@ -466,7 +466,7 @@ export function renderTs(result, meta) {
   for (const [raw, c] of charClasses) {
     const g = c.gen;
     const ncs = c.spec.noDoubleHyphen ? ', noConsecutiveSeparator: true' : '';
-    // 금지형(Can't use …)은 INVISIBLE_CLASS(\p{Cc} 와 \u 범위)를 쓰려고 u 플래그 — 원문이 control characters 를 말하지 않아도 막는다(문서보다 넓게 · 보수적)
+    // 금지형(Can't use …)은 INVISIBLE_CLASS(유니코드 속성 \p{…})를 쓰려고 u 플래그 — 원문이 control characters 를 말하지 않아도 막는다(문서보다 넓게 · 보수적)
     const flags = c.pattern.includes('\\p{') ? 'u' : '';
     if (!/^C[0-9]+$/.test(c.key)) throw new Error(`문자 규칙 키 꼴이 아니다: ${c.key}`);
     L.push(`  ${c.key}: { raw: ${dq(raw)}, pattern: ${regexLit(c.pattern, flags)}, allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}${ncs} },`);

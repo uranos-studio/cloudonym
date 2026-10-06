@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { physicalHold, generationOf, anchorPattern, matchPatternOf, backtracks, LINEAR_EQUIVALENT, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES, EXISTING, MANUAL, HAND_REVIEWED } from './build-aws-rules.mjs';
+import { physicalHold, generationOf, anchorPattern, flagsOf, matchPatternOf, backtracks, LINEAR_EQUIVALENT, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES, EXISTING, MANUAL, HAND_REVIEWED } from './build-aws-rules.mjs';
 
 const targets = JSON.parse(readFileSync(new URL('./aws-intake-targets.json', import.meta.url), 'utf-8'));
 
@@ -36,7 +36,7 @@ test('맞춤 pattern — 지수 백트래킹 원문은 같은 집합의 선형 �
   assert.match(backtracks(raw) ?? '', /ms$/); // 검사기를 먼저 시험한다 — 원문은 25자에 수십 ms 를 넘는다
   assert.equal(backtracks(matchPatternOf(raw)), null);
   const slow = new RegExp(anchorPattern(raw));
-  const fast = new RegExp(anchorPattern(matchPatternOf(raw)));
+  const fast = new RegExp(anchorPattern(matchPatternOf(raw)), flagsOf(matchPatternOf(raw)));
   // 같은 문자열 집합 — 길이 1~6 의 'a' '/' ':' 조합 전부를 대어 본다
   const alpha = ['a', '/', ':', ' '];
   let words = [''];
@@ -46,10 +46,15 @@ test('맞춤 pattern — 지수 백트래킹 원문은 같은 집합의 선형 �
   }
 });
 
-test('맞춤 pattern — 「[^…]」 꼴은 제어 · 폭 없는 · 방향 제어 문자를 받지 않는다 · 다른 꼴은 원문 그대로', () => {
-  const re = new RegExp(anchorPattern(matchPatternOf('^[^:*]{1,512}')));
+test('맞춤 pattern — 「[^…]」 꼴은 보이지 않는 글자(src/core/invisible.mjs)를 받지 않는다 · 다른 꼴은 원문 그대로', () => {
+  const raw = matchPatternOf('^[^:*]{1,512}');
+  assert.equal(flagsOf(raw), 'u');
+  const re = new RegExp(anchorPattern(raw), flagsOf(raw));
   assert.equal(re.test('my filter/1'), true);
-  for (const ch of ['\u0001', '\u007f', '\u0085', '\u200B', '\u202E', '\u2028', '\uFEFF']) assert.equal(re.test(`a${ch}b`), false, JSON.stringify(ch));
+  // 제어 · 폭 없는 · 방향 제어 · 줄 구분 · BOM 과 손 목록이 놓쳤던 소프트 하이픈 · 한글 채움 · 몽골 모음 구분 · 이체 선택자 · 결합 자소 결합 금지 · 태그 문자
+  for (const ch of ['\u0001', '\u007f', '\u0085', '\u200B', '\u202E', '\u2028', '\u2029', '\uFEFF', '\u00AD', '\u3164', '\u115F', '\u1160', '\u180E', '\uFE0F', '\u034F', '\u{E0041}']) {
+    assert.equal(re.test(`a${ch}b`), false, JSON.stringify(ch));
+  }
   assert.equal(re.test('a:b'), false);
   assert.equal(matchPatternOf('[\\w._-]+'), '[\\w._-]+');
 });

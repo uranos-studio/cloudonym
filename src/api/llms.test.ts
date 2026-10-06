@@ -48,10 +48,14 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const rg = lines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
     expect(rg).toContain('(flags: u)');
     const flagged = rules.filter((r) => r.pattern.flags !== '');
-    // 손으로 쓴 규칙은 resource_group 하나 · 나머지는 들인 Azure 행의 금지형(\p{Cc} 를 쓰는 u)
-    // 들인 AWS 행 중 EC2 밖 Name 태그(일반 태그 문자 \p{L} 을 쓰는 u)도 손으로 쓴 규칙이 아니다
+    // 들인 Azure 행의 금지형 · 들인 AWS 행 중 EC2 밖 Name 태그와 「[^…]」 꼴 — 보이지 않는 글자 정의(invisible.mjs 의 \p{…})를 쓰는 u.
+    // 손으로 쓴 규칙은 resource_group(\p{L}) 과 같은 정의를 쓰는 금지형 손 규칙(Logs 둘 · Azure policy 넷 · tagNames · Synapse SQL pool)
     const intake = new Set([...AZURE_INTAKE_ROWS.map((r) => r.id), ...AWS_INTAKE_ROWS.map((r) => r.id)]);
-    expect(flagged.filter((r) => !intake.has(r.id)).map((r) => r.id)).toEqual(['azure.resource_group']);
+    expect(flagged.filter((r) => !intake.has(r.id)).map((r) => r.id).sort()).toEqual([
+      'aws.logs_log_stream', 'aws.logs_subscription_filter',
+      'azure.authorization_policy_assignments', 'azure.authorization_policy_definitions', 'azure.authorization_policy_exemptions', 'azure.authorization_policy_set_definitions',
+      'azure.resource_group', 'azure.resources_tag_names', 'azure.synapse_workspaces_sql_pools',
+    ]);
     const s3 = lines.find((l) => l.startsWith('- `aws.s3_bucket` ('))!;
     expect(s3).not.toContain('(flags:');
   });

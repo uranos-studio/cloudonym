@@ -1883,14 +1883,11 @@
     "a~\tb",
     "a~\u0001b",
     "a~\u200bb",
-    "a~\u202eb"
-   ],
-   "invisibleAccepted": {
-    "chars": [
-     "\u2028"
-    ],
-    "reason": "공개 TagValue 패턴이 \\p{Z}(줄 · 문단 구분 포함)를 받는다 — constraints.ts AWS_TAG_VALUE 와 같은 집합. 「spaces」만 받을지는 미결"
-   }
+    "a~\u202eb",
+    "a~\u2028b",
+    "a~\u2029b",
+    "a~\u3164b"
+   ]
   },
   "tag:ec2": {
    "source": "Although EC2 allows for any character in its tags, other AWS services are more restrictive.",

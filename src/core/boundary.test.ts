@@ -22,12 +22,12 @@ function isAllowed(spec: string, fromFile: string): boolean {
   return rel !== '' && !rel.startsWith('..') && !rel.startsWith(sep) && !rel.split(sep).includes('..');
 }
 
-/** src/core 아래 .ts (시험 · __fixtures__ 제외) — 하위 폴더까지 재귀로 */
+/** src/core 아래 .ts · .mjs(invisible.mjs — 생성기와 같이 쓰는 정의) (시험 · __fixtures__ 제외) — 하위 폴더까지 재귀로 */
 function coreFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = join(dir, e.name);
     if (e.isDirectory()) return e.name === '__fixtures__' ? [] : coreFiles(p);
-    return e.name.endsWith('.ts') && !e.name.endsWith('.test.ts') ? [p] : [];
+    return /\.(ts|mjs)$/.test(e.name) && !e.name.endsWith('.test.ts') ? [p] : [];
   });
 }
 

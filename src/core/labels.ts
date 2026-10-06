@@ -2,9 +2,10 @@
 import type { LabelSet, NamingContext, Provider } from './types';
 import { AWS_TAG_VALUE, LABEL_LIMITS } from './constraints';
 import type { CoreMessage } from './messages';
+import { INVISIBLE_CLASS } from './invisible.mjs';
 
-/** GCP 라벨 값 규격 (D21) — \p{L} 이라 한글(Lo)도 남는다 */
-const GCP_VALUE_STRIP = /[^\p{L}\p{N}_-]/gu;
+/** GCP 라벨 값 규격 (D21) — \p{L} 이라 한글(Lo)도 남는다. 한글 채움(U+3164 등 Lo)처럼 보이지 않는 글자는 지운다(invisible.mjs) */
+const GCP_VALUE_STRIP = new RegExp(`[^\\p{L}\\p{N}_-]|[${INVISIBLE_CLASS}]`, 'gu');
 
 export function labelsFor(ctx: NamingContext, provider: Provider): LabelSet {
   const base: Record<string, string> = {

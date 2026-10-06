@@ -62,12 +62,12 @@ function normalizeSource(text: string): string {
   return tokens.join(' ');
 }
 
-/** src/core 아래 비시험 소스 — 하위 폴더까지 재귀(rules/ 등) · __fixtures__ 제외 · 키는 src/core 기준 posix 상대 경로 */
+/** src/core 아래 비시험 소스(.ts · .mjs) — 하위 폴더까지 재귀(rules/ 등) · __fixtures__ 제외 · 키는 src/core 기준 posix 상대 경로 */
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = join(dir, e.name);
     if (e.isDirectory()) return e.name === '__fixtures__' ? [] : sourceFiles(p);
-    return e.name.endsWith('.ts') && !e.name.endsWith('.test.ts') ? [p] : [];
+    return /\.(ts|mjs)$/.test(e.name) && !e.name.endsWith('.test.ts') ? [p] : [];
   });
 }
 

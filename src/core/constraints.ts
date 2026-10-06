@@ -4,6 +4,7 @@
 // 표 자체는 provider 별 파일(rules/gcp.ts · rules/aws.ts · rules/azure.ts)에 있고 여기서 합친다.
 import type { Provider, ResourceRule } from './types';
 import { lookup } from './dict';
+import { NO_INVISIBLE } from './invisible.mjs';
 import { GCP_RULES } from './rules/gcp';
 import { AWS_RULES } from './rules/aws';
 import { AZURE_RULES_TABLE } from './rules/azure';
@@ -27,7 +28,7 @@ export const LABEL_LIMITS: Record<Provider, { key: number; value: number; docUrl
 /** AWS 태그 값에 쓸 수 있는 문자 — 문서: "letters, numbers, spaces representable in UTF-8, and the following characters: _ . : / = + - @".
  *  AWS API 가 공개하는 TagValue 패턴(`^([\p{L}\p{Z}\p{N}_.:/=+\-@]*)$`)과 같다. 서비스마다 다를 수 있고(EC2 는 더 넓다) 여기서는 일반 규칙을 따른다 — 무효를 유효로 내지 않는 쪽 (docs/decisions.md 2026-09-29)
  *  docUrl: https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions (LABEL_LIMITS.aws.docUrl 과 같은 쪽) */
-export const AWS_TAG_VALUE = /^[\p{L}\p{Z}\p{N}_.:/=+\-@]*$/u;
+export const AWS_TAG_VALUE = new RegExp(String.raw`${NO_INVISIBLE}^[\p{L}\p{Z}\p{N}_.:/=+\-@]*$`, 'u');
 export const AWS_TAG_VALUE_DOC_URL = LABEL_LIMITS_AWS_DOC;
 
 export function rulesFor(provider: Provider): ResourceRule[] {

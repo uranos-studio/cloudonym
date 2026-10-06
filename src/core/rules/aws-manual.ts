@@ -5,6 +5,7 @@
 import type { CoreMessage } from '../messages';
 import type { ResourceRule, Token } from '../types';
 import type { ScopeDef } from '../scopes';
+import { NO_INVISIBLE } from '../invisible.mjs';
 
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const ADVISORY: CoreMessage = { code: 'note.advisory_rule_enforced' };
@@ -19,7 +20,8 @@ const ELB_NAME = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,30}[A-Za-z0-9])?$/;
 const DYNAMODB_NAME = /^[a-zA-Z0-9_.-]{3,255}$/;
 const ECS_NAME = /^[A-Za-z0-9_-]{1,255}$/;
 const IAM_128 = /^[\w+=,.@-]{1,128}$/;
-const LOGS_NAME = /^[^:*]{1,512}$/;
+/** CloudWatch Logs "Pattern: [^:*]*" — 「이 글자만 빼고 전부」 꼴이라 보이지 않는 글자까지 받는다. 앞보기로 뺀다(좁히는 쪽 · invisible.mjs) */
+const LOGS_NAME = new RegExp(`${NO_INVISIBLE}^[^:*]{1,512}$`, 'u');
 /** RDS 프록시 · 통합 식별자 — API 참조 "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" 를 이름 전체에 건다(길이는 maxLength).
  *  원문 꼴은 `-?` 가 빠지면 영숫자 토막을 여러 방법으로 쪼갤 수 있어 「aaa…!」 에서 갈래가 2^n 이다(26자에 수십 ms · 63자는 끝나지 않는다).
  *  같은 집합의 선형 꼴 — 글자로 시작 · 하이픈은 하나씩 영숫자 사이에만 — 로 맞춘다(길이 1~7 조합 전부로 같음을 확인 · redos.test.ts) */

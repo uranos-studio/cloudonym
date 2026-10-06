@@ -4,6 +4,7 @@
 import type { CoreMessage } from '../messages';
 import type { ResourceRule, Token } from '../types';
 import type { ScopeDef } from '../scopes';
+import { INVISIBLE_CLASS } from '../invisible.mjs';
 
 const RULES_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const PARENT: CoreMessage = { code: 'note.parent_length_limit' };
@@ -17,13 +18,11 @@ const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
 const SEP: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
 
-/** policy* 리소스 이름 — "Resource name can't use: `#<>%&:\?/` or control characters. Can't end with period or space."
- *  control characters 는 C0 · DEL · C1 에 폭 없는 문자 · 양방향 제어 · BOM 까지 넓게 읽는다(생성기 INVISIBLE_CLASS · display.ts 와 같은 집합) */
-// oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
-const POLICY_NAME = /^[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]{0,63}[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF. ]$/;
-/** tagNames — "Can't use: `<>%&\?/` or control characters" (제어 문자 집합은 POLICY_NAME 과 같다) */
-// oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
-const TAG_NAME = /^[^<>%&\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]{1,512}$/;
+/** policy* 리소스 이름 — "Resource name can't use: `#<>%&:\\?/` or control characters. Can't end with period or space."
+ *  control characters 는 보이지 않는 글자 전부로 넓게 읽는다(invisible.mjs — 생성기 · display.ts 와 같은 정의) */
+const POLICY_NAME = new RegExp(String.raw`^[^#<>%&:\\?/${INVISIBLE_CLASS}]{0,63}[^#<>%&:\\?/${INVISIBLE_CLASS}. ]$`, 'u');
+/** tagNames — "Can't use: `<>%&\\?/` or control characters" (제어 문자 집합은 POLICY_NAME 과 같다) */
+const TAG_NAME = new RegExp(String.raw`^[^<>%&\\?/${INVISIBLE_CLASS}]{1,512}$`, 'u');
 /** 영숫자로 시작 · 끝, `.` 뒤는 영숫자 — MobileNetwork dataNetworks · attachedDataNetworks */
 const DOTTED_64 = /^(?=.{1,64}$)[A-Za-z0-9](?:(?:[A-Za-z0-9-]|\.(?=[A-Za-z0-9]))*[A-Za-z0-9])?$/;
 
@@ -157,8 +156,7 @@ const RULES: AzureManualRule[] = [
   rule({ id: 'azure.synapse_workspaces_big_data_pools', displayName: 'Synapse workspace / Apache Spark pools', slug: 'bdp', minLength: 1, maxLength: 15, pattern: /^[A-Za-z][A-Za-z0-9]{0,14}$/,
     allowed: 'lower-digit', separator: '', caseRule: 'lower', startsWithLetter: true, reserved: true, scope: 'azure:synapse/workspaces', entity: 'Microsoft.Synapse/workspaces/bigDataPools', category: 'database', anchor: 'microsoftsynapse' }),
   // workspaces / sqlPools 1-60 "Can't contain `<>*%&:\/?@-` or control characters. Can't end with `.` or space. Can't contain reserved words." — 하이픈이 금지 목록에 있다
-  // oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
-  rule({ id: 'azure.synapse_workspaces_sql_pools', displayName: 'Synapse workspace / SQL pools', slug: 'sp', minLength: 1, maxLength: 60, pattern: /^[^<>*%&:\\/?@\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF-]{0,59}[^<>*%&:\\/?@\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF. -]$/,
+  rule({ id: 'azure.synapse_workspaces_sql_pools', displayName: 'Synapse workspace / SQL pools', slug: 'sp', minLength: 1, maxLength: 60, pattern: new RegExp(String.raw`^[^<>*%&:\\/?@${INVISIBLE_CLASS}-]{0,59}[^<>*%&:\\/?@${INVISIBLE_CLASS}. -]$`, 'u'),
     allowed: 'lower-digit', separator: '', caseRule: 'lower', reserved: true, scope: 'azure:synapse/workspaces', entity: 'Microsoft.Synapse/workspaces/sqlPools', category: 'database', anchor: 'microsoftsynapse' }),
 
   // ── Microsoft.Web — "Alphanumeric, hyphens, and Unicode characters that can be mapped to Punycode" · "Unicode characters are parsed to Punycode using the IdnMapping.GetAscii method" ──

@@ -1,6 +1,7 @@
 // AWS 규칙 표 — constraints.ts 가 gcp · azure 와 합쳐 RULES 로 낸다 (파일을 나눠도 이름 · 판정 불변)
 import type { ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
+import { NO_INVISIBLE } from '../invisible.mjs';
 import { AWS_INTAKE_ROWS } from './aws-intake';
 import { AWS_MANUAL_RULES } from './aws-manual';
 
@@ -126,7 +127,7 @@ const AWS_HAND_RULES: Record<string, ResourceRule> = {
 // ─── 들인 행 (D43) — rules/aws-intake.ts 의 행을 규칙으로 편다 ──────────────
 /** 일반 태그 값 문자(LABEL_LIMITS 의 #tag-conventions — AWS_TAG_VALUE 와 같은 문자)에 Name 태그 길이 1~256.
  *  EC2 밖 서비스(S3 · IAM · RDS …)는 EC2 보다 좁게 받는다 — 무효를 유효로 내지 않는 쪽 (docs/decisions.md 2026-09-29) */
-export const AWS_NAME_TAG_GENERAL = /^[\p{L}\p{Z}\p{N}_.:/=+\-@]{1,256}$/u;
+export const AWS_NAME_TAG_GENERAL = new RegExp(String.raw`${NO_INVISIBLE}^[\p{L}\p{Z}\p{N}_.:/=+\-@]{1,256}$`, 'u');
 const AWS_TAG_CONVENTIONS = 'https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions';
 const AWS_SCHEMA_NOTE: CoreMessage = { code: 'note.aws_schema_scope_unconfirmed' };
 const PLACED_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
@@ -134,7 +135,7 @@ const PLACED_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 
 const ACCOUNT_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'slug', 'seq'];
 
 /** 스키마 pattern 은 앵커가 없을 수 있다(JSON Schema 는 부분 일치) — 이름 전체로 읽는다(좁히는 쪽 · D20). `\Z` 는 끝으로 읽는다 */
-export const anchorSchemaPattern = (raw: string): RegExp => new RegExp(`^(?:${raw.replace(/\\Z$/, '$')})$`);
+export const anchorSchemaPattern = (raw: string): RegExp => new RegExp(`^(?:${raw.replace(/\\Z$/, '$')})$`, raw.includes('\\p{') ? 'u' : '');
 
 function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
   const template = r.scope === 'aws:account' ? ACCOUNT_TEMPLATE : PLACED_TEMPLATE;

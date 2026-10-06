@@ -12,10 +12,11 @@ import type { ResourceRule } from './types';
 import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './rules/azure-intake';
 import { AWS_INTAKE_ROWS } from './rules/aws-intake';
 import { GCP_INTAKE_ROWS } from './rules/gcp-intake';
+import { SAMPLE } from './__fixtures__/invisible-sample';
 
 type Invalid = string | { name: string; checkOnly: string };
-/** invisibleAllowed — 원문이 어떤 글자든 받는다(검사하지 않는다) · invisibleAccepted — 공개 패턴이 받는 글자 몇 개와 그 근거 */
-interface Entry { source: string; url: string; valid: string[]; invalid: Invalid[]; noInvalid?: string; invisibleAllowed?: string; invisibleAccepted?: { chars: string[]; reason: string } }
+/** invisibleAllowed — 원문이 어떤 글자든 받는다(보이지 않는 글자를 검사하지 않는다) */
+interface Entry { source: string; url: string; valid: string[]; invalid: Invalid[]; noInvalid?: string; invisibleAllowed?: string }
 type Provider = 'azure' | 'aws' | 'gcp';
 const HAND = JSON.parse(readFileSync(join(import.meta.dirname, '__fixtures__', 'intake-hand-cases.json'), 'utf-8')) as Record<Provider, Record<string, Entry>>;
 
@@ -38,8 +39,8 @@ function fit(core: string, n: number): string {
 const coreLen = (core: string) => core.length - 1;
 const LEN_CODES = new Set(['name.too_short', 'name.too_long', 'name.empty']);
 
-/** invisible-chars.test.ts 와 같은 대표 — RLO · 폭 없는 공백 · DEL · C1 NEL · 아랍 글자 표시 · 방향 격리 · 단어 결합 · BOM · 줄 구분 */
-const INVISIBLE = ['\u202E', '\u200B', '\u007F', '\u0085', '\u061C', '\u2066', '\u2060', '\uFEFF', '\u2028'];
+/** invisible-chars.test.ts 와 같은 표본 — 정의(invisible.mjs)의 구간마다 처음 · 끝 + 재검증이 든 낱글자 */
+const INVISIBLE = SAMPLE;
 
 const PROVIDERS: Provider[] = ['azure', 'aws', 'gcp'];
 const rule = (id: string): ResourceRule => {
@@ -70,7 +71,6 @@ describe('손 예 — 빠짐 · 남음', () => {
       if (e.invalid.length === 0) expect(e.noInvalid, k).toBeTruthy();
       expect(e.url, k).toMatch(/^https:\/\//);
       expect(e.source, k).toBeTruthy();
-      if (e.invisibleAccepted) expect(e.invisibleAccepted.reason, k).toBeTruthy();
     }
   });
 });
@@ -104,7 +104,7 @@ for (const p of PROVIDERS) {
       if (!e.invisibleAllowed) {
         const core = e.valid[0]!;
         const base = fit(core, Math.max(r.minLength - 1, coreLen(core), 1));
-        for (const ch of INVISIBLE.filter((c) => !e.invisibleAccepted?.chars.includes(c))) {
+        for (const ch of INVISIBLE) {
           const name = base[0] + ch + base.slice(1);
           if (name.length > r.maxLength) continue;
           expect(checkName(name, r).length, `${id} 보이지 않는 문자 ${JSON.stringify(name)}`).toBeGreaterThan(0);

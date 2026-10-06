@@ -23,6 +23,7 @@ import { sq, dq, idLit, intLit, boolLit } from './emit-ts.mjs';
 import { typeWords, typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { NO_INVISIBLE } from '../../src/core/invisible.mjs';
 
 export const SCHEMA_URL = 'https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip';
 const CFN_REF = 'https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference';
@@ -156,6 +157,8 @@ export const GENERAL_TAG_CASES = { valid: ['team-a_1 prod', 'a'], invalid: ['tea
 // ── 판정 ──────────────────────────────────────────────────────────
 /** 스키마 pattern → 이름 전체에 맞는 정규식 원문 (rules/aws.ts 와 같은 규칙) */
 export const anchorPattern = (raw) => `^(?:${raw.replace(/\\Z$/, '$')})$`;
+/** 유니코드 속성(\\p{…})을 쓰는 원문은 u 플래그로 읽는다 — rules/aws.ts anchorSchemaPattern 과 같은 판단 */
+export const flagsOf = (raw) => (raw.includes('\\p{') ? 'u' : '');
 
 /** 원문 pattern 이 겹친 반복으로 지수 시간 백트래킹을 하면 같은 문자열 집합을 받는 선형 꼴로 바꿔 맞춘다.
  *  원문은 schemaPattern 에 그대로 남기고(전사 대조), 맞춤에는 matchPattern 을 쓴다.
@@ -165,8 +168,7 @@ export const LINEAR_EQUIVALENT = {
   '^([^:*\\/]+\\/?)*[^:*\\/]+$': '^[^:*\\/]+(?:\\/[^:*\\/]+)*$',
 };
 /** 「이 글자만 빼고 전부」(`[^…]`) 꼴은 제어 문자 · 폭 없는 문자 · 양방향 제어까지 받는다. 원문은 이 글자들을 따로 말하지 않는다 —
- *  화면에서 다르게 보이는 이름을 유효로 내지 않도록 앞보기로 뺀다(좁히는 쪽 · D20 · Azure 금지형 규칙 · display.ts INVISIBLE 과 같은 집합) */
-export const NO_INVISIBLE = '(?![\\s\\S]*[\\x00-\\x1F\\x7F-\\x9F\\u061C\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF])';
+ *  화면에서 다르게 보이는 이름을 유효로 내지 않도록 앞보기로 뺀다(좁히는 쪽 · D20). 앞보기 NO_INVISIBLE 의 정의는 src/core/invisible.mjs 하나다(u 플래그) */
 export const matchPatternOf = (raw) => {
   const linear = LINEAR_EQUIVALENT[raw] ?? raw;
   return /\[\^/.test(linear) ? `${NO_INVISIBLE}(?:${linear.replace(/\\Z$/, '$')})` : linear;
@@ -174,7 +176,7 @@ export const matchPatternOf = (raw) => {
 
 /** 맞춤 정규식이 지수 백트래킹을 하는가 — 받는 글자를 25자 늘어놓고 받지 않는 글자로 끝낸 입력에 걸리는 시간을 잰다 */
 export function backtracks(raw) {
-  const re = new RegExp(anchorPattern(raw));
+  const re = new RegExp(anchorPattern(raw), flagsOf(raw));
   for (const unit of ['a', 'a/', 'a-', 'a.', 'a_', 'a ', '1', 'a--', 'a__']) {
     const body = unit.repeat(25).slice(0, 25);
     for (const end of [':', '*', '!', '/', '-', '_', ' ', '\u0000', 'A', '.']) {
@@ -201,7 +203,7 @@ export function physicalHold(prop) {
 
 /** 생성 쪽 설정 — pattern 에 이름을 대어 본다 (생성용 문자 집합은 허용 집합의 부분집합이어야 한다) */
 export function generationOf(raw) {
-  const re = new RegExp(anchorPattern(raw));
+  const re = new RegExp(anchorPattern(raw), flagsOf(raw));
   const hyphen = re.test('ab-cd');
   const lowerOnly = !re.test('abCde');
   const underscore = re.test('ab_cd');

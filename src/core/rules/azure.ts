@@ -1,6 +1,7 @@
 // Azure 규칙 표 — constraints.ts 가 gcp · aws 와 합쳐 RULES 로 낸다 (파일을 나눠도 이름 · 판정 불변)
 import type { Forbidden, ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
+import { NO_INVISIBLE } from '../invisible.mjs';
 import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './azure-intake';
 import { AZURE_MANUAL_ROWS, type AzureManualRule } from './azure-manual';
 
@@ -37,7 +38,8 @@ const AZURE_HAND_RULES: Record<string, ResourceRule> = {
     displayName: 'Resource Group', slug: 'rg', minLength: 1, maxLength: 90,
     // 끝 점 불가를 pattern 이 표현한다 · 숫자는 DecimalDigitNumber(Nd)만 — 문서가 UnicodeCategory 로 한정한다
     // 보조 평면(U+10000 이상)은 앞보기로 거부한다 — .NET Char.IsLetterOrDigit(char) 는 서로게이트 쌍을 글자로 보지 않는다 (보수적 · D20)
-    pattern: /^(?!.*[\u{10000}-\u{10FFFF}])[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
+    // \p{L} 은 한글 채움(U+3164 · U+115F · U+1160 · U+FFA0 — Lo)을 받는다 — 보이지 않는 글자는 앞보기로 뺀다(invisible.mjs)
+    pattern: new RegExp(String.raw`${NO_INVISIBLE}^(?!.*[\u{10000}-\u{10FFFF}])[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$`, 'u'), allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
     scope: 'azure:subscription', entity: 'Microsoft.Resources/resourceGroups', category: 'management', uniqueness: 'csp',
