@@ -7,12 +7,14 @@ import { lookup } from './dict';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
+/** Compute 디스커버리 문서 — insert.path 가 범위(global · regions/{region} · zones/{zone})를 준다 */
+const GCP_COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
 const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
 
 /** RFC 1035 라벨 — GCP compute_instance · vpc_network · subnet */
 const RFC1035 = /^[a-z]([-a-z0-9]{0,61}[a-z0-9])?$/;
 /** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
-const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
+export const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
 const AWS_NAME_TAG_NOTE: CoreMessage = { code: 'note.aws_tag_utf16_length' };
 const AZURE_VM_NOTE: CoreMessage = { code: 'note.azure_vm_hostname_rule' };
 /** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다 (codex P1).
@@ -48,7 +50,8 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     forbidden: { contains: ['google', 'ssl'] },
     template: ['owner', 'system', 'purpose', 'env'], optional: ['owner'],
-    scope: 'global', docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
+    scope: 'gcp:namespace', entity: 'cloudresourcemanager.projects', category: 'management', uniqueness: 'csp',
+    docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
     // undefined · null 은 문서가 "Avoid"(권고)라 적었다 — 금지가 아니므로 넣지 않는다
   },
   'gcp.service_account': {
@@ -57,7 +60,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['owner', 'system', 'purpose', 'env', 'region', 'slug', 'role'], optional: ['region', 'owner'],
-    scope: 'project', docUrl: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create',
+    scope: 'gcp:project', entity: 'iam.serviceAccounts', category: 'identity', uniqueness: 'csp',
+    docUrl: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create',
   },
   'gcp.compute_instance': {
     id: 'gcp.compute_instance', provider: 'gcp', resourceType: 'compute_instance',
@@ -65,7 +69,10 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'zone', docUrl: 'https://docs.cloud.google.com/compute/docs/naming-resources',
+    // 디스커버리 insert.path 는 zones/{zone}/instances 지만 naming-resources 가 「vmDnsSetting 이 ZonalOnly 가 아니면 프로젝트 안 유일」이라 해 프로젝트 범위에 둔다
+    scope: 'gcp:project', entity: 'compute.instances', category: 'compute', uniqueness: 'csp',
+    docUrl: 'https://docs.cloud.google.com/compute/docs/naming-resources',
+    notes: [{ code: 'note.gcp_vm_project_unique' }],
   },
   'gcp.vpc_network': {
     id: 'gcp.vpc_network', provider: 'gcp', resourceType: 'vpc_network',
@@ -73,7 +80,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'slug', 'seq'], optional: [],
-    scope: 'project', docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/networks#Network.FIELDS.name',
+    scope: 'gcp:project_global', entity: 'compute.networks', category: 'networking', uniqueness: 'csp', uniquenessDocUrl: GCP_COMPUTE_DISCOVERY,
+    docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/networks#Network.FIELDS.name',
   },
   'gcp.subnet': {
     id: 'gcp.subnet', provider: 'gcp', resourceType: 'subnet',
@@ -81,7 +89,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: RFC1035, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'region', docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/subnetworks#Subnetwork.FIELDS.name',
+    scope: 'gcp:project_region', entity: 'compute.subnetworks', category: 'networking', uniqueness: 'csp', uniquenessDocUrl: GCP_COMPUTE_DISCOVERY,
+    docUrl: 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/subnetworks#Subnetwork.FIELDS.name',
   },
   'gcp.cloud_sql_instance': {
     id: 'gcp.cloud_sql_instance', provider: 'gcp', resourceType: 'cloud_sql_instance',
@@ -89,7 +98,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z]([a-z0-9-]*[a-z0-9])?$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'project', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/instance-settings',
+    scope: 'gcp:project', entity: 'sqladmin.instances', category: 'database', uniqueness: 'csp',
+    docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/instance-settings',
     notes: [{ code: 'note.cloud_sql_combined_limit' }],
   },
   'gcp.storage_bucket': {
@@ -99,7 +109,8 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: false, endsWithAlnum: true,
     forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle', '..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
-    scope: 'global', docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
+    scope: 'gcp:namespace', entity: 'storage.buckets', category: 'storage', uniqueness: 'csp',
+    docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
     notes: [{ code: 'note.gcs_dotted_names_222' }],
   },
 
@@ -111,7 +122,8 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: false, endsWithAlnum: true,
     forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
-    scope: 'global', docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
+    scope: 'aws:partition', entity: 's3.bucket', category: 'storage', uniqueness: 'csp',
+    docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
     notes: [{ code: 'note.s3_an_suffix' }],
   },
   'aws.iam_role': {
@@ -120,7 +132,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[\w+=,.@-]{1,64}$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'slug', 'role'], optional: [],
-    scope: 'account', docUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html',
+    scope: 'aws:account', entity: 'iam.role', category: 'identity', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html',
+    docUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html',
   },
   'aws.vpc': {
     id: 'aws.vpc', provider: 'aws', resourceType: 'vpc',
@@ -128,7 +141,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'region', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+    scope: 'aws:region', entity: 'ec2.vpc.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.subnet': {
     id: 'aws.subnet', provider: 'aws', resourceType: 'subnet',
@@ -136,7 +150,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'zone', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+    scope: 'aws:vpc', entity: 'ec2.subnet.NameTag', category: 'networking', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.ec2_instance': {
     id: 'aws.ec2_instance', provider: 'aws', resourceType: 'ec2_instance',
@@ -144,7 +159,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: AWS_NAME_TAG, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'zone', docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
+    scope: 'aws:vpc', entity: 'ec2.instance.NameTag', category: 'compute', uniqueness: 'none',
+    docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
   'aws.rds_instance': {
     id: 'aws.rds_instance', provider: 'aws', resourceType: 'rds_instance',
@@ -154,7 +170,8 @@ export const RULES: Record<string, ResourceRule> = {
     allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: true, endsWithAlnum: true,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'region', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html',
+    scope: 'aws:region', entity: 'rds.dbInstance', category: 'database', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html',
+    docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html',
   },
 
   // ─── Azure ─────────────────────────────────────────────
@@ -166,7 +183,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^(?!.*[\u{10000}-\u{10FFFF}])[\p{L}\p{Nd}_().-]*[\p{L}\p{Nd}_()-]$/u, allowed: 'alnum-hyphen-underscore-period-paren', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'subscription', docUrl: `${AZURE_RULES}#microsoftresources`,
+    scope: 'azure:subscription', entity: 'Microsoft.Resources/resourceGroups', category: 'management', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftresources`,
   },
   'azure.storage_account': {
     id: 'azure.storage_account', provider: 'azure', resourceType: 'storage_account',
@@ -174,7 +192,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z0-9]{3,24}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftstorage`, notes: [AZURE_RESERVED_NOTE],
+    scope: 'azure:global', entity: 'Microsoft.Storage/storageAccounts', category: 'storage', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftstorage`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.key_vault': {
     id: 'azure.key_vault', provider: 'azure', resourceType: 'key_vault',
@@ -183,7 +202,8 @@ export const RULES: Record<string, ResourceRule> = {
     allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'system', 'purpose', 'env'], optional: [],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftkeyvault`, notes: [AZURE_RESERVED_NOTE],
+    scope: 'azure:global', entity: 'Microsoft.KeyVault/vaults', category: 'security', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftkeyvault`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.managed_identity': {
     id: 'azure.managed_identity', provider: 'azure', resourceType: 'managed_identity',
@@ -191,7 +211,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-zA-Z0-9][a-zA-Z0-9_-]{2,127}$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'slug', 'role'], optional: [],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftmanagedidentity`,
+    scope: 'azure:resource_group', entity: 'Microsoft.ManagedIdentity/userAssignedIdentities', category: 'identity', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftmanagedidentity`,
   },
   'azure.virtual_machine': {
     id: 'azure.virtual_machine', provider: 'azure', resourceType: 'virtual_machine',
@@ -200,7 +221,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[A-Za-z0-9]([A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
+    scope: 'azure:resource_group', entity: 'Microsoft.Compute/virtualMachines', category: 'compute', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.virtual_machine_windows': {
     id: 'azure.virtual_machine_windows', provider: 'azure', resourceType: 'virtual_machine_windows',
@@ -209,7 +231,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^(?![0-9]+$)[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$/, allowed: 'alnum-hyphen', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, WINDOWS_NO_ALL_DIGITS_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
+    scope: 'azure:resource_group', entity: 'Microsoft.Compute/virtualMachines', category: 'compute', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftcompute`, notes: [AZURE_VM_NOTE, WINDOWS_NO_ALL_DIGITS_NOTE, AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.virtual_network': {
     id: 'azure.virtual_network', provider: 'azure', resourceType: 'virtual_network',
@@ -217,7 +240,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-zA-Z0-9][\w.-]{0,62}[a-zA-Z0-9_]$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'resource_group', docUrl: `${AZURE_RULES}#microsoftnetwork`,
+    scope: 'azure:resource_group', entity: 'Microsoft.Network/virtualNetworks', category: 'networking', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftnetwork`,
   },
   'azure.subnet': {
     id: 'azure.subnet', provider: 'azure', resourceType: 'subnet',
@@ -225,7 +249,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-zA-Z0-9]([\w.-]{0,78}[a-zA-Z0-9_])?$/, allowed: 'alnum-hyphen-underscore', separator: '-', caseRule: 'any',
     startsWithLetter: false, endsWithAlnum: false,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'virtual_network', docUrl: `${AZURE_RULES}#microsoftnetwork`,
+    scope: 'azure:virtual_network', entity: 'Microsoft.Network/virtualNetworks/subnets', category: 'networking', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftnetwork`,
   },
   'azure.sql_server': {
     id: 'azure.sql_server', provider: 'azure', resourceType: 'sql_server',
@@ -233,7 +258,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['system', 'purpose', 'env', 'region', 'slug', 'seq'], optional: ['region'],
-    scope: 'global', docUrl: `${AZURE_RULES}#microsoftsql`, notes: [AZURE_RESERVED_NOTE],
+    scope: 'azure:global', entity: 'Microsoft.Sql/servers', category: 'database', uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#microsoftsql`, notes: [AZURE_RESERVED_NOTE],
   },
   'azure.aks_nodepool_linux': {
     id: 'azure.aks_nodepool_linux', provider: 'azure', resourceType: 'aks_nodepool_linux',
@@ -242,7 +268,8 @@ export const RULES: Record<string, ResourceRule> = {
     startsWithLetter: true, endsWithAlnum: true,
     forbidden: { ...AZURE_RESERVED, exact: ['aksmanagedap'] }, // FAQ: AKS 시스템 구성요소 예약 이름
     template: ['slug', 'purpose', 'env'], optional: [],
-    scope: 'managed_cluster', docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
+    scope: 'azure:managed_cluster', entity: 'Microsoft.ContainerService/managedClusters/agentPools', category: 'containers', uniqueness: 'csp', uniquenessDocUrl: `${AZURE_RULES}#microsoftcontainerservice`,
+    docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
   'azure.aks_nodepool_windows': {
     id: 'azure.aks_nodepool_windows', provider: 'azure', resourceType: 'aks_nodepool_windows',
@@ -250,7 +277,8 @@ export const RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z][a-z0-9]{0,5}$/, allowed: 'lower-digit', separator: '', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true, forbidden: AZURE_RESERVED,
     template: ['slug', 'purpose'], optional: [],
-    scope: 'managed_cluster', docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
+    scope: 'azure:managed_cluster', entity: 'Microsoft.ContainerService/managedClusters/agentPools', category: 'containers', uniqueness: 'csp', uniquenessDocUrl: `${AZURE_RULES}#microsoftcontainerservice`,
+    docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
 };
 

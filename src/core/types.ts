@@ -1,6 +1,7 @@
 // 엔진 공개 타입 — 이후 모듈(normalize · compose · truncate · validate · engine · labels)이 이 이름을 쓴다
 import type { CoreMessage } from './messages';
-export type { CoreMessage };
+import type { ScopeId } from './scopes';
+export type { CoreMessage, ScopeId };
 
 export type Provider = 'aws' | 'gcp' | 'azure';
 export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
@@ -34,6 +35,9 @@ export interface Forbidden {
   ipv4?: boolean;           // 192.168.0.1 꼴 금지 (S3 · GCS)
 }
 
+/** 트리의 표시 분류 (D37) */
+export type Category = 'compute' | 'networking' | 'storage' | 'database' | 'identity' | 'security' | 'management' | 'containers';
+
 export interface ResourceRule {
   id: string;                 // 'gcp.service_account'
   provider: Provider;
@@ -52,7 +56,11 @@ export interface ResourceRule {
   endsWithAlnum: boolean;
   template: Token[];          // 조립 순서 — 예: ['system','purpose','env','slug','role']
   optional: Token[];          // 축소 1단계에서 적힌 순서대로 떼는 토큰. template 에 있는 것만
-  scope: 'global' | 'account' | 'region' | 'project' | 'zone' | 'subscription' | 'resource_group' | 'virtual_network' | 'managed_cluster';
+  scope: ScopeId;             // 이름이 유일한 범위 — SCOPES(scopes.ts)의 키 (D37). Name 태그는 포함 관계로 놓인 자리 (D38)
+  entity: string;             // 고유성 부류 — CSP 의 유형 이름. Azure 는 표의 Entity(네임스페이스 포함) · GCP 는 디스커버리 리소스 이름 · AWS 는 API 종류 이름 (D31)
+  category: Category;         // 표시 분류 — 콘솔 메뉴를 따른 것이라 근거 URL 이 없다
+  uniqueness: 'csp' | 'none'; // none = CSP 가 고유성을 매기지 않는다(AWS Name 태그 · D38)
+  uniquenessDocUrl?: string;  // 범위 근거가 docUrl 과 다른 쪽에 있을 때 그 URL
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL } from './constraints';
+import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL, AWS_NAME_TAG } from './constraints';
 import { PROVIDERS } from './types';
 
 describe('RULES 표 무결성', () => {
@@ -103,9 +103,42 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
     }
   });
   it('Azure 서브넷 scope 는 virtual_network · AKS 노드풀 scope 는 managed_cluster', () => {
-    expect(RULES['azure.subnet'].scope).toBe('virtual_network');
-    expect(RULES['azure.aks_nodepool_linux'].scope).toBe('managed_cluster');
-    expect(RULES['azure.aks_nodepool_windows'].scope).toBe('managed_cluster');
+    expect(RULES['azure.subnet'].scope).toBe('azure:virtual_network');
+    expect(RULES['azure.aks_nodepool_linux'].scope).toBe('azure:managed_cluster');
+    expect(RULES['azure.aks_nodepool_windows'].scope).toBe('azure:managed_cluster');
+  });
+});
+
+describe('고유성 부류 · 분류 · 유일성 (D31 · D37 · D38)', () => {
+  it('entity 는 비어 있지 않고 Azure 는 Microsoft. 로 시작한다', () => {
+    for (const r of Object.values(RULES)) {
+      expect(r.entity.length, r.id).toBeGreaterThan(0);
+      if (r.provider === 'azure') expect(r.entity, r.id).toMatch(/^Microsoft\./);
+    }
+  });
+  it('Linux · Windows VM 은 같은 부류 · AKS 노드풀 둘도 같은 부류다', () => {
+    expect(RULES['azure.virtual_machine'].entity).toBe('Microsoft.Compute/virtualMachines');
+    expect(RULES['azure.virtual_machine_windows'].entity).toBe(RULES['azure.virtual_machine'].entity);
+    expect(RULES['azure.aks_nodepool_linux'].entity).toBe('Microsoft.ContainerService/managedClusters/agentPools');
+    expect(RULES['azure.aks_nodepool_windows'].entity).toBe(RULES['azure.aks_nodepool_linux'].entity);
+  });
+  it("uniqueness 'none' 인 규칙은 전부 AWS Name 태그다 — 그 역도 같다", () => {
+    for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG);
+    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ec2_instance', 'aws.subnet', 'aws.vpc']);
+  });
+  it('uniquenessDocUrl 이 있으면 https 이고 docUrl 과 다르다', () => {
+    for (const r of Object.values(RULES)) {
+      if (r.uniquenessDocUrl === undefined) continue;
+      expect(r.uniquenessDocUrl, r.id).toMatch(/^https:\/\//);
+      expect(r.uniquenessDocUrl, r.id).not.toBe(r.docUrl);
+    }
+  });
+  it('resourceType 은 40자 이하 — 공유 hash 상한(D42)이 이 수에 기댄다', () => {
+    for (const r of Object.values(RULES)) expect(r.resourceType.length, r.id).toBeLessThanOrEqual(40);
+  });
+  it('GCP VM 은 프로젝트 범위 — ZonalOnly 가 아니면 프로젝트 안 유일이라는 note 가 실린다', () => {
+    expect(RULES['gcp.compute_instance'].scope).toBe('gcp:project');
+    expect(RULES['gcp.compute_instance'].notes).toContainEqual({ code: 'note.gcp_vm_project_unique' });
   });
 });
 

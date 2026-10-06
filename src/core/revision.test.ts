@@ -96,6 +96,9 @@ describe('규칙 버전 · 지문 (D26)', () => {
     const base = currentParts();
     const rules = base.rules.map((r, i) => (i === 0 ? { ...r, maxLength: r.maxLength + 1 } : r));
     expect(fingerprintOf({ ...base, rules })).not.toBe(fingerprint);
+    // 범위 한 글자 — scope 는 규칙 데이터라 지문에 들어간다 (D37)
+    const scoped = base.rules.map((r, i) => (i === 0 ? { ...r, scope: `${r.scope}x` } : r));
+    expect(fingerprintOf({ ...base, rules: scoped })).not.toBe(fingerprint);
     const outputs = { ...base.outputs, validate: base.outputs.validate.map((v, i) => (i === 0 ? { ...v, valid: !v.valid } : v)) };
     expect(fingerprintOf({ ...base, outputs })).not.toBe(fingerprint);
     expect(fingerprintOf({ ...base, envAliases: { ...base.envAliases, qa: 'stg' } })).not.toBe(fingerprint);

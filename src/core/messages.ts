@@ -17,9 +17,10 @@ export const MESSAGE_CODES = [
   'step.token_dropped', 'step.abbreviated', 'step.budget_shortened',
   // labels.ts (3)
   'label.normalized', 'label.too_long', 'label.aws_invalid_chars',
-  // constraints.ts notes (8)
+  // constraints.ts notes (9)
   'note.aws_tag_utf16_length', 'note.azure_vm_hostname_rule', 'note.azure_reserved', 'note.azure_reserved_ambiguous',
   'note.windows_no_all_digits', 'note.cloud_sql_combined_limit', 'note.gcs_dotted_names_222', 'note.s3_an_suffix',
+  'note.gcp_vm_project_unique',
 ] as const;
 
 export type CoreMessage =
@@ -58,7 +59,8 @@ export type CoreMessage =
   | { code: 'note.windows_no_all_digits'; params: { doc_url: string } }
   | { code: 'note.cloud_sql_combined_limit' }
   | { code: 'note.gcs_dotted_names_222' }
-  | { code: 'note.s3_an_suffix' };
+  | { code: 'note.s3_an_suffix' }
+  | { code: 'note.gcp_vm_project_unique' };
 
 export type CoreCode = CoreMessage['code'];
 

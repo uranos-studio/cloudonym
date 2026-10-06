@@ -46,6 +46,7 @@ export const en: Catalog = {
     'note.cloud_sql_combined_limit': () => 'The provider limits project-id:instance-id to 98 characters; the instance ID alone is capped at 67 (98 minus the longest project ID, 30, minus 1). The alphanumeric-end requirement is a conservative limit with no documented source (D20)',
     'note.gcs_dotted_names_222': () => 'Dotted names may be up to 222 characters, but the engine never generates dots and keeps 63 (conservative, D20)',
     'note.s3_an_suffix': () => 'The -an suffix is reserved for account-regional namespace buckets',
+    'note.gcp_vm_project_unique': () => 'VM names must be unique across the project unless its vmDnsSetting is ZonalOnly, so this rule is placed at project scope although the API path is zones/{zone}/instances',
     // API
     'request.body_not_json': () => 'Request body is not JSON',
     'request.body_not_object': () => 'Request body must be a JSON object',
