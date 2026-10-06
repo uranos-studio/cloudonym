@@ -20,8 +20,10 @@ const DYNAMODB_NAME = /^[a-zA-Z0-9_.-]{3,255}$/;
 const ECS_NAME = /^[A-Za-z0-9_-]{1,255}$/;
 const IAM_128 = /^[\w+=,.@-]{1,128}$/;
 const LOGS_NAME = /^[^:*]{1,512}$/;
-/** RDS 프록시 · 통합 식별자 — API 참조 "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" 를 이름 전체에 건다(길이는 maxLength) */
-const RDS_IDENT = /^[A-Za-z](?:-?[A-Za-z0-9]+)*$/;
+/** RDS 프록시 · 통합 식별자 — API 참조 "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" 를 이름 전체에 건다(길이는 maxLength).
+ *  원문 꼴은 `-?` 가 빠지면 영숫자 토막을 여러 방법으로 쪼갤 수 있어 「aaa…!」 에서 갈래가 2^n 이다(26자에 수십 ms · 63자는 끝나지 않는다).
+ *  같은 집합의 선형 꼴 — 글자로 시작 · 하이픈은 하나씩 영숫자 사이에만 — 로 맞춘다(길이 1~7 조합 전부로 같음을 확인 · redos.test.ts) */
+const RDS_IDENT = /^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*$/;
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
   & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl'>>;
