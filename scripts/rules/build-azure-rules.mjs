@@ -3,6 +3,9 @@
 // 사용: node scripts/rules/build-azure-rules.mjs <intake.json> <resource-abbreviations.html>
 //   <intake.json>  = intake-azure.mjs 의 출력(고정 커밋 원문으로 만든 것)
 //   <…html>        = Microsoft CAF 약어 쪽(접두 약어 출처)
+//   --existing <json> = 손으로 쓴 Azure 규칙 [{ "entity": "Microsoft.Network/virtualNetworks", "resourceType": "virtual_network" }, …]
+//                       — rules/azure.ts 의 AZURE_HAND_RULES 에서 entity · resourceType 을 뽑는다. 같은 Entity 는 건너뛰고 이름은 겹치지 않게 한다
+//   --commit <sha>      = 원문 커밋(docs/rule-sources.lock.json 의 azure.commit)
 // 쓰는 파일:
 //   src/core/rules/azure-intake.ts                    — 문자 규칙 표(원문 → 정규식) · 범위 · 규칙 행
 //   src/core/__fixtures__/azure-intake.json           — 원문 행 스냅샷(전사 검사의 정답)
