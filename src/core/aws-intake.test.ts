@@ -59,7 +59,13 @@ describe('들인 AWS 행 — 원문 스냅샷과 대조', () => {
       expect(row.property).toBe(src.property);
       expect(row.schemaPattern).toBe(src.pattern);
       expect([rule.minLength, rule.maxLength]).toEqual([src.minLength ?? 1, src.maxLength]);
-      expect(rule.pattern.source).toBe(anchorSchemaPattern(src.pattern!).source);
+      // matchPattern — 원문이 지수 백트래킹을 하거나 「[^…]」 꼴이라 보이지 않는 문자를 받을 때만 생성기가 싣는다(좁히는 쪽).
+      // 같은 집합 · 좁힘은 build-aws-rules.test.mjs 와 intake-hand.test.ts 가 본다
+      if (row.matchPattern === undefined) expect(rule.pattern.source).toBe(anchorSchemaPattern(src.pattern!).source);
+      else {
+        expect(src.pattern, id).toMatch(/\[\^/);
+        expect(rule.pattern.source).toBe(anchorSchemaPattern(row.matchPattern).source);
+      }
       expect(rule.uniqueness).toBe('csp');
       expect(rule.scope).toBe(typeName.startsWith('AWS::IAM::') || typeName === 'AWS::S3::MultiRegionAccessPoint' ? 'aws:account' : 'aws:region');
       const [, ns, type] = typeName.split('::').map((x) => x.toLowerCase());

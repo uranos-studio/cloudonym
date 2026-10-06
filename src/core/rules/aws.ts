@@ -152,7 +152,7 @@ function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
     };
   }
   return {
-    ...base, minLength: r.min, maxLength: r.max, pattern: anchorSchemaPattern(r.schemaPattern),
+    ...base, minLength: r.min, maxLength: r.max, pattern: anchorSchemaPattern(r.matchPattern ?? r.schemaPattern),
     ...(r.noConsecutiveSeparator ? { noConsecutiveSeparator: true } : {}),
     allowed: r.allowed, separator: r.separator, caseRule: r.caseRule, startsWithLetter: r.startsWithLetter, endsWithAlnum: r.endsWithAlnum,
     uniqueness: 'csp', docUrl: r.docUrl, notes: [AWS_SCHEMA_NOTE],

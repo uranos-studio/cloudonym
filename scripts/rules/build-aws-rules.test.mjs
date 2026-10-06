@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { physicalHold, generationOf, anchorPattern, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES, EXISTING, MANUAL, HAND_REVIEWED } from './build-aws-rules.mjs';
+import { physicalHold, generationOf, anchorPattern, matchPatternOf, backtracks, LINEAR_EQUIVALENT, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES, EXISTING, MANUAL, HAND_REVIEWED } from './build-aws-rules.mjs';
 
 const targets = JSON.parse(readFileSync(new URL('./aws-intake-targets.json', import.meta.url), 'utf-8'));
 
@@ -28,6 +28,30 @@ test('pattern 은 이름 전체로 읽는다 · \\Z 는 끝', () => {
   assert.equal(re.test('my provider!'), false);
   assert.equal(new RegExp('[\\w._-]+').test('my provider!'), true); // 부분 일치면 통과해 버린다
   assert.equal(new RegExp(anchorPattern('^[a-z]{1,5}\\Z')).test('abc'), true);
+});
+
+test('맞춤 pattern — 지수 백트래킹 원문은 같은 집합의 선형 꼴로 · 백트래킹 검사기가 원문을 잡는다', () => {
+  const raw = '^([^:*\\/]+\\/?)*[^:*\\/]+$';
+  assert.ok(raw in LINEAR_EQUIVALENT);
+  assert.match(backtracks(raw) ?? '', /ms$/); // 검사기를 먼저 시험한다 — 원문은 25자에 수십 ms 를 넘는다
+  assert.equal(backtracks(matchPatternOf(raw)), null);
+  const slow = new RegExp(anchorPattern(raw));
+  const fast = new RegExp(anchorPattern(matchPatternOf(raw)));
+  // 같은 문자열 집합 — 길이 1~6 의 'a' '/' ':' 조합 전부를 대어 본다
+  const alpha = ['a', '/', ':', ' '];
+  let words = [''];
+  for (let n = 1; n <= 6; n++) {
+    words = words.flatMap((w) => alpha.map((c) => w + c));
+    for (const w of words) assert.equal(fast.test(w), slow.test(w), JSON.stringify(w));
+  }
+});
+
+test('맞춤 pattern — 「[^…]」 꼴은 제어 · 폭 없는 · 방향 제어 문자를 받지 않는다 · 다른 꼴은 원문 그대로', () => {
+  const re = new RegExp(anchorPattern(matchPatternOf('^[^:*]{1,512}')));
+  assert.equal(re.test('my filter/1'), true);
+  for (const ch of ['\u0001', '\u007f', '\u0085', '\u200B', '\u202E', '\u2028', '\uFEFF']) assert.equal(re.test(`a${ch}b`), false, JSON.stringify(ch));
+  assert.equal(re.test('a:b'), false);
+  assert.equal(matchPatternOf('[\\w._-]+'), '[\\w._-]+');
 });
 
 test('생성 설정 — pattern 에 이름을 대어 본다', () => {

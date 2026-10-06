@@ -157,6 +157,35 @@ export const GENERAL_TAG_CASES = { valid: ['team-a_1 prod', 'a'], invalid: ['tea
 /** 스키마 pattern → 이름 전체에 맞는 정규식 원문 (rules/aws.ts 와 같은 규칙) */
 export const anchorPattern = (raw) => `^(?:${raw.replace(/\\Z$/, '$')})$`;
 
+/** 원문 pattern 이 겹친 반복으로 지수 시간 백트래킹을 하면 같은 문자열 집합을 받는 선형 꼴로 바꿔 맞춘다.
+ *  원문은 schemaPattern 에 그대로 남기고(전사 대조), 맞춤에는 matchPattern 을 쓴다.
+ *  원문(아래 표의 왼쪽)은 「`/` 로 나뉜 비지 않은 토막들 — 처음 · 끝이 `/` 가 아니고 `//` 가 없다」이고, 토막 하나를
+ *  여러 방법으로 쪼갤 수 있어 `aaaa…:` 에서 갈래가 2^n 이다(25자에 수백 ms · 255자는 끝나지 않는다). 아래 꼴은 `/` 가 토막을 가르므로 갈래가 하나다 */
+export const LINEAR_EQUIVALENT = {
+  '^([^:*\\/]+\\/?)*[^:*\\/]+$': '^[^:*\\/]+(?:\\/[^:*\\/]+)*$',
+};
+/** 「이 글자만 빼고 전부」(`[^…]`) 꼴은 제어 문자 · 폭 없는 문자 · 양방향 제어까지 받는다. 원문은 이 글자들을 따로 말하지 않는다 —
+ *  화면에서 다르게 보이는 이름을 유효로 내지 않도록 앞보기로 뺀다(좁히는 쪽 · D20 · Azure 금지형 규칙 · display.ts INVISIBLE 과 같은 집합) */
+export const NO_INVISIBLE = '(?![\\s\\S]*[\\x00-\\x1F\\x7F-\\x9F\\u061C\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF])';
+export const matchPatternOf = (raw) => {
+  const linear = LINEAR_EQUIVALENT[raw] ?? raw;
+  return /\[\^/.test(linear) ? `${NO_INVISIBLE}(?:${linear.replace(/\\Z$/, '$')})` : linear;
+};
+
+/** 맞춤 정규식이 지수 백트래킹을 하는가 — 받는 글자를 25자 늘어놓고 받지 않는 글자로 끝낸 입력에 걸리는 시간을 잰다 */
+export function backtracks(raw) {
+  const re = new RegExp(anchorPattern(raw));
+  for (const unit of ['a', 'a/', 'a-', 'a.', 'a_', 'a ', '1', 'a--', 'a__']) {
+    const body = unit.repeat(25).slice(0, 25);
+    for (const end of [':', '*', '!', '/', '-', '_', ' ', '\u0000', 'A', '.']) {
+      const t = performance.now();
+      re.test(body + end);
+      if (performance.now() - t > 50) return `${JSON.stringify(body + end)} 에 ${Math.round(performance.now() - t)}ms`;
+    }
+  }
+  return null;
+}
+
 /** a 행: 정형이면 null, 아니면 보류 사유 */
 export function physicalHold(prop) {
   if (!prop) return 'name property not found in the schema';
@@ -254,6 +283,8 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       if (why) { held.push({ src, reason: why }); continue; }
       const docUrl = anchors[typeName];
       if (!docUrl) { held.push({ src, reason: 'anchorMissing: property anchor not found on the CloudFormation reference page' }); continue; }
+      const slow = backtracks(matchPatternOf(prop.pattern));
+      if (slow) throw new Error(`pattern 이 지수 백트래킹을 한다: ${typeName} ${prop.pattern} — ${slow}. LINEAR_EQUIVALENT 에 같은 집합의 선형 꼴을 적는다`);
       const cases = PHYSICAL_CASES[typeName];
       if (!cases) throw new Error(`손 예가 없다: ${typeName} — PHYSICAL_CASES 에 pattern 을 읽고 적는다`);
       const resourceType = resourceTypeOf(ns, type, used);
@@ -262,7 +293,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       rules.push({
         id: `aws.${resourceType}`, kind: 'a', typeName, property: t.property, displayName: `${ns} ${typeWords(type).join(' ')}`,
         entity: typeName, scope: scopeOf('a', typeName, schema), category: t.category, slug: slugOf(type),
-        min: prop.minLength ?? 1, max: prop.maxLength, schemaPattern: prop.pattern, gen: generationOf(prop.pattern), docUrl, cases,
+        min: prop.minLength ?? 1, max: prop.maxLength, schemaPattern: prop.pattern, matchPattern: matchPatternOf(prop.pattern), gen: generationOf(matchPatternOf(prop.pattern)), docUrl, cases,
       });
     } else {
       const resourceType = resourceTypeOf(ns, type, used);
@@ -288,14 +319,14 @@ export function renderTs(result) {
   out.push('// b 행은 Name 태그(EC2 는 aws.vpc 와 같은 규칙 · 다른 서비스는 일반 태그 값 문자). rules/aws.ts 가 규칙으로 편다.');
   out.push("import type { ResourceRule } from '../types';");
   out.push('');
-  out.push("interface PhysicalRow { kind: 'a'; id: string; displayName: string; entity: string; property: string; scope: ResourceRule['scope']; category: ResourceRule['category']; slug: string; min: number; max: number; schemaPattern: string; allowed: ResourceRule['allowed']; separator: '' | '-'; caseRule: 'lower' | 'any'; startsWithLetter: boolean; endsWithAlnum: boolean; noConsecutiveSeparator: boolean; docUrl: string }");
+  out.push("interface PhysicalRow { kind: 'a'; id: string; displayName: string; entity: string; property: string; scope: ResourceRule['scope']; category: ResourceRule['category']; slug: string; min: number; max: number; schemaPattern: string; matchPattern?: string; allowed: ResourceRule['allowed']; separator: '' | '-'; caseRule: 'lower' | 'any'; startsWithLetter: boolean; endsWithAlnum: boolean; noConsecutiveSeparator: boolean; docUrl: string }");
   out.push("interface TagRow { kind: 'b'; id: string; displayName: string; entity: string; scope: ResourceRule['scope']; category: ResourceRule['category']; slug: string; tag: 'ec2' | 'general' }");
   out.push('');
   out.push('export const AWS_INTAKE_ROWS: (PhysicalRow | TagRow)[] = [');
   for (const r of result.rules) {
     if (r.kind === 'a') {
       const g = r.gen;
-      out.push(`  { kind: 'a', id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, property: ${sq(r.property)}, scope: ${idLit(r.scope)}, category: ${sq(r.category)}, slug: ${sq(r.slug)}, min: ${intLit(r.min)}, max: ${intLit(r.max)}, schemaPattern: ${dq(r.schemaPattern)}, allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}, noConsecutiveSeparator: ${boolLit(g.noConsecutiveSeparator)}, docUrl: ${sq(r.docUrl)} },`);
+      out.push(`  { kind: 'a', id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, property: ${sq(r.property)}, scope: ${idLit(r.scope)}, category: ${sq(r.category)}, slug: ${sq(r.slug)}, min: ${intLit(r.min)}, max: ${intLit(r.max)}, schemaPattern: ${dq(r.schemaPattern)}, ${r.matchPattern !== undefined && r.matchPattern !== r.schemaPattern ? `matchPattern: ${dq(r.matchPattern)}, ` : ''}allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}, noConsecutiveSeparator: ${boolLit(g.noConsecutiveSeparator)}, docUrl: ${sq(r.docUrl)} },`);
     } else {
       out.push(`  { kind: 'b', id: ${idLit(r.id)}, displayName: ${dq(r.displayName)}, entity: ${sq(r.entity)}, scope: ${idLit(r.scope)}, category: ${sq(r.category)}, slug: ${sq(r.slug)}, tag: ${sq(r.tag)} },`);
     }
