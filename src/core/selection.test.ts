@@ -70,7 +70,7 @@ describe('validateSelection (D40)', () => {
     if (r.ok) return;
     expect(r.errors[0]).toEqual({ code: 'selection.item_not_object', params: { index: 0 } });
     expect(r.errors[1]).toMatchObject({ code: 'selection.unknown_type', params: { index: 1, value: 'no_such' } });
-    expect(r.errors[1]!.code === 'selection.unknown_type' && r.errors[1]!.params.supported).toEqual(rulesFor('aws').map((x) => x.resourceType));
+    expect(r.errors[1]).toEqual({ code: 'selection.unknown_type', params: { index: 1, value: 'no_such' } });
     expect(r.errors[2]).toMatchObject({ code: 'selection.unknown_type', params: { index: 2, value: '3' } });
     expect(r.errors[3]).toMatchObject({ code: 'selection.unknown_type', params: { index: 3, value: 'undefined' } });
     // 다른 provider 의 type 은 모른다

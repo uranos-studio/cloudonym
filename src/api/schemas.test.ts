@@ -136,7 +136,7 @@ describe('parseNamesBody (D39)', () => {
     expect(parseNamesBody({ ...ok, resources: 'vm' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.not_array' }] } });
     const types = rulesFor('azure').map((r) => r.resourceType);
     expect(parseNamesBody({ ...ok, resources: [{ type: 'nope' }] }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.unknown_type', params: { index: 0, value: 'nope', supported: types } }], supported: types } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.unknown_type', params: { index: 0, value: 'nope' } }], supported: types } });
     expect(parseNamesBody({ ...ok, resources: [{ type: 'storage_account', count: 2 }] }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.count_not_supported', params: { index: 0, type: 'storage_account' } }] } });
   });

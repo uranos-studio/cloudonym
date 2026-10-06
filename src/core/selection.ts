@@ -39,7 +39,7 @@ export function validateSelection(provider: Provider, raw: unknown, table: reado
     if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) { errors.push({ code: 'selection.item_not_object', params: { index } }); return; }
     const { type, count, role } = entry as { type?: unknown; count?: unknown; role?: unknown };
     const rule = typeof type === 'string' ? rules.find((r) => r.resourceType === type) : undefined;
-    if (!rule) { errors.push({ code: 'selection.unknown_type', params: { index, value: shown(type), supported: rules.map((r) => r.resourceType) } }); return; }
+    if (!rule) { errors.push({ code: 'selection.unknown_type', params: { index, value: shown(type) } }); return; }
     if (seen.has(rule.resourceType)) { errors.push({ code: 'selection.duplicate_type', params: { index, value: rule.resourceType } }); return; }
     seen.add(rule.resourceType);
 

@@ -87,8 +87,8 @@ export type CoreMessage =
   | { code: 'selection.empty' }
   | { code: 'selection.too_many_items'; params: { max: number } }
   | { code: 'selection.item_not_object'; params: { index: number } }
-  /** value 는 표시용 문자열(비문자열은 String()) */
-  | { code: 'selection.unknown_type'; params: { index: number; value: string; supported: string[] } }
+  /** value 는 표시용 문자열(비문자열은 String()). 지원 목록은 항목마다 싣지 않는다 — API 응답 수준 supported 에 한 번 (오류 200개가 목록 200벌이 되지 않게) */
+  | { code: 'selection.unknown_type'; params: { index: number; value: string } }
   | { code: 'selection.duplicate_type'; params: { index: number; value: string } }
   | { code: 'selection.count_out_of_range'; params: { index: number; min: number; max: number } }
   | { code: 'selection.count_not_supported'; params: { index: number; type: string } }

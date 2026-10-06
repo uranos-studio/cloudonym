@@ -63,7 +63,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'selection.empty': { code: 'selection.empty' },
   'selection.too_many_items': { code: 'selection.too_many_items', params: { max: 200 } },
   'selection.item_not_object': { code: 'selection.item_not_object', params: { index: 3 } },
-  'selection.unknown_type': { code: 'selection.unknown_type', params: { index: 3, value: 'BBB', supported: ['CCC', 'DDD'] } },
+  'selection.unknown_type': { code: 'selection.unknown_type', params: { index: 3, value: 'BBB' } },
   'selection.duplicate_type': { code: 'selection.duplicate_type', params: { index: 3, value: 'BBB' } },
   'selection.count_out_of_range': { code: 'selection.count_out_of_range', params: { index: 3, min: 1, max: 99 } },
   'selection.count_not_supported': { code: 'selection.count_not_supported', params: { index: 3, type: 'BBB' } },
