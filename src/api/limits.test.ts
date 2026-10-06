@@ -55,10 +55,16 @@ describe('필드 1024자 상한 (I-1) — 본문 상한과 별개로 400', () =>
     expect(body.valid).toBe(false);
     expect(body.violations).toContainEqual({ code: 'name.too_long', params: { actual: 257, max: 256 }, message: 'Name is 257 characters long; the maximum is 256' });
   });
-  it('generate context owner 1025자 → 400 owner: 1024자를 넘는다', async () => {
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(1025) } }));
+  it('generate context owner 65자 → 400 owner: 64자를 넘는다 · 딱 64자는 200', async () => {
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(65) } }));
     expect(res.status).toBe(400);
-    expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'owner', params: { max: 1024 }, message: "'owner' is longer than 1024 characters" }] });
+    expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'owner', params: { max: 64 }, message: "'owner' is longer than 64 characters" }] });
+    expect((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(64) } }))).res.status).toBe(200);
+  });
+  it('generate context system · purpose 65자 · env 1025자 → 오류 셋, 문맥 필드 순서', async () => {
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...ctx, system: 's'.repeat(65), purpose: 'p'.repeat(65), env: 'e'.repeat(1025) } }));
+    expect(res.status).toBe(400);
+    expect((await json(res)).errors.map((e: { field: string; params: { max: number } }) => [e.field, e.params.max])).toEqual([['system', 64], ['purpose', 64], ['env', 1024]]);
   });
   it('긴 provider · resource_type · event 는 오류 문구에 값을 되돌려 주지 않는다', async () => {
     const long = 'z'.repeat(2000);

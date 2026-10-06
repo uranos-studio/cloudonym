@@ -9,6 +9,7 @@ import { inputKind } from './tree';
 import { fit } from './truncate';
 import { checkName } from './validate';
 import type { CoreMessage, ContextField } from './messages';
+import { clipForDisplay } from './display';
 
 function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
   const raw = tokenValues(ctx, rule, extra);
@@ -19,7 +20,7 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
     const before = raw[t] ?? '';
     const { value, changed } = normalizeToken(before, rule.allowed);
     values[t] = value;
-    if (changed) { transformed = true; steps.push({ code: 'step.normalized', field: t, params: { from: before, to: value } }); }
+    if (changed) { transformed = true; steps.push({ code: 'step.normalized', field: t, params: { from: clipForDisplay(before), to: clipForDisplay(value) } }); }
   }
   // 구분자를 쓰지 않는 규칙은 토큰 사이 하이픈이 빠진다 (D15)
   if (rule.separator === '' && rule.template.length >= 2) { transformed = true; steps.push({ code: 'step.separator_removed' }); }
@@ -130,6 +131,11 @@ const REGION_VALUES = (): string[] => [...new Set(Object.values(REGION_ALIASES))
 
 const FIELDS: readonly ContextField[] = ['owner', 'system', 'purpose', 'env', 'region'];
 
+/** 자유 입력(owner · system · purpose) 하나의 길이 상한 — 이름 규칙이 아니라 전송 위생이다. API 와 화면 입력 · 공유 hash 가 이 값을 쓴다.
+ *  가장 긴 이름 규칙이 256자라 필드 하나 64자면 모자라지 않고, 이름 200개 응답이 작은 요청으로 커지지 않는다 (docs/decisions.md · 2026-10-06).
+ *  parseContext 는 길이를 보지 않는다 — 엔진을 직접 부르는 시험 · 기준선은 더 긴 값도 넣는다 */
+export const MAX_CONTEXT_CHARS = 64;
+
 export function parseContext(raw: RawContext):
   { ok: true; context: NamingContext; transformed: CoreMessage[] } | { ok: false; errors: CoreMessage[] } {
   const errors: CoreMessage[] = [];
@@ -142,13 +148,13 @@ export function parseContext(raw: RawContext):
     if (v.trim() === '') { errors.push({ code: 'context.empty', field: f }); continue; }
     if (f === 'env') {
       const c = canonicalEnv(v);
-      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'env', params: { value: v, supported: ENV_VALUES() } }); continue; }
-      if (c !== v) transformed.push({ code: 'context.normalized', field: 'env', params: { from: v, to: c } });
+      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'env', params: { value: clipForDisplay(v), supported: ENV_VALUES() } }); continue; }
+      if (c !== v) transformed.push({ code: 'context.normalized', field: 'env', params: { from: clipForDisplay(v), to: c } });
       vals[f] = c;
     } else if (f === 'region') {
       const c = canonicalRegion(v);
-      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: v, supported: REGION_VALUES() } }); continue; }
-      if (c !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: v, to: c } });
+      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: clipForDisplay(v), supported: REGION_VALUES() } }); continue; }
+      if (c !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: clipForDisplay(v), to: c } });
       vals[f] = c;
     } else {
       vals[f] = v.trim();

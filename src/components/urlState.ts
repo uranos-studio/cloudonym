@@ -1,13 +1,15 @@
 // URL hash ↔ 화면 상태(문맥 다섯 값 · 규칙 버전 v · CSP p · 선택 r) — 화면 상태의 저장소는 URL 뿐이다 (L3 · D17 · D42).
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다 (Review Focus 4). 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
-import { DEFAULT_ROLE, parseContext } from '../core/engine';
+import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind } from '../core/tree';
 import { PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 
 export const HASH_KEY = 'state';
-/** 필드 하나의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다 (보안 리뷰 L-5) */
+/** env · region 등 자유 입력이 아닌 필드의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다.
+ *  자유 입력 셋(owner · system · purpose)의 상한은 core 의 MAX_CONTEXT_CHARS 다 */
 export const MAX_FIELD_CHARS = 1024;
+const FREE_FIELDS = ['owner', 'system', 'purpose'] as const;
 /** JSON 이 UTF-16 코드 유닛 하나를 적는 최대 바이트 — 제어 문자 · 짝 없는 서로게이트는 `\uXXXX` 6바이트다 (한글 3 · 보조 평면 2단위에 4) */
 const MAX_JSON_BYTES_PER_UNIT = 6;
 /** 규칙 버전 꼴 `YYYY-MM-DD.N` (D26) — 이 꼴이 아닌 `v` 는 없는 것으로 본다. N 은 1~2자리 — 아래 V_PLACEHOLDER 가 13자를 잡아 두므로 그보다 긴 `v` 는 받지 않는다 (리뷰 L4) */
@@ -21,10 +23,10 @@ export const MAX_ROLE_CHARS = 16;
 const MAX_ITEM_JSON_BYTES = Math.max(`"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":99,`.length, `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"${'r'.repeat(MAX_ROLE_CHARS)}",`.length);
 /** 최악 JSON 바이트 — 뼈대(env `prd` · region `global` · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
 const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prd', region: 'global', v: V_PLACEHOLDER, p: 'azure', r: {} }).length
-  + 3 * MAX_FIELD_CHARS * MAX_JSON_BYTES_PER_UNIT
+  + FREE_FIELDS.length * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_ITEMS * MAX_ITEM_JSON_BYTES - 1;
-/** hash 전체 상한 — 화면 · API 가 받는 모든 입력(필드당 1024자 · 아무 유니코드)과 최대 선택이 왕복하도록 최악 JSON 의
- *  표준 Base64(패딩 포함) 길이에 `#state=` 를 더한 값(41259 — urlState.test 가 잰다). 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게 · codex P2) */
+/** hash 전체 상한 — 화면 · API 가 받는 모든 입력(자유 입력 셋 각 MAX_CONTEXT_CHARS 자 · 아무 유니코드)과 최대 선택이 왕복하도록 최악 JSON 의
+ *  표준 Base64(패딩 포함) 길이에 `#state=` 를 더한 값(18219 — urlState.test 가 잰다). 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게) */
 export const MAX_HASH_CHARS = `#${HASH_KEY}=`.length + Math.ceil(MAX_JSON_BYTES / 3) * 4;
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -137,6 +139,7 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[]): Deco
   }
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
+  if (FREE_FIELDS.some((f) => { const v = (raw as Record<string, unknown>)[f]; return typeof v === 'string' && v.length > MAX_CONTEXT_CHARS; })) return undefined;
   const parsed = parseContext(raw as RawContext);
   if (!parsed.ok) return undefined;
   const { v, p, r } = raw as Record<string, unknown>;

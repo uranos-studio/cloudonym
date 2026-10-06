@@ -52,7 +52,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, context is invalid (including a value longer than 1024 characters), providers is not a non-empty array of supported providers, or rules_version is not a string",
+            "description": "Body is not JSON or not an object, context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), providers is not a non-empty array of supported providers, or rules_version is not a string",
             "content": {
               "application/json": {
                 "schema": {
@@ -167,7 +167,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, provider is unknown (supported lists the providers), context is invalid (including a value longer than 1024 characters), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
+            "description": "Body is not JSON or not an object, provider is unknown (supported lists the providers), context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
             "content": {
               "application/json": {
                 "schema": {
@@ -462,17 +462,17 @@
             "properties": {
               "owner": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "platform"
               },
               "system": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "billing"
               },
               "purpose": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "trade"
               },
               "env": {
@@ -685,17 +685,17 @@
             "properties": {
               "owner": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "platform"
               },
               "system": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "billing"
               },
               "purpose": {
                 "type": "string",
-                "maxLength": 1024,
+                "maxLength": 64,
                 "example": "trade"
               },
               "env": {

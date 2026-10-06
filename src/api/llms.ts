@@ -2,6 +2,8 @@
 import type { Provider, ResourceRule, Token } from '../core/types';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { ENV_ALIASES, REGION_ALIASES } from '../core/normalize';
+import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { MAX_FIELD_CHARS } from './schemas';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -102,6 +104,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '',
     '- `POST /v1/generate` — body `{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: ["aws", "gcp", "azure"], "rules_version"?: string }`',
     '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
+    `- \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\``,
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',

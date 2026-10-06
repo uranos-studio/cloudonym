@@ -1,5 +1,6 @@
 // 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
 import type { CoreMessage, Env, NamingContext, Region } from '../core/types';
+import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -67,6 +68,7 @@ export function ContextForm({ value, errors, onChange }: Props) {
               type="text"
               value={value[f.key]}
               onChange={(e) => setText(f.key, e.target.value)}
+              maxLength={MAX_CONTEXT_CHARS}
               placeholder={f.placeholder}
               autoCapitalize="off"
               autoCorrect="off"

@@ -2,6 +2,7 @@
 // core 는 이 폴더를 들여오지 않는다. api 와 components 가 들여온다.
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from '../api/codes';
+import { escapeInvisible } from '../core/display';
 
 export type Message = CoreMessage | ApiMessage;
 export type MessageCode = Message['code'];
@@ -53,17 +54,10 @@ export interface Catalog {
   ui: Record<UiKey, string>;
 }
 
-/** C0 · DEL · C1 · ALM(U+061C) · 폭 없는 문자와 LRM/RLM(U+200B–200F) · 줄/문단 구분과 LRE–RLO(U+2028–202E) · U+2060–2064 · 격리(U+2066–2069) · BOM */
-// oxlint-disable-next-line no-control-regex -- 제어 문자를 찾는 것이 이 정규식의 목적이다
-const INVISIBLE = /[\u0000-\u001F\u007F-\u009F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]/g;
+/** 보이지 않는 문자 이스케이프는 core/display.ts 가 정본이다 — Terraform 내보내기(components/terraform.ts)와 메시지 params(아래 displayMessage)가 같이 쓴다 */
+export { escapeInvisible };
 
-/** 제어 문자 · 양방향 제어 · 폭 없는 문자를 `\uXXXX` 글자로 바꾼다 — 사용자 값이 보이는 것과 다른 순서로 렌더되지 않게 (Trojan Source).
- *  Terraform 내보내기(components/terraform.ts)와 메시지 params(아래 displayMessage)가 같이 쓴다 */
-export function escapeInvisible(text: string): string {
-  return text.replace(INVISIBLE, (ch) => `\\u${ch.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}`);
-}
-
-/** 메시지의 문자열 params(배열 원소 포함)를 escapeInvisible 로 바꾼 사본 — 사용자 값이 들어가는 자리라 표시 전에 거친다 (리뷰 S2) */
+/** 메시지의 문자열 params(배열 원소 포함)를 escapeInvisible 로 바꾼 사본 — 사용자 값이 들어가는 자리라 표시 전에 거친다 */
 export function displayMessage<M extends Message>(m: M): M {
   if (!('params' in m) || m.params === undefined) return m;
   const params = Object.fromEntries(Object.entries(m.params as Record<string, unknown>).map(([k, v]) => [k,

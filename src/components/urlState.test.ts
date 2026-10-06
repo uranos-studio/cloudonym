@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { decodeState, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } from './urlState';
 import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import type { NamingContext } from '../core/types';
+import { MAX_CONTEXT_CHARS } from '../core/engine';
 
 const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
@@ -67,26 +68,33 @@ describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
   /** 가장 긴 v — N 두 자리 */
   const V = '2099-12-31.99';
   const hashOf = (c: NamingContext) => `#${'state'}=${encodeState(c, V)}`;
-  it('필드 상한은 API 와 같은 1024', () => expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS));
-  it('필드 하나가 1024자를 넘으면 undefined(기본값) · 딱 1024자는 받는다', () => {
-    expect(ctxOf(`#state=${b64({ ...ctx, owner: 'a'.repeat(1025) })}`)).toBeUndefined();
-    expect(ctxOf(`#state=${b64({ ...ctx, owner: 'a'.repeat(1024) })}`)?.owner).toBe('a'.repeat(1024));
+  it('필드 상한은 API 와 같은 1024 · 자유 입력 셋은 core 의 MAX_CONTEXT_CHARS(64)', () => {
+    expect(MAX_FIELD_CHARS).toBe(API_MAX_FIELD_CHARS);
+    expect(MAX_CONTEXT_CHARS).toBe(64);
+  });
+  it.each(['owner', 'system', 'purpose'])('자유 입력 %s 가 64자를 넘으면 undefined(기본값) · 딱 64자는 받는다', (f) => {
+    expect(ctxOf(`#state=${b64({ ...ctx, [f]: 'a'.repeat(MAX_CONTEXT_CHARS + 1) })}`)).toBeUndefined();
+    expect((ctxOf(`#state=${b64({ ...ctx, [f]: 'a'.repeat(MAX_CONTEXT_CHARS) })}`) as Record<string, string> | undefined)?.[f]).toBe('a'.repeat(MAX_CONTEXT_CHARS));
+  });
+  it('env 는 1024자까지 받는다(앞뒤 공백은 정본 값으로) · 넘으면 undefined', () => {
+    expect(ctxOf(`#state=${b64({ ...ctx, env: `prd${' '.repeat(1021)}` })}`)?.env).toBe('prd');
+    expect(ctxOf(`#state=${b64({ ...ctx, env: `prd${' '.repeat(1022)}` })}`)).toBeUndefined();
   });
   it.each([
-    ['ASCII 1024자 × 3', 'a'.repeat(1024)],
-    ['한글(UTF-8 3바이트) 1024자 × 3', '가'.repeat(1024)],
-    ['보조 평면(UTF-8 4바이트 · UTF-16 2단위) 512자 × 3', '😀'.repeat(512)],
-    ['제어 문자(JSON 이 \\uXXXX 6바이트로 적는다) 1024자 × 3', '\u0001'.repeat(1024)],
+    ['ASCII 64자 × 3', 'a'.repeat(64)],
+    ['한글(UTF-8 3바이트) 64자 × 3', '가'.repeat(64)],
+    ['보조 평면(UTF-8 4바이트 · UTF-16 2단위) 32자 × 3', '😀'.repeat(32)],
+    ['제어 문자(JSON 이 \\uXXXX 6바이트로 적는다) 64자 × 3', '\u0001'.repeat(64)],
   ])('필드마다 상한까지 채운 문맥도 왕복한다 — %s', (_label, s) => {
     const c = at(s);
     const h = hashOf(c);
     expect(h.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
     expect(ctxOf(h)).toEqual(c);
   });
-  it('선택 없는 최악 문맥(필드당 6바이트 × 1024 × 3 · region global · v 13자)은 24699자 — v2 상한(선택 포함 · 아래 절) 안이다', () => {
-    const worst = at('\u0001'.repeat(1024));
+  it('선택 없는 최악 문맥(필드당 6바이트 × 64 × 3 · region global · v 13자)은 1659자 — v2 상한(선택 포함 · 아래 절) 안이다', () => {
+    const worst = at('\u0001'.repeat(64));
     const url = hashOf(worst);
-    expect(url.length).toBe(24699); // 18519 바이트는 3 의 배수라 패딩이 없다
+    expect(url.length).toBe(1659); // 87 + 1152 = 1239 바이트는 3 의 배수라 패딩이 없다
     expect(url.length).toBeLessThan(MAX_HASH_CHARS);
     expect(decodeState(url)).toEqual({ context: worst, rulesVersion: V });
   });
@@ -218,13 +226,13 @@ describe('hash v2 — 디코더가 걸린 항목만 버린다 (계획 §7-3)', (
 });
 
 describe('hash v2 — 최대 상태 왕복과 상한 (계획 §7-3 · codex #2)', () => {
-  // 시험 전용 role 규칙 200개 · resourceType 40자 · 역할 16자 · 자유 필드 셋 최악 JSON 문자 1024자
+  // 시험 전용 role 규칙 200개 · resourceType 40자 · 역할 16자 · 자유 필드 셋 최악 JSON 문자 64자
   const mi = rulesFor('azure').find((r) => r.resourceType === 'managed_identity')!;
   const rules: ResourceRule[] = Array.from({ length: MAX_ITEMS }, (_, i) => {
     const type = `${'t'.repeat(MAX_RESOURCE_TYPE_CHARS - 3)}${String(i).padStart(3, '0')}`;
     return { ...mi, id: `azure.${type}`, resourceType: type };
   });
-  const worst: NamingContext = { owner: '\u0001'.repeat(1024), system: '\u0001'.repeat(1024), purpose: '\u0001'.repeat(1024), env: 'prd', region: 'global' };
+  const worst: NamingContext = { owner: '\u0001'.repeat(MAX_CONTEXT_CHARS), system: '\u0001'.repeat(MAX_CONTEXT_CHARS), purpose: '\u0001'.repeat(MAX_CONTEXT_CHARS), env: 'prd', region: 'global' };
   const items = sel('azure', rules.map((r) => ({ type: r.resourceType, role: 'r'.repeat(MAX_ROLE_CHARS) })), rules);
   const V = '2099-12-31.99';
 
@@ -241,7 +249,7 @@ describe('hash v2 — 최대 상태 왕복과 상한 (계획 §7-3 · codex #2)'
     const bytes = new TextEncoder().encode(JSON.stringify(jsonOf(encoded)));
     const padded = `#state=${btoa(String.fromCharCode(...bytes))}`;
     expect(padded.length).toBe(MAX_HASH_CHARS);
-    expect(MAX_HASH_CHARS).toBe(41259);
+    expect(MAX_HASH_CHARS).toBe(18219);
     const back = decodeState(hash, rules);
     expect(back?.context).toEqual(worst);
     expect(back?.rulesVersion).toBe(V);

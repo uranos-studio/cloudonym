@@ -217,3 +217,27 @@ describe('generateMany (D30\' · D41)', () => {
     expect(r.items[0]!.violations[0]).not.toBe(r.conflicts[0]);
   });
 });
+
+describe('메시지에 되돌려 싣는 사용자 값은 이스케이프한 뒤 80자까지 (docs/decisions.md · 2026-10-06 응답 증폭)', () => {
+  const ctx0 = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+  it('step.normalized 의 from 은 보이지 않는 문자를 \\uXXXX 로 바꾸고 80자 + … · to 도 같은 꼴', () => {
+    const owner = `A${'\u200B'.repeat(200)}`;
+    const r = generate({ ...ctx0, owner }, ['aws'])['aws']!['s3_bucket']!;
+    const step = r.steps.find((m) => m.code === 'step.normalized' && m.field === 'owner');
+    expect(step).toBeDefined();
+    if (step?.code !== 'step.normalized') return;
+    expect(step.params.from).toBe(`A${'\\u200B'.repeat(13)}\\…`);
+    expect(step.params.from.length).toBe(81);
+    expect(step.params.to).toBe('a');
+  });
+  it('길이 80 이하 · 보이는 문자는 그대로', () => {
+    const r = generate({ ...ctx0, owner: 'Team A' }, ['aws'])['aws']!['s3_bucket']!;
+    expect(r.steps.find((m) => m.code === 'step.normalized')).toMatchObject({ params: { from: 'Team A', to: 'team-a' } });
+  });
+  it('context.value_unsupported 의 value · context.normalized 의 from 도 80자 + …', () => {
+    const bad = parseContext({ ...ctx0, env: 'q'.repeat(1024) });
+    expect(bad).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: `${'q'.repeat(80)}…` } }] });
+    const padded = parseContext({ ...ctx0, region: `kr${' '.repeat(500)}` });
+    expect(padded.ok && padded.transformed[0]).toMatchObject({ code: 'context.normalized', field: 'region', params: { from: `kr${' '.repeat(78)}…`, to: 'kr' } });
+  });
+});

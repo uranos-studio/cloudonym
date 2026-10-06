@@ -1,12 +1,13 @@
 // 요청 본문 검증 — 모양(shape)만 본다. 값의 뜻은 엔진(parseContext · rulesFor)이 판정한다. 의존성 추가 없음(수작업 타입 가드)
 import { PROVIDERS, type NamingContext, type Provider, type RawContext } from '../core/types';
 import { rulesFor } from '../core/constraints';
-import { parseContext } from '../core/engine';
+import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
-import { escapeInvisible, type Message } from '../messages/catalog';
+import type { Message } from '../messages/catalog';
+import { clipForDisplay } from '../core/display';
 
 /** 거부 — 상태 코드와 메시지 코드. 응답 본문은 라우터가 fail() 로 만든다 (D25) */
 export interface Rejection { status: 400 | 409; errors: Message[]; supported?: string[] }
@@ -33,10 +34,16 @@ function isProvider(v: unknown): v is Provider {
 export const MAX_FIELD_CHARS = 1024;
 
 /** 상한을 넘는 문자열 필드마다 오류 한 건. 문자열이 아닌 값은 여기서 보지 않는다(모양 검사가 따로 본다) */
-function tooLong(fields: Record<string, unknown>): ApiMessage[] {
+function tooLong(fields: Record<string, unknown>, max: number = MAX_FIELD_CHARS): ApiMessage[] {
   return Object.entries(fields)
-    .filter(([, v]) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)
-    .map(([k]): ApiMessage => ({ code: 'request.field_too_long', field: k, params: { max: MAX_FIELD_CHARS } }));
+    .filter(([, v]) => typeof v === 'string' && v.length > max)
+    .map(([k]): ApiMessage => ({ code: 'request.field_too_long', field: k, params: { max } }));
+}
+
+/** 문맥 다섯 값의 상한 — 자유 입력 셋은 MAX_CONTEXT_CHARS, env · region 은 MAX_FIELD_CHARS. 오류 순서는 owner → system → purpose → env → region */
+function contextTooLong(ctx: Record<string, unknown>): ApiMessage[] {
+  const { owner, system, purpose, env, region } = ctx;
+  return [...tooLong({ owner, system, purpose }, MAX_CONTEXT_CHARS), ...tooLong({ env, region })];
 }
 
 /** rules_version 핀 (D27 ⑴) — 없으면 통과. 문자열이 아니면(null 포함) 400 · 1024자 초과 400 · 지금 규칙 버전과 다르면(빈 문자열 포함) 409 */
@@ -63,8 +70,7 @@ function describe(v: unknown): string {
       text = typeof v;
     }
   }
-  text = escapeInvisible(text);
-  return text.length > 80 ? `${text.slice(0, 80)}…` : text;
+  return clipForDisplay(text);
 }
 
 export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
@@ -73,8 +79,7 @@ export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
   if (pin) return pin;
   // parseContext 는 raw[f] 를 읽는다 — null 을 넘기면 던지므로 여기서 막는다
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
-  const { owner, system, purpose, env, region } = body.context;
-  const long = tooLong({ owner, system, purpose, env, region });
+  const long = contextTooLong(body.context);
   if (long.length > 0) return reject(long);
   let providers: Provider[] = [...PROVIDERS];
   if (body.providers !== undefined) {
@@ -136,11 +141,10 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
   if (longProvider.length > 0) return reject(longProvider);
   if (!isProvider(provider)) return reject([{ code: 'request.value_unsupported', field: 'provider', params: { value: describe(provider) } }], [...PROVIDERS]);
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
-  const { owner, system, purpose, env, region } = body.context;
   const resources = Array.isArray(body.resources) ? (body.resources as unknown[]) : [];
   // 항목 안 문자열도 전송 위생 상한을 건다 — 1024 를 넘는 type · role 을 엔진까지 보내지 않는다
   const long = [
-    ...tooLong({ owner, system, purpose, env, region }),
+    ...contextTooLong(body.context),
     ...resources.flatMap((r, i) => (isRecord(r) ? tooLong({ [`resources[${i}].type`]: r.type, [`resources[${i}].role`]: r.role }) : [])),
   ];
   if (long.length > 0) return reject(long);

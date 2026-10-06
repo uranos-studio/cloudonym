@@ -9,6 +9,7 @@ import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
 import { rulesFor } from '../core/constraints';
 import { MESSAGE_CODES } from '../core/messages';
+import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 
 const SELECTION_CODES_IN_SAMPLES = MESSAGE_CODES.filter((c) => c.startsWith('selection.'));
@@ -43,9 +44,12 @@ describe('public/openapi.json — 형식', () => {
       expect(r429.headers?.['Retry-After']?.schema.type, p).toBe('integer');
     }
   });
-  it('문자열 입력 필드에 maxLength 1024 (최종 리뷰 I-1)', () => {
-    const ctxProps = schemas['GenerateRequest']!.properties!['context']!.properties!;
-    for (const f of ['owner', 'system', 'purpose', 'env', 'region']) expect(ctxProps[f]!.maxLength, f).toBe(1024);
+  it('문자열 입력 필드의 maxLength — 자유 입력 셋은 64 · 나머지는 1024', () => {
+    for (const r of ['GenerateRequest', 'NamesRequest']) {
+      const ctxProps = schemas[r]!.properties!['context']!.properties!;
+      for (const f of ['owner', 'system', 'purpose']) expect(ctxProps[f]!.maxLength, `${r}.${f}`).toBe(MAX_CONTEXT_CHARS);
+      for (const f of ['env', 'region']) expect(ctxProps[f]!.maxLength, `${r}.${f}`).toBe(1024);
+    }
     for (const f of ['provider', 'resource_type', 'name']) expect(schemas['ValidateRequest']!.properties![f]!.maxLength, f).toBe(1024);
     expect(schemas['EventRequest']!.properties!['event']!.maxLength).toBe(1024);
     for (const r of ['GenerateRequest', 'ValidateRequest']) expect(schemas[r]!.properties!['rules_version']!.maxLength, r).toBe(1024);
