@@ -1,19 +1,34 @@
 # Cloudonym
 
-Multi-cloud resource naming engine for **AWS · GCP · Azure**. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people, and `/v1/generate` · `/v1/validate` · `/llms.txt` · `/openapi.json` for AI coding agents and IaC.
+Multi-cloud resource naming engine for **AWS · GCP · Azure**. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people, and `/v1/generate` · `/v1/names` · `/v1/validate` · `/llms.txt` · `/openapi.json` for AI coding agents and IaC.
 
 [한국어](#한국어)
 
-![Cloudonym web UI — context form, provider tabs and result cards](docs/screenshots/01-desktop-light.png)
+![Cloudonym web UI — four steps: cloud, naming context, resource tree and generated names](docs/screenshots/01-desktop-light.png)
 
-## Usage in 3 seconds (web UI)
+## Usage in four steps (web UI)
 
-1. Type **Owner · System · Purpose**, pick **Environment** and **Region** — names are regenerated as you type.
-2. Each card shows the name, `PASS`/`FAIL`, and why it was shortened or transformed (e.g. dropped `region`, removed hyphens).
-3. Copy a name with its button, copy the tags/labels as **JSON** or **Terraform**, or share the whole form with **Share URL** (state lives in the URL hash). The JSON copy is `{ "version": {…}, "labels": {…} }` and the Terraform copy starts with a comment carrying the engine and rules versions.
-4. Under the tabs, one line says what **PASS** means (it is not an availability or uniqueness check — see **What PASS means** under [API in three lines](#api-in-three-lines)). The footer shows the engine and rules versions; a share link made with older rules shows a notice until you edit the form.
+1. **① Cloud** — pick one provider: AWS, GCP or Azure. Nothing is picked on a first visit.
+2. **② Context** — type **Owner · System · Purpose** (at most 64 characters each) and pick **Environment** and **Region**. Names are regenerated as you type.
+3. **③ Resources** — a tree of the provider's resources, grouped by the scope in which the provider requires a name to be unique (for Azure: Global › Subscription › Resource group …). Search by name, id or type, filter by category, or show the selected rows only. Tick a resource and set how many you need (1–99, numbered `01`…`99`); resources without a sequence number are always one, and identity-like resources take a short role (`sync` by default).
+4. **④ Names** — only the picked resources, grouped by scope, each with `PASS`/`FAIL` and why it was shortened or transformed. Copy one name, **all valid names** (one per line), the **names JSON** or **Terraform locals** (names and tags). The **Tags · Labels** panel copies the provider's standard tags as JSON. Two picked resources that would get the same name in the same scope are both marked `FAIL` (`name.conflict`).
+
+One line above the names says what **PASS** means (see [What PASS means](#what-pass-means)). The footer shows the engine and rules versions; a share link made with older rules shows a notice until you change the input.
 
 Allowed values — env: `prd` · `stg` · `dev` · `sbx` (aliases such as `prod`, `staging` are accepted) · region: `kr` · `us` · `jp` · `eu` · `global` (aliases such as `asia-northeast3`, `ap-northeast-2`, `koreacentral` are accepted). The full alias list is in `/llms.txt`.
+
+### Share URL — your input is readable by anyone with the link
+
+The page keeps its state (the five values, the provider and the selection) in the URL hash, and **Share URL** copies that link. The hash is written to the address bar as you type, even if you never press the button. It is **Base64, not encryption**: anyone who gets the link can decode it and read owner, system, purpose and the rest. Do not enter sensitive values such as internal company or project names if you plan to share the link. The page shows the same warning next to the button.
+
+### Screenshots
+
+| | |
+|---|---|
+| [Desktop, light](docs/screenshots/01-desktop-light.png) | Azure, four resources picked (the tree shows the selected rows only) |
+| [Mobile, 360 px](docs/screenshots/02-mobile-360.png) | The same selection on a narrow screen, with the bar that jumps to the names |
+| [Desktop, dark](docs/screenshots/03-desktop-dark.png) | The same share link opened in dark mode |
+| [FAIL cards](docs/screenshots/04-fail-card.png) | A `system` made only of symbols — every name fails with the reason and cannot be copied |
 
 ## API in three lines
 
@@ -22,16 +37,18 @@ There is no public domain yet — replace `https://<your-deployment>` with your 
 ```sh
 curl -s -X POST https://<your-deployment>/v1/generate -H 'content-type: application/json' \
   -d '{"context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"kr"},"providers":["gcp"]}'
+curl -s -X POST https://<your-deployment>/v1/names -H 'content-type: application/json' \
+  -d '{"provider":"azure","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"kr"},"resources":[{"type":"resource_group"},{"type":"virtual_machine","count":2},{"type":"managed_identity","role":"db"}]}'
 curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: application/json' \
   -d '{"provider":"azure","resource_type":"storage_account","name":"St-Payments-Prd"}'
 ```
 
-`providers` is optional (default: all three). Response of `/v1/generate`, trimmed to one resource:
+`/v1/generate` returns a name for **every** resource type of the requested providers; `/v1/names` returns names only for the resources you pick, as many as you ask for. `providers` is optional (default: all three). Response of `/v1/generate`, trimmed to one resource:
 
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-09-29.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-06.13" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -49,7 +66,9 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
           "pattern_flags": "",
           "allowed": "lower-digit-hyphen",
           "doc_url": "https://docs.cloud.google.com/compute/docs/naming-resources",
-          "notes": []
+          "notes": [
+            { "code": "note.gcp_vm_project_unique", "message": "VM names must be unique across the project unless its vmDnsSetting is ZonalOnly, so this rule is placed at project scope although the API path is zones/{zone}/instances" }
+          ]
         }
       }
     }
@@ -65,12 +84,57 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 }
 ```
 
+Response of `/v1/names`, trimmed to two of the four items (`rule` and `metadata` have the same shape as above):
+
+```json
+{
+  "success": true,
+  "version": { "engine": "0.1.0", "rules": "2026-10-06.13" },
+  "data": {
+    "azure": {
+      "valid": true,
+      "items": [
+        {
+          "key": "virtual_machine_02",
+          "resource_type": "virtual_machine",
+          "seq": "02",
+          "scope": "azure:resource_group",
+          "uniqueness": "csp",
+          "name": "payments-batch-prd-kr-vm-02",
+          "valid": true,
+          "is_truncated": false,
+          "is_transformed": false,
+          "original": "payments-batch-prd-kr-vm-02",
+          "violations": [],
+          "steps": [],
+          "rule": { "min_length": 1, "max_length": 64, "…": "…" }
+        },
+        {
+          "key": "managed_identity_db",
+          "resource_type": "managed_identity",
+          "role": "db",
+          "scope": "azure:resource_group",
+          "uniqueness": "csp",
+          "name": "payments-batch-prd-id-db",
+          "valid": true,
+          "…": "…"
+        }
+      ],
+      "conflicts": []
+    }
+  },
+  "metadata": { "generated_labels": { "azure": { "owner": "platform", "system": "payments", "purpose": "batch", "environment": "prd", "managed_by": "cloudonym" } }, "…": "…" }
+}
+```
+
+`resources` — `count` 1–99 (default 1) on rules with a sequence number, `role` (`^[a-z0-9]{2,16}$`, default `sync`) on rules with a role; at most 200 items and 200 names per request, no type twice. `scope` is the uniqueness scope the name belongs to and `uniqueness: "none"` means the provider enforces none (AWS `Name` tags). One request is treated as one instance of the parent scope: two items that would get the same name are both `valid: false` with `name.conflict`, and `conflicts` summarises them.
+
 Response of `/v1/validate`:
 
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-09-29.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-06.13" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9]{3,24}$" }, "message": "Does not match the allowed pattern ^[a-z0-9]{3,24}$" }
   ],
@@ -82,18 +146,22 @@ Response of `/v1/validate`:
 
 **Errors.** Every failure has the same shape — `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }` (`supported` when a provider, resource type or event is unknown, or when `providers` is not a non-empty array). User values echoed in `params` are cut to 80 characters and control / bidirectional characters appear as `\uXXXX`. `400` malformed request, `404` unknown `/v1` path or method (`request.not_found`), `409` `rules_version` mismatch, `413` body over 16 KB, `429` over 60 requests per 60 seconds per client IP (POST `/v1/*` and GET `/llms.txt` together, with `Retry-After: 60`), `500` unexpected error. `GET /v1/health` returns `{ "ok": true, "version": { … } }`.
 
-**What PASS means.** PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.
+**Input limits.** `owner`, `system` and `purpose` are at most **64 characters** each (`400 request.field_too_long` above that; the UI inputs stop at 64).
 
-**Version and name stability.** Successful responses of `/v1/generate`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
+<a id="what-pass-means"></a>**What PASS means.** PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.
+
+**Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
 
 ## AI-agent integration
 
-- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, every rule's length · pattern · forbidden words · notes · doc link, what PASS means, and the API summary. It is built from the rule table, so it never drifts from the engine.
-- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/validate`, `/v1/events` and `/v1/health`, including every error status. The test suite validates real responses against it.
+- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, and the API summary. It is built from the rule table, so it never drifts from the engine.
+- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/names`, `/v1/validate`, `/v1/events` and `/v1/health`, including every error status. The test suite validates real responses against it.
 
 Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relative to the host that served it.
 
 ## Supported resources (655 rules)
+
+**GCP 120 · AWS 163 · Azure 372 — 655 rules** in rules revision `2026-10-06.13` (counted from the engine's rule table and matching the per-provider rule lists in `/llms.txt`).
 
 The 35 hand-written rules below are each checked against the official document linked. On top of them, **328 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) and [docs/aws-intake-held.md](docs/aws-intake-held.md). A further **29 GCP rules**, **36 AWS rules** and **29 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
 
@@ -199,14 +267,20 @@ See the LICENSE file for details.
 
 ## 한국어
 
-**Cloudonym** 은 **AWS · GCP · Azure** 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 사람은 웹 화면으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/validate` · `/llms.txt` · `/openapi.json` 으로 쓴다.
+**Cloudonym** 은 **AWS · GCP · Azure** 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 사람은 웹 화면으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/names` · `/v1/validate` · `/llms.txt` · `/openapi.json` 으로 쓴다.
 
-### 3초 사용법 (웹 화면)
+### 네 단계 사용법 (웹 화면)
 
-1. **Owner · System · Purpose** 를 적고 **Environment** · **Region** 을 고른다 — 입력하는 대로 이름이 다시 만들어진다
-2. 카드마다 이름 · `PASS`/`FAIL` · 줄이거나 바꾼 이유(`region` 생략 · 하이픈 제거 등)가 나온다
-3. 이름은 복사 버튼으로, 태그 · 라벨은 **JSON** · **Terraform** 으로 복사하고, **Share URL** 로 입력 전체를 넘긴다(상태는 URL hash 에 있다). JSON 은 `{ "version": {…}, "labels": {…} }` 꼴이고 Terraform 은 첫 줄 주석에 엔진 · 규칙 버전이 있다
-4. 탭 아래 한 줄이 **PASS** 의 뜻을 말한다(쓸 수 있는지 · 고유한지는 검사하지 않는다). 꼬리말에 엔진 · 규칙 버전이 있고, 옛 규칙으로 만든 공유 링크는 폼을 고칠 때까지 안내를 보인다
+1. **① Cloud** — AWS · GCP · Azure 중 하나를 고른다. 첫 방문에는 아무것도 골라 두지 않는다
+2. **② Context** — **Owner · System · Purpose** 를 적고(각 64자까지) **Environment** · **Region** 을 고른다. 입력하는 대로 이름이 다시 만들어진다
+3. **③ Resources** — CSP 가 이름을 유일하게 요구하는 범위(Azure 는 Global › Subscription › Resource group …)로 묶은 리소스 트리다. 이름 · id · 종류로 찾고, 분류로 거르고, 고른 행만 볼 수 있다. 체크하고 개수(1~99 · 순번 `01`…`99`)를 정한다. 순번이 없는 리소스는 늘 하나이고, ID 성격의 리소스는 짧은 역할(기본 `sync`)을 받는다
+4. **④ Names** — 고른 리소스만 범위별로 보이고, 카드마다 `PASS`/`FAIL` 과 줄이거나 바꾼 이유가 나온다. 이름 하나 · **유효한 이름 전부**(한 줄에 하나) · **이름 JSON** · **Terraform locals**(이름 + 태그)를 복사한다. **Tags · Labels** 칸은 CSP 표준 태그를 JSON 으로 복사한다. 같은 범위에서 같은 이름이 될 두 리소스는 둘 다 `FAIL`(`name.conflict`)이다
+
+이름 위 한 줄이 **PASS** 의 뜻을 말한다(쓸 수 있는지 · 고유한지는 검사하지 않는다). 꼬리말에 엔진 · 규칙 버전이 있고, 옛 규칙으로 만든 공유 링크는 입력을 바꿀 때까지 안내를 보인다.
+
+**공유 URL 주의** — 화면 상태(다섯 값 · CSP · 선택)는 URL hash 에 있고 **Share URL** 은 그 링크를 복사한다. hash 는 버튼을 누르지 않아도 입력하는 대로 주소창에 쓰인다. **Base64 는 암호화가 아니다** — 링크를 받은 사람은 owner · system · purpose 등 입력값을 그대로 읽는다. 링크를 넘길 생각이면 회사 내부 이름 같은 민감한 값을 넣지 않는다. 화면도 버튼 옆에 같은 경고를 보인다.
+
+스크린샷 — [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png).
 
 허용값 — env: `prd` · `stg` · `dev` · `sbx`(`prod` · `staging` 같은 별칭도 받는다) · region: `kr` · `us` · `jp` · `eu` · `global`(`asia-northeast3` · `ap-northeast-2` · `koreacentral` 같은 별칭도 받는다). 별칭 전체는 `/llms.txt` 에 있다.
 
@@ -217,25 +291,30 @@ See the LICENSE file for details.
 ```sh
 curl -s -X POST https://<your-deployment>/v1/generate -H 'content-type: application/json' \
   -d '{"context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"kr"},"providers":["gcp"]}'
+curl -s -X POST https://<your-deployment>/v1/names -H 'content-type: application/json' \
+  -d '{"provider":"azure","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"kr"},"resources":[{"type":"resource_group"},{"type":"virtual_machine","count":2},{"type":"managed_identity","role":"db"}]}'
 curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: application/json' \
   -d '{"provider":"azure","resource_type":"storage_account","name":"St-Payments-Prd"}'
 ```
 
-`providers` 는 생략할 수 있다(기본은 셋 다).
+`providers` 는 생략할 수 있다(기본은 셋 다). `/v1/generate` 는 고른 CSP 의 **모든** 리소스 종류에 이름을 하나씩 주고, `/v1/names` 는 **고른 리소스만** 요청한 개수만큼 준다.
+
+- **`/v1/names`** — `resources` 의 `count` 는 순번이 있는 규칙에만 1~99(기본 1), `role` 은 역할 규칙에만 `^[a-z0-9]{2,16}$`(기본 `sync`). 한 요청에 항목 200개 · 이름 200개까지, 같은 종류는 한 번만. 항목마다 `scope`(이름이 유일해야 하는 범위)와 `uniqueness`(`none` 이면 CSP 가 유일성을 매기지 않는다 — AWS `Name` 태그)가 실린다. 한 요청은 부모 범위 하나로 본다 — 같은 이름이 될 두 항목은 둘 다 `valid: false` · `name.conflict` 이고 `conflicts` 가 요약한다
+- **입력 상한** — `owner` · `system` · `purpose` 는 각 **64자**까지다(넘으면 `400 request.field_too_long` · 화면 입력은 64자에서 멈춘다)
 
 - **메시지** — `violations` · `steps` · `rule.notes` · `metadata.transformed` · 라벨 위반 · 라벨 변환 · `errors` 는 전부 `{ code, field?, params?, message }` 목록이다. 분기는 `code`(바뀌지 않는다)로, 사람에게는 `message`(영어 · 문구는 다듬어질 수 있다)를 보인다
 - **오류** — 모든 실패가 `{ "success": false, "errors": [...], "supported"?: [...] }` 한 꼴이다. `supported` 는 provider · resource type · event 가 모르는 값이거나 `providers` 가 비지 않은 배열이 아닐 때 실린다. `params` 에 되돌려 싣는 사용자 값은 80자로 자르고 제어 · 양방향 문자는 `\uXXXX` 로 보인다. `400` 요청 모양 오류 · `404` `/v1` 아래 없는 경로 · 메서드(`request.not_found`) · `409` `rules_version` 불일치 · `413` 본문 16KB 초과 · `429` 클라이언트 IP 당 60초 60건 초과(POST `/v1/*` 와 GET `/llms.txt` 합산 · `Retry-After: 60`) · `500` 내부 오류. `GET /v1/health` 는 `{ "ok": true, "version": {…} }`
 - **PASS 의 뜻** — 이 규칙 버전의 이름 검사(길이 · 형식 · 예약어)를 통과했다는 뜻이다. 그 이름을 쓸 수 있다는 뜻이 아니다 — 고유성 · 권한 · 할당량 · 조직 정책은 검사하지 않고, 축소 때문에 서로 다른 문맥이 같은 이름이 될 수 있다
-- **버전 · 이름 안정성** — `/v1/generate` · `/v1/validate` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
+- **버전 · 이름 안정성** — `/v1/generate` · `/v1/names` · `/v1/validate` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
 
 ### AI 에이전트 연동
 
-- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · PASS 의 뜻 · API 요약. 규칙 표에서 만들므로 엔진과 어긋나지 않는다
-- **`GET /openapi.json`** — `/v1/generate` · `/v1/validate` · `/v1/events` · `/v1/health` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
+- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약. 규칙 표에서 만들므로 엔진과 어긋나지 않는다
+- **`GET /openapi.json`** — `/v1/generate` · `/v1/names` · `/v1/validate` · `/v1/events` · `/v1/health` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
 
 ### 지원 리소스
 
-GCP 120 · AWS 163 · Azure 372, 모두 **655개** 규칙이다. 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-655-rules) 에 있다. Azure 328개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md) · [docs/aws-intake-held.md](docs/aws-intake-held.md) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 29개 · AWS 36개 · Azure 29개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/규칙-대조-20260928.md](docs/규칙-대조-20260928.md) 다.
+규칙 버전 `2026-10-06.13` 기준 GCP 120 · AWS 163 · Azure 372, 모두 **655개** 규칙이다(엔진의 규칙 표에서 세고 `/llms.txt` 의 CSP 별 규칙 목록과 대어 본 값). 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-655-rules) 에 있다. Azure 328개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md) · [docs/aws-intake-held.md](docs/aws-intake-held.md) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 29개 · AWS 36개 · Azure 29개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/규칙-대조-20260928.md](docs/규칙-대조-20260928.md) 다.
 
 ### 한계
 
