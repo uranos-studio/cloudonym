@@ -49,6 +49,15 @@ export const en: Catalog = {
     'note.gcp_vm_project_unique': () => 'VM names must be unique across the project unless its vmDnsSetting is ZonalOnly, so this rule is placed at project scope although the API path is zones/{zone}/instances',
     'note.aws_key_pair_scope_unconfirmed': () => 'The API asks for "a unique name for the key pair" but does not say within what; this rule is placed at Region scope, which is not confirmed by the documentation. Only printable ASCII is accepted (conservative, D20)',
     'note.aws_schema_scope_unconfirmed': () => 'Length and pattern come from the AWS CloudFormation resource schema and are matched against the whole name. The schema has no field for the uniqueness scope, so the scope shown here is not confirmed by the documentation',
+    'note.scope_unconfirmed': () => 'The documentation does not say within what this name must be unique, so the scope shown here is not confirmed',
+    'note.narrower_source_used': () => 'Official sources disagree on this rule; the narrower one is used (conservative, D20)',
+    'note.blocklist_narrowed': () => 'The documentation only lists forbidden characters; this rule accepts letters, digits and hyphens only (conservative, D20)',
+    'note.parent_length_limit': () => 'The documentation caps the combined length with the parent name; the maximum here assumes the longest parent name (conservative, D20)',
+    'note.unicode_excluded': () => 'Unicode characters that map to Punycode are accepted by the provider but rejected here (conservative, D20)',
+    'note.variant_narrowed': () => 'The limit differs by kind or scope; the narrowest limit is used for all of them (conservative, D20)',
+    'note.secondary_source': () => 'The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)',
+    'note.obsolete_source_applied': () => 'Part of this rule comes from a page the provider marks as retired; it is still enforced (conservative, D20)',
+    'note.advisory_rule_enforced': () => 'The documentation recommends against this form rather than forbidding it; it is rejected here (conservative, D20)',
     // 같은 요청 안 충돌 (conflict)
     'name.conflict': (m) => `Name '${m.params.name}' is used by more than one resource of the same kind in this request (${list(m.params.keys)}); the provider rejects the second one`,
     // 선택 (selection)

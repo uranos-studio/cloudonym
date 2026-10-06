@@ -21,6 +21,9 @@ export const MESSAGE_CODES = [
   'note.aws_tag_utf16_length', 'note.azure_vm_hostname_rule', 'note.azure_reserved', 'note.azure_reserved_ambiguous',
   'note.windows_no_all_digits', 'note.cloud_sql_combined_limit', 'note.gcs_dotted_names_222', 'note.s3_an_suffix',
   'note.gcp_vm_project_unique', 'note.aws_key_pair_scope_unconfirmed', 'note.aws_schema_scope_unconfirmed',
+  // rules/*-manual.ts notes (9)
+  'note.scope_unconfirmed', 'note.narrower_source_used', 'note.blocklist_narrowed', 'note.parent_length_limit', 'note.unicode_excluded',
+  'note.variant_narrowed', 'note.secondary_source', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
   // conflict.ts (1)
   'name.conflict',
   // selection.ts (11)
@@ -69,6 +72,15 @@ export type CoreMessage =
   | { code: 'note.gcp_vm_project_unique' }
   | { code: 'note.aws_key_pair_scope_unconfirmed' }
   | { code: 'note.aws_schema_scope_unconfirmed' }
+  | { code: 'note.scope_unconfirmed' }
+  | { code: 'note.narrower_source_used' }
+  | { code: 'note.blocklist_narrowed' }
+  | { code: 'note.parent_length_limit' }
+  | { code: 'note.unicode_excluded' }
+  | { code: 'note.variant_narrowed' }
+  | { code: 'note.secondary_source' }
+  | { code: 'note.obsolete_source_applied' }
+  | { code: 'note.advisory_rule_enforced' }
   /** keys 는 충돌한 항목의 key(NameItem.key) — 처음 나온 순 */
   | { code: 'name.conflict'; params: { name: string; keys: string[] } }
   | { code: 'selection.not_array' }

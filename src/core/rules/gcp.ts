@@ -1,6 +1,7 @@
 // GCP 규칙 표 — constraints.ts 가 aws · azure 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
 import type { ResourceRule, Token } from '../types';
 import { GCP_INTAKE_ROWS } from './gcp-intake';
+import { GCP_MANUAL_RULES } from './gcp-manual';
 
 /** Compute 디스커버리 문서 — insert.path 가 범위(global · regions/{region} · zones/{zone})를 준다 */
 const GCP_COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
@@ -126,4 +127,5 @@ function fromIntakeRow(r: (typeof GCP_INTAKE_ROWS)[number]): ResourceRule {
 export const GCP_RULES: Record<string, ResourceRule> = {
   ...GCP_HAND_RULES,
   ...Object.fromEntries(GCP_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
+  ...GCP_MANUAL_RULES,
 };

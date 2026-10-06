@@ -62,7 +62,8 @@ describe('들인 GCP 행 — 원문 스냅샷과 대조', () => {
   });
 
   it('보류에 KMS 깨진 원문 · 조사 밖 행이 사유와 함께 있다 · 깨진 여섯 칸이 적혀 있다', () => {
-    expect(HELD).toMatch(/cloudkms\.projects\.locations\.keyHandles\.create .*no regular expression/);
+    expect(HELD).toMatch(/cloudkms\.projects\.locations\.keyHandles\.create .*reviewed by hand — not imported \(/);
+    expect(HELD.match(/^\| compute \| compute\.\w*[fF]irewallPolicies\.insert .*reviewed by hand — unconfirmed \(/gm)).toHaveLength(3);
     expect(HELD).toMatch(/singleTenantHsmInstances\.create .*outside the surveyed/);
     expect(HELD.match(/^\| (spanner|iam) v\d \| /gm)).toHaveLength(6);
   });

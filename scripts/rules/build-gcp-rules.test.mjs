@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { regexInDescription, uniquenessScopeOf, scopeOfPath, slugOf, build, BROKEN_SOURCES, RFC1035_CASES, KMS_CASES } from './build-gcp-rules.mjs';
+import { regexInDescription, uniquenessScopeOf, scopeOfPath, slugOf, build, BROKEN_SOURCES, RFC1035_CASES, KMS_CASES, HAND_REVIEWED } from './build-gcp-rules.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const compute = JSON.parse(readFileSync(join(here, 'fixtures/gcp-sample.json'), 'utf-8'));
@@ -64,11 +64,15 @@ test('표본 — 기존 entity 는 건너뛰고 · 깨진 정규식 · 조사 �
   const reasons = Object.fromEntries(r.held.map((h) => [h.row.method, h.reason]));
   assert.match(reasons['compute.parents.children.insert'], /anchorMissing|parent/);
   assert.match(reasons['cloudkms.projects.locations.keyRings.cryptoKeys.create'], /brackets look lost/);
-  assert.match(reasons['cloudkms.projects.locations.keyHandles.create'], /manual: no regular expression/);
+  assert.match(reasons['cloudkms.projects.locations.keyHandles.create'], /^reviewed by hand — not imported \(/);
   assert.equal(r.rules[1].scope, 'gcp:project_location');
   assert.deepEqual([r.rules[1].min, r.rules[1].max], [1, 63]);
   assert.equal(r.scopes.find((s) => s.id === 'gcp:kms_key_ring').ruleId, 'gcp.kms_key_ring');
   // 원문 행 = 규칙 + 보류 + 기존
   const existingCount = r.sourceRows.filter((x) => x.existing).length;
   assert.equal(r.sourceRows.length, r.rules.length + r.held.length + existingCount);
+});
+
+test('손으로 다시 읽은 행 — 사유는 넣지 않음 · 미확인 둘 중 하나와 괄호 안 이유', () => {
+  for (const [m, why] of Object.entries(HAND_REVIEWED)) assert.match(why, /^reviewed by hand — (not imported|unconfirmed) \(.+\)$/, m);
 });

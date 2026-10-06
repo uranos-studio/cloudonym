@@ -5,12 +5,16 @@ import { RULES } from './constraints';
 import { PROVIDERS } from './types';
 import { AZURE_INTAKE_SCOPES } from './rules/azure-intake';
 import { GCP_INTAKE_SCOPES } from './rules/gcp-intake';
+import { GCP_MANUAL_SCOPES } from './rules/gcp-manual';
+
+/** 손으로 넣은 규칙(rules/*-manual.ts)의 부모 리소스 범위 */
+const MANUAL_SCOPES: Record<string, unknown> = { ...GCP_MANUAL_SCOPES };
 
 const ALL = Object.values(SCOPES);
 
 describe('SCOPES — 범위 그래프 (D37)', () => {
   it('손으로 쓴 15 행 + 들인 부모 리소스 범위 · 키와 id 가 같다 · docUrl 은 https', () => {
-    expect(ALL).toHaveLength(15 + Object.keys(AZURE_INTAKE_SCOPES).length + Object.keys(GCP_INTAKE_SCOPES).length);
+    expect(ALL).toHaveLength(15 + Object.keys(AZURE_INTAKE_SCOPES).length + Object.keys(GCP_INTAKE_SCOPES).length + Object.keys(MANUAL_SCOPES).length);
     for (const [k, s] of Object.entries(SCOPES)) {
       expect(s.id).toBe(k);
       expect(s.id.startsWith(`${s.provider}:`), s.id).toBe(true);
@@ -41,7 +45,7 @@ describe('SCOPES — 범위 그래프 (D37)', () => {
 
   it('ruleId 가 가리키는 규칙은 같은 provider 에 있고 그 규칙의 scope 는 이 범위의 parent 다', () => {
     const withRule = ALL.filter((s) => s.ruleId !== undefined);
-    const hand = withRule.filter((s) => !(s.id in AZURE_INTAKE_SCOPES) && !(s.id in GCP_INTAKE_SCOPES));
+    const hand = withRule.filter((s) => !(s.id in AZURE_INTAKE_SCOPES) && !(s.id in GCP_INTAKE_SCOPES) && !(s.id in MANUAL_SCOPES));
     expect(hand.map((s) => s.ruleId).sort()).toEqual(['aws.vpc', 'azure.container_service_managed_clusters', 'azure.resource_group', 'azure.virtual_network', 'gcp.project_id']);
     for (const s of withRule) {
       const r = RULES[s.ruleId!];

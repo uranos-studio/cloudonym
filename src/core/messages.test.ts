@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { MESSAGE_CODES } from './messages';
 
 describe('엔진 메시지 코드 (D23)', () => {
-  it('51개 · 중복 없음 · 꼴 영역.이름', () => {
-    expect(MESSAGE_CODES).toHaveLength(51);
+  it('60개 · 중복 없음 · 꼴 영역.이름', () => {
+    expect(MESSAGE_CODES).toHaveLength(60);
     expect(new Set(MESSAGE_CODES).size).toBe(MESSAGE_CODES.length);
     for (const c of MESSAGE_CODES) expect(c).toMatch(/^[a-z]+\.[a-z_0-9]+$/);
   });

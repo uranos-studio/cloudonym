@@ -388,5 +388,367 @@
       "disk web",
       "disk/1"
     ]
+  },
+  "gcp.node_group": {
+    "valid": [
+      "ng-01",
+      "a"
+    ],
+    "invalid": [
+      "1ng",
+      "ng-",
+      "Ng",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.node_template": {
+    "valid": [
+      "nt-a1"
+    ],
+    "invalid": [
+      "nt_a",
+      "-nt",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.network_endpoint_group": {
+    "valid": [
+      "neg-01"
+    ],
+    "invalid": [
+      "neg-",
+      "NEG",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.region_network_endpoint_group": {
+    "valid": [
+      "neg-01"
+    ],
+    "invalid": [
+      "9neg",
+      "neg.1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.global_network_endpoint_group": {
+    "valid": [
+      "neg-01"
+    ],
+    "invalid": [
+      "neg_1",
+      "neg-",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.firestore_database": {
+    "valid": [
+      "app-db",
+      "abcd"
+    ],
+    "invalid": [
+      "abc",
+      "1app",
+      "app-",
+      "App-db",
+      "app_db",
+      "0a1b2c3d-1111-2222-3333-444455556666",
+      "(default)",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.spanner_instance": {
+    "valid": [
+      "ab",
+      "trade-prd-01"
+    ],
+    "invalid": [
+      "a",
+      "1ab",
+      "ab-",
+      "ab_c",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.spanner_instance_config": {
+    "valid": [
+      "custom-a",
+      "custom-nam3-x1"
+    ],
+    "invalid": [
+      "custom-",
+      "custom-a-",
+      "nam3",
+      "Custom-a",
+      "custom_a",
+      "custom-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.spanner_instance_partition": {
+    "valid": [
+      "ip-01"
+    ],
+    "invalid": [
+      "-ip",
+      "ip-",
+      "IP",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.spanner_database": {
+    "valid": [
+      "ab",
+      "trade_db-01"
+    ],
+    "invalid": [
+      "a",
+      "1db",
+      "db_",
+      "db-",
+      "Db",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.spanner_backup": {
+    "valid": [
+      "ab",
+      "bkp_2026-01"
+    ],
+    "invalid": [
+      "a",
+      "_bkp",
+      "bkp-",
+      "Bkp",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.gke_cluster": {
+    "valid": [
+      "a",
+      "gke-prd-01"
+    ],
+    "invalid": [
+      "1gke",
+      "gke-",
+      "gke_1",
+      "Gke",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.cloud_function_gen1": {
+    "valid": [
+      "F",
+      "Trade_fn-01"
+    ],
+    "invalid": [
+      "1fn",
+      "fn-",
+      "fn_",
+      "fn.1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.cloud_function": {
+    "valid": [
+      "fn-1",
+      "trade-fn"
+    ],
+    "invalid": [
+      "fn1",
+      "Trade-fn",
+      "trade_fn",
+      "trade-",
+      "1abc",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_oauth_client": {
+    "valid": [
+      "client",
+      "oc-prd-01"
+    ],
+    "invalid": [
+      "oc-01",
+      "gcp-client",
+      "1client",
+      "client-",
+      "Client",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_oauth_client_credential": {
+    "valid": [
+      "cred",
+      "1-a-"
+    ],
+    "invalid": [
+      "abc",
+      "gcp-cred",
+      "Cred",
+      "cr_d",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_policy_binding": {
+    "valid": [
+      "pb1",
+      "bind.prd-01"
+    ],
+    "invalid": [
+      "pb",
+      "1pb",
+      "Pb1",
+      "pb_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_principal_access_boundary_policy": {
+    "valid": [
+      "pab",
+      "pab.prd-01"
+    ],
+    "invalid": [
+      "pa",
+      "-pab",
+      "pab_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_deny_policy": {
+    "valid": [
+      "deny",
+      "deny.prd-01"
+    ],
+    "invalid": [
+      "dn",
+      "1deny",
+      "Deny",
+      "deny_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_custom_role": {
+    "valid": [
+      "abc",
+      "Trade_role.v1"
+    ],
+    "invalid": [
+      "ab",
+      "trade-role",
+      "role 1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_workforce_pool": {
+    "valid": [
+      "wfpool",
+      "wfp-prd-01"
+    ],
+    "invalid": [
+      "wfp01",
+      "gcp-pool",
+      "1wfpool",
+      "wfpool-",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_workforce_pool_provider": {
+    "valid": [
+      "prov",
+      "1-p-"
+    ],
+    "invalid": [
+      "pro",
+      "gcp-prov",
+      "Prov",
+      "pr_v",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_workforce_pool_provider_key": {
+    "valid": [
+      "key1",
+      "gcp-key"
+    ],
+    "invalid": [
+      "key",
+      "Key1",
+      "k_y1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_workload_identity_pool": {
+    "valid": [
+      "pool",
+      "1-p-"
+    ],
+    "invalid": [
+      "poo",
+      "gcp-pool",
+      "Pool",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_wip_managed_identity": {
+    "valid": [
+      "a",
+      "1mi-a"
+    ],
+    "invalid": [
+      "-mi",
+      "mi-",
+      "gcp-mi",
+      "Mi",
+      "mi_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_wip_namespace": {
+    "valid": [
+      "ns",
+      "9"
+    ],
+    "invalid": [
+      "ns-",
+      "gcp-ns",
+      "NS",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_wip_provider": {
+    "valid": [
+      "prov",
+      "1-p-"
+    ],
+    "invalid": [
+      "pro",
+      "gcp-prov",
+      "Prov",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.iam_wip_provider_key": {
+    "valid": [
+      "key1",
+      "gcp-key"
+    ],
+    "invalid": [
+      "key",
+      "Key1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.secret": {
+    "valid": [
+      "a",
+      "Trade_SECRET-01"
+    ],
+    "invalid": [
+      "",
+      "my.secret",
+      "my secret",
+      "a/b",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
   }
 }

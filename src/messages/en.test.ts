@@ -49,6 +49,15 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'note.gcp_vm_project_unique': { code: 'note.gcp_vm_project_unique' },
   'note.aws_key_pair_scope_unconfirmed': { code: 'note.aws_key_pair_scope_unconfirmed' },
   'note.aws_schema_scope_unconfirmed': { code: 'note.aws_schema_scope_unconfirmed' },
+  'note.scope_unconfirmed': { code: 'note.scope_unconfirmed' },
+  'note.narrower_source_used': { code: 'note.narrower_source_used' },
+  'note.blocklist_narrowed': { code: 'note.blocklist_narrowed' },
+  'note.parent_length_limit': { code: 'note.parent_length_limit' },
+  'note.unicode_excluded': { code: 'note.unicode_excluded' },
+  'note.variant_narrowed': { code: 'note.variant_narrowed' },
+  'note.secondary_source': { code: 'note.secondary_source' },
+  'note.obsolete_source_applied': { code: 'note.obsolete_source_applied' },
+  'note.advisory_rule_enforced': { code: 'note.advisory_rule_enforced' },
   'name.conflict': { code: 'name.conflict', params: { name: 'AAA', keys: ['CCC', 'DDD'] } },
   'selection.not_array': { code: 'selection.not_array' },
   'selection.empty': { code: 'selection.empty' },
@@ -85,7 +94,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(65);
+    expect(codes).toHaveLength(74);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

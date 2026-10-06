@@ -6,7 +6,8 @@
 //   node scripts/rules/build-gcp-rules.mjs <compute.json> <cloudkms.json> --anchors anchors.json --existing existing.json
 //       <compute.json>  = https://www.googleapis.com/discovery/v1/apis/compute/v1/rest (JSON 원문)
 //       <cloudkms.json> = https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest (JSON 원문)
-//       --existing      = 손으로 쓴 GCP 규칙의 entity 목록 ["compute.instances", …] — 같은 entity 는 건너뛴다
+//       --existing      = 손으로 쓴 GCP 규칙의 entity 목록 ["compute.instances", …] — 같은 entity 는 건너뛴다.
+//                         rules/gcp.ts 의 손 규칙과 rules/gcp-manual.ts 의 손으로 넣은 규칙(D43)을 둘 다 넣는다
 // 쓰는 파일:
 //   src/core/rules/gcp-intake.ts                     — 범위 · 규칙 행
 //   src/core/__fixtures__/gcp-intake.json            — 원문 행 스냅샷(전사 검사의 정답)
@@ -147,6 +148,15 @@ function kmsRows(doc) {
 }
 
 /** --measure 결과: 메서드 id → 쓸 docUrl (없으면 앵커가 없다) */
+/** 손으로 원문을 다시 읽고도 넣지 않은 행 (D43) — 보류 사유를 이것으로 바꾼다. 넣은 행은 --existing 으로 건너뛴다 */
+const FIREWALL_POLICY_NAME = 'reviewed by hand — unconfirmed (the organization policy shortName is RFC 1035, but no source states a rule for the network firewall policy name)';
+export const HAND_REVIEWED = {
+  'compute.firewallPolicies.insert': FIREWALL_POLICY_NAME,
+  'compute.networkFirewallPolicies.insert': FIREWALL_POLICY_NAME,
+  'compute.regionNetworkFirewallPolicies.insert': FIREWALL_POLICY_NAME,
+  'cloudkms.projects.locations.keyHandles.create': 'reviewed by hand — not imported (optional ID; a UUID is used when it is empty, and no source states its characters or length)',
+};
+
 export function build({ compute, kms, anchors, existing }) {
   const existingSet = new Set(existing);
   const rules = [];
@@ -192,6 +202,7 @@ export function build({ compute, kms, anchors, existing }) {
       cases: KMS_CASES,
     });
   }
+  for (const h of held) if (HAND_REVIEWED[h.row.method]) h.reason = HAND_REVIEWED[h.row.method];
   const keyRing = rules.find((r) => r.method === 'cloudkms.projects.locations.keyRings.create');
   const scopes = [
     { id: 'gcp:project_location', parent: 'gcp:project', displayName: 'Location', docUrl: `${KMS_REST}/projects.locations.keyRings/create#query-parameters` },
@@ -256,7 +267,7 @@ export function renderHeld(result, meta) {
   L.push('');
   L.push('## Other surveyed APIs — not in this pass');
   L.push('');
-  L.push('Cloud Storage, Cloud SQL, GKE, Artifact Registry, Cloud Run, Cloud Functions, IAM, Secret Manager, Firestore and Spanner state their ID rules in prose (or not at all) in their discovery documents, so none of their rows is formal. These descriptions carry a regular expression whose brackets are broken and must not be imported as written:');
+  L.push('Cloud Storage, Cloud SQL, GKE, Artifact Registry, Cloud Run, Cloud Functions, IAM, Secret Manager, Firestore and Spanner state their ID rules in prose (or not at all) in their discovery documents, so none of their rows is formal. Rows whose rule could be read from the REST reference or product guide were added by hand (`src/core/rules/gcp-manual.ts`, one source quote per rule). These descriptions carry a regular expression whose brackets are broken and must not be imported as written — the hand-added rules use the REST reference text instead:');
   L.push('');
   L.push('| API | Field | Text in the discovery document |');
   L.push('|---|---|---|');
