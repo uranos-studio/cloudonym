@@ -351,16 +351,22 @@ with sync_playwright() as p:
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
     expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
 
-    # ── ⑺ 라벨 한도 위반(Azure 태그 값 256자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 (I-1) ──
+    # ── ⑺ 자유 입력은 64자에서 멈춘다 · 라벨 한도 위반(GCP 라벨 값 63자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 ──
+    # Azure 태그 값 한도(256자)는 입력 상한(64자) 때문에 화면에서 닿지 않는다 — GCP 상태로 옮겨 본다
+    page.evaluate('h => { location.hash = h; }', other_hash)
+    expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     page.fill('#field-owner', 'o' * 300)
+    expect(page.locator('#field-owner')).to_have_value('o' * 64)
     expect(page.locator('[data-copy="tags-json"]')).to_be_disabled()
     expect(page.locator('[data-json-blocked]')).to_be_visible()
     expect(page.locator('[data-copy="terraform"]')).to_be_enabled()
     page.click('[data-copy="terraform"]')
-    assert '  # INVALID: azure_tags' in page.evaluate('navigator.clipboard.readText()')
-    page.fill('#field-owner', INPUT['owner'])
+    assert '  # INVALID: gcp_labels' in page.evaluate('navigator.clipboard.readText()')
+    page.fill('#field-owner', OTHER['owner'])
     expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
     expect(page.locator('[data-json-blocked]')).to_have_count(0)
+    page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
 
     # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — CSP 는 고르지 않은 상태 ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
