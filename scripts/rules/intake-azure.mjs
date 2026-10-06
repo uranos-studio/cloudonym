@@ -47,7 +47,7 @@ const isSeparator = (cells) => cells.every((c) => /^:?-{3,}:?$/.test(c));
 const isHeader = (cells) => cells.length === HEADER.length && cells.every((c, i) => c === HEADER[i]);
 
 // ── 판정 ─────────────────────────────────────────────────────────────
-// 조사-지원범위 §2-3 의 규칙을 옮겼다: Length 가 N 또는 N-M 이고, Valid Characters 를 <br> 로 나눈
+// 정형 판정 규칙: Length 가 N 또는 N-M 이고, Valid Characters 를 <br> 로 나눈
 // 토막마다 ① 문자 종류 나열 ② `Can't use: `…` or control characters` ③ 시작 · 끝 · 연속 하이픈의
 // 정해진 문장 — 중 하나에 맞으면 정형. 「Must be `x`」 · 「Use one of」 · GUID · 「Must be in format」은 고정값.
 

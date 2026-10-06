@@ -20,7 +20,7 @@ import { parseAzureRules, h2IdsOf, AZURE_RULES_URL } from './intake-azure.mjs';
 import { parseComputeDiscovery } from './intake-gcp-discovery.mjs';
 import { placedInVpc } from './build-aws-rules.mjs';
 
-/** 조사-지원범위 §3 의 18개 네임스페이스 */
+/** 주요 서비스 18개 네임스페이스(지원 범위 결정 — docs/decisions.md) */
 export const AWS_NAMESPACES = [
   'ApiGateway', 'ApiGatewayV2', 'DynamoDB', 'EC2', 'ECR', 'ECS', 'EFS', 'EKS', 'ElastiCache',
   'ElasticLoadBalancing', 'ElasticLoadBalancingV2', 'IAM', 'KMS', 'Lambda', 'Logs', 'RDS', 'S3', 'SecretsManager',
