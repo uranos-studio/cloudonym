@@ -3,8 +3,10 @@
 // 뿌리는 provider 마다 가장 넓은 유일 범위다(Azure global · GCP 전역 네임스페이스 · AWS 파티션) — 구독 · 프로젝트 · 계정 밖에서 유일한 이름이 있어서다.
 // children 순서 = 이 표의 순서. 각 행 위 주석이 docUrl 쪽에서 옮긴 근거 문장이다.
 import type { Provider } from './types';
+import { AZURE_INTAKE_SCOPES, type AzureIntakeScopeId } from './rules/azure-intake';
 
 export type ScopeId =
+  | AzureIntakeScopeId | 'azure:region'
   | 'aws:partition' | 'aws:account' | 'aws:region' | 'aws:vpc'
   | 'gcp:namespace' | 'gcp:project' | 'gcp:project_global' | 'gcp:project_region' | 'gcp:project_zone'
   | 'azure:global' | 'azure:subscription' | 'azure:resource_group' | 'azure:virtual_network' | 'azure:managed_cluster';
@@ -32,8 +34,12 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   'azure:resource_group': { id: 'azure:resource_group', provider: 'azure', displayName: 'Resource group', parent: 'azure:subscription', ruleId: 'azure.resource_group', docUrl: AZURE_RULES },
   // virtualnetworks / subnets 행 Scope virtual network
   'azure:virtual_network': { id: 'azure:virtual_network', provider: 'azure', displayName: 'Virtual network', parent: 'azure:resource_group', ruleId: 'azure.virtual_network', docUrl: `${AZURE_RULES}#microsoftnetwork` },
+  // batchAccounts 행 Scope Region · EventGrid topics · PowerBI workspaceCollections 등 행 Scope region — 구독 안에서 지역마다 유일로 읽는다 (Scope 열의 정의 문장은 쪽에 없다 · §4-3)
+  'azure:region': { id: 'azure:region', provider: 'azure', displayName: 'Region', parent: 'azure:subscription', docUrl: `${AZURE_RULES}#microsoftbatch` },
   // managedClusters / agentPools 행 Scope managed cluster — AKS 클러스터 규칙은 아직 없어 ruleId 가 없다
-  'azure:managed_cluster': { id: 'azure:managed_cluster', provider: 'azure', displayName: 'Managed cluster', parent: 'azure:resource_group', docUrl: `${AZURE_RULES}#microsoftcontainerservice` },
+  'azure:managed_cluster': { id: 'azure:managed_cluster', provider: 'azure', displayName: 'Managed cluster', parent: 'azure:resource_group', ruleId: 'azure.container_service_managed_clusters', docUrl: `${AZURE_RULES}#microsoftcontainerservice` },
+  // 부모 리소스 범위 — 표의 Scope 칸이 부모 리소스 이름인 행(service · namespace · factory …). 생성 파일 rules/azure-intake.ts
+  ...AZURE_INTAKE_SCOPES,
 
   // ─── GCP ───────────────────────────────────────────────
   // "Project ID: A globally unique identifier for your project." · 버킷 "Every bucket name must be globally unique."

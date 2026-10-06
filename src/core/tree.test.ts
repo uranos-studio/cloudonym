@@ -26,8 +26,9 @@ describe('buildTree', () => {
 
   it('범위이면서 규칙인 노드 — RG 규칙은 Subscription 노드에, RG 범위는 그 자식으로', () => {
     const sub = walk(buildTree('azure')).find((n) => n.scope.id === 'azure:subscription')!;
-    expect(sub.rules.map((r) => r.id)).toEqual(['azure.resource_group']);
-    expect(sub.children.map((c) => c.scope.id)).toEqual(['azure:resource_group']);
+    expect(sub.rules[0]!.id).toBe('azure.resource_group');
+    expect(sub.rules.every((r) => r.scope === 'azure:subscription')).toBe(true);
+    expect(sub.children.map((c) => c.scope.id)).toEqual(['azure:resource_group', 'azure:region']);
     expect(sub.children[0]!.scope.ruleId).toBe('azure.resource_group');
   });
 });
@@ -47,11 +48,11 @@ describe('inputKind', () => {
 });
 
 describe('scopePath', () => {
-  it('뿌리 → 그 범위 · 깊이 ≤ 4', () => {
+  it('뿌리 → 그 범위 · 깊이 ≤ 5 (들인 Azure 부모 리소스 범위가 두 단계 — 2026-10-06 실측 최대 5)', () => {
     for (const r of Object.values(RULES)) {
       const path = scopePath(r);
       expect(path.length, r.id).toBeGreaterThanOrEqual(1);
-      expect(path.length, r.id).toBeLessThanOrEqual(4);
+      expect(path.length, r.id).toBeLessThanOrEqual(5);
       expect(path[0]!.parent, r.id).toBeUndefined();
       expect(path.at(-1)!.id, r.id).toBe(r.scope);
     }

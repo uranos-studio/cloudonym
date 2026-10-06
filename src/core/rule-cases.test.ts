@@ -7,9 +7,16 @@ import { RULES } from './constraints';
 import { checkName } from './validate';
 
 type Cases = Record<string, { valid: string[]; invalid: string[] }>;
-const CASES: Cases = JSON.parse(readFileSync(join(import.meta.dirname, '__fixtures__', 'rule-cases.json'), 'utf-8'));
+const read = (f: string): Cases => JSON.parse(readFileSync(join(import.meta.dirname, '__fixtures__', f), 'utf-8'));
+/** 손 예(rule-cases.json) + 들인 Azure 행의 생성 예(rule-cases-azure-intake.json — scripts/rules/build-azure-rules.mjs 가 원문 문장에서 짠다) */
+const HAND = read('rule-cases.json');
+const INTAKE = read('rule-cases-azure-intake.json');
+const CASES: Cases = { ...HAND, ...INTAKE };
 
 describe('규칙마다 손 예 (rule-cases.json)', () => {
+  it('두 파일의 키가 겹치지 않는다 — 손 예는 손으로 쓴 규칙에만', () => {
+    expect(Object.keys(HAND).filter((k) => k in INTAKE)).toEqual([]);
+  });
   it('모든 규칙에 손 예가 있고 · fixture 에 없는 규칙 키가 없다', () => {
     expect(Object.keys(CASES).sort()).toEqual(Object.keys(RULES).sort());
   });

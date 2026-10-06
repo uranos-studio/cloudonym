@@ -1,0 +1,4589 @@
+{
+ "azure.analysis_services_servers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.api_management_service": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis_issues": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_apis_issues_attachments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_apis_issues_comments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis_operations": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_apis_operations_tags": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis_releases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis_schemas": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_apis_tag_descriptions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_apis_tags": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_api_version_sets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_authorization_servers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_backends": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_diagnostics": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_groups_users": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_identity_providers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_loggers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_notifications": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_s_n_recipient_emails": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.am_service_openid_connect_providers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_products": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_products_apis": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_products_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_products_tags": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_properties": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_subscriptions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_tags": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_templates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.api_management_service_users": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.app_platform_spring": {
+  "valid": [
+   "axxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a--z"
+  ],
+  "invalid": [
+   "axxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axz",
+   "a!xz"
+  ]
+ },
+ "azure.automation_automation_accounts": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.a_automation_accounts_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.a_automation_accounts_connections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.a_automation_accounts_credentials": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.automation_automation_accounts_runbooks": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.automation_automation_accounts_schedules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.automation_automation_accounts_variables": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.automation_automation_accounts_watchers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.automation_automation_accounts_webhooks": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.avs_private_clouds": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.batch_batch_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.batch_batch_accounts_applications": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.batch_batch_accounts_certificates": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a___z",
+   "a---z"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.batch_batch_accounts_pools": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.blockchain_blockchain_members": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.bot_service_bot_services": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.bot_service_bot_services_channels": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.bot_service_bot_services_connections": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.bot_service_enterprise_channels": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.cache_redis": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-",
+   "a--z"
+  ]
+ },
+ "azure.cache_redis_firewall_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.cdn_profiles": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.cdn_profiles_endpoints": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.cdn_profiles_origin_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.cdn_profiles_origin_groups_origins": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.cdn_profiles_afd_endpoints_routes": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.cr_certificate_orders": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.cognitive_services_accounts": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.compute_availability_sets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.compute_disk_encryption_sets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.compute_galleries": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz",
+   "ax_"
+  ]
+ },
+ "azure.compute_galleries_applications": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.compute_galleries_images": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.compute_images": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.compute_snapshots": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.communication_communication_services": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.confidential_ledger_ledgers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.container_instance_container_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-",
+   "a--z"
+  ]
+ },
+ "azure.container_registry_registries": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.cr_registries_build_tasks": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.cr_registries_build_tasks_steps": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.cr_registries_replications": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.container_registry_registries_scope_maps": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a---z",
+   "a___z"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.container_registry_registries_tasks": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a---z",
+   "a___z"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.container_registry_registries_tokens": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a---z",
+   "a___z"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.container_registry_registries_webhooks": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz"
+  ]
+ },
+ "azure.container_service_managed_clusters": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.customer_insights_hubs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.ci_hubs_authorization_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz",
+   "ax_"
+  ]
+ },
+ "azure.customer_insights_hubs_connectors": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.ci_hubs_connectors_mappings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_interactions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_kpi": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_links": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_predictions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_profiles": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.ci_hubs_relationship_links": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_relationships": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_role_assignments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.customer_insights_hubs_views": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "_xz"
+  ]
+ },
+ "azure.custom_providers_associations": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a%z",
+   "ax."
+  ]
+ },
+ "azure.custom_providers_resource_providers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a%z",
+   "ax."
+  ]
+ },
+ "azure.data_box_jobs": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.databricks_workspaces": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.data_factory_factories": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.data_factory_factories_dataflows": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz"
+  ]
+ },
+ "azure.data_factory_factories_datasets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "_xz"
+  ]
+ },
+ "azure.df_factories_integration_runtimes": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.data_factory_factories_linkedservices": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz"
+  ]
+ },
+ "azure.data_factory_factories_pipelines": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz"
+  ]
+ },
+ "azure.data_factory_factories_triggers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz"
+  ]
+ },
+ "azure.df_factories_triggers_rerun_triggers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz"
+  ]
+ },
+ "azure.data_lake_analytics_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.dla_accounts_compute_policies": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.dla_accounts_data_lake_store_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.dla_accounts_firewall_rules": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.dla_accounts_storage_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.data_lake_store_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.data_lake_store_accounts_firewall_rules": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.dls_accounts_virtual_network_rules": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.data_migration_services": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.data_migration_services_projects": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.data_protection_backup_vaults": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.dp_backupvaults_backup_instances": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dp_backup_vaults_backup_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_maria_db_servers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.dbfor_maria_db_servers_databases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_maria_db_servers_firewall_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dmd_servers_virtual_network_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_my_sql_servers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.dbfor_my_sql_servers_databases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_my_sql_servers_firewall_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dms_servers_virtual_network_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_postgre_sql_servers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.dbfor_postgre_sql_servers_databases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dbfor_postgre_sql_servers_firewall_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dps_servers_virtual_network_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dv_application_groups": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.desktop_virtualization_host_pools": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.desktop_virtualization_workspaces": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.devices_iot_hubs": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "ax-"
+  ]
+ },
+ "azure.devices_iot_hubs_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.devices_ih_ehe_consumer_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.devices_provisioning_services": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "ax-"
+  ]
+ },
+ "azure.d_provisioning_services_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dev_test_lab_labs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dev_test_lab_labs_customimages": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.dev_test_lab_labs_formulas": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.document_db_database_accounts": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.event_grid_domains": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.event_grid_domains_topics": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.event_grid_event_subscriptions": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.event_grid_topics": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.event_hub_clusters": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.event_hub_namespaces": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.event_hub_namespaces_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.eh_namespaces_disaster_recovery_configs": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.event_hub_namespaces_eventhubs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.event_hub_n_e_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.eh_namespaces_eventhubs_consumergroups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.file_shares_file_share": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-",
+   "a--z"
+  ]
+ },
+ "azure.hd_insight_clusters": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.import_export_jobs": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.insights_action_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a:z",
+   "ax."
+  ]
+ },
+ "azure.insights_auto_scale_settings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a:z",
+   "ax."
+  ]
+ },
+ "azure.insights_components": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a%z",
+   "ax."
+  ]
+ },
+ "azure.insights_scheduled_query_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a*z",
+   "ax."
+  ]
+ },
+ "azure.insights_metric_alerts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a*z",
+   "ax."
+  ]
+ },
+ "azure.insights_activity_log_alerts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax."
+  ]
+ },
+ "azure.alerts_management_prometheus_rule_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax."
+  ]
+ },
+ "azure.io_t_central_io_t_apps": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.key_vault_vaults_secrets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.kusto_clusters": {
+  "valid": [
+   "axxz",
+   "axxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axxzxxxxxxxxxxxxxxxxxxx",
+   "axz",
+   "a!xz",
+   "1xxz"
+  ]
+ },
+ "azure.kusto_clusters_databases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.k_clusters_databases_data_connections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.k_clusters_databases_eventhubconnections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.lab_services_labplans": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.lab_services_labs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.load_test_service_loadtests": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.logic_integration_accounts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_assemblies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_ia_batch_configurations": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_maps": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_partners": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_ia_rosettanetprocessconfigurations": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_schemas": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_accounts_sessions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_integration_service_environments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_ise_managed_apis": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a.z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.logic_workflows": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.machine_learning_commitment_plans": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.machine_learning_web_services": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.machine_learning_workspaces": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax "
+  ]
+ },
+ "azure.machine_learning_services_workspaces": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.media_mediaservices": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.media_mediaservices_live_events": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.m_mediaservices_live_events_live_outputs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.media_mediaservices_streaming_endpoints": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mobile_network_mobile_networks": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mobile_network_mobile_networks_sites": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mobile_network_mobile_networks_slices": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mn_mobile_networks_sim_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mn_packet_core_control_planes": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.pccp_packet_core_data_planes": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mobile_network_sim_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.mobile_network_sim_groups_sims": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_backups": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_backup_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_capacity_pools": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_share_names": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_snapshots": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.na_net_app_accounts_snapshot_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.net_app_net_app_accounts_volume_groups": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.network_application_gateways": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_application_security_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_azure_firewalls": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_bastion_hosts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_connections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_dns_forwarding_ruleset": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_dns_resolvers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_dns_resolvers_inbound_endpoints": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_dns_resolvers_outbound_endpoints": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_express_route_circuits": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_firewall_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_firewall_policies_rule_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_front_doors": {
+  "valid": [
+   "axxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a---z"
+  ],
+  "invalid": [
+   "axxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxz",
+   "a!xxz",
+   "-xxxz",
+   "axxx-"
+  ]
+ },
+ "azure.network_fwafp": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.network_load_balancers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_load_balancers_inbound_nat_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_local_network_gateways": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.n_network_security_groups_security_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_network_watchers": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_pdz_virtual_network_links": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_private_endpoints": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_private_link_services": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_pls_private_endpoint_connections": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_public_ip_prefixes": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_route_filters": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_route_filters_route_filter_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_route_tables": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_route_tables_routes": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_service_endpoint_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_virtual_network_gateways": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_vn_virtual_network_peerings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_virtual_wans": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_vpn_gateways": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_vpn_gateways_vpn_connections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_vpn_sites": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.nc_bare_metal_machine_key_sets": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_bare_metal_machines": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z"
+  ]
+ },
+ "azure.network_cloud_bmc_key_sets": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_cloud_services_networks": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_cluster_managers": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_clusters": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_edge_clusters": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_edge_clusters_nodes": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z"
+  ]
+ },
+ "azure.network_cloud_kubernetes_clusters": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.nc_kubernetes_clusters_agent_pools": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_l2_networks": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_l3_networks": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_racks": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_registration_hubs": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_registration_hubs_machines": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_storage_appliances": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_trunked_networks": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_volumes": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.network_cloud_virtual_machines": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z"
+  ]
+ },
+ "azure.notification_hubs_namespaces": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.nh_namespaces_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.nh_namespaces_notification_hubs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.n_nh_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.operational_insights_clusters": {
+  "valid": [
+   "axxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a--z"
+  ],
+  "invalid": [
+   "axxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axz",
+   "a!xz",
+   "-xxz",
+   "axx-"
+  ]
+ },
+ "azure.operational_insights_workspaces": {
+  "valid": [
+   "axxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a--z"
+  ],
+  "invalid": [
+   "axxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axz",
+   "a!xz",
+   "-xxz",
+   "axx-"
+  ]
+ },
+ "azure.power_bi_workspace_collections": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "a--z"
+  ]
+ },
+ "azure.power_bi_dedicated_capacities": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.quantum_workspaces": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.recovery_services_vaults": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz"
+  ]
+ },
+ "azure.recovery_services_vaults_backup_policies": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.relay_namespaces": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.relay_namespaces_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.relay_namespaces_hybrid_connections": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z",
+   "a/z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.relay_n_hc_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.relay_namespaces_wcf_relays": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z",
+   "a/z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.relay_n_wr_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.resources_deployments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a(z",
+   "a)z",
+   "a-z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.resources_template_specs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a(z",
+   "a)z",
+   "a-z",
+   "a.z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_alerts_suppression_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_automations": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_auto_provisioning_settings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_connectors": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_device_security_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_iot_security_solutions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.s_locations_application_whitelistings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.s_locations_jit_network_access_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_ingestion_settings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_pricings": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.security_security_contacts": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.sb_namespaces_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sb_namespaces_disaster_recovery_configs": {
+  "valid": [
+   "axxxxz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a----z"
+  ],
+  "invalid": [
+   "axxxxzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "axxxz",
+   "a!xxxz",
+   "-xxxxz",
+   "axxxx-"
+  ]
+ },
+ "azure.service_bus_namespaces_queues": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z",
+   "a/z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sb_namespaces_queues_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.service_bus_namespaces_topics": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z",
+   "a/z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sb_namespaces_topics_authorization_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sb_namespaces_topics_subscriptions": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sb_namespaces_topics_subscriptions_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.service_fabric_clusters": {
+  "valid": [
+   "axxz",
+   "axxxxxxxxxxxxxxxxxxxxxz",
+   "a--z"
+  ],
+  "invalid": [
+   "axxzxxxxxxxxxxxxxxxxxxxx",
+   "axz",
+   "a!xz",
+   "-xxz",
+   "axx-"
+  ]
+ },
+ "azure.signal_r_service_signal_r": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sql_managed_instances": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sql_servers_databases": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax."
+  ]
+ },
+ "azure.sql_servers_databases_sync_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.sql_servers_elastic_pools": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax."
+  ]
+ },
+ "azure.sql_servers_failover_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.sql_servers_firewall_rules": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a<z",
+   "ax."
+  ]
+ },
+ "azure.storage_sa_bs_containers": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "a--z"
+  ]
+ },
+ "azure.s_storage_accounts_file_services_shares": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-",
+   "a--z"
+  ]
+ },
+ "azure.storage_queue": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "-xz",
+   "ax-",
+   "a--z"
+  ]
+ },
+ "azure.storage_table": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z",
+   "1xz"
+  ]
+ },
+ "azure.storage_sync_storage_sync_services": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a z",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "ax."
+  ]
+ },
+ "azure.ss_storage_sync_services_sync_groups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a z",
+   "a.z",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "ax."
+  ]
+ },
+ "azure.stor_simple_managers": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
+  ]
+ },
+ "azure.stream_analytics_streamingjobs": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.stream_analytics_streamingjobs_functions": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.stream_analytics_streamingjobs_inputs": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.stream_analytics_streamingjobs_outputs": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.sa_streamingjobs_transformations": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.synapse_private_link_hubs": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
+  ]
+ },
+ "azure.time_series_insights_environments": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a'z"
+  ]
+ },
+ "azure.tsi_environments_access_policies": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a'z"
+  ]
+ },
+ "azure.tsi_environments_event_sources": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a'z"
+  ]
+ },
+ "azure.tsi_environments_reference_data_sets": {
+  "valid": [
+   "axz",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "az",
+   "a!z"
+  ]
+ },
+ "azure.web_certificates": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a/z",
+   "ax."
+  ]
+ }
+}

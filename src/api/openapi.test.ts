@@ -7,6 +7,7 @@ import { req, jsonPost, json, collectSamples, type Sample } from './test-support
 import { VERSION } from '../version';
 import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
+import { rulesFor } from '../core/constraints';
 import { MESSAGE_CODES } from '../core/messages';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 
@@ -81,9 +82,9 @@ describe('public/openapi.json — /names (D39 · codex #9)', () => {
     expect(it0.properties['role']!.pattern).toBe('^[a-z0-9]{2,16}$');
     expect(r.properties['context']).toEqual(schemas['GenerateRequest']!.properties!['context']);
   });
-  it('NameItem — scope enum 은 ScopeId 전부(14) · uniqueness enum 둘 · 설명은 llms.txt 와 같은 문장', () => {
+  it('NameItem — scope enum 은 ScopeId 전부 · uniqueness enum 둘 · 설명은 llms.txt 와 같은 문장', () => {
     expect(item()['scope']!.enum!.sort()).toEqual(Object.keys(SCOPES).sort());
-    expect(Object.keys(SCOPES)).toHaveLength(14);
+    expect(Object.keys(SCOPES).length).toBeGreaterThan(14); // 손 15 + 들인 Azure 부모 리소스 범위 — 수는 scopes.test 가 센다
     expect(item()['uniqueness']!.enum).toEqual(['csp', 'none']);
     expect(item()['scope']!.description).toBe(SCOPE_MEANING);
     expect(item()['uniqueness']!.description).toBe(UNIQUENESS_MEANING);
@@ -160,10 +161,10 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(expect.arrayContaining(['400', '409']));
   });
 
-  it('example 요청은 200 이고 /generate example 은 24 항목(gcp 9 + azure 15)', async () => {
+  it('example 요청은 200 이고 /generate example 은 gcp · azure 규칙 수만큼', async () => {
     const body = await json((await req(app, '/v1/generate', jsonPost(exampleOf('/generate')))).res);
     expect(validatorFor('GenerateResponse')(body)).toBe(true);
-    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(24);
+    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(rulesFor('gcp').length + rulesFor('azure').length);
     const n = await json((await req(app, '/v1/names', jsonPost(exampleOf('/names')))).res);
     expect(validatorFor('NamesResponse')(n)).toBe(true);
     expect(n.data.azure.valid).toBe(true);

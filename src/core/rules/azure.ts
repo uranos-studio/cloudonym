@@ -1,6 +1,7 @@
 // Azure 규칙 표 — constraints.ts 가 gcp · aws 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
-import type { Forbidden, ResourceRule } from '../types';
+import type { Forbidden, ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
+import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './azure-intake';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
@@ -29,7 +30,7 @@ const AZURE_RESERVED_NOTE: CoreMessage = { code: 'note.azure_reserved', params: 
 const AZURE_RESERVED_AMBIGUOUS_NOTE: CoreMessage = { code: 'note.azure_reserved_ambiguous', params: { doc_url: AZURE_RESERVED_DOC_URL } };
 const WINDOWS_NO_ALL_DIGITS_NOTE: CoreMessage = { code: 'note.windows_no_all_digits', params: { doc_url: WINDOWS_COMPUTER_NAME_DOC_URL } };
 
-export const AZURE_RULES_TABLE: Record<string, ResourceRule> = {
+const AZURE_HAND_RULES: Record<string, ResourceRule> = {
   'azure.resource_group': {
     id: 'azure.resource_group', provider: 'azure', resourceType: 'resource_group',
     displayName: 'Resource Group', slug: 'rg', minLength: 1, maxLength: 90,
@@ -174,4 +175,33 @@ export const AZURE_RULES_TABLE: Record<string, ResourceRule> = {
     scope: 'azure:resource_group', entity: 'Microsoft.Compute/disks', category: 'compute', uniqueness: 'csp',
     docUrl: `${AZURE_RULES}#microsoftcompute`,
   },
+};
+
+// ─── 들인 행 (D43) — rules/azure-intake.ts 의 행을 규칙으로 편다 ──────────────
+// 생성 꼴은 기존 두 꼴을 따른다: 구분자가 있으면 VM 꼴(순번 · region 선택), 없으면 storage 꼴.
+// 전역 범위 행(이름이 엔드포인트가 된다)은 storage · key vault · SQL 처럼 예약어를 건다 (보수적 · D20).
+const SEP_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
+const NOSEP_TEMPLATE: Token[] = ['slug', 'system', 'purpose', 'env'];
+
+function fromIntakeRow(r: (typeof AZURE_INTAKE_ROWS)[number]): ResourceRule {
+  const c = AZURE_INTAKE_CHARS[r.chars];
+  const base = c.separator === '' ? NOSEP_TEMPLATE : SEP_TEMPLATE;
+  const template = r.slug === '' ? base.filter((t) => t !== 'slug') : base;
+  return {
+    id: r.id, provider: 'azure', resourceType: r.id.slice('azure.'.length), displayName: r.displayName, slug: r.slug,
+    minLength: r.min, maxLength: r.max, pattern: c.pattern,
+    ...(c.noConsecutiveSeparator ? { noConsecutiveSeparator: true } : {}),
+    allowed: c.allowed, separator: c.separator, caseRule: c.caseRule, startsWithLetter: c.startsWithLetter, endsWithAlnum: c.endsWithAlnum,
+    ...(r.reserved ? { forbidden: AZURE_RESERVED } : {}),
+    template, optional: template.includes('region') ? ['region'] : [],
+    scope: r.scope, entity: r.entity, category: r.category, uniqueness: 'csp',
+    docUrl: `${AZURE_RULES}#${r.anchor}`,
+    ...(r.reserved ? { notes: [AZURE_RESERVED_NOTE] } : {}),
+  };
+}
+
+/** 손으로 쓴 규칙 다음에 들인 행 — 표 순서 */
+export const AZURE_RULES_TABLE: Record<string, ResourceRule> = {
+  ...AZURE_HAND_RULES,
+  ...Object.fromEntries(AZURE_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
 };

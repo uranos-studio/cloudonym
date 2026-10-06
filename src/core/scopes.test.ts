@@ -3,12 +3,13 @@ import { describe, it, expect } from 'vitest';
 import { SCOPES, type ScopeId } from './scopes';
 import { RULES } from './constraints';
 import { PROVIDERS } from './types';
+import { AZURE_INTAKE_SCOPES } from './rules/azure-intake';
 
 const ALL = Object.values(SCOPES);
 
 describe('SCOPES — 범위 그래프 (D37)', () => {
-  it('14 행 · 키와 id 가 같다 · docUrl 은 https', () => {
-    expect(ALL).toHaveLength(14);
+  it('손으로 쓴 15 행 + 들인 부모 리소스 범위 · 키와 id 가 같다 · docUrl 은 https', () => {
+    expect(ALL).toHaveLength(15 + Object.keys(AZURE_INTAKE_SCOPES).length);
     for (const [k, s] of Object.entries(SCOPES)) {
       expect(s.id).toBe(k);
       expect(s.id.startsWith(`${s.provider}:`), s.id).toBe(true);
@@ -39,7 +40,8 @@ describe('SCOPES — 범위 그래프 (D37)', () => {
 
   it('ruleId 가 가리키는 규칙은 같은 provider 에 있고 그 규칙의 scope 는 이 범위의 parent 다', () => {
     const withRule = ALL.filter((s) => s.ruleId !== undefined);
-    expect(withRule.map((s) => s.ruleId).sort()).toEqual(['aws.vpc', 'azure.resource_group', 'azure.virtual_network', 'gcp.project_id']);
+    const hand = withRule.filter((s) => !(s.id in AZURE_INTAKE_SCOPES));
+    expect(hand.map((s) => s.ruleId).sort()).toEqual(['aws.vpc', 'azure.container_service_managed_clusters', 'azure.resource_group', 'azure.virtual_network', 'gcp.project_id']);
     for (const s of withRule) {
       const r = RULES[s.ruleId!];
       expect(r, s.ruleId).toBeDefined();

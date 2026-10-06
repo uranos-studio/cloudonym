@@ -8,6 +8,7 @@ import { BASELINE_CONTEXTS, coreBaseline } from './baseline-inputs';
 import { generate, parseContext } from './engine';
 import { labelsFor } from './labels';
 import { PROVIDERS, type LabelSet, type Provider } from './types';
+import { RULES } from './constraints';
 import { outputEntries, toTerraformLocals } from '../components/terraform';
 import { labelsJsonBlocked } from '../components/labelsGate';
 
@@ -46,8 +47,8 @@ describe('기준선 — 이름 · 판정 · 제안 · 라벨 · 내보내기가 
     const base = actual.core.contexts.find((c) => c.id === 'base');
     expect(base && 'names' in base).toBe(true);
     const types = PROVIDERS.flatMap((p) => Object.keys((base as { names: Record<string, object> }).names[p] ?? {}));
-    expect(types.length).toBe(35);
-    expect(actual.core.validate.length).toBeGreaterThan(35 * 10);
+    expect(types.length).toBe(Object.keys(RULES).length);
+    expect(actual.core.validate.length).toBeGreaterThan(Object.keys(RULES).length * 10);
     expect(actual.core.contexts.filter((c) => !c.parse.ok).length).toBeGreaterThanOrEqual(5);
     // 무효 · 유효 · 제안이 모두 표본에 있다 — 한쪽만 있으면 회귀를 못 잡는다
     expect(actual.core.validate.some((v) => v.valid)).toBe(true);
