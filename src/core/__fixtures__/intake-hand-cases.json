@@ -1,0 +1,1887 @@
+{
+ "$comment": "손 예 — 원문 문장만 읽고 쓴다(생성기를 보지 않는다). '~' 는 채움 글자 자리. intake-hand.test.ts 가 행마다 길이를 맞춰 적용한다",
+ "azure": {
+  "C01": {
+   "source": "Lowercase letters and numbers<br><br>Start with a lowercase letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftanalysisservices",
+   "valid": [
+    "a~1",
+    "ab~c"
+   ],
+   "invalid": [
+    "1~a",
+    "A~b",
+    "a~B",
+    "a~-b",
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C02": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftapimanagement",
+   "valid": [
+    "A~-b1",
+    "a~9",
+    "a~-1"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C03": {
+   "source": "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric or underscore.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftapimanagement",
+   "valid": [
+    "_~-a",
+    "1~_",
+    "A~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C04": {
+   "source": "Lowercase letters, numbers, and hyphens",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftappplatform",
+   "valid": [
+    "a~-1",
+    "9~z"
+   ],
+   "invalid": [
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C05": {
+   "source": "Can't use:<br> `<>*%&:\\?.+/` or control characters <br><br>Can't end with space.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation",
+   "valid": [
+    "a~ b",
+    "A~-_b",
+    "a~(1)"
+   ],
+   "invalid": [
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~?b",
+    "a~.b",
+    "a~+b",
+    "a~/b",
+    "a~ ",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C06": {
+   "source": "Alphanumerics, underscores, and hyphens<br><br>Start with a letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation",
+   "valid": [
+    "a~_-1",
+    "Z~9"
+   ],
+   "invalid": [
+    "1~a",
+    "_~a",
+    "-~a",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C07": {
+   "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start with alphanumeric and end with alphanumeric or underscore.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftavs",
+   "valid": [
+    "a~.-_",
+    "1~b"
+   ],
+   "invalid": [
+    ".~a",
+    "_~a",
+    "-~a",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C08": {
+   "source": "Lowercase letters and numbers",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbatch",
+   "valid": [
+    "1~a",
+    "a~1"
+   ],
+   "invalid": [
+    "A~a",
+    "a~-b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C09": {
+   "source": "Alphanumerics, underscores, and hyphens",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbatch",
+   "valid": [
+    "a~_-B1"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C10": {
+   "source": "Lowercase letters and numbers<br><br>Start with lowercase letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftblockchain",
+   "valid": [
+    "a~1",
+    "ab~c"
+   ],
+   "invalid": [
+    "1~a",
+    "A~b",
+    "a~B",
+    "a~-b",
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C11": {
+   "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbotservice",
+   "valid": [
+    "a~._-B",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C12": {
+   "source": "Alphanumerics and hyphens<br><br>Start and end with alphanumeric. Consecutive hyphens not allowed.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcache",
+   "valid": [
+    "a~-b-1",
+    "1~A"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    },
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C13": {
+   "source": "Alphanumerics",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcache",
+   "valid": [
+    "a~1B"
+   ],
+   "invalid": [
+    "a~-b",
+    "a~_b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C14": {
+   "source": "Alphanumerics and hyphens<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcdn",
+   "valid": [
+    "a~-1",
+    "1~-B"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C15": {
+   "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric. End with alphanumeric or underscore.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
+   "valid": [
+    "a~._-_",
+    "1~b"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C16": {
+   "source": "Alphanumerics, underscores, and periods<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
+   "valid": [
+    "a~._1"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "a~_",
+    "a~.",
+    "a~-b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C17": {
+   "source": "Alphanumerics, hyphens, and periods<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
+   "valid": [
+    "a~.-1"
+   ],
+   "invalid": [
+    "-~a",
+    ".~a",
+    "a~-",
+    "a~.",
+    "a~_b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C18": {
+   "source": "Alphanumerics, underscores, hyphens, and periods<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
+   "valid": [
+    "a~._-1"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    ".~a",
+    "a~_",
+    "a~-",
+    "a~.",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C19": {
+   "source": "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.<br><br>Can't use underscores.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcommunication",
+   "valid": [
+    "a~-1",
+    "1~-B"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C20": {
+   "source": "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftconfidentialledger",
+   "valid": [
+    "a~-1",
+    "1~-B"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C21": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Consecutive hyphens aren't allowed.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerinstance",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    }
+   ]
+  },
+  "C22": {
+   "source": "Alphanumerics, hyphens, and underscores",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerregistry",
+   "valid": [
+    "a~-_B1"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C23": {
+   "source": "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerservice",
+   "valid": [
+    "a~_-1"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "a~_",
+    "a~-",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C24": {
+   "source": "Alphanumerics<br><br>Start with a letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomerinsights",
+   "valid": [
+    "a~1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "a~-b",
+    "a~_b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C25": {
+   "source": "Alphanumerics and underscores<br><br>Start with a letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomerinsights",
+   "valid": [
+    "a~_1"
+   ],
+   "invalid": [
+    "1~a",
+    "_~a",
+    "a~-b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C26": {
+   "source": "Can't use:<br>`%&\\\\?/` or control characters<br><br>Can't end with period or space.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomproviders",
+   "valid": [
+    "a~ b.c",
+    "a~:b"
+   ],
+   "invalid": [
+    "a~%b",
+    "a~&b",
+    "a~\\b",
+    "a~?b",
+    "a~/b",
+    "a~.",
+    "a~ ",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C27": {
+   "source": "Alphanumerics, hyphens, underscores, and periods",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatabox",
+   "valid": [
+    "a~-_.1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C28": {
+   "source": "Can't use:<br>`<>*#.%&:\\\\+?/` or control characters<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatafactory",
+   "valid": [
+    "a~ b",
+    "1~-_"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    " ~a",
+    "é~a",
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~#b",
+    "a~.b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~+b",
+    "a~?b",
+    "a~/b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "C29": {
+   "source": "Can't use:<br>`<>*#.%&:\\\\+?/-` or control characters<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatafactory",
+   "valid": [
+    "a~ b",
+    "1~_"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    " ~a",
+    "é~a",
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~#b",
+    "a~.b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~+b",
+    "a~?b",
+    "a~/b",
+    "a~-b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "C30": {
+   "source": "Alphanumerics, hyphens, periods, and underscores<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatamigration",
+   "valid": [
+    "a~._-B",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C31": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdataprotection",
+   "valid": [
+    "a~-1"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C32": {
+   "source": "Alphanumerics and hyphens",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdataprotection",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C33": {
+   "source": "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdbformariadb",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C34": {
+   "source": "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphens.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdbforpostgresql",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C35": {
+   "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with a letter or number. End with letter, number, or underscore.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdesktopvirtualization",
+   "valid": [
+    "a~._-_",
+    "1~b"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C36": {
+   "source": "Alphanumerics and hyphens<br><br>Can't end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C37": {
+   "source": "Alphanumerics, hyphens, periods, and underscores",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
+   "valid": [
+    "a~-._1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C38": {
+   "source": "Alphanumerics and hyphens<br><br>End with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
+   "valid": [
+    "a~-1"
+   ],
+   "invalid": [
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C39": {
+   "source": "Alphanumerics, underscores, hyphens, and parentheses",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevtestlab",
+   "valid": [
+    "a~_-(1)"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~[b]",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C40": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdocumentdb",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C41": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C42": {
+   "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
+   "valid": [
+    "a~.-_1"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~_",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C43": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C44": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphens. Can't use consecutive hyphens.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftfileshares",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    }
+   ]
+  },
+  "C45": {
+   "source": "Alphanumerics and hyphens<br><br>Start and end with letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofthdinsight",
+   "valid": [
+    "a~-1",
+    "1~-B"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C46": {
+   "source": "Can't use:<br>`:<>+/&%\\?|` or control characters <br><br>Can't end with space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~:b",
+    "a~<b",
+    "a~>b",
+    "a~+b",
+    "a~/b",
+    "a~&b",
+    "a~%b",
+    "a~\\b",
+    "a~?b",
+    "a~|b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C47": {
+   "source": "Can't use:<br>`%&\\?/` or control characters <br><br>Can't end with space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
+   "valid": [
+    "a~ b.c",
+    "a~:b"
+   ],
+   "invalid": [
+    "a~%b",
+    "a~&b",
+    "a~\\b",
+    "a~?b",
+    "a~/b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C48": {
+   "source": "Can't use:<br>`*<>%{}&:\\\\?/#|` or control characters <br><br>Can't end with space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~*b",
+    "a~<b",
+    "a~>b",
+    "a~%b",
+    "a~{b",
+    "a~}b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~?b",
+    "a~/b",
+    "a~#b",
+    "a~|b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C49": {
+   "source": "Can't use:<br>`*#&+:<>?@%{}\\/|` or control characters <br><br>Can't end with space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~*b",
+    "a~#b",
+    "a~&b",
+    "a~+b",
+    "a~:b",
+    "a~<b",
+    "a~>b",
+    "a~?b",
+    "a~@b",
+    "a~%b",
+    "a~{b",
+    "a~}b",
+    "a~\\b",
+    "a~/b",
+    "a~|b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C50": {
+   "source": "Can't use:<br>`<>*%{}&:\\\\?+/#|` or control characters <br><br>Can't end with space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~%b",
+    "a~{b",
+    "a~}b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~?b",
+    "a~+b",
+    "a~/b",
+    "a~#b",
+    "a~|b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C51": {
+   "source": "Lowercase letters and numbers<br><br>Start with a letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftkusto",
+   "valid": [
+    "a~1",
+    "ab~c"
+   ],
+   "invalid": [
+    "1~a",
+    "A~b",
+    "a~B",
+    "a~-b",
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C52": {
+   "source": "Alphanumerics, hyphens, spaces, and periods",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftkusto",
+   "valid": [
+    "a~ b-c.1"
+   ],
+   "invalid": [
+    "a~_b",
+    "a~/b",
+    "a~\tb",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C53": {
+   "source": "Alphanumerics, hyphens, periods, and underscores<br><br>Start with a letter and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftlabservices",
+   "valid": [
+    "a~.-_1"
+   ],
+   "invalid": [
+    "1~a",
+    "_~a",
+    "a~_",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C54": {
+   "source": "Can't use:<br>`<>*&@:?+/\\,;=.|[]\"` or space<br><br>Can't start with underscore, hyphen, or number. Can't end with underscore or hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftloadtestservice",
+   "valid": [
+    "a~-_b1",
+    "Z~9"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "1~a",
+    "a~_",
+    "a~-",
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~&b",
+    "a~@b",
+    "a~:b",
+    "a~?b",
+    "a~+b",
+    "a~/b",
+    "a~\\b",
+    "a~,b",
+    "a~;b",
+    "a~=b",
+    "a~.b",
+    "a~|b",
+    "a~[b",
+    "a~]b",
+    "a~\"b",
+    "a~ b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "C55": {
+   "source": "Alphanumerics, hyphens, underscores, periods, and parentheses",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftlogic",
+   "valid": [
+    "a~-_.(1)"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~[b]",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C56": {
+   "source": "Can't use:<br>`<>*%&:?+/\\\\` or control characters<br><br>Can't end with a space.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmachinelearning",
+   "valid": [
+    "a~ b-c",
+    "a~.b"
+   ],
+   "invalid": [
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~?b",
+    "a~+b",
+    "a~/b",
+    "a~\\b",
+    "a~ ",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C57": {
+   "source": "Alphanumerics and hyphens<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmedia",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C58": {
+   "source": "Alphanumeric, underscores and hyphens <br><br> Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmobilenetwork",
+   "valid": [
+    "a~_-1",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C59": {
+   "source": "Alphanumeric, underscores, and hyphens <br><br> Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmobilenetwork",
+   "valid": [
+    "a~_-1",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C60": {
+   "source": "Alphanumerics, underscores, and hyphens <br><br> Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
+   "valid": [
+    "a~_-1",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C61": {
+   "source": "Alphanumerics, underscores, periods, and hyphens <br><br> Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
+   "valid": [
+    "a~._-B",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C62": {
+   "source": "Alphanumerics, underscores, and hyphens<br><br>Start with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
+   "valid": [
+    "a~_-1",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C63": {
+   "source": "Alphanumerics and hyphens. <br><br>Start with alphanumeric.<br><br>Underscores aren't supported.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C64": {
+   "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnotificationhubs",
+   "valid": [
+    "a~._-B",
+    "1~a"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C65": {
+   "source": "Alphanumerics and hyphens<br><br>Can't start with hyphen. Can't use consecutive hyphens.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftpowerbi",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    },
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C66": {
+   "source": "Lowercase letters or numbers<br><br>Start with lowercase letter.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftpowerbidedicated",
+   "valid": [
+    "a~1",
+    "ab~c"
+   ],
+   "invalid": [
+    "1~a",
+    "A~b",
+    "a~B",
+    "a~-b",
+    "a~_b",
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C67": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter. Can't end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrecoveryservices",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C68": {
+   "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with a letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C69": {
+   "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
+   "valid": [
+    "a~.-_1"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~_",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C70": {
+   "source": "Alphanumerics, periods, hyphens, underscores, and slashes<br><br>Start and end with alphanumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
+   "valid": [
+    "a~/._-1"
+   ],
+   "invalid": [
+    "/~a",
+    "a~/",
+    "_~a",
+    "a~.",
+    "a~ b",
+    "a~\\b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C71": {
+   "source": "Alphanumerics, underscores, parentheses, hyphens, and periods",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources",
+   "valid": [
+    "a~-_.(1)"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~[b]",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C72": {
+   "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphnumeric.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus",
+   "valid": [
+    "a~.-_1"
+   ],
+   "invalid": [
+    "_~a",
+    ".~a",
+    "-~a",
+    "a~_",
+    "a~.",
+    "a~-",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C73": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter. End with lowercase letter or number.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicefabric",
+   "valid": [
+    "a~-1"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C74": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br> Can't start or end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C75": {
+   "source": "Can't use:<br>`<>*%&:\\/?` or control characters<br><br>Can't end with period or space.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~/b",
+    "a~?b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C76": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C77": {
+   "source": "Can't use:<br>`<>*%&:;\\/?` or control characters<br><br>Can't end with period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~<b",
+    "a~>b",
+    "a~*b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~;b",
+    "a~\\b",
+    "a~/b",
+    "a~?b",
+    "a~.",
+    "a~\u0001b",
+    "a~\u007fb",
+    "a~\u200bb"
+   ]
+  },
+  "C78": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number. Can't use consecutive hyphens.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    },
+    "A~b",
+    "a~_b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C79": {
+   "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Can't use consecutive hyphens.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage",
+   "valid": [
+    "a~-1",
+    "1~b"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb",
+    {
+     "name": "a~--b",
+     "checkOnly": "연속 하이픈"
+    }
+   ]
+  },
+  "C80": {
+   "source": "Alphanumerics, spaces, periods, hyphens, and underscores<br><br>Can't end with period or space.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstoragesync",
+   "valid": [
+    "a~ b.-_1"
+   ],
+   "invalid": [
+    "a~.",
+    "a~ ",
+    "a~/b",
+    "a~\tb",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "C81": {
+   "source": "Can't use:<br>`'<>%&:\\?/#` or control characters",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofttimeseriesinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~'b",
+    "a~<b",
+    "a~>b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~?b",
+    "a~/b",
+    "a~#b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "C82": {
+   "source": "Can't use:<br> `'<>%&:\\?/#` or control characters",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofttimeseriesinsights",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~'b",
+    "a~<b",
+    "a~>b",
+    "a~%b",
+    "a~&b",
+    "a~:b",
+    "a~\\b",
+    "a~?b",
+    "a~/b",
+    "a~#b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "C83": {
+   "source": "Can't use:<br>`/` <br><br>Can't end with a space or period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftweb",
+   "valid": [
+    "a~ b.c"
+   ],
+   "invalid": [
+    "a~/b",
+    "a~ ",
+    "a~.",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  }
+ },
+ "aws": {
+  "^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)$": {
+   "source": "CloudFormation schema pattern ^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)$ (AWS::ECR::PublicRepository.RepositoryName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ecr-publicrepository.html#cfn-ecr-publicrepository-repositoryname",
+   "valid": [
+    "a~b/c-d",
+    "a~.b_c",
+    "1~a"
+   ],
+   "invalid": [
+    "A~b",
+    "-~a",
+    "a~-",
+    "a~--b",
+    "a~._b",
+    "/~a",
+    "a~/",
+    "a~//b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^(?=.{2,256}$)([a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*(\\/[a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*)*)$": {
+   "source": "CloudFormation schema pattern ^(?=.{2,256}$)([a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*(\\/[a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*)*)$ (AWS::ECR::Repository.RepositoryName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ecr-repository.html#cfn-ecr-repository-repositoryname",
+   "valid": [
+    "a~--b",
+    "a~__b",
+    "a~/b.c"
+   ],
+   "invalid": [
+    "a~___b",
+    "a~._b",
+    "A~b",
+    "-~a",
+    "a~-",
+    "_~a",
+    "a~/",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[0-9A-Za-z][A-Za-z0-9\\-_]*": {
+   "source": "CloudFormation schema pattern ^[0-9A-Za-z][A-Za-z0-9\\-_]* (AWS::EKS::Cluster.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-eks-cluster.html#cfn-eks-cluster-name",
+   "valid": [
+    "a~-_1",
+    "1~a",
+    "a~-"
+   ],
+   "invalid": [
+    "-~a",
+    "_~a",
+    "a~.b",
+    "a~ b",
+    "a~:b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-z][a-z0-9]*(-[a-z0-9]+)*$": {
+   "source": "CloudFormation schema pattern ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ (AWS::ElastiCache::ServerlessCacheSnapshot.ServerlessCacheSnapshotName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-elasticache-serverlesscachesnapshot.html#cfn-elasticache-serverlesscachesnapshot-serverlesscachesnapshotname",
+   "valid": [
+    "a~-1",
+    "a~1-b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~--b",
+    "A~b",
+    "a~_b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "[\\w._-]+": {
+   "source": "CloudFormation schema pattern [\\w._-]+ (AWS::IAM::SAMLProvider.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-iam-samlprovider.html#cfn-iam-samlprovider-name",
+   "valid": [
+    "a~._-B1",
+    "_~a"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~@b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "[\\w+=,.@-]+": {
+   "source": "CloudFormation schema pattern [\\w+=,.@-]+ (AWS::IAM::ServerCertificate.ServerCertificateName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-iam-servercertificate.html#cfn-iam-servercertificate-servercertificatename",
+   "valid": [
+    "a~+=,.@-_1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~/b",
+    "a~:b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-zA-Z0-9-_]+$": {
+   "source": "CloudFormation schema pattern ^[a-zA-Z0-9-_]+$ (AWS::Lambda::MicrovmImage.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-microvmimage.html#cfn-lambda-microvmimage-name",
+   "valid": [
+    "a~-_1"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[^:*]{1,256}$": {
+   "source": "CloudFormation schema pattern ^[^:*]{1,256}$ (AWS::Logs::AccountPolicy.PolicyName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-accountpolicy.html#cfn-logs-accountpolicy-policyname",
+   "valid": [
+    "a~ b/c.d"
+   ],
+   "invalid": [
+    "a~:b",
+    "a~*b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "[\\w-]*$": {
+   "source": "CloudFormation schema pattern [\\w-]*$ (AWS::Logs::DeliveryDestination.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-deliverydestination.html#cfn-logs-deliverydestination-name",
+   "valid": [
+    "a~-_1"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[^:*]{1,512}$": {
+   "source": "CloudFormation schema pattern ^[^:*]{1,512}$ (AWS::Logs::Destination.DestinationName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-destination.html#cfn-logs-destination-destinationname",
+   "valid": [
+    "a~ b/c.d"
+   ],
+   "invalid": [
+    "a~:b",
+    "a~*b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "[\\.\\-_/#A-Za-z0-9]+": {
+   "source": "CloudFormation schema pattern [\\.\\-_/#A-Za-z0-9]+ (AWS::Logs::Integration.IntegrationName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-integration.html#cfn-logs-integration-integrationname",
+   "valid": [
+    "a~./#-_1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~:b",
+    "a~*b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[.\\-_/#A-Za-z0-9]{1,512}\\Z": {
+   "source": "CloudFormation schema pattern ^[.\\-_/#A-Za-z0-9]{1,512}\\Z (AWS::Logs::LogGroup.LogGroupName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-loggroup.html#cfn-logs-loggroup-loggroupname",
+   "valid": [
+    "a~./#-_1",
+    "a~1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~:b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[^:*]{1,512}": {
+   "source": "CloudFormation schema pattern ^[^:*]{1,512} (AWS::Logs::MetricFilter.FilterName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-metricfilter.html#cfn-logs-metricfilter-filtername",
+   "valid": [
+    "a~ b/c.d"
+   ],
+   "invalid": [
+    "a~:b",
+    "a~*b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "^([^:*\\/]+\\/?)*[^:*\\/]+$": {
+   "source": "CloudFormation schema pattern ^([^:*\\/]+\\/?)*[^:*\\/]+$ (AWS::Logs::ResourcePolicy.PolicyName)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-resourcepolicy.html#cfn-logs-resourcepolicy-policyname",
+   "valid": [
+    "a~/b",
+    "a~ b"
+   ],
+   "invalid": [
+    "/~a",
+    "a~/",
+    "a~//b",
+    "a~:b",
+    "a~*b",
+    "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-zA-Z0-9_\\-/.#]+$": {
+   "source": "CloudFormation schema pattern ^[a-zA-Z0-9_\\-/.#]+$ (AWS::Logs::ScheduledQuery.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-logs-scheduledquery.html#cfn-logs-scheduledquery-name",
+   "valid": [
+    "a~_-/.#1"
+   ],
+   "invalid": [
+    "a~ b",
+    "a~:b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$": {
+   "source": "CloudFormation schema pattern ^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$ (AWS::RDS::ClusterSnapshot.DBClusterSnapshotIdentifier)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-rds-clustersnapshot.html#cfn-rds-clustersnapshot-dbclustersnapshotidentifier",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~--b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$": {
+   "source": "CloudFormation schema pattern ^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$ (AWS::RDS::DBCluster.DBClusterIdentifier)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbclusteridentifier",
+   "valid": [
+    "a~-1",
+    "Z~b"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "a~--b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$": {
+   "source": "CloudFormation schema pattern ^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$ (AWS::S3::AccessPoint.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-s3-accesspoint.html#cfn-s3-accesspoint-name",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "^[a-z0-9][-a-z0-9]{1,48}[a-z0-9]$": {
+   "source": "CloudFormation schema pattern ^[a-z0-9][-a-z0-9]{1,48}[a-z0-9]$ (AWS::S3::MultiRegionAccessPoint.Name)",
+   "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-s3-multiregionaccesspoint.html#cfn-s3-multiregionaccesspoint-name",
+   "valid": [
+    "a~-1",
+    "1~a"
+   ],
+   "invalid": [
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "tag:general": {
+   "source": "In general, the allowed characters are letters, numbers, spaces representable in UTF-8, and the following characters: _ . : / = + - @.",
+   "url": "https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions",
+   "valid": [
+    "a~ b_.:/=+-@1",
+    "가~나1"
+   ],
+   "invalid": [
+    "a~*b",
+    "a~#b",
+    "a~(b)",
+    "a~,b",
+    "a~\tb",
+    "a~\u0001b",
+    "a~\u200bb",
+    "a~\u202eb"
+   ],
+   "invisibleAccepted": {
+    "chars": [
+     "\u2028"
+    ],
+    "reason": "공개 TagValue 패턴이 \\p{Z}(줄 · 문단 구분 포함)를 받는다 — constraints.ts AWS_TAG_VALUE 와 같은 집합. 「spaces」만 받을지는 미결"
+   }
+  },
+  "tag:ec2": {
+   "source": "Although EC2 allows for any character in its tags, other AWS services are more restrictive.",
+   "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions",
+   "valid": [
+    "a~ *#(b)",
+    "a~\u0001b"
+   ],
+   "invalid": [],
+   "noInvalid": "EC2 는 태그 값에 어떤 문자든 받는다 — 문자로 거부할 예가 원문에 없다",
+   "invisibleAllowed": "같은 이유"
+  }
+ },
+ "gcp": {
+  "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?": {
+   "url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/addresses#Address.FIELDS.name",
+   "source": "The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.",
+   "valid": [
+    "a~-1",
+    "a~--b",
+    "a~"
+   ],
+   "invalid": [
+    "1~a",
+    "-~a",
+    "a~-",
+    "A~b",
+    "a~B",
+    "a~_b",
+    "a~.b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "[a-zA-Z0-9_-]{1,63}": {
+   "url": "https://docs.cloud.google.com/kms/docs/reference/rest/v1/projects.locations.ekmConnections/create#query-parameters",
+   "source": "(id 쿼리 매개변수 설명 안의 정규식) [a-zA-Z0-9_-]{1,63}",
+   "valid": [
+    "a~_-B1",
+    "_~-",
+    "-~a"
+   ],
+   "invalid": [
+    "a~.b",
+    "a~ b",
+    "a~/b",
+    "a~é",
+    "a~\u200bb"
+   ]
+  }
+ }
+}
+
