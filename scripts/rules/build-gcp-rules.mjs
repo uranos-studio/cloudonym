@@ -22,6 +22,7 @@ import { sq, dq, idLit, intLit, metaToken, METHOD_RE } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
 import { scopeIdsFromSources, syncScopeEnum } from './openapi-scopes.mjs';
 import { parseComputeDiscovery, RFC1035_PATTERN } from './intake-gcp-discovery.mjs';
+import { displayWords } from './naming.mjs';
 
 export const COMPUTE_DISCOVERY_URL = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
 export const KMS_DISCOVERY_URL = 'https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest';
@@ -182,7 +183,7 @@ export function build({ compute, kms, anchors, existing }) {
     used.add(resourceType);
     rules.push({
       id: `gcp.${resourceType}`, resourceType, entity, scope, method: row.method,
-      displayName: `${words(row.schema).join(' ')}${prefix ? ` (${PLACE_LABEL[prefix]})` : ''}`,
+      displayName: `${displayWords(words(row.schema)).join(' ')}${prefix ? ` (${PLACE_LABEL[prefix]})` : ''}`,
       slug: slugOf(row.schema), category: categoryOf(row.schema), min: 1, max: 63, pattern: row.pattern, chars: 'rfc1035',
       docUrl, uniquenessDocUrl: COMPUTE_DISCOVERY_URL, cases: RFC1035_CASES,
     });

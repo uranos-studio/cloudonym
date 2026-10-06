@@ -18,6 +18,14 @@ export function typeWords(s) {
 
 export const typeSnake = (s) => typeWords(s).join('_').toLowerCase();
 
+/** 표시명에서만 쓰는 약어 꼴 — 낙타 표기 분해는 VpnGateway → Vpn Gateway 처럼 약어의 첫 글자만 대문자로 남긴다.
+ *  낱말 전체가 표의 열쇠와 같을 때만 바꾼다(Ipam · Http2 · Natural 은 그대로). type(공개 계약)은 typeSnake 가 만들고 이 표를 보지 않는다 */
+export const DISPLAY_ACRONYMS = {
+  Acl: 'ACL', Api: 'API', Cdn: 'CDN', Dns: 'DNS', Grpc: 'gRPC', Http: 'HTTP', Https: 'HTTPS', Ip: 'IP', Iot: 'IoT', Nat: 'NAT',
+  Sql: 'SQL', Ssl: 'SSL', Tcp: 'TCP', Tls: 'TLS', Udp: 'UDP', Url: 'URL', Vm: 'VM', Vpc: 'VPC', Vpn: 'VPN',
+};
+export const displayWords = (words) => words.map((w) => DISPLAY_ACRONYMS[w] ?? w);
+
 /** 한 글자 토막 — `_a_` 같은 type 은 읽을 수 없다(리뷰 지적). 생성기는 이런 후보를 고르지 않는다 */
 export const hasSingleLetterToken = (type) => /(^|_)[a-z](_|$)/.test(type);
 

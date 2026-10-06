@@ -20,7 +20,7 @@
 //   통과 · 실패 예는 a 행마다 사람이 pattern 을 읽고 적은 것(PHYSICAL_CASES)이다 — 정규식에서 뽑지 않는다.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { sq, dq, idLit, intLit, boolLit } from './emit-ts.mjs';
-import { typeWords, typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
+import { typeWords, typeSnake, abbreviateSnake, hasSingleLetterToken, displayWords } from './naming.mjs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { NO_INVISIBLE } from '../../src/core/invisible.mjs';
@@ -293,7 +293,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       if (!resourceType) { held.push({ src, reason: 'no unique resource type of 40 characters or fewer' }); continue; }
       used.add(resourceType);
       rules.push({
-        id: `aws.${resourceType}`, kind: 'a', typeName, property: t.property, displayName: `${ns} ${typeWords(type).join(' ')}`,
+        id: `aws.${resourceType}`, kind: 'a', typeName, property: t.property, displayName: `${ns} ${displayWords(typeWords(type)).join(' ')}`,
         entity: typeName, scope: scopeOf('a', typeName, schema), category: t.category, slug: slugOf(type),
         min: prop.minLength ?? 1, max: prop.maxLength, schemaPattern: prop.pattern, matchPattern: matchPatternOf(prop.pattern), gen: generationOf(matchPatternOf(prop.pattern)), docUrl, cases,
       });
@@ -303,7 +303,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
       used.add(resourceType);
       const ec2 = ns === 'EC2';
       rules.push({
-        id: `aws.${resourceType}`, kind: 'b', typeName, displayName: `${ns} ${typeWords(type).join(' ')} (Name tag)`,
+        id: `aws.${resourceType}`, kind: 'b', typeName, displayName: `${ns} ${displayWords(typeWords(type)).join(' ')} (Name tag)`,
         entity: `${typeName}.NameTag`, scope: scopeOf('b', typeName, schema), category: t.category, slug: slugOf(type),
         tag: ec2 ? 'ec2' : 'general', cases: ec2 ? EC2_TAG_CASES : GENERAL_TAG_CASES,
       });

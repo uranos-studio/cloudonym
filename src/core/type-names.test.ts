@@ -19,3 +19,11 @@ describe('resourceType 꼴', () => {
     expect(types.filter((t) => /(?:^|[._])(?:io_t|i_pv[46]|signal_r)(?:_|$)/.test(t))).toEqual([]);
   });
 });
+
+describe('displayName — 약어는 약어 꼴로', () => {
+  // 생성기(scripts/rules/naming.mjs DISPLAY_ACRONYMS)가 낙타 표기를 낱말로 쪼갠 뒤 첫 글자만 대문자로 남기던 꼴(Vpn · Ssl · Nat …)
+  const CAMEL = /\b(?:Acl|Api|Cdn|Dns|Grpc|Http|Https|Ip|Nat|Sql|Ssl|Tcp|Tls|Udp|Url|Vm|Vpc|Vpn)\b/;
+  it('알려진 약어가 낙타 꼴로 남은 표시명이 없다', () => {
+    expect(Object.values(RULES).filter((r) => CAMEL.test(r.displayName)).map((r) => `${r.id}: ${r.displayName}`)).toEqual([]);
+  });
+});

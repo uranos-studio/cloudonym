@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { typeWords, typeSnake, hasSingleLetterToken, abbreviateSnake } from './naming.mjs';
+import { typeWords, typeSnake, hasSingleLetterToken, abbreviateSnake, displayWords } from './naming.mjs';
 
 test('typeWords — 섞인 약어를 한 낱말로', () => {
   assert.deepEqual(typeWords('IPv4Pool'), ['IPv4', 'Pool']);
@@ -21,4 +21,14 @@ test('한 글자 토막 판정', () => {
 
 test('낱말 약어', () => {
   assert.equal(abbreviateSnake('ec2_ipam_external_resource_verification_token'), 'ec2_ipam_ext_resource_verif_token');
+});
+
+test('displayWords — 표시명의 약어를 약어 꼴로 · type 낱말(typeWords)은 그대로', () => {
+  assert.deepEqual(displayWords(typeWords('ExternalVpnGateway')), ['External', 'VPN', 'Gateway']);
+  assert.deepEqual(displayWords(typeWords('TargetHttpsProxy')), ['Target', 'HTTPS', 'Proxy']);
+  assert.deepEqual(displayWords(typeWords('TargetGrpcProxy')), ['Target', 'gRPC', 'Proxy']);
+  assert.deepEqual(displayWords(['Sql', 'servers']), ['SQL', 'servers']);
+  // 약어 낱말 그 자체만 바꾼다 — Ipam · Http2 · Natural 은 그대로
+  assert.deepEqual(displayWords(['Ipam', 'Http2', 'Natural', 'IoT']), ['Ipam', 'Http2', 'Natural', 'IoT']);
+  assert.equal(typeSnake('ExternalVpnGateway'), 'external_vpn_gateway');
 });

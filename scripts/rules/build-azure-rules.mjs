@@ -19,7 +19,7 @@ import { sq, dq, idLit, intLit, boolLit, regexLit, metaToken } from './emit-ts.m
 import { pathToFileURL } from 'node:url';
 import { INVISIBLE_CLASS } from '../../src/core/invisible.mjs';
 import { scopeIdsFromSources, syncScopeEnum } from './openapi-scopes.mjs';
-import { typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
+import { typeSnake, abbreviateSnake, hasSingleLetterToken, displayWords } from './naming.mjs';
 
 export const AZURE_RULES_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 export const CAF_URL = 'https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations';
@@ -434,7 +434,7 @@ export function build(intake, caf, existing) {
     const cls = charClasses.get(row.validCharactersRaw);
     rules.push({
       row, id: `azure.${resourceType}`, resourceType, entity: id, scope, cls: cls.key,
-      displayName: cafHit?.name ?? `${ns.replace(/^Microsoft\./, '')} ${segs.join(' / ')}`,
+      displayName: cafHit?.name ?? `${displayWords([ns.replace(/^Microsoft\./, '')])[0]} ${segs.join(' / ')}`,
       slug, slugSource: cafHit ? 'caf' : 'derived', category: categoryOf(ns), min: row.length.min, max: row.length.max,
       reserved: scope === 'azure:global',
       cases: casesOf(spec, row.length.min, row.length.max),
