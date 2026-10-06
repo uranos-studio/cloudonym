@@ -124,10 +124,10 @@ describe('규칙 버전 · 지문 (D26)', () => {
     // 정규식 안의 // 와 템플릿 안의 /* 를 주석으로 읽어 뒤를 삼키지 않는다
     expect(normalizeSource('const a = /\\/\\//; const b = 1;')).toContain('b');
     expect(normalizeSource('const a = `/* ${x} */`; const b = 1;')).toContain('b');
-    // 위 src 의 {3}→{2,3} 이 리뷰 M1 의 변이다 — 실제 validate.ts 글자에 묶지 않는다(정규식을 고치면 이 시험이 엉뚱하게 깨진다)
+    // 위 src 의 {3}→{2,3} 이 IPv4 꼴 경계 고침의 변이다 — 실제 validate.ts 글자에 묶지 않는다(정규식을 고치면 이 시험이 엉뚱하게 깨진다)
     expect(Object.keys(currentParts().sources)).toEqual(expect.arrayContaining(['validate.ts', 'engine.ts', 'constraints.ts', 'truncate.ts']));
     expect(Object.keys(currentParts().sources)).not.toContain('revision.ts');
-    // 하위 폴더 소스도 지문에 들어간다 — 재귀 수집 · __fixtures__ 제외 (계획 §15 codex #4)
+    // 하위 폴더 소스도 지문에 들어간다 — 재귀 수집 · __fixtures__ 제외
     const keys = Object.keys(currentParts().sources);
     expect(keys.some((k) => k.startsWith('__fixtures__/'))).toBe(false);
     expect(keys.filter((k) => k.includes('/')).length).toBeGreaterThan(0);

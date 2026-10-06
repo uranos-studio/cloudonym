@@ -1,4 +1,4 @@
-// 요청 제한 (보안 리뷰 M-1) — Workers Rate Limiting 바인딩 API_LIMITER 로 클라이언트 IP 당 센다.
+// 요청 제한 — Workers Rate Limiting 바인딩 API_LIMITER 로 클라이언트 IP 당 센다.
 // https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/ — period 는 10 또는 60 초만 된다
 // 공식 문서는 IP 를 키로 권하지 않는다(NAT 뒤 여러 사용자가 한 IP 를 나눈다). 무인증 공개 API 라 다른 식별자가 없어 IP 로 간다 — 한도를 넉넉히 잡는 까닭이다
 import type { Context, MiddlewareHandler } from 'hono';

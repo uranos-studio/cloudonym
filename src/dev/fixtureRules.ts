@@ -1,4 +1,4 @@
-// 시험 전용 규칙 표 (계획 §7-4 · §15 codex #7) — 화면을 `?fixture=…` 로 열 때만 쓴다. DEV 빌드에서만 들인다(main.tsx).
+// 시험 전용 규칙 표 — 화면을 `?fixture=…` 로 열 때만 쓴다. DEV 빌드에서만 들인다(main.tsx).
 // rules500 — Azure 규칙 500개(500행 측정). 범위 다섯 · 분류 여덟 · 입력 종류 셋을 고루 섞는다. 이름은 fx500_ 로 시작한다(번들 검사가 이 글자를 센다)
 // conflict — Azure 규칙 표 + 충돌 fixture 둘(D41 · core/__fixtures__/conflict.ts — 엔진 · API 시험과 같은 것)
 import { rulesFor } from '../core/constraints';

@@ -18,7 +18,7 @@ export function hclString(value: string): string {
     // 치환 문자열의 `$$` 는 `$` 하나로 줄어든다 — 함수로 넘겨 글자 그대로 넣는다
     .replace(/\$\{/g, () => '$${')
     .replace(/%\{/g, () => '%%{');
-  // 제어 문자 · 양방향 제어 · 폭 없는 문자는 \uXXXX 로 — 공유 URL 로 심은 값이 리뷰에서 보이는 것과 다른 순서로 렌더되지 않게 (Trojan Source · 보안 리뷰 L-5).
+  // 제어 문자 · 양방향 제어 · 폭 없는 문자는 \uXXXX 로 — 공유 URL 로 심은 값이 리뷰에서 보이는 것과 다른 순서로 렌더되지 않게 (Trojan Source).
   // 역슬래시 이스케이프 뒤에 둔다 — 여기서 넣은 역슬래시가 다시 두 겹이 되지 않는다. HCL 은 \uNNNN 을 받는다
   return `"${escapeInvisible(escaped)}"`;
 }

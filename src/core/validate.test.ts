@@ -17,10 +17,10 @@ describe('checkName', () => {
   it('길이 초과 이유에 실제 길이와 최대가 들어간다 (34자) — pattern 위반은 겹쳐 말하지 않는다', () => {
     expect(checkName('infra-billing-trade-prd-kr-sa-sync', sa)).toEqual([{ code: 'name.too_long', params: { actual: 34, max: 30 } }]);
   });
-  it('숫자로 시작하는 GCP 이름은 첫 글자 위반 (Review Focus 2)', () => {
+  it('숫자로 시작하는 GCP 이름은 첫 글자 위반', () => {
     expect(checkName('3tier-trade-prd-sa-sync', sa)).toEqual([{ code: 'name.first_not_letter' }]);
   });
-  it('빈 이름은 하나의 이유만 (Review Focus 1)', () => expect(checkName('', st)).toEqual([{ code: 'name.empty' }]));
+  it('빈 이름은 하나의 이유만', () => expect(checkName('', st)).toEqual([{ code: 'name.empty' }]));
   it('Azure Storage 에 하이픈 → pattern 위반', () => {
     expect(checkName('st-web-prod', st)).toContainEqual({ code: 'name.pattern_mismatch', params: { pattern: '^[a-z0-9]{3,24}$' } });
   });
@@ -30,7 +30,7 @@ describe('checkName', () => {
     expect(checkName('my_bucket', gcs)).toEqual([]);
     expect(checkName('Mydb', rds)).toEqual([]);
   });
-  it('예약어 · 금지 접두사 · 접미사 (Review Focus 3 · D19)', () => {
+  it('예약어 · 금지 접두사 · 접미사', () => {
     expect(checkName('sthree-example', s3)).toContainEqual({ code: 'name.forbidden_prefix', params: { value: 'sthree-' } });
     expect(checkName('demo--table-s3', s3)).toContainEqual({ code: 'name.forbidden_suffix', params: { value: '--table-s3' } });
     expect(checkName('goog-example', gcs)).toContainEqual({ code: 'name.forbidden_prefix', params: { value: 'goog' } });
@@ -48,7 +48,7 @@ describe('checkName', () => {
     expect(checkName('rg_(1)', rg)).toEqual([]);
   });
   it('한 글자 이름을 허용하는 규칙(Azure SQL)은 a 가 유효', () => expect(checkName('a', sql)).toEqual([]));
-  it('codex P1: Windows VM 은 숫자로만 된 이름이 pattern 위반 · Linux VM 은 유효', () => {
+  it('Windows VM 은 숫자로만 된 이름이 pattern 위반 · Linux VM 은 유효', () => {
     const win = getRule('azure', 'virtual_machine_windows')!;
     const linux = getRule('azure', 'virtual_machine')!;
     expect(checkName('12345', win)).toEqual([expect.objectContaining({ code: 'name.pattern_mismatch' })]);
@@ -93,7 +93,7 @@ describe('checkName', () => {
     expect(checkName('aksmanagedap', aksLinux)).toEqual([{ code: 'name.forbidden_exact', params: { value: 'aksmanagedap' } }]);
   });
 
-  // ─── 원장 판정 M2 · forbidden 전 필드 ───
+  // ─── forbidden 전 필드 ───
   it('S3 새 접미사 -an 은 위반', () => expect(checkName('x-an', s3)).toEqual([{ code: 'name.forbidden_suffix', params: { value: '-an' } }]));
   it('AKS Linux 노드풀 예약 이름 aksmanagedap 은 위반 (exact) — 그 이름을 포함할 뿐인 것은 아니다', () => {
     expect(checkName('aksmanagedap', aksLinux)).toEqual([{ code: 'name.forbidden_exact', params: { value: 'aksmanagedap' } }]);

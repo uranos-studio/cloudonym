@@ -1,5 +1,5 @@
 // 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
-// 제목에 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01`) data-key 로 항목을 가리킨다 (계획 §7-5)
+// 제목에 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01`) data-key 로 항목을 가리킨다
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';

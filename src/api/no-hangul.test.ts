@@ -1,4 +1,4 @@
-// 시스템 문구 한글 0 (완료 기준 ⑴ · codex #7 · #12) — ASCII 입력만 쓰는 대표 요청의 응답 JSON 전체를 면제 없이 걷는다.
+// 시스템 문구 한글 0 (D24) — ASCII 입력만 쓰는 대표 요청의 응답 JSON 전체를 면제 없이 걷는다.
 // 입력이 ASCII 라 응답에 한글이 있으면 그것은 시스템 문구다. 사용자 값 보존은 user-data.test 가 따로 본다
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { app } from './index';

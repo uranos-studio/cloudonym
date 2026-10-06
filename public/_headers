@@ -1,7 +1,7 @@
 # Workers Static Assets 헤더 — Worker 가 만든 응답(/v1/* · /llms.txt)에는 적용되지 않는다 (그쪽은 src/api/index.ts 의 secureHeaders)
 # https://developers.cloudflare.com/workers/static-assets/headers/
 #
-# 보안 헤더 (보안 리뷰 L-1) — 빌드 산출물(dist/client/index.html)에 인라인 스크립트 · 스타일이 없어 'self' 만으로 된다.
+# 보안 헤더 — 빌드 산출물(dist/client/index.html)에 인라인 스크립트 · 스타일이 없어 'self' 만으로 된다.
 # React 의 style prop 은 CSSOM 이라 style-src 에 막히지 않는다. connect-src 'self' 는 /v1/events 비콘용.
 # 클립보드는 막지 않는다 — 복사(writeText)는 화면 기능이고, clipboard-read=() 는 화면 시험(tests/ui/screen.py)이 복사된 값을 readText 로 대어 보는 길을 막는다.
 # 읽기는 어차피 브라우저가 사용자 허락을 묻는다. HSTS 는 커스텀 도메인을 붙일 때 존 설정에서 켠다

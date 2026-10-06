@@ -1,4 +1,4 @@
-// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-azure-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).
+// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-azure-rules.mjs 로 다시 만든다 (D43).
 // 출처: resource-name-rules 원문 커밋 4966c6cb088804bf367be4399949194a937c8cba (ms.date 08/05/2026) · 접두 약어는 Microsoft CAF 약어 쪽(없으면 docs/azure-intake-held.md 의 규칙).
 // 문자 규칙 표의 키는 원문 「Valid Characters」 칸 그대로다 — 원문 → 정규식이 리뷰 자리다. 길이는 minLength · maxLength 가 센다(validate.ts).
 import type { Allowed, ResourceRule } from '../types';

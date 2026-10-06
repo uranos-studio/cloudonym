@@ -123,13 +123,13 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
-  it('meta 가 _time · kst_day · event 를 덮어쓰지 못한다 — 서버 값이 이긴다 (이월 6)', async () => {
+  it('meta 가 _time · kst_day · event 를 덮어쓰지 못한다 — 서버 값이 이긴다', async () => {
     const { fetchFn, calls } = fakeFetch();
     await logTelemetry(source({ AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }), 'api_validate', { _time: 'x', kst_day: 'x', event: 'x', is_ai_agent: true, provider: 'gcp' }, { now: NOW, fetchFn });
     const [row] = JSON.parse(calls[0]!.init.body) as Record<string, unknown>[];
     expect(row).toMatchObject({ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'api_validate', is_ai_agent: false, provider: 'gcp' });
   });
-  it('formatToParts 에 부분이 빠지면 실패로 친다 — console.error 뒤 KV · Axiom 을 건너뛴다 (「--T::」 를 보내지 않는다 · 이월 7)', async () => {
+  it('formatToParts 에 부분이 빠지면 실패로 친다 — console.error 뒤 KV · Axiom 을 건너뛴다 (「--T::」 를 보내지 않는다)', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const { kv, store } = fakeKv();
@@ -142,7 +142,7 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
-  it('어떤 오류도 밖으로 내지 않는다 — 잘못된 시각(RangeError)도 resolve (최종 리뷰 M-3)', async () => {
+  it('어떤 오류도 밖으로 내지 않는다 — 잘못된 시각(RangeError)도 resolve', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const { kv, store } = fakeKv();
@@ -164,7 +164,7 @@ describe('logTelemetry', () => {
   });
 });
 
-describe('Axiom 에 싣는 User-Agent (보안 리뷰 L-4)', () => {
+describe('Axiom 에 싣는 User-Agent', () => {
   it('256자로 자르고 제어 문자를 지운다 — 판정(is_ai_agent)도 자른 값으로 한다', async () => {
     const { fetchFn, calls } = fakeFetch();
     const ua = `Claude\n\r\u0000${'x'.repeat(1000)}`;

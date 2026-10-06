@@ -44,7 +44,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(text).toContain('- `kr` — aliases: korea, koreacentral, asia-northeast3, ap-northeast-2');
     expect(text).toContain('- `global`');
   });
-  it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u (최종 리뷰 I-3)', () => {
+  it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = lines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
     expect(rg).toContain('(flags: u)');
     const flagged = rules.filter((r) => r.pattern.flags !== '');
@@ -112,7 +112,7 @@ describe('GET /llms.txt — Worker 라우트 (D17)', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toMatch(/^text\/plain;\s*charset=utf-8$/i);
     expect(res.headers.get('cache-control')).toBe('public, max-age=86400');
-    expect(res.headers.get('access-control-allow-origin')).toBe('*');   // 최종 리뷰 M-1 — 다른 origin 의 에이전트 도구가 읽는다
+    expect(res.headers.get('access-control-allow-origin')).toBe('*');   // 다른 origin 의 에이전트 도구가 읽는다
     expect((await res.text()).split('\n')[0]).toBe('# Cloudonym');
     expect(promises).toHaveLength(1);
     await promises[0];

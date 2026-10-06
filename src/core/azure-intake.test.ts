@@ -1,4 +1,4 @@
-// 전사 검사 (D43 · 계획 §8-4) — 들인 Azure 행이 원문 표와 같은지 원문 스냅샷(__fixtures__/azure-intake.json)에 대어 본다.
+// 전사 검사 (D43) — 들인 Azure 행이 원문 표와 같은지 원문 스냅샷(__fixtures__/azure-intake.json)에 대어 본다.
 // 정답은 RULES 가 아니라 원문이다 — RULES 에서 뽑아 RULES 를 검사하면 돌림 시험이 된다.
 // 원문 402행은 셋 중 하나여야 한다: 손으로 쓴 규칙 · 들인 규칙 · 보류 목록(docs/azure-intake-held.md).
 import { describe, it, expect } from 'vitest';

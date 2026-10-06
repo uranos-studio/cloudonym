@@ -74,7 +74,7 @@ describe('public/openapi.json — 형식', () => {
   });
 });
 
-describe('public/openapi.json — /names (D39 · codex #9)', () => {
+describe('public/openapi.json — /names (D39)', () => {
   const item = () => schemas['NameItem']!.properties!;
   it('NamesRequest — resources 1~200 · count 1~99 · role pattern · provider enum · context 는 generate 와 같다', () => {
     const r = schemas['NamesRequest']! as Schema & { properties: Record<string, Schema & { minItems?: number; maxItems?: number }> };
@@ -102,7 +102,7 @@ describe('public/openapi.json — /names (D39 · codex #9)', () => {
   });
 });
 
-describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다 (ajv · D25 · codex #8)', () => {
+describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다 (ajv · D25)', () => {
   // OpenAPI 3.0 의 example 키워드 때문에 strict:false. 명세 전체를 한 스키마로 넣고 #/components/schemas/X 를 그 안에서 찾는다
   const ajv = new Ajv({ strict: false, allErrors: true });
   ajv.addSchema({ $id: 'openapi', components: spec.components }, 'openapi');

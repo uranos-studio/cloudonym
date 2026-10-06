@@ -1,4 +1,4 @@
-// GCP 정형 행 → 규칙 데이터 생성기 (D43 · 계획 §8-2 ②). 개발 때만 돈다(번들 · CI 밖).
+// GCP 정형 행 → 규칙 데이터 생성기 (D43). 개발 때만 돈다(번들 · CI 밖).
 //
 // 사용:
 //   node scripts/rules/build-gcp-rules.mjs --measure <compute.json> <cloudkms.json> > anchors.json
@@ -215,7 +215,7 @@ export function build({ compute, kms, anchors, existing }) {
 // ── 출력 ──────────────────────────────────────────────────────────
 export function renderTs(result, meta) {
   const L = [];
-  L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-gcp-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
+  L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-gcp-rules.mjs 로 다시 만든다 (D43).');
   L.push(`// 출처: Compute 디스커버리 revision ${metaToken(meta.computeRevision)} · Cloud KMS 디스커버리 revision ${metaToken(meta.kmsRevision)}.`);
   L.push('// pattern 은 원문 그대로(compute name.pattern · KMS 설명 문장 안 정규식)이고 rules/gcp.ts 가 ^(?:…)$ 로 감싼다.');
   L.push("import type { ResourceRule } from '../types';");

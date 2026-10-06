@@ -29,7 +29,7 @@ function isProvider(v: unknown): v is Provider {
   return typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
 }
 
-/** 문자열 필드 길이 상한 — 이름 규칙이 아니라 전송 위생이다(최종 리뷰 I-1). 규칙 표의 최대 max_length 는 256 이라
+/** 문자열 필드 길이 상한 — 이름 규칙이 아니라 전송 위생이다. 규칙 표의 최대 max_length 는 256 이라
  *  257자 이름은 여기를 지나 엔진에 닿아 「길이 257자 — 최대 256자」를 받는다. 1024 면 엔진의 제안 루프도 1 ms 안이다 */
 export const MAX_FIELD_CHARS = 1024;
 
@@ -53,13 +53,13 @@ function checkRulesVersion(body: Record<string, unknown>): { ok: false; rejectio
   if (typeof v !== 'string') return reject([{ code: 'request.field_not_string', field: 'rules_version' }]);
   if (v.length > MAX_FIELD_CHARS) return reject(tooLong({ rules_version: v }));
   if (v !== RULES_REVISION) {
-    // requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다. 문장(message)에는 넣지 않는다 (리뷰 S1)
+    // requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다. 문장(message)에는 넣지 않는다
     return reject([{ code: 'request.rules_version_mismatch', params: { requested: describe(v), current: RULES_REVISION } }], undefined, 409);
   }
   return undefined;
 }
 
-/** 오류 params 에 넣을 표시용 값 — 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 80자까지 (리뷰 S2). String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다(최종 리뷰 I-2) */
+/** 오류 params 에 넣을 표시용 값 — 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 80자까지. String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다 */
 function describe(v: unknown): string {
   let text: string;
   if (typeof v === 'string') text = v;

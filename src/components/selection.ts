@@ -1,4 +1,4 @@
-// 화면의 선택 상태 (D40 · D42) — resourceType → { count, role } Map 하나. 트리 행은 이것을 읽기만 한다 (계획 §7-4).
+// 화면의 선택 상태 (D40 · D42) — resourceType → { count, role } Map 하나. 트리 행은 이것을 읽기만 한다.
 // 바꿀 때마다 core validateSelection 으로 판정한다 — API · hash 디코더와 같은 함수라 세 호출자의 판정이 같다
 import { DEFAULT_ROLE } from '../core/engine';
 import { MAX_COUNT, MAX_ITEMS, MAX_NAMES, validateSelection, type SelectionItem } from '../core/selection';
@@ -8,7 +8,7 @@ import type { Provider, ResourceRule } from '../core/types';
 export interface PickedEntry { count: number; role?: string }
 export type Picked = ReadonlyMap<string, PickedEntry>;
 
-/** 트리 순서(전위 — 노드의 규칙 → 자식 범위) — 범위 경로 → 규칙 표 순서 (계획 §7-5) */
+/** 트리 순서(전위 — 노드의 규칙 → 자식 범위) — 범위 경로 → 규칙 표 순서 */
 export function treeRules(tree: TreeNode): ResourceRule[] {
   return [...tree.rules, ...tree.children.flatMap(treeRules)];
 }
@@ -72,7 +72,7 @@ export function applyChange(provider: Provider, tree: TreeNode, next: Picked, ru
   return validateSelection(provider, raw, rules).ok ? next : undefined;
 }
 
-/** CSP 를 바꾸면 선택을 비운다 — 규칙 id 가 provider 에 묶여 있어 옮길 수 없다 (계획 §7-1) */
+/** CSP 를 바꾸면 선택을 비운다 — 규칙 id 가 provider 에 묶여 있어 옮길 수 없다 */
 export function clearForCloudSwitch(): Picked {
   return new Map();
 }

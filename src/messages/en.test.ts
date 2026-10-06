@@ -120,12 +120,12 @@ describe('영어 사전 (D24)', () => {
     expect(format(SAMPLES['step.abbreviated'], en)).toContain("'AAA' to 'BBB'");
     expect(format(SAMPLES['rule.unknown_resource_type'], en)).toContain('CCC, DDD');
     expect(format(SAMPLES['request.value_unsupported'], en)).toBe("Unsupported providers[1] 'BBB'");
-    // requested 는 params 에만 있고 문장에는 넣지 않는다 (리뷰 S1)
+    // requested 는 params 에만 있고 문장에는 넣지 않는다
     expect(format(SAMPLES['request.rules_version_mismatch'], en)).toContain("does not match the current rules revision 'BBB'");
     expect(format(SAMPLES['request.rules_version_mismatch'], en)).not.toContain('AAA');
   });
 
-  it('사용자 값의 제어 · 양방향 · 폭 없는 문자는 문장과 params 에서 \\uXXXX 로 바뀐다 (리뷰 S2)', () => {
+  it('사용자 값의 제어 · 양방향 · 폭 없는 문자는 문장과 params 에서 \\uXXXX 로 바뀐다', () => {
     const rlo = String.fromCodePoint(0x202e);
     const m = { code: 'request.value_unsupported', field: 'provider', params: { value: `a${rlo}b\u0000c\u200Bd` } } as const;
     expect(format(m, en)).toBe("Unsupported provider 'a\\u202Eb\\u0000c\\u200Bd'");
@@ -136,7 +136,7 @@ describe('영어 사전 (D24)', () => {
     expect(escapeInvisible('plain-name_01 · é')).toBe('plain-name_01 · é');
   });
 
-  it('notes 는 한 구분자로 잇는다 — 화면과 llms.txt 가 같다 (리뷰 Q4)', () => {
+  it('notes 는 한 구분자로 잇는다 — 화면과 llms.txt 가 같다', () => {
     const notes = [SAMPLES['note.s3_an_suffix'], SAMPLES['note.gcs_dotted_names_222']] as Message[];
     expect(formatNotes(notes, en)).toBe(`${format(notes[0]!, en)}${NOTE_SEPARATOR}${format(notes[1]!, en)}`);
   });

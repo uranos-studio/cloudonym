@@ -1,4 +1,4 @@
-// 전사 검사 (D43 · 계획 §8-4) — 들인 AWS 행이 원문(CloudFormation 리소스 스키마)과 같은지 원문 스냅샷(__fixtures__/aws-intake.json)에 대어 본다.
+// 전사 검사 (D43) — 들인 AWS 행이 원문(CloudFormation 리소스 스키마)과 같은지 원문 스냅샷(__fixtures__/aws-intake.json)에 대어 본다.
 // 정답은 RULES 가 아니라 원문이다. 원문 행(판정 표의 a · b 타입 202)은 셋 중 하나여야 한다:
 // 손으로 쓴 규칙 · 들인 규칙 · 보류 목록(docs/aws-intake-held.md).
 import { describe, it, expect } from 'vitest';

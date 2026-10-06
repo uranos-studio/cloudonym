@@ -25,7 +25,7 @@ describe('encodeState — Base64url', () => {
   });
 });
 
-describe('decodeState — 깨진 hash 는 전부 undefined (Review Focus 4)', () => {
+describe('decodeState — 깨진 hash 는 전부 undefined', () => {
   it.each([
     ['#state=!!!', 'Base64 가 아니다'],
     [`#state=${btoa('{not json')}`, 'JSON 이 아니다'],
@@ -63,7 +63,7 @@ describe('shareUrl', () => {
   });
 });
 
-describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
+describe('decodeState 길이 상한', () => {
   const at = (s: string): NamingContext => ({ owner: s, system: s, purpose: s, env: 'prd', region: 'global' });
   /** 가장 긴 v — N 두 자리 */
   const V = '2099-12-31.99';
@@ -132,7 +132,7 @@ describe('규칙 버전 v (D26 · D27 ⑵)', () => {
   });
 });
 
-// ─── hash v2 — p · r (D42 · 계획 §7-3) ───────────────────────────
+// ─── hash v2 — p · r (D42) ───────────────────────────
 import { validateSelection, MAX_ITEMS, MAX_NAMES } from '../core/selection';
 import { rulesFor } from '../core/constraints';
 import type { ResourceRule } from '../core/types';
@@ -181,7 +181,7 @@ describe('hash v2 — p · r 왕복 (D42)', () => {
   });
 });
 
-describe('hash v2 — 디코더가 걸린 항목만 버린다 (계획 §7-3)', () => {
+describe('hash v2 — 디코더가 걸린 항목만 버린다', () => {
   const open = (r: unknown, p = 'azure') => decodeState(`#state=${b64({ ...ctx, v: V2, p, r })}`);
   it('모르는 type 은 버리고 나머지는 연다', () => {
     const d = open({ virtual_machine: 3, no_such_type: 1 });
@@ -193,7 +193,7 @@ describe('hash v2 — 디코더가 걸린 항목만 버린다 (계획 §7-3)', (
     expect(flat(d?.selection)).toEqual([['key_vault', 1, null]]);
     expect(d?.dropped).toBe(6);
   });
-  it('role 규칙에 1 이 와도 기본 역할로 읽지 않고 버린다 — codex 의 겹침 꼴(r 에 1 · o 에 역할)은 둘 다 남지 않는다', () => {
+  it('role 규칙에 1 이 와도 기본 역할로 읽지 않고 버린다 — 겹침 꼴(r 에 1 · o 에 역할)은 둘 다 남지 않는다', () => {
     const d = decodeState(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: { managed_identity: 1 }, o: { managed_identity: 'db' } })}`);
     expect(d?.selection).toBeUndefined();
     expect(d?.dropped).toBe(1);
@@ -225,7 +225,7 @@ describe('hash v2 — 디코더가 걸린 항목만 버린다 (계획 §7-3)', (
   });
 });
 
-describe('hash v2 — 최대 상태 왕복과 상한 (계획 §7-3 · codex #2)', () => {
+describe('hash v2 — 최대 상태 왕복과 상한', () => {
   // 시험 전용 role 규칙 200개 · resourceType 40자 · 역할 16자 · 자유 필드 셋 최악 JSON 문자 64자
   const mi = rulesFor('azure').find((r) => r.resourceType === 'managed_identity')!;
   const rules: ResourceRule[] = Array.from({ length: MAX_ITEMS }, (_, i) => {

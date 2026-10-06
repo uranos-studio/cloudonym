@@ -1,4 +1,4 @@
-// IPv4 꼴 경계 (리뷰 M1) — 기준선 fixture 는 손대지 않으므로 경계 표본은 이 파일에 따로 둔다.
+// IPv4 꼴 경계 — 기준선 fixture 는 손대지 않으므로 경계 표본은 이 파일에 따로 둔다.
 // 점 셋으로 이은 1~3자리 숫자 넷만 IPv4 꼴이다. 정규식이 {3} → {2,3} 처럼 느슨해지면 '1.2.3' 이 무효로 뒤집혀 여기서 걸린다
 import { describe, it, expect } from 'vitest';
 import { validateName } from './engine';

@@ -66,14 +66,14 @@ describe('LABEL_LIMITS', () => {
   });
 });
 
-describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
+describe('공식 문서 대조로 고친 값 ', () => {
   it('S3 금지 접미사에 -an 이 있다 (계정 지역 네임스페이스 전용)', () => {
     expect(RULES['aws.s3_bucket'].forbidden?.suffixes).toContain('-an');
   });
   it('AKS Linux 노드풀 예약 이름 aksmanagedap 을 막는다', () => {
     expect(RULES['azure.aks_nodepool_linux'].forbidden?.exact).toContain('aksmanagedap');
   });
-  it('codex P1: Windows VM 의 숫자만 금지는 Windows ComputerName 문서가 근거이고 notes 에 그 URL 이 실린다', () => {
+  it('Windows VM 의 숫자만 금지는 Windows ComputerName 문서가 근거이고 notes 에 그 URL 이 실린다', () => {
     expect(WINDOWS_COMPUTER_NAME_DOC_URL).toMatch(/^https:\/\/learn\.microsoft\.com\/en-us\/windows-hardware\/.*computername$/);
     expect(RULES['azure.virtual_machine_windows'].notes).toContainEqual({ code: 'note.windows_no_all_digits', params: { doc_url: WINDOWS_COMPUTER_NAME_DOC_URL } });
     expect(RULES['azure.virtual_machine_windows'].pattern.test('12345')).toBe(false);

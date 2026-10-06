@@ -1,4 +1,4 @@
-// 범위 그래프 불변식 (D37 · 계획 §4-5) — SCOPES 는 provider 마다 뿌리 하나 · 순환 없음 · ruleId 의 scope = 그 범위의 parent
+// 범위 그래프 불변식 (D37) — SCOPES 는 provider 마다 뿌리 하나 · 순환 없음 · ruleId 의 scope = 그 범위의 parent
 import { describe, it, expect } from 'vitest';
 import { SCOPES, type ScopeId } from './scopes';
 import { RULES } from './constraints';

@@ -17,11 +17,11 @@ describe('generate', () => {
     const out = generate({ ...ctx, system: 'billing-trade' }, ['azure']);
     expect(out.azure?.storage_account).toMatchObject({ name: 'stbillingtradetradeprd', isTransformed: true });
   });
-  it('정제 뒤 빈 필수 토큰은 valid:false 이고 이름을 만들지 않는다 (Review Focus 1)', () => {
+  it('정제 뒤 빈 필수 토큰은 valid:false 이고 이름을 만들지 않는다', () => {
     const out = generate({ ...ctx, system: '매매' }, ['azure']);
     expect(out.azure?.storage_account).toMatchObject({ valid: false, name: '', violations: [{ code: 'name.token_empty', field: 'system' }] });
   });
-  it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유 (Review Focus 2)', () => {
+  it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유', () => {
     const vm = generate({ ...ctx, system: '3tier' }, ['gcp']).gcp!.compute_instance;
     expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prd-kr-vm-01', violations: [{ code: 'name.first_not_letter' }] });
   });
@@ -37,7 +37,7 @@ describe('generate', () => {
     const s3 = generate(ctx, ['aws']).aws!.s3_bucket;
     expect(s3.rule).toMatchObject({ maxLength: 63, allowed: 'lower-digit-hyphen', pattern: '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$' });
   });
-  // 원장 판정 M1 (Task 1-5 이월) — GCP 에서 owner 가 든 규칙은 전부 owner 가 optional 이다
+  // GCP 에서 owner 가 든 규칙은 전부 owner 가 optional 이다
   it('한글 owner 는 정제 뒤 비어도 optional 이라 GCP 규칙 전부 유효', () => {
     const out = generate({ ...ctx, owner: '홍길동' }, ['gcp']).gcp!;
     for (const r of rulesFor('gcp')) expect(out[r.resourceType], r.id).toMatchObject({ valid: true, violations: [] });
@@ -60,7 +60,7 @@ describe('parseContext', () => {
     expect(parseContext({ ...ctx, env: 'qa' })).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prd', 'stg', 'dev', 'sbx'] } }] });
     expect(parseContext({ ...ctx, owner: 3 })).toMatchObject({ ok: false });
   });
-  it('모르는 region 문구와 필드 순서 (원장 판정 n8)', () => {
+  it('모르는 region 문구와 필드 순서', () => {
     expect(parseContext({ ...ctx, region: 'mars', owner: '' })).toEqual({ ok: false, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: ['kr', 'us', 'jp', 'eu', 'global'] } }] });
   });
 });
@@ -75,19 +75,19 @@ describe('validateName', () => {
   it('구분자 없는 규칙의 길이 초과는 제안하지 않는다', () => {
     expect(validateName('azure', 'storage_account', 'st' + 'a'.repeat(23)).suggestedName).toBeUndefined();
   });
-  it('모르는 resource_type 은 violations 하나로 알린다 (Review Focus 5)', () => {
+  it('모르는 resource_type 은 violations 하나로 알린다', () => {
     expect(validateName('gcp', 'nope', 'x').violations[0]).toMatchObject({ code: 'rule.unknown_resource_type', params: { provider: 'gcp' } });
   });
   it('유효한 이름은 제안 없이 valid:true', () => {
     expect(validateName('gcp', 'service_account', 'billing-trade-prd-sa-sync')).toEqual({ valid: true, violations: [] });
   });
-  it('⑵ 는 정제한 값을 쪼갠다 (원장 판정 n7)', () => {
+  it('⑵ 는 정제한 값을 쪼갠다', () => {
     // 대문자 · 밑줄이 섞인 긴 이름 — 정제 뒤 값에서 앞 토큰을 뗀다
     expect(validateName('gcp', 'service_account', 'InFra-Billing-trade-prd-kr-sa_sync').suggestedName).toBe('billing-trade-prd-kr-sasync');
   });
 });
 
-describe('1단계 최종 리뷰 고침', () => {
+describe('개발 1단계 마감 고침', () => {
   it('I-1: rule.patternFlags 를 함께 내보내 wire 쪽에서 같은 정규식을 다시 만들 수 있다', () => {
     const rg = generate(ctx, ['azure']).azure?.resource_group;
     expect(rg?.rule.patternFlags).toBe('u');
@@ -112,7 +112,7 @@ describe('1단계 최종 리뷰 고침', () => {
       expect(validateName('azure', t, 'vm-web-01').valid, `${t} vm-web-01`).toBe(true);
     }
   });
-  it('codex P1: Windows VM 은 숫자로만 된 이름(12345)을 거부한다 — Linux VM 은 문서 근거가 없어 그대로 받는다', () => {
+  it('Windows VM 은 숫자로만 된 이름(12345)을 거부한다 — Linux VM 은 문서 근거가 없어 그대로 받는다', () => {
     expect(validateName('azure', 'virtual_machine_windows', '12345').valid).toBe(false);
     expect(validateName('azure', 'virtual_machine_windows', '1').valid).toBe(false);
     expect(validateName('azure', 'virtual_machine_windows', '123456789012345').valid).toBe(false);
@@ -120,7 +120,7 @@ describe('1단계 최종 리뷰 고침', () => {
     expect(validateName('azure', 'virtual_machine_windows', '12-34').valid).toBe(true);
     expect(validateName('azure', 'virtual_machine', '12345').valid).toBe(true);
   });
-  it('codex P1: 숫자만 넣어도 generate 의 Windows VM 이름은 숫자만으로 되지 않는다 (slug vm 이 늘 든다)', () => {
+  it('숫자만 넣어도 generate 의 Windows VM 이름은 숫자만으로 되지 않는다 (slug vm 이 늘 든다)', () => {
     const w = generate({ owner: '1', system: '12', purpose: '34', env: 'prd', region: 'kr' }, ['azure']).azure!.virtual_machine_windows;
     expect(w.valid).toBe(true);
     expect(w.name).not.toMatch(/^\d+$/);
@@ -136,7 +136,7 @@ describe('1단계 최종 리뷰 고침', () => {
     expect(r.suggestedName ?? '').not.toMatch(/microsoft/);
     expect(validateName('azure', 'storage_account', 'stbilling01').valid).toBe(true);
   });
-  it('결과의 rule.notes 를 고쳐도 규칙 표는 그대로다 — 참조가 아니라 사본 (리뷰 Q3)', () => {
+  it('결과의 rule.notes 를 고쳐도 규칙 표는 그대로다 — 참조가 아니라 사본', () => {
     const first = generate(ctx, ['gcp']).gcp!.cloud_sql_instance!;
     expect(first.rule.notes.length).toBeGreaterThan(0);
     first.rule.notes.push({ code: 'note.s3_an_suffix' });

@@ -33,7 +33,7 @@ export function jsonPost(body: unknown): RequestInit {
 }
 
 /** 응답이 끝난 뒤에도 아직 pending 인가 — waitUntil 이 응답을 막지 않았다는 증거.
- *  반대편을 Promise.resolve(true) 로 두면 이미 끝난 p 도 true 가 된다(p.then 의 파생 Promise 가 한 마이크로태스크 늦다 · challenge M-1).
+ *  반대편을 Promise.resolve(true) 로 두면 이미 끝난 p 도 true 가 된다(p.then 의 파생 Promise 가 한 마이크로태스크 늦다).
  *  매크로태스크(setTimeout 0) 뒤에 true 를 내면 끝난 p 의 반응이 먼저 settle 한다. 자기 시험: test-support.test.ts */
 export function isPending(p: Promise<unknown>): Promise<boolean> {
   return Promise.race([p.then(() => false, () => false), new Promise<boolean>((r) => setTimeout(() => r(true), 0))]);
@@ -53,7 +53,7 @@ export function fakeKv(mode: 'ok' | 'throw' | 'hang' = 'ok'): { kv: KVNamespace;
   return { kv: kv as unknown as KVNamespace, store };
 }
 
-/** 화면 비콘과 같은 요청 — 브라우저가 붙이는 Sec-Fetch-Site: same-origin 을 싣는다. /v1/events 는 이 헤더가 없으면 403 이다 (보안 리뷰 M-2) */
+/** 화면 비콘과 같은 요청 — 브라우저가 붙이는 Sec-Fetch-Site: same-origin 을 싣는다. /v1/events 는 이 헤더가 없으면 403 이다 */
 export function beaconPost(body: unknown, headers: Record<string, string> = {}): RequestInit {
   return { method: 'POST', headers: { 'content-type': 'text/plain;charset=UTF-8', 'sec-fetch-site': 'same-origin', ...headers }, body: JSON.stringify(body) };
 }

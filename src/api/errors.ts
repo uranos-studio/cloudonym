@@ -1,6 +1,6 @@
 // 실패 응답 직렬화기 (D25) — 모든 실패(400 · 403 · 404 · 409 · 413 · 429 · 500)가 이 fail() 하나를 지난다.
 // 404(없는 경로 · 메서드)도 같다. 꼴은 { success:false, errors: WireMessage[], supported? } — errors[i] 마다 code 와 영어 message 가 있다.
-// 500 은 스택을 로그에만 남기고 응답에는 싣지 않는다 (최종 리뷰 I-2)
+// 500 은 스택을 로그에만 남기고 응답에는 싣지 않는다
 import type { Context } from 'hono';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { Message } from '../messages/catalog';

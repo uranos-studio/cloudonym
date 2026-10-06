@@ -1,5 +1,5 @@
-# 개발 4단계 Task 4-3 — 태그 v* 가 붙을 때만 Cloudflare Workers 로 배포한다.
-# 배포는 항상 `npm run deploy`(빌드 포함)로 한다 (Global Constraints · codex 1차 #21)
+# 태그 v* 가 붙을 때만 Cloudflare Workers 로 배포한다.
+# 배포는 항상 `npm run deploy`(빌드 포함)로 한다 (Global Constraints)
 name: deploy
 
 on:
@@ -14,7 +14,7 @@ concurrency:
   group: deploy-production
   cancel-in-progress: false
 
-# 액션은 커밋 SHA 로 고정한다 — 이 job 은 CLOUDFLARE_API_TOKEN 을 쥐고 돈다. 태그가 옮겨지면 남의 코드가 토큰을 본다 (보안 리뷰 L-3)
+# 액션은 커밋 SHA 로 고정한다 — 이 job 은 CLOUDFLARE_API_TOKEN 을 쥐고 돈다. 태그가 옮겨지면 남의 코드가 토큰을 본다
 jobs:
   deploy:
     runs-on: ubuntu-latest

@@ -1,4 +1,4 @@
-// AWS 정형 행 → 규칙 데이터 생성기 (D43 · 계획 §8-2 ②). 개발 때만 돈다(번들 · CI 밖).
+// AWS 정형 행 → 규칙 데이터 생성기 (D43). 개발 때만 돈다(번들 · CI 밖).
 //
 // 사용:
 //   node scripts/rules/build-aws-rules.mjs --measure <스키마 폴더> > anchors.json
@@ -263,7 +263,7 @@ export function build({ schemas, targets, anchors, existingTypes = [...Object.ke
 // ── 출력 ──────────────────────────────────────────────────────────
 export function renderTs(result) {
   const out = [];
-  out.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-aws-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
+  out.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-aws-rules.mjs 로 다시 만든다 (D43).');
   out.push('// 출처: CloudFormation 리소스 스키마(CloudformationSchema.zip) — a 행은 이름 속성의 pattern · minLength · maxLength 그대로,');
   out.push('// b 행은 Name 태그(EC2 는 aws.vpc 와 같은 규칙 · 다른 서비스는 일반 태그 값 문자). rules/aws.ts 가 규칙으로 편다.');
   out.push("import type { ResourceRule } from '../types';");

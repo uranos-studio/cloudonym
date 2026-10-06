@@ -1,4 +1,4 @@
-// 태그 · 라벨 JSON — 고른 CSP 하나만 담는다 (계획 §7-5). 복사: 태그 JSON({ version, labels } · D26).
+// 태그 · 라벨 JSON — 고른 CSP 하나만 담는다. 복사: 태그 JSON({ version, labels } · D26).
 // Terraform(이름 + 태그)은 ④ Names 의 내보내기 셋에 있다
 import { CopyButton } from './CopyButton';
 import { labelsJsonBlocked } from './labelsGate';

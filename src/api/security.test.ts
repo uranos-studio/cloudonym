@@ -9,7 +9,7 @@ const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', r
 const TOO_MANY = { success: false, errors: [{ code: 'request.rate_limited', params: { retry_after: 60 }, message: 'Too many requests; retry after 60 seconds' }] };
 const ip = (h: Record<string, string> = {}) => ({ 'cf-connecting-ip': '203.0.113.7', ...h });
 
-describe('요청 제한 (보안 리뷰 M-1) — Rate Limiting 바인딩 API_LIMITER, 클라이언트 IP 당', () => {
+describe('요청 제한 — Rate Limiting 바인딩 API_LIMITER, 클라이언트 IP 당', () => {
   it('기본값은 60 초에 60 건 — wrangler.jsonc 의 ratelimits 와 같다', () => {
     expect(RATE_LIMIT).toEqual({ limit: 60, period: 60 });
     const text = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
@@ -75,7 +75,7 @@ describe('요청 제한 (보안 리뷰 M-1) — Rate Limiting 바인딩 API_LIMI
   });
 });
 
-describe('/v1/events 는 화면(같은 출처)만 받는다 (보안 리뷰 M-2)', () => {
+describe('/v1/events 는 화면(같은 출처)만 받는다', () => {
   const FORBIDDEN = { success: false, errors: [{ code: 'request.same_origin_only', message: 'Only same-origin requests from the Cloudonym page are accepted' }] };
   for (const site of [undefined, 'cross-site', 'same-site', 'none']) {
     it(`Sec-Fetch-Site ${site ?? '없음(curl 등)'} → 403 · 카운터를 올리지 않는다`, async () => {
@@ -108,7 +108,7 @@ describe('/v1/events 는 화면(같은 출처)만 받는다 (보안 리뷰 M-2)'
   });
 });
 
-describe('Worker 응답 보안 헤더 (보안 리뷰 L-2) — secureHeaders', () => {
+describe('Worker 응답 보안 헤더 — secureHeaders', () => {
   const hasSecure = (res: Response, label: string) => {
     expect(res.headers.get('X-Content-Type-Options'), label).toBe('nosniff');
     expect(res.headers.get('Cross-Origin-Resource-Policy'), label).toBe('cross-origin');
@@ -146,7 +146,7 @@ describe('Worker 응답 보안 헤더 (보안 리뷰 L-2) — secureHeaders', ()
   });
 });
 
-describe('정적 UI 보안 헤더 (보안 리뷰 L-1) — public/_headers', () => {
+describe('정적 UI 보안 헤더 — public/_headers', () => {
   const text = readFileSync(join(import.meta.dirname, '../../public/_headers'), 'utf-8');
   /** 규칙 이름(/* 등) → 헤더 줄들 */
   const rules = new Map<string, string[]>();

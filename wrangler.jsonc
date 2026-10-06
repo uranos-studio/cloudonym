@@ -27,7 +27,7 @@
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-	// 요청 제한 (보안 리뷰 M-1) — 클라이언트 IP 당 60 초에 60 건. POST /v1/* 와 GET /llms.txt 를 센다(src/api/ratelimit.ts).
+	// 요청 제한 — 클라이언트 IP 당 60 초에 60 건. POST /v1/* 와 GET /llms.txt 를 센다(src/api/ratelimit.ts).
 	// period 는 10 또는 60 만 된다. namespace_id 는 계정 안에서 고유한 양의 정수 문자열이다
 	// https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
 	"ratelimits": [

@@ -14,7 +14,7 @@ function specifiersOf(content: string): string[] {
 
 const CORE_DIR = import.meta.dirname;
 
-/** 상대 경로(./ · ../)이고, 그 파일 자리에서 해석한 경로가 src/core/ 아래여야 한다 (계획 §8-2 ③).
+/** 상대 경로(./ · ../)이고, 그 파일 자리에서 해석한 경로가 src/core/ 아래여야 한다.
  *  하위 폴더(rules/)의 '../types' 는 통과, '../../api/x' · './../api/x' 는 src/core 밖이라 거부한다. 패키지 이름은 거부 */
 function isAllowed(spec: string, fromFile: string): boolean {
   if (!spec.startsWith('./') && !spec.startsWith('../')) return false;
@@ -32,7 +32,7 @@ function coreFiles(dir: string): string[] {
 }
 
 describe('src/core/ 모듈 경계 — import 는 ./ 로만', () => {
-  // 검사기를 먼저 시험한다 — 잡아야 할 것을 실제로 잡는가 (최종 리뷰 I-4)
+  // 검사기를 먼저 시험한다 — 잡아야 할 것을 실제로 잡는가
   it('검사기 자체: 우회 꼴을 전부 잡고 정상 꼴은 통과시킨다', () => {
     const probe = [
       "import { a } from './types';",

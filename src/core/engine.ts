@@ -30,11 +30,11 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
     original: compose(raw, rule.template, rule.separator),
     isTransformed: transformed,
     rule: { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
-            // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게 (리뷰 Q3)
+            // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게
             notes: (rule.notes ?? []).map((m) => structuredClone(m)) },
   };
 
-  // Review Focus 1 — 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다
+  // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다
   const emptied = rule.template.filter((t) => !rule.optional.includes(t) && !values[t]);
   if (emptied.length > 0) {
     return { ...base, name: '', valid: false, isTruncated: false, violations: emptied.map((t): CoreMessage => ({ code: 'name.token_empty', field: t })), steps };
@@ -42,7 +42,7 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
 
   const f = fit(values, rule);
   steps.push(...f.steps);
-  // 원장 판정 n6 — 축소 실패면 이유는 그 하나만 (checkName 을 부르지 않는다)
+  // 축소 실패면 이유는 그 하나만 (checkName 을 부르지 않는다)
   const violations: CoreMessage[] = f.fits ? checkName(f.name, rule) : [{ code: 'name.cannot_fit', params: { max: rule.maxLength } }];
   return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
 }
@@ -112,8 +112,8 @@ export function validateName(provider: Provider, resourceType: string, name: str
   const normalized = normalizeToken(name, rule.allowed).value;
   if (checkName(normalized, rule).length === 0) return { valid: false, violations, suggestedName: normalized };
 
-  // ⑵ 길이 초과면 정제한 값을 쪼개 앞 토큰부터 뗀다 (원장 판정 n7).
-  // 생성의 축소 1단계(template 순서대로 optional 을 뗀다)와 다른 까닭: 검증은 이름이 어떤 template 으로 만들어졌는지 모른다 (원장 판정 n11)
+  // ⑵ 길이 초과면 정제한 값을 쪼개 앞 토큰부터 뗀다.
+  // 생성의 축소 1단계(template 순서대로 optional 을 뗀다)와 다른 까닭: 검증은 이름이 어떤 template 으로 만들어졌는지 모른다
   // ⑶ 구분자 없는 규칙은 토큰 경계를 모르므로 제안하지 않는다
   if (normalized.length > rule.maxLength && rule.separator === '-') {
     const parts = normalized.split('-');
@@ -141,7 +141,7 @@ export function parseContext(raw: RawContext):
   const errors: CoreMessage[] = [];
   const transformed: CoreMessage[] = [];
   const vals: Record<string, string> = {};
-  // 원장 판정 n8 — 여러 필드가 틀리면 owner → system → purpose → env → region 순서로 알린다
+  // 여러 필드가 틀리면 owner → system → purpose → env → region 순서로 알린다
   for (const f of FIELDS) {
     const v = raw[f];
     if (typeof v !== 'string') { errors.push({ code: 'context.not_string', field: f }); continue; }

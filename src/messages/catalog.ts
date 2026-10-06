@@ -71,7 +71,7 @@ export function format(m: Message, catalog: Catalog): string {
   return template(displayMessage(m));
 }
 
-/** 규칙 notes 를 한 줄로 — 화면(ResultCard)과 llms.txt 가 같은 구분자를 쓴다 (리뷰 Q4) */
+/** 규칙 notes 를 한 줄로 — 화면(ResultCard)과 llms.txt 가 같은 구분자를 쓴다 */
 export const NOTE_SEPARATOR = '; ';
 export function formatNotes(notes: readonly Message[], catalog: Catalog): string {
   return notes.map((m) => format(m, catalog)).join(NOTE_SEPARATOR);

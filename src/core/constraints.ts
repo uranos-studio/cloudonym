@@ -1,7 +1,7 @@
 // CSP 리소스 이름 규칙 표 (D9 · D14 · D18 · D19 · D20)
-// 값은 Task 1-2 에서 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
+// 값은 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
 // pattern · forbidden · 길이 = CSP 물리 규칙(검증), allowed = 우리가 생성할 때 쓰는 문자 집합.
-// 표 자체는 provider 별 파일(rules/gcp.ts · rules/aws.ts · rules/azure.ts)에 있고 여기서 합친다 (계획 §8-2 ③).
+// 표 자체는 provider 별 파일(rules/gcp.ts · rules/aws.ts · rules/azure.ts)에 있고 여기서 합친다.
 import type { Provider, ResourceRule } from './types';
 import { lookup } from './dict';
 import { GCP_RULES } from './rules/gcp';
@@ -14,7 +14,7 @@ export { WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL } from './rules/a
 /** 키 순서 = GCP · AWS · Azure — 분할 전 한 표의 순서와 같다(rulesFor · 트리 · 기준선이 이 순서를 쓴다) */
 export const RULES: Record<string, ResourceRule> = { ...GCP_RULES, ...AWS_RULES, ...AZURE_RULES_TABLE };
 
-/** 태그 · 라벨의 키 · 값 길이 한도 (Task 1-2 에서 문서로 대조했다)
+/** 태그 · 라벨의 키 · 값 길이 한도 (문서로 대조했다)
  *  Azure 스토리지 계정만 키 128 — 엔진의 태그 키는 고정 다섯(11자 이하)이라 적용하지 않는다 (docs/decisions.md) */
 const LABEL_LIMITS_AWS_DOC = 'https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions';
 

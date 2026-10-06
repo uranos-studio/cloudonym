@@ -112,11 +112,11 @@ describe('rules_version 핀 (D27 ⑴)', () => {
     expect(body.success).toBe(false);
     expect(body.errors).toEqual([expect.objectContaining({ code: 'request.rules_version_mismatch', params: { requested: '2026-09-15.1', current: VERSION.rules } })]);
     expect(body.errors[0].message).toContain('pinned mode');
-    expect(body.errors[0].message).not.toContain('2026-09-15.1'); // 요청 값은 params 에만 (리뷰 S1)
+    expect(body.errors[0].message).not.toContain('2026-09-15.1'); // 요청 값은 params 에만
   });
 });
 
-describe('없는 경로 · 메서드 — 공통 실패 꼴 404 (리뷰 L1)', () => {
+describe('없는 경로 · 메서드 — 공통 실패 꼴 404', () => {
   it.each([['GET', '/v1/generate'], ['GET', '/v1/nope'], ['POST', '/v1/nope'], ['DELETE', '/v1/validate']])('%s %s → 404 JSON request.not_found', async (method, path) => {
     const { res } = await req(app, path, { method });
     expect(res.status).toBe(404);
@@ -125,7 +125,7 @@ describe('없는 경로 · 메서드 — 공통 실패 꼴 404 (리뷰 L1)', () 
   });
 });
 
-describe('되돌려 싣는 사용자 값의 보이지 않는 문자 (리뷰 S2)', () => {
+describe('되돌려 싣는 사용자 값의 보이지 않는 문자', () => {
   it('value_unsupported 의 params · message 에 \\uXXXX 로 나온다', async () => {
     const rlo = String.fromCodePoint(0x202e);
     const { res } = await post({ context: ctx, providers: [`aws${rlo}x`] });
@@ -188,7 +188,7 @@ describe('POST /v1/names (D39)', () => {
     expect(az.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'bi-tr-prd-vm-01']);
     expect(az.conflicts).toEqual([]);
   });
-  it('계획 §10 완료 기준 — storage_account 에 count 2 → 400 selection.count_not_supported', async () => {
+  it('storage_account 에 count 2 → 400 selection.count_not_supported', async () => {
     const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'storage_account', count: 2 }] });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ success: false, errors: [{ code: 'selection.count_not_supported', params: { index: 1, type: 'storage_account' }, message: "resources[1]: 'storage_account' has no sequence number, so count must be 1" }] });

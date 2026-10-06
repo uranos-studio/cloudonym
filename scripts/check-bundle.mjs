@@ -1,6 +1,6 @@
 // 빌드 산출물(dist/)에 package.json 의 devDependencies 이름이 실리지 않았는지 본다 — 시험 전용 도구(ajv 등)가 런타임 번들에 들어가면 실패한다.
 // 따옴표로 감싼 이름(`"ajv"` · `'ajv'`)과 `devDependencies` 글자를 찾는다 — 짧은 식별자를 줄인 이름이 우연히 같은 경우를 오탐하지 않게.
-// 시험 전용 fixture(src/dev · `?fixture=`)도 실리면 안 된다 — DEV 가드 밖으로 새면 그 글자(FIXTURE_MARKERS)가 번들에 남는다 (계획 §7-4).
+// 시험 전용 fixture(src/dev · `?fixture=`)도 실리면 안 된다 — DEV 가드 밖으로 새면 그 글자(FIXTURE_MARKERS)가 번들에 남는다.
 // 쓰는 법: node scripts/check-bundle.mjs [dist 폴더] — 걸리면 exit 1
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';

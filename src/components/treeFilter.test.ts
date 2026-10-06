@@ -1,4 +1,4 @@
-// 트리 거르기 (계획 §7-4) — 검색 · 분류 칩 · 「선택만 보기」. 걸러진 행의 조상만 남는다
+// 트리 거르기 — 검색 · 분류 칩 · 「선택만 보기」. 걸러진 행의 조상만 남는다
 import { describe, it, expect } from 'vitest';
 import { categoryCounts, filterTree, isFiltering, matchesQuery, type ViewNode } from './treeFilter';
 import { buildTree } from '../core/tree';

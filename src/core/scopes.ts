@@ -38,7 +38,7 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   'azure:resource_group': { id: 'azure:resource_group', provider: 'azure', displayName: 'Resource group', parent: 'azure:subscription', ruleId: 'azure.resource_group', docUrl: AZURE_RULES },
   // virtualnetworks / subnets 행 Scope virtual network
   'azure:virtual_network': { id: 'azure:virtual_network', provider: 'azure', displayName: 'Virtual network', parent: 'azure:resource_group', ruleId: 'azure.virtual_network', docUrl: `${AZURE_RULES}#microsoftnetwork` },
-  // batchAccounts 행 Scope Region · EventGrid topics · PowerBI workspaceCollections 등 행 Scope region — 구독 안에서 지역마다 유일로 읽는다 (Scope 열의 정의 문장은 쪽에 없다 · §4-3)
+  // batchAccounts 행 Scope Region · EventGrid topics · PowerBI workspaceCollections 등 행 Scope region — 구독 안에서 지역마다 유일로 읽는다 (Scope 열의 정의 문장은 쪽에 없다)
   'azure:region': { id: 'azure:region', provider: 'azure', displayName: 'Region', parent: 'azure:subscription', docUrl: `${AZURE_RULES}#microsoftbatch` },
   // managedClusters / agentPools 행 Scope managed cluster — AKS 클러스터 규칙은 아직 없어 ruleId 가 없다
   'azure:managed_cluster': { id: 'azure:managed_cluster', provider: 'azure', displayName: 'Managed cluster', parent: 'azure:resource_group', ruleId: 'azure.container_service_managed_clusters', docUrl: `${AZURE_RULES}#microsoftcontainerservice` },

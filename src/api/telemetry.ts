@@ -3,7 +3,7 @@ import type { Bindings } from './env';
 
 /** Hono Context 가 이 모양을 만족한다 — 시험은 평범한 객체를 넣는다 */
 export interface TelemetrySource { env: Bindings; req: { header: (name: string) => string | undefined } }
-/** fetch 응답에서 쓰는 부분만 — 전역 Response 가 이것을 만족한다. fetch 는 HTTP 오류에 reject 하지 않으므로 ok · status 를 직접 본다 (challenge M-2) */
+/** fetch 응답에서 쓰는 부분만 — 전역 Response 가 이것을 만족한다. fetch 는 HTTP 오류에 reject 하지 않으므로 ok · status 를 직접 본다 */
 export interface FetchResponseLike { ok: boolean; status: number; text: () => Promise<string> }
 export type FetchLike = (url: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<FetchResponseLike>;
 /** formatToParts 꼴 — 시험이 부분이 빠진 결과를 주입한다 */
@@ -11,7 +11,7 @@ export type FormatParts = (d: Date) => Intl.DateTimeFormatPart[];
 /** 시험이 시계 · fetch · 시각 포매터를 주입하는 자리 — 운영 코드는 넘기지 않는다 */
 export interface TelemetryDeps { now?: Date; fetchFn?: FetchLike; formatParts?: FormatParts }
 
-/** Axiom 에 싣는 UA 상한 — 수 KB 짜리 UA 로 수집량을 부풀리지 못하게 (보안 리뷰 L-4) */
+/** Axiom 에 싣는 UA 상한 — 수 KB 짜리 UA 로 수집량을 부풀리지 못하게 */
 export const MAX_USER_AGENT_CHARS = 256;
 // oxlint-disable-next-line no-control-regex -- 제어 문자를 찾는 것이 이 정규식의 목적이다
 const CONTROL_CHARS = /[\u0000-\u001F\u007F]/g;
@@ -44,7 +44,7 @@ export function kstStamp(now: Date, formatParts: FormatParts = (d) => KST.format
 }
 
 /** read-modify-write — 동시 요청은 한 건을 잃을 수 있고 같은 키 초당 1회 쓰기 제한에 걸리면 그 건은 버려진다. 근사치로 받아들인다 (D16).
- *  값이 숫자가 아니면 0 에서 다시 센다 — 'NaN' 을 저장하면 그날 카운터가 죽는다 (challenge L-2) */
+ *  값이 숫자가 아니면 0 에서 다시 센다 — 'NaN' 을 저장하면 그날 카운터가 죽는다 */
 async function bump(kv: KVNamespace, key: string): Promise<void> {
   const n = Number.parseInt((await kv.get(key)) ?? '0', 10);
   const current = Number.isFinite(n) ? n : 0;
@@ -91,7 +91,7 @@ async function sendAxiom(fetchFn: FetchLike, apiKey: string, dataset: string, pa
 }
 
 export async function logTelemetry(c: TelemetrySource, event: string, meta: Record<string, unknown> = {}, deps: TelemetryDeps = {}): Promise<void> {
-  // 몸통 전체를 try 로 감싼다 — waitUntil 로 넘긴 Promise 가 reject 하지 않는다 (최종 리뷰 M-3)
+  // 몸통 전체를 try 로 감싼다 — waitUntil 로 넘긴 Promise 가 reject 하지 않는다
   try {
     const now = deps.now ?? new Date();
     const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
@@ -100,11 +100,11 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
     const { day, time } = kstStamp(now, deps.formatParts);
     const { CLOUDONYM_KV: kv, AXIOM_API_KEY: apiKey, AXIOM_DATASET: dataset } = c.env;
 
-    // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다 (challenge L-3). 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
+    // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다. 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
     const parts: Promise<void>[] = [];
     if (kv) parts.push(countKv(kv, event, day, ai));
     if (apiKey && dataset) {
-      // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다 (challenge M-3).
+      // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다.
       // meta 를 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · user_agent · is_ai_agent)을 meta 가 덮어쓰지 못한다
       parts.push(sendAxiom(fetchFn, apiKey, dataset, [{ ...meta, _time: time, kst_day: day, event, user_agent: userAgent, is_ai_agent: ai }]));
     }

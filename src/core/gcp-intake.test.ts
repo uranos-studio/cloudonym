@@ -1,4 +1,4 @@
-// 전사 검사 (D43 · 계획 §8-4) — 들인 GCP 행이 원문(디스커버리 문서)과 같은지 원문 스냅샷(__fixtures__/gcp-intake.json)에 대어 본다.
+// 전사 검사 (D43) — 들인 GCP 행이 원문(디스커버리 문서)과 같은지 원문 스냅샷(__fixtures__/gcp-intake.json)에 대어 본다.
 // 정답은 RULES 가 아니라 원문이다. 원문 행(compute insert 메서드 · KMS create 의 …Id 인자)은 셋 중 하나여야 한다:
 // 손으로 쓴 규칙 · 들인 규칙 · 보류 목록(docs/gcp-intake-held.md).
 import { describe, it, expect } from 'vitest';

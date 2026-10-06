@@ -1,5 +1,5 @@
 {
-  "$comment": "규칙 출처 고정 (D43 · 계획 §8-5). scripts/rules/check-sources.mjs 가 대어 본다. 고칠 때는 --write 로 만들고 diff 를 읽는다",
+  "$comment": "규칙 출처 고정 (D43). scripts/rules/check-sources.mjs 가 대어 본다. 고칠 때는 --write 로 만들고 diff 를 읽는다",
   "sources": {
     "azure": {
       "url": "https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/management/resource-name-rules.md",

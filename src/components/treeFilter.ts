@@ -1,4 +1,4 @@
-// 트리 거르기 (계획 §7-4) — 검색 · 분류 칩 · 「선택만 보기」. 트리(core buildTree)를 읽기만 하고 걸러진 사본을 만든다
+// 트리 거르기 — 검색 · 분류 칩 · 「선택만 보기」. 트리(core buildTree)를 읽기만 하고 걸러진 사본을 만든다
 import type { TreeNode } from '../core/tree';
 import type { Category, ResourceRule } from '../core/types';
 import type { ScopeDef } from '../core/scopes';

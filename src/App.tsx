@@ -45,7 +45,7 @@ function openHash(hash: string, rules: readonly ResourceRule[] | undefined): Ope
 
 /** rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
 function App({ rules }: { rules?: readonly ResourceRule[] }) {
-  // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (Review Focus 4: 깨진 hash 는 decodeState 가 undefined 로 돌려준다)
+  // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (깨진 hash 는 decodeState 가 undefined 로 돌려준다)
   const [initial] = useState(() => openHash(window.location.hash, rules));
   const [form, setForm] = useState<NamingContext>(() => initial?.form ?? DEFAULT_CONTEXT);
   const [provider, setProvider] = useState<Provider | undefined>(() => initial?.provider);
@@ -66,7 +66,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   const many = useMemo(() => (ctx && provider && items.length > 0 ? generateMany(ctx, provider, items) : undefined), [ctx, provider, items]);
   const labels = useMemo(() => (ctx && provider ? labelsFor(ctx, provider) : undefined), [ctx, provider]);
 
-  // 상태 key — 다섯 값 + v + p + r. 링크 비교 · hash 쓰기에 쓴다. 비콘은 문맥 key 만 본다(선택 이벤트는 더하지 않는다 · 계획 §7-6)
+  // 상태 key — 다섯 값 + v + p + r. 링크 비교 · hash 쓰기에 쓴다. 비콘은 문맥 key 만 본다(선택 이벤트는 더하지 않는다)
   const stateKey = ctx ? encodeState(ctx, VERSION.rules, { provider, selection: items }) : '';
   const contextKey = ctx ? encodeState(ctx, VERSION.rules) : '';
   const linkedVersion = mismatchedLinkVersion(stateKey, link, VERSION.rules);
@@ -83,7 +83,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
 
   const onCloud = (p: Provider) => {
     if (p === provider) return;
-    // 규칙 id 가 provider 에 묶여 있어 선택을 옮길 수 없다 — 지우기 전에 한 번 묻는다(선택이 있을 때만 · 계획 §7-1)
+    // 규칙 id 가 provider 에 묶여 있어 선택을 옮길 수 없다 — 지우기 전에 한 번 묻는다(선택이 있을 때만)
     if (picked.size > 0 && !window.confirm(fillUi(en, 'switch_cloud_confirm', { n: picked.size }))) return;
     setLink(undefined);
     setProvider(p);
@@ -103,7 +103,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     visitOnce(sessionStore());
   }, []);
 
-  // ui_generate — 첫 화면은 세지 않고(방문이 이미 셌다) 문맥이 바뀐 뒤 1초 디바운스. 선택 · CSP 변경은 세지 않는다 (계획 §7-6 「그대로」)
+  // ui_generate — 첫 화면은 세지 않고(방문이 이미 셌다) 문맥이 바뀐 뒤 1초 디바운스. 선택 · CSP 변경은 세지 않는다
   const lastSentKey = useRef(contextKey);
   const scheduleGenerate = useMemo(() => debounce(() => sendBeacon('ui_generate'), GENERATE_DEBOUNCE_MS), []);
   useEffect(() => {
@@ -169,7 +169,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
         )}
         {dropped > 0 && <p data-selection-dropped role="status" className={NOTICE}>{fillUi(en, 'selection_dropped', { n: dropped })}</p>}
 
-        {/* 좁은 화면은 ② → ③ → ④ → 태그 순서, 넓은 화면은 왼쪽 열(② · 태그) · 오른쪽 열(③ · ④) — 계획 §7-2 */}
+        {/* 좁은 화면은 ② → ③ → ④ → 태그 순서, 넓은 화면은 왼쪽 열(② · 태그) · 오른쪽 열(③ · ④) */}
         <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
           <div className={`${PANEL} lg:col-start-1 lg:row-start-1`}>
             <ContextForm value={form} errors={parsed.ok ? [] : parsed.errors} onChange={editForm} />
@@ -199,7 +199,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
         </div>
       </main>
 
-      {/* 좁은 화면 — 아래 고정 막대. 누르면 ④ 로 스크롤 (계획 §7-2) */}
+      {/* 좁은 화면 — 아래 고정 막대. 누르면 ④ 로 스크롤 */}
       {provider && picked.size > 0 && (
         <div data-sticky-bar className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-white/95 px-4 py-2 backdrop-blur lg:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">

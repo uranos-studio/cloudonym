@@ -1,4 +1,4 @@
-// Azure 정형 행 → 규칙 데이터 생성기 (D43 · 계획 §8-2 ②). 개발 때만 돈다(번들 · CI 밖).
+// Azure 정형 행 → 규칙 데이터 생성기 (D43). 개발 때만 돈다(번들 · CI 밖).
 //
 // 사용: node scripts/rules/build-azure-rules.mjs <intake.json> <resource-abbreviations.html>
 //   <intake.json>  = intake-azure.mjs 의 출력(고정 커밋 원문으로 만든 것)
@@ -311,7 +311,7 @@ export function cafAbbreviations(html) {
 
 const initials = (snakeWord) => snakeWord.split('_').map((w) => w[0]).join('');
 
-/** resourceType — 40자 이하 · Azure 안 유일(화면 hash 상한이 40 에 기댄다 · 계획 §4-5). 아래 후보 중 처음 맞는 것:
+/** resourceType — 40자 이하 · Azure 안 유일(화면 hash 상한이 40 에 기댄다). 아래 후보 중 처음 맞는 것:
  *  ① 네임스페이스_경로 전체 ② 네임스페이스 머리글자_경로 ③ 네임스페이스_중간 머리글자_끝 ④ 경로 전체 ⑤ 중간 머리글자_끝 ⑥ 네임스페이스_전부 머리글자 */
 export function resourceTypeOf(ns, segs, used) {
   const n = snake(ns.replace(/^Microsoft\./, '').replace(/^DBfor/, 'Dbfor'));
@@ -432,7 +432,7 @@ export function build(intake, caf, existing) {
 export function renderTs(result, meta) {
   const { rules, scopes, charClasses } = result;
   const L = [];
-  L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-azure-rules.mjs 로 다시 만든다 (D43 · 계획 §8-2 ②).');
+  L.push('// 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-azure-rules.mjs 로 다시 만든다 (D43).');
   L.push(`// 출처: resource-name-rules 원문 커밋 ${metaToken(meta.commit)} (ms.date ${metaToken(meta.msDate)}) · 접두 약어는 Microsoft CAF 약어 쪽(없으면 docs/azure-intake-held.md 의 규칙).`);
   L.push('// 문자 규칙 표의 키는 원문 「Valid Characters」 칸 그대로다 — 원문 → 정규식이 리뷰 자리다. 길이는 minLength · maxLength 가 센다(validate.ts).');
   L.push("import type { Allowed, ResourceRule } from '../types';");

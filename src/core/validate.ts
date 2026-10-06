@@ -4,7 +4,7 @@ import type { ResourceRule } from './types';
 import type { CoreMessage } from './messages';
 
 const IPV4 = /^\d{1,3}(\.\d{1,3}){3}$/;
-/** 첫 글자 · 끝 글자 검사는 영문 여부만 본다 — 대소문자는 pattern 몫이다 (원장 판정 M2) */
+/** 첫 글자 · 끝 글자 검사는 영문 여부만 본다 — 대소문자는 pattern 몫이다 */
 const FIRST_LETTER = /^[A-Za-z]/;
 const LAST_ALNUM = /[A-Za-z0-9]$/;
 const LETTER = /[A-Za-z]/;

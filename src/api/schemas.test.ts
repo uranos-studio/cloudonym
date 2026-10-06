@@ -38,7 +38,7 @@ describe('parseValidateBody', () => {
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x' }))
       .toEqual({ ok: true, value: { provider: 'gcp', resourceType: 'service_account', name: 'x' } });
   });
-  it('모르는 provider · resource_type · 문자열 아닌 name → 400 + supported (Review Focus 5)', () => {
+  it('모르는 provider · resource_type · 문자열 아닌 name → 400 + supported', () => {
     expect(parseValidateBody({ provider: 'oci', resource_type: 'x', name: 'x' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported: ['aws', 'gcp', 'azure'] } });
     expect(parseValidateBody({ provider: 'aws', resource_type: 'nope', name: 'x' }))
@@ -57,7 +57,7 @@ describe('parseEventBody', () => {
   });
 });
 
-describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400 (최종 리뷰 I-2)', () => {
+describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400', () => {
   const evil = { toString: 1 };
   it('provider · resource_type 자리 → ok:false', () => {
     const p = parseValidateBody({ provider: evil, resource_type: 'x', name: 'y' });
@@ -94,7 +94,7 @@ describe('rules_version (D27 ⑴)', () => {
     }
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x', rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409 } });
   });
-  it('requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다 (리뷰 S1 · S2)', () => {
+  it('requested 는 다른 사용자 값처럼 80자로 자르고 보이지 않는 문자를 바꾼다', () => {
     const r = parseGenerateBody({ context: ctx, rules_version: 'y'.repeat(1024) });
     expect(r).toEqual({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch', params: { requested: `${'y'.repeat(80)}…`, current } }] } });
     const rlo = String.fromCodePoint(0x202e);

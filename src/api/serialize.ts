@@ -24,7 +24,7 @@ export interface WireGenerate {
     transformed: WireMessage[];
   };
 }
-/** /v1/names 항목 — WireName 앞에 키 · 유형 · 순번/역할 · 배치 범위 · 고유성 (D39 · codex #9) */
+/** /v1/names 항목 — WireName 앞에 키 · 유형 · 순번/역할 · 배치 범위 · 고유성 (D39) */
 export interface WireNameItem extends WireName {
   key: string; resource_type: string; seq?: string; role?: string; scope: ScopeId; uniqueness: 'csp' | 'none';
 }
@@ -37,7 +37,7 @@ export interface ProviderResult { provider: Provider; names: Record<string, Name
 
 /** 키 순서는 code · field · params · message. field · params 가 없는 코드는 그 키도 없다 */
 export function toWireMessage(raw: Message, catalog: Catalog = en): WireMessage {
-  // params 의 사용자 값은 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 싣는다 — message 도 같은 값으로 만든다 (리뷰 S2)
+  // params 의 사용자 값은 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 싣는다 — message 도 같은 값으로 만든다
   const m = displayMessage(raw);
   return {
     code: m.code,

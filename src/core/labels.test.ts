@@ -20,7 +20,7 @@ describe('labelsFor', () => {
     expect(labelsFor({ ...ctx, owner: '개발' }, 'gcp')).toMatchObject({ labels: { owner: '개발' }, transformed: [] });
     expect(labelsFor({ ...ctx, owner: '123' }, 'gcp').violations).toEqual([]);
   });
-  it('AWS 태그 값 문자 집합 — 문서 밖 문자는 자르지 않고 violations (결정 2026-09-29 · 보안 리뷰 M-3)', () => {
+  it('AWS 태그 값 문자 집합 — 문서 밖 문자는 자르지 않고 violations (결정 2026-09-29)', () => {
     const r = labelsFor({ ...ctx, owner: 'team#1<x>' }, 'aws');
     expect(r.labels.owner).toBe('team#1<x>');
     expect(r.violations).toEqual([{ code: 'label.aws_invalid_chars', field: 'owner' }]);

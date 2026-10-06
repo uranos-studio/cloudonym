@@ -1,4 +1,4 @@
-// GCP 규칙 표 — constraints.ts 가 aws · azure 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
+// GCP 규칙 표 — constraints.ts 가 aws · azure 와 합쳐 RULES 로 낸다 (파일을 나눠도 이름 · 판정 불변)
 import type { ResourceRule, Token } from '../types';
 import { GCP_INTAKE_ROWS } from './gcp-intake';
 import { GCP_MANUAL_RULES } from './gcp-manual';

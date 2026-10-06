@@ -1,4 +1,4 @@
-// 화면 문구 한글 0 (완료 기준 ⑴ · D24) — 컴포넌트 · App 의 문자열 · 템플릿 · JSX 텍스트 · JSX 속성 문자열과 index.html 에 한글이 없다.
+// 화면 문구 한글 0 (D24) — 컴포넌트 · App 의 문자열 · 템플릿 · JSX 텍스트 · JSX 속성 문자열과 index.html 에 한글이 없다.
 // TypeScript 컴파일러 API 로 그 노드만 모은다 — 주석(// · /* */ · JSX 의 {/* */})은 노드가 아니라 자연히 빠진다.
 // node:fs 는 tsconfig.app.json(브라우저 타입)이 거부하므로 Vite 의 ?raw 글롭으로 읽는다 (boundary.test 와 같다)
 import { describe, it, expect } from 'vitest';

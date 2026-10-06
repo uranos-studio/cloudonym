@@ -1,4 +1,4 @@
-// 손 예 — 문서가 허용한다고 말한 이름 · 금지한다고 말한 이름을 사람이 골라 규칙마다 둔다 (D43 · 계획 §8-4).
+// 손 예 — 문서가 허용한다고 말한 이름 · 금지한다고 말한 이름을 사람이 골라 규칙마다 둔다 (D43).
 // 기준선의 자동 경계 시험은 pattern 이 틀려도 pattern 대로 통과한다 — 원문에서 뽑은 예만이 정규식을 검사한다
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';

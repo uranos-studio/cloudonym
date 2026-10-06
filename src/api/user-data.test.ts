@@ -1,4 +1,4 @@
-// 사용자 값 보존 (§1-2 · codex #6 · #12) — 「오늘과 같은 동작」: 한글 · 공백 · 따옴표 · 결합 문자 입력이
+// 사용자 값 보존 — 「오늘과 같은 동작」: 한글 · 공백 · 따옴표 · 결합 문자 입력이
 // API 를 지나도 이름 · 판정 · 원래 이름 · 라벨이 기준선 fixture(문구 이관 전 엔진 출력)와 같고, 값은 params 에 실리되 code · field 에는 없다
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';

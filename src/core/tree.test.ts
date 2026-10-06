@@ -1,4 +1,4 @@
-// 리소스 트리 (D37 · 계획 §4-2 · §4-5) — 트리는 SCOPES + RULES 에서 파생한다
+// 리소스 트리 (D37) — 트리는 SCOPES + RULES 에서 파생한다
 import { describe, it, expect } from 'vitest';
 import { buildTree, inputKind, scopePath, type TreeNode } from './tree';
 import { RULES, rulesFor } from './constraints';
@@ -63,7 +63,7 @@ describe('scopePath', () => {
   });
 });
 
-describe('buildTree — rules 인자 (계획 §7-4 · 화면 fixture 진입점)', () => {
+describe('buildTree — rules 인자 (화면 fixture 진입점)', () => {
   it('넘긴 규칙으로 트리를 만든다 · 다른 provider 규칙은 거른다 · 생략하면 rulesFor 와 같다', () => {
     const vm = rulesFor('azure').find((r) => r.resourceType === 'virtual_machine')!;
     const extra = { ...vm, id: 'azure.fx_extra', resourceType: 'fx_extra' };

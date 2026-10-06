@@ -58,7 +58,7 @@ describe('fit — 3단계 축소', () => {
     const rule = getRule('azure', 'key_vault')!;
     expect(fit({ slug: 'kv', system: 'a-', purpose: 'bb', env: 'prd' }, rule).fits).toBe(false);   // kv-a--bb-prd
   });
-  // 원장 판정 M1 — MIN_TOKEN 은 축소가 만든 토큰에만, 빈 선택 토큰은 가변 토큰으로 세지 않는다 (D13)
+  // MIN_TOKEN 은 축소가 만든 토큰에만, 빈 선택 토큰은 가변 토큰으로 세지 않는다 (D13)
   it('정제로 비워진 선택 토큰(owner \'\')은 가변 토큰으로 세지 않는다 (SA)', () => {
     const rule = getRule('gcp', 'service_account')!;
     const r = fit({ owner: '', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr', slug: 'sa', role: 'sync' }, rule);
@@ -71,7 +71,7 @@ describe('fit — 3단계 축소', () => {
   });
 });
 
-describe('fit — 순번 자리수와 Windows VM 15자 (§5-2 실측 고정)', () => {
+describe('fit — 순번 자리수와 Windows VM 15자 (실측 고정)', () => {
   const ctx = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
   it("seq '01' 은 들어간다 — bi-tr-prd-vm-01", () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;

@@ -9,7 +9,7 @@ export function fit(input: Values, rule: ResourceRule) {
   const steps: CoreMessage[] = [];
   const values: Values = { ...input };
   const name = () => compose(values, rule.template, rule.separator);
-  // 가변 토큰 = 입력에 값이 있고(정제로 빈 '' 은 제외) 1단계에서 떼지 않은 비보호 토큰 (원장 판정 M1)
+  // 가변 토큰 = 입력에 값이 있고(정제로 빈 '' 은 제외) 1단계에서 떼지 않은 비보호 토큰
   const variableTokens = () => rule.template.filter((t) => !!input[t] && values[t] !== undefined && !PROTECTED.includes(t));
   // MIN_TOKEN 은 2단계(단축·균등)가 바꾼 토큰에만 건다 — 사용자가 준 짧은 값은 축소의 결과가 아니다 (D13)
   const shrunkTooShort = (t: Token) => values[t] !== input[t] && (values[t] ?? '').length < MIN_TOKEN;

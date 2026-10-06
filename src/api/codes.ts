@@ -22,7 +22,7 @@ export type ApiMessage =
   | { code: 'request.same_origin_only' }
   | { code: 'request.rate_limited'; params: { retry_after: number } }
   | { code: 'request.rules_version_mismatch'; params: { requested: string; current: string } }
-  /** /v1 아래 없는 경로 · 메서드 (리뷰 L1). 경로를 되돌려 싣지 않는다 */
+  /** /v1 아래 없는 경로 · 메서드. 경로를 되돌려 싣지 않는다 */
   | { code: 'request.not_found' }
   | { code: 'server.internal_error' };
 

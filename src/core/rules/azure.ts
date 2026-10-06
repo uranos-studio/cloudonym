@@ -1,4 +1,4 @@
-// Azure 규칙 표 — constraints.ts 가 gcp · aws 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
+// Azure 규칙 표 — constraints.ts 가 gcp · aws 와 합쳐 RULES 로 낸다 (파일을 나눠도 이름 · 판정 불변)
 import type { Forbidden, ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
 import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './azure-intake';
@@ -7,7 +7,7 @@ import { AZURE_MANUAL_ROWS, type AzureManualRule } from './azure-manual';
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
 const AZURE_VM_NOTE: CoreMessage = { code: 'note.azure_vm_hostname_rule' };
-/** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다 (codex P1).
+/** Windows 컴퓨터 이름 규칙 — "computer names that only contain numbers (0-9)" 는 쓸 수 없다.
  *  Azure 이름 규칙 쪽(#microsoftcompute)에는 이 문장이 없어 Windows VM 규칙의 두 번째 근거로 note 에 싣는다 */
 export const WINDOWS_COMPUTER_NAME_DOC_URL = 'https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup-computername';
 /** Azure 예약어 · 상표 — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words".

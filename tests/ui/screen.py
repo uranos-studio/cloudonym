@@ -215,7 +215,7 @@ with sync_playwright() as p:
     assert sent.count('ui_generate') == 1, f'CSP 전환이 ui_generate 를 셌다: {sent}'
 
     # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드 ──
-    # 처음엔 뿌리 바로 아래 한 단계만 펼친다(계획 §7-4) — Resource group 안은 닫혀 있다
+    # 처음엔 뿌리 바로 아래 한 단계만 펼친다 — Resource group 안은 닫혀 있다
     # 기대값은 /llms.txt 의 트리 — 깊이 0 · 1 의 규칙이 전부 보이고 그보다 깊은 규칙은 하나도 보이지 않는다(규칙이 늘어도 뜻이 같다)
     AZ_TREE = llms_tree(page, 'azure')
     shallow = sorted(t for t, d in AZ_TREE if d <= 1)
@@ -362,7 +362,7 @@ with sync_playwright() as p:
     expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
     expect(page.locator('[data-json-blocked]')).to_have_count(0)
 
-    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — CSP 는 고르지 않은 상태 (Review Focus 4) ──
+    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — CSP 는 고르지 않은 상태 ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
         ctx3 = browser.new_context(viewport={'width': 1280, 'height': 900})
         page3 = ctx3.new_page()
@@ -453,7 +453,7 @@ with sync_playwright() as p:
     shared = page8.evaluate('navigator.clipboard.readText()')
     assert hash_state(shared) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': {'resource_group': 1, 'virtual_machine': 2}}, hash_state(shared)
     assert page8.evaluate('location.hash') == old_hash, '공유 버튼이 주소창의 옛 v 를 바꾸면 안 된다'
-    # 선택을 바꿔도 링크의 옛 v 를 버린다 (계획 §7-3)
+    # 선택을 바꿔도 링크의 옛 v 를 버린다
     row(page8, 'virtual_machine').locator('[data-inc]').click()
     expect(notice).to_have_count(0)
     page8.wait_for_function('h => location.hash !== h', arg=old_hash)

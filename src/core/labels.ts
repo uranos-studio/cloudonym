@@ -1,4 +1,4 @@
-// 리소스에 붙일 표준 태그 · 라벨 — 한도는 constraints.ts 의 LABEL_LIMITS 가 정본이다 (원장 판정 M4)
+// 리소스에 붙일 표준 태그 · 라벨 — 한도는 constraints.ts 의 LABEL_LIMITS 가 정본이다
 import type { LabelSet, NamingContext, Provider } from './types';
 import { AWS_TAG_VALUE, LABEL_LIMITS } from './constraints';
 import type { CoreMessage } from './messages';
@@ -20,7 +20,7 @@ export function labelsFor(ctx: NamingContext, provider: Provider): LabelSet {
     if (value !== before) transformed.push({ code: 'label.normalized', field: key, params: { from: before, to: value } });
     // 자르지 않는다 (TC-AWS-02) — 한도 초과는 이유로 알린다
     if (value.length > max) violations.push({ code: 'label.too_long', field: key, params: { actual: value.length, max } });
-    // AWS 는 값의 문자 집합도 본다 — 자르거나 지우지 않고 이유로 알린다 (보안 리뷰 M-3 · AWS_TAG_VALUE 의 docUrl)
+    // AWS 는 값의 문자 집합도 본다 — 자르거나 지우지 않고 이유로 알린다 (AWS_TAG_VALUE 의 docUrl)
     if (provider === 'aws' && !AWS_TAG_VALUE.test(value)) violations.push({ code: 'label.aws_invalid_chars', field: key });
     labels[key] = value;
   }

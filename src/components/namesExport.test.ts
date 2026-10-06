@@ -1,4 +1,4 @@
-// 이름 내보내기 (D41 · 계획 §7-5) — 무효는 names 에 넣지 않는다. 충돌 항목도 무효다
+// 이름 내보내기 (D41) — 무효는 names 에 넣지 않는다. 충돌 항목도 무효다
 import { describe, it, expect } from 'vitest';
 import { allNamesText, toNamesExport } from './namesExport';
 import { generateMany } from '../core/engine';

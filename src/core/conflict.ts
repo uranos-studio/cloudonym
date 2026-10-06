@@ -1,4 +1,4 @@
-// 같은 요청 안 이름 충돌 (D41 · 묶음 계획 §6) — 한 요청은 부모 범위의 한 인스턴스(한 RG · 한 프로젝트 · 한 VPC)로 본다.
+// 같은 요청 안 이름 충돌 (D41) — 한 요청은 부모 범위의 한 인스턴스(한 RG · 한 프로젝트 · 한 VPC)로 본다.
 // 범위는 키에 넣지 않는다. uniqueness 'none'(AWS Name 태그)이어도 같은 이름 둘은 사람이 구분할 수 없어 충돌로 낸다
 import type { CoreMessage } from './messages';
 import type { NameResult, Provider, ResourceRule } from './types';

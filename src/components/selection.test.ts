@@ -1,4 +1,4 @@
-// 화면의 선택 상태 (D40 · D42 · 계획 §7-4) — Map 하나 · 트리 순서 · 판정은 core validateSelection 하나
+// 화면의 선택 상태 (D40 · D42) — Map 하나 · 트리 순서 · 판정은 core validateSelection 하나
 import { describe, it, expect } from 'vitest';
 import { applyChange, canAdd, canIncrease, clearForCloudSwitch, fromItems, setCount, setRole, toItems, toggle, totalNames, treeRules, type Picked } from './selection';
 import { buildTree } from '../core/tree';
@@ -9,7 +9,7 @@ import type { ResourceRule } from '../core/types';
 const azure = buildTree('azure');
 const rule = (t: string) => rulesFor('azure').find((r) => r.resourceType === t)!;
 
-describe('treeRules · toItems — 순서는 트리 순서(범위 경로 → 규칙 표 순서 · 계획 §7-5)', () => {
+describe('treeRules · toItems — 순서는 트리 순서(범위 경로 → 규칙 표 순서)', () => {
   it('Azure 트리 순서 — Global 의 셋 → Subscription 의 RG → RG 안 → VNet 안 → Managed cluster 안', () => {
     // 규칙이 늘어도 깨지지 않게 — 처음 24종의 Azure 11개가 이 상대 순서로 나오는지만 본다
     const order = treeRules(azure).map((r) => r.resourceType);
@@ -94,7 +94,7 @@ describe('Σ 200 · 항목 200 에서 + 와 새 체크가 막힌다', () => {
   });
 });
 
-describe('CSP 를 바꾸면 선택을 비운다 (계획 §7-1 — 규칙 id 가 provider 에 묶여 있다)', () => {
+describe('CSP 를 바꾸면 선택을 비운다 (규칙 id 가 provider 에 묶여 있다)', () => {
   it('clearForCloudSwitch 는 빈 Map', () => {
     expect(clearForCloudSwitch().size).toBe(0);
   });

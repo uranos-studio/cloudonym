@@ -1,4 +1,4 @@
-// 충돌 fixture (D41 · 계획 §5-5) 를 HTTP 로 — 실제 규칙 표에는 같은 이름을 내는 짝이 없어(Windows VM 은 region 을 늘 떨구고 Linux VM 은 남긴다)
+// 충돌 fixture (D41) 를 HTTP 로 — 실제 규칙 표에는 같은 이름을 내는 짝이 없어(Windows VM 은 region 을 늘 떨구고 Linux VM 은 남긴다)
 // constraints 의 rulesFor('azure') 에만 시험 전용 규칙 둘을 덧붙인다. RULES · getRule 은 원본 그대로다. 운영 코드에는 시험용 훅이 없다
 import { describe, it, expect, vi } from 'vitest';
 import Ajv from 'ajv';

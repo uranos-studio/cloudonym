@@ -51,7 +51,7 @@ describe('mismatchedLinkVersion — 안내는 옛 v 링크가 폼과 같은 동�
   });
 });
 
-describe('링크 키에 p · r 이 들어간다 (D42 · 계획 §7-3)', () => {
+describe('링크 키에 p · r 이 들어간다 (D42)', () => {
   /** App 이 하는 것과 같다 — 풀린 문맥 · CSP · 선택을 지금 버전으로 다시 인코딩한 것이 키 */
   const openV2 = (hash: string) => {
     const d = decodeState(hash);

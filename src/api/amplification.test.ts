@@ -26,7 +26,7 @@ const FILLERS: [string, string][] = [
 ];
 
 describe('POST /v1/names 응답 증폭', () => {
-  it('보안 리뷰가 잰 입력(자유 입력 셋 각 ZWSP 1024자) → 400 field_too_long 셋, 응답이 작다', async () => {
+  it('예전 상한의 최악 입력(자유 입력 셋 각 ZWSP 1024자) → 400 field_too_long 셋, 응답이 작다', async () => {
     const z = '\u200B'.repeat(1024);
     const { res } = await req(app, '/v1/names', jsonPost({ provider: 'azure', context: { owner: z, system: z, purpose: z, env: 'prd', region: 'kr' }, resources: worstSelection('azure') }));
     expect(res.status).toBe(400);

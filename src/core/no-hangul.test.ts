@@ -1,4 +1,4 @@
-// 시스템 문구 한글 0 (D23 · 완료 기준 ⑴) — src/core/*.ts 의 문자열 리터럴 · 템플릿 리터럴에 한글이 없다.
+// 시스템 문구 한글 0 (D23) — src/core/*.ts 의 문자열 리터럴 · 템플릿 리터럴에 한글이 없다.
 // TypeScript 컴파일러 API 로 리터럴 노드만 모은다 — 주석은 노드가 아니라 자연히 빠지고, URL 속 // 도 망가지지 않는다
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ function hangulLiterals(source: string, fileName = 'x.ts'): string[] {
 
 describe('src/core 문자열 리터럴에 한글이 없다', () => {
   it('검사기 자체 — 한글 리터럴 · 템플릿은 잡고, 한글 주석과 URL 은 통과시킨다', () => {
-    const hangul = String.fromCodePoint(0xd7a3); // 힣 — [ㄱ-힝] 범위 밖 (codex #12)
+    const hangul = String.fromCodePoint(0xd7a3); // 힣 — [ㄱ-힝] 범위 밖
     expect(hangulLiterals(`const a = '${hangul}';`)).toEqual([hangul]);
     expect(hangulLiterals(`const b = \`x \${1} ${hangul}\`;`)).toHaveLength(1);
     expect(hangulLiterals(`// ${hangul}\n/* ${hangul} */\nconst u = 'https://example.com/a'; // ${hangul}`)).toEqual([]);

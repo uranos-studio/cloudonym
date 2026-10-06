@@ -27,7 +27,7 @@ describe('conflictKey · NAME_COMPARISON', () => {
   });
 });
 
-describe('findConflicts — 검사기를 먼저 시험한다 (§5-4)', () => {
+describe('findConflicts — 검사기를 먼저 시험한다', () => {
   it('같은 entity 의 같은 이름 둘은 충돌 하나 — keys 에 둘', () => {
     const out = findConflicts([
       { key: 'a', rule: CONFLICT_RULE_A, result: ok('vm-x') },

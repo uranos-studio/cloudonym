@@ -1,4 +1,4 @@
-# 개발 4단계 Task 4-2 — push · PR 마다 시험 · 타입 · 린트 · 빌드를 돈다. 어느 하나라도 실패하면 job 이 non-zero 로 끝난다
+# push · PR 마다 시험 · 타입 · 린트 · 빌드를 돈다. 어느 하나라도 실패하면 job 이 non-zero 로 끝난다
 name: ci
 
 on:
@@ -14,7 +14,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# 액션은 커밋 SHA 로 고정한다 — 태그는 옮길 수 있다. 올릴 때는 gh api repos/<owner>/<repo>/git/ref/tags/<tag> 로 SHA 를 찾는다 (보안 리뷰 L-3)
+# 액션은 커밋 SHA 로 고정한다 — 태그는 옮길 수 있다. 올릴 때는 gh api repos/<owner>/<repo>/git/ref/tags/<tag> 로 SHA 를 찾는다
 jobs:
   check:
     runs-on: ubuntu-latest

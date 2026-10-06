@@ -26,7 +26,7 @@ describe('POST /v1/validate', () => {
     const body = await json((await post({ provider: 'azure', resource_type: 'storage_account', name: 'st-web-prod' })).res);
     expect(body).toMatchObject({ valid: false, suggested_name: 'stwebprod' });
   });
-  it('모르는 provider → 400 + supported 셋 (Review Focus 5)', async () => {
+  it('모르는 provider → 400 + supported 셋', async () => {
     const { res } = await post({ provider: 'oci', resource_type: 'bucket', name: 'x' });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' }, message: "Unsupported provider 'oci'" }], supported: ['aws', 'gcp', 'azure'] });

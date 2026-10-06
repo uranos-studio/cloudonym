@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-// UTC 로 새는 호출 — workerd 의 로컬 시간대는 UTC 라 getHours() · toLocaleDateString() 도 UTC 다. 시각은 telemetry.ts 의 kstStamp 로만 만든다 (challenge L-4)
+// UTC 로 새는 호출 — workerd 의 로컬 시간대는 UTC 라 getHours() · toLocaleDateString() 도 UTC 다. 시각은 telemetry.ts 의 kstStamp 로만 만든다
 const FORBIDDEN = /\.(toISOString|toJSON|toUTCString|toDateString|toLocale(Date|Time)?String|get(Date|Day|Hours|Month|FullYear))\(/;
 
 describe('src/api/ KST 위반 검사 — toISOString · toJSON · 로컬 시간대 게터 금지', () => {

@@ -1,4 +1,4 @@
-// ③ Resources — 이름 유일 범위 트리(D37) · 검색 · 분류 칩 · 「선택만 보기」 · 접기 · 체크 · 개수/역할 (계획 §7-4).
+// ③ Resources — 이름 유일 범위 트리(D37) · 검색 · 분류 칩 · 「선택만 보기」 · 접기 · 체크 · 개수/역할.
 // 선택 상태는 App 의 Map 하나이고 이 트리는 그것을 읽기만 한다. 바꾼 값은 onChange 로 넘기고 판정(core validateSelection)은 App 이 한다.
 // 키보드 — 행의 체크 상자에서 ↑ ↓ 로 행 이동 · 스페이스로 체크 · + - 로 개수
 import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
@@ -12,7 +12,7 @@ import { providerName } from './providerName';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
 
-/** 범위 안 규칙이 이보다 많고 분류가 둘 이상이면 분류별로 접는다 (계획 §7-4 — 많아지는 것은 깊이가 아니라 한 범위 아래의 폭이다) */
+/** 범위 안 규칙이 이보다 많고 분류가 둘 이상이면 분류별로 접는다 (많아지는 것은 깊이가 아니라 한 범위 아래의 폭이다) */
 const GROUP_AT = 8;
 const CATEGORY_LABEL: Record<Category, string> = {
   compute: en.ui.category_compute, networking: en.ui.category_networking, storage: en.ui.category_storage, database: en.ui.category_database,
@@ -37,7 +37,7 @@ interface Props {
   onChange: (next: Picked) => void;
 }
 
-/** 처음 펼침 — 뿌리와 그 바로 아래 한 단계 (계획 §7-4). 링크로 연 선택이 있으면 그 행의 조상 범위도 연다 — 고른 행이 접힌 채 숨지 않게 */
+/** 처음 펼침 — 뿌리와 그 바로 아래 한 단계. 링크로 연 선택이 있으면 그 행의 조상 범위도 연다 — 고른 행이 접힌 채 숨지 않게 */
 function initialOpen(tree: TreeNode, picked: Picked): Set<string> {
   const open = new Set<string>([tree.scope.id, ...tree.children.map((c) => c.scope.id)]);
   const walk = (n: TreeNode) => {

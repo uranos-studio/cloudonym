@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { app } from './index';
 import { req, jsonPost, beaconPost, json } from './test-support';
 
-// 2단계 최종 리뷰 I-1 (본문 · 필드 상한) · I-2 (500 도 ErrorResponse 꼴)
+// 본문 · 필드 상한과 500 도 ErrorResponse 꼴
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
 /** 본문 크기를 content-length 헤더로 알린다 — bodyLimit 의 헤더 분기. jsonPost 는 헤더가 없어 스트림 분기로 간다 */

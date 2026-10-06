@@ -1,4 +1,4 @@
-// ④ Names — 고른 것만 (계획 §7-5). 범위 경로 머리글 · ResultCard · 충돌 목록 · PASS 수 · 내보내기 셋(Copy all names · JSON · Terraform).
+// ④ Names — 고른 것만. 범위 경로 머리글 · ResultCard · 충돌 목록 · PASS 수 · 내보내기 셋(Copy all names · JSON · Terraform).
 // 결과는 App 이 generateMany 로 만든 것을 그대로 보인다 — 판정은 전부 엔진 값이다. 무효(충돌 포함)는 어느 내보내기에도 유효로 실리지 않는다 (D41)
 import type { ManyResult, NameItem } from '../core/engine';
 import type { SelectionItem } from '../core/selection';

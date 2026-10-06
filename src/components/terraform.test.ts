@@ -62,7 +62,7 @@ describe('toTerraformLocals', () => {
   });
 });
 
-describe('toTerraformLocals — 고른 항목 (D41 · 계획 §7-5)', () => {
+describe('toTerraformLocals — 고른 항목 (D41)', () => {
   it('키는 ${p}_${key} — azure_virtual_machine_01 · _02 · 역할 · 입력 없는 규칙', () => {
     const res = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }]);
     if (!res.ok) throw new Error('선택이 틀렸다');
@@ -91,7 +91,7 @@ describe('hclString', () => {
   ])('%j → %s', (input, expected) => {
     expect(hclString(input)).toBe(expected);
   });
-  it('제어 · 양방향 · 폭 없는 문자는 \\uXXXX 로 적는다 — 보이는 것과 다른 순서로 렌더되지 않는다 (보안 리뷰 L-5)', () => {
+  it('제어 · 양방향 · 폭 없는 문자는 \\uXXXX 로 적는다 — 보이는 것과 다른 순서로 렌더되지 않는다', () => {
     expect(hclString('a\u202Eb')).toBe('"a\\u202Eb"');
     expect(hclString('\u2066x\u2069')).toBe('"\\u2066x\\u2069"');
     expect(hclString('a\u200Bb\uFEFF')).toBe('"a\\u200Bb\\uFEFF"');

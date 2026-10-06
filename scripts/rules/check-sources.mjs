@@ -1,4 +1,4 @@
-// 규칙 출처 감지 (D43 · 계획 §8-5) — 받아 둔 원문을 docs/rule-sources.lock.json 과 대어 보고
+// 규칙 출처 감지 (D43) — 받아 둔 원문을 docs/rule-sources.lock.json 과 대어 보고
 // 다른 출처를 나열한 뒤 exit 1 로 끝낸다. 고치지 않는다 — 사람이 행을 읽고 판정한다.
 // 네트워크를 쓰지 않는다. 원문은 인자로 받는다(받는 일은 워크플로가 curl 로 한다).
 //
@@ -120,7 +120,7 @@ export function awsDigest(dir) {
 export function buildLock(inputs, { azureCommit = null } = {}) {
   const at = kstNow();
   return {
-    $comment: '규칙 출처 고정 (D43 · 계획 §8-5). scripts/rules/check-sources.mjs 가 대어 본다. 고칠 때는 --write 로 만들고 diff 를 읽는다',
+    $comment: '규칙 출처 고정 (D43). scripts/rules/check-sources.mjs 가 대어 본다. 고칠 때는 --write 로 만들고 diff 를 읽는다',
     sources: {
       azure: {
         url: URLS.azure,

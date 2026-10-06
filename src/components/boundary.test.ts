@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 // 화면은 엔진을 부르기만 한다 (L3) — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes)뿐이다.
-// 시험 전용 fixture(src/dev)는 import.meta.env.DEV 분기 안의 동적 import 로만 들인다 — 운영 번들에서 빠진다 (계획 §7-4)
+// 시험 전용 fixture(src/dev)는 import.meta.env.DEV 분기 안의 동적 import 로만 들인다 — 운영 번들에서 빠진다
 // node:fs 는 tsconfig.app.json(브라우저 타입 · node 없음)이 거부하므로 Vite 의 ?raw 글롭으로 소스를 읽는다
 const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
@@ -42,7 +42,7 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
     expect(specs).toEqual(['../core/truncate', '../core/constraints', 'hono']);
     expect(specs.filter((s) => ALLOWED.some((re) => re.test(s)))).toEqual([]);
     expect(specs.filter((s) => INTERNAL.test(s))).toHaveLength(2);
-    // 우회 꼴 — 재수출 · 동적 import · 부수효과 import 도 잡는다 (core 경계 시험과 같은 검사식 · 3단계 최종 리뷰 이월 minor)
+    // 우회 꼴 — 재수출 · 동적 import · 부수효과 import 도 잡는다 (core 경계 시험과 같은 검사식)
     const sneaky = "export { fit } from '../core/truncate';\nexport * from '../core/validate';\nconst m = await import('../core/constraints');\nimport '../core/dict';";
     expect(specifiers(sneaky)).toEqual(['../core/truncate', '../core/validate', '../core/dict', '../core/constraints']);
     expect(specifiers(sneaky).filter((s) => INTERNAL.test(s))).toHaveLength(4);

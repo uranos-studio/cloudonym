@@ -10,7 +10,7 @@ import type { Version } from '../version';
 
 const ORDER: readonly Provider[] = ['gcp', 'aws', 'azure'];
 
-/** /v1/names 항목의 scope · uniqueness 뜻 — openapi.json NameItem 의 두 설명이 같은 문장이다(openapi.test 가 대어 본다 · codex #9) */
+/** /v1/names 항목의 scope · uniqueness 뜻 — openapi.json NameItem 의 두 설명이 같은 문장이다(openapi.test 가 대어 본다) */
 export const SCOPE_MEANING = 'scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.';
 export const UNIQUENESS_MEANING = 'uniqueness "csp" means the provider requires the name to be unique within its scope; "none" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.';
 
@@ -51,7 +51,7 @@ function constraintLine(rule: ResourceRule, catalog: Catalog): string {
         ...(f.ignoreCase ? ['case-insensitive'] : []),
       ].join('; ')
     : '';
-  // 플래그가 있으면 같이 적는다 — \p{L} · \u{…} 는 u 없이는 다른 뜻이 된다 (최종 리뷰 I-3)
+  // 플래그가 있으면 같이 적는다 — \p{L} · \u{…} 는 u 없이는 다른 뜻이 된다
   const flags = rule.pattern.flags ? ` (flags: ${rule.pattern.flags})` : '';
   const bits = [`${rule.minLength}-${rule.maxLength} chars`, `pattern \`${rule.pattern.source}\`${flags}`];
   if (rule.noConsecutiveSeparator) bits.push('no consecutive separators');
