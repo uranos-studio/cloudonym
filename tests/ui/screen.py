@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒃을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒄을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
 스크린샷에는 중립 예시 값만 쓴다(INPUT · OTHER · 기호만 든 system).
@@ -490,6 +490,21 @@ with sync_playwright() as p:
     expect(page8.locator('[data-selected-count]')).to_have_text('1 selected')
     row(page8, 'key_vault').locator('input[data-row-check]').check()  # 사용자가 선택을 바꾸면 안내를 지운다
     expect(page8.locator('[data-selection-dropped]')).to_have_count(0)
+
+    # ── ⒄ 지금 버전 링크로 연 뒤 개수 +1 → −1 — 주소창 hash 가 화면의 선택을 따라간다(링크 상태가 남아 hash 쓰기를 막으면 안 된다) ──
+    linked = state_hash(INPUT, RULES, 'azure', {'virtual_machine': 2})
+    goto_ready(page8, BASE + '/?y' + linked)
+    goto_ready(page8, BASE + '/' + linked)
+    vm8 = row(page8, 'virtual_machine')
+    expect(vm8.locator('[data-count]')).to_have_text('2')
+    vm8.locator('[data-inc]').click()
+    expect(vm8.locator('[data-count]')).to_have_text('3')
+    page8.wait_for_timeout(300)
+    assert hash_state(page8.url)['r'] == {'virtual_machine': 3}, hash_state(page8.url)
+    vm8.locator('[data-dec]').click()
+    expect(vm8.locator('[data-count]')).to_have_text('2')
+    page8.wait_for_timeout(300)
+    assert hash_state(page8.url) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': {'virtual_machine': 2}}, f'화면은 2 인데 주소창은 {hash_state(page8.url)}'
     ctx8.close()
 
     # ── ⒃ 충돌 fixture(시험 전용 규칙 둘 · ?fixture=conflict) → 두 카드 FAIL · 충돌 줄 · Copy all names 의 skipped 수 (D41) ──
@@ -510,4 +525,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒃ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒄ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

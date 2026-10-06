@@ -75,6 +75,8 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     if (!provider || !tree) return;
     const ok = applyChange(provider, tree, next, rules);
     if (!ok) return;
+    // 선택을 바꾸면 링크 상태를 버린다 — 남겨 두면 링크와 같은 선택으로 돌아왔을 때 hash 쓰기가 멈춰 주소창이 낡은 선택에 남는다
+    setLink(undefined);
     setDropped(0);
     setPicked(ok);
   }, [provider, tree, rules]);
@@ -83,6 +85,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     if (p === provider) return;
     // 규칙 id 가 provider 에 묶여 있어 선택을 옮길 수 없다 — 지우기 전에 한 번 묻는다(선택이 있을 때만 · 계획 §7-1)
     if (picked.size > 0 && !window.confirm(fillUi(en, 'switch_cloud_confirm', { n: picked.size }))) return;
+    setLink(undefined);
     setProvider(p);
     setPicked(clearForCloudSwitch());
     setDropped(0);
