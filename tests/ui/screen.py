@@ -125,6 +125,37 @@ def visible_types(page):
     return page.eval_on_selector_all('[data-tree] [data-rule]', 'els => els.filter(e => e.checkVisibility()).map(e => e.dataset.type)')
 
 
+# 트리의 행 — 타입 · 분류 · entity · 보이는 글자 · 보이는가 · 범위 깊이(뿌리 = 0, 걸러진 트리에서도 조상 범위가 남으므로 같다)
+ROWS_JS = '''els => els.map(e => {
+  let depth = -1;
+  for (let d = e.closest('details[data-scope]'); d; d = d.parentElement.closest('details[data-scope]')) depth++;
+  return { type: e.dataset.type, category: e.dataset.ruleCategory, entity: e.dataset.entity, text: e.innerText, visible: e.checkVisibility(), depth };
+})'''
+
+
+def rows_info(page):
+    return page.eval_on_selector_all('[data-tree] [data-rule]', ROWS_JS)
+
+
+def llms_tree(page, provider):
+    """/llms.txt 「Resource tree」의 한 CSP 절 → [(resource_type, 범위 깊이)] — 화면 밖에서 오는 규칙 목록(시험이 규칙 수를 적어 두지 않는다)"""
+    text = page.request.get(BASE + '/llms.txt').text()
+    sect = text.split('\n## Resource tree\n', 1)[1].split('\n## ', 1)[0]
+    block = sect.split(f'\n### {provider.upper()}\n', 1)[1].split('\n### ', 1)[0]
+    out = []
+    for line in block.splitlines():
+        stripped = line.lstrip(' ')
+        if stripped.startswith(f'- `{provider}.'):  # 규칙 줄은 자기 범위 줄보다 두 칸 안쪽이다
+            out.append((stripped.split('`')[1].split('.', 1)[1], (len(line) - len(stripped)) // 2 - 1))
+    assert out, block
+    return out
+
+
+def chip_count(page, cat):
+    """분류 칩 「Networking (2)」 의 괄호 안 수"""
+    return int(page.locator(f'button[data-category="{cat}"]').inner_text().rsplit('(', 1)[1].rstrip(')'))
+
+
 def no_hangul(page):
     body_text = page.inner_text('body')
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
@@ -185,8 +216,17 @@ with sync_playwright() as p:
 
     # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드 ──
     # 처음엔 뿌리 바로 아래 한 단계만 펼친다(계획 §7-4) — Resource group 안은 닫혀 있다
-    assert visible_types(page) == ['storage_account', 'key_vault', 'sql_server', 'resource_group'], visible_types(page)
+    # 기대값은 /llms.txt 의 트리 — 깊이 0 · 1 의 규칙이 전부 보이고 그보다 깊은 규칙은 하나도 보이지 않는다(규칙이 늘어도 뜻이 같다)
+    AZ_TREE = llms_tree(page, 'azure')
+    shallow = sorted(t for t, d in AZ_TREE if d <= 1)
+    assert {'storage_account', 'key_vault', 'sql_server', 'resource_group'} <= set(shallow), shallow  # 앵커 — 이 시나리오가 쓰는 행
+    assert sorted(visible_types(page)) == shallow, (visible_types(page), shallow)
+    assert any(d >= 2 for _, d in AZ_TREE), '깊이 2 이상 규칙이 없으면 「처음엔 닫혀 있다」를 잰 것이 아니다'
     page.click('[data-expand-all]')
+    ALL_ROWS = rows_info(page)
+    # 펼친 트리 = /llms.txt 의 트리(타입 · 깊이) — 화면이 규칙을 빼거나 엉뚱한 범위에 그리면 여기서 걸린다
+    assert sorted((r['type'], r['depth']) for r in ALL_ROWS) == sorted(AZ_TREE), (ALL_ROWS, AZ_TREE)
+    assert all(r['visible'] for r in ALL_ROWS), [r['type'] for r in ALL_ROWS if not r['visible']]
     expect(row(page, 'subnet')).to_be_visible()
     for t in ('storage_account', 'resource_group', 'managed_identity', 'virtual_machine'):
         check(page, t)
@@ -201,8 +241,9 @@ with sync_playwright() as p:
     page.keyboard.press('-')
     expect(vm_row.locator('[data-count]')).to_have_text('2')
     expect(page.locator('article[data-key="virtual_machine_03"]')).to_have_count(0)
-    page.keyboard.press('ArrowDown')  # 다음 행(Windows VM)으로
-    assert page.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == 'virtual_machine_windows'
+    shown = visible_types(page)
+    page.keyboard.press('ArrowDown')  # 화면에 보이는 다음 행으로 — 기대값은 지금 보이는 행 순서에서 VM 바로 다음
+    assert page.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == shown[shown.index('virtual_machine') + 1], shown
     role_input = row(page, 'managed_identity').locator('[data-role-input]')
     expect(role_input).to_have_value('sync')
     role_input.fill('D')  # 꼴이 틀리면 반영하지 않고 aria-invalid
@@ -249,20 +290,32 @@ with sync_playwright() as p:
     # ── ⑿ 검색 · 분류 칩 · 선택만 보기 ──
     search = page.locator('[data-tree-search]')
     search.fill('subnet')
-    expect(tree_rows(page)).to_have_count(1)
-    assert visible_types(page) == ['subnet'], visible_types(page)  # 일치하는 행의 조상만 펼친다
+    # 검색 일치(displayName · type · slug · entity 소문자 부분 일치)를 펼친 전체 행에서 따로 계산해 화면과 맞춘다
+    hit = lambda r: 'subnet' in (r['type'] + ' ' + r['text'] + ' ' + r['entity']).lower()
+    want = sorted(r['type'] for r in ALL_ROWS if hit(r))
+    assert 'subnet' in want and len(want) < len(ALL_ROWS), want  # 공허하지 않다 — 일치가 있고 걸러지는 행도 있다
+    expect(tree_rows(page)).to_have_count(len(want))
+    assert sorted(visible_types(page)) == want, visible_types(page)  # 일치하는 행만 남고 그 조상은 펼친다
     search.fill('zzz-none')
     expect(page.locator('[data-search-empty]')).to_have_text('No resource matches. A resource missing from this list is not supported yet.')
     search.fill('')
-    page.click('[data-category="networking"]')
-    assert sorted(visible_types(page)) == ['subnet', 'virtual_network'], visible_types(page)
-    page.click('[data-category="all"]')
+    # 분류 칩 — 누르면 그 분류의 행만 전부 보인다 · 칩의 수 = 그 수 · 앵커 둘이 들어 있다
+    net = sorted(r['type'] for r in ALL_ROWS if r['category'] == 'networking')
+    assert {'subnet', 'virtual_network'} <= set(net) and len(net) < len(ALL_ROWS), net
+    assert chip_count(page, 'networking') == len(net), (chip_count(page, 'networking'), net)
+    page.click('button[data-category="networking"]')
+    assert all(r['category'] == 'networking' for r in rows_info(page)), rows_info(page)
+    assert sorted(visible_types(page)) == net, visible_types(page)
+    page.click('button[data-category="all"]')
     page.check('[data-selected-only]')
     assert visible_types(page) == ['storage_account', 'resource_group', 'managed_identity', 'virtual_machine'], visible_types(page)
     page.uncheck('[data-selected-only]')
-    expect(tree_rows(page)).to_have_count(11)
-    page.click('[data-collapse-all]')  # 뿌리만 열어 둔다
-    assert visible_types(page) == ['storage_account', 'key_vault', 'sql_server'], visible_types(page)
+    expect(tree_rows(page)).to_have_count(len(AZ_TREE))
+    assert chip_count(page, 'all') == len(AZ_TREE), chip_count(page, 'all')
+    page.click('[data-collapse-all]')  # 뿌리만 열어 둔다 — 깊이 0 의 규칙만 보인다
+    roots = sorted(t for t, d in AZ_TREE if d == 0)
+    assert {'storage_account', 'key_vault', 'sql_server'} <= set(roots) and len(roots) < len(AZ_TREE), roots
+    assert sorted(visible_types(page)) == roots, visible_types(page)
     page.click('[data-expand-all]')
 
     # ── ⑵ 공유 URL 을 새 탭(새 컨텍스트 = 빈 sessionStorage)에 붙이면 문맥 · CSP · 선택이 복원된다 ──

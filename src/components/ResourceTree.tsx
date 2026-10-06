@@ -226,7 +226,7 @@ const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount
   const kind = inputKind(rule);
   const name = { displayName: rule.displayName };
   return (
-    <div data-rule={rule.id} data-type={rule.resourceType} data-checked={checked} className="flex min-h-11 items-center gap-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
+    <div data-rule={rule.id} data-type={rule.resourceType} data-rule-category={rule.category} data-entity={rule.entity} data-checked={checked} className="flex min-h-11 items-center gap-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
       <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" data-row-check checked={checked} disabled={!canCheck} onChange={() => onToggle(rule)}
           aria-label={fillUi(en, 'select_resource_label', name)} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed" />
