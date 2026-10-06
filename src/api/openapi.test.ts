@@ -90,8 +90,10 @@ describe('public/openapi.json — /names (D39 · codex #9)', () => {
     // ResourceItem 의 키를 전부 가진다 — 같은 이름 결과에 키를 더한 것
     for (const k of Object.keys(schemas['ResourceItem']!.properties!)) expect(item()[k], k).toEqual(schemas['ResourceItem']!.properties![k]);
   });
-  it('owner 예시에 개인 이름이 없다', () => {
-    expect(JSON.stringify(spec)).not.toContain('acmex');
+  it('owner 예시는 정해 둔 중립 값만 쓴다', () => {
+    const owners = [...JSON.stringify(spec).matchAll(/"owner":"([^"]*)"/g)].map((m) => m[1]);
+    expect(owners.length).toBeGreaterThan(0);
+    for (const o of owners) expect(['platform', 'infra']).toContain(o);
   });
 });
 
