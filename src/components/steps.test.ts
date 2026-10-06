@@ -7,7 +7,7 @@ const emptied = (field: 'system' | 'purpose', from: string): CoreMessage => ({ c
 
 describe('visibleSteps — 대상이 빈 변환 단계를 숨긴다', () => {
   it('대상이 빈 변환만 뺀다', () => {
-    const keep: CoreMessage[] = [{ code: 'step.normalized', field: 'owner', params: { from: 'Ac Mex', to: 'acmex' } }, { code: 'step.separator_removed' }];
+    const keep: CoreMessage[] = [{ code: 'step.normalized', field: 'owner', params: { from: 'In Fra', to: 'infra' } }, { code: 'step.separator_removed' }];
     expect(visibleSteps([emptied('system', 'x'), ...keep])).toEqual(keep);
   });
   it('축약 · 생략 단계는 건드리지 않는다', () => {

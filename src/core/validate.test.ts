@@ -15,7 +15,7 @@ const aksLinux = getRule('azure', 'aks_nodepool_linux')!;
 describe('checkName', () => {
   it('유효하면 빈 배열', () => expect(checkName('billing-trade-prd-sa-sync', sa)).toEqual([]));
   it('길이 초과 이유에 실제 길이와 최대가 들어간다 (34자) — pattern 위반은 겹쳐 말하지 않는다', () => {
-    expect(checkName('acmex-billing-trade-prd-kr-sa-sync', sa)).toEqual([{ code: 'name.too_long', params: { actual: 34, max: 30 } }]);
+    expect(checkName('infra-billing-trade-prd-kr-sa-sync', sa)).toEqual([{ code: 'name.too_long', params: { actual: 34, max: 30 } }]);
   });
   it('숫자로 시작하는 GCP 이름은 첫 글자 위반 (Review Focus 2)', () => {
     expect(checkName('3tier-trade-prd-sa-sync', sa)).toEqual([{ code: 'name.first_not_letter' }]);

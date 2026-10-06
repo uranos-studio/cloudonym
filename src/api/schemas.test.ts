@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { parseEventBody, parseGenerateBody, parseValidateBody } from './schemas';
 import { RULES_REVISION } from '../core/revision';
 
-const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
 describe('parseGenerateBody', () => {
   it('정상 — providers 는 순서를 지키고 중복은 없앤다', () => {

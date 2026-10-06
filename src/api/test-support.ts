@@ -89,7 +89,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await gen('generate-long-values', { context: { owner: 'platformengineering', system: 'paymentsettlement', purpose: 'reconciliation', env: 'dev', region: 'global' } });
   await gen('generate-shrink-fail', { context: { ...SAMPLE_CTX, system: 'a-long', purpose: 'longpurpose' }, providers: ['azure'] });
   await gen('generate-label-limits', { context: { ...SAMPLE_CTX, owner: 'o'.repeat(257) } });
-  await gen('generate-label-transform', { context: { ...SAMPLE_CTX, owner: 'Ac.Mex' }, providers: ['gcp'] });
+  await gen('generate-label-transform', { context: { ...SAMPLE_CTX, owner: 'In.Fra' }, providers: ['gcp'] });
   await gen('generate-aws-tag-chars', { context: { ...SAMPLE_CTX, owner: 'team#1' }, providers: ['aws'] });
   await gen('generate-env-alias', { context: { ...SAMPLE_CTX, env: 'production', region: 'koreacentral' } });
   await gen('generate-pinned-current', { context: SAMPLE_CTX, providers: ['gcp'], rules_version: rulesVersion });

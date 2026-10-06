@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { labelsFor } from './labels';
 import { AWS_TAG_VALUE } from './constraints';
-const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
 
 describe('labelsFor', () => {
   it('공통 다섯 키', () => {
-    expect(labelsFor(ctx, 'aws').labels).toEqual({ owner: 'acmex', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(labelsFor(ctx, 'aws').labels).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
   });
   it('TC-AWS-02 값 한도 초과는 자르지 않고 violations (AWS 256 · Azure 256 · GCP 63)', () => {
     const big = { ...ctx, owner: 'a'.repeat(257) };
@@ -14,9 +14,9 @@ describe('labelsFor', () => {
     expect(labelsFor({ ...ctx, owner: 'a'.repeat(64) }, 'gcp').violations).toEqual([{ code: 'label.too_long', field: 'owner', params: { actual: 64, max: 63 } }]);
   });
   it('GCP 는 라벨 값 규격으로 바꾸고 기록한다 — 한글 · 숫자 시작은 유효 (D21)', () => {
-    const r = labelsFor({ ...ctx, owner: 'Ac.Mex' }, 'gcp');
-    expect(r.labels.owner).toBe('acmex');
-    expect(r.transformed).toEqual([{ code: 'label.normalized', field: 'owner', params: { from: 'Ac.Mex', to: 'acmex' } }]);
+    const r = labelsFor({ ...ctx, owner: 'In.Fra' }, 'gcp');
+    expect(r.labels.owner).toBe('infra');
+    expect(r.transformed).toEqual([{ code: 'label.normalized', field: 'owner', params: { from: 'In.Fra', to: 'infra' } }]);
     expect(labelsFor({ ...ctx, owner: '개발' }, 'gcp')).toMatchObject({ labels: { owner: '개발' }, transformed: [] });
     expect(labelsFor({ ...ctx, owner: '123' }, 'gcp').violations).toEqual([]);
   });

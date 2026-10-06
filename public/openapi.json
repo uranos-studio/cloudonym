@@ -26,7 +26,7 @@
               },
               "example": {
                 "context": {
-                  "owner": "acmex",
+                  "owner": "infra",
                   "system": "billing",
                   "purpose": "trade",
                   "env": "prd",
@@ -128,7 +128,7 @@
               "example": {
                 "provider": "gcp",
                 "resource_type": "service_account",
-                "name": "acmex-billing-trade-prd-kr-sa-sync"
+                "name": "infra-billing-trade-prd-kr-sa-sync"
               }
             }
           }
@@ -348,7 +348,7 @@
               "owner": {
                 "type": "string",
                 "maxLength": 1024,
-                "example": "acmex"
+                "example": "infra"
               },
               "system": {
                 "type": "string",
@@ -519,7 +519,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "acmex-billing-trade-prd-kr-sa-sync"
+            "example": "infra-billing-trade-prd-kr-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -687,7 +687,7 @@
             "type": "string",
             "maxLength": 1024,
             "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).",
-            "example": "acmex-billing-trade-prd-kr-sa-sync"
+            "example": "infra-billing-trade-prd-kr-sa-sync"
           },
           "rules_version": {
             "type": "string",

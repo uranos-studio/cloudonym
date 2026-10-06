@@ -14,7 +14,7 @@ describe('fit — 3단계 축소', () => {
   });
   it('① 예시: 34자 SA → region 만 떼면 31, owner 까지 떼면 25', () => {
     const rule = getRule('gcp', 'service_account')!;
-    const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+    const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
     expect(fit(tokenValues(ctx, rule), rule).name).toBe('billing-trade-prd-sa-sync');
   });
   it('들어가면 손대지 않는다', () => {

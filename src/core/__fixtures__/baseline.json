@@ -3828,7 +3828,7 @@
         "parse": {
           "ok": true,
           "context": {
-            "owner": "Ac.Mex",
+            "owner": "In.Fra",
             "system": "billing",
             "purpose": "trade",
             "env": "prd",
@@ -3839,11 +3839,11 @@
         "names": {
           "aws": {
             "s3_bucket": {
-              "name": "acmex-billing-trade-prd-bucket",
+              "name": "infra-billing-trade-prd-bucket",
               "valid": true,
               "isTruncated": false,
               "isTransformed": true,
-              "original": "Ac.Mex-billing-trade-prd-bucket",
+              "original": "In.Fra-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
             },
@@ -3895,11 +3895,11 @@
           },
           "gcp": {
             "project_id": {
-              "name": "acmex-billing-trade-prd",
+              "name": "infra-billing-trade-prd",
               "valid": true,
               "isTruncated": false,
               "isTransformed": true,
-              "original": "Ac.Mex-billing-trade-prd",
+              "original": "In.Fra-billing-trade-prd",
               "violations": 0,
               "steps": 1
             },
@@ -3908,7 +3908,7 @@
               "valid": true,
               "isTruncated": true,
               "isTransformed": true,
-              "original": "Ac.Mex-billing-trade-prd-kr-sa-sync",
+              "original": "In.Fra-billing-trade-prd-kr-sa-sync",
               "violations": 0,
               "steps": 3
             },
@@ -3949,11 +3949,11 @@
               "steps": 0
             },
             "storage_bucket": {
-              "name": "acmex-billing-trade-prd-bucket",
+              "name": "infra-billing-trade-prd-bucket",
               "valid": true,
               "isTruncated": false,
               "isTransformed": true,
-              "original": "Ac.Mex-billing-trade-prd-bucket",
+              "original": "In.Fra-billing-trade-prd-bucket",
               "violations": 0,
               "steps": 1
             }
@@ -4063,7 +4063,7 @@
         "labels": {
           "aws": {
             "labels": {
-              "owner": "Ac.Mex",
+              "owner": "In.Fra",
               "system": "billing",
               "purpose": "trade",
               "environment": "prd",
@@ -4074,7 +4074,7 @@
           },
           "gcp": {
             "labels": {
-              "owner": "acmex",
+              "owner": "infra",
               "system": "billing",
               "purpose": "trade",
               "environment": "prd",
@@ -4085,7 +4085,7 @@
           },
           "azure": {
             "labels": {
-              "owner": "Ac.Mex",
+              "owner": "In.Fra",
               "system": "billing",
               "purpose": "trade",
               "environment": "prd",
@@ -15029,27 +15029,27 @@
       "id": "label-gcp-transform",
       "terraform": {
         "assignments": [
-          "aws_s3_bucket = \"acmex-billing-trade-prd-bucket\"",
+          "aws_s3_bucket = \"infra-billing-trade-prd-bucket\"",
           "aws_iam_role = \"billing-trade-prd-role-sync\"",
           "aws_vpc = \"billing-trade-prd-kr-vpc-01\"",
           "aws_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "aws_ec2_instance = \"billing-trade-prd-kr-vm-01\"",
           "aws_rds_instance = \"billing-trade-prd-kr-db-01\"",
           "aws_tags = {",
-          "owner = \"Ac.Mex\"",
+          "owner = \"In.Fra\"",
           "system = \"billing\"",
           "purpose = \"trade\"",
           "environment = \"prd\"",
           "managed_by = \"cloudonym\"",
-          "gcp_project_id = \"acmex-billing-trade-prd\"",
+          "gcp_project_id = \"infra-billing-trade-prd\"",
           "gcp_service_account = \"billing-trade-prd-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prd-kr-vm-01\"",
           "gcp_vpc_network = \"billing-trade-prd-vpc-01\"",
           "gcp_subnet = \"billing-trade-prd-kr-subnet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prd-kr-db-01\"",
-          "gcp_storage_bucket = \"acmex-billing-trade-prd-bucket\"",
+          "gcp_storage_bucket = \"infra-billing-trade-prd-bucket\"",
           "gcp_labels = {",
-          "owner = \"acmex\"",
+          "owner = \"infra\"",
           "system = \"billing\"",
           "purpose = \"trade\"",
           "environment = \"prd\"",
@@ -15066,7 +15066,7 @@
           "azure_aks_nodepool_linux = \"nptradeprd\"",
           "azure_aks_nodepool_windows = \"nptrd\"",
           "azure_tags = {",
-          "owner = \"Ac.Mex\"",
+          "owner = \"In.Fra\"",
           "system = \"billing\"",
           "purpose = \"trade\"",
           "environment = \"prd\"",

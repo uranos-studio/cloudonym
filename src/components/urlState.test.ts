@@ -3,7 +3,7 @@ import { decodeState, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } f
 import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import type { NamingContext } from '../core/types';
 
-const ctx: NamingContext = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
 /** 문맥만 — v 를 보지 않는 시험용 */
 const ctxOf = (hash: string) => decodeState(hash)?.context;
@@ -19,7 +19,7 @@ describe('encodeState — Base64url', () => {
     expect(ctxOf(`#state=${encodeState(ko)}`)).toEqual(ko);
   });
   it('필드 순서가 달라도 같은 문자열 — 다섯 필드만 고정 순서로 담는다', () => {
-    const shuffled = { region: 'kr', env: 'prd', purpose: 'trade', system: 'billing', owner: 'acmex', extra: 'x' } as unknown as NamingContext;
+    const shuffled = { region: 'kr', env: 'prd', purpose: 'trade', system: 'billing', owner: 'infra', extra: 'x' } as unknown as NamingContext;
     expect(encodeState(shuffled)).toBe(encodeState(ctx));
   });
 });
@@ -31,7 +31,7 @@ describe('decodeState — 깨진 hash 는 전부 undefined (Review Focus 4)', ()
     [`#state=${b64('billing')}`, 'JSON 이 객체가 아니다(문자열)'],
     [`#state=${b64(['a'])}`, 'JSON 이 배열이다'],
     [`#state=${b64(null)}`, 'JSON 이 null 이다'],
-    [`#state=${b64({ owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd' })}`, 'region 이 빠졌다'],
+    [`#state=${b64({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd' })}`, 'region 이 빠졌다'],
     [`#state=${b64({ ...ctx, owner: 42 })}`, '값이 숫자다'],
     [`#state=${b64({ ...ctx, env: 'qa' })}`, 'env 가 지원 밖이다'],
     ['', '빈 hash'],

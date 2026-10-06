@@ -2,13 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { compose, tokenValues } from './compose';
 import { getRule } from './constraints';
 
-const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
 
 describe('tokenValues · compose', () => {
   it('GCP SA 원본 조립은 ① 예시와 같다 (34자)', () => {
     const rule = getRule('gcp', 'service_account')!;
     const name = compose(tokenValues(ctx, rule), rule.template, rule.separator);
-    expect(name).toBe('acmex-billing-trade-prd-kr-sa-sync');
+    expect(name).toBe('infra-billing-trade-prd-kr-sa-sync');
     expect(name.length).toBe(34);
   });
   it('Azure Storage 는 구분자 없이 st 앞', () => {

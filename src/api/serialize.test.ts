@@ -6,11 +6,11 @@ const version = { engine: '0.1.0', rules: '2026-09-29.1' };
 const base: NameResult = {
   ruleId: 'gcp.service_account', resourceType: 'service_account', displayName: 'Service Account',
   name: 'billing-trade-prd-sa-sync', valid: true, isTruncated: true, isTransformed: false,
-  original: 'acmex-billing-trade-prd-kr-sa-sync', violations: [],
+  original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
   steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }],
   rule: { minLength: 6, maxLength: 30, pattern: '^[a-z]$', patternFlags: 'u', allowed: 'lower-digit-hyphen', docUrl: 'https://example.invalid/doc', notes: [] },
 };
-const labels = { labels: { owner: 'acmex' }, violations: [], transformed: [] };
+const labels = { labels: { owner: 'infra' }, violations: [], transformed: [] };
 
 describe('toWireMessage (D25)', () => {
   it('code · field · params · message 순서 — field · params 가 없는 코드는 키도 없다', () => {
@@ -25,7 +25,7 @@ describe('toWireName (D15 · D25)', () => {
   it('snake_case · steps 는 메시지 배열 · notes 는 항상 있다 · reason 은 없다', () => {
     expect(toWireName(base)).toEqual({
       name: 'billing-trade-prd-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'acmex-billing-trade-prd-kr-sa-sync', violations: [],
+      original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
       steps: [
         { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
         { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },

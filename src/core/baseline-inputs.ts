@@ -29,7 +29,7 @@ export const BASELINE_CONTEXTS: readonly { id: string; raw: RawContext }[] = [
   { id: 'label-gcp-65', raw: { ...BASE, owner: 'o'.repeat(65) } },
   { id: 'label-aws-257', raw: { ...BASE, owner: 'o'.repeat(257) } },
   { id: 'label-aws-invalid-char', raw: { ...BASE, owner: 'team#1' } },
-  { id: 'label-gcp-transform', raw: { ...BASE, owner: 'Ac.Mex' } },
+  { id: 'label-gcp-transform', raw: { ...BASE, owner: 'In.Fra' } },
   { id: 'parse-env-qa', raw: { ...BASE, env: 'qa' } },
   { id: 'parse-region-mars', raw: { ...BASE, region: 'mars' } },
   { id: 'parse-owner-empty', raw: { ...BASE, owner: '   ' } },

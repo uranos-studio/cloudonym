@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { generate, validateName, parseContext } from './engine';
 import { rulesFor } from './constraints';
-const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
 
 describe('generate', () => {
   it('① 응답 예시: GCP SA 는 축약, Azure Storage 는 변환(하이픈 제거)', () => {
     const out = generate(ctx, ['gcp', 'azure']);
-    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prd-sa-sync', valid: true, isTruncated: true, original: 'acmex-billing-trade-prd-kr-sa-sync' });
+    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prd-sa-sync', valid: true, isTruncated: true, original: 'infra-billing-trade-prd-kr-sa-sync' });
     expect(out.azure?.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, isTransformed: true });
     expect(out.azure?.storage_account.steps).toContainEqual({ code: 'step.separator_removed' });
     expect(out.aws).toBeUndefined();
@@ -66,7 +66,7 @@ describe('parseContext', () => {
 
 describe('validateName', () => {
   it('이유와 제안을 준다 (앞 토큰부터 뗀다)', () => {
-    expect(validateName('gcp', 'service_account', 'acmex-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: [{ code: 'name.too_long', params: { actual: 34, max: 30 } }], suggestedName: 'billing-trade-prd-kr-sa-sync' });
+    expect(validateName('gcp', 'service_account', 'infra-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: [{ code: 'name.too_long', params: { actual: 34, max: 30 } }], suggestedName: 'billing-trade-prd-kr-sa-sync' });
   });
   it('정제만으로 되면 그 값을 제안', () => {
     expect(validateName('azure', 'storage_account', 'st-web-prod')).toMatchObject({ valid: false, suggestedName: 'stwebprod' });
@@ -82,7 +82,7 @@ describe('validateName', () => {
   });
   it('⑵ 는 정제한 값을 쪼갠다 (원장 판정 n7)', () => {
     // 대문자 · 밑줄이 섞인 긴 이름 — 정제 뒤 값에서 앞 토큰을 뗀다
-    expect(validateName('gcp', 'service_account', 'AcMex-Billing-trade-prd-kr-sa_sync').suggestedName).toBe('billing-trade-prd-kr-sasync');
+    expect(validateName('gcp', 'service_account', 'InFra-Billing-trade-prd-kr-sa_sync').suggestedName).toBe('billing-trade-prd-kr-sasync');
   });
 });
 

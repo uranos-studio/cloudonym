@@ -3,7 +3,7 @@ import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 import { VERSION } from '../version';
 
-const ctx = { owner: 'acmex', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const post = (body: unknown) => req(app, '/v1/generate', jsonPost(body));
 
 describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
@@ -39,7 +39,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(body.version).toEqual(VERSION);
     expect(body.data.gcp.service_account).toEqual({
       name: 'billing-trade-prd-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'acmex-billing-trade-prd-kr-sa-sync', violations: [],
+      original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
       steps: [
         { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
         { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
@@ -48,7 +48,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     });
     expect(body.data.azure.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, is_transformed: true, steps: [{ code: 'step.separator_removed', message: 'Removed hyphens (this rule allows no separator)' }] });
     expect(body.data.azure.storage_account.rule.notes).toEqual([expect.objectContaining({ code: 'note.azure_reserved', params: { doc_url: expect.stringContaining('learn.microsoft.com') } })]);
-    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'acmex', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
     expect(body.metadata).toMatchObject({ label_violations: { gcp: [], azure: [] }, label_transformed: { gcp: [], azure: [] }, transformed: [] });
   });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {

@@ -7,7 +7,7 @@ const post = (body: unknown) => req(app, '/v1/validate', jsonPost(body));
 
 describe('POST /v1/validate', () => {
   it('① 예시: 34자 SA → valid:false · 이유 · suggested_name', async () => {
-    const { res } = await post({ provider: 'gcp', resource_type: 'service_account', name: 'acmex-billing-trade-prd-kr-sa-sync' });
+    const { res } = await post({ provider: 'gcp', resource_type: 'service_account', name: 'infra-billing-trade-prd-kr-sa-sync' });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
       valid: false, version: VERSION,
@@ -16,7 +16,7 @@ describe('POST /v1/validate', () => {
     });
   });
   it('유효한 이름 → { valid:true, version, violations:[] } — suggested_name 키가 없다', async () => {
-    const body = await json((await post({ provider: 'aws', resource_type: 's3_bucket', name: 'acmex-billing-trade-prd-bucket' })).res);
+    const body = await json((await post({ provider: 'aws', resource_type: 's3_bucket', name: 'infra-billing-trade-prd-bucket' })).res);
     expect(body).toEqual({ valid: true, version: VERSION, violations: [] });
     expect('suggested_name' in body).toBe(false);
   });
