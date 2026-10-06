@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { sq, dq, idLit, intLit, metaToken, METHOD_RE } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
+import { scopeIdsFromSources, syncScopeEnum } from './openapi-scopes.mjs';
 import { parseComputeDiscovery, RFC1035_PATTERN } from './intake-gcp-discovery.mjs';
 
 export const COMPUTE_DISCOVERY_URL = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
@@ -332,10 +333,8 @@ async function main(argv) {
   };
   writeFileSync('src/core/__fixtures__/gcp-intake.json', `${JSON.stringify(snapshot, null, 1)}\n`);
   writeFileSync('src/core/__fixtures__/rule-cases-gcp-intake.json', `${JSON.stringify(Object.fromEntries(result.rules.map((r) => [r.id, r.cases])), null, 1)}\n`);
-  // openapi.json NameItem.scope enum 에 새 범위를 붙인다
-  const api = JSON.parse(readFileSync('public/openapi.json', 'utf-8'));
-  const scopeEnum = api.components.schemas.NameItem.properties.scope.enum;
-  for (const s of result.scopes) if (!scopeEnum.includes(s.id)) scopeEnum.splice(scopeEnum.indexOf('gcp:project_zone') + 1 + result.scopes.indexOf(s), 0, s.id);
+  // openapi.json NameItem.scope enum 을 전체 SCOPES(손 범위 포함)에 맞춘다. 방금 쓴 gcp-intake.ts 를 다시 읽는다
+  const api = syncScopeEnum(JSON.parse(readFileSync('public/openapi.json', 'utf-8')), scopeIdsFromSources((f) => readFileSync(f, 'utf-8')));
   writeFileSync('public/openapi.json', `${JSON.stringify(api, null, 2)}\n`);
   console.error(`규칙 ${result.rules.length} · 보류 ${result.held.length} · 원문 행 ${result.sourceRows.length} · 기존 ${result.sourceRows.filter((r) => r.existing).length}`);
   return 0;

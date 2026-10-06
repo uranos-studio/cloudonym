@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { sq, dq, idLit, intLit, boolLit, regexLit, metaToken } from './emit-ts.mjs';
 import { pathToFileURL } from 'node:url';
+import { scopeIdsFromSources, syncScopeEnum } from './openapi-scopes.mjs';
 import { typeSnake, abbreviateSnake, hasSingleLetterToken } from './naming.mjs';
 
 export const AZURE_RULES_URL = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
@@ -529,13 +530,8 @@ function main(argv) {
   writeFileSync('src/core/__fixtures__/azure-intake.json', `${JSON.stringify(snapshot, null, 1)}\n`);
   const cases = Object.fromEntries(result.rules.map((r) => [r.id, r.cases]));
   writeFileSync('src/core/__fixtures__/rule-cases-azure-intake.json', `${JSON.stringify(cases, null, 1)}\n`);
-  // openapi.json 은 정적 파일이다 — NameItem.scope enum 에 새 범위를 붙인다(손으로 쓴 범위는 그대로 · 들인 범위는 다시 쓴다)
-  const api = JSON.parse(readFileSync('public/openapi.json', 'utf-8'));
-  const scopeEnum = api.components.schemas.NameItem.properties.scope.enum;
-  const intakeIds = new Set(result.scopes.map((x) => x.id));
-  const kept = scopeEnum.filter((x) => !(x.startsWith('azure:') && x.includes('/')) && !intakeIds.has(x));
-  if (!kept.includes('azure:region')) kept.push('azure:region');
-  api.components.schemas.NameItem.properties.scope.enum = [...kept, ...result.scopes.map((x) => x.id)];
+  // openapi.json 은 정적 파일이다 — NameItem.scope enum 을 전체 SCOPES(손 범위 포함)에 맞춘다. 방금 쓴 azure-intake.ts 를 다시 읽는다
+  const api = syncScopeEnum(JSON.parse(readFileSync('public/openapi.json', 'utf-8')), scopeIdsFromSources((f) => readFileSync(f, 'utf-8')));
   writeFileSync('public/openapi.json', `${JSON.stringify(api, null, 2)}\n`);
   const bySlug = result.rules.filter((r) => r.slugSource === 'caf').length;
   console.error(`규칙 ${result.rules.length} · 보류 ${result.held.length} · 새 범위 ${result.scopes.length} · 문자 규칙 ${result.charClasses.length} · CAF 약어 ${bySlug}`);
