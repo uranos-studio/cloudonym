@@ -272,6 +272,61 @@ export function renderHeld(result, meta) {
   L.push('| API | Field | Text in the discovery document |');
   L.push('|---|---|---|');
   for (const [api, field, text] of BROKEN_SOURCES) L.push(`| ${api} | ${field} | ${cell(text)} |`);
+  L.push('');
+  return `${L.join('\n')}\n${renderAssetTypes()}`;
+}
+
+const RUN_V2 = 'https://run.googleapis.com/$discovery/rest?version=v2';
+const AR_V1 = 'https://artifactregistry.googleapis.com/$discovery/rest?version=v1';
+const CONTAINER_V1 = 'https://www.googleapis.com/discovery/v1/apis/container/v1/rest';
+const COMPUTE_V1 = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
+const KMS_V1 = 'https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest';
+const NO_ID = 'no user-chosen ID: ';
+/**
+ * 지원 범위(12개 API 의 Cloud Asset Inventory 유형 116종) 가운데 규칙이 없는 유형 — 원문을 다시 읽은 2026-10-06 판정.
+ * kind: held = 이름을 사람이 짓지만 규칙이 완전하지 않다 · no name = 이름을 짓지 않는다 · external value = 이름이 이 엔진 밖에서 정해진다.
+ * src/core/gcp-intake.test.ts 가 116종 전부를 「규칙 또는 이 표」로 센다.
+ */
+export const ASSET_TYPES_WITHOUT_RULE = [
+  { type: 'artifactregistry.googleapis.com/Repository', kind: 'held', reason: 'repositories.create repositoryId says only "Required. The repository id to use for this repository." — no length or character rule', confirm: 'a length and character sentence for the repository ID in the Artifact Registry REST reference or the create-repositories guide', checked: AR_V1 },
+  { type: 'container.googleapis.com/NodePool', kind: 'held', reason: 'NodePool.name says only "The name of the node pool." — no length or character rule', confirm: 'a naming sentence for node pools in the GKE REST reference or the add-node-pools guide', checked: CONTAINER_V1 },
+  { type: 'run.googleapis.com/Job', kind: 'held', reason: 'jobs.create jobId says only "The unique identifier for the Job." — no length or character rule', confirm: 'a naming sentence for jobs in the Cloud Run REST reference or the create-jobs guide', checked: RUN_V2 },
+  { type: 'run.googleapis.com/Service', kind: 'held', reason: 'services.create serviceId: "It must begin with letter, and cannot end with hyphen; must contain fewer than 50 characters." — the allowed characters are not stated', confirm: 'the character set for service names in the Cloud Run REST reference or the deploy guide', checked: RUN_V2 },
+  { type: 'run.googleapis.com/WorkerPool', kind: 'held', reason: 'workerPools.create workerPoolId has the serviceId sentence (letter first, no trailing hyphen, fewer than 50 characters); the deploy guide adds "must not share the same name as an existing service name from your project" — the allowed characters are not stated', confirm: 'the character set for worker pool names in the Cloud Run REST reference or the deploy guide', checked: 'https://docs.cloud.google.com/run/docs/deploy-worker-pools' },
+  { type: 'compute.googleapis.com/FirewallPolicy', kind: 'held', reason: 'the firewall policy insert methods are held in the rows above (no source states a rule for the network firewall policy name)', confirm: 'a naming sentence for network firewall policies in the Compute Engine REST reference', checked: COMPUTE_V1 },
+  { type: 'compute.googleapis.com/WireGroup', kind: 'held', reason: 'wireGroups.insert is held in the rows above (nested under a cross-site network — no scope node for the parent)', confirm: 'a scope node for the cross-site network parent', checked: COMPUTE_V1 },
+  { type: 'cloudkms.googleapis.com/KeyHandle', kind: 'held', reason: 'keyHandles.create is held in the rows above (optional ID; a UUID is used when it is empty)', confirm: 'a length and character sentence for keyHandleId in the Cloud KMS REST reference', checked: KMS_V1 },
+  { type: 'compute.googleapis.com/InstanceSettings', kind: 'no name', reason: `${NO_ID}the resource has get and patch methods only, no insert`, checked: COMPUTE_V1 },
+  { type: 'compute.googleapis.com/Project', kind: 'no name', reason: `${NO_ID}Compute Engine project metadata; the project ID itself is the gcp.project_id rule`, checked: COMPUTE_V1 },
+  { type: 'firestore.googleapis.com/Backup', kind: 'no name', reason: `${NO_ID}Backup.name is "Output only"`, checked: 'https://www.googleapis.com/discovery/v1/apis/firestore/v1/rest' },
+  { type: 'sqladmin.googleapis.com/Backup', kind: 'no name', reason: `${NO_ID}Backup.name is "Output only"`, checked: 'https://www.googleapis.com/discovery/v1/apis/sqladmin/v1/rest' },
+  { type: 'sqladmin.googleapis.com/BackupRun', kind: 'no name', reason: `${NO_ID}backupRuns.insert has no ID field for the caller`, checked: 'https://www.googleapis.com/discovery/v1/apis/sqladmin/v1/rest' },
+  { type: 'run.googleapis.com/Execution', kind: 'no name', reason: `${NO_ID}executions have no create method (an execution is started by running a job)`, checked: RUN_V2 },
+  { type: 'run.googleapis.com/Revision', kind: 'no name', reason: `${NO_ID}Revision.name is "Output only"`, checked: RUN_V2 },
+  { type: 'cloudkms.googleapis.com/AutokeyConfig', kind: 'no name', reason: `${NO_ID}getAutokeyConfig and updateAutokeyConfig only, no create`, checked: KMS_V1 },
+  { type: 'cloudkms.googleapis.com/CryptoKeyVersion', kind: 'no name', reason: `${NO_ID}cryptoKeyVersions.create takes the parent only`, checked: KMS_V1 },
+  { type: 'cloudkms.googleapis.com/EkmConfig', kind: 'no name', reason: `${NO_ID}getEkmConfig only, no create`, checked: KMS_V1 },
+  { type: 'cloudkms.googleapis.com/RetiredResource', kind: 'no name', reason: `${NO_ID}get and list only, no create`, checked: KMS_V1 },
+  { type: 'iam.googleapis.com/ServiceAccountKey', kind: 'no name', reason: `${NO_ID}serviceAccounts.keys.create takes the service account name only`, checked: 'https://www.googleapis.com/discovery/v1/apis/iam/v1/rest' },
+  { type: 'secretmanager.googleapis.com/SecretVersion', kind: 'no name', reason: `${NO_ID}secrets.addVersion takes the parent only`, checked: 'https://www.googleapis.com/discovery/v1/apis/secretmanager/v1/rest' },
+  { type: 'artifactregistry.googleapis.com/DockerImage', kind: 'external value', reason: 'the API has get and list only; the name is set by the client when the image is pushed', checked: AR_V1 },
+  { type: 'artifactregistry.googleapis.com/MavenArtifact', kind: 'external value', reason: 'the API has get and list only; the name is set by the client when the artifact is pushed', checked: AR_V1 },
+  { type: 'artifactregistry.googleapis.com/NpmPackage', kind: 'external value', reason: 'the API has get and list only; the name is set by the client when the package is pushed', checked: AR_V1 },
+  { type: 'artifactregistry.googleapis.com/PythonPackage', kind: 'external value', reason: 'the API has get and list only; the name is set by the client when the package is pushed', checked: AR_V1 },
+  { type: 'run.googleapis.com/DomainMapping', kind: 'external value', reason: 'a DNS name the user owns, not a generated name (run v2 has no domainMappings resource)', checked: RUN_V2 },
+];
+
+/** 규칙이 없는 자산 유형 절 — renderHeld 의 끝에 붙는다 */
+export function renderAssetTypes() {
+  const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
+  const L = [];
+  L.push('## Asset types with no rule');
+  L.push('');
+  L.push('The supported scope is the 116 Cloud Asset Inventory types of the twelve surveyed APIs (Compute Engine, Cloud Storage, Cloud SQL, GKE, Artifact Registry, Cloud Run, Cloud Functions, IAM, Cloud KMS, Secret Manager, Firestore, Spanner). Every type is either covered by a rule or listed here: **held** — the name is chosen by the user but no complete rule was found; **no name** — the resource has no user-chosen ID; **external value** — the name is decided outside this engine. `src/core/gcp-intake.test.ts` checks all 116.');
+  L.push('');
+  L.push('| Asset type | Kind | Reason | What would confirm it | Checked |');
+  L.push('|---|---|---|---|---|');
+  for (const r of ASSET_TYPES_WITHOUT_RULE) L.push(`| \`${r.type}\` | ${r.kind} | ${cell(r.reason)} | ${cell(r.confirm ?? '—')} | ${r.checked} |`);
   return `${L.join('\n')}\n`;
 }
 

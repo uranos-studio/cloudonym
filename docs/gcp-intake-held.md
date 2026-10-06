@@ -37,3 +37,36 @@ Cloud Storage, Cloud SQL, GKE, Artifact Registry, Cloud Run, Cloud Functions, IA
 | iam v3 | policyBindings.create policyBindingId | Pattern, /a-z{2,62}/. |
 | iam v3 | principalAccessBoundaryPolicies.create principalAccessBoundaryPolicyId | Pattern, /a-z{2,62}/. |
 | iam v3 | accessPolicies.create accessPolicyId | Pattern, /a-z{2,62}/. |
+
+## Asset types with no rule
+
+The supported scope is the 116 Cloud Asset Inventory types of the twelve surveyed APIs (Compute Engine, Cloud Storage, Cloud SQL, GKE, Artifact Registry, Cloud Run, Cloud Functions, IAM, Cloud KMS, Secret Manager, Firestore, Spanner). Every type is either covered by a rule or listed here: **held** — the name is chosen by the user but no complete rule was found; **no name** — the resource has no user-chosen ID; **external value** — the name is decided outside this engine. `src/core/gcp-intake.test.ts` checks all 116.
+
+| Asset type | Kind | Reason | What would confirm it | Checked |
+|---|---|---|---|---|
+| `artifactregistry.googleapis.com/Repository` | held | repositories.create repositoryId says only "Required. The repository id to use for this repository." — no length or character rule | a length and character sentence for the repository ID in the Artifact Registry REST reference or the create-repositories guide | https://artifactregistry.googleapis.com/$discovery/rest?version=v1 |
+| `container.googleapis.com/NodePool` | held | NodePool.name says only "The name of the node pool." — no length or character rule | a naming sentence for node pools in the GKE REST reference or the add-node-pools guide | https://www.googleapis.com/discovery/v1/apis/container/v1/rest |
+| `run.googleapis.com/Job` | held | jobs.create jobId says only "The unique identifier for the Job." — no length or character rule | a naming sentence for jobs in the Cloud Run REST reference or the create-jobs guide | https://run.googleapis.com/$discovery/rest?version=v2 |
+| `run.googleapis.com/Service` | held | services.create serviceId: "It must begin with letter, and cannot end with hyphen; must contain fewer than 50 characters." — the allowed characters are not stated | the character set for service names in the Cloud Run REST reference or the deploy guide | https://run.googleapis.com/$discovery/rest?version=v2 |
+| `run.googleapis.com/WorkerPool` | held | workerPools.create workerPoolId has the serviceId sentence (letter first, no trailing hyphen, fewer than 50 characters); the deploy guide adds "must not share the same name as an existing service name from your project" — the allowed characters are not stated | the character set for worker pool names in the Cloud Run REST reference or the deploy guide | https://docs.cloud.google.com/run/docs/deploy-worker-pools |
+| `compute.googleapis.com/FirewallPolicy` | held | the firewall policy insert methods are held in the rows above (no source states a rule for the network firewall policy name) | a naming sentence for network firewall policies in the Compute Engine REST reference | https://www.googleapis.com/discovery/v1/apis/compute/v1/rest |
+| `compute.googleapis.com/WireGroup` | held | wireGroups.insert is held in the rows above (nested under a cross-site network — no scope node for the parent) | a scope node for the cross-site network parent | https://www.googleapis.com/discovery/v1/apis/compute/v1/rest |
+| `cloudkms.googleapis.com/KeyHandle` | held | keyHandles.create is held in the rows above (optional ID; a UUID is used when it is empty) | a length and character sentence for keyHandleId in the Cloud KMS REST reference | https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest |
+| `compute.googleapis.com/InstanceSettings` | no name | no user-chosen ID: the resource has get and patch methods only, no insert | — | https://www.googleapis.com/discovery/v1/apis/compute/v1/rest |
+| `compute.googleapis.com/Project` | no name | no user-chosen ID: Compute Engine project metadata; the project ID itself is the gcp.project_id rule | — | https://www.googleapis.com/discovery/v1/apis/compute/v1/rest |
+| `firestore.googleapis.com/Backup` | no name | no user-chosen ID: Backup.name is "Output only" | — | https://www.googleapis.com/discovery/v1/apis/firestore/v1/rest |
+| `sqladmin.googleapis.com/Backup` | no name | no user-chosen ID: Backup.name is "Output only" | — | https://www.googleapis.com/discovery/v1/apis/sqladmin/v1/rest |
+| `sqladmin.googleapis.com/BackupRun` | no name | no user-chosen ID: backupRuns.insert has no ID field for the caller | — | https://www.googleapis.com/discovery/v1/apis/sqladmin/v1/rest |
+| `run.googleapis.com/Execution` | no name | no user-chosen ID: executions have no create method (an execution is started by running a job) | — | https://run.googleapis.com/$discovery/rest?version=v2 |
+| `run.googleapis.com/Revision` | no name | no user-chosen ID: Revision.name is "Output only" | — | https://run.googleapis.com/$discovery/rest?version=v2 |
+| `cloudkms.googleapis.com/AutokeyConfig` | no name | no user-chosen ID: getAutokeyConfig and updateAutokeyConfig only, no create | — | https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest |
+| `cloudkms.googleapis.com/CryptoKeyVersion` | no name | no user-chosen ID: cryptoKeyVersions.create takes the parent only | — | https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest |
+| `cloudkms.googleapis.com/EkmConfig` | no name | no user-chosen ID: getEkmConfig only, no create | — | https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest |
+| `cloudkms.googleapis.com/RetiredResource` | no name | no user-chosen ID: get and list only, no create | — | https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest |
+| `iam.googleapis.com/ServiceAccountKey` | no name | no user-chosen ID: serviceAccounts.keys.create takes the service account name only | — | https://www.googleapis.com/discovery/v1/apis/iam/v1/rest |
+| `secretmanager.googleapis.com/SecretVersion` | no name | no user-chosen ID: secrets.addVersion takes the parent only | — | https://www.googleapis.com/discovery/v1/apis/secretmanager/v1/rest |
+| `artifactregistry.googleapis.com/DockerImage` | external value | the API has get and list only; the name is set by the client when the image is pushed | — | https://artifactregistry.googleapis.com/$discovery/rest?version=v1 |
+| `artifactregistry.googleapis.com/MavenArtifact` | external value | the API has get and list only; the name is set by the client when the artifact is pushed | — | https://artifactregistry.googleapis.com/$discovery/rest?version=v1 |
+| `artifactregistry.googleapis.com/NpmPackage` | external value | the API has get and list only; the name is set by the client when the package is pushed | — | https://artifactregistry.googleapis.com/$discovery/rest?version=v1 |
+| `artifactregistry.googleapis.com/PythonPackage` | external value | the API has get and list only; the name is set by the client when the package is pushed | — | https://artifactregistry.googleapis.com/$discovery/rest?version=v1 |
+| `run.googleapis.com/DomainMapping` | external value | a DNS name the user owns, not a generated name (run v2 has no domainMappings resource) | — | https://run.googleapis.com/$discovery/rest?version=v2 |

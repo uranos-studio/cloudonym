@@ -7,6 +7,7 @@ import type { ScopeDef } from '../scopes';
 
 const COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
 const IAM_V1_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/iam/v1/rest';
+const AR_DOWNLOAD_RULES = 'https://docs.cloud.google.com/artifact-registry/docs/restrict-artifact-downloads#gcloud';
 const RFC1035 = /^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$/;
 const SPANNER_ID = /^[a-z][-a-z0-9]{0,62}[a-z0-9]$/;
 const IAM_V3_ID = /^[a-z][a-z0-9.-]{2,62}$/;
@@ -37,7 +38,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -45,6 +46,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:workforce_pool': { id: 'gcp:workforce_pool', provider: 'gcp', displayName: 'Workforce pool', parent: 'gcp:namespace', ruleId: 'gcp.iam_workforce_pool', docUrl: IAM_V1_DISCOVERY },
   // 관리 ID · 네임스페이스 · 공급자 · 키는 workloadIdentityPools/{pool} 아래 — 유일 범위 문장은 없다(규칙 notes)
   'gcp:workload_identity_pool': { id: 'gcp:workload_identity_pool', provider: 'gcp', displayName: 'Workload identity pool', parent: 'gcp:project_location', ruleId: 'gcp.iam_workload_identity_pool', docUrl: IAM_V1_DISCOVERY },
+  // 다운로드 규칙 "The name must be unique within your repository" — 저장소(repositoryId) 규칙은 원문이 없어 보류라 ruleId 가 없다
+  'gcp:artifact_registry_repository': { id: 'gcp:artifact_registry_repository', provider: 'gcp', displayName: 'Artifact Registry repository', parent: 'gcp:project_location', docUrl: AR_DOWNLOAD_RULES },
 };
 
 const RULES: ResourceRule[] = [
@@ -82,6 +85,12 @@ const RULES: ResourceRule[] = [
   // ── GKE ──
   // schemas.Cluster.properties.name "The name must be unique within this project and location (e.g. zone or region), and can be up to 40 characters with the following restrictions: * Lowercase letters, numbers, and hyphens only. * Must start with a letter. * Must end with a number or a letter."
   rule({ id: 'gcp.gke_cluster', displayName: 'GKE Cluster', slug: 'gke', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/, scope: 'gcp:project_location', entity: 'container.clusters', category: 'containers', docUrl: 'https://www.googleapis.com/discovery/v1/apis/container/v1/rest' }),
+
+  // ── Artifact Registry ──
+  // 다운로드 규칙 gcloud "RULE_NAME: the name of the rule. The name must be unique within your repository, have a max length of 256 characters, and consist of alpha-numeric characters, percent-encoded characters, or characters in the list [-, ., _, ~, :, @, +, ^]."
+  // 디스커버리 rules.create ruleId 는 "The rule id to use for this repository." 뿐이다. 최소 길이 문장이 없어 1 로 둔다. 생성은 영숫자 · - · _ 만 쓴다(나머지 문자는 검증만 받는다)
+  rule({ id: 'gcp.artifact_registry_rule', displayName: 'Artifact Registry Rule', slug: 'rule', minLength: 1, maxLength: 256, pattern: /^(?:[A-Za-z0-9._~:@+^-]|%[0-9A-Fa-f]{2})+$/,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:artifact_registry_repository', entity: 'artifactregistry.repositories.rules', category: 'containers', docUrl: AR_DOWNLOAD_RULES, notes: [NARROWER] }),
 
   // ── Cloud Functions ──
   // 1세대 "The function name must start with a letter followed by up to 62 letters, numbers, hyphens, or underscores, and must end with a letter or a number." · discovery v1 "Function names must be unique globally and match pattern `projects/*/locations/*/functions/*`"

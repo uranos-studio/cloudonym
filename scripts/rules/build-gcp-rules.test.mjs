@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { regexInDescription, uniquenessScopeOf, scopeOfPath, slugOf, build, BROKEN_SOURCES, RFC1035_CASES, KMS_CASES, HAND_REVIEWED } from './build-gcp-rules.mjs';
+import { regexInDescription, uniquenessScopeOf, scopeOfPath, slugOf, build, BROKEN_SOURCES, RFC1035_CASES, KMS_CASES, HAND_REVIEWED, ASSET_TYPES_WITHOUT_RULE, renderAssetTypes } from './build-gcp-rules.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const compute = JSON.parse(readFileSync(join(here, 'fixtures/gcp-sample.json'), 'utf-8'));
@@ -75,4 +75,20 @@ test('표본 — 기존 entity 는 건너뛰고 · 깨진 정규식 · 조사 �
 
 test('손으로 다시 읽은 행 — 사유는 넣지 않음 · 미확인 둘 중 하나와 괄호 안 이유', () => {
   for (const [m, why] of Object.entries(HAND_REVIEWED)) assert.match(why, /^reviewed by hand — (not imported|unconfirmed) \(.+\)$/, m);
+});
+
+test('규칙이 없는 자산 유형 표 — 문서 끝에 생성기 출력 그대로 있고, 행마다 종류 · 사유 · 확인한 URL 이 있다', () => {
+  const doc = readFileSync(join(here, '../../docs/gcp-intake-held.md'), 'utf-8');
+  assert.ok(doc.endsWith(renderAssetTypes()), 'docs/gcp-intake-held.md 끝 절이 renderAssetTypes() 와 다르다 — 생성기로 다시 만든다');
+  const kinds = { held: 0, 'no name': 0, 'external value': 0 };
+  for (const r of ASSET_TYPES_WITHOUT_RULE) {
+    assert.match(r.type, /^[a-z]+\.googleapis\.com\/[A-Za-z0-9]+$/);
+    assert.ok(r.kind in kinds, r.kind);
+    kinds[r.kind]++;
+    assert.ok(r.reason.length > 20, r.type);
+    assert.match(r.checked, /^https:\/\//, r.type);
+    if (r.kind === 'held') assert.ok(r.confirm && r.confirm.length > 10, `${r.type} — 무엇을 열면 확정되나`);
+  }
+  assert.deepEqual(kinds, { held: 8, 'no name': 13, 'external value': 5 });
+  assert.equal(new Set(ASSET_TYPES_WITHOUT_RULE.map((r) => r.type)).size, ASSET_TYPES_WITHOUT_RULE.length);
 });

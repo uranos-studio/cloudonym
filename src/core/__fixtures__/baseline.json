@@ -2412,6 +2412,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "billing-trade-prd-kr-fn-01",
               "valid": true,
@@ -8361,6 +8370,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -14316,6 +14334,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "billing-trade-prd-kr-fn-01",
               "valid": true,
@@ -20265,6 +20292,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -26220,6 +26256,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "windows-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "windows-trade-prd-kr-fn-01",
               "valid": true,
@@ -32169,6 +32214,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "google-trade-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "google-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -38124,6 +38178,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "azure-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "azure-trade-prd-kr-fn-01",
               "valid": true,
@@ -44073,6 +44136,15 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "매매-trade-prd-kr-gke-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "artifact_registry_rule": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-rule-01",
               "violations": 1,
               "steps": 1
             },
@@ -50028,6 +50100,15 @@
               "violations": 0,
               "steps": 2
             },
+            "artifact_registry_rule": {
+              "name": "paymentsettlement-reconciliation-dev-global-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "paymentsettlement-reconciliation-dev-global-fn-01",
               "valid": true,
@@ -55977,6 +56058,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "a-long-longpurpose-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "a-long-longpurpose-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -61932,6 +62022,15 @@
               "violations": 1,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "3tier-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "3tier-trade-prd-kr-fn-01",
               "valid": false,
@@ -67881,6 +67980,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -73836,6 +73944,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "billing-trade-prd-kr-fn-01",
               "valid": true,
@@ -79788,6 +79905,15 @@
               "violations": 0,
               "steps": 0
             },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
+              "violations": 0,
+              "steps": 0
+            },
             "cloud_function_gen1": {
               "name": "billing-trade-prd-kr-fn-01",
               "valid": true,
@@ -85737,6 +85863,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-gke-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "artifact_registry_rule": {
+              "name": "billing-trade-prd-kr-rule-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-rule-01",
               "violations": 0,
               "steps": 0
             },
@@ -197977,6 +198112,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "artifact_registry_rule",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "autoscaler",
         "name": "",
         "known": true,
@@ -211359,6 +211602,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -212046,6 +212290,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -212727,6 +212972,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -213416,6 +213662,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -214103,6 +214350,7 @@
           "gcp_spanner_database = \"windows-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"windows-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"windows-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"windows-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"windows-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"windows-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"windows-trade-prd-kr-oc-01\"",
@@ -214789,6 +215037,7 @@
           "gcp_spanner_database = \"google-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"google-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"google-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"google-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"google-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"google-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"google-trade-prd-kr-oc-01\"",
@@ -215479,6 +215728,7 @@
           "gcp_spanner_database = \"azure-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"azure-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"azure-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"azure-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"azure-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"azure-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"azure-trade-prd-kr-oc-01\"",
@@ -216183,6 +216433,7 @@
           "# INVALID: gcp_spanner_database",
           "# INVALID: gcp_spanner_backup",
           "# INVALID: gcp_gke_cluster",
+          "# INVALID: gcp_artifact_registry_rule",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: gcp_iam_oauth_client",
@@ -216855,6 +217106,7 @@
           "gcp_spanner_database = \"paymentse-reconcili-dev-db-01\"",
           "gcp_spanner_backup = \"paymentsettlement-reconciliation-dev-global-bkp-01\"",
           "gcp_gke_cluster = \"paymentsettlem-reconciliation-dev-gke-01\"",
+          "gcp_artifact_registry_rule = \"paymentsettlement-reconciliation-dev-global-rule-01\"",
           "gcp_cloud_function_gen1 = \"paymentsettlement-reconciliation-dev-global-fn-01\"",
           "gcp_cloud_function = \"paymentsettlement-reconciliation-dev-global-fn-01\"",
           "gcp_iam_oauth_client = \"paymentsettlement-reconciliation-dev-global-oc-01\"",
@@ -217542,6 +217794,7 @@
           "gcp_spanner_database = \"a-long-longpurpose-prd-db-01\"",
           "gcp_spanner_backup = \"a-long-longpurpose-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"a-long-longpurpose-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"a-long-longpurpose-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"a-long-longpurpose-prd-kr-fn-01\"",
           "gcp_cloud_function = \"a-long-longpurpose-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"a-long-longpurpose-prd-kr-oc-01\"",
@@ -218124,6 +218377,7 @@
           "gcp_kms_crypto_key = \"3tier-trade-prd-kr-key-01\"",
           "gcp_kms_import_job = \"3tier-trade-prd-kr-ij-01\"",
           "gcp_spanner_instance_config = \"custom-3tier-trade-prd\"",
+          "gcp_artifact_registry_rule = \"3tier-trade-prd-kr-rule-01\"",
           "gcp_iam_oauth_client_credential = \"3tier-trade-prd-kr-occ-01\"",
           "gcp_iam_custom_role = \"role3tiertradeprd\"",
           "gcp_iam_workforce_pool_provider = \"3tier-trade-prd-kr-wpp-01\"",
@@ -218918,6 +219172,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -219595,6 +219850,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -220268,6 +220524,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",
@@ -220957,6 +221214,7 @@
           "gcp_spanner_database = \"billing-trade-prd-kr-db-01\"",
           "gcp_spanner_backup = \"billing-trade-prd-kr-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prd-kr-gke-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prd-kr-rule-01\"",
           "gcp_cloud_function_gen1 = \"billing-trade-prd-kr-fn-01\"",
           "gcp_cloud_function = \"billing-trade-prd-kr-fn-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prd-kr-oc-01\"",

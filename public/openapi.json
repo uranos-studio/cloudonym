@@ -953,7 +953,8 @@
               "azure:storage/storageaccounts/fileservices",
               "azure:storagesync/storagesyncservices",
               "azure:streamanalytics/streamingjobs",
-              "azure:timeseriesinsights/environments"
+              "azure:timeseriesinsights/environments",
+              "gcp:artifact_registry_repository"
             ],
             "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
             "example": "azure:resource_group"
