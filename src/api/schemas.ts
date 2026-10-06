@@ -3,6 +3,7 @@ import { PROVIDERS, type NamingContext, type Provider, type RawContext } from '.
 import { rulesFor } from '../core/constraints';
 import { parseContext } from '../core/engine';
 import { RULES_REVISION } from '../core/revision';
+import { validateSelection, type SelectionItem } from '../core/selection';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
 import { escapeInvisible, type Message } from '../messages/catalog';
@@ -12,6 +13,7 @@ export interface Rejection { status: 400 | 409; errors: Message[]; supported?: s
 export type Parsed<T> = { ok: true; value: T } | { ok: false; rejection: Rejection };
 
 export interface GenerateInput { context: NamingContext; transformed: CoreMessage[]; providers: Provider[] }
+export interface NamesInput { provider: Provider; context: NamingContext; transformed: CoreMessage[]; items: SelectionItem[] }
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
 export type UiEvent = (typeof UI_EVENTS)[number];
@@ -114,4 +116,42 @@ export function parseEventBody(body: unknown): Parsed<UiEvent> {
     return reject([{ code: 'request.value_unsupported', field: 'event', params: { value: describe(event) } }], [...UI_EVENTS]);
   }
   return { ok: true, value: event as UiEvent };
+}
+
+/** selection 오류의 사용자 값(value)을 원래 입력에서 다시 만든다 — 80자 · 보이지 않는 문자 · 비문자열은 JSON (다른 요청 오류와 같은 표시 · 8775326) */
+function echoSafe(m: CoreMessage, resources: unknown[]): CoreMessage {
+  const entry = (i: number): Record<string, unknown> => (isRecord(resources[i]) ? resources[i] : {});
+  if (m.code === 'selection.unknown_type') return { ...m, params: { ...m.params, value: describe(entry(m.params.index).type) } };
+  if (m.code === 'selection.invalid_role') return { ...m, params: { ...m.params, value: describe(entry(m.params.index).role) } };
+  return m;
+}
+
+/** POST /v1/names (D39) — provider · context 는 모양을 보고, resources 는 core validateSelection 에 넘겨 selection.* 를 그대로 싣는다 */
+export function parseNamesBody(body: unknown): Parsed<NamesInput> {
+  if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
+  const pin = checkRulesVersion(body);
+  if (pin) return pin;
+  const { provider } = body;
+  const longProvider = tooLong({ provider });
+  if (longProvider.length > 0) return reject(longProvider);
+  if (!isProvider(provider)) return reject([{ code: 'request.value_unsupported', field: 'provider', params: { value: describe(provider) } }], [...PROVIDERS]);
+  if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
+  const { owner, system, purpose, env, region } = body.context;
+  const resources = Array.isArray(body.resources) ? (body.resources as unknown[]) : [];
+  // 항목 안 문자열도 전송 위생 상한을 건다 — 1024 를 넘는 type · role 을 엔진까지 보내지 않는다
+  const long = [
+    ...tooLong({ owner, system, purpose, env, region }),
+    ...resources.flatMap((r, i) => (isRecord(r) ? tooLong({ [`resources[${i}].type`]: r.type, [`resources[${i}].role`]: r.role }) : [])),
+  ];
+  if (long.length > 0) return reject(long);
+
+  const parsed = parseContext(body.context as RawContext);
+  const selection = validateSelection(provider, body.resources);
+  // 문맥 오류와 선택 오류를 함께 — 한 번에 고칠 수 있게. 문맥이 먼저다
+  const errors: Message[] = [...(parsed.ok ? [] : parsed.errors), ...(selection.ok ? [] : selection.errors.map((m) => echoSafe(m, resources)))];
+  if (!parsed.ok || !selection.ok) {
+    const unknownType = errors.some((m) => m.code === 'selection.unknown_type');
+    return reject(errors, unknownType ? rulesFor(provider).map((r) => r.resourceType) : undefined);
+  }
+  return { ok: true, value: { provider, context: parsed.context, transformed: parsed.transformed, items: selection.items } };
 }

@@ -7,6 +7,9 @@ import { app } from './index';
 import { req, fakeKv } from './test-support';
 import { VERSION } from '../version';
 import { en } from '../messages/en';
+import { SCOPES } from '../core/scopes';
+import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
+import { inputKind } from '../core/tree';
 
 const rules = Object.values(RULES);
 const text = buildLlmsText(rules, VERSION);
@@ -59,6 +62,27 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(vpc).toContain('(VPC (Name tag))');
     expect(/\p{Script=Hangul}/u.test(text)).toBe(false);
   });
+  it('「## Resource tree」 절 — provider 마다 범위 노드(id · docUrl) 아래 규칙마다 들여쓴 한 줄(id · input) · scope/uniqueness 문장은 openapi 와 같다', () => {
+    const at = lines.indexOf('## Resource tree');
+    const end = lines.findIndex((l, i) => i > at && l.startsWith('## '));
+    expect(at).toBeGreaterThan(0);
+    const section = lines.slice(at, end);
+    expect(section).toContain(SCOPE_MEANING);
+    expect(section).toContain(UNIQUENESS_MEANING);
+    for (const s of Object.values(SCOPES)) expect(section.some((l) => l.includes(`(\`${s.id}\`)`) && l.includes(s.docUrl)), s.id).toBe(true);
+    const ruleLines = section.filter((l) => /^ +- `[a-z]+\.[a-z0-9_]+` · input: /.test(l));
+    expect(ruleLines).toHaveLength(rules.length);
+    for (const r of rules) expect(ruleLines.some((l) => l.includes(`\`${r.id}\` · input: ${inputKind(r)}`)), r.id).toBe(true);
+    // Azure subnet 은 global › subscription › resource_group › virtual_network 아래 — 들여쓰기 깊이 4 단계(8칸)
+    expect(section).toContain('        - `azure.subnet` · input: count');
+    expect(section).toContain('        - `aws.ec2_instance` · input: count · uniqueness: none');
+  });
+  it('seq · role 설명과 /v1/names 줄 · 한 요청 = 한 부모 범위 · 충돌의 뜻', () => {
+    expect(text).toContain('`<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`).');
+    expect(text).toContain('- `POST /v1/names` — body');
+    expect(text).toContain('One `/v1/names` request stands for one instance of each parent scope');
+    expect(text).toContain('`name.conflict`');
+  });
   it('API 절에 rules_version · version · 실패 꼴 · health', () => {
     expect(text).toContain('"rules_version"?: string');
     expect(text).toContain('`version: { engine, rules }`');
@@ -105,9 +129,9 @@ describe('GET /llms.txt — Worker 라우트 (D17)', () => {
     const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
     expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/llms\.txt"/);
   });
-  it('app.routes 는 정확히 다섯 경로 + secureHeaders 의 ALL /* · cors 의 ALL /v1/* 하나씩 · /v1/v1 없음', () => {
+  it('app.routes 는 정확히 여섯 경로 + secureHeaders 의 ALL /* · cors 의 ALL /v1/* 하나씩 · /v1/v1 없음', () => {
     const routes = app.routes.map((r) => `${r.method} ${r.path}`);
-    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /llms.txt', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/validate']);
+    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /llms.txt', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/names', 'POST /v1/validate']);
     expect(routes.filter((r) => r.startsWith('ALL ')).sort()).toEqual(['ALL /*', 'ALL /v1/*']);
     expect(routes.some((r) => r.includes('/v1/v1'))).toBe(false);
   });

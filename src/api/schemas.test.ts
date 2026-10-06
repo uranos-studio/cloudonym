@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parseEventBody, parseGenerateBody, parseValidateBody } from './schemas';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } from './schemas';
+import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
@@ -104,5 +105,63 @@ describe('rules_version (D27 ⑴)', () => {
     }
     expect(parseGenerateBody({ context: ctx, rules_version: 'x'.repeat(1025) }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'rules_version', params: { max: 1024 } }] } });
+  });
+});
+
+describe('parseNamesBody (D39)', () => {
+  const ok = { provider: 'azure', context: ctx, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'resource_group' }] };
+  it('정상 — provider · 정규화된 문맥 · 선택 항목(규칙 · count)', () => {
+    const r = parseNamesBody(ok);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.provider).toBe('azure');
+    expect(r.value.context).toEqual(ctx);
+    expect(r.value.items.map((i) => [i.rule.id, i.count])).toEqual([['azure.virtual_machine', 2], ['azure.resource_group', 1]]);
+  });
+  it('provider 없음 · 모르는 값 → 400 request.value_unsupported + supported 셋', () => {
+    const supported = ['aws', 'gcp', 'azure'];
+    expect(parseNamesBody({ ...ok, provider: undefined }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'undefined' } }], supported } });
+    expect(parseNamesBody({ ...ok, provider: 'oci' }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported } });
+  });
+  it('본문 · context 모양 오류는 generate 와 같다', () => {
+    expect(parseNamesBody([1])).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.body_not_object' }] } });
+    expect(parseNamesBody({ ...ok, context: null })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.context_not_object' }] } });
+  });
+  it('resources 의 selection.* 오류를 core 코드 그대로 400 으로 — 모르는 type 이면 supported 는 그 provider 의 resource_type', () => {
+    expect(parseNamesBody({ ...ok, resources: [] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.empty' }] } });
+    expect(parseNamesBody({ ...ok, resources: 'vm' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.not_array' }] } });
+    const types = rulesFor('azure').map((r) => r.resourceType);
+    expect(parseNamesBody({ ...ok, resources: [{ type: 'nope' }] }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.unknown_type', params: { index: 0, value: 'nope', supported: types } }], supported: types } });
+    expect(parseNamesBody({ ...ok, resources: [{ type: 'storage_account', count: 2 }] }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.count_not_supported', params: { index: 0, type: 'storage_account' } }] } });
+  });
+  it('문맥 오류와 선택 오류는 함께 낸다 — 문맥 먼저', () => {
+    const r = parseNamesBody({ ...ok, context: { ...ctx, env: 'qa' }, resources: [] });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.rejection.errors.map((e) => e.code)).toEqual(['context.value_unsupported', 'selection.empty']);
+  });
+  it('되돌려 싣는 type · role 값은 80자까지 · 보이지 않는 문자는 \\uXXXX (8775326 방식)', () => {
+    const long = parseNamesBody({ ...ok, resources: [{ type: 'x'.repeat(500) }] });
+    expect(long.ok).toBe(false);
+    if (!long.ok) expect(long.rejection.errors[0]).toMatchObject({ code: 'selection.unknown_type', params: { value: `${'x'.repeat(80)}…` } });
+    const rlo = String.fromCodePoint(0x202e);
+    const role = parseNamesBody({ ...ok, resources: [{ type: 'managed_identity', role: `d${rlo}b` }] });
+    if (!role.ok) expect(role.rejection.errors[0]).toMatchObject({ code: 'selection.invalid_role', params: { value: 'd\\u202Eb' } });
+    expect(role.ok).toBe(false);
+  });
+  it('type · role 문자열이 1024자를 넘으면 400 request.field_too_long (field 는 resources[i].type)', () => {
+    expect(parseNamesBody({ ...ok, resources: [{ type: 'virtual_machine' }, { type: 'x'.repeat(1025) }] }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'resources[1].type', params: { max: 1024 } }] } });
+  });
+  it('toString 이 호출 불가능한 type → 500 이 아니라 400 selection.unknown_type', () => {
+    const r = parseNamesBody({ ...ok, resources: [{ type: { toString: 1 } }] });
+    expect(r).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.unknown_type', params: { value: '{"toString":1}' } }] } });
+  });
+  it('rules_version 이 다르면 409', () => {
+    expect(parseNamesBody({ ...ok, rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch' }] } });
+    expect(parseNamesBody({ ...ok, rules_version: RULES_REVISION }).ok).toBe(true);
   });
 });

@@ -4,10 +4,10 @@ import { cors } from 'hono/cors';
 import { bodyLimit } from 'hono/body-limit';
 import { every, except } from 'hono/combine';
 import type { App } from './env';
-import { generate, validateName } from '../core/engine';
+import { generate, generateMany, validateName } from '../core/engine';
 import { labelsFor } from '../core/labels';
-import { parseEventBody, parseGenerateBody, parseValidateBody } from './schemas';
-import { toWireGenerate, toWireValidate, type ProviderResult } from './serialize';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } from './schemas';
+import { toWireGenerate, toWireNames, toWireValidate, type ProviderResult } from './serialize';
 import { logTelemetry } from './telemetry';
 import { fail, internalError } from './errors';
 import { VERSION } from '../version';
@@ -55,6 +55,19 @@ v1.post('/generate', async (c) => {
   const results: ProviderResult[] = providers.map((p) => ({ provider: p, names: out[p] ?? {}, labels: labelsFor(context, p) }));
   c.executionCtx.waitUntil(logTelemetry(c, 'api_generate', { providers }));
   return c.json(toWireGenerate(results, transformed, VERSION));
+});
+
+// 고른 리소스와 개수만 (D39) — 한 요청 = 부모 범위의 한 인스턴스. 항목 FAIL · 충돌도 200 이고 valid:false 와 이유를 싣는다
+v1.post('/names', async (c) => {
+  const read = await readJson(c);
+  if (!read.ok) return notJson(c);
+  const parsed = parseNamesBody(read.body);
+  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
+  const { provider, context, transformed, items } = parsed.value;
+  const out = generateMany(context, provider, items);
+  // 문맥값은 싣지 않는다 (D17)
+  c.executionCtx.waitUntil(logTelemetry(c, 'api_names', { provider, resource_count: items.length, name_count: out.items.length, valid: out.valid }));
+  return c.json(toWireNames(out, items.map((i) => i.rule), labelsFor(context, provider), transformed, VERSION));
 });
 
 v1.post('/validate', async (c) => {

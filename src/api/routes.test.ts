@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
 import { req, jsonPost, json } from './test-support';
+import { afterEach, vi } from 'vitest';
 import { VERSION } from '../version';
 
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
@@ -136,5 +137,83 @@ describe('되돌려 싣는 사용자 값의 보이지 않는 문자 (리뷰 S2)'
     const body = await json(res);
     expect(JSON.stringify(body)).toContain('\\\\u2066');
     expect(JSON.stringify(body)).not.toContain(String.fromCodePoint(0x2066));
+  });
+});
+
+describe('POST /v1/names (D39)', () => {
+  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+  const names = (body: unknown, env = {}) => req(app, '/v1/names', jsonPost(body), env);
+  afterEach(() => { vi.unstubAllGlobals(); });
+
+  it('200 — 키 전부 · 선택 순서 → 순번 순서 · scope · uniqueness · data · metadata 는 provider 하나', async () => {
+    const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'storage_account' }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }] });
+    expect(res.status).toBe(200);
+    const body = await json(res);
+    expect(Object.keys(body)).toEqual(['success', 'version', 'data', 'metadata']);
+    expect(body.version).toEqual(VERSION);
+    for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) expect(Object.keys(part)).toEqual(['azure']);
+    const az = body.data.azure;
+    expect(Object.keys(az)).toEqual(['valid', 'items', 'conflicts']);
+    expect(az.valid).toBe(true);
+    expect(az.conflicts).toEqual([]);
+    expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
+      'virtual_machine_01=billing-trade-prd-kr-vm-01', 'virtual_machine_02=billing-trade-prd-kr-vm-02',
+      'storage_account=stbillingtradeprd', 'managed_identity_db=billing-trade-prd-id-db', 'resource_group=rg-billing-trade-prd',
+    ]);
+    expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
+    expect(az.items[0]).toMatchObject({ resource_type: 'virtual_machine', seq: '01', scope: 'azure:resource_group', uniqueness: 'csp' });
+    expect(az.items[2]).toMatchObject({ scope: 'azure:global' });
+    expect(az.items[2].seq).toBeUndefined();
+    expect(az.items[3]).toMatchObject({ role: 'db', scope: 'azure:resource_group' });
+    expect(az.items[4]).toMatchObject({ scope: 'azure:subscription' });
+    expect(body.metadata.generated_labels.azure).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+  });
+  it('항목 하나가 FAIL 이면 200 · valid:false · 항목 전부와 이유', async () => {
+    const { res } = await names({ provider: 'azure', context: { ...base, system: 'a-long', purpose: 'longpurpose' }, resources: [{ type: 'virtual_machine_windows', count: 2 }, { type: 'resource_group' }] });
+    expect(res.status).toBe(200);
+    const az = (await json(res)).data.azure;
+    expect(az.valid).toBe(false);
+    expect(az.items).toHaveLength(3);
+    expect(az.items.filter((i: { valid: boolean }) => !i.valid).length).toBeGreaterThan(0);
+    expect(az.items[2].valid).toBe(true);
+  });
+  it('AWS Name 태그 항목은 uniqueness "none" · scope 는 배치 범위 aws:vpc', async () => {
+    const body = await json((await names({ provider: 'aws', context: base, resources: [{ type: 'ec2_instance' }, { type: 's3_bucket' }] })).res);
+    expect(body.data.aws.items[0]).toMatchObject({ key: 'ec2_instance_01', scope: 'aws:vpc', uniqueness: 'none' });
+    expect(body.data.aws.items[1]).toMatchObject({ key: 's3_bucket', scope: 'aws:partition', uniqueness: 'csp' });
+  });
+  it('실제 규칙 표의 Linux VM + Windows VM 은 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
+    const az = (await json((await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine' }, { type: 'virtual_machine_windows' }] })).res)).data.azure;
+    expect(az.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'bi-tr-prd-vm-01']);
+    expect(az.conflicts).toEqual([]);
+  });
+  it('계획 §10 완료 기준 — storage_account 에 count 2 → 400 selection.count_not_supported', async () => {
+    const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'storage_account', count: 2 }] });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'selection.count_not_supported', params: { index: 1, type: 'storage_account' }, message: "resources[1]: 'storage_account' has no sequence number, so count must be 1" }] });
+  });
+  it('모르는 provider → 400 + supported · rules_version 다르면 409', async () => {
+    const bad = await names({ provider: 'oci', context: base, resources: [{ type: 'x' }] });
+    expect(bad.res.status).toBe(400);
+    expect(await bad.res.json()).toMatchObject({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider' }], supported: ['aws', 'gcp', 'azure'] });
+    const pin = await names({ provider: 'gcp', context: base, resources: [{ type: 'project_id' }], rules_version: '2026-01-01.1' });
+    expect(pin.res.status).toBe(409);
+  });
+  it('되돌려 싣는 type 은 80자로 자르고 보이지 않는 문자를 \\uXXXX 로 — params · message 둘 다', async () => {
+    const rlo = String.fromCodePoint(0x202e);
+    const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: `${'x'.repeat(100)}${rlo}` }, { type: `a${rlo}b` }] })).res);
+    expect(body.errors[0].params.value).toBe(`${'x'.repeat(80)}…`);
+    expect(body.errors[1].params.value).toBe('a\\u202Eb');
+    expect(JSON.stringify(body)).not.toContain(rlo);
+  });
+  it('텔레메트리 api_names — { provider, resource_count, name_count, valid } · 문맥값은 싣지 않는다', async () => {
+    const sent: string[] = [];
+    vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { sent.push(init.body); return Promise.resolve(new Response('{"ingested":1,"failed":0}')); });
+    const { promises } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 3 }, { type: 'resource_group' }] }, { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' });
+    await Promise.all(promises);
+    expect(sent).toHaveLength(1);
+    const [row] = JSON.parse(sent[0]!) as Record<string, unknown>[];
+    expect(row).toMatchObject({ event: 'api_names', provider: 'azure', resource_count: 2, name_count: 4, valid: true });
+    expect(sent[0]).not.toContain('billing');
   });
 });

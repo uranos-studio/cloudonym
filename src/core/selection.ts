@@ -13,8 +13,15 @@ export const MAX_NAMES = 200;
 export const MAX_COUNT = 99;
 export const ROLE_PATTERN = /^[a-z0-9]{2,16}$/;
 
-/** 사용자 값을 표시용 문자열로 — 문자열은 그대로, 나머지는 String() */
-const shown = (v: unknown): string => (typeof v === 'string' ? v : String(v));
+/** 사용자 값을 표시용 문자열로 — 문자열은 그대로, 나머지는 String(). String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던지므로 그때는 typeof */
+const shown = (v: unknown): string => {
+  if (typeof v === 'string') return v;
+  try {
+    return String(v);
+  } catch {
+    return typeof v;
+  }
+};
 
 /** 검사 순서: 배열 → 비어 있지 않음 → 항목 수 → 항목마다(객체 · type · 중복 · count · 입력 종류 · role 꼴) → Σ count. 오류는 index 순으로 모두 낸다 */
 export function validateSelection(provider: Provider, raw: unknown):

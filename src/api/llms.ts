@@ -1,11 +1,26 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
 import type { Provider, ResourceRule, Token } from '../core/types';
+import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { ENV_ALIASES, REGION_ALIASES } from '../core/normalize';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
 
 const ORDER: readonly Provider[] = ['gcp', 'aws', 'azure'];
+
+/** /v1/names 항목의 scope · uniqueness 뜻 — openapi.json NameItem 의 두 설명이 같은 문장이다(openapi.test 가 대어 본다 · codex #9) */
+export const SCOPE_MEANING = 'scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.';
+export const UNIQUENESS_MEANING = 'uniqueness "csp" means the provider requires the name to be unique within its scope; "none" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.';
+
+/** 범위 트리를 들여쓰기로 — 범위 한 줄(이름 · id · 근거 URL) 아래에 그 범위의 규칙(id · 입력 종류)과 자식 범위. 규칙 줄은 늘 들여쓰여 공식 · 제약 줄과 섞이지 않는다 */
+function treeLines(node: TreeNode, depth = 0): string[] {
+  const pad = '  '.repeat(depth);
+  return [
+    `${pad}- ${node.scope.displayName} (\`${node.scope.id}\`) — docs: ${node.scope.docUrl}`,
+    ...node.rules.map((r) => `${pad}  - \`${r.id}\` · input: ${inputKind(r)}${r.uniqueness === 'none' ? ' · uniqueness: none' : ''}`),
+    ...node.children.flatMap((c) => treeLines(c, depth + 1)),
+  ];
+}
 
 /** template 을 `<owner>-<system>-…-sa-<role>` 꼴로 펼친다. slug 는 실제 약어를 그대로 쓴다 (구분자 없는 규칙은 붙여 쓴다) */
 export function formulaOf(rule: ResourceRule): string {
@@ -53,12 +68,12 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     `> Engine ${version.engine} · rules revision ${version.rules}`,
     '',
     "> Multi-cloud resource naming engine for AWS, GCP and Azure — generates, corrects and validates names against each provider's physical constraints.",
-    '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/validate` · `GET /openapi.json`).',
+    '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/validate` · `GET /openapi.json`).',
     "> Cloudonym does not replace the provider's final verdict — it checks only the reserved words and patterns that the official documents state.",
     '',
     '## Naming Formulas',
     '',
-    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` is `01`, `<role>` is `sync`.',
+    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`).',
   ];
   for (const p of ORDER) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -72,6 +87,13 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     lines.push('', `### ${p.toUpperCase()}`);
     for (const r of byProvider(p)) lines.push(constraintLine(r, catalog));
   }
+  // 범위 트리 (D37 · D39) — buildTree 에서 만든다. 손으로 쓴 트리는 없다
+  lines.push(
+    '', '## Resource tree', '',
+    'Where each resource is created, from the widest scope down. Under each scope: its rules (`input` = what `/v1/names` accepts for that rule: `count` 1-99, `role`, or `none`), then its child scopes.',
+    '', SCOPE_MEANING, '', UNIQUENESS_MEANING,
+  );
+  for (const p of ORDER) lines.push('', `### ${p.toUpperCase()}`, ...treeLines(buildTree(p)));
   // PASS 의 뜻 (D28) — 정본은 사전의 ui.pass_meaning. README · openapi.json 은 같은 문장을 옮겨 적고 시험이 대어 본다
   lines.push('', '## What PASS means', '', catalog.ui.pass_meaning);
   lines.push(
@@ -79,11 +101,13 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '## API',
     '',
     '- `POST /v1/generate` — body `{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: ["aws", "gcp", "azure"], "rules_version"?: string }`',
+    '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
     '',
-    'Successful responses of `/v1/generate`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
+    '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`); `/v1/names` is the selection. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
+    'Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
     'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',
     '',

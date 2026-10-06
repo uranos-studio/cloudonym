@@ -113,3 +113,11 @@ describe('validateSelection (D40)', () => {
     expect(r.ok && r.items.map((i) => i.rule.resourceType)).toEqual(['rds_instance', 'vpc']);
   });
 });
+
+describe('validateSelection — 던지지 않는다', () => {
+  it('toString 이 호출 불가능한 type · role 객체도 오류 하나로 (String() 이 던지는 값)', () => {
+    const evil = { toString: 1 };
+    expect(codes(validateSelection('azure', [{ type: evil }]))).toEqual(['selection.unknown_type']);
+    expect(codes(validateSelection('azure', [{ type: 'managed_identity', role: evil }]))).toEqual(['selection.invalid_role']);
+  });
+});

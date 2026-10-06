@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
     "version": "0.1.0"
   },
   "servers": [
@@ -26,7 +26,7 @@
               },
               "example": {
                 "context": {
-                  "owner": "infra",
+                  "owner": "platform",
                   "system": "billing",
                   "purpose": "trade",
                   "env": "prd",
@@ -113,6 +113,121 @@
         }
       }
     },
+    "/names": {
+      "post": {
+        "summary": "Generate names for the resources you pick",
+        "description": "Generates names for the selected resource types of one provider, count names each (sequence 01..99) or one per role. One request stands for one instance of each parent scope (one resource group, one project, one VPC): two items of the same kind of resource with the same name are each marked valid=false with name.conflict, and conflicts lists each collision once. Items that fail or collide are still returned with the reasons (status 200). Every violation, step and note is a Message: branch on code, show message to people.",
+        "operationId": "generateSelectedNames",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NamesRequest"
+              },
+              "example": {
+                "provider": "azure",
+                "context": {
+                  "owner": "platform",
+                  "system": "billing",
+                  "purpose": "trade",
+                  "env": "prd",
+                  "region": "kr"
+                },
+                "resources": [
+                  {
+                    "type": "virtual_machine",
+                    "count": 2
+                  },
+                  {
+                    "type": "subnet",
+                    "count": 2
+                  },
+                  {
+                    "type": "managed_identity",
+                    "role": "db"
+                  },
+                  {
+                    "type": "resource_group"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Names for the selected resources, in request order then sequence order. data.<provider>.valid is false when any item is invalid or collides",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NamesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body is not JSON or not an object, provider is unknown (supported lists the providers), context is invalid (including a value longer than 1024 characters), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "rules_version was sent and differs from the current rules revision (request.rules_version_mismatch; params.requested and params.current). The API never serves an old rules revision: re-run without rules_version to use the current rules, or keep using the names you already created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/validate": {
       "post": {
         "summary": "Validate an existing resource name",
@@ -128,7 +243,7 @@
               "example": {
                 "provider": "gcp",
                 "resource_type": "service_account",
-                "name": "infra-billing-trade-prd-kr-sa-sync"
+                "name": "platform-billing-trade-prd-kr-sa-sync"
               }
             }
           }
@@ -348,7 +463,7 @@
               "owner": {
                 "type": "string",
                 "maxLength": 1024,
-                "example": "infra"
+                "example": "platform"
               },
               "system": {
                 "type": "string",
@@ -519,7 +634,279 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "infra-billing-trade-prd-kr-sa-sync"
+            "example": "platform-billing-trade-prd-kr-sa-sync"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Why the name is invalid (empty when valid)"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Shortening and transformation steps in order (step.token_dropped, step.abbreviated, step.budget_shortened, step.normalized, step.separator_removed)"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/RuleInfo"
+          }
+        }
+      },
+      "NamesRequest": {
+        "type": "object",
+        "required": [
+          "provider",
+          "context",
+          "resources"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "aws",
+              "gcp",
+              "azure"
+            ],
+            "maxLength": 1024,
+            "example": "azure"
+          },
+          "context": {
+            "type": "object",
+            "required": [
+              "owner",
+              "system",
+              "purpose",
+              "env",
+              "region"
+            ],
+            "properties": {
+              "owner": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "platform"
+              },
+              "system": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "billing"
+              },
+              "purpose": {
+                "type": "string",
+                "maxLength": 1024,
+                "example": "trade"
+              },
+              "env": {
+                "type": "string",
+                "maxLength": 1024,
+                "description": "Canonical: prd, stg, dev, sbx. Common aliases are accepted and normalised (production, prod, live -> prd; staging -> stg; development -> dev; sandbox -> sbx).",
+                "example": "prd"
+              },
+              "region": {
+                "type": "string",
+                "maxLength": 1024,
+                "description": "Canonical: kr, us, jp, eu, global. Provider region codes are accepted and normalised (asia-northeast3, ap-northeast-2, koreacentral -> kr; us-east-1, us-central1, eastus -> us; ap-northeast-1, asia-northeast1, japaneast -> jp; eu-west-1, europe-west1, westeurope -> eu).",
+                "example": "kr"
+              }
+            }
+          },
+          "resources": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "description": "The resource types to name, each at most once. The total number of names (sum of count) is at most 200. The limits are for one screen and one share link; they do not bound the response size.",
+            "items": {
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "maxLength": 1024,
+                  "description": "A resource_type of the provider (see /llms.txt Resource tree)",
+                  "example": "virtual_machine"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 99,
+                  "description": "Only on rules with a sequence number (input count). Default 1",
+                  "example": 2
+                },
+                "role": {
+                  "type": "string",
+                  "maxLength": 1024,
+                  "pattern": "^[a-z0-9]{2,16}$",
+                  "description": "Only on role rules (input role). Default sync",
+                  "example": "db"
+                }
+              }
+            }
+          },
+          "rules_version": {
+            "type": "string",
+            "maxLength": 1024,
+            "description": "Optional pin to a rules revision (YYYY-MM-DD.N). If it differs from the current revision the API answers 409 instead of returning names that may differ. Not a string -> 400.",
+            "example": "2026-09-29.2"
+          }
+        }
+      },
+      "NamesResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "version",
+          "data",
+          "metadata"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          },
+          "data": {
+            "type": "object",
+            "description": "provider -> NamesProviderResult. Exactly one key: the requested provider.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/NamesProviderResult"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/GenerateMetadata"
+          }
+        }
+      },
+      "NamesProviderResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "valid",
+          "items",
+          "conflicts"
+        ],
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "true only when every item is valid (after name.conflict is applied)"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NameItem"
+            }
+          },
+          "conflicts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "One name.conflict per collision (params.name, params.keys). The same message is also in the violations of each colliding item"
+          }
+        }
+      },
+      "NameItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One generated name of /names: a ResourceItem with the item key, resource type, sequence or role, placement scope and uniqueness",
+        "required": [
+          "key",
+          "resource_type",
+          "scope",
+          "uniqueness",
+          "name",
+          "valid",
+          "is_truncated",
+          "is_transformed",
+          "original",
+          "violations",
+          "steps",
+          "rule"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique within the response: resource_type_seq (count rules), resource_type_role (role rules) or resource_type (rules with no input)",
+            "example": "virtual_machine_01"
+          },
+          "resource_type": {
+            "type": "string",
+            "example": "virtual_machine"
+          },
+          "seq": {
+            "type": "string",
+            "pattern": "^[0-9]{2}$",
+            "description": "Present on count rules: 01..99",
+            "example": "01"
+          },
+          "role": {
+            "type": "string",
+            "pattern": "^[a-z0-9]{2,16}$",
+            "description": "Present on role rules: the requested role or the default sync",
+            "example": "db"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "aws:partition",
+              "aws:account",
+              "aws:region",
+              "aws:vpc",
+              "gcp:namespace",
+              "gcp:project",
+              "gcp:project_global",
+              "gcp:project_region",
+              "gcp:project_zone",
+              "azure:global",
+              "azure:subscription",
+              "azure:resource_group",
+              "azure:virtual_network",
+              "azure:managed_cluster"
+            ],
+            "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
+            "example": "azure:resource_group"
+          },
+          "uniqueness": {
+            "type": "string",
+            "enum": [
+              "csp",
+              "none"
+            ],
+            "description": "uniqueness \"csp\" means the provider requires the name to be unique within its scope; \"none\" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.",
+            "example": "csp"
+          },
+          "name": {
+            "type": "string",
+            "description": "Final name. Empty when a required token became empty after normalisation.",
+            "example": "billing-trade-prd-sa-sync"
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+            "example": true
+          },
+          "is_truncated": {
+            "type": "boolean",
+            "description": "Optional tokens were dropped or tokens were shortened to fit",
+            "example": true
+          },
+          "is_transformed": {
+            "type": "boolean",
+            "description": "Characters were changed by normalisation or separators were removed",
+            "example": false
+          },
+          "original": {
+            "type": "string",
+            "description": "Name assembled before normalisation and shortening",
+            "example": "platform-billing-trade-prd-kr-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -687,7 +1074,7 @@
             "type": "string",
             "maxLength": 1024,
             "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).",
-            "example": "infra-billing-trade-prd-kr-sa-sync"
+            "example": "platform-billing-trade-prd-kr-sa-sync"
           },
           "rules_version": {
             "type": "string",
@@ -830,7 +1217,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Accepted values, present when a provider, resource_type, event or providers entry is unknown, or when providers is not a non-empty array (request.providers_not_array, request.providers_empty)"
+            "description": "Accepted values, present when a provider, resource_type, resources type, event or providers entry is unknown, or when providers is not a non-empty array (request.providers_not_array, request.providers_empty)"
           }
         }
       }

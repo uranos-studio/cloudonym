@@ -6,6 +6,11 @@ import { app } from './index';
 import { req, jsonPost, json, collectSamples, type Sample } from './test-support';
 import { VERSION } from '../version';
 import { en } from '../messages/en';
+import { SCOPES } from '../core/scopes';
+import { MESSAGE_CODES } from '../core/messages';
+import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
+
+const SELECTION_CODES_IN_SAMPLES = MESSAGE_CODES.filter((c) => c.startsWith('selection.'));
 
 // openapi.json 을 읽는 데 필요한 만큼만 타입을 둔다
 interface Schema { type?: string; maxLength?: number; description?: string; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema | boolean; $ref?: string }
@@ -27,12 +32,12 @@ describe('public/openapi.json — 형식', () => {
     expect(ctx['region']!.enum).toBeUndefined();
     expect(JSON.stringify(spec)).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
   });
-  it('네 경로 — generate · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500 (D25)', () => {
-    expect(keys(spec.paths)).toEqual(['/events', '/generate', '/health', '/validate']);
-    for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
+  it('다섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500 (D25 · D39)', () => {
+    expect(keys(spec.paths)).toEqual(['/events', '/generate', '/health', '/names', '/validate']);
+    for (const p of ['/generate', '/names', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
     expect(keys(spec.paths['/events']!.post!.responses)).toEqual(['200', '400', '403', '413', '429', '500']);
     expect(keys(spec.paths['/health']!.get!.responses)).toEqual(['200', '500']);
-    for (const p of ['/events', '/generate', '/validate']) {
+    for (const p of ['/events', '/generate', '/names', '/validate']) {
       const r429 = spec.paths[p]!.post!.responses['429'] as { headers?: Record<string, { schema: Schema }> };
       expect(r429.headers?.['Retry-After']?.schema.type, p).toBe('integer');
     }
@@ -61,6 +66,32 @@ describe('public/openapi.json — 형식', () => {
     expect(/\p{Script=Hangul}/u.test(raw)).toBe(false);
     expect(schemas['ResourceItem']!.properties!['reason']).toBeUndefined();
     expect(schemas['RuleInfo']!.properties!['note']).toBeUndefined();
+  });
+});
+
+describe('public/openapi.json — /names (D39 · codex #9)', () => {
+  const item = () => schemas['NameItem']!.properties!;
+  it('NamesRequest — resources 1~200 · count 1~99 · role pattern · provider enum · context 는 generate 와 같다', () => {
+    const r = schemas['NamesRequest']! as Schema & { properties: Record<string, Schema & { minItems?: number; maxItems?: number }> };
+    expect(r.required!.sort()).toEqual(['context', 'provider', 'resources']);
+    expect(r.properties['provider']!.enum!.sort()).toEqual(['aws', 'azure', 'gcp']);
+    expect(r.properties['resources']).toMatchObject({ minItems: 1, maxItems: 200 });
+    const it0 = r.properties['resources']!.items! as Schema & { properties: Record<string, Schema & { minimum?: number; maximum?: number; pattern?: string }> };
+    expect(it0.properties['count']).toMatchObject({ type: 'integer', minimum: 1, maximum: 99 });
+    expect(it0.properties['role']!.pattern).toBe('^[a-z0-9]{2,16}$');
+    expect(r.properties['context']).toEqual(schemas['GenerateRequest']!.properties!['context']);
+  });
+  it('NameItem — scope enum 은 ScopeId 전부(14) · uniqueness enum 둘 · 설명은 llms.txt 와 같은 문장', () => {
+    expect(item()['scope']!.enum!.sort()).toEqual(Object.keys(SCOPES).sort());
+    expect(Object.keys(SCOPES)).toHaveLength(14);
+    expect(item()['uniqueness']!.enum).toEqual(['csp', 'none']);
+    expect(item()['scope']!.description).toBe(SCOPE_MEANING);
+    expect(item()['uniqueness']!.description).toBe(UNIQUENESS_MEANING);
+    // ResourceItem 의 키를 전부 가진다 — 같은 이름 결과에 키를 더한 것
+    for (const k of Object.keys(schemas['ResourceItem']!.properties!)) expect(item()[k], k).toEqual(schemas['ResourceItem']!.properties![k]);
+  });
+  it('owner 예시에 개인 이름이 없다', () => {
+    expect(JSON.stringify(spec)).not.toContain('acmex');
   });
 });
 
@@ -107,6 +138,19 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     expect(failures).toEqual([]);
   });
 
+  it('names 표본 — 정상 · 항목 FAIL · Name 태그 · 충돌 · 400 selection.* 11개 전부 · 409', () => {
+    const ids = samples.map((x) => x.id);
+    for (const id of ['names-ok', 'names-item-fail', 'names-name-tag', 'names-conflict', '400-names-provider', '409-names-rules-version']) expect(ids, id).toContain(id);
+    const codesSeen = new Set(samples.filter((x) => x.path === '/v1/names' && x.status === 400).flatMap((x) => (x.body.errors as { code: string }[]).map((e) => e.code)));
+    expect(SELECTION_CODES_IN_SAMPLES).toHaveLength(11);
+    for (const c of SELECTION_CODES_IN_SAMPLES) expect([...codesSeen], c).toContain(c);
+    const tag = samples.find((x) => x.id === 'names-name-tag')!.body.data.aws.items[0];
+    expect(tag).toMatchObject({ scope: 'aws:vpc', uniqueness: 'none' });
+    const conflict = samples.find((x) => x.id === 'names-conflict')!.body.data.azure;
+    expect(conflict.valid).toBe(false);
+    expect(conflict.conflicts).toHaveLength(1);
+  });
+
   it('rules_version 다섯 경우 — null · 숫자 · 객체 · 1025자는 400, 빈 문자열은 409 (명세의 상태 코드)', () => {
     const status = (id: string) => samples.find((x) => x.id === id)!.status;
     expect(['400-rules-version-null', '400-rules-version-number', '400-rules-version-object', '400-rules-version-too-long'].map(status)).toEqual([400, 400, 400, 400]);
@@ -118,6 +162,9 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     const body = await json((await req(app, '/v1/generate', jsonPost(exampleOf('/generate')))).res);
     expect(validatorFor('GenerateResponse')(body)).toBe(true);
     expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(18);
+    const n = await json((await req(app, '/v1/names', jsonPost(exampleOf('/names')))).res);
+    expect(validatorFor('NamesResponse')(n)).toBe(true);
+    expect(n.data.azure.valid).toBe(true);
     const v = await json((await req(app, '/v1/validate', jsonPost(exampleOf('/validate')))).res);
     expect(validatorFor('ValidateResponse')(v)).toBe(true);
     expect(v.suggested_name).toBeDefined();

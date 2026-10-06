@@ -1,5 +1,6 @@
 // 코어(camelCase) → wire(snake_case) (D15 · D25). 이름 규칙 · 판정 로직은 여기 없다 — 필드 이름을 바꾸고 메시지 코드에 문장을 붙인다
-import type { LabelSet, NameResult, Provider } from '../core/types';
+import type { LabelSet, NameResult, Provider, ResourceRule, ScopeId } from '../core/types';
+import type { ManyResult } from '../core/engine';
 import { displayMessage, format, type Catalog, type Message, type MessageCode } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -23,6 +24,12 @@ export interface WireGenerate {
     transformed: WireMessage[];
   };
 }
+/** /v1/names 항목 — WireName 앞에 키 · 유형 · 순번/역할 · 배치 범위 · 고유성 (D39 · codex #9) */
+export interface WireNameItem extends WireName {
+  key: string; resource_type: string; seq?: string; role?: string; scope: ScopeId; uniqueness: 'csp' | 'none';
+}
+export interface WireNamesProvider { valid: boolean; items: WireNameItem[]; conflicts: WireMessage[] }
+export interface WireNames extends Omit<WireGenerate, 'data'> { data: Partial<Record<Provider, WireNamesProvider>> }
 export interface WireValidate { valid: boolean; version: Version; violations: WireMessage[]; suggested_name?: string }
 
 /** provider 하나의 결과 — 라우터가 요청 providers 순서대로 만든다. data 와 metadata 셋의 provider 집합이 같아지는 자리다 */
@@ -69,5 +76,32 @@ export function toWireValidate(r: { valid: boolean; violations: readonly Message
   return {
     valid: r.valid, version: { ...version }, violations: wire(r.violations, catalog),
     ...(r.suggestedName !== undefined ? { suggested_name: r.suggestedName } : {}),
+  };
+}
+
+/** POST /v1/names — rules 는 라우터가 고른 선택의 규칙(시험 전용 규칙도 여기서 찾는다). 항목의 scope · uniqueness 는 그 규칙에서 */
+export function toWireNames(result: ManyResult, rules: readonly ResourceRule[], labels: LabelSet, transformed: readonly Message[], version: Version, catalog: Catalog = en): WireNames {
+  const byId = new Map(rules.map((r) => [r.id, r]));
+  const items = result.items.map((it): WireNameItem => {
+    const rule = byId.get(it.ruleId);
+    if (!rule) throw new Error(`no rule for item ${it.key}`);
+    return {
+      key: it.key, resource_type: it.resourceType,
+      ...(it.seq !== undefined ? { seq: it.seq } : {}),
+      ...(it.role !== undefined ? { role: it.role } : {}),
+      scope: rule.scope, uniqueness: rule.uniqueness,
+      ...toWireName(it, catalog),
+    };
+  });
+  const p = result.provider;
+  return {
+    success: true, version: { ...version },
+    data: { [p]: { valid: result.valid, items, conflicts: wire(result.conflicts, catalog) } },
+    metadata: {
+      generated_labels: { [p]: labels.labels },
+      label_violations: { [p]: wire(labels.violations, catalog) },
+      label_transformed: { [p]: wire(labels.transformed, catalog) },
+      transformed: wire(transformed, catalog),
+    },
   };
 }
