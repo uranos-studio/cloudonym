@@ -1,13 +1,18 @@
-// 레이아웃 · 탭 · 상태 → URL hash 동기화 · 비콘. 엔진은 브라우저에서 직접 부른다 (D17) — API 왕복 없음. 화면 문구는 사전(en)이 정본이다 (D24)
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Cloud, FileText } from 'lucide-react';
-import { generate, parseContext } from './core/engine';
+// 네 단계 화면 (D42) — ① Cloud ② Context ③ Resources ④ Names · 상태 → URL hash 동기화 · 비콘.
+// 엔진은 브라우저에서 직접 부른다 (D17) — API 왕복 없음. 화면 문구는 사전(en)이 정본이다 (D24)
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, Cloud, FileText } from 'lucide-react';
+import { generateMany, parseContext } from './core/engine';
 import { labelsFor } from './core/labels';
-import { PROVIDERS, type LabelSet, type NamingContext, type Provider } from './core/types';
+import { buildTree } from './core/tree';
+import type { NamingContext, Provider, ResourceRule } from './core/types';
+import { CloudPicker } from './components/CloudPicker';
 import { ContextForm } from './components/ContextForm';
-import { ProviderSection } from './components/ProviderSection';
+import { ResourceTree } from './components/ResourceTree';
+import { NamesPanel } from './components/NamesPanel';
 import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
+import { applyChange, clearForCloudSwitch, fromItems, toItems, totalNames, type Picked } from './components/selection';
 import { decodeState, encodeState, shareUrl } from './components/urlState';
 import { linkStateOf, mismatchedLinkVersion, shouldRewriteHash, type LinkState } from './components/linkRevision';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
@@ -15,53 +20,73 @@ import { en } from './messages/en';
 import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
-/** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다 */
+/** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다. CSP 는 기본값이 없다(오너 결정) */
 const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
-
-type Tab = 'all' | Provider;
-const TABS: ReadonlyArray<{ id: Tab; label: string }> = [
-  { id: 'all', label: en.ui.tab_all },
-  { id: 'aws', label: 'AWS' },
-  { id: 'gcp', label: 'GCP' },
-  { id: 'azure', label: 'Azure' },
-];
+const NO_PICK: Picked = new Map();
 
 const PANEL = 'rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900';
 const LINK =
   'inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800';
+const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-/** 주소창의 hash 가 온전하면 그 링크 상태 — 폼과 대어 볼 key 는 지금 규칙 버전으로 만든다 (D27 ⑵) */
-function linkFromHash(hash: string): { form: NamingContext; link: LinkState } | undefined {
-  const decoded = decodeState(hash);
-  if (!decoded) return undefined;
-  return { form: decoded.context, link: linkStateOf(decoded, hash, encodeState(decoded.context, VERSION.rules)) };
+interface Opened { form: NamingContext; provider?: Provider; picked: Picked; dropped: number; link: LinkState }
+
+/** 주소창의 hash 가 온전하면 그 상태 — 폼과 대어 볼 key 는 지금 규칙 버전 · 트리 순서로 만든다 (D27 ⑵ · D42).
+ *  hash 의 r 순서가 트리 순서와 달라도 같은 선택이면 같은 key 다 — 링크를 연 직후 hash 를 덮어쓰지 않는다 */
+function openHash(hash: string, rules: readonly ResourceRule[] | undefined): Opened | undefined {
+  const d = decodeState(hash, rules);
+  if (!d) return undefined;
+  const picked = d.selection ? fromItems(d.selection) : NO_PICK;
+  const selection = d.provider ? toItems(buildTree(d.provider, rules?.filter((r) => r.provider === d.provider)), picked) : [];
+  const key = encodeState(d.context, VERSION.rules, { provider: d.provider, selection });
+  return { form: d.context, provider: d.provider, picked, dropped: d.dropped ?? 0, link: linkStateOf(d, hash, key) };
 }
 
-function App() {
+/** rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
+function App({ rules }: { rules?: readonly ResourceRule[] }) {
   // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (Review Focus 4: 깨진 hash 는 decodeState 가 undefined 로 돌려준다)
-  const [initial] = useState(() => linkFromHash(window.location.hash));
+  const [initial] = useState(() => openHash(window.location.hash, rules));
   const [form, setForm] = useState<NamingContext>(() => initial?.form ?? DEFAULT_CONTEXT);
+  const [provider, setProvider] = useState<Provider | undefined>(() => initial?.provider);
+  const [picked, setPicked] = useState<Picked>(() => initial?.picked ?? NO_PICK);
+  // 링크에서 버린 선택 수 — 사용자가 선택 · CSP 를 바꾸면 지운다
+  const [dropped, setDropped] = useState(() => initial?.dropped ?? 0);
   // 링크에서 읽은 상태 — 폼과 따로 둔다. 사용자가 폼을 고치면 버린다 (D27 ⑵)
   const [link, setLink] = useState<LinkState | undefined>(() => initial?.link);
   const editForm = (next: NamingContext) => {
     setLink(undefined);
     setForm(next);
   };
-  const [tab, setTab] = useState<Tab>('all');
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
+  const tree = useMemo(() => (provider ? buildTree(provider, rules?.filter((r) => r.provider === provider)) : undefined), [provider, rules]);
+  const items = useMemo(() => (tree ? toItems(tree, picked) : []), [tree, picked]);
   const parsed = useMemo(() => parseContext(form), [form]);
   const ctx = parsed.ok ? parsed.context : undefined;
-  const output = useMemo(() => (ctx ? generate(ctx) : undefined), [ctx]);
-  const labels = useMemo<Partial<Record<Provider, LabelSet>>>(() => {
-    if (!ctx) return {};
-    const out: Partial<Record<Provider, LabelSet>> = {};
-    for (const p of PROVIDERS) out[p] = labelsFor(ctx, p);
-    return out;
-  }, [ctx]);
-  const stateKey = ctx ? encodeState(ctx, VERSION.rules) : '';
+  const many = useMemo(() => (ctx && provider && items.length > 0 ? generateMany(ctx, provider, items) : undefined), [ctx, provider, items]);
+  const labels = useMemo(() => (ctx && provider ? labelsFor(ctx, provider) : undefined), [ctx, provider]);
+
+  // 상태 key — 다섯 값 + v + p + r. 링크 비교 · hash 쓰기에 쓴다. 비콘은 문맥 key 만 본다(선택 이벤트는 더하지 않는다 · 계획 §7-6)
+  const stateKey = ctx ? encodeState(ctx, VERSION.rules, { provider, selection: items }) : '';
+  const contextKey = ctx ? encodeState(ctx, VERSION.rules) : '';
   const linkedVersion = mismatchedLinkVersion(stateKey, link, VERSION.rules);
+
+  const onPick = useCallback((next: Picked) => {
+    if (!provider || !tree) return;
+    const ok = applyChange(provider, tree, next, rules);
+    if (!ok) return;
+    setDropped(0);
+    setPicked(ok);
+  }, [provider, tree, rules]);
+
+  const onCloud = (p: Provider) => {
+    if (p === provider) return;
+    // 규칙 id 가 provider 에 묶여 있어 선택을 옮길 수 없다 — 지우기 전에 한 번 묻는다(선택이 있을 때만 · 계획 §7-1)
+    if (picked.size > 0 && !window.confirm(fillUi(en, 'switch_cloud_confirm', { n: picked.size }))) return;
+    setProvider(p);
+    setPicked(clearForCloudSwitch());
+    setDropped(0);
+  };
 
   // 상태 → URL hash (replaceState — 히스토리를 쌓지 않는다). 문맥이 불완전하면 hash 를 비운다 — 낡은 상태를 공유하지 않게.
   // 링크로 연 상태 그대로인 동안은 쓰지 않는다 — 새로고침해도 링크의 옛 v 가 남는다 (D27 ⑵)
@@ -75,17 +100,17 @@ function App() {
     visitOnce(sessionStore());
   }, []);
 
-  // ui_generate — 첫 화면은 세지 않고(방문이 이미 셌다) 문맥이 바뀐 뒤 1초 디바운스
-  const lastSentKey = useRef(stateKey);
+  // ui_generate — 첫 화면은 세지 않고(방문이 이미 셌다) 문맥이 바뀐 뒤 1초 디바운스. 선택 · CSP 변경은 세지 않는다 (계획 §7-6 「그대로」)
+  const lastSentKey = useRef(contextKey);
   const scheduleGenerate = useMemo(() => debounce(() => sendBeacon('ui_generate'), GENERATE_DEBOUNCE_MS), []);
   useEffect(() => {
-    if (!stateKey || stateKey === lastSentKey.current) return;
-    lastSentKey.current = stateKey;
+    if (!contextKey || contextKey === lastSentKey.current) return;
+    lastSentKey.current = contextKey;
     scheduleGenerate();
-  }, [stateKey, scheduleGenerate]);
+  }, [contextKey, scheduleGenerate]);
 
-  // 같은 탭에서 공유 URL 로 이동(주소창에 붙여 Enter) — 브라우저는 hash 만 바꾸고 다시 불러오지 않는다
-  // 온전한 hash 면 폼을 그것으로 바꾼다. 사용자가 만든 문맥이 아니므로 lastSentKey 를 먼저 맞춰 ui_generate 를 세지 않는다(첫 로드 복원과 같은 규칙)
+  // 같은 탭에서 공유 URL 로 이동(주소창에 붙여 Enter) — 브라우저는 hash 만 바꾸고 다시 불러오지 않는다.
+  // 온전한 hash 면 상태를 그것으로 바꾼다. 사용자가 만든 문맥이 아니므로 lastSentKey 를 먼저 맞춰 ui_generate 를 세지 않는다(첫 로드 복원과 같은 규칙).
   // 깨진 hash 면 화면은 그대로 두고 주소창을 지금 상태로 되돌린다 — 깨진 값이 다시 공유되지 않게. replaceState 는 hashchange 를 내지 않는다.
   // 링크 상태 그대로면 되돌릴 값은 링크의 원래 hash 다(옛 v 를 잃지 않는다). 새 링크의 v 는 링크 상태를 바꾼다 (D27 ⑵)
   const currentHash = useRef('');
@@ -94,11 +119,14 @@ function App() {
   }, [stateKey, link]);
   useEffect(() => {
     const onHashChange = () => {
-      const opened = linkFromHash(window.location.hash);
+      const opened = openHash(window.location.hash, rules);
       if (opened) {
-        lastSentKey.current = opened.link.key;
+        lastSentKey.current = encodeState(opened.form, VERSION.rules);
         setLink(opened.link);
         setForm(opened.form);
+        setProvider(opened.provider);
+        setPicked(opened.picked);
+        setDropped(opened.dropped);
         return;
       }
       const hash = currentHash.current;
@@ -106,20 +134,9 @@ function App() {
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  }, [rules]);
 
-  const visible: Provider[] = tab === 'all' ? [...PROVIDERS] : [tab];
-
-  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const moves: Record<string, number> = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: TABS.length - 1 };
-    const next = moves[e.key];
-    if (next === undefined) return;
-    e.preventDefault();
-    const target = TABS[(next + TABS.length) % TABS.length];
-    if (!target) return;
-    setTab(target.id);
-    tabRefs.current[(next + TABS.length) % TABS.length]?.focus();
-  };
+  const nameCount = totalNames(picked);
 
   return (
     <div className="min-h-screen">
@@ -134,67 +151,65 @@ function App() {
           </div>
           <nav aria-label={en.ui.nav_label} className="flex flex-wrap items-center gap-2">
             {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵) */}
-            {ctx && <CopyButton text={shareUrl(ctx, window.location.origin + window.location.pathname, VERSION.rules)} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+            {ctx && <CopyButton text={shareUrl(ctx, window.location.origin + window.location.pathname, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
             <a href="/llms.txt" target="_blank" rel="noreferrer" className={LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
-        <aside className="space-y-6">
-          <div className={PANEL}>
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">
+        <div className={PANEL}>
+          <CloudPicker value={provider} onPick={onCloud} />
+        </div>
+        {linkedVersion && (
+          <p data-rules-mismatch role="status" className={NOTICE}>{fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}</p>
+        )}
+        {dropped > 0 && <p data-selection-dropped role="status" className={NOTICE}>{fillUi(en, 'selection_dropped', { n: dropped })}</p>}
+
+        {/* 좁은 화면은 ② → ③ → ④ → 태그 순서, 넓은 화면은 왼쪽 열(② · 태그) · 오른쪽 열(③ · ④) — 계획 §7-2 */}
+        <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
+          <div className={`${PANEL} lg:col-start-1 lg:row-start-1`}>
             <ContextForm value={form} errors={parsed.ok ? [] : parsed.errors} onChange={editForm} />
           </div>
-          {output && (
+
+          <div className="min-w-0 space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className={PANEL}>
-              <LabelsPanel providers={visible} output={output} labels={labels} />
+              {provider && tree
+                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} />
+                : (
+                  <section aria-labelledby="step-resources" className="space-y-2">
+                    <h2 id="step-resources" className="text-base font-semibold"><span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">3</span>{en.ui.step_resources}</h2>
+                    <p role="status" data-pick-cloud className="text-sm text-zinc-600 dark:text-zinc-400">{en.ui.pick_cloud_prompt}</p>
+                  </section>
+                )}
+            </div>
+            <div className={PANEL}>
+              <NamesPanel ctx={ctx} items={items} many={many} labels={labels} />
+            </div>
+          </div>
+
+          {provider && labels && (
+            <div className={`${PANEL} self-start lg:col-start-1 lg:row-start-2`}>
+              <LabelsPanel provider={provider} labels={labels} />
             </div>
           )}
-        </aside>
-
-        <section aria-labelledby="results-title" className="min-w-0 space-y-4">
-          <h2 id="results-title" className="sr-only">{en.ui.results_title}</h2>
-          {linkedVersion && (
-            <p data-rules-mismatch role="status" className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              {fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}
-            </p>
-          )}
-          <div role="tablist" aria-label={en.ui.tablist_label} className="flex gap-1 overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
-            {TABS.map((t, i) => {
-              const selected = tab === t.id;
-              return (
-                <button
-                  key={t.id}
-                  ref={(el) => { tabRefs.current[i] = el; }}
-                  type="button"
-                  role="tab"
-                  id={`tab-${t.id}`}
-                  aria-selected={selected}
-                  aria-controls="results-panel"
-                  tabIndex={selected ? 0 : -1}
-                  onClick={() => setTab(t.id)}
-                  onKeyDown={(e) => onTabKey(e, i)}
-                  className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-400 ${
-                    selected
-                      ? 'border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300'
-                      : 'border-transparent text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-          <p data-pass-meaning className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{en.ui.pass_meaning}</p>
-
-          <div role="tabpanel" id="results-panel" aria-labelledby={`tab-${tab}`} className="space-y-8">
-            {output
-              ? visible.map((p) => <ProviderSection key={p} provider={p} names={output[p] ?? {}} />)
-              : <p role="status" className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">{en.ui.empty_state}</p>}
-          </div>
-        </section>
+        </div>
       </main>
-      <footer className="mx-auto max-w-7xl px-4 pb-6 text-xs text-zinc-600 dark:text-zinc-400">
+
+      {/* 좁은 화면 — 아래 고정 막대. 누르면 ④ 로 스크롤 (계획 §7-2) */}
+      {provider && picked.size > 0 && (
+        <div data-sticky-bar className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-white/95 px-4 py-2 backdrop-blur lg:hidden dark:border-zinc-800 dark:bg-zinc-900/95">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <span className="text-sm font-medium">{fillUi(en, 'sticky_summary', { resources: picked.size, names: nameCount })}</span>
+            <button type="button" data-sticky-jump onClick={() => document.getElementById('names')?.scrollIntoView({ block: 'start' })}
+              className="inline-flex min-h-11 items-center gap-1 rounded-md bg-indigo-600 px-3 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
+              {en.ui.sticky_jump}<ArrowDown aria-hidden="true" className="size-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <footer className={`mx-auto max-w-7xl px-4 text-xs text-zinc-600 dark:text-zinc-400 ${provider && picked.size > 0 ? 'pb-24 lg:pb-6' : 'pb-6'}`}>
         <p data-version>{fillUi(en, 'version_footer', VERSION)}</p>
       </footer>
     </div>

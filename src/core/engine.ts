@@ -62,7 +62,8 @@ export interface ManyResult { provider: Provider; valid: boolean; items: NameIte
 
 /** 순번은 두 자리 고정 (D40) — 한 항목의 이름이 같은 자리수를 써서 축소 경로가 같다 */
 const seqOf = (i: number): string => String(i).padStart(2, '0');
-const DEFAULT_ROLE = 'sync';
+/** role 규칙에 역할을 주지 않았을 때의 역할 — 화면의 공유 hash 도 이 값을 문자열로 적는다 (D42) */
+export const DEFAULT_ROLE = 'sync';
 
 /** 고른 항목마다 이름을 만든다 (D30' · D41). 선택은 validateSelection 을 거친 것이라 여기서 다시 검사하지 않는다.
  *  항목 순서 = 선택 순서 → 순번 순서. 입력 없는 · role 규칙은 count 와 무관하게 하나.

@@ -1,15 +1,15 @@
-"""화면 시험 — Playwright(Python) 로 시나리오 ⑴~⑼를 재고 스크린샷을 남긴다 (개발 3단계 Task 3-4 · 문구 코드화 T5).
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒃을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
 스크린샷에는 중립 예시 값만 쓴다(INPUT · OTHER · 기호만 든 system).
+⒃ 은 시험 전용 fixture(`?fixture=conflict`)를 쓴다 — DEV 빌드(npm run dev)에서만 열린다.
 
 실행(저장소 루트) — 터미널 둘:
-  ① npm run dev -- --port 5199 --strictPort
-  ② uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://localhost:5199 docs/screenshots
+  ① npm run dev -- --host 127.0.0.1 --port 5199 --strictPort
+  ② uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://127.0.0.1:5199 docs/screenshots
 
-①이 뜬 뒤(`curl -s http://localhost:5199/v1/health` → {"ok":true}) ②를 돌리고, 끝나면 ①을 멈춘다.
-서버를 띄우고 내리는 일을 한 번에 하려면 Anthropic webapp-testing 스킬의 with_server.py 를 쓸 수 있다
-(`python3 path/to/with_server.py --server "npm run dev -- --port 5199 --strictPort" --port 5199 -- <② 명령>`).
+①이 뜬 뒤(`curl -s http://127.0.0.1:5199/v1/health` → {"ok":true}) ②를 돌리고, 끝나면 ①을 멈춘다.
+500행 성능 측정은 tests/ui/perf.py 다(같은 서버).
 
 playwright 는 1.63.0 으로 고정한다 — 다른 버전은 맞는 Chromium 을 새로 받아야 한다(`uv run --with "playwright==1.63.0" playwright install chromium`).
 단언이 하나라도 틀리면 non-zero 로 끝난다(실패를 성공으로 보고하지 않는다).
@@ -28,26 +28,33 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 # ⑴ 의 입력 — 기본값(platform · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
 INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prd', 'region': 'kr'}
-SA = '[data-rule="gcp.service_account"]'
 # 같은 탭 공유 URL 이동(I-2)의 입력 — INPUT 과 다섯 값이 모두 다르다
 OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'jp'}
-
+# ⑴ 에서 고르는 Azure 선택 — 트리 순서(Global → Subscription → Resource group)
+PICK = {'storage_account': 1, 'resource_group': 1, 'managed_identity': 'db', 'virtual_machine': 2}
 
 # 옛 규칙 버전 — 지금 버전(/v1/health 의 version.rules)과 다른, 꼴이 맞는 값 (D27 ⑵)
 OLD_RULES = '2000-01-01.1'
 
+SA_CARD = 'article[data-key="service_account_sync"]'
+VM1 = 'article[data-key="virtual_machine_01"]'
 
-def state_hash(ctx, v=None):
-    """encodeState 와 같은 꼴 — 고정 순서 JSON(공백 없음) · v 는 마지막 키 · UTF-8 · Base64url · 패딩 없음"""
+
+def state_hash(ctx, v=None, p=None, r=None):
+    """encodeState 와 같은 꼴 — 고정 순서 JSON(공백 없음) · v · p · r 순서 · UTF-8 · Base64url · 패딩 없음"""
     body = {k: ctx[k] for k in ('owner', 'system', 'purpose', 'env', 'region')}
     if v is not None:
         body['v'] = v
+    if p is not None:
+        body['p'] = p
+        if r:
+            body['r'] = r
     raw = json.dumps(body, separators=(',', ':'), ensure_ascii=False)
     return '#state=' + base64.urlsafe_b64encode(raw.encode()).rstrip(b'=').decode()
 
 
 def hash_state(hash_or_url):
-    """`…#state=…` → JSON 객체 (시험이 v 를 읽는다)"""
+    """`…#state=…` → JSON 객체 (시험이 v · p · r 을 읽는다)"""
     enc = hash_or_url.split('#state=', 1)[1]
     return json.loads(base64.urlsafe_b64decode(enc + '=' * (-len(enc) % 4)).decode())
 
@@ -102,11 +109,32 @@ def fill_five(page, ctx):
     page.select_option('#field-region', ctx['region'])
 
 
+def row(page, rtype):
+    return page.locator(f'[data-tree] [data-type="{rtype}"]')
+
+
+def check(page, rtype):
+    row(page, rtype).locator('input[data-row-check]').check()
+
+
+def tree_rows(page):
+    return page.locator('[data-tree] [data-rule]')
+
+
+def visible_types(page):
+    return page.eval_on_selector_all('[data-tree] [data-rule]', 'els => els.filter(e => e.checkVisibility()).map(e => e.dataset.type)')
+
+
+def no_hangul(page):
+    body_text = page.inner_text('body')
+    assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
+
+
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     errors = []
 
-    # ── ⑴ 다섯 입력 → GCP SA 카드에 축약 안내 · 비콘 수 · 키보드 탭 · 스크린샷 ──
+    # ── ⑴ 첫 방문 — CSP 기본값 없음 · 다섯 입력 · GCP 에서 SA 를 골라 축약 안내 · 비콘 수 ──
     ctx1 = browser.new_context(viewport={'width': 1280, 'height': 900})
     ctx1.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     page = ctx1.new_page()
@@ -118,63 +146,126 @@ with sync_playwright() as p:
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
     assert page.evaluate('document.documentElement.lang') == 'en'
+    # 첫 방문은 CSP 를 고르지 않는다(오너 결정) — 트리 대신 안내 · 선택된 라디오 없음
+    expect(page.locator('[role="radio"][aria-checked="true"]')).to_have_count(0)
+    expect(page.locator('[data-pick-cloud]')).to_have_text('Choose a cloud above to see its resources.')
+    expect(page.locator('[data-tree]')).to_have_count(0)
     # PASS 뜻 한 줄(D28) · 버전 꼬리말(D26) · 링크가 없으면 규칙 버전 안내도 없다
     expect(page.locator('[data-pass-meaning]')).to_contain_text('It does not mean the name is available')
     expect(page.locator('[data-pass-meaning]')).to_contain_text('Generated names are not guaranteed unique')
     expect(page.locator('[data-version]')).to_have_text(f"Engine {VERSION['engine']} · rules {RULES}")
     expect(page.locator('[data-rules-mismatch]')).to_have_count(0)
     fill_five(page, INPUT)
-    sa = page.locator(SA)
+    page.click('[data-cloud="gcp"]')
+    expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(page.locator('[data-names-empty]')).to_have_text('Pick resources in step 3 to generate their names.')
+    check(page, 'service_account')
+    sa = page.locator(SA_CARD)
     expect(sa.locator('[data-name]')).to_have_text('payments-ledger-prd-sa-sync')
     expect(sa.locator('[data-steps]')).to_contain_text("Shortened — Dropped optional token 'region' · Dropped optional token 'owner' (originally 37 characters)")
     expect(sa).to_have_attribute('data-valid', 'true')
-    expect(sa).to_contain_text('PASS')
-    expect(page.locator('[data-rule="azure.storage_account"] [data-name]')).to_have_text('stpaymentsledgerprd')
+    expect(sa.locator('h4')).to_have_text('Service Account · sync')
     page.wait_for_timeout(1500)  # 디바운스 1초 뒤에 ui_generate 가 한 번
     assert sent.count('ui_visit') == 1, f'ui_visit 이 {sent.count("ui_visit")}회 — StrictMode 이중 effect 를 sessionStorage 가드가 막아야 한다: {sent}'
-    assert sent.count('ui_generate') == 1, f'ui_generate 가 {sent.count("ui_generate")}회 — 다섯 입력을 1초 디바운스로 한 번이어야 한다: {sent}'
-    # 키보드 탭 — 선택된 탭에 포커스 → ArrowRight → 다음 탭이 선택되고 패널이 그 CSP 만 보인다
-    page.locator('[role="tab"][aria-selected="true"]').focus()
-    page.keyboard.press('ArrowRight')
-    expect(page.locator('#tab-aws')).to_have_attribute('aria-selected', 'true')
-    expect(page.locator('#tab-aws')).to_be_focused()
-    expect(page.locator('[data-provider]')).to_have_count(1)
-    page.keyboard.press('ArrowLeft')
-    expect(page.locator('#tab-all')).to_have_attribute('aria-selected', 'true')
-    expect(page.locator('[data-provider]')).to_have_count(3)
+    assert sent.count('ui_generate') == 1, f'ui_generate 가 {sent.count("ui_generate")}회 — 다섯 입력을 1초 디바운스로 한 번 · CSP · 선택은 세지 않는다: {sent}'
+
+    # ── ⑽ 단계 — CSP 를 바꾸면 선택이 지워진다 · 바꾸기 전 확인 · 취소하면 그대로 ──
+    page.once('dialog', lambda d: (errors.append('') if d.message != 'Switching the cloud clears 1 selected resources. Continue?' else None, d.dismiss()))
+    page.locator('[data-cloud="gcp"]').focus()
+    page.keyboard.press('ArrowRight')  # 라디오 그룹 — 방향키로 옆 CSP 를 고른다
+    expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(page.locator('[data-selected-count]')).to_have_text('1 selected')
+    page.once('dialog', lambda d: d.accept())
+    page.click('[data-cloud="azure"]')
+    expect(page.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'true')
+    expect(page.locator('[data-selected-count]')).to_have_text('0 selected')
+    expect(page.locator('article[data-key]')).to_have_count(0)
+    page.wait_for_timeout(1200)
+    assert sent.count('ui_generate') == 1, f'CSP 전환이 ui_generate 를 셌다: {sent}'
+
+    # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드 ──
+    # 처음엔 뿌리 바로 아래 한 단계만 펼친다(계획 §7-4) — Resource group 안은 닫혀 있다
+    assert visible_types(page) == ['storage_account', 'key_vault', 'sql_server', 'resource_group'], visible_types(page)
+    page.click('[data-expand-all]')
+    expect(row(page, 'subnet')).to_be_visible()
+    for t in ('storage_account', 'resource_group', 'managed_identity', 'virtual_machine'):
+        check(page, t)
+    expect(row(page, 'resource_group').locator('[data-count-fixed]')).to_have_attribute('title', 'This resource has no sequence number, so it is always one')
+    vm_row = row(page, 'virtual_machine')
+    for _ in range(2):
+        vm_row.locator('[data-inc]').click()
+    expect(vm_row.locator('[data-count]')).to_have_text('3')
+    expect(page.locator('article[data-key="virtual_machine_03"] [data-name]')).to_have_text('payments-ledger-prd-kr-vm-03')
+    expect(page.locator('article[data-key="virtual_machine_03"] h4')).to_have_text('Virtual Machine (Linux) · 03')
+    vm_row.locator('input[data-row-check]').focus()
+    page.keyboard.press('-')
+    expect(vm_row.locator('[data-count]')).to_have_text('2')
+    expect(page.locator('article[data-key="virtual_machine_03"]')).to_have_count(0)
+    page.keyboard.press('ArrowDown')  # 다음 행(Windows VM)으로
+    assert page.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == 'virtual_machine_windows'
+    role_input = row(page, 'managed_identity').locator('[data-role-input]')
+    expect(role_input).to_have_value('sync')
+    role_input.fill('D')  # 꼴이 틀리면 반영하지 않고 aria-invalid
+    expect(role_input).to_have_attribute('aria-invalid', 'true')
+    expect(page.locator('article[data-key="managed_identity_sync"]')).to_have_count(1)
+    role_input.fill('db')
+    expect(page.locator('article[data-key="managed_identity_db"] [data-name]')).to_have_text('payments-ledger-prd-id-db')
+    expect(page.locator('[data-names-summary]')).to_have_text('4 resources · 5 names · 5/5 PASS')
+    # 범위 경로 머리글 — 트리 순서
+    assert page.locator('[data-scope-path]').all_inner_texts() == ['Global', 'Global › Subscription', 'Global › Subscription › Resource group'], page.locator('[data-scope-path]').all_inner_texts()
+    assert hash_state(page.url) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': PICK}, hash_state(page.url)
     assert_selects_fit(page, 1280)
+    no_hangul(page)
+    page.evaluate('window.scrollTo(0, 0)')
     page.screenshot(path=str(OUT / '01-desktop-light.png'), full_page=True)
     share_url = page.url
-    assert '#state=' in share_url, share_url
-    assert hash_state(share_url).get('v') == RULES, hash_state(share_url)
-    # 화면에 시스템 문구 한글 0 — 입력이 ASCII 라 보이는 글자에 한글이 있으면 시스템 문구다
-    body_text = page.inner_text('body')
-    assert not any('\uac00' <= ch <= '\ud7a3' or '\u3131' <= ch <= '\u318e' for ch in body_text), body_text
 
-    # ── ⑸ Terraform 복사 → 클립보드가 locals { 로 시작 · 태그 JSON · 이름 복사 ──
+    # ── ⑸ 내보내기 셋 + 태그 JSON · 이름 복사 · 공유 URL ──
     page.click('[data-copy="terraform"]')
     hcl = page.evaluate('navigator.clipboard.readText()')
-    # 첫 줄 주석 둘 — 엔진 · 규칙 버전과 PASS 뜻 (D26) — 그 다음 locals {
     head = hcl.split('\n')
     assert head[0] == f"# Generated by Cloudonym — engine {VERSION['engine']} · rules {RULES}", head[:3]
     assert head[1].startswith('# PASS means') and head[2] == 'locals {', head[:3]
-    assert '  gcp_service_account = "payments-ledger-prd-sa-sync"\n' in hcl, hcl
-    assert '  gcp_labels = {\n' in hcl and 'INVALID' not in hcl, hcl
+    assert '  # azure\n  azure_storage_account = "stpaymentsledgerprd"\n  azure_resource_group = "rg-payments-ledger-prd"\n  azure_managed_identity_db = "payments-ledger-prd-id-db"\n  azure_virtual_machine_01 = "payments-ledger-prd-kr-vm-01"\n  azure_virtual_machine_02 = "payments-ledger-prd-kr-vm-02"\n' in hcl, hcl
+    assert '  azure_tags = {\n' in hcl and 'INVALID' not in hcl and 'gcp' not in hcl, hcl
+    page.click('[data-copy="names-json"]')
+    names = json.loads(page.evaluate('navigator.clipboard.readText()'))
+    assert names['version'] == VERSION and names['provider'] == 'azure' and names['context'] == INPUT, names
+    assert [n['key'] for n in names['names']] == ['storage_account', 'resource_group', 'managed_identity_db', 'virtual_machine_01', 'virtual_machine_02'], names['names']
+    assert names['names'][3] == {'key': 'virtual_machine_01', 'resource_type': 'virtual_machine', 'seq': '01', 'scope': 'azure:resource_group', 'name': 'payments-ledger-prd-kr-vm-01'}, names['names'][3]
+    assert names['invalid'] == [], names['invalid']
+    expect(page.locator('[data-copy="all-names"]')).to_have_text('Copy all names')
+    page.click('[data-copy="all-names"]')
+    assert page.evaluate('navigator.clipboard.readText()') == 'stpaymentsledgerprd\nrg-payments-ledger-prd\npayments-ledger-prd-id-db\npayments-ledger-prd-kr-vm-01\npayments-ledger-prd-kr-vm-02'
     page.click('[data-copy="tags-json"]')
     copied_tags = json.loads(page.evaluate('navigator.clipboard.readText()'))
-    # { version, labels } 로 감싼다 (D26)
-    assert copied_tags['version'] == VERSION, copied_tags['version']
-    tags = copied_tags['labels']
-    assert tags['gcp'] == {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'environment': 'prd', 'managed_by': 'cloudonym'}, tags
-    assert set(tags) == {'aws', 'gcp', 'azure'}, list(tags)
-    page.click(f'{SA} [data-copy="name:gcp.service_account"]')
-    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prd-sa-sync'
-    # 공유 URL 복사 — 버튼이 넣는 값이 지금 주소와 같다
+    assert copied_tags == {'version': VERSION, 'labels': {'azure': {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'environment': 'prd', 'managed_by': 'cloudonym'}}}, copied_tags
+    page.click(f'{VM1} [data-copy="name:virtual_machine_01"]')
+    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prd-kr-vm-01'
     page.click('[data-copy="share-url"]')
     copied_url = page.evaluate('navigator.clipboard.readText()')
     assert copied_url == share_url, (copied_url, share_url)
 
-    # ── ⑵ 공유 URL 을 새 탭(새 컨텍스트 = 빈 sessionStorage)에 붙이면 같은 입력이 복원된다 ──
+    # ── ⑿ 검색 · 분류 칩 · 선택만 보기 ──
+    search = page.locator('[data-tree-search]')
+    search.fill('subnet')
+    expect(tree_rows(page)).to_have_count(1)
+    assert visible_types(page) == ['subnet'], visible_types(page)  # 일치하는 행의 조상만 펼친다
+    search.fill('zzz-none')
+    expect(page.locator('[data-search-empty]')).to_have_text('No resource matches. A resource missing from this list is not supported yet.')
+    search.fill('')
+    page.click('[data-category="networking"]')
+    assert sorted(visible_types(page)) == ['subnet', 'virtual_network'], visible_types(page)
+    page.click('[data-category="all"]')
+    page.check('[data-selected-only]')
+    assert visible_types(page) == ['storage_account', 'resource_group', 'managed_identity', 'virtual_machine'], visible_types(page)
+    page.uncheck('[data-selected-only]')
+    expect(tree_rows(page)).to_have_count(11)
+    page.click('[data-collapse-all]')  # 뿌리만 열어 둔다
+    assert visible_types(page) == ['storage_account', 'key_vault', 'sql_server'], visible_types(page)
+    page.click('[data-expand-all]')
+
+    # ── ⑵ 공유 URL 을 새 탭(새 컨텍스트 = 빈 sessionStorage)에 붙이면 문맥 · CSP · 선택이 복원된다 ──
     ctx2 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page2 = ctx2.new_page()
     page2.on('pageerror', lambda e: errors.append(str(e)))
@@ -182,37 +273,43 @@ with sync_playwright() as p:
     goto_ready(page2, copied_url)
     for key, val in INPUT.items():
         expect(page2.locator(f'#field-{key}')).to_have_value(val)
-    expect(page2.locator(f'{SA} [data-name]')).to_have_text('payments-ledger-prd-sa-sync')
+    expect(page2.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'true')
+    expect(page2.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
+    expect(page2.locator('article[data-key]')).to_have_count(5)
     page2.wait_for_timeout(1300)
     assert sent2 == ['ui_visit'], f'복원 로드는 ui_visit 1회뿐이어야 한다(첫 화면은 ui_generate 를 세지 않는다): {sent2}'
+    assert page2.url == copied_url, (page2.url, copied_url)
     ctx2.close()
 
-    # ── ⑹ 같은 탭에서 공유 URL 로 이동(hash 만 바뀐다) → 폼이 따라온다 · ui_generate 를 세지 않는다 · 깨진 hash 는 지금 상태로 되돌린다 (I-2) ──
+    # ── ⑹ 같은 탭에서 공유 URL 로 이동(hash 만 바뀐다) → 상태가 따라온다 · ui_generate 를 세지 않는다 · 깨진 hash 는 지금 상태로 되돌린다 (I-2) ──
     generated_before = sent.count('ui_generate')
-    other_hash = state_hash(OTHER)
+    other_hash = state_hash(OTHER, RULES, 'gcp', {'compute_instance': 3})
     page.evaluate('h => { location.hash = h; }', other_hash)
     for key, val in OTHER.items():
         expect(page.locator(f'#field-{key}')).to_have_value(val)
-    expect(page.locator(f'{SA} [data-name]')).not_to_have_text('payments-ledger-prd-sa-sync')
+    expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('billing-batch-stg-jp-vm-03')
     page.wait_for_timeout(1300)
     assert sent.count('ui_generate') == generated_before, f'hash 이동 복원이 ui_generate 를 셌다: {sent}'
     assert page.evaluate('location.hash') == other_hash, (page.evaluate('location.hash'), other_hash)
     page.evaluate("() => { location.hash = '#state=!!!'; }")
     page.wait_for_function('h => location.hash === h', arg=other_hash)
     expect(page.locator('#field-owner')).to_have_value(OTHER['owner'])
-    fill_five(page, INPUT)
-    expect(sa.locator('[data-name]')).to_have_text('payments-ledger-prd-sa-sync')
+    page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
 
-    # ── ⑺ 라벨 한도 위반(GCP 63자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 (I-1) ──
-    page.fill('#field-owner', 'o' * 70)
+    # ── ⑺ 라벨 한도 위반(Azure 태그 값 256자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 (I-1) ──
+    page.fill('#field-owner', 'o' * 300)
     expect(page.locator('[data-copy="tags-json"]')).to_be_disabled()
     expect(page.locator('[data-json-blocked]')).to_be_visible()
     expect(page.locator('[data-copy="terraform"]')).to_be_enabled()
+    page.click('[data-copy="terraform"]')
+    assert '  # INVALID: azure_tags' in page.evaluate('navigator.clipboard.readText()')
     page.fill('#field-owner', INPUT['owner'])
     expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
     expect(page.locator('[data-json-blocked]')).to_have_count(0)
 
-    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 (Review Focus 4) ──
+    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — CSP 는 고르지 않은 상태 (Review Focus 4) ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
         ctx3 = browser.new_context(viewport={'width': 1280, 'height': 900})
         page3 = ctx3.new_page()
@@ -220,46 +317,63 @@ with sync_playwright() as p:
         goto_ready(page3, BASE + '/' + broken)
         expect(page3.locator('h1')).to_have_text('Cloudonym')
         expect(page3.locator('#field-owner')).to_have_value('platform')
-        expect(page3.locator('[data-rule="gcp.service_account"] [data-name]')).to_have_text('billing-trade-prd-sa-sync')
+        expect(page3.locator('[data-pick-cloud]')).to_be_visible()
         # 깨진 hash 는 기본 상태의 hash 로 바뀐다 — 다시 공유해도 깨진 값이 퍼지지 않는다
-        assert page3.evaluate('location.hash').startswith('#state=eyJ'), page3.evaluate('location.hash')
+        assert hash_state(page3.evaluate('location.hash')) == {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prd', 'region': 'kr', 'v': RULES}, page3.evaluate('location.hash')
         ctx3.close()
 
-    # ── ⑷ 정제 뒤 빈 토큰 → FAIL 카드 · 복사 버튼 비활성 · Terraform 은 INVALID 주석 ──
+    # ── ⑷ 정제 뒤 빈 토큰 → FAIL 카드 · 복사 버튼 비활성 · 내보내기 셋에서 빠진다 ──
     # 한글 입력(매매)도 같은 FAIL 이다 — 먼저 확인하고, 공개 스크린샷은 기호만 든 ASCII 입력(###)으로 찍는다
+    vm1 = page.locator(VM1)
     page.fill('#field-system', '매매')
-    expect(sa).to_have_attribute('data-valid', 'false')
-    expect(sa.locator('[data-violations]')).to_contain_text("Required token 'system' is empty after normalisation")
+    expect(vm1).to_have_attribute('data-valid', 'false')
+    expect(vm1.locator('[data-violations]')).to_contain_text("Required token 'system' is empty after normalisation")
     page.fill('#field-system', '###')
-    expect(sa).to_have_attribute('data-valid', 'false')
-    expect(sa).to_contain_text('FAIL')
-    expect(sa.locator('[data-violations]')).to_contain_text("Required token 'system' is empty after normalisation")
-    expect(sa.locator('[data-name]')).to_have_text('—')
+    expect(vm1).to_have_attribute('data-valid', 'false')
+    expect(vm1).to_contain_text('FAIL')
+    expect(vm1.locator('[data-name]')).to_have_text('—')
     # 정제 뒤 빈 값의 변환 줄(「'system' normalised from '###' to ''」)은 숨긴다 — 위반 이유가 이미 말한다 (M-2)
-    expect(sa.locator('[data-steps]')).to_have_count(0)
-    assert 'normalised from' not in sa.inner_text(), sa.inner_text()
-    expect(sa.locator('button[data-copy]')).to_be_disabled()
-    expect(page.locator('[data-provider="gcp"] [data-pass-count]')).to_have_text('0/7 PASS')
+    expect(vm1.locator('[data-steps]')).to_have_count(0)
+    expect(vm1.locator('button[data-copy]')).to_be_disabled()
+    expect(page.locator('[data-names-summary]')).to_have_text('4 resources · 5 names · 0/5 PASS')
+    expect(page.locator('[data-copy="all-names"]')).to_have_text('Copy all names · 5 invalid skipped')
+    expect(page.locator('[data-copy="all-names"]')).to_be_disabled()
     page.click('[data-copy="terraform"]')
     hcl_bad = page.evaluate('navigator.clipboard.readText()')
-    assert "  # INVALID: gcp_service_account — Required token 'system' is empty after normalisation\n" in hcl_bad, hcl_bad
-    assert 'gcp_service_account =' not in hcl_bad
-    sa.scroll_into_view_if_needed()
+    assert "  # INVALID: azure_virtual_machine_01 — Required token 'system' is empty after normalisation\n" in hcl_bad, hcl_bad
+    assert 'azure_virtual_machine_01 =' not in hcl_bad
+    page.click('[data-copy="names-json"]')
+    bad = json.loads(page.evaluate('navigator.clipboard.readText()'))
+    assert bad['names'] == [] and {'key': 'virtual_machine_01', 'codes': ['name.token_empty']} in bad['invalid'], bad
+    vm1.scroll_into_view_if_needed()
     page.screenshot(path=str(OUT / '04-fail-card.png'), full_page=False)
 
-    # ── 폭 360px · 다크 모드 스크린샷 (가로 스크롤 없음) ──
+    # ── ⒀ 폭 360px — 가로 스크롤 없음 · 아래 고정 막대 · 누르면 ④ 로 · 스크린샷 ──
     page.fill('#field-system', INPUT['system'])
     page.set_viewport_size({'width': 360, 'height': 800})
     page.wait_for_timeout(300)
     assert page.evaluate('document.documentElement.scrollWidth') <= 360, page.evaluate('document.documentElement.scrollWidth')
     assert_selects_fit(page, 360)
+    bar = page.locator('[data-sticky-bar]')
+    expect(bar).to_be_visible()
+    expect(bar).to_contain_text('4 resources · 5 names')
+    page.evaluate('window.scrollTo(0, 0)')
+    page.click('[data-sticky-jump]')
+    page.wait_for_function("() => Math.abs(document.getElementById('names').getBoundingClientRect().top) < 40")
+    # 행 높이 44px(터치) — 체크 상자가 든 행
+    h = row(page, 'storage_account').evaluate('e => e.getBoundingClientRect().height')
+    assert h >= 44, h
+    page.evaluate('window.scrollTo(0, 0)')
     page.screenshot(path=str(OUT / '02-mobile-360.png'), full_page=True)
+    page.set_viewport_size({'width': 1280, 'height': 900})
+    expect(bar).to_be_hidden()  # 넓은 화면에는 고정 막대가 없다
     ctx1.close()
 
     dark = browser.new_context(viewport={'width': 1280, 'height': 900}, color_scheme='dark')
     page4 = dark.new_page()
+    page4.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(page4, share_url)
-    expect(page4.locator(f'{SA} [data-name]')).to_have_text('payments-ledger-prd-sa-sync')
+    expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
     bg = page4.evaluate('getComputedStyle(document.body).backgroundColor')
     assert bg not in ('rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)'), f'다크 모드 배경이 아니다: {bg}'
     page4.screenshot(path=str(OUT / '03-desktop-dark.png'), full_page=True)
@@ -270,7 +384,8 @@ with sync_playwright() as p:
     ctx8.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     page8 = ctx8.new_page()
     page8.on('pageerror', lambda e: errors.append(str(e)))
-    old_hash = state_hash(INPUT, OLD_RULES)
+    # r 순서를 트리 순서와 다르게 — 같은 선택이면 링크를 연 직후 hash 를 덮어쓰지 않는다
+    old_hash = state_hash(INPUT, OLD_RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})
     goto_ready(page8, BASE + '/' + old_hash)
     notice = page8.locator('[data-rules-mismatch]')
     expect(notice).to_have_text(f'This link was made with rules {OLD_RULES}; the current rules are {RULES}. Names may differ.')
@@ -283,14 +398,15 @@ with sync_playwright() as p:
     assert page8.evaluate('location.hash') == old_hash, page8.evaluate('location.hash')
     page8.click('[data-copy="share-url"]')
     shared = page8.evaluate('navigator.clipboard.readText()')
-    assert hash_state(shared) == {**INPUT, 'v': RULES}, hash_state(shared)
+    assert hash_state(shared) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': {'resource_group': 1, 'virtual_machine': 2}}, hash_state(shared)
     assert page8.evaluate('location.hash') == old_hash, '공유 버튼이 주소창의 옛 v 를 바꾸면 안 된다'
-    page8.fill('#field-purpose', 'batch')
+    # 선택을 바꿔도 링크의 옛 v 를 버린다 (계획 §7-3)
+    row(page8, 'virtual_machine').locator('[data-inc]').click()
     expect(notice).to_have_count(0)
     page8.wait_for_function('h => location.hash !== h', arg=old_hash)
-    assert hash_state(page8.url) == {**INPUT, 'purpose': 'batch', 'v': RULES}, hash_state(page8.url)
+    assert hash_state(page8.url) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': {'resource_group': 1, 'virtual_machine': 3}}, hash_state(page8.url)
 
-    # ── ⑼ 같은 탭에서 옛 v hash 로 이동 → 안내가 보이고 폼이 따라온다 ──
+    # ── ⑼ 같은 탭에서 옛 v hash 로 이동 → 안내가 보이고 폼이 따라온다 · 폼을 고치면 안내가 사라진다 ──
     other_old = state_hash(OTHER, OLD_RULES)
     page8.evaluate('h => { location.hash = h; }', other_old)
     expect(notice).to_be_visible()
@@ -298,8 +414,47 @@ with sync_playwright() as p:
         expect(page8.locator(f'#field-{key}')).to_have_value(val)
     page8.wait_for_timeout(300)
     assert page8.evaluate('location.hash') == other_old, page8.evaluate('location.hash')
+    page8.fill('#field-purpose', 'ledger')
+    expect(notice).to_have_count(0)
+
+    # ── ⒁ 옛 링크(다섯 키만) → 문맥이 열리고 CSP 는 고르지 않은 상태 · hash 를 덮어쓰지 않는다 ──
+    v1_hash = state_hash(INPUT)
+    goto_ready(page8, BASE + '/?' + v1_hash)  # 경로를 바꿔 새로 불러온다
+    goto_ready(page8, BASE + '/' + v1_hash)
+    for key, val in INPUT.items():
+        expect(page8.locator(f'#field-{key}')).to_have_value(val)
+    expect(page8.locator('[role="radio"][aria-checked="true"]')).to_have_count(0)
+    expect(page8.locator('[data-pick-cloud]')).to_be_visible()
+    page8.wait_for_timeout(300)
+    assert page8.evaluate('location.hash') == v1_hash, page8.evaluate('location.hash')
+
+    # ── ⒂ 모르는 type · 종류가 안 맞는 값이 든 링크 → 그 항목만 버리고 한 줄 안내 ──
+    odd = state_hash(INPUT, RULES, 'azure', {'no_such_type': 1, 'virtual_machine': 2, 'managed_identity': 1})
+    goto_ready(page8, BASE + '/?x' + odd)
+    goto_ready(page8, BASE + '/' + odd)
+    expect(page8.locator('[data-selection-dropped]')).to_have_text('This link had 2 resource selections that do not fit the current rules or limits; they were left out.')
+    expect(page8.locator('article[data-key]')).to_have_count(2)
+    expect(page8.locator('[data-selected-count]')).to_have_text('1 selected')
+    row(page8, 'key_vault').locator('input[data-row-check]').check()  # 사용자가 선택을 바꾸면 안내를 지운다
+    expect(page8.locator('[data-selection-dropped]')).to_have_count(0)
     ctx8.close()
+
+    # ── ⒃ 충돌 fixture(시험 전용 규칙 둘 · ?fixture=conflict) → 두 카드 FAIL · 충돌 줄 · Copy all names 의 skipped 수 (D41) ──
+    ctx16 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    page16 = ctx16.new_page()
+    page16.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(page16, BASE + '/?fixture=conflict' + state_hash(INPUT, RULES, 'azure', {'test_conflict_a': 1, 'test_conflict_b': 1, 'key_vault': 1}))
+    for k in ('test_conflict_a_01', 'test_conflict_b_01'):
+        card = page16.locator(f'article[data-key="{k}"]')
+        expect(card).to_have_attribute('data-valid', 'false')
+        expect(card.locator('[data-violations]')).to_contain_text('is used by more than one resource of the same kind')
+    expect(page16.locator('article[data-key="key_vault"]')).to_have_attribute('data-valid', 'true')
+    expect(page16.locator('[data-conflicts] li')).to_have_count(1)
+    expect(page16.locator('[data-conflicts]')).to_contain_text('Name conflict — Name ')
+    expect(page16.locator('[data-copy="all-names"]')).to_have_text('Copy all names · 2 invalid skipped')
+    expect(page16.locator('[data-names-summary]')).to_have_text('3 resources · 3 names · 1/3 PASS')
+    ctx16.close()
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⑼ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒃ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

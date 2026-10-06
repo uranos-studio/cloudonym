@@ -23,14 +23,15 @@ const shown = (v: unknown): string => {
   }
 };
 
-/** 검사 순서: 배열 → 비어 있지 않음 → 항목 수 → 항목마다(객체 · type · 중복 · count · 입력 종류 · role 꼴) → Σ count. 오류는 index 순으로 모두 낸다 */
-export function validateSelection(provider: Provider, raw: unknown):
+/** 검사 순서: 배열 → 비어 있지 않음 → 항목 수 → 항목마다(객체 · type · 중복 · count · 입력 종류 · role 꼴) → Σ count. 오류는 index 순으로 모두 낸다.
+ *  rules 는 기본이 규칙 표 — 화면의 시험 전용 fixture 가 다른 표를 넘긴다. 다른 provider 규칙은 거른다 */
+export function validateSelection(provider: Provider, raw: unknown, table: readonly ResourceRule[] = rulesFor(provider)):
   { ok: true; items: SelectionItem[] } | { ok: false; errors: CoreMessage[] } {
   if (!Array.isArray(raw)) return { ok: false, errors: [{ code: 'selection.not_array' }] };
   if (raw.length === 0) return { ok: false, errors: [{ code: 'selection.empty' }] };
   if (raw.length > MAX_ITEMS) return { ok: false, errors: [{ code: 'selection.too_many_items', params: { max: MAX_ITEMS } }] };
 
-  const rules = rulesFor(provider);
+  const rules = table.filter((r) => r.provider === provider);
   const errors: CoreMessage[] = [];
   const items: SelectionItem[] = [];
   const seen = new Set<string>();

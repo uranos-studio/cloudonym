@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { hclString, toTerraformLocals } from './terraform';
-import { generate } from '../core/engine';
+import { hclString, manyEntries, outputEntries as entriesOf, toTerraformLocals } from './terraform';
+import { generate, generateMany } from '../core/engine';
 import { labelsFor } from '../core/labels';
+import { validateSelection } from '../core/selection';
+import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from '../core/__fixtures__/conflict';
 import type { GenerateOutput, LabelSet, NameResult, NamingContext } from '../core/types';
 
 const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
@@ -17,7 +19,7 @@ describe('toTerraformLocals', () => {
   it('엔진 결과 전체 — locals { 로 시작하고 } 로 끝난다 · 유효한 이름은 provider_type = "…" 한 줄', () => {
     const out = generate(ctx);
     const labels = { aws: labelsFor(ctx, 'aws'), gcp: labelsFor(ctx, 'gcp'), azure: labelsFor(ctx, 'azure') };
-    const hcl = toTerraformLocals(out, labels);
+    const hcl = toTerraformLocals(entriesOf(out), labels);
     expect(hcl.startsWith('locals {\n')).toBe(true);
     expect(hcl.endsWith('\n}\n')).toBe(true);
     expect(hcl).toContain('  gcp_service_account = "billing-trade-prd-sa-sync"\n');
@@ -35,28 +37,46 @@ describe('toTerraformLocals', () => {
   });
   it('valid:false 항목은 # INVALID: 주석으로만 나온다 — 값 줄이 없다', () => {
     const out: GenerateOutput = { gcp: { service_account: stub({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'system' }] }), project_id: stub({ ruleId: 'gcp.project_id', resourceType: 'project_id', name: 'infra-billing-trade-prd' }) } };
-    const hcl = toTerraformLocals(out, { gcp: noLabels });
+    const hcl = toTerraformLocals(entriesOf(out), { gcp: noLabels });
     expect(hcl).toContain("  # INVALID: gcp_service_account — Required token 'system' is empty after normalisation\n");
     expect(hcl).not.toMatch(/^\s*gcp_service_account\s*=/m);
     expect(hcl).toContain('  gcp_project_id = "infra-billing-trade-prd"\n');
   });
   it('라벨 한도 위반이 있으면 라벨 블록 대신 # INVALID: 주석', () => {
     const bad: LabelSet = { labels: { owner: 'x'.repeat(300) }, violations: [{ code: 'label.too_long', field: 'owner', params: { actual: 300, max: 256 } }], transformed: [] };
-    const hcl = toTerraformLocals({ aws: { s3_bucket: stub({ ruleId: 'aws.s3_bucket', resourceType: 's3_bucket', name: 'b' }) } }, { aws: bad });
+    const hcl = toTerraformLocals(entriesOf({ aws: { s3_bucket: stub({ ruleId: 'aws.s3_bucket', resourceType: 's3_bucket', name: 'b' }) } }), { aws: bad });
     expect(hcl).toContain("  # INVALID: aws_tags — Label 'owner' is 300 characters long; the maximum is 256\n");
     expect(hcl).not.toContain('aws_tags = {');
   });
   it('요청에 없는 provider 는 나오지 않는다 · 빈 입력이면 locals {\\n}\\n', () => {
     expect(toTerraformLocals({}, {})).toBe('locals {\n}\n');
-    const hcl = toTerraformLocals({ azure: { key_vault: stub({ ruleId: 'azure.key_vault', resourceType: 'key_vault', name: 'kv-a' }) } }, {});
+    const hcl = toTerraformLocals(entriesOf({ azure: { key_vault: stub({ ruleId: 'azure.key_vault', resourceType: 'key_vault', name: 'kv-a' }) } }), {});
     expect(hcl).not.toContain('aws');
     expect(hcl).not.toContain('gcp');
     expect(hcl).toContain('  azure_key_vault = "kv-a"\n');
   });
   it('라벨 값의 따옴표 · 역슬래시 · 보간은 이스케이프된다 (사용자 입력이 HCL 로 새지 않는다)', () => {
     const tricky: LabelSet = { labels: { owner: 'a"b\\c ${x} %{y}' }, violations: [], transformed: [] };
-    const hcl = toTerraformLocals({ aws: {} }, { aws: tricky });
+    const hcl = toTerraformLocals({ aws: [] }, { aws: tricky });
     expect(hcl).toContain('    owner = "a\\"b\\\\c $${x} %%{y}"\n');
+  });
+});
+
+describe('toTerraformLocals — 고른 항목 (D41 · 계획 §7-5)', () => {
+  it('키는 ${p}_${key} — azure_virtual_machine_01 · _02 · 역할 · 입력 없는 규칙', () => {
+    const res = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }]);
+    if (!res.ok) throw new Error('선택이 틀렸다');
+    const hcl = toTerraformLocals(manyEntries(generateMany(ctx, 'azure', res.items)), { azure: labelsFor(ctx, 'azure') });
+    expect(hcl).toContain('  azure_virtual_machine_01 = "billing-trade-prd-kr-vm-01"\n  azure_virtual_machine_02 = "billing-trade-prd-kr-vm-02"\n');
+    expect(hcl).toContain('  azure_managed_identity_db = "billing-trade-prd-id-db"\n');
+    expect(hcl).toContain('  azure_resource_group = "rg-billing-trade-prd"\n');
+    expect(hcl).toContain('  azure_tags = {\n');
+    expect(hcl).not.toContain('aws');
+  });
+  it('충돌 fixture — 두 줄 다 # INVALID 이고 값 줄이 없다', () => {
+    const hcl = toTerraformLocals(manyEntries(generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION)), {});
+    expect(hcl.match(/^ {2}# INVALID: azure_test_conflict_[ab]_01 — Name '.+' is used by more than one resource/gm)).toHaveLength(2);
+    expect(hcl).not.toMatch(/^\s*azure_test_conflict_[ab]_01\s*=/m);
   });
 });
 

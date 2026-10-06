@@ -8,7 +8,7 @@ import { BASELINE_CONTEXTS, coreBaseline } from './baseline-inputs';
 import { generate, parseContext } from './engine';
 import { labelsFor } from './labels';
 import { PROVIDERS, type LabelSet, type Provider } from './types';
-import { toTerraformLocals } from '../components/terraform';
+import { outputEntries, toTerraformLocals } from '../components/terraform';
 import { labelsJsonBlocked } from '../components/labelsGate';
 
 const FIXTURE = join(import.meta.dirname, '__fixtures__', 'baseline.json');
@@ -31,7 +31,7 @@ function uiBaseline() {
     for (const p of PROVIDERS) labels[p] = labelsFor(parsed.context, p);
     const blocked: Record<string, boolean> = { all: labelsJsonBlocked([...PROVIDERS], labels) };
     for (const p of PROVIDERS) blocked[p] = labelsJsonBlocked([p], labels);
-    return [{ id, terraform: terraformSkeleton(toTerraformLocals(out, labels)), labelsJsonBlocked: blocked }];
+    return [{ id, terraform: terraformSkeleton(toTerraformLocals(outputEntries(out), labels)), labelsJsonBlocked: blocked }];
   });
 }
 

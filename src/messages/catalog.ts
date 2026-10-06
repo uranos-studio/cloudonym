@@ -11,9 +11,23 @@ export const UI_KEYS = [
   // ContextForm
   'form_title', 'form_hint', 'field_owner_hint', 'field_system_hint', 'field_purpose_hint',
   'field_owner_placeholder', 'field_system_placeholder', 'field_purpose_placeholder', 'region_global_label',
-  // App
-  'tab_all', 'tagline', 'nav_label', 'share_button', 'share_button_label', 'results_title', 'tablist_label',
+  // App — 네 단계 (D42)
+  'tagline', 'nav_label', 'share_button', 'share_button_label', 'results_title',
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
+  'step_cloud', 'step_context', 'step_resources', 'step_names', 'selection_dropped', 'switch_cloud_confirm',
+  'sticky_summary', 'sticky_jump',
+  // CloudPicker
+  'cloud_group_label', 'pick_cloud_prompt',
+  // ResourceTree
+  'resources_title', 'search_label', 'search_placeholder', 'search_empty', 'selected_only', 'selected_count',
+  'expand_all', 'collapse_all', 'category_filter_label', 'category_all',
+  'category_compute', 'category_networking', 'category_storage', 'category_database',
+  'category_identity', 'category_security', 'category_management', 'category_containers',
+  'select_resource_label', 'count_label', 'count_decrease', 'count_increase', 'count_fixed_hint',
+  'role_label', 'role_hint', 'tree_label',
+  // NamesPanel
+  'names_summary', 'names_empty_selection', 'copy_all_names', 'copy_all_names_skipped', 'copy_all_names_label',
+  'copy_names_json_label', 'copy_names_json_blocked_label', 'conflict_prefix',
   // ResultCard
   'copy_name_label', 'copy_invalid_label', 'shortened', 'transformed', 'originally_chars', 'length_range',
   'generation_charset', 'official_doc', 'validation',

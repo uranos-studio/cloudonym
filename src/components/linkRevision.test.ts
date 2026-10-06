@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { linkStateOf, mismatchedLinkVersion, shouldRewriteHash } from './linkRevision';
 import { decodeState, encodeState } from './urlState';
+import { validateSelection } from '../core/selection';
 import type { NamingContext } from '../core/types';
 
 const CURRENT = '2026-09-29.1';
@@ -47,5 +48,32 @@ describe('mismatchedLinkVersion — 안내는 옛 v 링크가 폼과 같은 동�
     const link = open(`#state=${encodeState(ctx, OLD)}`);
     expect(mismatchedLinkVersion(encodeState(other, CURRENT), link, CURRENT)).toBeUndefined();
     expect(mismatchedLinkVersion(encodeState(ctx, CURRENT), undefined, CURRENT)).toBeUndefined();
+  });
+});
+
+describe('링크 키에 p · r 이 들어간다 (D42 · 계획 §7-3)', () => {
+  /** App 이 하는 것과 같다 — 풀린 문맥 · CSP · 선택을 지금 버전으로 다시 인코딩한 것이 키 */
+  const openV2 = (hash: string) => {
+    const d = decodeState(hash);
+    if (!d) throw new Error('hash 가 풀리지 않는다');
+    return linkStateOf(d, hash, encodeState(d.context, CURRENT, { provider: d.provider, selection: d.selection }));
+  };
+  const pick = (r: unknown[]) => {
+    const res = validateSelection('azure', r);
+    if (!res.ok) throw new Error('선택이 틀렸다');
+    return res.items;
+  };
+  it('옛 다섯 키 링크를 연 직후 — CSP · 선택 없는 폼 키와 같아 hash 를 다시 쓰지 않는다', () => {
+    const link = openV2(`#state=${encodeState(ctx, OLD)}`);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, {}), link)).toBe(false);
+    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, {}), link, CURRENT)).toBe(OLD);
+  });
+  it('p · r 링크를 연 직후는 같은 키 · 선택을 바꾸거나 CSP 를 바꾸면 링크의 옛 v 를 버린다', () => {
+    const items = pick([{ type: 'virtual_machine', count: 2 }]);
+    const link = openV2(`#state=${encodeState(ctx, OLD, { provider: 'azure', selection: items })}`);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'azure', selection: items }), link)).toBe(false);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'azure', selection: pick([{ type: 'virtual_machine', count: 3 }]) }), link)).toBe(true);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(true);
+    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBeUndefined();
   });
 });

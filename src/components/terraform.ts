@@ -1,5 +1,6 @@
-// GenerateOutput → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다 (L3)
-import { PROVIDERS, type GenerateOutput, type LabelSet, type Provider } from '../core/types';
+// 엔진 결과 → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다 (L3)
+import type { ManyResult } from '../core/engine';
+import { PROVIDERS, type GenerateOutput, type LabelSet, type NameResult, type Provider } from '../core/types';
 import { escapeInvisible, fillUi, format, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -22,12 +23,26 @@ export function hclString(value: string): string {
   return `"${escapeInvisible(escaped)}"`;
 }
 
+/** locals 의 한 줄 — 키는 `${provider}_${key}` 로 적힌다 */
+export interface TerraformEntry { key: string; result: NameResult }
+export type TerraformNames = Partial<Record<Provider, readonly TerraformEntry[]>>;
+
+/** generateMany 결과 → 항목 key 그대로(`virtual_machine_01` · `managed_identity_sync` · `resource_group`) — 충돌 항목은 valid:false 라 INVALID 다 (D41) */
+export function manyEntries(many: ManyResult): TerraformNames {
+  return { [many.provider]: many.items.map((i) => ({ key: i.key, result: i })) };
+}
+
+/** generate(세 CSP 전 리소스) 결과 → 항목 key = resourceType. 기준선 시험(core/baseline.test)이 옛 꼴 그대로 대어 보는 데 쓴다 */
+export function outputEntries(out: GenerateOutput): TerraformNames {
+  return Object.fromEntries(Object.entries(out).map(([p, names]) => [p, Object.entries(names ?? {}).map(([key, result]) => ({ key, result }))]));
+}
+
 /**
  * `valid:false` 인 항목은 값 없이 `# INVALID:` 주석으로만 나온다 — 무효한 이름을 변수로 내주지 않는다.
- * 라벨도 한도 위반이 있으면 블록 대신 `# INVALID:` 주석이다. provider 순서는 PROVIDERS, 리소스 순서는 엔진이 준 순서(규칙 표 순서).
+ * 라벨도 한도 위반이 있으면 블록 대신 `# INVALID:` 주석이다. provider 순서는 PROVIDERS, 리소스 순서는 넘긴 순서(엔진이 준 순서).
  * version 을 넘기면 `locals {` 앞에 엔진 · 규칙 버전과 PASS 의 뜻을 주석 두 줄로 적는다 (D26 · D28)
  */
-export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Provider, LabelSet>>, catalog: Catalog = en, version?: Version): string {
+export function toTerraformLocals(out: TerraformNames, labels: Partial<Record<Provider, LabelSet>>, catalog: Catalog = en, version?: Version): string {
   const reasons = (ms: LabelSet['violations']) => ms.map((m) => format(m, catalog)).join(' · ');
   const header = version
     ? [`# ${fillUi(catalog, 'terraform_header_version', version)}`, `# ${fillUi(catalog, 'terraform_header_pass')}`]
@@ -37,8 +52,8 @@ export function toTerraformLocals(out: GenerateOutput, labels: Partial<Record<Pr
     const names = out[p];
     if (!names) continue;
     lines.push(`  # ${p}`);
-    for (const [type, r] of Object.entries(names)) {
-      const key = `${p}_${type}`;
+    for (const { key: k, result: r } of names) {
+      const key = `${p}_${k}`;
       if (r.valid) lines.push(`  ${key} = ${hclString(r.name)}`);
       else lines.push(`  # INVALID: ${key} — ${reasons(r.violations)}`);
     }

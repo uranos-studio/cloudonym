@@ -10,15 +10,16 @@ export interface TreeNode {
   children: TreeNode[];    // SCOPES 순서
 }
 
-/** provider 의 트리 — 뿌리 하나. 범위이면서 규칙인 것(RG · VNet · VPC · project)은 규칙이 부모 범위 노드에, 범위가 그 자식으로 놓인다(scope.ruleId 로 잇는다) */
-export function buildTree(provider: Provider): TreeNode {
+/** provider 의 트리 — 뿌리 하나. 범위이면서 규칙인 것(RG · VNet · VPC · project)은 규칙이 부모 범위 노드에, 범위가 그 자식으로 놓인다(scope.ruleId 로 잇는다).
+ *  rules 는 기본이 규칙 표 — 화면의 시험 전용 fixture(500행 측정 · 충돌)가 다른 표를 넘긴다. 다른 provider 규칙은 거른다 */
+export function buildTree(provider: Provider, rules: readonly ResourceRule[] = rulesFor(provider)): TreeNode {
   const scopes = Object.values(SCOPES).filter((s) => s.provider === provider);
   const roots = scopes.filter((s) => s.parent === undefined);
   if (roots.length !== 1) throw new Error(`scope graph for ${provider} must have exactly one root, found ${roots.length}`);
-  const rules = rulesFor(provider);
+  const own = rules.filter((r) => r.provider === provider);
   const build = (s: ScopeDef): TreeNode => ({
     scope: s,
-    rules: rules.filter((r) => r.scope === s.id),
+    rules: own.filter((r) => r.scope === s.id),
     children: scopes.filter((c) => c.parent === s.id).map(build),
   });
   return build(roots[0]!);

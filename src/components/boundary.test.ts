@@ -1,21 +1,27 @@
 import { describe, it, expect } from 'vitest';
 
-// 화면은 엔진을 부르기만 한다 (L3) — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API 셋(engine · labels · types)뿐이다.
+// 화면은 엔진을 부르기만 한다 (L3) — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes)뿐이다.
+// 시험 전용 fixture(src/dev)는 import.meta.env.DEV 분기 안의 동적 import 로만 들인다 — 운영 번들에서 빠진다 (계획 §7-4)
 // node:fs 는 tsconfig.app.json(브라우저 타입 · node 없음)이 거부하므로 Vite 의 ?raw 글롭으로 소스를 읽는다
-const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 // import/export 의 from '...' · 부수효과 import '...' · 동적 import('...') · require('...') — src/core/boundary.test.ts 와 같은 검사식
 const STATIC_RE = /(?:import|export)(?:[^'"]*from)?\s+['"]([^'"]+)['"]/g;
 const CALL_RE = /\b(?:import|require)\s*\(\s*['"]([^'"]+)['"]/g;
 const ALLOWED = [
-  /^react$/,
+  /^react$/, /^react-dom\/client$/,
   /^lucide-react$/,
-  /^(?:\.\.?\/)+core\/(?:engine|labels|types)$/,   // 엔진 공개 API 셋
+  /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 (D37 · D40)
+  /^\.\/index\.css$/, /^\.\/App\.tsx$/,              // main.tsx 의 진입
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
   /^\.\.?\/version$/,                               // 결과에 싣는 버전 (D26)
 ];
-const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict)/;
+const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict|__fixtures__)/;
+/** src/dev 를 들이는 자리는 `import.meta.env.DEV` 가 앞선 같은 식의 동적 import 뿐이다 */
+const DEV_SPEC = /\/dev\//;
+const DEV_GUARDED = /import\.meta\.env\.DEV[^;]*?import\(\s*['"][^'"]*\/dev\//g;
+const DEV_ANY = /(?:from\s+|import\s*\(\s*|import\s+)['"][^'"]*\/dev\//g;
 
 function specifiers(src: string): string[] {
   const out: string[] = [];
@@ -43,8 +49,22 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
     const ok = "import { useState } from 'react';\nimport type { NameResult } from '../core/types';\nimport { generate } from './core/engine';\nimport { ResultCard } from './components/ResultCard';\nimport { Copy } from 'lucide-react';";
     expect(specifiers(ok).every((s) => ALLOWED.some((re) => re.test(s)))).toBe(true);
   });
+  it('src/dev 는 DEV 가드 안의 동적 import 로만 들인다 (검사기 자체 시험 포함)', () => {
+    const guarded = "if (import.meta.env.DEV && fx) { const m = await import('./dev/fixtureRules'); }";
+    const bare = "import { fixtureRules } from './dev/fixtureRules';";
+    const unguarded = "const m = await import('./dev/fixtureRules');";
+    const devImports = (src: string) => ({ any: [...src.matchAll(DEV_ANY)].length, guarded: [...src.matchAll(DEV_GUARDED)].length });
+    expect(devImports(guarded)).toEqual({ any: 1, guarded: 1 });
+    expect(devImports(bare)).toEqual({ any: 1, guarded: 0 });
+    expect(devImports(unguarded)).toEqual({ any: 1, guarded: 0 });
+    for (const f of files) {
+      const d = devImports(sources[f] ?? '');
+      expect(d.any, f).toBe(d.guarded);
+    }
+    expect(devImports(sources['../main.tsx'] ?? '').guarded).toBe(1);
+  });
   it('모든 import 지정자가 허용 목록 안이다 · 내부 모듈은 하나도 없다', () => {
-    const all = files.flatMap((f) => specifiers(sources[f] ?? '').map((s) => `${f} → ${s}`));
+    const all = files.flatMap((f) => specifiers(sources[f] ?? '').filter((s) => !DEV_SPEC.test(s)).map((s) => `${f} → ${s}`));
     expect(all.length).toBeGreaterThan(0);
     const outside = all.filter((line) => !ALLOWED.some((re) => re.test(line.split(' → ')[1] ?? '')));
     expect(outside).toEqual([]);

@@ -9,3 +9,10 @@
     @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
   }
 }
+
+/* 트리의 접기 표시 — 열린 <details> 의 화살표를 돌린다. summary 를 flex 로 두면 기본 표시가 사라져 아이콘으로 대신한다 */
+@layer components {
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] > summary > [data-chevron] { transform: rotate(90deg); }
+}

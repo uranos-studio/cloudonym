@@ -1,7 +1,9 @@
-// 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다
+// 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
+// 제목에 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01`) data-key 로 항목을 가리킨다 (계획 §7-5)
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';
+import type { NameItem } from '../core/engine';
 import type { NameResult } from '../core/types';
 import { fillUi, format, formatNotes } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -10,14 +12,18 @@ const CARD =
   'flex flex-col gap-2 rounded-lg border bg-white p-3 shadow-xs dark:bg-zinc-900 ' +
   'data-[valid=false]:border-rose-300 border-zinc-200 dark:border-zinc-800 dark:data-[valid=false]:border-rose-900';
 
-export function ResultCard({ result: r }: { result: NameResult }) {
-  const id = `card-${r.ruleId.replace('.', '-')}`;
+export function ResultCard({ result: r }: { result: NameResult | NameItem }) {
+  const item = 'key' in r ? r : undefined;
+  const key = item?.key ?? r.resourceType;
+  const id = `card-${r.ruleId.replace('.', '-')}-${key}`;
+  const suffix = item?.seq ?? item?.role;
+  const title = suffix === undefined ? r.displayName : `${r.displayName} · ${suffix}`;
   const stepsText = visibleSteps(r.steps).map((m) => format(m, en)).join(' · ');
   // aria-invalid 는 폼 위젯 역할에만 허용된다 — 카드는 data-valid 로 상태를 들고 PASS/FAIL 글자가 뜻을 전한다
   return (
-    <article data-rule={r.ruleId} data-valid={r.valid} aria-labelledby={`${id}-title`} className={CARD}>
+    <article data-rule={r.ruleId} data-key={key} data-valid={r.valid} aria-labelledby={`${id}-title`} className={CARD}>
       <div className="flex items-start justify-between gap-2">
-        <h4 id={`${id}-title`} className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{r.displayName}</h4>
+        <h4 id={`${id}-title`} className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{title}</h4>
         {r.valid
           ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400"><CircleCheck aria-hidden="true" className="size-3.5" />PASS</span>
           : <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-700 dark:text-rose-400"><CircleX aria-hidden="true" className="size-3.5" />FAIL</span>}
@@ -26,7 +32,7 @@ export function ResultCard({ result: r }: { result: NameResult }) {
       <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-2 dark:bg-zinc-950">
         <code data-name className="min-w-0 break-all font-mono text-sm text-zinc-900 dark:text-zinc-100">{r.name || '—'}</code>
         {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 (L3) */}
-        <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: r.displayName }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${r.ruleId}`} />
+        <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${key}`} />
       </div>
 
       {stepsText && (

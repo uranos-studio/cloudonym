@@ -83,20 +83,22 @@ describe('decodeState 길이 상한 (보안 리뷰 L-5 · codex P2)', () => {
     expect(h.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
     expect(ctxOf(h)).toEqual(c);
   });
-  it('hash 상한은 최악 입력(필드당 6바이트 × 1024 × 3 · region global · v 13자)의 표준 Base64(패딩 포함) 길이와 같다', () => {
+  it('선택 없는 최악 문맥(필드당 6바이트 × 1024 × 3 · region global · v 13자)은 24699자 — v2 상한(선택 포함 · 아래 절) 안이다', () => {
     const worst = at('\u0001'.repeat(1024));
     const url = hashOf(worst);
-    const padded = `#state=${btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({ ...worst, v: V }))))}`;
     expect(url.length).toBe(24699); // 18519 바이트는 3 의 배수라 패딩이 없다
-    expect(padded.length).toBe(24699);
-    expect(MAX_HASH_CHARS).toBe(padded.length);
-    expect(decodeState(padded)).toEqual({ context: worst, rulesVersion: V });
+    expect(url.length).toBeLessThan(MAX_HASH_CHARS);
+    expect(decodeState(url)).toEqual({ context: worst, rulesVersion: V });
   });
   it('상한을 한 글자라도 넘으면 내용이 멀쩡해도 디코딩하지 않고 undefined', () => {
-    // env 별칭 production 은 parseContext 가 prd 로 받는 값이다 — 상한이 없다면 풀린다
-    const over = `#state=${b64({ ...at('\u0001'.repeat(1024)), env: 'production', v: V })}`;
-    expect(over.length).toBeGreaterThan(MAX_HASH_CHARS);
-    expect(ctxOf(over)).toBeUndefined();
+    // 문맥이 읽지 않는 키(x · 수 배열)로 길이만 늘린다 — 상한 바로 아래는 풀리고(검사기 자체 시험), 처음으로 넘는 길이는 풀리지 않는다
+    const hashWith = (n: number) => `#state=${b64({ ...ctx, x: new Array(n).fill(1) })}`;
+    let n = 0;
+    while (hashWith(n + 1).length <= MAX_HASH_CHARS) n++;
+    expect(hashWith(n).length).toBeLessThanOrEqual(MAX_HASH_CHARS);
+    expect(ctxOf(hashWith(n))).toEqual(ctx);
+    expect(hashWith(n + 1).length).toBeGreaterThan(MAX_HASH_CHARS);
+    expect(ctxOf(hashWith(n + 1))).toBeUndefined();
     const big = `#state=${encodeState(ctx)}${'A'.repeat(MAX_HASH_CHARS)}`;
     expect(ctxOf(big)).toBeUndefined();
   });
@@ -119,5 +121,132 @@ describe('규칙 버전 v (D26 · D27 ⑵)', () => {
   it('shareUrl 은 넘긴 버전을 담는다', () => {
     const url = shareUrl(ctx, 'http://localhost:5173/', '2026-09-29.1');
     expect(decodeState(new URL(url).hash)?.rulesVersion).toBe('2026-09-29.1');
+  });
+});
+
+// ─── hash v2 — p · r (D42 · 계획 §7-3) ───────────────────────────
+import { validateSelection, MAX_ITEMS, MAX_NAMES } from '../core/selection';
+import { rulesFor } from '../core/constraints';
+import type { ResourceRule } from '../core/types';
+import { MAX_RESOURCE_TYPE_CHARS, MAX_ROLE_CHARS } from './urlState';
+
+const V2 = '2026-10-06.4';
+const sel = (provider: 'aws' | 'gcp' | 'azure', raw: unknown[], rules?: readonly ResourceRule[]) => {
+  const r = validateSelection(provider, raw, rules);
+  if (!r.ok) throw new Error(JSON.stringify(r.errors));
+  return r.items;
+};
+/** 풀린 선택을 비교하기 쉬운 꼴로 */
+const flat = (items: { rule: ResourceRule; count: number; role?: string }[] | undefined) => (items ?? []).map((i) => [i.rule.resourceType, i.count, i.role ?? null]);
+const jsonOf = (encoded: string) => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(encoded.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (encoded.length % 4)) % 4)), (c) => c.charCodeAt(0)))) as Record<string, unknown>;
+
+describe('hash v2 — p · r 왕복 (D42)', () => {
+  it('p · r 은 v 뒤에 붙고 왕복한다 — r 값 꼴 셋: count 규칙은 수 · role 규칙은 역할 문자열 · 입력 없는 규칙은 1', () => {
+    const items = sel('azure', [{ type: 'virtual_machine', count: 2 }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }]);
+    const encoded = encodeState(ctx, V2, { provider: 'azure', selection: items });
+    const json = jsonOf(encoded);
+    expect(Object.keys(json)).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'v', 'p', 'r']);
+    expect(json.p).toBe('azure');
+    expect(json.r).toEqual({ virtual_machine: 2, managed_identity: 'db', resource_group: 1 });
+    const back = decodeState(`#state=${encoded}`);
+    expect(back?.provider).toBe('azure');
+    expect(flat(back?.selection)).toEqual([['virtual_machine', 2, null], ['managed_identity', 1, 'db'], ['resource_group', 1, null]]);
+    expect(back?.dropped).toBeUndefined();
+  });
+  it('역할을 주지 않은 role 항목도 기본 역할을 문자열로 적는다 — 선택을 표시해야 하므로 생략하지 않는다', () => {
+    const items = sel('azure', [{ type: 'managed_identity' }]);
+    expect(jsonOf(encodeState(ctx, V2, { provider: 'azure', selection: items })).r).toEqual({ managed_identity: 'sync' });
+  });
+  it('provider 가 없으면 p · r 키가 없다 · 선택이 비면 r 키가 없다 — 옛 링크와 같은 문자열', () => {
+    expect(encodeState(ctx, V2, {})).toBe(encodeState(ctx, V2));
+    expect(Object.keys(jsonOf(encodeState(ctx, V2, { provider: 'gcp', selection: [] })))).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'v', 'p']);
+  });
+  it('옛 다섯 키 링크(v · p · r 없음)도 열린다 — provider · 선택 없음', () => {
+    expect(decodeState(`#state=${b64(ctx)}`)).toEqual({ context: ctx });
+  });
+  it.each([['AWS'], ['oci'], [1], [null]])('p 가 셋 밖(%j)이면 없는 것으로 — 문맥은 열린다 · r 은 판정할 수 없어 버린다', (p) => {
+    const d = decodeState(`#state=${b64({ ...ctx, p, r: { vpc: 1 } })}`);
+    expect(d?.context).toEqual(ctx);
+    expect(d?.provider).toBeUndefined();
+    expect(d?.selection).toBeUndefined();
+    expect(d?.dropped).toBe(1);
+  });
+});
+
+describe('hash v2 — 디코더가 걸린 항목만 버린다 (계획 §7-3)', () => {
+  const open = (r: unknown, p = 'azure') => decodeState(`#state=${b64({ ...ctx, v: V2, p, r })}`);
+  it('모르는 type 은 버리고 나머지는 연다', () => {
+    const d = open({ virtual_machine: 3, no_such_type: 1 });
+    expect(flat(d?.selection)).toEqual([['virtual_machine', 3, null]]);
+    expect(d?.dropped).toBe(1);
+  });
+  it('종류가 안 맞는 값 — count 규칙에 문자열 · role 규칙에 수 · 입력 없는 규칙에 2 · 범위 밖 수 · 소수 · 객체', () => {
+    const d = open({ virtual_machine: 'db', managed_identity: 2, resource_group: 2, subnet: 100, virtual_network: 1.5, storage_account: { n: 1 }, key_vault: 1 });
+    expect(flat(d?.selection)).toEqual([['key_vault', 1, null]]);
+    expect(d?.dropped).toBe(6);
+  });
+  it('role 규칙에 1 이 와도 기본 역할로 읽지 않고 버린다 — codex 의 겹침 꼴(r 에 1 · o 에 역할)은 둘 다 남지 않는다', () => {
+    const d = decodeState(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: { managed_identity: 1 }, o: { managed_identity: 'db' } })}`);
+    expect(d?.selection).toBeUndefined();
+    expect(d?.dropped).toBe(1);
+  });
+  it('역할 꼴이 틀리면 버린다 (대문자 · 17자)', () => {
+    expect(open({ managed_identity: 'Sync' })?.dropped).toBe(1);
+    expect(open({ managed_identity: 'a'.repeat(MAX_ROLE_CHARS + 1) })?.dropped).toBe(1);
+    expect(flat(open({ managed_identity: 'a'.repeat(MAX_ROLE_CHARS) })?.selection)).toEqual([['managed_identity', 1, 'a'.repeat(MAX_ROLE_CHARS)]]);
+  });
+  it('r 이 객체가 아니면 통째로 버린다 (한 건) · 빈 객체는 선택 없음', () => {
+    expect(open(['virtual_machine'])?.dropped).toBe(1);
+    expect(open('x')?.dropped).toBe(1);
+    expect(open({})).toEqual({ context: ctx, rulesVersion: V2, provider: 'azure' });
+  });
+  it('Σ count 가 200 을 넘으면 끝에서부터 뺀다 — 앞의 항목은 남는다', () => {
+    const d = open({ virtual_machine: 99, virtual_machine_windows: 99, subnet: 3, key_vault: 1 });
+    expect(flat(d?.selection)).toEqual([['virtual_machine', 99, null], ['virtual_machine_windows', 99, null]]);
+    expect(d?.dropped).toBe(2);
+    expect(MAX_NAMES).toBe(200);
+  });
+  it('201번째 항목부터 버린다 — 돌려준 목록은 앞 200개', () => {
+    const vm = rulesFor('azure').find((r) => r.resourceType === 'key_vault')!;
+    const rules = Array.from({ length: 205 }, (_, i) => ({ ...vm, id: `azure.fx_${i}`, resourceType: `fx_${i}` }));
+    const r = Object.fromEntries(rules.map((x) => [x.resourceType, 1]));
+    const d = decodeState(`#state=${b64({ ...ctx, p: 'azure', r })}`, rules);
+    expect(d?.selection).toHaveLength(MAX_ITEMS);
+    expect(d?.selection?.[199]?.rule.resourceType).toBe('fx_199');
+    expect(d?.dropped).toBe(5);
+  });
+});
+
+describe('hash v2 — 최대 상태 왕복과 상한 (계획 §7-3 · codex #2)', () => {
+  // 시험 전용 role 규칙 200개 · resourceType 40자 · 역할 16자 · 자유 필드 셋 최악 JSON 문자 1024자
+  const mi = rulesFor('azure').find((r) => r.resourceType === 'managed_identity')!;
+  const rules: ResourceRule[] = Array.from({ length: MAX_ITEMS }, (_, i) => {
+    const type = `${'t'.repeat(MAX_RESOURCE_TYPE_CHARS - 3)}${String(i).padStart(3, '0')}`;
+    return { ...mi, id: `azure.${type}`, resourceType: type };
+  });
+  const worst: NamingContext = { owner: '\u0001'.repeat(1024), system: '\u0001'.repeat(1024), purpose: '\u0001'.repeat(1024), env: 'prd', region: 'global' };
+  const items = sel('azure', rules.map((r) => ({ type: r.resourceType, role: 'r'.repeat(MAX_ROLE_CHARS) })), rules);
+  const V = '2099-12-31.99';
+
+  it('상수 둘은 core 의 판정과 맞다 — 규칙 표의 resourceType 은 40자 이하 · 역할 꼴은 16자까지', () => {
+    expect(MAX_RESOURCE_TYPE_CHARS).toBe(40);
+    for (const p of ['aws', 'gcp', 'azure'] as const) for (const r of rulesFor(p)) expect(r.resourceType.length).toBeLessThanOrEqual(MAX_RESOURCE_TYPE_CHARS);
+    expect(validateSelection('azure', [{ type: 'managed_identity', role: 'r'.repeat(MAX_ROLE_CHARS) }]).ok).toBe(true);
+    expect(validateSelection('azure', [{ type: 'managed_identity', role: 'r'.repeat(MAX_ROLE_CHARS + 1) }]).ok).toBe(false);
+  });
+  it('encoder 가 만드는 최대 상태가 왕복하고, 그 표준 Base64(패딩 포함) 길이가 MAX_HASH_CHARS 와 같다', () => {
+    const encoded = encodeState(worst, V, { provider: 'azure', selection: items });
+    const hash = `#state=${encoded}`;
+    expect(hash.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
+    const bytes = new TextEncoder().encode(JSON.stringify(jsonOf(encoded)));
+    const padded = `#state=${btoa(String.fromCharCode(...bytes))}`;
+    expect(padded.length).toBe(MAX_HASH_CHARS);
+    expect(MAX_HASH_CHARS).toBe(41259);
+    const back = decodeState(hash, rules);
+    expect(back?.context).toEqual(worst);
+    expect(back?.rulesVersion).toBe(V);
+    expect(flat(back?.selection)).toEqual(flat(items));
+    expect(back?.dropped).toBeUndefined();
+    expect(decodeState(padded, rules)?.selection).toHaveLength(MAX_ITEMS);
   });
 });

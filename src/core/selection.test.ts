@@ -121,3 +121,15 @@ describe('validateSelection — 던지지 않는다', () => {
     expect(codes(validateSelection('azure', [{ type: 'managed_identity', role: evil }]))).toEqual(['selection.invalid_role']);
   });
 });
+
+describe('validateSelection — rules 인자 (계획 §7-4 · 화면 fixture 진입점)', () => {
+  it('넘긴 규칙 표로 판정한다 · 다른 provider 규칙은 거른다', () => {
+    const vm = rulesFor('azure').find((r) => r.resourceType === 'virtual_machine')!;
+    const extra = { ...vm, id: 'azure.fx_extra', resourceType: 'fx_extra' };
+    expect(codes(validateSelection('azure', [{ type: 'fx_extra', count: 2 }]))).toEqual(['selection.unknown_type']);
+    const r = validateSelection('azure', [{ type: 'fx_extra', count: 2 }], [extra, rulesFor('aws')[0]!]);
+    expect(r.ok && r.items.map((i) => [i.rule.id, i.count])).toEqual([['azure.fx_extra', 2]]);
+    expect(codes(validateSelection('azure', [{ type: 'virtual_machine' }], [extra]))).toEqual(['selection.unknown_type']);
+    expect(codes(validateSelection('aws', [{ type: 'fx_extra' }], [extra]))).toEqual(['selection.unknown_type']);
+  });
+});

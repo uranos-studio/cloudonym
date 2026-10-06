@@ -61,3 +61,14 @@ describe('scopePath', () => {
     expect(scopePath(RULES['azure.subnet']!).map((s) => s.id)).toEqual(['azure:global', 'azure:subscription', 'azure:resource_group', 'azure:virtual_network']);
   });
 });
+
+describe('buildTree — rules 인자 (계획 §7-4 · 화면 fixture 진입점)', () => {
+  it('넘긴 규칙으로 트리를 만든다 · 다른 provider 규칙은 거른다 · 생략하면 rulesFor 와 같다', () => {
+    const vm = rulesFor('azure').find((r) => r.resourceType === 'virtual_machine')!;
+    const extra = { ...vm, id: 'azure.fx_extra', resourceType: 'fx_extra' };
+    const aws = rulesFor('aws')[0]!;
+    const ids = walk(buildTree('azure', [vm, extra, aws])).flatMap((n) => n.rules.map((r) => r.id));
+    expect(ids).toEqual(['azure.virtual_machine', 'azure.fx_extra']);
+    expect(walk(buildTree('azure', rulesFor('azure')))).toEqual(walk(buildTree('azure')));
+  });
+});
