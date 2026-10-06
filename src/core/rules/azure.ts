@@ -2,6 +2,7 @@
 import type { Forbidden, ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
 import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './azure-intake';
+import { AZURE_MANUAL_ROWS, type AzureManualRule } from './azure-manual';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
@@ -200,8 +201,21 @@ function fromIntakeRow(r: (typeof AZURE_INTAKE_ROWS)[number]): ResourceRule {
   };
 }
 
+/** 손으로 넣은 행 (rules/azure-manual.ts) — 예약어 행은 손 규칙과 같은 목록을 더하고 note 를 앞에 싣는다 */
+function fromManualRow({ reserved, ...r }: AzureManualRule): ResourceRule {
+  if (!reserved) return r;
+  const f = r.forbidden ?? {};
+  const merged: Forbidden = { ...AZURE_RESERVED, ...f, ignoreCase: true };
+  for (const k of ['words', 'contains', 'prefixes', 'suffixes', 'exact'] as const) {
+    const xs = [...(AZURE_RESERVED[k] ?? []), ...(f[k] ?? [])];
+    if (xs.length > 0) merged[k] = xs;
+  }
+  return { ...r, forbidden: merged, notes: [AZURE_RESERVED_NOTE, ...(r.notes ?? [])] };
+}
+
 /** 손으로 쓴 규칙 다음에 들인 행 — 표 순서 */
 export const AZURE_RULES_TABLE: Record<string, ResourceRule> = {
   ...AZURE_HAND_RULES,
   ...Object.fromEntries(AZURE_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
+  ...Object.fromEntries(AZURE_MANUAL_ROWS.map((r) => [r.id, fromManualRow(r)])),
 };

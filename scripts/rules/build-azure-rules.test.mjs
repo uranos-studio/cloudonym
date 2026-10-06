@@ -1,7 +1,8 @@
 // build-azure-rules.mjs 시험 — 원문 문장 → 정규식 · 통과/실패 예 · 이름 · 범위 판정.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCharacters, patternOf, casesOf, generationOf, resourceTypeOf, scopeKind, fallbackSlug } from './build-azure-rules.mjs';
+import { readFileSync } from 'node:fs';
+import { parseCharacters, patternOf, casesOf, generationOf, resourceTypeOf, scopeKind, fallbackSlug, HAND_REVIEWED } from './build-azure-rules.mjs';
 
 const re = (raw) => new RegExp(patternOf(parseCharacters(raw)), 'u');
 
@@ -70,4 +71,13 @@ test('범위 칸 — 기존 셋 · region · 부모 리소스 · 판정 불가',
 test('약어가 없을 때 — 낱말 둘 이상이면 머리글자 · 하나면 앞 세 글자', () => {
   assert.equal(fallbackSlug('service / authorizationServers'), 'as');
   assert.equal(fallbackSlug('service / apis'), 'api');
+});
+
+test('손으로 다시 읽고 넣지 않은 행 — 원문 스냅샷의 Entity 이고 사유는 넣지 않음 · 미확인 둘 중 하나와 괄호 안 이유', () => {
+  const snap = JSON.parse(readFileSync(new URL('../../src/core/__fixtures__/azure-intake.json', import.meta.url), 'utf-8'));
+  const entities = new Set(snap.rows.map((r) => r.entity));
+  for (const [e, why] of Object.entries(HAND_REVIEWED)) {
+    assert.ok(entities.has(e), e);
+    assert.match(why, /^reviewed by hand — (not imported|unconfirmed) \(.+\)$/, e);
+  }
 });

@@ -1179,5 +1179,393 @@
       "a*b",
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
+  },
+  "azure.app_container_apps": {
+    "valid": [
+      "ca",
+      "web-app-1"
+    ],
+    "invalid": [
+      "a",
+      "1app",
+      "app-",
+      "Web-app",
+      "web_app",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.app_configuration_configuration_stores": {
+    "valid": [
+      "store",
+      "My-store--1"
+    ],
+    "invalid": [
+      "abcd",
+      "-store",
+      "store-",
+      "a---b",
+      "my_store",
+      "azure-store",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.app_configuration_stores_replicas": {
+    "valid": [
+      "r1",
+      "Replica01"
+    ],
+    "invalid": [
+      "",
+      "rep-1",
+      "rep_1",
+      "aaaaaaaaaaa"
+    ]
+  },
+  "azure.authorization_policy_assignments": {
+    "valid": [
+      "a",
+      "Deny public IP"
+    ],
+    "invalid": [
+      "a#b",
+      "a/b",
+      "a:b",
+      "name.",
+      "name ",
+      "aaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.authorization_policy_definitions": {
+    "valid": [
+      "a",
+      "Allowed locations (v2)"
+    ],
+    "invalid": [
+      "a%b",
+      "a?b",
+      "end.",
+      "end ",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.authorization_policy_exemptions": {
+    "valid": [
+      "exempt-1"
+    ],
+    "invalid": [
+      "a<b",
+      "a&b",
+      "x.",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.authorization_policy_set_definitions": {
+    "valid": [
+      "set_1"
+    ],
+    "invalid": [
+      "a>b",
+      "a\\b",
+      "x ",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.compute_cloudservices": {
+    "valid": [
+      "a",
+      "Web-cs-01"
+    ],
+    "invalid": [
+      "_cs",
+      "cs-",
+      "cs.1",
+      "cs_1",
+      "c s",
+      "aaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.compute_vm_scale_sets": {
+    "valid": [
+      "a",
+      "web-vmss-01"
+    ],
+    "invalid": [
+      "_v",
+      "v-",
+      "v.1",
+      "v_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.compute_vm_scale_sets_windows": {
+    "valid": [
+      "a",
+      "web-vmss-01"
+    ],
+    "invalid": [
+      "v-",
+      "v_1",
+      "aaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.dev_test_lab_virtualmachines": {
+    "valid": [
+      "a",
+      "vm-01"
+    ],
+    "invalid": [
+      "123",
+      "-vm",
+      "vm-",
+      "vm_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.dev_test_lab_virtualmachines_windows": {
+    "valid": [
+      "a",
+      "vm-01"
+    ],
+    "invalid": [
+      "123",
+      "vm-",
+      "aaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.elastic_san_elastic_sans": {
+    "valid": [
+      "san",
+      "my-san_01"
+    ],
+    "invalid": [
+      "ab",
+      "-san",
+      "san_",
+      "a--b",
+      "a-_b",
+      "San1",
+      "azure-san",
+      "aaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.elastic_san_elastic_sans_volume_groups": {
+    "valid": [
+      "vg1",
+      "my-vg-01"
+    ],
+    "invalid": [
+      "ab",
+      "vg-",
+      "a--b",
+      "vg_1",
+      "Vg1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.machine_learning_workspaces_computes": {
+    "valid": [
+      "abc",
+      "Gpu-cluster",
+      "a-b1"
+    ],
+    "invalid": [
+      "ab",
+      "1abc",
+      "gpu-01",
+      "abc-",
+      "gpu_1",
+      "aaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.maps_accounts": {
+    "valid": [
+      "a",
+      "Map_1.x"
+    ],
+    "invalid": [
+      "_map",
+      ".map",
+      "map 1",
+      "aaaaaaaa"
+    ]
+  },
+  "azure.mobile_network_mobile_networks_services": {
+    "valid": [
+      "svc-1",
+      "Service1"
+    ],
+    "invalid": [
+      "default",
+      "Requested",
+      "service",
+      "-svc",
+      "svc_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.mobile_network_data_networks": {
+    "valid": [
+      "a",
+      "internet.v1-x"
+    ],
+    "invalid": [
+      "-dn",
+      "dn-",
+      "dn.",
+      "a..b",
+      "a.-b",
+      "dn_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.mobile_network_attached_data_networks": {
+    "valid": [
+      "adn-1",
+      "a.b"
+    ],
+    "invalid": [
+      "adn.",
+      ".adn",
+      "adn_1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.net_app_net_app_accounts_volumes": {
+    "valid": [
+      "a",
+      "Vol_01-x"
+    ],
+    "invalid": [
+      "bin",
+      "Default",
+      "_vol",
+      "-vol",
+      "vol.1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.network_trafficmanagerprofiles": {
+    "valid": [
+      "a",
+      "web-tm-01"
+    ],
+    "invalid": [
+      "-tm",
+      "tm-",
+      "web.tm",
+      "tm_1",
+      "azure",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.portal_dashboards": {
+    "valid": [
+      "abc",
+      "-Ops-board-"
+    ],
+    "invalid": [
+      "ab",
+      "ops board",
+      "ops_board",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.service_bus_namespaces": {
+    "valid": [
+      "sbns01",
+      "Orders-ns-1"
+    ],
+    "invalid": [
+      "abcde",
+      "1sbns1",
+      "sbns1-",
+      "orders-sb",
+      "orders-MGMT",
+      "orders_ns",
+      "azure-ns",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.synapse_workspaces": {
+    "valid": [
+      "a",
+      "syn-ws-01"
+    ],
+    "invalid": [
+      "-ws",
+      "ws-",
+      "Ws1",
+      "ws_1",
+      "my-ondemand-x",
+      "azure-ws",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.synapse_workspaces_big_data_pools": {
+    "valid": [
+      "a",
+      "Spark01"
+    ],
+    "invalid": [
+      "1pool",
+      "spark-1",
+      "spark_1",
+      "azure",
+      "aaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.synapse_workspaces_sql_pools": {
+    "valid": [
+      "a",
+      "Sql_pool 1"
+    ],
+    "invalid": [
+      "sql-pool",
+      "a@b",
+      "a/b",
+      "pool.",
+      "pool ",
+      "azure",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.web_serverfarms": {
+    "valid": [
+      "a",
+      "-plan-"
+    ],
+    "invalid": [
+      "",
+      "plan_1",
+      "plan.1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.web_sites": {
+    "valid": [
+      "ab",
+      "Web-app-01"
+    ],
+    "invalid": [
+      "a",
+      "-app",
+      "app-",
+      "app_1",
+      "app.x",
+      "azure",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "azure.web_sites_slots": {
+    "valid": [
+      "ab",
+      "-stage-"
+    ],
+    "invalid": [
+      "a",
+      "slot_1",
+      "slot.1",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
   }
 }

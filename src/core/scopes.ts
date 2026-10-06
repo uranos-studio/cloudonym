@@ -7,9 +7,10 @@ import { AZURE_INTAKE_SCOPES, type AzureIntakeScopeId } from './rules/azure-inta
 import { GCP_INTAKE_SCOPES, type GcpIntakeScopeId } from './rules/gcp-intake';
 import { GCP_MANUAL_SCOPES, type GcpManualScopeId } from './rules/gcp-manual';
 import { AWS_MANUAL_SCOPES, type AwsManualScopeId } from './rules/aws-manual';
+import { AZURE_MANUAL_SCOPES, type AzureManualScopeId } from './rules/azure-manual';
 
 export type ScopeId =
-  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId | GcpManualScopeId | AwsManualScopeId
+  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId | GcpManualScopeId | AwsManualScopeId | AzureManualScopeId
   | 'aws:partition' | 'aws:account' | 'aws:region' | 'aws:vpc'
   | 'gcp:namespace' | 'gcp:project' | 'gcp:project_global' | 'gcp:project_region' | 'gcp:project_zone'
   | 'azure:global' | 'azure:subscription' | 'azure:resource_group' | 'azure:virtual_network' | 'azure:managed_cluster';
@@ -43,6 +44,8 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   'azure:managed_cluster': { id: 'azure:managed_cluster', provider: 'azure', displayName: 'Managed cluster', parent: 'azure:resource_group', ruleId: 'azure.container_service_managed_clusters', docUrl: `${AZURE_RULES}#microsoftcontainerservice` },
   // 부모 리소스 범위 — 표의 Scope 칸이 부모 리소스 이름인 행(service · namespace · factory …). 생성 파일 rules/azure-intake.ts
   ...AZURE_INTAKE_SCOPES,
+  // 손으로 넣은 규칙의 부모 리소스 범위 — rules/azure-manual.ts
+  ...AZURE_MANUAL_SCOPES,
 
   // ─── GCP ───────────────────────────────────────────────
   // "Project ID: A globally unique identifier for your project." · 버킷 "Every bucket name must be globally unique."

@@ -5,6 +5,7 @@ import { AWS_INTAKE_ROWS } from './rules/aws-intake';
 import { AWS_NAME_TAG_GENERAL } from './rules/aws';
 import { GCP_MANUAL_RULES } from './rules/gcp-manual';
 import { AWS_MANUAL_RULES } from './rules/aws-manual';
+import { AZURE_MANUAL_ROWS } from './rules/azure-manual';
 import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL, AWS_NAME_TAG } from './constraints';
 import { PROVIDERS } from './types';
 
@@ -92,7 +93,9 @@ describe('공식 문서 대조로 고친 값 (Task 1-2)', () => {
       const has = (r.forbidden?.words ?? []).includes('azure');
       // 들인 행은 전역 범위(이름이 엔드포인트)만 건다 — rules/azure.ts
       const intakeReserved = AZURE_INTAKE_ROWS.some((x) => x.id === r.id && x.reserved === true);
-      expect(has, r.id).toBe(on.includes(r.resourceType) || intakeReserved);
+      // 손으로 넣은 행은 reserved 로 표시한 것만 — rules/azure-manual.ts
+      const manualReserved = AZURE_MANUAL_ROWS.some((x) => x.id === r.id && x.reserved);
+      expect(has, r.id).toBe(on.includes(r.resourceType) || intakeReserved || manualReserved);
       if (has) {
         expect(r.forbidden?.contains, r.id).toEqual(expect.arrayContaining(['microsoft', 'windows']));
         expect(r.forbidden?.prefixes, r.id).toContain('login');
@@ -183,8 +186,8 @@ describe('조사 11종 (Task 5) — 범위 · 부류 · 분류 · 근거', () =>
     expect(r!.docUrl).toMatch(/^https:\/\//);
     expect(r!.template).toContain('seq');
   });
-  it('규칙 수 — AWS 손 11 + 들인 행 · GCP 손 9 + 들인 행 · Azure 손 15 + 들인 행', () => {
-    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11 + AWS_INTAKE_ROWS.length + Object.keys(AWS_MANUAL_RULES).length, 9 + GCP_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length, 15 + AZURE_INTAKE_ROWS.length]);
+  it('규칙 수 — provider 마다 손으로 쓴 규칙 + 들인 행 + 손으로 넣은 규칙(rules/*-manual.ts)', () => {
+    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11 + AWS_INTAKE_ROWS.length + Object.keys(AWS_MANUAL_RULES).length, 9 + GCP_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length, 15 + AZURE_INTAKE_ROWS.length + AZURE_MANUAL_ROWS.length]);
   });
   it('docUrl 은 숫자가 적힌 쪽의 앵커다', () => {
     expect(RULES['gcp.firewall_rule']!.docUrl).toBe('https://docs.cloud.google.com/compute/docs/reference/rest/v1/firewalls#Firewall.FIELDS.name');
