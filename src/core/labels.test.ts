@@ -41,3 +41,11 @@ describe('labelsFor', () => {
     expect(AWS_TAG_VALUE.test('')).toBe(true);
   });
 });
+
+describe('labelsFor — 항목 입력(seq · role)이 라벨에 들어가지 않는다 (D30\')', () => {
+  it('세 provider 모두 라벨 키 집합이 다섯 그대로다', () => {
+    for (const p of ['aws', 'gcp', 'azure'] as const) {
+      expect(Object.keys(labelsFor(ctx, p).labels).sort(), p).toEqual(['environment', 'managed_by', 'owner', 'purpose', 'system']);
+    }
+  });
+});

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { generate, validateName, parseContext } from './engine';
-import { rulesFor } from './constraints';
+import { generate, generateMany, validateName, parseContext } from './engine';
+import { getRule, rulesFor } from './constraints';
+import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
 
 describe('generate', () => {
@@ -141,5 +142,78 @@ describe('1단계 최종 리뷰 고침', () => {
     first.rule.notes.push({ code: 'note.s3_an_suffix' });
     (first.rule.notes[0] as { code: string }).code = 'x.changed';
     expect(generate(ctx, ['gcp']).gcp!.cloud_sql_instance!.rule.notes).toEqual([{ code: 'note.cloud_sql_combined_limit' }]);
+  });
+});
+
+describe('generateMany (D30\' · D41)', () => {
+  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+  const rule = (p: 'aws' | 'gcp' | 'azure', t: string) => getRule(p, t)!;
+
+  it('항목 순서 = 선택 순서 → 순번 순서 · count 2 → 01 02', () => {
+    const r = generateMany(base, 'azure', [
+      { rule: rule('azure', 'subnet'), count: 2 },
+      { rule: rule('azure', 'virtual_machine'), count: 2 },
+    ]);
+    expect(r.items.map((i) => i.key)).toEqual(['subnet_01', 'subnet_02', 'virtual_machine_01', 'virtual_machine_02']);
+    expect(r.items.map((i) => i.seq)).toEqual(['01', '02', '01', '02']);
+    expect(r.items[3]!.name).toBe('billing-trade-prd-kr-vm-02');
+    expect(r).toMatchObject({ provider: 'azure', valid: true, conflicts: [] });
+  });
+
+  it('count 1 · 기본 role 은 generate 와 이름 · 판정이 같다 (호환)', () => {
+    const all = generate(base, ['gcp']).gcp!;
+    const r = generateMany(base, 'gcp', rulesFor('gcp').map((x) => ({ rule: x, count: 1 })));
+    for (const it of r.items) expect({ name: it.name, valid: it.valid }, it.key).toEqual({ name: all[it.resourceType]!.name, valid: all[it.resourceType]!.valid });
+  });
+
+  it('key 꼴 셋 — count 규칙 type_seq · role 규칙 type_role(생략이면 sync) · 입력 없는 규칙 type', () => {
+    const r = generateMany(base, 'gcp', [
+      { rule: rule('gcp', 'compute_instance'), count: 1 },
+      { rule: rule('gcp', 'service_account'), count: 1, role: 'db' },
+      { rule: rule('gcp', 'project_id'), count: 1 },
+    ]);
+    expect(r.items.map((i) => [i.key, i.seq, i.role])).toEqual([
+      ['compute_instance_01', '01', undefined], ['service_account_db', undefined, 'db'], ['project_id', undefined, undefined],
+    ]);
+    expect(r.items[1]!.name).toBe('billing-trade-prd-sa-db');
+    const d = generateMany(base, 'gcp', [{ rule: rule('gcp', 'service_account'), count: 1 }]);
+    expect(d.items.map((i) => [i.key, i.role, i.name])).toEqual([['service_account_sync', 'sync', 'billing-trade-prd-sa-sync']]);
+  });
+
+  it('순번은 두 자리 고정 — 9 → 09 · 99 → 99', () => {
+    const r = generateMany(base, 'aws', [{ rule: rule('aws', 'vpc'), count: 99 }]);
+    expect(r.items).toHaveLength(99);
+    expect(r.items[8]!.seq).toBe('09');
+    expect(r.items[98]!.seq).toBe('99');
+    for (const it of r.items) expect(it.seq).toMatch(/^\d{2}$/);
+  });
+
+  it('입력 없는 · role 규칙은 count 와 무관하게 하나 (검증은 validateSelection 몫)', () => {
+    const r = generateMany(base, 'azure', [{ rule: rule('azure', 'resource_group'), count: 3 }, { rule: rule('azure', 'managed_identity'), count: 3 }]);
+    expect(r.items).toHaveLength(2);
+  });
+
+  it('FAIL 항목도 전부 돌려준다 — 축소 실패한 Windows VM 3개', () => {
+    const r = generateMany({ ...base, system: 'a-long', purpose: 'longpurpose' }, 'azure', [{ rule: rule('azure', 'virtual_machine_windows'), count: 3 }]);
+    expect(r.items).toHaveLength(3);
+    expect(r.items.every((i) => !i.valid && i.violations[0]!.code === 'name.cannot_fit')).toBe(true);
+    expect(r.valid).toBe(false);
+    expect(r.conflicts).toEqual([]);
+  });
+
+  it('충돌 fixture — 두 항목 모두 valid:false + name.conflict · conflicts 한 건 · 전체 valid = 항목 전부 valid', () => {
+    const r = generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION);
+    expect(r.items).toHaveLength(2);
+    expect(r.items[0]!.name).toBe(r.items[1]!.name);
+    const msg = { code: 'name.conflict', params: { name: r.items[0]!.name, keys: ['test_conflict_a_01', 'test_conflict_b_01'] } };
+    for (const it of r.items) {
+      expect(it.valid).toBe(false);
+      expect(it.violations).toEqual([msg]);
+    }
+    expect(r.conflicts).toEqual([msg]);
+    expect(r.valid).toBe(false);
+    expect(r.valid).toBe(r.items.every((i) => i.valid));
+    // 항목 위반과 요약은 서로 다른 객체 — 한쪽을 고쳐도 다른 쪽이 바뀌지 않는다
+    expect(r.items[0]!.violations[0]).not.toBe(r.conflicts[0]);
   });
 });

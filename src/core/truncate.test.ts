@@ -70,3 +70,15 @@ describe('fit — 3단계 축소', () => {
     expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prd-kr-vm-01' });
   });
 });
+
+describe('fit — 순번 자리수와 Windows VM 15자 (§5-2 실측 고정)', () => {
+  const ctx = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+  it("seq '01' 은 들어간다 — bi-tr-prd-vm-01", () => {
+    const rule = getRule('azure', 'virtual_machine_windows')!;
+    expect(fit(tokenValues(ctx, rule, { seq: '01' }), rule)).toMatchObject({ fits: true, name: 'bi-tr-prd-vm-01' });
+  });
+  it("seq '099' 는 축소를 포기한다 — 세 자리면 가변 토큰 예산이 MIN_TOKEN 아래", () => {
+    const rule = getRule('azure', 'virtual_machine_windows')!;
+    expect(fit(tokenValues(ctx, rule, { seq: '099' }), rule).fits).toBe(false);
+  });
+});

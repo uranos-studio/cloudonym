@@ -1,14 +1,17 @@
-// 엔진 공개 API — API(개발 2단계)와 화면(개발 3단계)은 이 셋만 부른다
+// 엔진 공개 API — API 와 화면은 generate · validateName · parseContext · generateMany 넷을 부른다 (선택 검증은 selection.ts)
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { getRule, rulesFor } from './constraints';
 import { ENV_ALIASES, REGION_ALIASES, canonicalEnv, canonicalRegion, normalizeToken } from './normalize';
-import { compose, tokenValues } from './compose';
+import { compose, tokenValues, type ItemExtra } from './compose';
+import { findConflicts } from './conflict';
+import type { SelectionItem } from './selection';
+import { inputKind } from './tree';
 import { fit } from './truncate';
 import { checkName } from './validate';
 import type { CoreMessage, ContextField } from './messages';
 
-function generateOne(ctx: NamingContext, rule: ResourceRule): NameResult {
-  const raw = tokenValues(ctx, rule);
+function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+  const raw = tokenValues(ctx, rule, extra);
   const steps: CoreMessage[] = [];
   let transformed = false;
   const values: Partial<Record<Token, string>> = {};
@@ -51,6 +54,48 @@ export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDE
     out[p] = byType;
   }
   return out;
+}
+
+/** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음) */
+export interface NameItem extends NameResult { key: string; seq?: string; role?: string }
+export interface ManyResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
+
+/** 순번은 두 자리 고정 (D40) — 한 항목의 이름이 같은 자리수를 써서 축소 경로가 같다 */
+const seqOf = (i: number): string => String(i).padStart(2, '0');
+const DEFAULT_ROLE = 'sync';
+
+/** 고른 항목마다 이름을 만든다 (D30' · D41). 선택은 validateSelection 을 거친 것이라 여기서 다시 검사하지 않는다.
+ *  항목 순서 = 선택 순서 → 순번 순서. 입력 없는 · role 규칙은 count 와 무관하게 하나.
+ *  같은 부류(entity)의 같은 이름은 그 항목마다 valid:false + name.conflict 이고, conflicts 는 그 요약이다 — 전체 valid 는 항목 전부의 valid 다 */
+export function generateMany(ctx: NamingContext, provider: Provider, selection: readonly SelectionItem[]): ManyResult {
+  const items: { item: NameItem; rule: ResourceRule }[] = [];
+  for (const { rule, count, role } of selection) {
+    if (rule.provider !== provider) throw new Error(`rule ${rule.id} is not a ${provider} rule`);
+    const kind = inputKind(rule);
+    if (kind === 'count') {
+      for (let i = 1; i <= count; i++) {
+        const seq = seqOf(i);
+        items.push({ rule, item: { ...generateOne(ctx, rule, { seq }), key: `${rule.resourceType}_${seq}`, seq } });
+      }
+    } else if (kind === 'role') {
+      const r = role ?? DEFAULT_ROLE;
+      items.push({ rule, item: { ...generateOne(ctx, rule, { role: r }), key: `${rule.resourceType}_${r}`, role: r } });
+    } else {
+      items.push({ rule, item: { ...generateOne(ctx, rule), key: rule.resourceType } });
+    }
+  }
+
+  const conflicts = findConflicts(items.map(({ item, rule }) => ({ key: item.key, rule, result: item })));
+  for (const c of conflicts) {
+    if (c.code !== 'name.conflict') continue;
+    for (const { item } of items) {
+      if (!c.params.keys.includes(item.key)) continue;
+      item.valid = false;
+      item.violations.push(structuredClone(c));
+    }
+  }
+  const out = items.map(({ item }) => item);
+  return { provider, valid: out.every((i) => i.valid), items: out, conflicts };
 }
 
 export function validateName(provider: Provider, resourceType: string, name: string):

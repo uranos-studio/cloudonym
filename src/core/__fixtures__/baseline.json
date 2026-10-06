@@ -14258,6 +14258,124 @@
         "violations": 1,
         "suggestedName": null
       }
+    ],
+    "many": [
+      {
+        "id": "azure-vm2-subnet2-linux-windows-role",
+        "provider": "azure",
+        "valid": true,
+        "conflicts": 0,
+        "items": [
+          {
+            "key": "virtual_machine_01",
+            "name": "billing-trade-prd-kr-vm-01",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "virtual_machine_02",
+            "name": "billing-trade-prd-kr-vm-02",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "subnet_01",
+            "name": "billing-trade-prd-kr-snet-01",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "subnet_02",
+            "name": "billing-trade-prd-kr-snet-02",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "virtual_machine_windows_01",
+            "name": "bi-tr-prd-vm-01",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "managed_identity_db",
+            "name": "billing-trade-prd-id-db",
+            "valid": true,
+            "violations": 0
+          }
+        ]
+      },
+      {
+        "id": "gcp-vm2-sa-db",
+        "provider": "gcp",
+        "valid": true,
+        "conflicts": 0,
+        "items": [
+          {
+            "key": "compute_instance_01",
+            "name": "billing-trade-prd-kr-vm-01",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "compute_instance_02",
+            "name": "billing-trade-prd-kr-vm-02",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "service_account_db",
+            "name": "billing-trade-prd-sa-db",
+            "valid": true,
+            "violations": 0
+          }
+        ]
+      },
+      {
+        "id": "aws-ec2-2-role-db",
+        "provider": "aws",
+        "valid": true,
+        "conflicts": 0,
+        "items": [
+          {
+            "key": "ec2_instance_01",
+            "name": "billing-trade-prd-kr-vm-01",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "ec2_instance_02",
+            "name": "billing-trade-prd-kr-vm-02",
+            "valid": true,
+            "violations": 0
+          },
+          {
+            "key": "iam_role_db",
+            "name": "billing-trade-prd-role-db",
+            "valid": true,
+            "violations": 0
+          }
+        ]
+      },
+      {
+        "id": "conflict-fixture",
+        "provider": "azure",
+        "valid": false,
+        "conflicts": 1,
+        "items": [
+          {
+            "key": "test_conflict_a_01",
+            "name": "billing-trade-prd-kr-vm-01",
+            "valid": false,
+            "violations": 1
+          },
+          {
+            "key": "test_conflict_b_01",
+            "name": "billing-trade-prd-kr-vm-01",
+            "valid": false,
+            "violations": 1
+          }
+        ]
+      }
     ]
   },
   "ui": [

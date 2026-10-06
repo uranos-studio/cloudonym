@@ -2,7 +2,8 @@
 // 시험 파일이 아니다 — 기준선 시험(baseline.test.ts)과 규칙 지문(revision.test.ts)이 같이 쓴다.
 // 문구는 기록하지 않는다(문구는 바뀐다) — 위반 · 단계는 개수만 담는다.
 import { RULES, getRule } from './constraints';
-import { generate, parseContext, validateName } from './engine';
+import { generate, generateMany, parseContext, validateName, type ManyResult } from './engine';
+import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
 import { labelsFor } from './labels';
 import { PROVIDERS, type Provider, type RawContext } from './types';
 
@@ -66,6 +67,27 @@ export function baselineValidateCases(): ValidateCase[] {
   return cases;
 }
 
+/** 여러 개 생성 입력 (D30' · D41) — 개수 · 역할 · 같은 부류 다른 이름(Linux+Windows VM) · 충돌 fixture.
+ *  문맥은 base 하나(BASELINE_CONTEXTS 는 바꾸지 않는다) — 충돌 fixture 만 자기 문맥을 쓴다 */
+export function baselineMany(): { id: string; result: ManyResult }[] {
+  const base = parseContext(BASE);
+  if (!base.ok) throw new Error('base context must parse');
+  const r = (p: Provider, t: string) => getRule(p, t)!;
+  return [
+    { id: 'azure-vm2-subnet2-linux-windows-role', result: generateMany(base.context, 'azure', [
+      { rule: r('azure', 'virtual_machine'), count: 2 }, { rule: r('azure', 'subnet'), count: 2 },
+      { rule: r('azure', 'virtual_machine_windows'), count: 1 }, { rule: r('azure', 'managed_identity'), count: 1, role: 'db' },
+    ]) },
+    { id: 'gcp-vm2-sa-db', result: generateMany(base.context, 'gcp', [
+      { rule: r('gcp', 'compute_instance'), count: 2 }, { rule: r('gcp', 'service_account'), count: 1, role: 'db' },
+    ]) },
+    { id: 'aws-ec2-2-role-db', result: generateMany(base.context, 'aws', [
+      { rule: r('aws', 'ec2_instance'), count: 2 }, { rule: r('aws', 'iam_role'), count: 1, role: 'db' },
+    ]) },
+    { id: 'conflict-fixture', result: generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION) },
+  ];
+}
+
 /** 엔진 쪽 기준선 — 이름 · 판정 · 제안 · 라벨. 문구 대신 개수를 담는다 */
 export function coreBaseline() {
   const contexts = BASELINE_CONTEXTS.map(({ id, raw }) => {
@@ -100,7 +122,11 @@ export function coreBaseline() {
       valid: v.valid, violations: v.violations.length, suggestedName: v.suggestedName ?? null,
     };
   });
-  return { contexts, validate };
+  const many = baselineMany().map(({ id, result }) => ({
+    id, provider: result.provider, valid: result.valid, conflicts: result.conflicts.length,
+    items: result.items.map((i) => ({ key: i.key, name: i.name, valid: i.valid, violations: i.violations.length })),
+  }));
+  return { contexts, validate, many };
 }
 
 /** 규칙 지문(revision.test)용 — 기준선 입력의 위반 · 라벨 위반 · 파싱 오류를 개수가 아니라 코드 목록으로 담는다.
@@ -120,5 +146,6 @@ export function coreBaselineCodes() {
     return { id, names, labels };
   });
   const validate = baselineValidateCases().map((c) => codes(validateName(c.provider, c.resourceType, c.name).violations));
-  return { contexts, validate };
+  const many = baselineMany().map(({ id, result }) => ({ id, items: result.items.map((i) => codes(i.violations)), conflicts: codes(result.conflicts) }));
+  return { contexts, validate, many };
 }

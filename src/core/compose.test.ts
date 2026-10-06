@@ -23,3 +23,27 @@ describe('tokenValues · compose', () => {
     expect(compose({ system: 'a', purpose: '', env: 'prd' }, ['system', 'purpose', 'env'], '-')).toBe('a-prd');
   });
 });
+
+describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
+  it('extra 가 없으면 seq 01 · role sync — 지금 출력과 같다', () => {
+    const vm = getRule('gcp', 'compute_instance')!;
+    const sa = getRule('gcp', 'service_account')!;
+    expect(tokenValues(ctx, vm).seq).toBe('01');
+    expect(tokenValues(ctx, sa).role).toBe('sync');
+    expect(tokenValues(ctx, vm, {})).toEqual(tokenValues(ctx, vm));
+  });
+  it("seq '07' 을 주면 …-vm-07", () => {
+    const vm = getRule('gcp', 'compute_instance')!;
+    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prd-kr-vm-07');
+  });
+  it("role 'db' 를 주면 …-sa-db", () => {
+    const sa = getRule('gcp', 'service_account')!;
+    expect(compose(tokenValues(ctx, sa, { role: 'db' }), sa.template, sa.separator)).toBe('infra-billing-trade-prd-kr-sa-db');
+  });
+  it('template 에 없는 토큰은 extra 로 주어도 담지 않는다', () => {
+    const rg = getRule('azure', 'resource_group')!;
+    const v = tokenValues(ctx, rg, { seq: '05', role: 'db' });
+    expect('seq' in v).toBe(false);
+    expect('role' in v).toBe(false);
+  });
+});

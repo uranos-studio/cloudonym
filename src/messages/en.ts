@@ -47,6 +47,20 @@ export const en: Catalog = {
     'note.gcs_dotted_names_222': () => 'Dotted names may be up to 222 characters, but the engine never generates dots and keeps 63 (conservative, D20)',
     'note.s3_an_suffix': () => 'The -an suffix is reserved for account-regional namespace buckets',
     'note.gcp_vm_project_unique': () => 'VM names must be unique across the project unless its vmDnsSetting is ZonalOnly, so this rule is placed at project scope although the API path is zones/{zone}/instances',
+    // 같은 요청 안 충돌 (conflict)
+    'name.conflict': (m) => `Name '${m.params.name}' is used by more than one resource of the same kind in this request (${list(m.params.keys)}); the provider rejects the second one`,
+    // 선택 (selection)
+    'selection.not_array': () => "'resources' must be an array",
+    'selection.empty': () => "'resources' is empty; pick at least one resource",
+    'selection.too_many_items': (m) => `Too many resources; the maximum is ${m.params.max}`,
+    'selection.item_not_object': (m) => `resources[${m.params.index}] must be an object`,
+    'selection.unknown_type': (m) => `resources[${m.params.index}]: unknown resource type '${m.params.value}'; supported: ${list(m.params.supported)}`,
+    'selection.duplicate_type': (m) => `resources[${m.params.index}]: '${m.params.value}' is already selected; use count for more than one`,
+    'selection.count_out_of_range': (m) => `resources[${m.params.index}]: count must be an integer from ${m.params.min} to ${m.params.max}`,
+    'selection.count_not_supported': (m) => `resources[${m.params.index}]: '${m.params.type}' has no sequence number, so count must be 1`,
+    'selection.role_not_supported': (m) => `resources[${m.params.index}]: '${m.params.type}' takes no role`,
+    'selection.invalid_role': (m) => `resources[${m.params.index}]: role '${m.params.value}' does not match ${m.params.pattern}`,
+    'selection.too_many_names': (m) => `The request would create ${m.params.actual} names; the maximum is ${m.params.max}`,
     // API
     'request.body_not_json': () => 'Request body is not JSON',
     'request.body_not_object': () => 'Request body must be a JSON object',

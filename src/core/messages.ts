@@ -21,6 +21,12 @@ export const MESSAGE_CODES = [
   'note.aws_tag_utf16_length', 'note.azure_vm_hostname_rule', 'note.azure_reserved', 'note.azure_reserved_ambiguous',
   'note.windows_no_all_digits', 'note.cloud_sql_combined_limit', 'note.gcs_dotted_names_222', 'note.s3_an_suffix',
   'note.gcp_vm_project_unique',
+  // conflict.ts (1)
+  'name.conflict',
+  // selection.ts (11)
+  'selection.not_array', 'selection.empty', 'selection.too_many_items', 'selection.item_not_object', 'selection.unknown_type',
+  'selection.duplicate_type', 'selection.count_out_of_range', 'selection.count_not_supported', 'selection.role_not_supported',
+  'selection.invalid_role', 'selection.too_many_names',
 ] as const;
 
 export type CoreMessage =
@@ -60,7 +66,21 @@ export type CoreMessage =
   | { code: 'note.cloud_sql_combined_limit' }
   | { code: 'note.gcs_dotted_names_222' }
   | { code: 'note.s3_an_suffix' }
-  | { code: 'note.gcp_vm_project_unique' };
+  | { code: 'note.gcp_vm_project_unique' }
+  /** keys 는 충돌한 항목의 key(NameItem.key) — 처음 나온 순 */
+  | { code: 'name.conflict'; params: { name: string; keys: string[] } }
+  | { code: 'selection.not_array' }
+  | { code: 'selection.empty' }
+  | { code: 'selection.too_many_items'; params: { max: number } }
+  | { code: 'selection.item_not_object'; params: { index: number } }
+  /** value 는 표시용 문자열(비문자열은 String()) */
+  | { code: 'selection.unknown_type'; params: { index: number; value: string; supported: string[] } }
+  | { code: 'selection.duplicate_type'; params: { index: number; value: string } }
+  | { code: 'selection.count_out_of_range'; params: { index: number; min: number; max: number } }
+  | { code: 'selection.count_not_supported'; params: { index: number; type: string } }
+  | { code: 'selection.role_not_supported'; params: { index: number; type: string } }
+  | { code: 'selection.invalid_role'; params: { index: number; value: string; pattern: string } }
+  | { code: 'selection.too_many_names'; params: { max: number; actual: number } };
 
 export type CoreCode = CoreMessage['code'];
 

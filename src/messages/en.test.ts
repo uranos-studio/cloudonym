@@ -47,6 +47,18 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'note.gcs_dotted_names_222': { code: 'note.gcs_dotted_names_222' },
   'note.s3_an_suffix': { code: 'note.s3_an_suffix' },
   'note.gcp_vm_project_unique': { code: 'note.gcp_vm_project_unique' },
+  'name.conflict': { code: 'name.conflict', params: { name: 'AAA', keys: ['CCC', 'DDD'] } },
+  'selection.not_array': { code: 'selection.not_array' },
+  'selection.empty': { code: 'selection.empty' },
+  'selection.too_many_items': { code: 'selection.too_many_items', params: { max: 200 } },
+  'selection.item_not_object': { code: 'selection.item_not_object', params: { index: 3 } },
+  'selection.unknown_type': { code: 'selection.unknown_type', params: { index: 3, value: 'BBB', supported: ['CCC', 'DDD'] } },
+  'selection.duplicate_type': { code: 'selection.duplicate_type', params: { index: 3, value: 'BBB' } },
+  'selection.count_out_of_range': { code: 'selection.count_out_of_range', params: { index: 3, min: 1, max: 99 } },
+  'selection.count_not_supported': { code: 'selection.count_not_supported', params: { index: 3, type: 'BBB' } },
+  'selection.role_not_supported': { code: 'selection.role_not_supported', params: { index: 3, type: 'BBB' } },
+  'selection.invalid_role': { code: 'selection.invalid_role', params: { index: 3, value: 'BBB', pattern: 'AAA' } },
+  'selection.too_many_names': { code: 'selection.too_many_names', params: { max: 200, actual: 201 } },
   'request.body_not_json': { code: 'request.body_not_json' },
   'request.body_not_object': { code: 'request.body_not_object' },
   'request.body_too_large': { code: 'request.body_too_large', params: { max_bytes: 16384 } },
@@ -71,7 +83,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(51);
+    expect(codes).toHaveLength(63);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });
