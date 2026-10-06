@@ -1,0 +1,96 @@
+{
+  "kind": "discovery#restDescription",
+  "name": "compute",
+  "version": "v1",
+  "revision": "20260101",
+  "schemas": {
+    "Disk": {
+      "id": "Disk",
+      "properties": {
+        "name": { "type": "string", "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?", "description": "Name of the resource." }
+      }
+    },
+    "NodeGroup": {
+      "id": "NodeGroup",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the resource, provided by the client when initially creating the resource. Must comply with RFC1035." }
+      }
+    },
+    "LicenseCode": {
+      "id": "LicenseCode",
+      "properties": {
+        "name": { "type": "string", "readOnly": true, "pattern": "[0-9]{0,20}?", "description": "Output only." }
+      }
+    },
+    "FirewallPolicyRuleSecureTag": {
+      "id": "FirewallPolicyRuleSecureTag",
+      "properties": {
+        "name": { "type": "string", "pattern": "tagValues/[0-9]+", "description": "Name of the secure tag." }
+      }
+    },
+    "Broken": {
+      "id": "Broken",
+      "properties": {
+        "name": { "type": "string", "pattern": "[a-z(" }
+      }
+    },
+    "NoName": {
+      "id": "NoName",
+      "properties": { "labels": { "type": "object" } }
+    },
+    "Nested": {
+      "id": "Nested",
+      "properties": {
+        "name": { "type": "string", "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?" }
+      }
+    }
+  },
+  "resources": {
+    "disks": {
+      "methods": {
+        "insert": { "id": "compute.disks.insert", "request": { "$ref": "Disk" } },
+        "bulkInsert": { "id": "compute.disks.bulkInsert", "request": { "$ref": "Disk" } },
+        "get": { "id": "compute.disks.get" }
+      }
+    },
+    "regionDisks": {
+      "methods": {
+        "insert": { "id": "compute.regionDisks.insert", "request": { "$ref": "Disk" } }
+      }
+    },
+    "nodeGroups": {
+      "methods": {
+        "insert": { "id": "compute.nodeGroups.insert", "request": { "$ref": "NodeGroup" } }
+      }
+    },
+    "licenseCodes": {
+      "methods": {
+        "insert": { "id": "compute.licenseCodes.insert", "request": { "$ref": "LicenseCode" } }
+      }
+    },
+    "secureTags": {
+      "methods": {
+        "insert": { "id": "compute.secureTags.insert", "request": { "$ref": "FirewallPolicyRuleSecureTag" } }
+      }
+    },
+    "brokens": {
+      "methods": {
+        "insert": { "id": "compute.brokens.insert", "request": { "$ref": "Broken" } }
+      }
+    },
+    "nonames": {
+      "methods": {
+        "insert": { "id": "compute.nonames.insert", "request": { "$ref": "NoName" } }
+      }
+    },
+    "parents": {
+      "resources": {
+        "children": {
+          "methods": {
+            "insert": { "id": "compute.parents.children.insert", "request": { "$ref": "Nested" } }
+          }
+        }
+      }
+    }
+  }
+}

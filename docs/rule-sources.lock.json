@@ -1,0 +1,69 @@
+{
+  "$comment": "규칙 출처 고정 (D43 · 계획 §8-5). scripts/rules/check-sources.mjs 가 대어 본다. 고칠 때는 --write 로 만들고 diff 를 읽는다",
+  "sources": {
+    "azure": {
+      "url": "https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/azure-resource-manager/management/resource-name-rules.md",
+      "publishedUrl": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules",
+      "commit": "4966c6cb088804bf367be4399949194a937c8cba",
+      "fetchedAt": "2026-10-06T20:44:41+09:00",
+      "marker": {
+        "msDate": "08/05/2026"
+      },
+      "counts": {
+        "rows": 402,
+        "headerRows": 85,
+        "providers": 85,
+        "uniqueKeys": 402,
+        "anchors": 85,
+        "anchorsMissing": 0
+      },
+      "hashOf": "provider · entity · scope · length · valid characters 원문 다섯 칸(공백 정규화), 문서 순서",
+      "sha256": "48f4dfa03808dafbf48f3c482ad8fffa8ab45cd0e68391e0e1de56b5827db416"
+    },
+    "gcp": {
+      "url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+      "fetchedAt": "2026-10-06T20:44:41+09:00",
+      "marker": {
+        "revision": "20260922"
+      },
+      "counts": {
+        "insertMethods": 95,
+        "formal": 87,
+        "manual": 8,
+        "excluded": 0
+      },
+      "hashOf": "insert 메서드마다 method · schema · name.pattern · name.readOnly, 정렬",
+      "sha256": "7474cf6e07e55cf0072b624291c5644beb59a984469f2675ad326b6badf37eea"
+    },
+    "aws": {
+      "url": "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip",
+      "namespaces": [
+        "ApiGateway",
+        "ApiGatewayV2",
+        "DynamoDB",
+        "EC2",
+        "ECR",
+        "ECS",
+        "EFS",
+        "EKS",
+        "ElastiCache",
+        "ElasticLoadBalancing",
+        "ElasticLoadBalancingV2",
+        "IAM",
+        "KMS",
+        "Lambda",
+        "Logs",
+        "RDS",
+        "S3",
+        "SecretsManager"
+      ],
+      "fetchedAt": "2026-10-06T20:44:41+09:00",
+      "marker": null,
+      "counts": {
+        "types": 298
+      },
+      "hashOf": "18개 네임스페이스(typeName 으로 고른다) 타입마다 createOnlyProperties, 최상위 속성 중 minLength · maxLength · pattern 이 있는 것의 세 값, 정렬",
+      "sha256": "2da03f0a197182c146f0dfe8337f83b8cfc410c05fddcf0183b19bfecb34a18c"
+    }
+  }
+}

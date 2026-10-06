@@ -1,0 +1,8 @@
+{
+  "typeName": "AWS::EC2::KeyPair",
+  "properties": {
+    "KeyName": { "type": "string", "description": "A unique name for the key pair." },
+    "KeyType": { "type": "string", "enum": ["rsa", "ed25519"] }
+  },
+  "createOnlyProperties": ["/properties/KeyName"]
+}

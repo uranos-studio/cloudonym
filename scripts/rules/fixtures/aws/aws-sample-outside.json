@@ -1,0 +1,6 @@
+{
+  "typeName": "AWS::Outside::Thing",
+  "properties": {
+    "ThingName": { "type": "string", "maxLength": 10 }
+  }
+}
