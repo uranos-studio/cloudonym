@@ -12,6 +12,7 @@ const UNICODE: CoreMessage = { code: 'note.unicode_excluded' };
 const VARIANT: CoreMessage = { code: 'note.variant_narrowed' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
 const OBSOLETE: CoreMessage = { code: 'note.obsolete_source_applied' };
+const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
 
 const SEP: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
@@ -20,6 +21,9 @@ const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
  *  control characters 는 C0 · DEL · C1 에 폭 없는 문자 · 양방향 제어 · BOM 까지 넓게 읽는다(생성기 INVISIBLE_CLASS · display.ts 와 같은 집합) */
 // oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
 const POLICY_NAME = /^[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]{0,63}[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF. ]$/;
+/** tagNames — "Can't use: `<>%&\?/` or control characters" (제어 문자 집합은 POLICY_NAME 과 같다) */
+// oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
+const TAG_NAME = /^[^<>%&\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]{1,512}$/;
 /** 영숫자로 시작 · 끝, `.` 뒤는 영숫자 — MobileNetwork dataNetworks · attachedDataNetworks */
 const DOTTED_64 = /^(?=.{1,64}$)[A-Za-z0-9](?:(?:[A-Za-z0-9-]|\.(?=[A-Za-z0-9]))*[A-Za-z0-9])?$/;
 
@@ -133,6 +137,12 @@ const RULES: AzureManualRule[] = [
   // ── Microsoft.Portal dashboards 3-160 "Alphanumerics and hyphens. To use restricted characters, add a tag named hidden-title …" ──
   rule({ id: 'azure.portal_dashboards', displayName: 'Portal dashboard', slug: 'das', minLength: 3, maxLength: 160, pattern: /^[A-Za-z0-9-]{3,160}$/,
     scope: 'azure:resource_group', entity: 'Microsoft.Portal/dashboards', category: 'management', anchor: 'microsoftportal' }),
+
+  // ── Microsoft.Resources tagNames 1-512 "Can't use: `<>%&\?/` or control characters" (Scope 칸 resource) ──
+  // REST 참조 Tags - Create Or Update "This operation allows adding a name to the list of predefined tag names for the given subscription. A tag name can have a maximum of 512 characters and is case-insensitive. Tag names cannot have the following prefixes which are reserved for Azure use: 'microsoft', 'azure', 'windows'."
+  // 경로가 subscriptions/{id}/tagNames/{tagName} 라 구독에 둔다. 제어 문자는 policy* 와 같은 넓은 집합으로 읽는다
+  rule({ id: 'azure.resources_tag_names', displayName: 'Predefined tag name', slug: 'tag', minLength: 1, maxLength: 512, pattern: TAG_NAME,
+    forbidden: { prefixes: ['microsoft', 'azure', 'windows'], ignoreCase: true }, scope: 'azure:subscription', entity: 'Microsoft.Resources/tagNames', category: 'management', anchor: 'microsoftresources', notes: [SECONDARY] }),
 
   // ── Microsoft.ServiceBus namespaces 6-50 "Alphanumerics and hyphens. Start with a letter. End with a letter or number." Scope global ──
   // 표가 가리키는 Create namespace 쪽(learn.microsoft.com/en-us/rest/api/servicebus/create-namespace) "The name doesn't end with “-“, “-sb“ or “-mgmt“." — 그 쪽은 "This API is obsolete and retired as of 11/1/2021"

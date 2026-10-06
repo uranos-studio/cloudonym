@@ -10,7 +10,7 @@ import { AWS_MANUAL_SCOPES, type AwsManualScopeId } from './rules/aws-manual';
 import { AZURE_MANUAL_SCOPES, type AzureManualScopeId } from './rules/azure-manual';
 
 export type ScopeId =
-  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId | GcpManualScopeId | AwsManualScopeId | AzureManualScopeId
+  | AzureIntakeScopeId | 'azure:region' | 'azure:tenant' | GcpIntakeScopeId | GcpManualScopeId | AwsManualScopeId | AzureManualScopeId
   | 'aws:partition' | 'aws:account' | 'aws:region' | 'aws:vpc'
   | 'gcp:namespace' | 'gcp:project' | 'gcp:project_global' | 'gcp:project_region' | 'gcp:project_zone'
   | 'azure:global' | 'azure:subscription' | 'azure:resource_group' | 'azure:virtual_network' | 'azure:managed_cluster';
@@ -40,6 +40,8 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   'azure:virtual_network': { id: 'azure:virtual_network', provider: 'azure', displayName: 'Virtual network', parent: 'azure:resource_group', ruleId: 'azure.virtual_network', docUrl: `${AZURE_RULES}#microsoftnetwork` },
   // batchAccounts 행 Scope Region · EventGrid topics · PowerBI workspaceCollections 등 행 Scope region — 구독 안에서 지역마다 유일로 읽는다 (Scope 열의 정의 문장은 쪽에 없다)
   'azure:region': { id: 'azure:region', provider: 'azure', displayName: 'Region', parent: 'azure:subscription', docUrl: `${AZURE_RULES}#microsoftbatch` },
+  // managementgroups 행 Scope tenant — 구독은 테넌트 아래에 있지만 구독 노드를 옮기지 않으려 전역 바로 아래 형제로 둔다
+  'azure:tenant': { id: 'azure:tenant', provider: 'azure', displayName: 'Tenant', parent: 'azure:global', docUrl: `${AZURE_RULES}#microsoftmanagement` },
   // managedClusters / agentPools 행 Scope managed cluster — AKS 클러스터 규칙은 아직 없어 ruleId 가 없다
   'azure:managed_cluster': { id: 'azure:managed_cluster', provider: 'azure', displayName: 'Managed cluster', parent: 'azure:resource_group', ruleId: 'azure.container_service_managed_clusters', docUrl: `${AZURE_RULES}#microsoftcontainerservice` },
   // 부모 리소스 범위 — 표의 Scope 칸이 부모 리소스 이름인 행(service · namespace · factory …). 생성 파일 rules/azure-intake.ts

@@ -88,7 +88,7 @@ describe('public/openapi.json — /names (D39)', () => {
   });
   it('NameItem — scope enum 은 ScopeId 전부 · uniqueness enum 둘 · 설명은 llms.txt 와 같은 문장', () => {
     expect(item()['scope']!.enum!.sort()).toEqual(Object.keys(SCOPES).sort());
-    expect(Object.keys(SCOPES).length).toBeGreaterThan(14); // 손 15 + 들인 Azure 부모 리소스 범위 — 수는 scopes.test 가 센다
+    expect(Object.keys(SCOPES).length).toBeGreaterThan(14); // 손 16 + 들인 Azure 부모 리소스 범위 — 수는 scopes.test 가 센다
     expect(item()['uniqueness']!.enum).toEqual(['csp', 'none']);
     expect(item()['scope']!.description).toBe(SCOPE_MEANING);
     expect(item()['uniqueness']!.description).toBe(UNIQUENESS_MEANING);

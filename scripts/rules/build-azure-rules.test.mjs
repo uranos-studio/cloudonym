@@ -64,8 +64,20 @@ test('범위 칸 — 기존 셋 · region · 부모 리소스 · 판정 불가',
   assert.equal(scopeKind('Resource Group'), 'azure:resource_group');
   assert.equal(scopeKind('Azure region'), 'azure:region');
   assert.equal(scopeKind('namespace'), 'parent');
-  assert.equal(scopeKind('subscription or resource group'), null);
-  assert.equal(scopeKind('tenant'), null);
+  // 여러 범위에 걸치는 칸은 넓은 쪽(구독)에 둔다 — 넓은 노드가 유일성 판정에서 보수적이다
+  assert.equal(scopeKind('subscription or resource group'), 'azure:subscription');
+  assert.equal(scopeKind('scope of assignment'), 'azure:subscription');
+  assert.equal(scopeKind('tenant'), 'azure:tenant');
+  // 관리 그룹 · 구독 · RG 셋에 걸치는 blueprint 는 길이 칸이 정해지지 않아 손 확인 보류다 — 범위도 정하지 않는다
+  assert.equal(scopeKind('Management groups, Subscriptions, Resource groups'), null);
+  assert.equal(scopeKind('resource'), null);
+  assert.equal(scopeKind('subscription; resource group'), null);
+});
+
+test('손 확인 보류 — Azure 범위 칸이 한 노드에 맞지 않던 행의 사유가 구체적이다', () => {
+  for (const e of ['Microsoft.Blueprint/blueprint', 'Microsoft.Blueprint/blueprintAssignments', 'Microsoft.Security/assessmentMetadata', 'Microsoft.Security/assessments', 'Microsoft.Security/sqlVulnerabilityAssessments/baselineRules']) {
+    assert.match(HAND_REVIEWED[e] ?? '', /^reviewed by hand — (not imported|unconfirmed) \(.{40,}\)$/, e);
+  }
 });
 
 test('약어가 없을 때 — 낱말 둘 이상이면 머리글자 · 하나면 앞 세 글자', () => {

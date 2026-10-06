@@ -1,7 +1,7 @@
 {
- "$comment": "손 예 — 원문 문장만 읽고 쓴다(생성기를 보지 않는다). '~' 는 채움 글자 자리. intake-hand.test.ts 가 행마다 길이를 맞춰 적용한다",
+ "$comment": "손 예 — 원문 문장만 읽고 쓴다(생성기를 보지 않는다). '~' 는 채움 글자 자리. intake-hand.test.ts 가 행마다 길이를 맞춰 적용한다. 열쇠는 원문 그 자체다 — Azure 는 Valid Characters 칸의 문장, AWS 는 스키마 pattern(태그는 tag:), GCP 는 패턴. 생성기가 문자 규칙에 매기는 C 번호는 다시 매겨질 수 있어 쓰지 않는다",
  "azure": {
-  "C01": {
+  "Lowercase letters and numbers<br><br>Start with a lowercase letter.": {
    "source": "Lowercase letters and numbers<br><br>Start with a lowercase letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftanalysisservices",
    "valid": [
@@ -20,7 +20,7 @@
     "a~\u200bb"
    ]
   },
-  "C02": {
+  "Alphanumerics and hyphens<br><br>Start with a letter and end with alphanumeric.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftapimanagement",
    "valid": [
@@ -39,7 +39,7 @@
     "a~\u200bb"
    ]
   },
-  "C03": {
+  "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric or underscore.": {
    "source": "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric or underscore.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftapimanagement",
    "valid": [
@@ -56,7 +56,7 @@
     "a~\u200bb"
    ]
   },
-  "C04": {
+  "Lowercase letters, numbers, and hyphens": {
    "source": "Lowercase letters, numbers, and hyphens",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftappplatform",
    "valid": [
@@ -71,7 +71,7 @@
     "a~\u200bb"
    ]
   },
-  "C05": {
+  "Can't use:<br> `<>*%&:\\?.+/` or control characters <br><br>Can't end with space.": {
    "source": "Can't use:<br> `<>*%&:\\?.+/` or control characters <br><br>Can't end with space.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation",
    "valid": [
@@ -97,7 +97,7 @@
     "a~\u200bb"
    ]
   },
-  "C06": {
+  "Alphanumerics, underscores, and hyphens<br><br>Start with a letter.": {
    "source": "Alphanumerics, underscores, and hyphens<br><br>Start with a letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftautomation",
    "valid": [
@@ -114,7 +114,7 @@
     "a~\u200bb"
    ]
   },
-  "C07": {
+  "Alphanumerics, periods, hyphens, and underscores<br><br>Start with alphanumeric and end with alphanumeric or underscore.": {
    "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start with alphanumeric and end with alphanumeric or underscore.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftavs",
    "valid": [
@@ -132,7 +132,7 @@
     "a~\u200bb"
    ]
   },
-  "C08": {
+  "Lowercase letters and numbers": {
    "source": "Lowercase letters and numbers",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbatch",
    "valid": [
@@ -148,7 +148,7 @@
     "a~\u200bb"
    ]
   },
-  "C09": {
+  "Alphanumerics, underscores, and hyphens": {
    "source": "Alphanumerics, underscores, and hyphens",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbatch",
    "valid": [
@@ -162,7 +162,7 @@
     "a~\u200bb"
    ]
   },
-  "C10": {
+  "Lowercase letters and numbers<br><br>Start with lowercase letter.": {
    "source": "Lowercase letters and numbers<br><br>Start with lowercase letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftblockchain",
    "valid": [
@@ -181,7 +181,7 @@
     "a~\u200bb"
    ]
   },
-  "C11": {
+  "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric.": {
    "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftbotservice",
    "valid": [
@@ -198,7 +198,7 @@
     "a~\u200bb"
    ]
   },
-  "C12": {
+  "Alphanumerics and hyphens<br><br>Start and end with alphanumeric. Consecutive hyphens not allowed.": {
    "source": "Alphanumerics and hyphens<br><br>Start and end with alphanumeric. Consecutive hyphens not allowed.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcache",
    "valid": [
@@ -218,7 +218,7 @@
     "a~\u200bb"
    ]
   },
-  "C13": {
+  "Alphanumerics": {
    "source": "Alphanumerics",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcache",
    "valid": [
@@ -232,7 +232,7 @@
     "a~\u200bb"
    ]
   },
-  "C14": {
+  "Alphanumerics and hyphens<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics and hyphens<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcdn",
    "valid": [
@@ -248,7 +248,7 @@
     "a~\u200bb"
    ]
   },
-  "C15": {
+  "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric. End with alphanumeric or underscore.": {
    "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric. End with alphanumeric or underscore.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
    "valid": [
@@ -266,7 +266,7 @@
     "a~\u200bb"
    ]
   },
-  "C16": {
+  "Alphanumerics, underscores, and periods<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, underscores, and periods<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
    "valid": [
@@ -282,7 +282,7 @@
     "a~\u200bb"
    ]
   },
-  "C17": {
+  "Alphanumerics, hyphens, and periods<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, hyphens, and periods<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
    "valid": [
@@ -298,7 +298,7 @@
     "a~\u200bb"
    ]
   },
-  "C18": {
+  "Alphanumerics, underscores, hyphens, and periods<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, underscores, hyphens, and periods<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcompute",
    "valid": [
@@ -316,7 +316,7 @@
     "a~\u200bb"
    ]
   },
-  "C19": {
+  "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.<br><br>Can't use underscores.": {
    "source": "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.<br><br>Can't use underscores.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcommunication",
    "valid": [
@@ -332,7 +332,7 @@
     "a~\u200bb"
    ]
   },
-  "C20": {
+  "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.": {
    "source": "Alphanumerics and hyphens<br><br>Can't start or end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftconfidentialledger",
    "valid": [
@@ -348,7 +348,7 @@
     "a~\u200bb"
    ]
   },
-  "C21": {
+  "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Consecutive hyphens aren't allowed.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Consecutive hyphens aren't allowed.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerinstance",
    "valid": [
@@ -369,7 +369,7 @@
     }
    ]
   },
-  "C22": {
+  "Alphanumerics, hyphens, and underscores": {
    "source": "Alphanumerics, hyphens, and underscores",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerregistry",
    "valid": [
@@ -383,7 +383,7 @@
     "a~\u200bb"
    ]
   },
-  "C23": {
+  "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, underscores, and hyphens<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcontainerservice",
    "valid": [
@@ -399,7 +399,7 @@
     "a~\u200bb"
    ]
   },
-  "C24": {
+  "Alphanumerics<br><br>Start with a letter.": {
    "source": "Alphanumerics<br><br>Start with a letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomerinsights",
    "valid": [
@@ -414,7 +414,7 @@
     "a~\u200bb"
    ]
   },
-  "C25": {
+  "Alphanumerics and underscores<br><br>Start with a letter.": {
    "source": "Alphanumerics and underscores<br><br>Start with a letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomerinsights",
    "valid": [
@@ -429,7 +429,7 @@
     "a~\u200bb"
    ]
   },
-  "C26": {
+  "Can't use:<br>`%&\\\\?/` or control characters<br><br>Can't end with period or space.": {
    "source": "Can't use:<br>`%&\\\\?/` or control characters<br><br>Can't end with period or space.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftcustomproviders",
    "valid": [
@@ -449,7 +449,7 @@
     "a~\u200bb"
    ]
   },
-  "C27": {
+  "Alphanumerics, hyphens, underscores, and periods": {
    "source": "Alphanumerics, hyphens, underscores, and periods",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatabox",
    "valid": [
@@ -462,7 +462,7 @@
     "a~\u200bb"
    ]
   },
-  "C28": {
+  "Can't use:<br>`<>*#.%&:\\\\+?/` or control characters<br><br>Start with alphanumeric.": {
    "source": "Can't use:<br>`<>*#.%&:\\\\+?/` or control characters<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatafactory",
    "valid": [
@@ -490,7 +490,7 @@
     "a~\u200bb"
    ]
   },
-  "C29": {
+  "Can't use:<br>`<>*#.%&:\\\\+?/-` or control characters<br><br>Start with alphanumeric.": {
    "source": "Can't use:<br>`<>*#.%&:\\\\+?/-` or control characters<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatafactory",
    "valid": [
@@ -519,7 +519,7 @@
     "a~\u200bb"
    ]
   },
-  "C30": {
+  "Alphanumerics, hyphens, periods, and underscores<br><br>Start with alphanumeric.": {
    "source": "Alphanumerics, hyphens, periods, and underscores<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdatamigration",
    "valid": [
@@ -536,7 +536,7 @@
     "a~\u200bb"
    ]
   },
-  "C31": {
+  "Alphanumerics and hyphens<br><br>Start with a letter.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdataprotection",
    "valid": [
@@ -551,7 +551,7 @@
     "a~\u200bb"
    ]
   },
-  "C32": {
+  "Alphanumerics and hyphens": {
    "source": "Alphanumerics and hyphens",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdataprotection",
    "valid": [
@@ -566,7 +566,7 @@
     "a~\u200bb"
    ]
   },
-  "C33": {
+  "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphen.": {
    "source": "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdbformariadb",
    "valid": [
@@ -583,7 +583,7 @@
     "a~\u200bb"
    ]
   },
-  "C34": {
+  "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphens.": {
    "source": "Lowercase letters, hyphens, and numbers<br><br>Can't start or end with hyphens.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdbforpostgresql",
    "valid": [
@@ -600,7 +600,7 @@
     "a~\u200bb"
    ]
   },
-  "C35": {
+  "Alphanumerics, underscores, periods, and hyphens<br><br>Start with a letter or number. End with letter, number, or underscore.": {
    "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with a letter or number. End with letter, number, or underscore.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdesktopvirtualization",
    "valid": [
@@ -618,7 +618,7 @@
     "a~\u200bb"
    ]
   },
-  "C36": {
+  "Alphanumerics and hyphens<br><br>Can't end with hyphen.": {
    "source": "Alphanumerics and hyphens<br><br>Can't end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
    "valid": [
@@ -633,7 +633,7 @@
     "a~\u200bb"
    ]
   },
-  "C37": {
+  "Alphanumerics, hyphens, periods, and underscores": {
    "source": "Alphanumerics, hyphens, periods, and underscores",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
    "valid": [
@@ -646,7 +646,7 @@
     "a~\u200bb"
    ]
   },
-  "C38": {
+  "Alphanumerics and hyphens<br><br>End with alphanumeric.": {
    "source": "Alphanumerics and hyphens<br><br>End with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevices",
    "valid": [
@@ -660,7 +660,7 @@
     "a~\u200bb"
    ]
   },
-  "C39": {
+  "Alphanumerics, underscores, hyphens, and parentheses": {
    "source": "Alphanumerics, underscores, hyphens, and parentheses",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdevtestlab",
    "valid": [
@@ -674,7 +674,7 @@
     "a~\u200bb"
    ]
   },
-  "C40": {
+  "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftdocumentdb",
    "valid": [
@@ -690,7 +690,7 @@
     "a~\u200bb"
    ]
   },
-  "C41": {
+  "Alphanumerics and hyphens<br><br>Start with a letter. End with letter or number.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
    "valid": [
@@ -707,7 +707,7 @@
     "a~\u200bb"
    ]
   },
-  "C42": {
+  "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with letter or number.": {
    "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
    "valid": [
@@ -725,7 +725,7 @@
     "a~\u200bb"
    ]
   },
-  "C43": {
+  "Alphanumerics and hyphens<br><br>Start with a letter. End with alphanumeric.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofteventhub",
    "valid": [
@@ -742,7 +742,7 @@
     "a~\u200bb"
    ]
   },
-  "C44": {
+  "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphens. Can't use consecutive hyphens.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphens. Can't use consecutive hyphens.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftfileshares",
    "valid": [
@@ -763,7 +763,7 @@
     }
    ]
   },
-  "C45": {
+  "Alphanumerics and hyphens<br><br>Start and end with letter or number.": {
    "source": "Alphanumerics and hyphens<br><br>Start and end with letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofthdinsight",
    "valid": [
@@ -779,7 +779,7 @@
     "a~\u200bb"
    ]
   },
-  "C46": {
+  "Can't use:<br>`:<>+/&%\\?|` or control characters <br><br>Can't end with space or period.": {
    "source": "Can't use:<br>`:<>+/&%\\?|` or control characters <br><br>Can't end with space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
    "valid": [
@@ -803,7 +803,7 @@
     "a~\u200bb"
    ]
   },
-  "C47": {
+  "Can't use:<br>`%&\\?/` or control characters <br><br>Can't end with space or period.": {
    "source": "Can't use:<br>`%&\\?/` or control characters <br><br>Can't end with space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
    "valid": [
@@ -823,7 +823,7 @@
     "a~\u200bb"
    ]
   },
-  "C48": {
+  "Can't use:<br>`*<>%{}&:\\\\?/#|` or control characters <br><br>Can't end with space or period.": {
    "source": "Can't use:<br>`*<>%{}&:\\\\?/#|` or control characters <br><br>Can't end with space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
    "valid": [
@@ -850,7 +850,7 @@
     "a~\u200bb"
    ]
   },
-  "C49": {
+  "Can't use:<br>`*#&+:<>?@%{}\\/|` or control characters <br><br>Can't end with space or period.": {
    "source": "Can't use:<br>`*#&+:<>?@%{}\\/|` or control characters <br><br>Can't end with space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
    "valid": [
@@ -879,7 +879,7 @@
     "a~\u200bb"
    ]
   },
-  "C50": {
+  "Can't use:<br>`<>*%{}&:\\\\?+/#|` or control characters <br><br>Can't end with space or period.": {
    "source": "Can't use:<br>`<>*%{}&:\\\\?+/#|` or control characters <br><br>Can't end with space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftinsights",
    "valid": [
@@ -907,7 +907,7 @@
     "a~\u200bb"
    ]
   },
-  "C51": {
+  "Lowercase letters and numbers<br><br>Start with a letter.": {
    "source": "Lowercase letters and numbers<br><br>Start with a letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftkusto",
    "valid": [
@@ -926,7 +926,7 @@
     "a~\u200bb"
    ]
   },
-  "C52": {
+  "Alphanumerics, hyphens, spaces, and periods": {
    "source": "Alphanumerics, hyphens, spaces, and periods",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftkusto",
    "valid": [
@@ -940,7 +940,7 @@
     "a~\u200bb"
    ]
   },
-  "C53": {
+  "Alphanumerics, hyphens, periods, and underscores<br><br>Start with a letter and end with alphanumeric.": {
    "source": "Alphanumerics, hyphens, periods, and underscores<br><br>Start with a letter and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftlabservices",
    "valid": [
@@ -957,7 +957,7 @@
     "a~\u200bb"
    ]
   },
-  "C54": {
+  "Can't use:<br>`<>*&@:?+/\\,;=.|[]\"` or space<br><br>Can't start with underscore, hyphen, or number. Can't end with underscore or hyphen.": {
    "source": "Can't use:<br>`<>*&@:?+/\\,;=.|[]\"` or space<br><br>Can't start with underscore, hyphen, or number. Can't end with underscore or hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftloadtestservice",
    "valid": [
@@ -993,7 +993,7 @@
     "a~\u200bb"
    ]
   },
-  "C55": {
+  "Alphanumerics, hyphens, underscores, periods, and parentheses": {
    "source": "Alphanumerics, hyphens, underscores, periods, and parentheses",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftlogic",
    "valid": [
@@ -1007,7 +1007,7 @@
     "a~\u200bb"
    ]
   },
-  "C56": {
+  "Can't use:<br>`<>*%&:?+/\\\\` or control characters<br><br>Can't end with a space.": {
    "source": "Can't use:<br>`<>*%&:?+/\\\\` or control characters<br><br>Can't end with a space.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmachinelearning",
    "valid": [
@@ -1031,7 +1031,7 @@
     "a~\u200bb"
    ]
   },
-  "C57": {
+  "Alphanumerics and hyphens<br><br>Start with alphanumeric.": {
    "source": "Alphanumerics and hyphens<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmedia",
    "valid": [
@@ -1046,7 +1046,7 @@
     "a~\u200bb"
    ]
   },
-  "C58": {
+  "Alphanumeric, underscores and hyphens <br><br> Start with alphanumeric.": {
    "source": "Alphanumeric, underscores and hyphens <br><br> Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmobilenetwork",
    "valid": [
@@ -1062,7 +1062,7 @@
     "a~\u200bb"
    ]
   },
-  "C59": {
+  "Alphanumeric, underscores, and hyphens <br><br> Start with alphanumeric.": {
    "source": "Alphanumeric, underscores, and hyphens <br><br> Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmobilenetwork",
    "valid": [
@@ -1078,7 +1078,7 @@
     "a~\u200bb"
    ]
   },
-  "C60": {
+  "Alphanumerics, underscores, and hyphens <br><br> Start with alphanumeric.": {
    "source": "Alphanumerics, underscores, and hyphens <br><br> Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
    "valid": [
@@ -1094,7 +1094,7 @@
     "a~\u200bb"
    ]
   },
-  "C61": {
+  "Alphanumerics, underscores, periods, and hyphens <br><br> Start with alphanumeric.": {
    "source": "Alphanumerics, underscores, periods, and hyphens <br><br> Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
    "valid": [
@@ -1111,7 +1111,7 @@
     "a~\u200bb"
    ]
   },
-  "C62": {
+  "Alphanumerics, underscores, and hyphens<br><br>Start with alphanumeric.": {
    "source": "Alphanumerics, underscores, and hyphens<br><br>Start with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
    "valid": [
@@ -1127,7 +1127,7 @@
     "a~\u200bb"
    ]
   },
-  "C63": {
+  "Alphanumerics and hyphens. <br><br>Start with alphanumeric.<br><br>Underscores aren't supported.": {
    "source": "Alphanumerics and hyphens. <br><br>Start with alphanumeric.<br><br>Underscores aren't supported.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnetapp",
    "valid": [
@@ -1142,7 +1142,7 @@
     "a~\u200bb"
    ]
   },
-  "C64": {
+  "Alphanumerics, periods, hyphens, and underscores<br><br>Start alphanumeric.": {
    "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftnotificationhubs",
    "valid": [
@@ -1159,7 +1159,7 @@
     "a~\u200bb"
    ]
   },
-  "C65": {
+  "Alphanumerics and hyphens<br><br>Can't start with hyphen. Can't use consecutive hyphens.": {
    "source": "Alphanumerics and hyphens<br><br>Can't start with hyphen. Can't use consecutive hyphens.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftpowerbi",
    "valid": [
@@ -1178,7 +1178,7 @@
     "a~\u200bb"
    ]
   },
-  "C66": {
+  "Lowercase letters or numbers<br><br>Start with lowercase letter.": {
    "source": "Lowercase letters or numbers<br><br>Start with lowercase letter.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftpowerbidedicated",
    "valid": [
@@ -1197,7 +1197,7 @@
     "a~\u200bb"
    ]
   },
-  "C67": {
+  "Alphanumerics and hyphens<br><br>Start with a letter. Can't end with hyphen.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter. Can't end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrecoveryservices",
    "valid": [
@@ -1214,7 +1214,7 @@
     "a~\u200bb"
    ]
   },
-  "C68": {
+  "Alphanumerics and hyphens<br><br>Start with a letter. End with a letter or number.": {
    "source": "Alphanumerics and hyphens<br><br>Start with a letter. End with a letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
    "valid": [
@@ -1231,7 +1231,7 @@
     "a~\u200bb"
    ]
   },
-  "C69": {
+  "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
    "valid": [
@@ -1249,7 +1249,7 @@
     "a~\u200bb"
    ]
   },
-  "C70": {
+  "Alphanumerics, periods, hyphens, underscores, and slashes<br><br>Start and end with alphanumeric.": {
    "source": "Alphanumerics, periods, hyphens, underscores, and slashes<br><br>Start and end with alphanumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftrelay",
    "valid": [
@@ -1266,7 +1266,7 @@
     "a~\u200bb"
    ]
   },
-  "C71": {
+  "Alphanumerics, underscores, parentheses, hyphens, and periods": {
    "source": "Alphanumerics, underscores, parentheses, hyphens, and periods",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftresources",
    "valid": [
@@ -1280,7 +1280,7 @@
     "a~\u200bb"
    ]
   },
-  "C72": {
+  "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphnumeric.": {
    "source": "Alphanumerics, periods, hyphens, and underscores<br><br>Start and end with alphnumeric.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicebus",
    "valid": [
@@ -1298,7 +1298,7 @@
     "a~\u200bb"
    ]
   },
-  "C73": {
+  "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter. End with lowercase letter or number.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter. End with lowercase letter or number.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftservicefabric",
    "valid": [
@@ -1314,7 +1314,7 @@
     "a~\u200bb"
    ]
   },
-  "C74": {
+  "Lowercase letters, numbers, and hyphens<br><br> Can't start or end with hyphen.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br> Can't start or end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
    "valid": [
@@ -1331,7 +1331,7 @@
     "a~\u200bb"
    ]
   },
-  "C75": {
+  "Can't use:<br>`<>*%&:\\/?` or control characters<br><br>Can't end with period or space.": {
    "source": "Can't use:<br>`<>*%&:\\/?` or control characters<br><br>Can't end with period or space.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
    "valid": [
@@ -1354,7 +1354,7 @@
     "a~\u200bb"
    ]
   },
-  "C76": {
+  "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
    "valid": [
@@ -1371,7 +1371,7 @@
     "a~\u200bb"
    ]
   },
-  "C77": {
+  "Can't use:<br>`<>*%&:;\\/?` or control characters<br><br>Can't end with period.": {
    "source": "Can't use:<br>`<>*%&:;\\/?` or control characters<br><br>Can't end with period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftsql",
    "valid": [
@@ -1394,7 +1394,7 @@
     "a~\u200bb"
    ]
   },
-  "C78": {
+  "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number. Can't use consecutive hyphens.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Start with lowercase letter or number. Can't use consecutive hyphens.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage",
    "valid": [
@@ -1413,7 +1413,7 @@
     "a~\u200bb"
    ]
   },
-  "C79": {
+  "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Can't use consecutive hyphens.": {
    "source": "Lowercase letters, numbers, and hyphens<br><br>Can't start or end with hyphen. Can't use consecutive hyphens.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstorage",
    "valid": [
@@ -1434,7 +1434,7 @@
     }
    ]
   },
-  "C80": {
+  "Alphanumerics, spaces, periods, hyphens, and underscores<br><br>Can't end with period or space.": {
    "source": "Alphanumerics, spaces, periods, hyphens, and underscores<br><br>Can't end with period or space.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftstoragesync",
    "valid": [
@@ -1449,7 +1449,7 @@
     "a~\u200bb"
    ]
   },
-  "C81": {
+  "Can't use:<br>`'<>%&:\\?/#` or control characters": {
    "source": "Can't use:<br>`'<>%&:\\?/#` or control characters",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofttimeseriesinsights",
    "valid": [
@@ -1470,7 +1470,7 @@
     "a~\u200bb"
    ]
   },
-  "C82": {
+  "Can't use:<br> `'<>%&:\\?/#` or control characters": {
    "source": "Can't use:<br> `'<>%&:\\?/#` or control characters",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsofttimeseriesinsights",
    "valid": [
@@ -1491,7 +1491,7 @@
     "a~\u200bb"
    ]
   },
-  "C83": {
+  "Can't use:<br>`/` <br><br>Can't end with a space or period.": {
    "source": "Can't use:<br>`/` <br><br>Can't end with a space or period.",
    "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftweb",
    "valid": [
@@ -1502,6 +1502,65 @@
     "a~ ",
     "a~.",
     "a~\u0001b",
+    "a~\u200bb"
+   ]
+  },
+  "Alphanumerics, periods, underscores, hyphens, and parentheses<br><br>Can't end in period.": {
+   "source": "Alphanumerics, periods, underscores, hyphens, and parentheses<br><br>Can't end in period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftauthorization",
+   "valid": [
+    "a~-_.(1)",
+    ".~a",
+    "(~)",
+    "_~_"
+   ],
+   "invalid": [
+    "a~.",
+    "a~ b",
+    "a~/b",
+    "a~[b]",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "Alphanumerics, hyphens, underscores, periods, and parentheses <br><br> Start with a letter or number.<br><br>Can't end with period.": {
+   "source": "Alphanumerics, hyphens, underscores, periods, and parentheses <br><br> Start with a letter or number.<br><br>Can't end with period.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagement",
+   "valid": [
+    "a~-_.(1)",
+    "1~)",
+    "A~_"
+   ],
+   "invalid": [
+    "-~a",
+    "_~a",
+    ".~a",
+    "(~a",
+    "a~.",
+    "a~ b",
+    "a~/b",
+    "a~[b]",
+    "a~é",
+    "a~\u200bb"
+   ]
+  },
+  "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric; end alphanumeric or underscore.": {
+   "source": "Alphanumerics, underscores, periods, and hyphens<br><br>Start with alphanumeric; end alphanumeric or underscore.",
+   "url": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftweb",
+   "valid": [
+    "a~._-1",
+    "1~_",
+    "Z~z"
+   ],
+   "invalid": [
+    "_~a",
+    "-~a",
+    ".~a",
+    "a~-",
+    "a~.",
+    "a~(b)",
+    "a~ b",
+    "a~é",
     "a~\u200bb"
    ]
   }
@@ -1884,4 +1943,3 @@
   }
  }
 }
-

@@ -271,7 +271,10 @@ export function scopeKind(text) {
   if (t === 'global') return 'azure:global';
   if (t === 'subscription') return 'azure:subscription';
   if (t === 'region' || t === 'azure region') return 'azure:region';
-  if (['management groups, subscriptions, resource groups', 'subscription or resource group', 'scope of assignment', 'tenant', 'resource'].includes(t)) return null;
+  if (t === 'tenant') return 'azure:tenant'; // managementgroups — 테넌트 안 유일
+  // 구독 또는 RG 에 만들 수 있는 행 — 넓은 쪽(구독)에 둔다. 넓은 노드가 유일성 판정에서 보수적이다(policy* 손 규칙과 같은 읽기)
+  if (t === 'subscription or resource group' || t === 'scope of assignment') return 'azure:subscription';
+  if (['management groups, subscriptions, resource groups', 'resource'].includes(t)) return null;
   if (t.includes(';') || t.includes(' or ')) return null;
   return 'parent';
 }
@@ -288,6 +291,8 @@ const PARENT_OVERRIDE = {
 const EXISTING_SCOPE_OF_PARENT = {
   'Microsoft.Network/virtualNetworks': 'azure:virtual_network',
   'Microsoft.ContainerService/managedClusters': 'azure:managed_cluster',
+  // sites 행은 Scope 칸이 「global or per domain」이라 생성기가 범위를 못 만든다 — 손 규칙(azure-manual.ts)의 범위를 쓴다
+  'Microsoft.Web/sites': 'azure:web/sites',
 };
 
 const snake = typeSnake; // naming.mjs — IoT · SignalR 같은 섞인 약어를 한 낱말로
@@ -346,6 +351,8 @@ const categoryOf = (ns) => CATEGORY.find(([re]) => re.test(ns))?.[1] ?? 'managem
 /** 손으로 원문을 다시 읽고도 넣지 않은 행 (D43) — 보류 사유를 이것으로 바꾼다. 넣은 행은 --existing 으로 건너뛴다 */
 const VERSION = 'reviewed by hand — not imported (version number: each segment is an int32, not a chosen name)';
 const DNS_NAME = 'reviewed by hand — not imported (a domain name the user owns, not a generated name)';
+const BLUEPRINT = 'reviewed by hand — unconfirmed (the Length cell is a single number, 90, and the same table uses a single number for an exact length — roleAssignments 36 — so the minimum is not settled; the Scope cell spans management groups, subscriptions and resource groups)';
+const ASSESSMENT_KEY = 'reviewed by hand — not imported (the REST reference names the path segment "The Assessment Key - Unique key for the assessment type": a key of an assessment type, not a chosen resource name; "assessment type" names no row in the table)';
 export const HAND_REVIEWED = {
   'Microsoft.Compute/galleries/applications/versions': VERSION,
   'Microsoft.Compute/galleries/images/versions': VERSION,
@@ -356,6 +363,11 @@ export const HAND_REVIEWED = {
   'Microsoft.Resources/tagNames/tagValues': 'reviewed by hand — not imported (a tag value, not a resource name)',
   'Microsoft.Storage/blob': 'reviewed by hand — not imported (an object key inside a container, not an ARM resource name)',
   'Microsoft.MachineLearningServices/workspaces/datastores': 'reviewed by hand — unconfirmed (the table gives a maximum of 255 but no minimum length)',
+  'Microsoft.Blueprint/blueprint': BLUEPRINT,
+  'Microsoft.Blueprint/blueprintAssignments': BLUEPRINT,
+  'Microsoft.Security/assessmentMetadata': ASSESSMENT_KEY,
+  'Microsoft.Security/assessments': ASSESSMENT_KEY,
+  'Microsoft.Security/sqlVulnerabilityAssessments/baselineRules': 'reviewed by hand — not imported (the name is the ID of an existing vulnerability-assessment rule: the REST reference path ends in baselineRules/{ruleId}, "The rule Id."; the parent sqlVulnerabilityAssessments/default has no row and no scope node)',
   'Microsoft.NetApp/netAppAccounts/buckets': 'reviewed by hand — unconfirmed (the minimum of 13 and the sentence about volumes look copied from the volumes row; not checked against the NetApp Files documentation)',
 };
 
@@ -495,7 +507,7 @@ export function renderHeld(result, meta) {
   L.push('## How the imported rows were mapped');
   L.push('');
   L.push('- **Pattern** — each distinct *Valid Characters* cell is read with a fixed sentence grammar (character kinds, `Can\'t use:` lists, start/end sentences, consecutive hyphens). A sentence outside the grammar stops the generator; nothing is guessed. Lengths are checked by `minLength`/`maxLength`.');
-  L.push('- **Scope** — `resource group` · `global` · `subscription` map to the existing scope nodes; `region` / `Azure region` map to a new `azure:region` node under the subscription; `resource group & region` is read as resource group (stricter). Any other value names a parent resource (`service`, `namespace`, …): a scope node is created for the parent entity, placed under the parent row\'s own scope.');
+  L.push('- **Scope** — `resource group` · `global` · `subscription` map to the existing scope nodes; `region` / `Azure region` map to a new `azure:region` node under the subscription; `resource group & region` is read as resource group (stricter). `tenant` maps to a new `azure:tenant` node under global; `subscription or resource group` and `scope of assignment` are placed at the subscription (the wider node is the conservative reading for uniqueness, as for the hand-written policy rules). Any other value names a parent resource (`service`, `namespace`, …): a scope node is created for the parent entity, placed under the parent row\'s own scope; App Service `sites` children use the hand-written `azure:web/sites` node.');
   L.push('- **Prefix (slug)** — the abbreviation from the Microsoft Cloud Adoption Framework [abbreviation list](' + CAF_URL + ') when the namespace/entity matches exactly (entries split by `kind` are skipped). Otherwise: the initials of the last entity segment when it has two or more words (`authorizationServers` → `as`), or its first three letters (`apis` → `api`). A slug the row\'s characters cannot hold is left empty.');
   L.push('- **Reserved words** — rows whose scope is `global` (names that become endpoints) get the Azure reserved-word check, like the existing storage account, key vault and SQL server rules.');
   L.push('- **Reviewed by hand** — the held rows were read again in the table and the pages it links. Rows with a complete rule were added by hand in `src/core/rules/azure-manual.ts` with the table text quoted; the reason of the others starts with "reviewed by hand".');

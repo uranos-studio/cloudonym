@@ -15,8 +15,8 @@ const MANUAL_SCOPES: Record<string, unknown> = { ...GCP_MANUAL_SCOPES, ...AWS_MA
 const ALL = Object.values(SCOPES);
 
 describe('SCOPES — 범위 그래프 (D37)', () => {
-  it('손으로 쓴 15 행 + 들인 부모 리소스 범위 · 키와 id 가 같다 · docUrl 은 https', () => {
-    expect(ALL).toHaveLength(15 + Object.keys(AZURE_INTAKE_SCOPES).length + Object.keys(GCP_INTAKE_SCOPES).length + Object.keys(MANUAL_SCOPES).length);
+  it('손으로 쓴 16 행 + 들인 부모 리소스 범위 · 키와 id 가 같다 · docUrl 은 https', () => {
+    expect(ALL).toHaveLength(16 + Object.keys(AZURE_INTAKE_SCOPES).length + Object.keys(GCP_INTAKE_SCOPES).length + Object.keys(MANUAL_SCOPES).length);
     for (const [k, s] of Object.entries(SCOPES)) {
       expect(s.id).toBe(k);
       expect(s.id.startsWith(`${s.provider}:`), s.id).toBe(true);

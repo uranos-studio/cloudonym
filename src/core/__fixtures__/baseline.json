@@ -3080,6 +3080,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -3410,6 +3419,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -4472,6 +4490,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -5717,6 +5744,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -5912,6 +5948,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -9095,6 +9140,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -9425,6 +9479,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -10487,6 +10550,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -11732,6 +11804,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -11927,6 +12008,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -15110,6 +15200,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -15440,6 +15539,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -16502,6 +16610,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -17747,6 +17864,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -17942,6 +18068,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -21125,6 +21260,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -21455,6 +21599,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -22517,6 +22670,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -23762,6 +23924,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -23957,6 +24128,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -27140,6 +27320,15 @@
               "violations": 1,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "windows-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "windows-trade-prd-kr-aa-01",
               "valid": true,
@@ -27470,6 +27659,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "windows-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "windows-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -28532,6 +28730,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "windows-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "windows-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -29777,6 +29984,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "windows-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "windows-trade-prd-kr-ca-01",
               "valid": true,
@@ -29973,6 +30189,15 @@
               "isTransformed": false,
               "original": "windows-trade-prd-kr-das-01",
               "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "windows-trade-prd-kr-tag-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-tag-01",
+              "violations": 1,
               "steps": 0
             },
             "service_bus_namespaces": {
@@ -33155,6 +33380,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "google-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "google-trade-prd-kr-aa-01",
               "valid": true,
@@ -33485,6 +33719,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "google-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "google-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -34547,6 +34790,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "google-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "google-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -35792,6 +36044,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "google-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "google-trade-prd-kr-ca-01",
               "valid": true,
@@ -35987,6 +36248,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "google-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "google-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -39170,6 +39440,15 @@
               "violations": 1,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "azure-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "azure-trade-prd-kr-aa-01",
               "valid": true,
@@ -39500,6 +39779,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "azure-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "azure-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -40562,6 +40850,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "azure-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "azure-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -41807,6 +42104,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "azure-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "azure-trade-prd-kr-ca-01",
               "valid": true,
@@ -42003,6 +42309,15 @@
               "isTransformed": false,
               "original": "azure-trade-prd-kr-das-01",
               "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "azure-trade-prd-kr-tag-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-tag-01",
+              "violations": 1,
               "steps": 0
             },
             "service_bus_namespaces": {
@@ -45185,6 +45500,15 @@
               "violations": 1,
               "steps": 1
             },
+            "authorization_locks": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-loc-01",
+              "violations": 1,
+              "steps": 1
+            },
             "automation_automation_accounts": {
               "name": "",
               "valid": false,
@@ -45515,6 +45839,15 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "매매-trade-prd-kr-led-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "consumption_budgets": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-bud-01",
               "violations": 1,
               "steps": 1
             },
@@ -46577,6 +46910,15 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "매매-trade-prd-kr-mlw-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "management_managementgroups": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-mg-01",
               "violations": 1,
               "steps": 1
             },
@@ -47822,6 +48164,15 @@
               "violations": 1,
               "steps": 1
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-pec-01",
+              "violations": 1,
+              "steps": 1
+            },
             "app_container_apps": {
               "name": "",
               "valid": false,
@@ -48017,6 +48368,15 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "매매-trade-prd-kr-das-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "resources_tag_names": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-tag-01",
               "violations": 1,
               "steps": 1
             },
@@ -51200,6 +51560,15 @@
               "violations": 0,
               "steps": 2
             },
+            "authorization_locks": {
+              "name": "paymentsettlement-reconciliation-dev-global-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "paymentsettlement-reconciliation-dev-global-aa-01",
               "valid": true,
@@ -51532,6 +51901,15 @@
               "original": "paymentsettlement-reconciliation-dev-global-led-01",
               "violations": 0,
               "steps": 2
+            },
+            "consumption_budgets": {
+              "name": "paymentsettlement-reconciliation-dev-global-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-bud-01",
+              "violations": 0,
+              "steps": 0
             },
             "container_instance_container_groups": {
               "name": "paymentsettlement-reconciliation-dev-global-ci-01",
@@ -52594,6 +52972,15 @@
               "original": "paymentsettlement-reconciliation-dev-global-mlw-01",
               "violations": 0,
               "steps": 2
+            },
+            "management_managementgroups": {
+              "name": "paymentsettlement-reconciliation-dev-global-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-mg-01",
+              "violations": 0,
+              "steps": 0
             },
             "media_mediaservices": {
               "name": "medpaymentsereconcilidev",
@@ -53837,6 +54224,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "paymentsettlement-reconciliation-dev-global-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "paymentset-reconcilia-dev-ca-01",
               "valid": true,
@@ -54032,6 +54428,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "paymentsettlement-reconciliation-dev-global-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "paymentsettlement-reconciliation-dev-global-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -57215,6 +57620,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "a-long-longpurpose-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "a-long-longpurpose-prd-kr-aa-01",
               "valid": true,
@@ -57545,6 +57959,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "a-long-longpurpose-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "a-long-longpurpose-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -58607,6 +59030,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "a-long-longpurpose-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "a-long-longpurpose-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -59852,6 +60284,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "a-long-longpurpose-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "a-long-longpurpose-prd-kr-ca-01",
               "valid": true,
@@ -60047,6 +60488,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "a-long-longpurpose-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "a-long-longpurpose-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -63230,6 +63680,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "3tier-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "3tier-trade-prd-kr-aa-01",
               "valid": false,
@@ -63560,6 +64019,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "3tier-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "3tier-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -64622,6 +65090,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "3tier-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "3tier-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -65867,6 +66344,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "3tier-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "3tier-trade-prd-kr-ca-01",
               "valid": false,
@@ -66062,6 +66548,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "3tier-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "3tier-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -69245,6 +69740,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -69575,6 +70079,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -70637,6 +71150,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -71882,6 +72404,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -72077,6 +72608,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -75260,6 +75800,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -75590,6 +76139,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -76652,6 +77210,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -77897,6 +78464,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -78092,6 +78668,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -81275,6 +81860,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -81605,6 +82199,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -82667,6 +83270,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -83912,6 +84524,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -84107,6 +84728,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -87290,6 +87920,15 @@
               "violations": 0,
               "steps": 0
             },
+            "authorization_locks": {
+              "name": "billing-trade-prd-kr-loc-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-loc-01",
+              "violations": 0,
+              "steps": 0
+            },
             "automation_automation_accounts": {
               "name": "billing-trade-prd-kr-aa-01",
               "valid": true,
@@ -87620,6 +88259,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-led-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "consumption_budgets": {
+              "name": "billing-trade-prd-kr-bud-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-bud-01",
               "violations": 0,
               "steps": 0
             },
@@ -88682,6 +89330,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-mlw-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "management_managementgroups": {
+              "name": "billing-trade-prd-kr-mg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-mg-01",
               "violations": 0,
               "steps": 0
             },
@@ -89927,6 +90584,15 @@
               "violations": 0,
               "steps": 0
             },
+            "web_sites_private_endpoint_connections": {
+              "name": "billing-trade-prd-kr-pec-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pec-01",
+              "violations": 0,
+              "steps": 0
+            },
             "app_container_apps": {
               "name": "billing-trade-prd-kr-ca-01",
               "valid": true,
@@ -90122,6 +90788,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-kr-das-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "resources_tag_names": {
+              "name": "billing-trade-prd-kr-tag-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-tag-01",
               "violations": 0,
               "steps": 0
             },
@@ -118363,6 +119038,114 @@
       },
       {
         "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "authorization_locks",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4"
+      },
+      {
+        "provider": "azure",
         "resourceType": "authorization_policy_assignments",
         "name": "",
         "known": true,
@@ -131752,6 +132535,114 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "consumption_budgets",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
       },
       {
         "provider": "azure",
@@ -163885,6 +164776,114 @@
       },
       {
         "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "management_managementgroups",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4"
+      },
+      {
+        "provider": "azure",
         "resourceType": "maps_accounts",
         "name": "",
         "known": true,
@@ -179371,6 +180370,141 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "microsoftabc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "azureabc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "windowsabc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "resources_tag_names",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9"
       },
       {
         "provider": "azure",
@@ -199354,6 +200488,114 @@
       },
       {
         "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "a",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "aa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "azure",
+        "resourceType": "web_sites_private_endpoint_connections",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "azure",
         "resourceType": "web_sites_slots",
         "name": "a",
         "known": true,
@@ -213140,6 +214382,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -213177,6 +214420,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -213295,6 +214539,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -213433,6 +214678,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -213455,6 +214701,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -213834,6 +215081,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -213871,6 +215119,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -213989,6 +215238,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -214127,6 +215377,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -214149,6 +215400,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -214522,6 +215774,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -214559,6 +215812,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -214677,6 +215931,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -214815,6 +216070,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -214837,6 +216093,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -215218,6 +216475,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -215255,6 +216513,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -215373,6 +216632,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -215511,6 +216771,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -215533,6 +216794,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -215906,6 +217168,7 @@
           "azure_api_management_service_tags = \"windows-trade-prd-kr-tag-01\"",
           "azure_api_management_service_templates = \"windows-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"windows-trade-prd-kr-use-01\"",
+          "azure_authorization_locks = \"windows-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"windows-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"windows-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"windows-trade-prd-kr-con-01\"",
@@ -215935,6 +217198,7 @@
           "azure_compute_images = \"windows-trade-prd-kr-ima-01\"",
           "azure_compute_snapshots = \"windows-trade-prd-kr-snap-01\"",
           "azure_confidential_ledger_ledgers = \"windows-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"windows-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"windows-trade-prd-kr-ci-01\"",
           "azure_cr_registries_build_tasks = \"btwindowstradeprd\"",
           "azure_cr_registries_build_tasks_steps = \"stewindowstradeprd\"",
@@ -216037,6 +217301,7 @@
           "azure_machine_learning_web_services = \"windows-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"windows-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"windows-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"windows-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medwindowstradeprd\"",
           "azure_media_mediaservices_live_events = \"windows-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"windows-trade-prd-kr-lo-01\"",
@@ -216168,6 +217433,7 @@
           "azure_tsi_environments_event_sources = \"windows-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdswindowstradeprd\"",
           "azure_web_certificates = \"windows-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"windows-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"windows-trade-prd-kr-ca-01\"",
           "azure_app_configuration_stores_replicas = \"repwitrprd\"",
           "azure_authorization_policy_assignments = \"windows-trade-prd-pa-01\"",
@@ -216238,6 +217504,7 @@
           "# INVALID: azure_app_configuration_configuration_stores",
           "# INVALID: azure_elastic_san_elastic_sans",
           "# INVALID: azure_network_trafficmanagerprofiles",
+          "# INVALID: azure_resources_tag_names",
           "# INVALID: azure_service_bus_namespaces",
           "# INVALID: azure_synapse_workspaces",
           "# INVALID: azure_synapse_workspaces_sql_pools",
@@ -216605,6 +217872,7 @@
           "azure_api_management_service_templates = \"google-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"google-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"google-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"google-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"google-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"google-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"google-trade-prd-kr-con-01\"",
@@ -216642,6 +217910,7 @@
           "azure_compute_snapshots = \"google-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"google-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"google-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"google-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"google-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crgoogletradeprd\"",
           "azure_cr_registries_build_tasks = \"btgoogletradeprd\"",
@@ -216760,6 +218029,7 @@
           "azure_machine_learning_web_services = \"google-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"google-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"google-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"google-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medgoogletradeprd\"",
           "azure_media_mediaservices_live_events = \"google-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"google-trade-prd-kr-lo-01\"",
@@ -216898,6 +218168,7 @@
           "azure_tsi_environments_event_sources = \"google-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsgoogletradeprd\"",
           "azure_web_certificates = \"google-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"google-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"google-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"google-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repgotrprd\"",
@@ -216920,6 +218191,7 @@
           "azure_net_app_net_app_accounts_volumes = \"google-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"google-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"google-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"google-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"google-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"google-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpgoogletrdprd\"",
@@ -217297,6 +218569,7 @@
           "azure_api_management_service_tags = \"azure-trade-prd-kr-tag-01\"",
           "azure_api_management_service_templates = \"azure-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"azure-trade-prd-kr-use-01\"",
+          "azure_authorization_locks = \"azure-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"azure-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"azure-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"azure-trade-prd-kr-con-01\"",
@@ -217327,6 +218600,7 @@
           "azure_compute_images = \"azure-trade-prd-kr-ima-01\"",
           "azure_compute_snapshots = \"azure-trade-prd-kr-snap-01\"",
           "azure_confidential_ledger_ledgers = \"azure-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"azure-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"azure-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crazuretradeprd\"",
           "azure_cr_registries_build_tasks = \"btazuretradeprd\"",
@@ -217433,6 +218707,7 @@
           "azure_machine_learning_web_services = \"azure-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"azure-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"azure-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"azure-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medazuretradeprd\"",
           "azure_media_mediaservices_live_events = \"azure-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"azure-trade-prd-kr-lo-01\"",
@@ -217564,6 +218839,7 @@
           "azure_tsi_environments_event_sources = \"azure-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsazuretradeprd\"",
           "azure_web_certificates = \"azure-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"azure-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"azure-trade-prd-kr-ca-01\"",
           "azure_app_configuration_stores_replicas = \"repaztrprd\"",
           "azure_authorization_policy_assignments = \"azure-trade-prd-kr-pa-01\"",
@@ -217629,6 +218905,7 @@
           "# INVALID: azure_app_configuration_configuration_stores",
           "# INVALID: azure_elastic_san_elastic_sans",
           "# INVALID: azure_network_trafficmanagerprofiles",
+          "# INVALID: azure_resources_tag_names",
           "# INVALID: azure_service_bus_namespaces",
           "# INVALID: azure_synapse_workspaces",
           "# INVALID: azure_web_sites"
@@ -218005,6 +219282,7 @@
           "# INVALID: azure_api_management_service_templates",
           "# INVALID: azure_api_management_service_users",
           "# INVALID: azure_app_platform_spring",
+          "# INVALID: azure_authorization_locks",
           "# INVALID: azure_automation_automation_accounts",
           "# INVALID: azure_automation_aa_certificates",
           "# INVALID: azure_automation_aa_connections",
@@ -218042,6 +219320,7 @@
           "# INVALID: azure_compute_snapshots",
           "# INVALID: azure_communication_communication_services",
           "# INVALID: azure_confidential_ledger_ledgers",
+          "# INVALID: azure_consumption_budgets",
           "# INVALID: azure_container_instance_container_groups",
           "# INVALID: azure_container_registry_registries",
           "# INVALID: azure_cr_registries_build_tasks",
@@ -218160,6 +219439,7 @@
           "# INVALID: azure_machine_learning_web_services",
           "# INVALID: azure_machine_learning_workspaces",
           "# INVALID: azure_machine_learning_services_workspaces",
+          "# INVALID: azure_management_managementgroups",
           "# INVALID: azure_media_mediaservices",
           "# INVALID: azure_media_mediaservices_live_events",
           "# INVALID: azure_mediaservices_live_events_live_outputs",
@@ -218298,6 +219578,7 @@
           "# INVALID: azure_tsi_environments_event_sources",
           "# INVALID: azure_tsi_environments_reference_data_sets",
           "# INVALID: azure_web_certificates",
+          "# INVALID: azure_web_sites_private_endpoint_connections",
           "# INVALID: azure_app_container_apps",
           "# INVALID: azure_app_configuration_configuration_stores",
           "# INVALID: azure_app_configuration_stores_replicas",
@@ -218320,6 +219601,7 @@
           "# INVALID: azure_net_app_net_app_accounts_volumes",
           "# INVALID: azure_network_trafficmanagerprofiles",
           "# INVALID: azure_portal_dashboards",
+          "# INVALID: azure_resources_tag_names",
           "# INVALID: azure_service_bus_namespaces",
           "# INVALID: azure_synapse_workspaces",
           "# INVALID: azure_synapse_workspaces_big_data_pools",
@@ -218692,6 +219974,7 @@
           "azure_api_management_service_templates = \"paymentsettlement-reconciliation-dev-global-tem-01\"",
           "azure_api_management_service_users = \"paymentsettlement-reconciliation-dev-global-use-01\"",
           "azure_app_platform_spring = \"paymentset-reconcilia-dev-spr-01\"",
+          "azure_authorization_locks = \"paymentsettlement-reconciliation-dev-global-loc-01\"",
           "azure_automation_automation_accounts = \"paymentsettlement-reconciliation-dev-global-aa-01\"",
           "azure_automation_aa_certificates = \"paymentsettlement-reconciliation-dev-global-cer-01\"",
           "azure_automation_aa_connections = \"paymentsettlement-reconciliation-dev-global-con-01\"",
@@ -218729,6 +220012,7 @@
           "azure_compute_snapshots = \"paymentsettlement-reconciliation-dev-global-snap-01\"",
           "azure_communication_communication_services = \"paymentsettlement-reconciliation-dev-global-acs-01\"",
           "azure_confidential_ledger_ledgers = \"paymentset-reconcilia-dev-led-01\"",
+          "azure_consumption_budgets = \"paymentsettlement-reconciliation-dev-global-bud-01\"",
           "azure_container_instance_container_groups = \"paymentsettlement-reconciliation-dev-global-ci-01\"",
           "azure_container_registry_registries = \"crpaymentsettlementreconciliationdev\"",
           "azure_cr_registries_build_tasks = \"btpaymentsettlementreconciliationdev\"",
@@ -218847,6 +220131,7 @@
           "azure_machine_learning_web_services = \"paymentsettlement-reconciliation-dev-global-ws-01\"",
           "azure_machine_learning_workspaces = \"paymentsettlement-reconciliation-dev-global-wor-01\"",
           "azure_machine_learning_services_workspaces = \"paymentset-reconcilia-dev-mlw-01\"",
+          "azure_management_managementgroups = \"paymentsettlement-reconciliation-dev-global-mg-01\"",
           "azure_media_mediaservices = \"medpaymentsereconcilidev\"",
           "azure_media_mediaservices_live_events = \"paymentset-reconcilia-dev-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"paymentsettlement-reconciliation-dev-global-lo-01\"",
@@ -218985,6 +220270,7 @@
           "azure_tsi_environments_event_sources = \"paymentsettlement-reconciliation-dev-global-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdspaymentsettlementreconciliationdev\"",
           "azure_web_certificates = \"paymentsettlement-reconciliation-dev-global-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"paymentsettlement-reconciliation-dev-global-pec-01\"",
           "azure_app_container_apps = \"paymentset-reconcilia-dev-ca-01\"",
           "azure_app_configuration_configuration_stores = \"paymentsettlement-reconciliation-dev-global-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repparedev\"",
@@ -219007,6 +220293,7 @@
           "azure_net_app_net_app_accounts_volumes = \"paymentsettlement-reconciliation-dev-global-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"paymentsettlement-reconciliation-dev-global-tra-01\"",
           "azure_portal_dashboards = \"paymentsettlement-reconciliation-dev-global-das-01\"",
+          "azure_resources_tag_names = \"paymentsettlement-reconciliation-dev-global-tag-01\"",
           "azure_service_bus_namespaces = \"paymentsettlement-reconciliation-dev-global-nam-01\"",
           "azure_synapse_workspaces = \"paymentsettlement-reconciliation-dev-global-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdppaymrecodev\"",
@@ -219385,6 +220672,7 @@
           "azure_api_management_service_templates = \"a-long-longpurpose-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"a-long-longpurpose-prd-kr-use-01\"",
           "azure_app_platform_spring = \"a-long-longpurpose-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"a-long-longpurpose-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"a-long-longpurpose-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"a-long-longpurpose-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"a-long-longpurpose-prd-kr-con-01\"",
@@ -219422,6 +220710,7 @@
           "azure_compute_snapshots = \"a-long-longpurpose-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"a-long-longpurpose-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"a-long-longpurpose-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"a-long-longpurpose-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"a-long-longpurpose-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"cralonglongpurposeprd\"",
           "azure_cr_registries_build_tasks = \"btalonglongpurposeprd\"",
@@ -219540,6 +220829,7 @@
           "azure_machine_learning_web_services = \"a-long-longpurpose-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"a-long-longpurpose-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"a-long-longpurpose-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"a-long-longpurpose-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medalonglongpurposeprd\"",
           "azure_media_mediaservices_live_events = \"a-long-longpurpose-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"a-long-longpurpose-prd-kr-lo-01\"",
@@ -219678,6 +220968,7 @@
           "azure_tsi_environments_event_sources = \"a-long-longpurpose-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsalonglongpurposeprd\"",
           "azure_web_certificates = \"a-long-longpurpose-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"a-long-longpurpose-prd-kr-pec-01\"",
           "azure_app_container_apps = \"a-long-longpurpose-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"a-long-longpurpose-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repalloprd\"",
@@ -219699,6 +220990,7 @@
           "azure_net_app_net_app_accounts_volumes = \"a-long-longpurpose-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"a-long-longpurpose-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"a-long-longpurpose-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"a-long-longpurpose-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"a-long-longpurpose-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"a-long-longpurpose-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpalonlongprd\"",
@@ -219932,6 +221224,7 @@
           "azure_analysis_services_servers = \"as3tiertradeprd\"",
           "azure_api_management_service_apis_releases = \"3tier-trade-prd-kr-rel-01\"",
           "azure_app_platform_spring = \"3tier-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"3tier-trade-prd-kr-loc-01\"",
           "azure_automation_aa_certificates = \"3tier-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"3tier-trade-prd-kr-con-01\"",
           "azure_automation_aa_credentials = \"3tier-trade-prd-kr-cre-01\"",
@@ -219966,6 +221259,7 @@
           "azure_compute_snapshots = \"3tier-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"3tier-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"3tier-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"3tier-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"3tier-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"cr3tiertradeprd\"",
           "azure_cr_registries_build_tasks = \"bt3tiertradeprd\"",
@@ -220076,6 +221370,7 @@
           "azure_machine_learning_web_services = \"3tier-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"3tier-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"3tier-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"3tier-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"med3tiertradeprd\"",
           "azure_media_mediaservices_live_events = \"3tier-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"3tier-trade-prd-kr-lo-01\"",
@@ -220206,6 +221501,7 @@
           "azure_tsi_environments_event_sources = \"3tier-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rds3tiertradeprd\"",
           "azure_web_certificates = \"3tier-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"3tier-trade-prd-kr-pec-01\"",
           "azure_app_configuration_configuration_stores = \"3tier-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"rep3ttrprd\"",
           "azure_authorization_policy_assignments = \"3tier-trade-prd-kr-pa-01\"",
@@ -220226,6 +221522,7 @@
           "azure_net_app_net_app_accounts_volumes = \"3tier-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"3tier-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"3tier-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"3tier-trade-prd-kr-tag-01\"",
           "azure_synapse_workspaces = \"3tier-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdp3tiertrdprd\"",
           "azure_synapse_workspaces_sql_pools = \"sp3tiertradeprd\"",
@@ -220770,6 +222067,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -220807,6 +222105,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -220925,6 +222224,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -221063,6 +222363,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -221085,6 +222386,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -221454,6 +222756,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -221491,6 +222794,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -221609,6 +222913,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -221747,6 +223052,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -221769,6 +223075,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -222140,6 +223447,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -222177,6 +223485,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -222295,6 +223604,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -222433,6 +223743,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -222455,6 +223766,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",
@@ -222836,6 +224148,7 @@
           "azure_api_management_service_templates = \"billing-trade-prd-kr-tem-01\"",
           "azure_api_management_service_users = \"billing-trade-prd-kr-use-01\"",
           "azure_app_platform_spring = \"billing-trade-prd-kr-spr-01\"",
+          "azure_authorization_locks = \"billing-trade-prd-kr-loc-01\"",
           "azure_automation_automation_accounts = \"billing-trade-prd-kr-aa-01\"",
           "azure_automation_aa_certificates = \"billing-trade-prd-kr-cer-01\"",
           "azure_automation_aa_connections = \"billing-trade-prd-kr-con-01\"",
@@ -222873,6 +224186,7 @@
           "azure_compute_snapshots = \"billing-trade-prd-kr-snap-01\"",
           "azure_communication_communication_services = \"billing-trade-prd-kr-acs-01\"",
           "azure_confidential_ledger_ledgers = \"billing-trade-prd-kr-led-01\"",
+          "azure_consumption_budgets = \"billing-trade-prd-kr-bud-01\"",
           "azure_container_instance_container_groups = \"billing-trade-prd-kr-ci-01\"",
           "azure_container_registry_registries = \"crbillingtradeprd\"",
           "azure_cr_registries_build_tasks = \"btbillingtradeprd\"",
@@ -222991,6 +224305,7 @@
           "azure_machine_learning_web_services = \"billing-trade-prd-kr-ws-01\"",
           "azure_machine_learning_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_machine_learning_services_workspaces = \"billing-trade-prd-kr-mlw-01\"",
+          "azure_management_managementgroups = \"billing-trade-prd-kr-mg-01\"",
           "azure_media_mediaservices = \"medbillingtradeprd\"",
           "azure_media_mediaservices_live_events = \"billing-trade-prd-kr-le-01\"",
           "azure_mediaservices_live_events_live_outputs = \"billing-trade-prd-kr-lo-01\"",
@@ -223129,6 +224444,7 @@
           "azure_tsi_environments_event_sources = \"billing-trade-prd-kr-es-01\"",
           "azure_tsi_environments_reference_data_sets = \"rdsbillingtradeprd\"",
           "azure_web_certificates = \"billing-trade-prd-kr-cer-01\"",
+          "azure_web_sites_private_endpoint_connections = \"billing-trade-prd-kr-pec-01\"",
           "azure_app_container_apps = \"billing-trade-prd-kr-ca-01\"",
           "azure_app_configuration_configuration_stores = \"billing-trade-prd-kr-cs-01\"",
           "azure_app_configuration_stores_replicas = \"repbitrprd\"",
@@ -223151,6 +224467,7 @@
           "azure_net_app_net_app_accounts_volumes = \"billing-trade-prd-kr-vol-01\"",
           "azure_network_trafficmanagerprofiles = \"billing-trade-prd-kr-tra-01\"",
           "azure_portal_dashboards = \"billing-trade-prd-kr-das-01\"",
+          "azure_resources_tag_names = \"billing-trade-prd-kr-tag-01\"",
           "azure_service_bus_namespaces = \"billing-trade-prd-kr-nam-01\"",
           "azure_synapse_workspaces = \"billing-trade-prd-kr-wor-01\"",
           "azure_synapse_workspaces_big_data_pools = \"bdpbilltrdprd\"",

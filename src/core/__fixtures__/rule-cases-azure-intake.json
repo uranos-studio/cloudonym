@@ -486,6 +486,23 @@
    "a!xz"
   ]
  },
+ "azure.authorization_locks": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a.z",
+   "a_z",
+   "a-z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "ax."
+  ]
+ },
  "azure.automation_automation_accounts": {
   "valid": [
    "axxxxz",
@@ -998,6 +1015,19 @@
    "a!z",
    "-xz",
    "ax-"
+  ]
+ },
+ "azure.consumption_budgets": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z"
   ]
  },
  "azure.container_instance_container_groups": {
@@ -2574,6 +2604,24 @@
    "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "az",
    "a!z"
+  ]
+ },
+ "azure.management_managementgroups": {
+  "valid": [
+   "axz",
+   "a",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a-z",
+   "a_z",
+   "a.z",
+   "a(z",
+   "a)z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a!z",
+   "-xz",
+   "ax."
   ]
  },
  "azure.media_mediaservices": {
@@ -4584,6 +4632,23 @@
    "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "a/z",
    "ax."
+  ]
+ },
+ "azure.web_sites_private_endpoint_connections": {
+  "valid": [
+   "axz",
+   "az",
+   "axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+   "a_z",
+   "a.z",
+   "a-z"
+  ],
+  "invalid": [
+   "axzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "a",
+   "a!z",
+   "-xz",
+   "ax-"
   ]
  }
 }
