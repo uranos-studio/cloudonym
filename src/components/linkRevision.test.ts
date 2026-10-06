@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { linkStateOf, mismatchedLinkVersion, shouldRewriteHash } from './linkRevision';
+import { hashToRestore, hashToWrite, linkStateOf, mismatchedLinkVersion, shouldRewriteHash } from './linkRevision';
 import { decodeState, encodeState } from './urlState';
 import { validateSelection } from '../core/selection';
 import type { NamingContext } from '../core/types';
@@ -75,5 +75,25 @@ describe('링크 키에 p · r 이 들어간다 (D42)', () => {
     expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'azure', selection: pick([{ type: 'virtual_machine', count: 3 }]) }), link)).toBe(true);
     expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(true);
     expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBeUndefined();
+  });
+});
+
+describe('hashToWrite · hashToRestore — 문맥이 불완전한 동안은 마지막 온전한 hash 를 둔다', () => {
+  const key = encodeState(ctx, CURRENT);
+  it('온전한 문맥 · 링크 없음 → 지금 상태의 hash', () => {
+    expect(hashToWrite(key, undefined)).toBe(`#state=${key}`);
+  });
+  it('문맥이 불완전(stateKey 빈 값) → 쓰지 않는다(undefined) — 지우지 않아 새로고침해도 CSP · 선택이 남는다', () => {
+    expect(hashToWrite('', undefined)).toBeUndefined();
+  });
+  it('링크 상태 그대로 → 쓰지 않는다', () => {
+    const link = open(`#state=${encodeState(ctx, OLD)}`);
+    expect(hashToWrite(key, link)).toBeUndefined();
+  });
+  it('되돌릴 값 — 온전하면 지금 hash · 불완전하면 직전 값 · 링크 그대로면 링크의 원래 hash', () => {
+    expect(hashToRestore(key, undefined, '#state=prev')).toBe(`#state=${key}`);
+    expect(hashToRestore('', undefined, '#state=prev')).toBe('#state=prev');
+    const hash = `#state=${encodeState(ctx, OLD)}`;
+    expect(hashToRestore(key, open(hash), '#state=prev')).toBe(hash);
   });
 });

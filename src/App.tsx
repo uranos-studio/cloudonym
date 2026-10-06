@@ -14,7 +14,7 @@ import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
 import { applyChange, clearForCloudSwitch, fromItems, toItems, totalNames, type Picked } from './components/selection';
 import { decodeState, encodeState, shareUrl } from './components/urlState';
-import { linkStateOf, mismatchedLinkVersion, shouldRewriteHash, type LinkState } from './components/linkRevision';
+import { hashToRestore, hashToWrite, linkStateOf, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
 import { en } from './messages/en';
 import { fillUi } from './messages/catalog';
@@ -91,11 +91,12 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     setDropped(0);
   };
 
-  // 상태 → URL hash (replaceState — 히스토리를 쌓지 않는다). 문맥이 불완전하면 hash 를 비운다 — 낡은 상태를 공유하지 않게.
-  // 링크로 연 상태 그대로인 동안은 쓰지 않는다 — 새로고침해도 링크의 옛 v 가 남는다 (D27 ⑵)
+  // 상태 → URL hash (replaceState — 히스토리를 쌓지 않는다). 문맥이 불완전한 동안은 쓰지 않는다 — 마지막 온전한 hash 가 남아 새로고침해도 CSP · 선택이 돌아온다.
+  // 그동안 Share URL 버튼은 그리지 않으므로(ctx 가 없다) 낡은 값을 복사하지 않는다.
+  // 링크로 연 상태 그대로인 동안도 쓰지 않는다 — 새로고침해도 링크의 옛 v 가 남는다 (D27 ⑵)
   useEffect(() => {
-    if (!shouldRewriteHash(stateKey, link)) return;
-    window.history.replaceState(null, '', stateKey ? `#state=${stateKey}` : window.location.pathname + window.location.search);
+    const hash = hashToWrite(stateKey, link);
+    if (hash !== undefined) window.history.replaceState(null, '', hash);
   }, [stateKey, link]);
 
   // ui_visit — 탭당 1회 (sessionStorage 가드가 StrictMode 이중 effect 와 새로고침을 막는다)
@@ -115,10 +116,10 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   // 같은 탭에서 공유 URL 로 이동(주소창에 붙여 Enter) — 브라우저는 hash 만 바꾸고 다시 불러오지 않는다.
   // 온전한 hash 면 상태를 그것으로 바꾼다. 사용자가 만든 문맥이 아니므로 lastSentKey 를 먼저 맞춰 ui_generate 를 세지 않는다(첫 로드 복원과 같은 규칙).
   // 깨진 hash 면 화면은 그대로 두고 주소창을 지금 상태로 되돌린다 — 깨진 값이 다시 공유되지 않게. replaceState 는 hashchange 를 내지 않는다.
-  // 링크 상태 그대로면 되돌릴 값은 링크의 원래 hash 다(옛 v 를 잃지 않는다). 새 링크의 v 는 링크 상태를 바꾼다 (D27 ⑵)
+  // 링크 상태 그대로면 되돌릴 값은 링크의 원래 hash 다(옛 v 를 잃지 않는다) · 문맥이 불완전하면 마지막 온전한 hash 다. 새 링크의 v 는 링크 상태를 바꾼다 (D27 ⑵)
   const currentHash = useRef('');
   useEffect(() => {
-    currentHash.current = !shouldRewriteHash(stateKey, link) && link ? link.hash : stateKey ? `#state=${stateKey}` : '';
+    currentHash.current = hashToRestore(stateKey, link, currentHash.current);
   }, [stateKey, link]);
   useEffect(() => {
     const onHashChange = () => {
@@ -189,7 +190,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
                 )}
             </div>
             <div className={PANEL}>
-              <NamesPanel ctx={ctx} items={items} many={many} labels={labels} />
+              <NamesPanel provider={provider} ctx={ctx} items={items} many={many} labels={labels} />
             </div>
           </div>
 

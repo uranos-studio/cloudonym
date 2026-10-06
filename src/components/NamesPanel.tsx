@@ -1,18 +1,21 @@
 // ④ Names — 고른 것만. 범위 경로 머리글 · ResultCard · 충돌 목록 · PASS 수 · 내보내기 셋(Copy all names · JSON · Terraform).
+// 선택이 0개여도 Terraform 버튼은 남는다 — 태그 블록만 담은 locals 를 복사한다
 // 결과는 App 이 generateMany 로 만든 것을 그대로 보인다 — 판정은 전부 엔진 값이다. 무효(충돌 포함)는 어느 내보내기에도 유효로 실리지 않는다 (D41)
+import { useMemo } from 'react';
 import type { ManyResult, NameItem } from '../core/engine';
 import type { SelectionItem } from '../core/selection';
 import { scopePath } from '../core/tree';
-import type { LabelSet, NamingContext } from '../core/types';
+import type { LabelSet, NamingContext, Provider } from '../core/types';
 import { CopyButton } from './CopyButton';
 import { ResultCard } from './ResultCard';
 import { allNamesText, toNamesExport } from './namesExport';
-import { manyEntries, toTerraformLocals } from './terraform';
+import { selectionTerraform } from './terraform';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 
 interface Props {
+  provider: Provider | undefined;
   ctx: NamingContext | undefined;
   items: readonly SelectionItem[];
   many: ManyResult | undefined;
@@ -35,7 +38,7 @@ function groupByScope(many: ManyResult, items: readonly SelectionItem[]): Array<
   return groups;
 }
 
-export function NamesPanel({ ctx, items, many, labels }: Props) {
+export function NamesPanel({ provider, ctx, items, many, labels }: Props) {
   const names = many?.items.length ?? 0;
   const pass = many?.items.filter((i) => i.valid).length ?? 0;
   const allPass = names > 0 && pass === names;
@@ -57,17 +60,28 @@ export function NamesPanel({ ctx, items, many, labels }: Props) {
       <p data-pass-meaning className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{en.ui.pass_meaning}</p>
 
       {!ctx && <p role="status" data-names-empty className={EMPTY}>{en.ui.empty_state}</p>}
-      {ctx && items.length === 0 && <p role="status" data-names-empty className={EMPTY}>{en.ui.names_empty_selection}</p>}
+      {ctx && items.length === 0 && (
+        <>
+          {provider && labels && <TerraformButton provider={provider} many={undefined} labels={labels} />}
+          <p role="status" data-names-empty className={EMPTY}>{en.ui.names_empty_selection}</p>
+        </>
+      )}
       {ctx && many && <Results ctx={ctx} items={items} many={many} labels={labels} />}
     </section>
   );
 }
 
+/** Terraform 복사 — 선택이 있으면 이름 줄 + 태그, 없으면(many 없음) 태그 블록만 */
+function TerraformButton({ provider, many, labels }: { provider: Provider; many: ManyResult | undefined; labels: LabelSet | undefined }) {
+  const hcl = useMemo(() => selectionTerraform(provider, many, labels, VERSION, en), [provider, many, labels]);
+  return <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>;
+}
+
 function Results({ ctx, items, many, labels }: { ctx: NamingContext; items: readonly SelectionItem[]; many: ManyResult; labels: LabelSet | undefined }) {
-  const all = allNamesText(many);
-  const json = JSON.stringify(toNamesExport(many, ctx, VERSION, items), null, 2);
-  const hcl = toTerraformLocals(manyEntries(many), labels ? { [many.provider]: labels } : {}, en, VERSION);
-  const groups = groupByScope(many, items);
+  // 내보내기 문자열은 결과가 바뀔 때만 다시 만든다 — 이름 200개면 렌더마다 만들 값이 아니다
+  const all = useMemo(() => allNamesText(many), [many]);
+  const json = useMemo(() => JSON.stringify(toNamesExport(many, ctx, VERSION, items), null, 2), [many, ctx, items]);
+  const groups = useMemo(() => groupByScope(many, items), [many, items]);
   return (
     <>
       <div className="flex flex-wrap gap-2">
@@ -75,7 +89,7 @@ function Results({ ctx, items, many, labels }: { ctx: NamingContext; items: read
           {all.skipped > 0 ? fillUi(en, 'copy_all_names_skipped', { n: all.skipped }) : en.ui.copy_all_names}
         </CopyButton>
         <CopyButton text={json} label={many.items.length > 0 ? en.ui.copy_names_json_label : en.ui.copy_names_json_blocked_label} disabled={many.items.length === 0} copyKey="names-json">JSON</CopyButton>
-        <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>
+        <TerraformButton provider={many.provider} many={many} labels={labels} />
       </div>
       {many.conflicts.length > 0 && (
         <ul data-conflicts className="space-y-1 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200">

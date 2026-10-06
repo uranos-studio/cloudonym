@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hclString, manyEntries, outputEntries as entriesOf, toTerraformLocals } from './terraform';
+import { hclString, manyEntries, outputEntries as entriesOf, selectionTerraform, toTerraformLocals } from './terraform';
 import { generate, generateMany } from '../core/engine';
 import { labelsFor } from '../core/labels';
 import { validateSelection } from '../core/selection';
@@ -99,5 +99,23 @@ describe('hclString', () => {
     expect(hclString('\u061C\u2028')).toBe('"\\u061C\\u2028"');
     // 역슬래시 이스케이프 뒤에 바꾸므로 넣은 \\u 가 다시 두 겹이 되지 않는다 · 한글은 그대로
     expect(hclString('\\\u202E개발')).toBe('"\\\\\\u202E개발"');
+  });
+});
+
+describe('selectionTerraform — ④ 의 Terraform 버튼 (선택이 0개여도 태그 블록을 복사한다)', () => {
+  const version = { engine: '0.0.0', rules: '2026-09-29.1' };
+  it('선택 0개(many 없음) → 이름 줄 없이 그 CSP 의 태그 블록만 담은 locals', () => {
+    const hcl = selectionTerraform('azure', undefined, labelsFor(ctx, 'azure'), version);
+    expect(hcl).toContain('  # azure\n  azure_tags = {\n');
+    expect(hcl).toContain('    owner = "infra"\n');
+    expect(hcl.endsWith('  }\n}\n')).toBe(true);
+    expect(hcl).not.toContain('aws');
+  });
+  it('선택이 있으면 이름 줄 + 태그 블록 — toTerraformLocals(manyEntries) 와 같다', () => {
+    const res = validateSelection('azure', [{ type: 'resource_group' }]);
+    if (!res.ok) throw new Error('선택이 틀렸다');
+    const many = generateMany(ctx, 'azure', res.items);
+    const labels = labelsFor(ctx, 'azure');
+    expect(selectionTerraform('azure', many, labels, version)).toBe(toTerraformLocals(manyEntries(many), { azure: labels }, undefined, version));
   });
 });

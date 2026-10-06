@@ -32,6 +32,12 @@ export function manyEntries(many: ManyResult): TerraformNames {
   return { [many.provider]: many.items.map((i) => ({ key: i.key, result: i })) };
 }
 
+/** ④ 의 Terraform 버튼 — 고른 CSP 하나의 이름 줄 + 태그 블록. 선택이 0개(many 없음)여도 태그 블록만 담은 locals 를 낸다 */
+export function selectionTerraform(provider: Provider, many: ManyResult | undefined, labels: LabelSet | undefined, version: Version, catalog: Catalog = en): string {
+  const names: TerraformNames = many ? manyEntries(many) : { [provider]: [] };
+  return toTerraformLocals(names, labels ? { [provider]: labels } : {}, catalog, version);
+}
+
 /** generate(세 CSP 전 리소스) 결과 → 항목 key = resourceType. 기준선 시험(core/baseline.test)이 옛 꼴 그대로 대어 보는 데 쓴다 */
 export function outputEntries(out: GenerateOutput): TerraformNames {
   return Object.fromEntries(Object.entries(out).map(([p, names]) => [p, Object.entries(names ?? {}).map(([key, result]) => ({ key, result }))]));

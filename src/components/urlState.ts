@@ -16,7 +16,7 @@ const MAX_JSON_BYTES_PER_UNIT = 6;
 const RULES_VERSION_RE = /^\d{4}-\d{2}-\d{2}\.\d{1,2}$/;
 /** 뼈대의 `v` 자리 — N 두 자리(`YYYY-MM-DD.NN` 13자)로 잡는다. 지금 규칙 버전의 길이를 쓰지 않는다 — 상한이 규칙 버전에 따라 움직이면 안 된다 */
 const V_PLACEHOLDER = '0000-00-00.00';
-/** 상한식이 기대는 두 수 — 규칙 표의 resourceType 길이(constraints.test 가 센다) · 역할 꼴(ROLE_PATTERN 의 16). 규칙이 늘어도 상한은 움직이지 않는다 (D42) */
+/** 상한식이 기대는 두 수 — 규칙 표의 resourceType 길이(urlState.test 「상수 둘은 core 의 판정과 맞다」가 세 CSP 규칙 전부를 센다) · 역할 꼴(ROLE_PATTERN 의 16). 규칙이 늘어도 상한은 움직이지 않는다 (D42) */
 export const MAX_RESOURCE_TYPE_CHARS = 40;
 export const MAX_ROLE_CHARS = 16;
 /** r 의 항목 하나 최악 — 수(`"<40>":99,` 47 바이트)와 역할(`"<40>":"<16>",` 62 바이트) 중 큰 쪽. 값이 배타라 한 type 은 한 번만 나온다 */
