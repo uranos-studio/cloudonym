@@ -1,8 +1,8 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒄을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
 스크린샷에는 중립 예시 값만 쓴다(INPUT · OTHER · 기호만 든 system).
-⒃ 은 시험 전용 fixture(`?fixture=conflict`)를 쓴다 — DEV 빌드(npm run dev)에서만 열린다.
+⒃ · ⒆ 는 시험 전용 fixture(`?fixture=conflict` · `?fixture=rules500`)를 쓴다 — DEV 빌드(npm run dev)에서만 열린다.
 
 실행(저장소 루트) — 터미널 둘:
   ① npm run dev -- --host 127.0.0.1 --port 5199 --strictPort
@@ -214,19 +214,41 @@ with sync_playwright() as p:
     assert sent.count('ui_visit') == 1, f'ui_visit 이 {sent.count("ui_visit")}회 — StrictMode 이중 effect 를 sessionStorage 가드가 막아야 한다: {sent}'
     assert sent.count('ui_generate') == 1, f'ui_generate 가 {sent.count("ui_generate")}회 — 다섯 입력을 1초 디바운스로 한 번 · CSP · 선택은 세지 않는다: {sent}'
 
-    # ── ⑽ 단계 — CSP 를 바꾸면 선택이 지워진다 · 바꾸기 전 확인 · 취소하면 그대로 ──
-    page.once('dialog', lambda d: (errors.append('') if d.message != 'Switching the cloud clears 1 selected resources. Continue?' else None, d.dismiss()))
+    # ── ⑽ 단계 — CSP 를 바꾸면 선택이 지워진다 · 방향키는 포커스만 옮긴다(대화창 없음) · 스페이스로 고르면 바꾸기 전 확인 · 취소하면 그대로 ──
+    dialogs = []
+    record = lambda d: (dialogs.append(d.message), d.dismiss())
+    page.on('dialog', record)
     page.locator('[data-cloud="gcp"]').focus()
-    page.keyboard.press('ArrowRight')  # 라디오 그룹 — 방향키로 옆 CSP 를 고른다
+    page.keyboard.press('ArrowRight')  # 수동 선택 라디오 그룹 — 포커스만 azure 로
+    page.keyboard.press('ArrowRight')  # aws 로 (둘 다 대화창을 띄우지 않는다)
+    page.keyboard.press('ArrowLeft')   # 다시 azure
+    page.wait_for_timeout(200)
+    assert dialogs == [], f'방향키가 확인 창을 띄웠다: {dialogs}'
+    assert page.evaluate('document.activeElement.dataset.cloud') == 'azure'
+    expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(page.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'false')
+    # 탭 순서는 체크된 라디오가 받는다 — 포커스가 옮겨도 aria-checked · tabIndex 가 서로 맞다
+    assert page.eval_on_selector_all('[role="radio"]', 'els => els.map(e => [e.dataset.cloud, e.tabIndex])') == [['aws', -1], ['gcp', 0], ['azure', -1]]
+    page.keyboard.press('Space')  # 고른다 → 확인 창 → 취소
+    page.wait_for_timeout(200)
+    assert dialogs == ['Switching the cloud clears 1 selected resources. Continue?'], dialogs
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(page.locator('[data-selected-count]')).to_have_text('1 selected')
+    page.remove_listener('dialog', record)
     page.once('dialog', lambda d: d.accept())
-    page.click('[data-cloud="azure"]')
+    page.keyboard.press('Enter')
     expect(page.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'true')
     expect(page.locator('[data-selected-count]')).to_have_text('0 selected')
     expect(page.locator('article[data-key]')).to_have_count(0)
     page.wait_for_timeout(1200)
     assert sent.count('ui_generate') == 1, f'CSP 전환이 ui_generate 를 셌다: {sent}'
+    # 선택이 0개여도 Terraform 버튼으로 태그 블록만 담은 locals 를 복사한다
+    expect(page.locator('[data-names-empty]')).to_have_text('Pick resources in step 3 to generate their names.')
+    page.click('[data-copy="terraform"]')
+    tags_only = page.evaluate('navigator.clipboard.readText()')
+    assert '  # azure\n  azure_tags = {\n' in tags_only, tags_only
+    assert '    owner = "devops"\n' in tags_only and tags_only.endswith('  }\n}\n'), tags_only
+    assert 'azure_storage' not in tags_only and 'INVALID' not in tags_only, tags_only
 
     # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드 ──
     # 처음엔 뿌리 바로 아래 한 단계만 펼친다 — Resource group 안은 닫혀 있다
@@ -263,6 +285,23 @@ with sync_playwright() as p:
     role_input.fill('D')  # 꼴이 틀리면 반영하지 않고 aria-invalid
     expect(role_input).to_have_attribute('aria-invalid', 'true')
     expect(page.locator('article[data-key="managed_identity_sync"]')).to_have_count(1)
+    # 무효인 동안 그 행에 「이전 역할로 생성됨」 안내 · blur 하면 칸이 마지막 유효 값으로 돌아간다
+    mi_row = row(page, 'managed_identity')
+    expect(mi_row.locator('[data-role-stale]')).to_have_text('Not a valid role — names still use the previous role "sync"')
+    expect(role_input).to_have_attribute('aria-describedby', mi_row.locator('[data-role-stale]').get_attribute('id'))
+    role_input.blur()
+    expect(role_input).to_have_value('sync')
+    expect(role_input).to_have_attribute('aria-invalid', 'false')
+    expect(mi_row.locator('[data-role-stale]')).to_have_count(0)
+    role_input.fill('Web')  # 대문자는 blur 때 소문자로 — 꼴에 맞으면 반영한다
+    expect(mi_row.locator('[data-role-stale]')).to_be_visible()
+    role_input.blur()
+    expect(role_input).to_have_value('web')
+    expect(page.locator('article[data-key="managed_identity_web"]')).to_have_count(1)
+    role_input.fill('')
+    expect(mi_row.locator('[data-role-stale]')).to_have_text('Not a valid role — names still use the previous role "web"')
+    role_input.blur()
+    expect(role_input).to_have_value('web')
     role_input.fill('db')
     expect(page.locator('article[data-key="managed_identity_db"] [data-name]')).to_have_text('payments-ledger-prd-id-db')
     expect(page.locator('[data-names-summary]')).to_have_text('4 resources · 5 names · 5/5 PASS')
@@ -310,6 +349,10 @@ with sync_playwright() as p:
     assert 'subnet' in want and len(want) < len(ALL_ROWS), want  # 공허하지 않다 — 일치가 있고 걸러지는 행도 있다
     expect(tree_rows(page)).to_have_count(len(want))
     assert sorted(visible_types(page)) == want, visible_types(page)  # 일치하는 행만 남고 그 조상은 펼친다
+    # 걸러진 동안 범위 머리(summary)를 눌러도 접히지 않는다 — <details> DOM 과 React 상태가 어긋나지 않게
+    page.locator('[data-tree] details[data-scope] > summary').first.click()
+    assert page.eval_on_selector_all('[data-tree] details', 'els => els.every(e => e.open)'), '걸러진 트리의 details 가 닫혔다'
+    assert sorted(visible_types(page)) == want, visible_types(page)
     search.fill('zzz-none')
     expect(page.locator('[data-search-empty]')).to_have_text('No resource matches. A resource missing from this list is not supported yet.')
     search.fill('')
@@ -326,10 +369,15 @@ with sync_playwright() as p:
     page.uncheck('[data-selected-only]')
     expect(tree_rows(page)).to_have_count(len(AZ_TREE))
     assert chip_count(page, 'all') == len(AZ_TREE), chip_count(page, 'all')
-    page.click('[data-collapse-all]')  # 뿌리만 열어 둔다 — 깊이 0 의 규칙만 보인다
+    # 검색을 지운 뒤에도 뿌리 범위는 열려 있다(걸러진 동안 누른 summary 가 DOM 만 닫아 두지 않았다)
+    assert page.eval_on_selector('[data-tree] details[data-scope]', 'e => e.open')
+    page.click('[data-collapse-all]')  # 뿌리만 열어 두고 분류 묶음은 전부 접는다 — 깊이 0 의 규칙 중 묶음 밖 것만 보인다
     roots = sorted(t for t, d in AZ_TREE if d == 0)
     assert {'storage_account', 'key_vault', 'sql_server'} <= set(roots) and len(roots) < len(AZ_TREE), roots
-    assert sorted(visible_types(page)) == roots, visible_types(page)
+    groups = page.eval_on_selector_all('[data-tree] details[data-group]', 'els => els.map(e => e.open)')
+    assert len(groups) > 0 and not any(groups), groups  # 공허하지 않다 — 묶음이 있고 전부 닫혔다
+    in_group = page.eval_on_selector_all('[data-tree] details[data-group] [data-rule]', 'els => els.map(e => e.dataset.type)')
+    assert sorted(visible_types(page)) == sorted(t for t in roots if t not in in_group), (visible_types(page), roots, in_group)
     page.click('[data-expand-all]')
 
     # ── ⑵ 공유 URL 을 새 탭(새 컨텍스트 = 빈 sessionStorage)에 붙이면 문맥 · CSP · 선택이 복원된다 ──
@@ -529,6 +577,52 @@ with sync_playwright() as p:
     assert hash_state(page8.url) == {**INPUT, 'v': RULES, 'p': 'azure', 'r': {'virtual_machine': 2}}, f'화면은 2 인데 주소창은 {hash_state(page8.url)}'
     ctx8.close()
 
+    # ── ⒅ 문맥 한 칸을 비워도 주소창 hash 는 마지막 온전한 상태로 남는다 → 새로고침하면 CSP · 선택이 돌아온다 · 그동안 Share URL 은 없다 ──
+    ctx18 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    page18 = ctx18.new_page()
+    page18.on('pageerror', lambda e: errors.append(str(e)))
+    full = state_hash(INPUT, RULES, 'azure', {'virtual_machine': 2})
+    goto_ready(page18, BASE + '/' + full)
+    expect(page18.locator('[data-copy="share-url"]')).to_have_count(1)
+    page18.fill('#field-owner', '')
+    expect(page18.locator('[data-names-empty]')).to_have_text('Fill in Owner · System · Purpose to generate names.')
+    expect(page18.locator('[data-copy="share-url"]')).to_have_count(0)  # 낡은 값을 복사할 버튼이 없다
+    page18.wait_for_timeout(300)
+    assert page18.evaluate('location.hash') == full, page18.evaluate('location.hash')
+    page18.evaluate("() => { location.hash = '#state=!!!'; }")  # 깨진 hash 로 이동 → 마지막 온전한 hash 로 되돌린다(지우지 않는다)
+    page18.wait_for_function('h => location.hash === h', arg=full)
+    page18.reload(wait_until='networkidle')
+    expect(page18.locator('#field-owner')).to_have_value(INPUT['owner'])
+    expect(page18.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'true')
+    expect(row(page18, 'virtual_machine').locator('[data-count]')).to_have_text('2')
+    expect(page18.locator('article[data-key]')).to_have_count(2)
+    ctx18.close()
+
+    # ── ⒆ 선택 상한(이름 200개)에서 ↓ 는 비활성 체크 상자를 건너뛴다 (?fixture=rules500) ──
+    ctx19 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    page19 = ctx19.new_page()
+    page19.on('pageerror', lambda e: errors.append(str(e)))
+    sel200 = {f'fx500_{i:03d}': ('sync' if i % 4 == 2 else 1) for i in range(200)}  # src/dev/fixtureRules.ts 의 입력 종류 순환
+    goto_ready(page19, BASE + '/?fixture=rules500' + state_hash(INPUT, RULES, 'azure', sel200))
+    expect(page19.locator('[data-selected-count]')).to_have_text('200 selected')
+    # 바로 다음 보이는 상자가 비활성이고 그 뒤에 활성 상자가 있는 체크된 행 — 기대값은 그 뒤 첫 활성 상자
+    plan = page19.evaluate('''() => {
+      const boxes = [...document.querySelectorAll('[data-tree] input[data-row-check]')].filter((b) => b.checkVisibility());
+      for (let i = 0; i < boxes.length - 1; i++) {
+        if (boxes[i].disabled || !boxes[i + 1].disabled) continue;
+        const j = boxes.findIndex((b, k) => k > i && !b.disabled);
+        if (j > 0) return { from: boxes[i].closest('[data-rule]').dataset.type, to: boxes[j].closest('[data-rule]').dataset.type, skipped: j - i - 1 };
+      }
+      return null;
+    }''')
+    assert plan and plan['skipped'] > 0, plan
+    row(page19, plan['from']).locator('input[data-row-check]').focus()
+    page19.keyboard.press('ArrowDown')
+    assert page19.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == plan['to'], plan
+    page19.keyboard.press('ArrowUp')
+    assert page19.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == plan['from'], plan
+    ctx19.close()
+
     # ── ⒃ 충돌 fixture(시험 전용 규칙 둘 · ?fixture=conflict) → 두 카드 FAIL · 충돌 줄 · Copy all names 의 skipped 수 (D41) ──
     ctx16 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page16 = ctx16.new_page()
@@ -547,4 +641,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒄ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

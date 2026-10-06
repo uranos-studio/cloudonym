@@ -1,5 +1,7 @@
 // ① Cloud — AWS · GCP · Azure 중 하나 (D42). 첫 방문은 아무것도 고르지 않는다 — 숨은 기본값을 두지 않는다(오너 결정).
-// 라디오 그룹 — 방향키로 옮기면 그 CSP 를 고른다(바꾸기 전 확인은 App 몫)
+// 라디오 그룹 — 「수동 선택」 꼴: 방향키는 포커스만 옮기고 Space · Enter(버튼의 click)로 고른다. 바꾸기 전 확인은 App 몫.
+// CSP 전환은 선택을 지우는 동작이라 방향키마다 고르면 누를 때마다 확인 창이 뜨고, 취소해도 포커스만 옮겨 aria-checked 와 어긋난다.
+// WAI-ARIA APG 의 radio group 은 툴바 안에서 이 꼴(방향키는 포커스만 · Space 로 체크)을 정해 둔다. 탭 순서(tabIndex 0)는 체크된 라디오가 받는다
 import { useRef, type KeyboardEvent } from 'react';
 import { PROVIDERS, type Provider } from '../core/types';
 import { en } from '../messages/en';
@@ -23,7 +25,6 @@ export function CloudPicker({ value, onPick }: { value: Provider | undefined; on
     const i = (next + PROVIDERS.length) % PROVIDERS.length;
     const p = PROVIDERS[i];
     if (!p) return;
-    onPick(p);
     refs.current[i]?.focus();
   };
   // 아무것도 고르지 않았으면 첫 버튼이 탭 순서를 받는다

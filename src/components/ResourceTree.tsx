@@ -1,7 +1,7 @@
 // ③ Resources — 이름 유일 범위 트리(D37) · 검색 · 분류 칩 · 「선택만 보기」 · 접기 · 체크 · 개수/역할.
 // 선택 상태는 App 의 Map 하나이고 이 트리는 그것을 읽기만 한다. 바꾼 값은 onChange 로 넘기고 판정(core validateSelection)은 App 이 한다.
 // 키보드 — 행의 체크 상자에서 ↑ ↓ 로 행 이동 · 스페이스로 체크 · + - 로 개수
-import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Minus, Plus, Search } from 'lucide-react';
 import { inputKind, scopePath, type TreeNode } from '../core/tree';
 import { ROLE_PATTERN } from '../core/selection';
@@ -48,6 +48,10 @@ function initialOpen(tree: TreeNode, picked: Picked): Set<string> {
   return open;
 }
 const allScopeIds = (n: TreeNode): string[] => [n.scope.id, ...n.children.flatMap(allScopeIds)];
+/** 분류 묶음 id 전부 — 「모두 접기」가 묶음도 접는다. 걸러진 트리는 묶음 판정이 달라질 수 있어 범위 × 분류 전부를 담는다(없는 id 는 쓰이지 않을 뿐이다) */
+const allGroupIds = (n: TreeNode): string[] => [...new Set(n.rules.map((r) => `${n.scope.id}/${r.category}`)), ...n.children.flatMap(allGroupIds)];
+/** 걸러진 동안 summary 를 눌러도 접지 않는다 — open 은 그동안 늘 true 라 React 가 DOM 을 다시 쓰지 않아, 접힌 DOM 과 상태가 어긋난다 */
+const keepOpenWhile = (filtering: boolean) => (e: MouseEvent<HTMLElement>) => { if (filtering) e.preventDefault(); };
 
 function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
@@ -95,8 +99,9 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
     const row = target.closest<HTMLElement>('[data-rule]');
     if (!row) return;
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      // 보이는 행만 — 닫힌 <details> 의 내용은 content-visibility 로 숨어 offsetParent 가 남으므로 checkVisibility 로 본다
-      const boxes = [...(containerRef.current?.querySelectorAll<HTMLInputElement>('input[data-row-check]') ?? [])].filter((b) => b.checkVisibility());
+      // 보이는 행만 — 닫힌 <details> 의 내용은 content-visibility 로 숨어 offsetParent 가 남으므로 checkVisibility 로 본다.
+      // 선택 상한에서 비활성인 상자는 건너뛴다 — focus() 가 먹지 않아 이동이 거기서 막힌다
+      const boxes = [...(containerRef.current?.querySelectorAll<HTMLInputElement>('input[data-row-check]') ?? [])].filter((b) => b === target || (!b.disabled && b.checkVisibility()));
       const i = boxes.indexOf(target);
       const next = boxes[e.key === 'ArrowDown' ? i + 1 : i - 1];
       if (next) { e.preventDefault(); next.focus(); }
@@ -127,7 +132,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
     const grouped = n.rules.length > GROUP_AT && cats.length > 1;
     return (
       <details key={id} open={isOpen} data-scope={id} onToggle={(e) => { if (!filtering) setScopeOpen(id, e.currentTarget.open); }}>
-        <summary className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
+        <summary onClick={keepOpenWhile(filtering)} className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
           <ChevronRight aria-hidden="true" data-chevron className="size-4 shrink-0 text-zinc-500" />{n.scope.displayName} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">({n.total})</span>
         </summary>
         <div className={depth === 0 ? 'pl-1' : 'ml-2 border-l border-zinc-200 pl-2 dark:border-zinc-800'}>
@@ -137,7 +142,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
               const rules = n.rules.filter((r) => r.category === c);
               return (
                 <details key={gid} open={filtering || !closedGroups.has(gid)} data-group={gid} onToggle={(e) => { if (!filtering) setGroupOpen(gid, e.currentTarget.open); }}>
-                  <summary className="flex min-h-8 cursor-pointer items-center gap-1 px-1 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+                  <summary onClick={keepOpenWhile(filtering)} className="flex min-h-8 cursor-pointer items-center gap-1 px-1 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
                     <ChevronRight aria-hidden="true" data-chevron className="size-3.5 shrink-0" />{CATEGORY_LABEL[c]} ({rules.length})
                   </summary>
                   <div className="ml-2 border-l border-zinc-200 pl-2 dark:border-zinc-800">{renderRows(rules)}</div>
@@ -192,7 +197,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
             onClick={() => { setOpen(new Set(allScopeIds(tree))); setClosedGroups(new Set()); }}>
             <ChevronsUpDown aria-hidden="true" className="size-3.5" />{en.ui.expand_all}
           </button>
-          <button type="button" className={SMALL_BUTTON} data-collapse-all onClick={() => setOpen(new Set([tree.scope.id]))}>
+          <button type="button" className={SMALL_BUTTON} data-collapse-all onClick={() => { setOpen(new Set([tree.scope.id])); setClosedGroups(new Set(allGroupIds(tree))); }}>
             <ChevronsDownUp aria-hidden="true" className="size-3.5" />{en.ui.collapse_all}
           </button>
         </div>
@@ -226,7 +231,7 @@ const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount
   const kind = inputKind(rule);
   const name = { displayName: rule.displayName };
   return (
-    <div data-rule={rule.id} data-type={rule.resourceType} data-rule-category={rule.category} data-entity={rule.entity} data-checked={checked} className="flex min-h-11 items-center gap-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
+    <div data-rule={rule.id} data-type={rule.resourceType} data-rule-category={rule.category} data-entity={rule.entity} data-checked={checked} className="flex min-h-11 flex-wrap items-center gap-x-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
       <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-sm">
         <input type="checkbox" data-row-check checked={checked} disabled={!canCheck} onChange={() => onToggle(rule)}
           aria-label={fillUi(en, 'select_resource_label', name)} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed" />
@@ -256,26 +261,44 @@ const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount
   );
 });
 
-/** 역할 입력 — 꼴(ROLE_PATTERN)에 맞을 때만 선택에 반영하고, 그 전엔 aria-invalid 로 알린다 */
+/** 역할 입력 — 꼴(ROLE_PATTERN)에 맞을 때만 선택에 반영한다. 무효인 동안은 aria-invalid 와 「이전 역할로 생성됨」 안내(행 아래 한 줄)를 보이고,
+ *  blur 때 대문자를 소문자로 바꿔 맞으면 반영하고 아니면 칸을 마지막 유효 값으로 되돌린다 — 칸과 이름 · hash 가 다른 값을 보이지 않게 */
 function RoleInput({ rule, value, disabled, onRole }: { rule: ResourceRule; value: string | undefined; disabled: boolean; onRole: (r: ResourceRule, role: string) => void }) {
   const [draft, setDraft] = useState(value ?? '');
   const [shown, setShown] = useState(value);
+  const noteId = useId();
   if (shown !== value) {
     setShown(value);
     setDraft(value ?? '');
   }
   const valid = disabled || ROLE_PATTERN.test(draft);
+  const settle = () => {
+    if (disabled) return;
+    const lower = draft.toLowerCase();
+    if (ROLE_PATTERN.test(lower)) {
+      setDraft(lower);
+      if (lower !== value) onRole(rule, lower);
+    } else setDraft(value ?? '');
+  };
   return (
-    <input
-      type="text" data-role-input value={disabled ? '' : draft} disabled={disabled} maxLength={16} placeholder="sync"
-      aria-label={fillUi(en, 'role_label', { displayName: rule.displayName })} aria-invalid={!valid} title={en.ui.role_hint}
-      onChange={(e) => {
-        const v = e.target.value;
-        setDraft(v);
-        if (ROLE_PATTERN.test(v)) onRole(rule, v);
-      }}
-      className="w-[5.5rem] shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-1 font-mono text-xs disabled:opacity-40 aria-invalid:border-rose-600 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-950"
-    />
+    <>
+      <input
+        type="text" data-role-input value={disabled ? '' : draft} disabled={disabled} maxLength={16} placeholder="sync"
+        aria-label={fillUi(en, 'role_label', { displayName: rule.displayName })} aria-invalid={!valid} aria-describedby={valid ? undefined : noteId} title={en.ui.role_hint}
+        onChange={(e) => {
+          const v = e.target.value;
+          setDraft(v);
+          if (ROLE_PATTERN.test(v)) onRole(rule, v);
+        }}
+        onBlur={settle}
+        className="w-[5.5rem] shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-1 font-mono text-xs disabled:opacity-40 aria-invalid:border-rose-600 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-950"
+      />
+      {!valid && value !== undefined && (
+        <p id={noteId} data-role-stale role="status" className="basis-full pb-1 text-right text-xs text-rose-700 dark:text-rose-300">
+          {fillUi(en, 'role_stale', { role: value })}
+        </p>
+      )}
+    </>
   );
 }
 

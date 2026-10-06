@@ -143,6 +143,7 @@ export const en: Catalog = {
     count_fixed_hint: 'This resource has no sequence number, so it is always one',
     role_label: 'Role for {displayName}',
     role_hint: '2–16 lowercase letters or digits',
+    role_stale: 'Not a valid role — names still use the previous role "{role}"',
     tree_label: 'Resource tree — arrow keys move, space selects, + and - change the count',
     names_summary: '{resources} resources · {names} names · {pass}/{names} PASS',
     names_empty_selection: 'Pick resources in step 3 to generate their names.',
