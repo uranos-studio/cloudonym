@@ -31,7 +31,7 @@ export function ResultCard({ result: r }: { result: NameResult | NameItem }) {
 
       <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-2 dark:bg-zinc-950">
         <code data-name className="min-w-0 break-all font-mono text-sm text-zinc-900 dark:text-zinc-100">{r.name || '—'}</code>
-        {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 (L3) */}
+        {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 */}
         <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${key}`} />
       </div>
 

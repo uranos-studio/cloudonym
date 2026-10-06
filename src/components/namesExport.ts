@@ -1,4 +1,4 @@
-// 이름 내보내기 (D41) — 엔진 결과를 옮겨 적을 뿐이다. 무효(충돌 포함)는 names 에 넣지 않는다 — 「무효를 유효로 내지 않는다」 (L3)
+// 이름 내보내기 (D41) — 엔진 결과를 옮겨 적을 뿐이다. 무효(충돌 포함)는 names 에 넣지 않는다 — 「무효를 유효로 내지 않는다」
 import type { ManyResult } from '../core/engine';
 import type { SelectionItem } from '../core/selection';
 import type { NamingContext, Provider, ScopeId } from '../core/types';

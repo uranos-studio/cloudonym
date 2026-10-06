@@ -9,7 +9,7 @@ import { VERSION } from '../version';
 
 export function LabelsPanel({ provider, labels }: { provider: Provider; labels: LabelSet }) {
   const json = JSON.stringify({ version: VERSION, labels: { [provider]: labels.labels } }, null, 2);
-  // 한도를 넘은 값은 CSP 가 거부한다 — Terraform 이 `# INVALID:` 로 바꾸듯 JSON 도 내보내지 않는다 (L3 「무효를 유효로 내지 않는다」)
+  // 한도를 넘은 값은 CSP 가 거부한다 — Terraform 이 `# INVALID:` 로 바꾸듯 JSON 도 내보내지 않는다 (「무효를 유효로 내지 않는다」)
   const jsonBlocked = labelsJsonBlocked([provider], { [provider]: labels });
   const transformed = labels.transformed.map((t) => `${provider} · ${format(t, en)}`);
   const violations = labels.violations.map((v) => `${provider} · ${format(v, en)}`);

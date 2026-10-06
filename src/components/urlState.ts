@@ -1,4 +1,4 @@
-// URL hash ↔ 화면 상태(문맥 다섯 값 · 규칙 버전 v · CSP p · 선택 r) — 화면 상태의 저장소는 URL 뿐이다 (L3 · D17 · D42).
+// URL hash ↔ 화면 상태(문맥 다섯 값 · 규칙 버전 v · CSP p · 선택 r) — 화면 상태의 저장소는 URL 뿐이다 (D17 · D42).
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다. 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
 import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';

@@ -28,7 +28,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 # ⑴ 의 입력 — 기본값(platform · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
 INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prd', 'region': 'kr'}
-# 같은 탭 공유 URL 이동(I-2)의 입력 — INPUT 과 다섯 값이 모두 다르다
+# 같은 탭 공유 URL 이동의 입력 — INPUT 과 다섯 값이 모두 다르다
 OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'jp'}
 # ⑴ 에서 고르는 Azure 선택 — 트리 순서(Global → Subscription → Resource group)
 PICK = {'storage_account': 1, 'resource_group': 1, 'managed_identity': 'db', 'virtual_machine': 2}
@@ -334,7 +334,7 @@ with sync_playwright() as p:
     assert page2.url == copied_url, (page2.url, copied_url)
     ctx2.close()
 
-    # ── ⑹ 같은 탭에서 공유 URL 로 이동(hash 만 바뀐다) → 상태가 따라온다 · ui_generate 를 세지 않는다 · 깨진 hash 는 지금 상태로 되돌린다 (I-2) ──
+    # ── ⑹ 같은 탭에서 공유 URL 로 이동(hash 만 바뀐다) → 상태가 따라온다 · ui_generate 를 세지 않는다 · 깨진 hash 는 지금 상태로 되돌린다 ──
     generated_before = sent.count('ui_generate')
     other_hash = state_hash(OTHER, RULES, 'gcp', {'compute_instance': 3})
     page.evaluate('h => { location.hash = h; }', other_hash)
@@ -391,7 +391,7 @@ with sync_playwright() as p:
     expect(vm1).to_have_attribute('data-valid', 'false')
     expect(vm1).to_contain_text('FAIL')
     expect(vm1.locator('[data-name]')).to_have_text('—')
-    # 정제 뒤 빈 값의 변환 줄(「'system' normalised from '###' to ''」)은 숨긴다 — 위반 이유가 이미 말한다 (M-2)
+    # 정제 뒤 빈 값의 변환 줄(「'system' normalised from '###' to ''」)은 숨긴다 — 위반 이유가 이미 말한다
     expect(vm1.locator('[data-steps]')).to_have_count(0)
     expect(vm1.locator('button[data-copy]')).to_be_disabled()
     expect(page.locator('[data-names-summary]')).to_have_text('4 resources · 5 names · 0/5 PASS')

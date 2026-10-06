@@ -1,4 +1,4 @@
-// 엔진 결과 → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다 (L3)
+// 엔진 결과 → Terraform `locals` 블록 문자열. 이름 규칙은 여기 없다 — 엔진 결과를 옮겨 적을 뿐이다
 import type { ManyResult } from '../core/engine';
 import { PROVIDERS, type GenerateOutput, type LabelSet, type NameResult, type Provider } from '../core/types';
 import { escapeInvisible, fillUi, format, type Catalog } from '../messages/catalog';

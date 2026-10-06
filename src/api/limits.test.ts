@@ -11,7 +11,7 @@ function sizedPost(body: unknown): RequestInit {
   return { method: 'POST', headers: { 'content-type': 'application/json', 'content-length': String(new TextEncoder().encode(text).length) }, body: text };
 }
 
-describe('본문 16KB 상한 (I-1) — 413 · ErrorResponse 꼴', () => {
+describe('본문 16KB 상한 — 413 · ErrorResponse 꼴', () => {
   it('20KB 본문 (content-length 있음) → 413 { success:false, errors }', async () => {
     const { res } = await req(app, '/v1/generate', sizedPost({ context: { ...ctx, owner: 'a'.repeat(20 * 1024) } }));
     expect(res.status).toBe(413);
@@ -36,7 +36,7 @@ describe('본문 16KB 상한 (I-1) — 413 · ErrorResponse 꼴', () => {
   });
 });
 
-describe('필드 1024자 상한 (I-1) — 본문 상한과 별개로 400', () => {
+describe('필드 길이 상한(자유 입력 64 · 나머지 1024) — 본문 상한과 별개로 400', () => {
   it('validate name 1025자(본문 약 1.1KB) → 400 name: 1024자를 넘는다', async () => {
     const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: 'vpc', name: 'a'.repeat(1025) }));
     expect(res.status).toBe(400);
@@ -77,7 +77,7 @@ describe('필드 1024자 상한 (I-1) — 본문 상한과 별개로 400', () =>
   });
 });
 
-describe('onError — 처리하지 못한 예외도 JSON 500 (I-2 안전망)', () => {
+describe('onError — 처리하지 못한 예외도 JSON 500 (안전망)', () => {
   // 운영 라우트를 더하지 않는다: ExecutionContext 없이 부르면 c.executionCtx 가 실제로 던진다
   it('v1 라우트에서 던지면 500 { success:false, errors:[내부 오류] } · console.error', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});

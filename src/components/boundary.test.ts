@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-// 화면은 엔진을 부르기만 한다 (L3) — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes)뿐이다.
+// 화면은 엔진을 부르기만 한다 — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes)뿐이다.
 // 시험 전용 fixture(src/dev)는 import.meta.env.DEV 분기 안의 동적 import 로만 들인다 — 운영 번들에서 빠진다
 // node:fs 는 tsconfig.app.json(브라우저 타입 · node 없음)이 거부하므로 Vite 의 ?raw 글롭으로 소스를 읽는다
 const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;

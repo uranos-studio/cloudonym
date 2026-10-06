@@ -62,7 +62,7 @@ describe('logTelemetry', () => {
     expect(calls[0]!.init.headers.Authorization).toBe('Bearer k');
     expect(JSON.parse(calls[0]!.init.body)).toEqual([{ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'api_validate', user_agent: 'Cursor/1.0', is_ai_agent: true, provider: 'gcp' }]);
   });
-  it('자정 경계 한 번 호출 — KV 키 일자 · _time · kst_day 가 모두 KST 09-29 (M-3: Axiom 이 _time 을 UTC 로 저장해도 kst_day 로 KV 와 같은 날로 묶인다)', async () => {
+  it('자정 경계 한 번 호출 — KV 키 일자 · _time · kst_day 가 모두 KST 09-29 (Axiom 이 _time 을 UTC 로 저장해도 kst_day 로 KV 와 같은 날로 묶인다)', async () => {
     const { kv, store } = fakeKv();
     const { fetchFn, calls } = fakeFetch();
     await logTelemetry(source({ CLOUDONYM_KV: kv, AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }), 'ui_visit', {}, { now: NOW, fetchFn });
@@ -90,7 +90,7 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
-  it('KV put 이 끝나지 않아도 Axiom 은 보낸다 — 둘은 서로를 기다리지 않는다 (L-3)', async () => {
+  it('KV put 이 끝나지 않아도 Axiom 은 보낸다 — 둘은 서로를 기다리지 않는다', async () => {
     const { kv } = fakeKv('hang');
     const { fetchFn, calls } = fakeFetch();
     // await 하지 않는다 — KV 쪽이 영원히 끝나지 않으므로 전체 Promise 도 끝나지 않는다
@@ -98,7 +98,7 @@ describe('logTelemetry', () => {
     await tick();
     expect(calls).toHaveLength(1);
   });
-  it('Axiom 이 401 을 돌려주면 console.error 로 남긴다 — fetch 는 HTTP 오류에 reject 하지 않는다 (M-2)', async () => {
+  it('Axiom 이 401 을 돌려주면 console.error 로 남긴다 — fetch 는 HTTP 오류에 reject 하지 않는다', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const { fetchFn } = fakeFetch({ status: 401, body: '{"message":"invalid token"}' });
@@ -109,7 +109,7 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
-  it('Axiom 이 200 이어도 failed > 0 이면 console.error · failed 0 이나 빈 본문이면 조용하다 (M-2)', async () => {
+  it('Axiom 이 200 이어도 failed > 0 이면 console.error · failed 0 이나 빈 본문이면 조용하다', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const env = { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' };
@@ -156,7 +156,7 @@ describe('logTelemetry', () => {
       spy.mockRestore();
     }
   });
-  it('KV 값이 깨졌으면(숫자가 아니면) 0 에서 다시 센다 — NaN 을 저장하지 않는다 (L-2)', async () => {
+  it('KV 값이 깨졌으면(숫자가 아니면) 0 에서 다시 센다 — NaN 을 저장하지 않는다', async () => {
     const { kv, store } = fakeKv();
     store.set('stats:api_generate:2026-09-29', 'abc');
     await logTelemetry(source({ CLOUDONYM_KV: kv }), 'api_generate', {}, { now: NOW });
