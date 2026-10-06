@@ -19,9 +19,10 @@ npm test           # Vitest
 npm run typecheck  # tsc -b --noEmit
 npm run lint       # oxlint
 npm run build      # tsc -b && vite build && node scripts/check-bundle.mjs
+npm run test:rules # node --test scripts/rules/*.test.mjs (rule generators and source checks)
 ```
 
-All four must pass before you open a pull request. Add or update tests for any behaviour you change.
+All five must pass before you open a pull request. Add or update tests for any behaviour you change.
 
 ## Rules the code must follow
 
@@ -31,6 +32,36 @@ All four must pass before you open a pull request. Add or update tests for any b
 - **The engine version lives in two places.** When you change `version` in `package.json`, change `ENGINE_VERSION` in `src/version.ts` too — a test fails if they differ. The build fails if a devDependency name appears in `dist/` (`scripts/check-bundle.mjs`).
 - **System text comes from the catalog.** API messages and screen text are English sentences in `src/messages/en.ts`; the engine returns codes only. Tests reject Hangul in string literals, JSX text and API responses.
 - **`src/core/` stays pure** — it imports only its own modules (`./…`), no npm packages and nothing from `src/api/` or `src/components/`. The API and the UI only call the engine; naming logic does not live there.
+
+## Adding or changing a naming rule
+
+Rules are typed `const` data in `src/core/rules/` — no rule is parsed from documentation at run time (decisions D9 and D43 in [docs/decisions.md](docs/decisions.md)). Each provider has three kinds of file:
+
+| File | What it holds |
+|---|---|
+| `src/core/rules/{aws,gcp,azure}.ts` | Hand-written core rules, and the provider table that merges all three files |
+| `src/core/rules/{aws,gcp,azure}-manual.ts` | Rules added by hand for rows a generator could not read as formal — the official sentence is quoted above each rule |
+| `src/core/rules/{aws,gcp,azure}-intake.ts` | **Generated** — do not edit by hand. Re-run the generator instead |
+
+1. **Find the official source** and the sentence that states the length, characters and uniqueness scope. Every rule needs a `docUrl` to that page, an `entity` (the provider's type name for uniqueness) and a `scope` that exists in `src/core/scopes.ts`. If the document is ambiguous, choose the stricter reading and add a dated row to `docs/decisions.md`.
+2. **Generated rows** — run the generator for the provider; its header comment lists the inputs and the files it writes:
+   - `node scripts/rules/build-azure-rules.mjs <intake.json> <resource-abbreviations.html> --existing <json> --commit <sha>`
+   - `node scripts/rules/build-gcp-rules.mjs <compute.json> <cloudkms.json> --anchors anchors.json --existing existing.json`
+   - `node scripts/rules/build-aws-rules.mjs <schema folder> --anchors anchors.json`
+
+   Each one rewrites `src/core/rules/<provider>-intake.ts`, the source snapshot `src/core/__fixtures__/<provider>-intake.json`, the per-row examples `src/core/__fixtures__/rule-cases-<provider>-intake.json` and the list of rows it held back, `docs/<provider>-intake-held.md`. Read the diff row by row before committing.
+3. **Hand rows** — add the rule to `src/core/rules/<provider>-manual.ts` (or the core file) with the quoted source sentence.
+4. **Examples for every rule** — `src/core/rule-cases.test.ts` fails unless every rule has at least one name the document allows and one it rejects. Hand rules take theirs from `src/core/__fixtures__/rule-cases.json` (pick them from the document, not from your regular expression); generated rules take them from the generator's `rule-cases-<provider>-intake.json`.
+5. **Source fingerprints** — if you brought in rows from a newer copy of a source, refresh `docs/rule-sources.lock.json` with `node scripts/rules/check-sources.mjs --lock docs/rule-sources.lock.json … --write` (arguments in the script header) and commit the diff. A monthly workflow runs the same script without `--write` and only reports changes.
+6. **Rules revision and fingerprint** — bump `RULES_REVISION` in `src/core/revision.ts` (`YYYY-MM-DD.N`), then rewrite the fingerprint and, if the baseline output changed, the baseline:
+
+   ```sh
+   UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts
+   UPDATE_BASELINE=1 npx vitest run src/core/baseline.test.ts
+   ```
+
+   CI runs `node scripts/check-rules-revision.mjs <main's fingerprint> src/core/rules-fingerprint.json` and fails if the fingerprint changed without a new revision or the other way round.
+7. **Check** — `npm test`, `npm run test:rules`, `npm run typecheck`, `npm run lint` and `npm run build`. `/llms.txt` and the resource tree are generated from the rule table, so a new rule appears there without further edits.
 
 ## Pull requests
 
@@ -58,7 +89,8 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 ## 한국어 요약
 
 - **issue · PR 모두 환영한다.** 큰 변경(새 provider · 새 리소스 · API 변경)은 issue 로 먼저 방향을 맞춘다. 보안 문제는 [SECURITY.md](SECURITY.md) 를 따른다
-- **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` 넷을 통과시킨 뒤 PR 을 연다
+- **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run test:rules` 다섯을 통과시킨 뒤 PR 을 연다
+- **규칙 더하기** — 공식 문장을 찾아 `docUrl` · `entity` · `scope` 를 정한다 → 생성 행은 `scripts/rules/build-<provider>-rules.mjs` 를 다시 돌리고(`*-intake.ts` 는 손으로 고치지 않는다), 손 행은 `src/core/rules/<provider>-manual.ts` 에 원문을 인용해 넣는다 → 규칙마다 허용 · 거부 예가 있어야 `rule-cases.test.ts` 가 통과한다 → 출처를 새로 받았으면 `check-sources.mjs … --write` 로 `docs/rule-sources.lock.json` 을 고친다 → `RULES_REVISION` 을 올리고 `UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts` (기준선이 바뀌었으면 `UPDATE_BASELINE=1 npx vitest run src/core/baseline.test.ts`) 로 지문을 다시 쓴다
 - **규칙 숫자에는 CSP 공식 문서 URL(`docUrl`)이 붙는다.** 출처 없는 길이 · 정규식은 받지 않는다. 무효인 이름을 유효로 표시하지 않는다 — 문서가 모호하면 보수적으로 잡고 [docs/decisions.md](docs/decisions.md) 에 적는다
 - **규칙을 바꾸면 규칙 버전을 올린다** — 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경은 `src/core/revision.ts` 의 `RULES_REVISION` 을 올리고 `src/core/rules-fingerprint.json` 을 다시 쓴다. CI 가 `main` 과 대어 본다
 - **엔진 버전은 두 곳에 있다** — `package.json` 의 `version` 을 바꾸면 `src/version.ts` 의 `ENGINE_VERSION` 도 같이 바꾼다(다르면 시험이 실패한다). `dist/` 에 devDependency 이름이 있으면 빌드가 실패한다
