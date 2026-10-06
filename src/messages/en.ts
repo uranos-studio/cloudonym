@@ -48,6 +48,7 @@ export const en: Catalog = {
     'note.s3_an_suffix': () => 'The -an suffix is reserved for account-regional namespace buckets',
     'note.gcp_vm_project_unique': () => 'VM names must be unique across the project unless its vmDnsSetting is ZonalOnly, so this rule is placed at project scope although the API path is zones/{zone}/instances',
     'note.aws_key_pair_scope_unconfirmed': () => 'The API asks for "a unique name for the key pair" but does not say within what; this rule is placed at Region scope, which is not confirmed by the documentation. Only printable ASCII is accepted (conservative, D20)',
+    'note.aws_schema_scope_unconfirmed': () => 'Length and pattern come from the AWS CloudFormation resource schema and are matched against the whole name. The schema has no field for the uniqueness scope, so the scope shown here is not confirmed by the documentation',
     // 같은 요청 안 충돌 (conflict)
     'name.conflict': (m) => `Name '${m.params.name}' is used by more than one resource of the same kind in this request (${list(m.params.keys)}); the provider rejects the second one`,
     // 선택 (selection)

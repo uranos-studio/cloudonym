@@ -74,8 +74,8 @@
       "counts": {
         "types": 298
       },
-      "hashOf": "18개 네임스페이스(typeName 으로 고른다) 타입마다 createOnlyProperties, 최상위 속성 중 minLength · maxLength · pattern 이 있는 것의 세 값, 정렬",
-      "sha256": "2da03f0a197182c146f0dfe8337f83b8cfc410c05fddcf0183b19bfecb34a18c"
+      "hashOf": "18개 네임스페이스(typeName 으로 고른다) 타입마다 createOnlyProperties · 쓰기 가능한 VpcId/SubnetId 유무(Name 태그 자리), 최상위 속성 중 minLength · maxLength · pattern 이 있는 것의 세 값, 정렬",
+      "sha256": "8d104cc33f49f6b7efd7a3b65f07e15f6b263c230688815c8b8448d2cfcc551d"
     }
   }
 }

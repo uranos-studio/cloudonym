@@ -12,6 +12,7 @@ import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { inputKind } from '../core/tree';
 import { AZURE_INTAKE_ROWS } from '../core/rules/azure-intake';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
+import { AWS_INTAKE_ROWS } from '../core/rules/aws-intake';
 
 const rules = Object.values(RULES);
 const text = buildLlmsText(rules, VERSION);
@@ -21,7 +22,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('첫 줄은 # Cloudonym', () => expect(lines[0]).toBe('# Cloudonym'));
   it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
-    expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length);
+    expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length);
     expect(formulaOf(RULES['gcp.service_account']!)).toBe('<owner>-<system>-<purpose>-<env>-<region>-sa-<role>');
     expect(formulaOf(RULES['azure.storage_account']!)).toBe('st<system><purpose><env>');
     expect(text).toContain('- `gcp.service_account`: `<owner>-<system>-<purpose>-<env>-<region>-sa-<role>` · optional: region, owner');
@@ -45,7 +46,8 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(rg).toContain('(flags: u)');
     const flagged = rules.filter((r) => r.pattern.flags !== '');
     // 손으로 쓴 규칙은 resource_group 하나 · 나머지는 들인 Azure 행의 금지형(\p{Cc} 를 쓰는 u)
-    const intake = new Set(AZURE_INTAKE_ROWS.map((r) => r.id));
+    // 들인 AWS 행 중 EC2 밖 Name 태그(일반 태그 문자 \p{L} 을 쓰는 u)도 손으로 쓴 규칙이 아니다
+    const intake = new Set([...AZURE_INTAKE_ROWS.map((r) => r.id), ...AWS_INTAKE_ROWS.map((r) => r.id)]);
     expect(flagged.filter((r) => !intake.has(r.id)).map((r) => r.id)).toEqual(['azure.resource_group']);
     const s3 = lines.find((l) => l.startsWith('- `aws.s3_bucket` ('))!;
     expect(s3).not.toContain('(flags:');

@@ -18,6 +18,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseAzureRules, h2IdsOf, AZURE_RULES_URL } from './intake-azure.mjs';
 import { parseComputeDiscovery } from './intake-gcp-discovery.mjs';
+import { placedInVpc } from './build-aws-rules.mjs';
 
 /** 조사-지원범위 §3 의 18개 네임스페이스 */
 export const AWS_NAMESPACES = [
@@ -102,6 +103,7 @@ export function awsDigest(dir) {
     if (vendor !== 'AWS' || !AWS_NAMESPACES.includes(ns)) continue;
     types += 1;
     lines.push(`${s.typeName}\t(type)\t${(s.createOnlyProperties ?? []).slice().sort().join(',')}`);
+    lines.push(`${s.typeName}\t(placement)\t${placedInVpc(s) ? 'vpc' : '-'}`);
     for (const [prop, def] of Object.entries(s.properties ?? {})) {
       if (def.minLength === undefined && def.maxLength === undefined && def.pattern === undefined) continue;
       lines.push([s.typeName, prop, def.minLength, def.maxLength, def.pattern].map(norm).join('\t'));
@@ -110,7 +112,7 @@ export function awsDigest(dir) {
   return {
     marker: null,
     counts: { types },
-    hashOf: '18개 네임스페이스(typeName 으로 고른다) 타입마다 createOnlyProperties, 최상위 속성 중 minLength · maxLength · pattern 이 있는 것의 세 값, 정렬',
+    hashOf: '18개 네임스페이스(typeName 으로 고른다) 타입마다 createOnlyProperties · 쓰기 가능한 VpcId/SubnetId 유무(Name 태그 자리), 최상위 속성 중 minLength · maxLength · pattern 이 있는 것의 세 값, 정렬',
     sha256: sha256(lines.sort()),
   };
 }

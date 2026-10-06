@@ -1,13 +1,14 @@
 // AWS 규칙 표 — constraints.ts 가 gcp · azure 와 합쳐 RULES 로 낸다 (계획 §8-2 ③ 분할 · 이름 · 판정 불변)
-import type { ResourceRule } from '../types';
+import type { ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
+import { AWS_INTAKE_ROWS } from './aws-intake';
 
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
 /** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
 export const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
 const AWS_NAME_TAG_NOTE: CoreMessage = { code: 'note.aws_tag_utf16_length' };
 
-export const AWS_RULES: Record<string, ResourceRule> = {
+const AWS_HAND_RULES: Record<string, ResourceRule> = {
   'aws.s3_bucket': {
     id: 'aws.s3_bucket', provider: 'aws', resourceType: 's3_bucket',
     displayName: 'S3 Bucket', slug: 'bucket', minLength: 3, maxLength: 63,
@@ -119,4 +120,46 @@ export const AWS_RULES: Record<string, ResourceRule> = {
     scope: 'aws:region', entity: 'ec2.volume.NameTag', category: 'storage', uniqueness: 'none',
     docUrl: AWS_TAGS, notes: [AWS_NAME_TAG_NOTE],
   },
+};
+
+// ─── 들인 행 (D43) — rules/aws-intake.ts 의 행을 규칙으로 편다 ──────────────
+/** 일반 태그 값 문자(LABEL_LIMITS 의 #tag-conventions — AWS_TAG_VALUE 와 같은 문자)에 Name 태그 길이 1~256.
+ *  EC2 밖 서비스(S3 · IAM · RDS …)는 EC2 보다 좁게 받는다 — 무효를 유효로 내지 않는 쪽 (docs/decisions.md 2026-09-29) */
+export const AWS_NAME_TAG_GENERAL = /^[\p{L}\p{Z}\p{N}_.:/=+\-@]{1,256}$/u;
+const AWS_TAG_CONVENTIONS = 'https://docs.aws.amazon.com/tag-editor/latest/userguide/best-practices-and-strats.html#tag-conventions';
+const AWS_SCHEMA_NOTE: CoreMessage = { code: 'note.aws_schema_scope_unconfirmed' };
+const PLACED_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
+/** 계정 범위(IAM · Multi-Region Access Point)는 지역이 없다 */
+const ACCOUNT_TEMPLATE: Token[] = ['system', 'purpose', 'env', 'slug', 'seq'];
+
+/** 스키마 pattern 은 앵커가 없을 수 있다(JSON Schema 는 부분 일치) — 이름 전체로 읽는다(좁히는 쪽 · D20). `\Z` 는 끝으로 읽는다 */
+export const anchorSchemaPattern = (raw: string): RegExp => new RegExp(`^(?:${raw.replace(/\\Z$/, '$')})$`);
+
+function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
+  const template = r.scope === 'aws:account' ? ACCOUNT_TEMPLATE : PLACED_TEMPLATE;
+  const base = {
+    id: r.id, provider: 'aws' as const, resourceType: r.id.slice('aws.'.length), displayName: r.displayName, slug: r.slug,
+    template, optional: template.includes('region') ? (['region'] as Token[]) : [],
+    scope: r.scope, entity: r.entity, category: r.category,
+  };
+  if (r.kind === 'b') {
+    const ec2 = r.tag === 'ec2';
+    return {
+      ...base, minLength: 1, maxLength: 256, pattern: ec2 ? AWS_NAME_TAG : AWS_NAME_TAG_GENERAL,
+      allowed: 'alnum-hyphen', separator: '-', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false,
+      uniqueness: 'none', docUrl: ec2 ? AWS_TAGS : AWS_TAG_CONVENTIONS, notes: [AWS_NAME_TAG_NOTE],
+    };
+  }
+  return {
+    ...base, minLength: r.min, maxLength: r.max, pattern: anchorSchemaPattern(r.schemaPattern),
+    ...(r.noConsecutiveSeparator ? { noConsecutiveSeparator: true } : {}),
+    allowed: r.allowed, separator: r.separator, caseRule: r.caseRule, startsWithLetter: r.startsWithLetter, endsWithAlnum: r.endsWithAlnum,
+    uniqueness: 'csp', docUrl: r.docUrl, notes: [AWS_SCHEMA_NOTE],
+  };
+}
+
+/** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서(타입 이름 순) */
+export const AWS_RULES: Record<string, ResourceRule> = {
+  ...AWS_HAND_RULES,
+  ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
 };

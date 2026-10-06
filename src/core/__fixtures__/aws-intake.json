@@ -1,0 +1,1824 @@
+{
+ "source": "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip",
+ "license": "Fields quoted from the AWS CloudFormation resource schemas for transcription tests.",
+ "rows": [
+  {
+   "typeName": "AWS::ApiGateway::ApiKey",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::Authorizer",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::ClientCertificate",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::DomainNameAccessAssociation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::Model",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::RequestValidator",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::RestApi",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::Stage",
+   "kind": "a",
+   "property": "StageName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::UsagePlan",
+   "kind": "a",
+   "property": "UsagePlanName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGateway::VpcLink",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::Api",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::Authorizer",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::Model",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::PortalProduct",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::Stage",
+   "kind": "a",
+   "property": "StageName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ApiGatewayV2::VpcLink",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::DynamoDB::GlobalTable",
+   "kind": "a",
+   "property": "TableName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::DynamoDB::Table",
+   "kind": "a",
+   "property": "TableName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::ApplicationStatusCheck",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::CapacityManagerDataExport",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::CapacityReservation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::CapacityReservationFleet",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::CarrierGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::ClientVpnEndpoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::CustomerGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::DHCPOptions",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::EC2Fleet",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::EIP",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::EgressOnlyInternetGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::FlowLog",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::FpgaImage",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::Host",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAM",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMPool",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMPrefixListResolver",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMPrefixListResolverTarget",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMResourceDiscovery",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMResourceDiscoveryAssociation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPAMScope",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IPv4Pool",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::Instance",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::InstanceConnectEndpoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::InstanceEventWindow",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::InternetGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::IpamExternalResourceVerificationToken",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::KeyPair",
+   "kind": "a",
+   "property": "KeyName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::LaunchTemplate",
+   "kind": "a",
+   "property": "LaunchTemplateName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::LocalGatewayRouteTable",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::LocalGatewayRouteTableVPCAssociation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::LocalGatewayRouteTableVirtualInterfaceGroupAssociation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::LocalGatewayVirtualInterface",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::LocalGatewayVirtualInterfaceGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::NatGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::NetworkAcl",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::NetworkInsightsAccessScope",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::NetworkInsightsAccessScopeAnalysis",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::NetworkInsightsAnalysis",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::NetworkInsightsPath",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::NetworkInterface",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::PlacementGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::PrefixList",
+   "kind": "a",
+   "property": "PrefixListName",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::RouteServer",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::RouteServerEndpoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::RouteServerPeer",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::RouteTable",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::SecondaryNetwork",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::SecurityGroup",
+   "kind": "a",
+   "property": "GroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::SpotFleet",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::Subnet",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::SubnetCidrReservation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::TrafficMirrorFilter",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TrafficMirrorFilterRule",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TrafficMirrorSession",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TrafficMirrorTarget",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayAttachment",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayConnect",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayConnectPeer",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayMeteringPolicy",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayMulticastDomain",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayPeeringAttachment",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayPolicyTable",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayRouteTable",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::TransitGatewayVpcAttachment",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::VPC",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VPCBlockPublicAccessExclusion",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::VPCEncryptionControl",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::VPCEndpoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::VPCEndpointService",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VPCPeeringConnection",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::EC2::VPNConcentrator",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VPNConnection",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VPNGateway",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VerifiedAccessEndpoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VerifiedAccessGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VerifiedAccessInstance",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::VerifiedAccessTrustProvider",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EC2::Volume",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECR::PublicRepository",
+   "kind": "a",
+   "property": "RepositoryName",
+   "minLength": 2,
+   "maxLength": 256,
+   "pattern": "^(?=.{2,256}$)((?:[a-z0-9]+(?:[._-][a-z0-9]+)*/)*[a-z0-9]+(?:[._-][a-z0-9]+)*)$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECR::Repository",
+   "kind": "a",
+   "property": "RepositoryName",
+   "minLength": 2,
+   "maxLength": 256,
+   "pattern": "^(?=.{2,256}$)([a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*(\\/[a-z0-9]+((\\.|_|__|-+)[a-z0-9]+)*)*)$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::CapacityProvider",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::Cluster",
+   "kind": "a",
+   "property": "ClusterName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::Daemon",
+   "kind": "a",
+   "property": "DaemonName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::DaemonTaskDefinition",
+   "kind": "a",
+   "property": "Family",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::ExpressGatewayService",
+   "kind": "a",
+   "property": "ServiceName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::Service",
+   "kind": "a",
+   "property": "ServiceName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::TaskDefinition",
+   "kind": "a",
+   "property": "Family",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ECS::TaskSet",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EFS::AccessPoint",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EFS::FileSystem",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::AccessEntry",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::Addon",
+   "kind": "a",
+   "property": "AddonName",
+   "minLength": 1,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::Capability",
+   "kind": "a",
+   "property": "CapabilityName",
+   "minLength": 1,
+   "maxLength": 100,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::Cluster",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 100,
+   "pattern": "^[0-9A-Za-z][A-Za-z0-9\\-_]*",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::FargateProfile",
+   "kind": "a",
+   "property": "FargateProfileName",
+   "minLength": 1,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::IdentityProviderConfig",
+   "kind": "a",
+   "property": "IdentityProviderConfigName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::Nodegroup",
+   "kind": "a",
+   "property": "NodegroupName",
+   "minLength": 1,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::EKS::PodIdentityAssociation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::CacheCluster",
+   "kind": "a",
+   "property": "ClusterName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::GlobalReplicationGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::ParameterGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::ReplicationGroup",
+   "kind": "a",
+   "property": "ReplicationGroupId",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::SecurityGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::ServerlessCache",
+   "kind": "a",
+   "property": "ServerlessCacheName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::ServerlessCacheSnapshot",
+   "kind": "a",
+   "property": "ServerlessCacheSnapshotName",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::Snapshot",
+   "kind": "a",
+   "property": "SnapshotName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::SubnetGroup",
+   "kind": "a",
+   "property": "CacheSubnetGroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::User",
+   "kind": "a",
+   "property": "UserId",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": "[a-z][a-z0-9\\\\-]*",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElastiCache::UserGroup",
+   "kind": "a",
+   "property": "UserGroupId",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": "[a-z][a-z0-9\\\\-]*",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancing::LoadBalancer",
+   "kind": "a",
+   "property": "LoadBalancerName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancingV2::Listener",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancingV2::ListenerRule",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": true
+  },
+  {
+   "typeName": "AWS::ElasticLoadBalancingV2::TrustStore",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::Group",
+   "kind": "a",
+   "property": "GroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::GroupPolicy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::InstanceProfile",
+   "kind": "a",
+   "property": "InstanceProfileName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::ManagedPolicy",
+   "kind": "a",
+   "property": "ManagedPolicyName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::OIDCProvider",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::Policy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": 1,
+   "maxLength": 128,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::Role",
+   "kind": "a",
+   "property": "RoleName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::RolePolicy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::SAMLProvider",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 128,
+   "pattern": "[\\w._-]+",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::ServerCertificate",
+   "kind": "a",
+   "property": "ServerCertificateName",
+   "minLength": 1,
+   "maxLength": 128,
+   "pattern": "[\\w+=,.@-]+",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::User",
+   "kind": "a",
+   "property": "UserName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::UserPolicy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::IAM::VirtualMFADevice",
+   "kind": "a",
+   "property": "VirtualMfaDeviceName",
+   "minLength": 1,
+   "maxLength": 226,
+   "pattern": "[\\w+=,.@-]+",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::KMS::Alias",
+   "kind": "a",
+   "property": "AliasName",
+   "minLength": 1,
+   "maxLength": 256,
+   "pattern": "^(alias/)[a-zA-Z0-9:/_-]+$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::KMS::Key",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::KMS::ReplicaKey",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::Alias",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::CapacityProvider",
+   "kind": "a",
+   "property": "CapacityProviderName",
+   "minLength": 1,
+   "maxLength": 140,
+   "pattern": "^(arn:aws[a-zA-Z-]*:lambda:(eusc-)?[a-z]{2}((-gov)|(-iso([a-z]?)))?-[a-z]+-\\d{1}:\\d{12}:capacity-provider:[a-zA-Z0-9-_]+)|[a-zA-Z0-9-_]+$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::CodeSigningConfig",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::EventSourceMapping",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::Function",
+   "kind": "a",
+   "property": "FunctionName",
+   "minLength": 1,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::LayerVersion",
+   "kind": "a",
+   "property": "LayerName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::MicrovmImage",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 64,
+   "pattern": "^[a-zA-Z0-9-_]+$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::NetworkConnector",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::WebFunction",
+   "kind": "a",
+   "property": "FunctionName",
+   "minLength": 1,
+   "maxLength": 256,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Lambda::WebFunctionEndpoint",
+   "kind": "a",
+   "property": "EndpointName",
+   "minLength": 1,
+   "maxLength": 256,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::AccountPolicy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": 1,
+   "maxLength": 256,
+   "pattern": "^[^:*]{1,256}$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::Delivery",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::DeliveryDestination",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 60,
+   "pattern": "[\\w-]*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::DeliverySource",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 60,
+   "pattern": "[\\w-]*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::Destination",
+   "kind": "a",
+   "property": "DestinationName",
+   "minLength": 1,
+   "maxLength": 512,
+   "pattern": "^[^:*]{1,512}$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::Integration",
+   "kind": "a",
+   "property": "IntegrationName",
+   "minLength": 1,
+   "maxLength": 50,
+   "pattern": "[\\.\\-_/#A-Za-z0-9]+",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::LogAnomalyDetector",
+   "kind": "a",
+   "property": "DetectorName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::LogGroup",
+   "kind": "a",
+   "property": "LogGroupName",
+   "minLength": 1,
+   "maxLength": 512,
+   "pattern": "^[.\\-_/#A-Za-z0-9]{1,512}\\Z",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::LogStream",
+   "kind": "a",
+   "property": "LogStreamName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::MetricFilter",
+   "kind": "a",
+   "property": "FilterName",
+   "minLength": 1,
+   "maxLength": 512,
+   "pattern": "^[^:*]{1,512}",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::QueryDefinition",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::ResourcePolicy",
+   "kind": "a",
+   "property": "PolicyName",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": "^([^:*\\/]+\\/?)*[^:*\\/]+$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::ScheduledQuery",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": "^[a-zA-Z0-9_\\-/.#]+$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::Logs::SubscriptionFilter",
+   "kind": "a",
+   "property": "FilterName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::ClusterSnapshot",
+   "kind": "a",
+   "property": "DBClusterSnapshotIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": "^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::CustomDBEngineVersion",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBCluster",
+   "kind": "a",
+   "property": "DBClusterIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBClusterEndpoint",
+   "kind": "a",
+   "property": "DBClusterEndpointIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBClusterParameterGroup",
+   "kind": "a",
+   "property": "DBClusterParameterGroupName",
+   "minLength": 1,
+   "maxLength": null,
+   "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9])*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBInstance",
+   "kind": "a",
+   "property": "DBInstanceIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": "^$|^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBParameterGroup",
+   "kind": "a",
+   "property": "DBParameterGroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9])*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBProxy",
+   "kind": "a",
+   "property": "DBProxyName",
+   "minLength": null,
+   "maxLength": 64,
+   "pattern": "[0-z]*",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBProxyEndpoint",
+   "kind": "a",
+   "property": "DBProxyEndpointName",
+   "minLength": null,
+   "maxLength": 64,
+   "pattern": "[0-z]*",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBProxyTargetGroup",
+   "kind": "a",
+   "property": "TargetGroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBSecurityGroup",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBShardGroup",
+   "kind": "a",
+   "property": "DBShardGroupIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBSnapshot",
+   "kind": "a",
+   "property": "DBSnapshotIdentifier",
+   "minLength": 1,
+   "maxLength": 255,
+   "pattern": "^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9]+)*$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::DBSubnetGroup",
+   "kind": "a",
+   "property": "DBSubnetGroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::EventSubscription",
+   "kind": "a",
+   "property": "SubscriptionName",
+   "minLength": null,
+   "maxLength": 255,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::GlobalCluster",
+   "kind": "a",
+   "property": "GlobalClusterIdentifier",
+   "minLength": 1,
+   "maxLength": 63,
+   "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::Integration",
+   "kind": "a",
+   "property": "IntegrationName",
+   "minLength": 1,
+   "maxLength": 64,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::RDS::OptionGroup",
+   "kind": "a",
+   "property": "OptionGroupName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::AccessGrant",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::AccessGrantsInstance",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::AccessGrantsLocation",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::AccessPoint",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 3,
+   "maxLength": 50,
+   "pattern": "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::Bucket",
+   "kind": "a",
+   "property": "BucketName",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::MultiRegionAccessPoint",
+   "kind": "a",
+   "property": "Name",
+   "minLength": 3,
+   "maxLength": 50,
+   "pattern": "^[a-z0-9][-a-z0-9]{1,48}[a-z0-9]$",
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::StorageLens",
+   "kind": "b",
+   "property": null,
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::S3::StorageLensGroup",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  },
+  {
+   "typeName": "AWS::SecretsManager::Secret",
+   "kind": "a",
+   "property": "Name",
+   "minLength": null,
+   "maxLength": null,
+   "pattern": null,
+   "hasVpcOrSubnet": false
+  }
+ ]
+}
