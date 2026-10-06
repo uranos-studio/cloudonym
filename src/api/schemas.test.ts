@@ -3,6 +3,7 @@ import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } 
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { AWS_INTAKE_ROWS } from '../core/rules/aws-intake';
+import { AWS_MANUAL_RULES } from '../core/rules/aws-manual';
 
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
@@ -41,7 +42,7 @@ describe('parseValidateBody', () => {
     expect(parseValidateBody({ provider: 'oci', resource_type: 'x', name: 'x' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported: ['aws', 'gcp', 'azure'] } });
     expect(parseValidateBody({ provider: 'aws', resource_type: 'nope', name: 'x' }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: 'nope' } }], supported: ['s3_bucket', 'iam_role', 'vpc', 'subnet', 'ec2_instance', 'rds_instance', 'internet_gateway', 'route_table', 'security_group', 'key_pair', 'ebs_volume', ...AWS_INTAKE_ROWS.map((r) => r.id.slice('aws.'.length))] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: 'nope' } }], supported: ['s3_bucket', 'iam_role', 'vpc', 'subnet', 'ec2_instance', 'rds_instance', 'internet_gateway', 'route_table', 'security_group', 'key_pair', 'ebs_volume', ...AWS_INTAKE_ROWS.map((r) => r.id.slice('aws.'.length)), ...Object.keys(AWS_MANUAL_RULES).map((id) => id.slice('aws.'.length))] } });
     expect(parseValidateBody({ provider: 'aws', resource_type: 's3_bucket', name: 3 }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_not_string', field: 'name' }] } });
   });

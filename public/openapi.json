@@ -859,6 +859,8 @@
               "aws:partition",
               "aws:account",
               "aws:region",
+              "aws:ecs_cluster",
+              "aws:log_group",
               "aws:vpc",
               "gcp:namespace",
               "gcp:project",

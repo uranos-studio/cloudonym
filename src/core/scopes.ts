@@ -6,9 +6,10 @@ import type { Provider } from './types';
 import { AZURE_INTAKE_SCOPES, type AzureIntakeScopeId } from './rules/azure-intake';
 import { GCP_INTAKE_SCOPES, type GcpIntakeScopeId } from './rules/gcp-intake';
 import { GCP_MANUAL_SCOPES, type GcpManualScopeId } from './rules/gcp-manual';
+import { AWS_MANUAL_SCOPES, type AwsManualScopeId } from './rules/aws-manual';
 
 export type ScopeId =
-  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId | GcpManualScopeId
+  | AzureIntakeScopeId | 'azure:region' | GcpIntakeScopeId | GcpManualScopeId | AwsManualScopeId
   | 'aws:partition' | 'aws:account' | 'aws:region' | 'aws:vpc'
   | 'gcp:namespace' | 'gcp:project' | 'gcp:project_global' | 'gcp:project_region' | 'gcp:project_zone'
   | 'azure:global' | 'azure:subscription' | 'azure:resource_group' | 'azure:virtual_network' | 'azure:managed_cluster';
@@ -67,5 +68,7 @@ export const SCOPES: Record<ScopeId, ScopeDef> = {
   // RDS "Must be unique for all DB instances per AWS account, per AWS Region."
   'aws:region': { id: 'aws:region', provider: 'aws', displayName: 'Region', parent: 'aws:account', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html' },
   // 보안 그룹 "Names are case-insensitive and must be unique within the VPC." — Name 태그 리소스는 유일 범위가 없고 포함 관계로만 여기 놓인다 (D38)
+  // 손으로 넣은 규칙의 부모 리소스 범위(ECS 클러스터 · 로그 그룹) — rules/aws-manual.ts
+  ...AWS_MANUAL_SCOPES,
   'aws:vpc': { id: 'aws:vpc', provider: 'aws', displayName: 'VPC', parent: 'aws:region', ruleId: 'aws.vpc', docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateSecurityGroup.html' },
 };

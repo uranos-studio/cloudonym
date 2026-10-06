@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { RULES, rulesFor } from './constraints';
 import { AWS_NAME_TAG, AWS_NAME_TAG_GENERAL, anchorSchemaPattern } from './rules/aws';
 import { AWS_INTAKE_ROWS } from './rules/aws-intake';
+import { AWS_MANUAL_RULES } from './rules/aws-manual';
 import { checkName } from './validate';
 
 interface SourceRow { typeName: string; kind: 'a' | 'b'; property: string | null; minLength: number | null; maxLength: number | null; pattern: string | null; hasVpcOrSubnet: boolean }
@@ -22,6 +23,8 @@ const EXISTING: Record<string, string> = {
 
 const rules = rulesFor('aws');
 const intakeByType = new Map(AWS_INTAKE_ROWS.map((r) => [r.entity.replace(/\.NameTag$/, ''), r]));
+/** 손으로 넣은 규칙이 덮는 타입 — entity 가 타입 이름이다 (rules/aws-manual.ts) */
+const manualTypes = new Set(Object.values(AWS_MANUAL_RULES).map((r) => r.entity));
 const heldTypes = new Set(HELD.split('\n').filter((l) => /^\| AWS::/.test(l)).map((l) => l.split(' | ')[0]!.slice(2)));
 
 describe('들인 AWS 행 — 원문 스냅샷과 대조', () => {
@@ -37,10 +40,10 @@ describe('들인 AWS 행 — 원문 스냅샷과 대조', () => {
     }
   });
 
-  it('원문 행은 전부 손 규칙 · 들인 규칙 · 보류 가운데 정확히 하나다', () => {
+  it('원문 행은 전부 손 규칙 · 들인 규칙 · 손으로 넣은 규칙 · 보류 가운데 정확히 하나다', () => {
     const bad: string[] = [];
     for (const s of SNAP.rows) {
-      const n = Number(s.typeName in EXISTING) + Number(intakeByType.has(s.typeName)) + Number(heldTypes.has(s.typeName));
+      const n = Number(s.typeName in EXISTING) + Number(intakeByType.has(s.typeName)) + Number(manualTypes.has(s.typeName)) + Number(heldTypes.has(s.typeName));
       if (n !== 1) bad.push(`${s.typeName} (${n})`);
     }
     expect(bad).toEqual([]);

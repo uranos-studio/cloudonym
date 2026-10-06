@@ -2,6 +2,7 @@
 import type { ResourceRule, Token } from '../types';
 import type { CoreMessage } from '../messages';
 import { AWS_INTAKE_ROWS } from './aws-intake';
+import { AWS_MANUAL_RULES } from './aws-manual';
 
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
 /** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
@@ -162,4 +163,5 @@ function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
 export const AWS_RULES: Record<string, ResourceRule> = {
   ...AWS_HAND_RULES,
   ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
+  ...AWS_MANUAL_RULES,
 };

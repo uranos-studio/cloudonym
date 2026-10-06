@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { physicalHold, generationOf, anchorPattern, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES } from './build-aws-rules.mjs';
+import { physicalHold, generationOf, anchorPattern, scopeOf, placedInVpc, resourceTypeOf, slugOf, build, PHYSICAL_CASES, EXISTING, MANUAL, HAND_REVIEWED } from './build-aws-rules.mjs';
 
 const targets = JSON.parse(readFileSync(new URL('./aws-intake-targets.json', import.meta.url), 'utf-8'));
 
@@ -71,4 +71,25 @@ test('build — 손 규칙 타입은 건너뛰고 · 손 예 없는 a 행은 멈
   assert.throws(() => build({ schemas, targets: t({ 'AWS::Logs::Fake': { kind: 'a', property: 'Name', category: 'management' } }), anchors: { 'AWS::Logs::Fake': 'https://example.test/y' } }), /손 예가 없다/);
   const noAnchor = build({ schemas, targets: t({ 'AWS::Logs::LogGroup': { kind: 'a', property: 'LogGroupName', category: 'management' } }), anchors: {} });
   assert.match(noAnchor.held[0].reason, /anchorMissing/);
+});
+
+test('손으로 넣은 타입 · 손 확인 사유 — 판정 표의 a 행이고 서로 겹치지 않는다', () => {
+  for (const t of [...Object.keys(MANUAL), ...Object.keys(HAND_REVIEWED)]) assert.equal(targets.types[t]?.kind, 'a', t);
+  for (const t of Object.keys(MANUAL)) {
+    assert.equal(t in EXISTING || t in HAND_REVIEWED, false, t);
+    assert.match(MANUAL[t], /^aws\.[a-z0-9_]+$/);
+  }
+  for (const [t, why] of Object.entries(HAND_REVIEWED)) assert.match(why, /^reviewed by hand — (not imported|unconfirmed) \(.+\)$/, t);
+});
+
+test('손으로 넣은 타입은 건너뛰고 · 손 확인 타입은 사유가 바뀐다', () => {
+  const schemas = new Map([
+    ['AWS::ECS::Cluster', { typeName: 'AWS::ECS::Cluster', properties: { ClusterName: { type: 'string' } } }],
+    ['AWS::EKS::Addon', { typeName: 'AWS::EKS::Addon', properties: { AddonName: { type: 'string' } } }],
+  ]);
+  const t = { types: { 'AWS::ECS::Cluster': targets.types['AWS::ECS::Cluster'], 'AWS::EKS::Addon': targets.types['AWS::EKS::Addon'] } };
+  const r = build({ schemas, targets: t, anchors: {} });
+  assert.deepEqual(r.rules, []);
+  assert.equal(r.sourceRows.find((x) => x.typeName === 'AWS::ECS::Cluster').existing, 'aws.ecs_cluster');
+  assert.deepEqual(r.held.map((h) => [h.src.typeName, h.reason]), [['AWS::EKS::Addon', HAND_REVIEWED['AWS::EKS::Addon']]]);
 });

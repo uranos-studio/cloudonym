@@ -34,6 +34,72 @@ export const EXISTING = {
   'AWS::EC2::InternetGateway': 'aws.internet_gateway', 'AWS::EC2::RouteTable': 'aws.route_table', 'AWS::EC2::Volume': 'aws.ebs_volume',
 };
 
+/** 손으로 넣은 규칙(src/core/rules/aws-manual.ts · D43) — API 참조에서 다시 읽고 넣은 타입. 손 규칙처럼 건너뛴다 */
+export const MANUAL = {
+  'AWS::EC2::LaunchTemplate': 'aws.ec2_launch_template',
+  'AWS::ElasticLoadBalancing::LoadBalancer': 'aws.elb_load_balancer',
+  'AWS::ElasticLoadBalancingV2::LoadBalancer': 'aws.elbv2_load_balancer',
+  'AWS::ElasticLoadBalancingV2::TargetGroup': 'aws.elbv2_target_group',
+  'AWS::ElasticLoadBalancingV2::TrustStore': 'aws.elbv2_trust_store',
+  'AWS::S3::StorageLensGroup': 'aws.s3_storage_lens_group',
+  'AWS::DynamoDB::GlobalTable': 'aws.dynamodb_global_table',
+  'AWS::DynamoDB::Table': 'aws.dynamodb_table',
+  'AWS::ElastiCache::CacheCluster': 'aws.elasticache_cache_cluster',
+  'AWS::ElastiCache::ReplicationGroup': 'aws.elasticache_replication_group',
+  'AWS::ElastiCache::SubnetGroup': 'aws.elasticache_subnet_group',
+  'AWS::RDS::DBSubnetGroup': 'aws.rds_db_subnet_group',
+  'AWS::RDS::OptionGroup': 'aws.rds_option_group',
+  'AWS::ECS::CapacityProvider': 'aws.ecs_capacity_provider',
+  'AWS::ECS::Cluster': 'aws.ecs_cluster',
+  'AWS::ECS::Daemon': 'aws.ecs_daemon',
+  'AWS::ECS::DaemonTaskDefinition': 'aws.ecs_daemon_task_definition',
+  'AWS::ECS::ExpressGatewayService': 'aws.ecs_express_gateway_service',
+  'AWS::ECS::Service': 'aws.ecs_service',
+  'AWS::ECS::TaskDefinition': 'aws.ecs_task_definition',
+  'AWS::EKS::Nodegroup': 'aws.eks_nodegroup',
+  'AWS::ApiGateway::Stage': 'aws.apigw_stage',
+  'AWS::ApiGatewayV2::Stage': 'aws.apigwv2_stage',
+  'AWS::Lambda::Alias': 'aws.lambda_alias',
+  'AWS::Lambda::Function': 'aws.lambda_function',
+  'AWS::Lambda::NetworkConnector': 'aws.lambda_network_connector',
+  'AWS::IAM::Group': 'aws.iam_group',
+  'AWS::IAM::GroupPolicy': 'aws.iam_group_policy',
+  'AWS::IAM::InstanceProfile': 'aws.iam_instance_profile',
+  'AWS::IAM::ManagedPolicy': 'aws.iam_managed_policy',
+  'AWS::IAM::RolePolicy': 'aws.iam_role_policy',
+  'AWS::IAM::User': 'aws.iam_user',
+  'AWS::IAM::UserPolicy': 'aws.iam_user_policy',
+  'AWS::SecretsManager::Secret': 'aws.secretsmanager_secret',
+  'AWS::Logs::LogStream': 'aws.logs_log_stream',
+  'AWS::Logs::SubscriptionFilter': 'aws.logs_subscription_filter',
+};
+
+/** 손으로 원문을 다시 읽고도 넣지 않은 타입 — 보류 사유를 이것으로 바꾼다 */
+const NO_RULE = 'reviewed by hand — not imported (no length or character rule in the API reference or the resource schema)';
+export const HAND_REVIEWED = {
+  'AWS::ApiGateway::ApiKey': NO_RULE,
+  'AWS::ApiGateway::Authorizer': NO_RULE,
+  'AWS::ApiGateway::Model': 'reviewed by hand — unconfirmed (the API says "Must be alphanumeric." but states no maximum length)',
+  'AWS::ApiGateway::RequestValidator': NO_RULE,
+  'AWS::ApiGateway::RestApi': NO_RULE,
+  'AWS::ApiGateway::UsagePlan': NO_RULE,
+  'AWS::ApiGateway::VpcLink': NO_RULE,
+  'AWS::ApiGatewayV2::Api': NO_RULE,
+  'AWS::ApiGatewayV2::Authorizer': NO_RULE,
+  'AWS::ApiGatewayV2::Model': 'reviewed by hand — unconfirmed (the API says "Must be alphanumeric." but states no maximum length)',
+  'AWS::ApiGatewayV2::VpcLink': NO_RULE,
+  'AWS::EC2::FpgaImage': NO_RULE,
+  'AWS::EC2::InstanceEventWindow': NO_RULE,
+  'AWS::EKS::Addon': 'reviewed by hand — not imported (fixed value: the name must match one returned by DescribeAddonVersions)',
+  'AWS::EKS::FargateProfile': NO_RULE,
+  'AWS::EKS::IdentityProviderConfig': NO_RULE,
+  'AWS::ElastiCache::ServerlessCache': NO_RULE,
+  'AWS::ElastiCache::Snapshot': NO_RULE,
+  'AWS::Lambda::LayerVersion': 'reviewed by hand — unconfirmed (the maximum of 140 includes the ARN form; no limit is stated for the name alone)',
+  'AWS::Logs::LogAnomalyDetector': 'reviewed by hand — not imported (the API states a minimum length of 1 only; no maximum and no character rule)',
+  'AWS::RDS::DBProxyTargetGroup': 'reviewed by hand — not imported (fixed value: the schema allows only "default")',
+};
+
 /** a 행 통과 · 실패 예 — pattern · 길이를 사람이 읽고 적었다 */
 const L = (n, c = 'a') => c.repeat(n);
 export const PHYSICAL_CASES = {
@@ -144,7 +210,7 @@ export function readSchemas(dir) {
 }
 
 // ── 전체 ──────────────────────────────────────────────────────────
-export function build({ schemas, targets, anchors, existingTypes = Object.keys(EXISTING), existingResourceTypes = [] }) {
+export function build({ schemas, targets, anchors, existingTypes = [...Object.keys(EXISTING), ...Object.keys(MANUAL)], existingResourceTypes = [] }) {
   const rules = [];
   const held = [];
   const sourceRows = [];
@@ -159,7 +225,7 @@ export function build({ schemas, targets, anchors, existingTypes = Object.keys(E
       hasVpcOrSubnet: placedInVpc(schema),
     };
     sourceRows.push(src);
-    if (existingTypes.includes(typeName)) { src.existing = EXISTING[typeName]; continue; }
+    if (existingTypes.includes(typeName)) { src.existing = EXISTING[typeName] ?? MANUAL[typeName]; continue; }
     if (!schema) { held.push({ src, reason: 'type not in the schema archive' }); continue; }
     const [, ns, type] = typeName.split('::');
     if (t.kind === 'a') {
@@ -189,6 +255,7 @@ export function build({ schemas, targets, anchors, existingTypes = Object.keys(E
       });
     }
   }
+  for (const h of held) if (HAND_REVIEWED[h.src.typeName]) h.reason = HAND_REVIEWED[h.src.typeName];
   return { rules, held, sourceRows };
 }
 
@@ -225,7 +292,7 @@ export function renderHeld(result) {
   out.push(`Source: [CloudFormation resource schemas](${SCHEMA_URL}) (no version marker; the hash of the fields used is in \`docs/rule-sources.lock.json\`). Generated by \`scripts/rules/build-aws-rules.mjs\` — do not edit by hand.`);
   out.push('');
   const a = result.rules.filter((r) => r.kind === 'a').length;
-  out.push(`Imported: **${result.rules.length}** rules — ${a} physical names and ${result.rules.length - a} Name tags (plus the types already covered by hand-written rules). Held: **${result.held.length}** types, listed below with the reason.`);
+  out.push(`Imported: **${result.rules.length}** rules — ${a} physical names and ${result.rules.length - a} Name tags (plus the types covered by hand-written rules, including those added by hand). Held: **${result.held.length}** types, listed below with the reason.`);
   out.push('');
   out.push('## How the imported rows were mapped');
   out.push('');
@@ -233,6 +300,7 @@ export function renderHeld(result) {
   out.push('- **Physical names** — imported only when the schema gives both a `pattern` and a `maxLength` for the name property. The pattern is kept verbatim and matched against the whole name (`^(?:…)$`; JSON Schema patterns are unanchored, the whole-name reading is narrower); `\\Z` is read as end of input. The schema has no field for the uniqueness scope, so IAM names and Multi-Region Access Points are placed at account scope and the rest at Region scope, with a note that the scope is not confirmed. `docUrl` is the property anchor on the CloudFormation template reference page (checked on 2026-10-06).');
   out.push('- **Name tags** — EC2 types use the existing EC2 `Name` tag rule (any characters, 1–256). Other services use the general tag-value characters (letters, numbers, spaces and `_ . : / = + - @`, 1–256), because S3, IAM, RDS and others reject more characters than EC2. A type whose schema has a writable `VpcId` or `SubnetId` property is placed under the VPC node, otherwise under the Region (placement only — tags are not unique).');
   out.push('- **Prefix (slug)** — the initials of the type name when it has two or more words (`NatGateway` → `ng`), otherwise its first three letters. Same rule as the Azure fallback.');
+  out.push('- **Reviewed by hand** — the held types were read again in each service\'s API reference (and the user guide or schema description where the API page is silent). Types with a complete rule were added by hand in `src/core/rules/aws-manual.ts` with the source sentence quoted; the reason of the others starts with "reviewed by hand".');
   out.push('');
   out.push('## Held types');
   out.push('');
@@ -249,7 +317,7 @@ export function renderHeld(result) {
 async function measure(schemas, targets) {
   const out = {};
   for (const [typeName, t] of Object.entries(targets.types)) {
-    if (t.kind !== 'a' || EXISTING[typeName] || physicalHold(schemas.get(typeName)?.properties?.[t.property])) continue;
+    if (t.kind !== 'a' || EXISTING[typeName] || MANUAL[typeName] || physicalHold(schemas.get(typeName)?.properties?.[t.property])) continue;
     const url = cfnDocUrl(typeName, t.property);
     const [page, anchor] = url.split('#');
     const res = await fetch(page, { redirect: 'follow' });

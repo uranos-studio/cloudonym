@@ -6,9 +6,10 @@ import { PROVIDERS } from './types';
 import { AZURE_INTAKE_SCOPES } from './rules/azure-intake';
 import { GCP_INTAKE_SCOPES } from './rules/gcp-intake';
 import { GCP_MANUAL_SCOPES } from './rules/gcp-manual';
+import { AWS_MANUAL_SCOPES } from './rules/aws-manual';
 
 /** 손으로 넣은 규칙(rules/*-manual.ts)의 부모 리소스 범위 */
-const MANUAL_SCOPES: Record<string, unknown> = { ...GCP_MANUAL_SCOPES };
+const MANUAL_SCOPES: Record<string, unknown> = { ...GCP_MANUAL_SCOPES, ...AWS_MANUAL_SCOPES };
 
 const ALL = Object.values(SCOPES);
 

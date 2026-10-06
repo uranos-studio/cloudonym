@@ -14,6 +14,7 @@ import { AZURE_INTAKE_ROWS } from '../core/rules/azure-intake';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
 import { AWS_INTAKE_ROWS } from '../core/rules/aws-intake';
 import { GCP_MANUAL_RULES } from '../core/rules/gcp-manual';
+import { AWS_MANUAL_RULES } from '../core/rules/aws-manual';
 
 const rules = Object.values(RULES);
 const text = buildLlmsText(rules, VERSION);
@@ -23,7 +24,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('첫 줄은 # Cloudonym', () => expect(lines[0]).toBe('# Cloudonym'));
   it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
-    expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length);
+    expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length + Object.keys(AWS_MANUAL_RULES).length);
     expect(formulaOf(RULES['gcp.service_account']!)).toBe('<owner>-<system>-<purpose>-<env>-<region>-sa-<role>');
     expect(formulaOf(RULES['azure.storage_account']!)).toBe('st<system><purpose><env>');
     expect(text).toContain('- `gcp.service_account`: `<owner>-<system>-<purpose>-<env>-<region>-sa-<role>` · optional: region, owner');
