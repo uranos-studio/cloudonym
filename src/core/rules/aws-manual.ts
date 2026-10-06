@@ -20,6 +20,8 @@ const DYNAMODB_NAME = /^[a-zA-Z0-9_.-]{3,255}$/;
 const ECS_NAME = /^[A-Za-z0-9_-]{1,255}$/;
 const IAM_128 = /^[\w+=,.@-]{1,128}$/;
 const LOGS_NAME = /^[^:*]{1,512}$/;
+/** RDS 프록시 · 통합 식별자 — API 참조 "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" 를 이름 전체에 건다(길이는 maxLength) */
+const RDS_IDENT = /^[A-Za-z](?:-?[A-Za-z0-9]+)*$/;
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
   & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl'>>;
@@ -97,6 +99,20 @@ const RULES: ResourceRule[] = [
   rule({ id: 'aws.rds_option_group', displayName: 'RDS Option Group', slug: 'og', minLength: 1, maxLength: 255, pattern: /^[A-Za-z](?:[A-Za-z0-9-]{0,253}[A-Za-z0-9])?$/, noConsecutiveSeparator: true,
     allowed: 'lower-digit-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::OptionGroup', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateOptionGroup.html', notes: [SCOPE] }),
 
+  // CreateDBParameterGroup "Must be 1 to 255 letters, numbers, or hyphens. First character must be a letter Can't end with a hyphen or contain two consecutive hyphens … This value is stored as a lowercase string."
+  rule({ id: 'aws.rds_db_parameter_group', displayName: 'RDS DB Parameter Group', slug: 'pg', minLength: 1, maxLength: 255, pattern: /^[A-Za-z](?:[A-Za-z0-9-]{0,253}[A-Za-z0-9])?$/, noConsecutiveSeparator: true,
+    allowed: 'lower-digit-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::DBParameterGroup', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBParameterGroup.html', notes: [SCOPE] }),
+  // CreateDBProxy "This name must be unique for all proxies owned by your AWS account in the specified AWS Region. An identifier must begin with a letter and must contain only ASCII letters, digits, and hyphens; it can't end with a hyphen or contain two consecutive hyphens. … Minimum length of 1. Maximum length of 63. Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*"
+  // 스키마는 [0-z]* 64자 — API 참조가 좁다
+  rule({ id: 'aws.rds_db_proxy', displayName: 'RDS DB Proxy', slug: 'prx', minLength: 1, maxLength: 63, pattern: RDS_IDENT, noConsecutiveSeparator: true,
+    allowed: 'alnum-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::DBProxy', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBProxy.html' }),
+  // CreateDBProxyEndpoint "Minimum length of 1. Maximum length of 63. Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" — 유일 범위 문장 없음(프록시 아래지만 범위 노드가 없어 지역에 둔다)
+  rule({ id: 'aws.rds_db_proxy_endpoint', displayName: 'RDS DB Proxy Endpoint', slug: 'pe', minLength: 1, maxLength: 63, pattern: RDS_IDENT, noConsecutiveSeparator: true,
+    allowed: 'alnum-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::DBProxyEndpoint', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBProxyEndpoint.html', notes: [SCOPE] }),
+  // CreateIntegration "Minimum length of 1. Maximum length of 63. Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" — 스키마는 64자 · 유일 범위 문장 없음
+  rule({ id: 'aws.rds_integration', displayName: 'RDS Integration', slug: 'int', minLength: 1, maxLength: 63, pattern: RDS_IDENT, noConsecutiveSeparator: true,
+    allowed: 'alnum-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::Integration', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateIntegration.html', notes: [SCOPE] }),
+
   // ── ECS ──
   // "Up to 255 characters are allowed. They include letters (both upper and lowercase letters), numbers, underscores (_), and hyphens (-). The name can't be prefixed with "aws", "ecs", or "fargate"."
   // 금지 접두를 대소문자 없이 본다 (보수적 · D20)
@@ -144,6 +160,10 @@ const RULES: ResourceRule[] = [
   // 스키마 definitions.Name "A unique name for the network connector within your account and Region. Must be 1 to 64 alphanumeric characters, hyphens, or underscores."
   rule({ id: 'aws.lambda_network_connector', displayName: 'Lambda Network Connector', slug: 'nc', minLength: 1, maxLength: 64, pattern: /^[A-Za-z0-9_-]{1,64}$/,
     scope: 'aws:region', entity: 'AWS::Lambda::NetworkConnector', category: 'compute', docUrl: CFN_SCHEMA }),
+  // CreateCapacityProvider CapacityProviderName "Minimum length of 1. Maximum length of 140. Pattern: (arn:aws…:capacity-provider:[a-zA-Z0-9-_]+)|[a-zA-Z0-9-_]+"
+  // ARN 갈래는 기존 공급자를 가리키는 값이다 — 이름 갈래만 쓴다 · 유일 범위 문장 없음
+  rule({ id: 'aws.lambda_capacity_provider', displayName: 'Lambda Capacity Provider', slug: 'cp', minLength: 1, maxLength: 140, pattern: /^[A-Za-z0-9_-]{1,140}$/,
+    scope: 'aws:region', entity: 'AWS::Lambda::CapacityProvider', category: 'compute', docUrl: 'https://docs.aws.amazon.com/lambda/latest/api/API_CreateCapacityProvider.html', notes: [SCOPE] }),
 
   // ── IAM — "IAM user, group, role, and policy names must be unique within the account. Names are not distinguished by case." ──
   // CreateGroup "Length Constraints: Minimum length of 1. Maximum length of 128. Pattern: [\w+=,.@-]+"
@@ -155,6 +175,10 @@ const RULES: ResourceRule[] = [
   // CreateInstanceProfile (같은 길이 · pattern) — 범위 문장 없음
   rule({ id: 'aws.iam_instance_profile', displayName: 'IAM Instance Profile', slug: 'ip', minLength: 1, maxLength: 128, pattern: IAM_128,
     scope: 'aws:account', entity: 'AWS::IAM::InstanceProfile', category: 'identity', docUrl: 'https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateInstanceProfile.html', notes: [SCOPE] }),
+  // AWS::IAM::Policy 는 사용자 · 그룹 · 역할에 붙이는 인라인 정책이다 — PutUserPolicy · PutGroupPolicy · PutRolePolicy PolicyName
+  // "Minimum length of 1. Maximum length of 128. Pattern: [\w+=,.@-]+" — 범위 문장 없음
+  rule({ id: 'aws.iam_policy', displayName: 'IAM Policy (inline)', slug: 'pol', minLength: 1, maxLength: 128, pattern: IAM_128,
+    scope: 'aws:account', entity: 'AWS::IAM::Policy', category: 'identity', docUrl: 'https://docs.aws.amazon.com/IAM/latest/APIReference/API_PutUserPolicy.html', notes: [SCOPE] }),
   // CreatePolicy (같은 길이 · pattern)
   rule({ id: 'aws.iam_managed_policy', displayName: 'IAM Managed Policy', slug: 'pol', minLength: 1, maxLength: 128, pattern: IAM_128,
     scope: 'aws:account', entity: 'AWS::IAM::ManagedPolicy', category: 'identity', docUrl: 'https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreatePolicy.html' }),

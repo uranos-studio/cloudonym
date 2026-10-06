@@ -1276,6 +1276,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -1393,6 +1429,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -1417,6 +1462,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -7237,6 +7291,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -7354,6 +7444,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -7378,6 +7477,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -13198,6 +13306,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -13315,6 +13459,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -13339,6 +13492,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -19159,6 +19321,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -19276,6 +19474,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -19300,6 +19507,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -25120,6 +25336,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "windows-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "windows-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "windows-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "windows-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "windows-trade-prd-kr-cp-01",
               "valid": true,
@@ -25237,6 +25489,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "windows-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "windows-trade-prd-grp-01",
               "valid": true,
@@ -25261,6 +25522,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "windows-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "windows-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "windows-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -31081,6 +31351,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "google-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "google-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "google-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "google-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "google-trade-prd-kr-cp-01",
               "valid": true,
@@ -31198,6 +31504,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "google-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "google-trade-prd-grp-01",
               "valid": true,
@@ -31222,6 +31537,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "google-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "google-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "google-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -37042,6 +37366,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "azure-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "azure-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "azure-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "azure-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "azure-trade-prd-kr-cp-01",
               "valid": true,
@@ -37159,6 +37519,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "azure-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "azure-trade-prd-grp-01",
               "valid": true,
@@ -37183,6 +37552,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "azure-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "azure-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "azure-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -43003,6 +43381,42 @@
               "violations": 1,
               "steps": 1
             },
+            "rds_db_parameter_group": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-pg-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "rds_db_proxy": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-prx-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-pe-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "rds_integration": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-int-01",
+              "violations": 1,
+              "steps": 1
+            },
             "ecs_capacity_provider": {
               "name": "",
               "valid": false,
@@ -43120,6 +43534,15 @@
               "violations": 1,
               "steps": 1
             },
+            "lambda_capacity_provider": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-kr-cp-01",
+              "violations": 1,
+              "steps": 1
+            },
             "iam_group": {
               "name": "",
               "valid": false,
@@ -43144,6 +43567,15 @@
               "isTruncated": false,
               "isTransformed": true,
               "original": "매매-trade-prd-ip-01",
+              "violations": 1,
+              "steps": 1
+            },
+            "iam_policy": {
+              "name": "",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": true,
+              "original": "매매-trade-prd-pol-01",
               "violations": 1,
               "steps": 1
             },
@@ -48964,6 +49396,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "paymentsettlement-reconciliation-dev-global-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "paymentsettlement-reconciliation-dev-global-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "paymentsettlement-reconciliation-dev-global-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "paymentsettlement-reconciliation-dev-global-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "paymentsettlement-reconciliation-dev-global-cp-01",
               "valid": true,
@@ -49081,6 +49549,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "paymentsettlement-reconciliation-dev-global-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-global-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "paymentsettlement-reconciliation-dev-grp-01",
               "valid": true,
@@ -49105,6 +49582,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "paymentsettlement-reconciliation-dev-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "paymentsettlement-reconciliation-dev-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "paymentsettlement-reconciliation-dev-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -54925,6 +55411,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "a-long-longpurpose-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "a-long-longpurpose-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "a-long-longpurpose-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "a-long-longpurpose-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "a-long-longpurpose-prd-kr-cp-01",
               "valid": true,
@@ -55042,6 +55564,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "a-long-longpurpose-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "a-long-longpurpose-prd-grp-01",
               "valid": true,
@@ -55066,6 +55597,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "a-long-longpurpose-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "a-long-longpurpose-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "a-long-longpurpose-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -60886,6 +61426,42 @@
               "violations": 1,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "3tier-trade-prd-kr-pg-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-pg-01",
+              "violations": 1,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "3tier-trade-prd-kr-prx-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-prx-01",
+              "violations": 1,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "3tier-trade-prd-kr-pe-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-pe-01",
+              "violations": 1,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "3tier-trade-prd-kr-int-01",
+              "valid": false,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-int-01",
+              "violations": 1,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "3tier-trade-prd-kr-cp-01",
               "valid": true,
@@ -61003,6 +61579,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "3tier-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "3tier-trade-prd-grp-01",
               "valid": true,
@@ -61027,6 +61612,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "3tier-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "3tier-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "3tier-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -66847,6 +67441,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -66964,6 +67594,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -66988,6 +67627,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -72808,6 +73456,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -72925,6 +73609,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -72949,6 +73642,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -78769,6 +79471,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -78886,6 +79624,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -78910,6 +79657,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -84730,6 +85486,42 @@
               "violations": 0,
               "steps": 0
             },
+            "rds_db_parameter_group": {
+              "name": "billing-trade-prd-kr-pg-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pg-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy": {
+              "name": "billing-trade-prd-kr-prx-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-prx-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_db_proxy_endpoint": {
+              "name": "billing-trade-prd-kr-pe-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-pe-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "rds_integration": {
+              "name": "billing-trade-prd-kr-int-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-int-01",
+              "violations": 0,
+              "steps": 0
+            },
             "ecs_capacity_provider": {
               "name": "billing-trade-prd-kr-cp-01",
               "valid": true,
@@ -84847,6 +85639,15 @@
               "violations": 0,
               "steps": 0
             },
+            "lambda_capacity_provider": {
+              "name": "billing-trade-prd-kr-cp-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-kr-cp-01",
+              "violations": 0,
+              "steps": 0
+            },
             "iam_group": {
               "name": "billing-trade-prd-grp-01",
               "valid": true,
@@ -84871,6 +85672,15 @@
               "isTruncated": false,
               "isTransformed": false,
               "original": "billing-trade-prd-ip-01",
+              "violations": 0,
+              "steps": 0
+            },
+            "iam_policy": {
+              "name": "billing-trade-prd-pol-01",
+              "valid": true,
+              "isTruncated": false,
+              "isTransformed": false,
+              "original": "billing-trade-prd-pol-01",
               "violations": 0,
               "steps": 0
             },
@@ -101587,6 +102397,114 @@
       },
       {
         "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "iam_policy",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3"
+      },
+      {
+        "provider": "aws",
         "resourceType": "iam_role",
         "name": "",
         "known": true,
@@ -102880,6 +103798,114 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "lambda_capacity_provider",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6"
       },
       {
         "provider": "aws",
@@ -105043,6 +106069,330 @@
       },
       {
         "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "ab-cd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_parameter_group",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 2,
+        "suggestedName": "ab-cd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 2,
+        "suggestedName": "ab-cd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_db_proxy_endpoint",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "aws",
         "resourceType": "rds_db_security_group",
         "name": "",
         "known": true,
@@ -105584,6 +106934,114 @@
       {
         "provider": "aws",
         "resourceType": "rds_instance",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 2,
+        "suggestedName": "ab-cd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_integration",
         "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
         "known": true,
         "valid": false,
@@ -211470,6 +212928,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -211483,9 +212945,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -212158,6 +213622,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -212171,9 +213639,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -212846,6 +214316,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -212859,9 +214333,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -213530,6 +215006,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -213543,9 +215023,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -214218,6 +215700,10 @@
           "aws_elasticache_subnet_group = \"windows-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"windows-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"windows-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"windows-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"windows-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"windows-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"windows-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"windows-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"windows-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"windows-trade-prd-kr-dmn-01\"",
@@ -214231,9 +215717,11 @@
           "aws_lambda_alias = \"windows-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"windows-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"windows-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"windows-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"windows-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"windows-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"windows-trade-prd-ip-01\"",
+          "aws_iam_policy = \"windows-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"windows-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"windows-trade-prd-rp-01\"",
           "aws_iam_user = \"windows-trade-prd-usr-01\"",
@@ -214907,6 +216395,10 @@
           "aws_elasticache_subnet_group = \"google-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"google-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"google-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"google-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"google-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"google-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"google-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"google-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"google-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"google-trade-prd-kr-dmn-01\"",
@@ -214920,9 +216412,11 @@
           "aws_lambda_alias = \"google-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"google-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"google-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"google-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"google-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"google-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"google-trade-prd-ip-01\"",
+          "aws_iam_policy = \"google-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"google-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"google-trade-prd-rp-01\"",
           "aws_iam_user = \"google-trade-prd-usr-01\"",
@@ -215596,6 +217090,10 @@
           "aws_elasticache_subnet_group = \"azure-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"azure-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"azure-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"azure-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"azure-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"azure-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"azure-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"azure-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"azure-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"azure-trade-prd-kr-dmn-01\"",
@@ -215609,9 +217107,11 @@
           "aws_lambda_alias = \"azure-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"azure-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"azure-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"azure-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"azure-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"azure-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"azure-trade-prd-ip-01\"",
+          "aws_iam_policy = \"azure-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"azure-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"azure-trade-prd-rp-01\"",
           "aws_iam_user = \"azure-trade-prd-usr-01\"",
@@ -216307,6 +217807,10 @@
           "# INVALID: aws_elasticache_subnet_group",
           "# INVALID: aws_rds_db_subnet_group",
           "# INVALID: aws_rds_option_group",
+          "# INVALID: aws_rds_db_parameter_group",
+          "# INVALID: aws_rds_db_proxy",
+          "# INVALID: aws_rds_db_proxy_endpoint",
+          "# INVALID: aws_rds_integration",
           "# INVALID: aws_ecs_capacity_provider",
           "# INVALID: aws_ecs_cluster",
           "# INVALID: aws_ecs_daemon",
@@ -216320,9 +217824,11 @@
           "# INVALID: aws_lambda_alias",
           "# INVALID: aws_lambda_function",
           "# INVALID: aws_lambda_network_connector",
+          "# INVALID: aws_lambda_capacity_provider",
           "# INVALID: aws_iam_group",
           "# INVALID: aws_iam_group_policy",
           "# INVALID: aws_iam_instance_profile",
+          "# INVALID: aws_iam_policy",
           "# INVALID: aws_iam_managed_policy",
           "# INVALID: aws_iam_role_policy",
           "# INVALID: aws_iam_user",
@@ -216974,6 +218480,10 @@
           "aws_elasticache_subnet_group = \"paymentsettlement-reconciliation-dev-global-sng-01\"",
           "aws_rds_db_subnet_group = \"paymentsettlement-reconciliation-dev-global-sng-01\"",
           "aws_rds_option_group = \"paymentsettlement-reconciliation-dev-global-og-01\"",
+          "aws_rds_db_parameter_group = \"paymentsettlement-reconciliation-dev-global-pg-01\"",
+          "aws_rds_db_proxy = \"paymentsettlement-reconciliation-dev-global-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"paymentsettlement-reconciliation-dev-global-pe-01\"",
+          "aws_rds_integration = \"paymentsettlement-reconciliation-dev-global-int-01\"",
           "aws_ecs_capacity_provider = \"paymentsettlement-reconciliation-dev-global-cp-01\"",
           "aws_ecs_cluster = \"paymentsettlement-reconciliation-dev-global-ecs-01\"",
           "aws_ecs_daemon = \"paymentsettlement-reconciliation-dev-global-dmn-01\"",
@@ -216987,9 +218497,11 @@
           "aws_lambda_alias = \"paymentsettlement-reconciliation-dev-global-alias-01\"",
           "aws_lambda_function = \"paymentsettlement-reconciliation-dev-global-fn-01\"",
           "aws_lambda_network_connector = \"paymentsettlement-reconciliation-dev-global-nc-01\"",
+          "aws_lambda_capacity_provider = \"paymentsettlement-reconciliation-dev-global-cp-01\"",
           "aws_iam_group = \"paymentsettlement-reconciliation-dev-grp-01\"",
           "aws_iam_group_policy = \"paymentsettlement-reconciliation-dev-gp-01\"",
           "aws_iam_instance_profile = \"paymentsettlement-reconciliation-dev-ip-01\"",
+          "aws_iam_policy = \"paymentsettlement-reconciliation-dev-pol-01\"",
           "aws_iam_managed_policy = \"paymentsettlement-reconciliation-dev-pol-01\"",
           "aws_iam_role_policy = \"paymentsettlement-reconciliation-dev-rp-01\"",
           "aws_iam_user = \"paymentsettlement-reconciliation-dev-usr-01\"",
@@ -217662,6 +219174,10 @@
           "aws_elasticache_subnet_group = \"a-long-longpurpose-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"a-long-longpurpose-prd-kr-sng-01\"",
           "aws_rds_option_group = \"a-long-longpurpose-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"a-long-longpurpose-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"a-long-longpurpose-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"a-long-longpurpose-prd-kr-pe-01\"",
+          "aws_rds_integration = \"a-long-longpurpose-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"a-long-longpurpose-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"a-long-longpurpose-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"a-long-longpurpose-prd-kr-dmn-01\"",
@@ -217675,9 +219191,11 @@
           "aws_lambda_alias = \"a-long-longpurpose-prd-kr-alias-01\"",
           "aws_lambda_function = \"a-long-longpurpose-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"a-long-longpurpose-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"a-long-longpurpose-prd-kr-cp-01\"",
           "aws_iam_group = \"a-long-longpurpose-prd-grp-01\"",
           "aws_iam_group_policy = \"a-long-longpurpose-prd-gp-01\"",
           "aws_iam_instance_profile = \"a-long-longpurpose-prd-ip-01\"",
+          "aws_iam_policy = \"a-long-longpurpose-prd-pol-01\"",
           "aws_iam_managed_policy = \"a-long-longpurpose-prd-pol-01\"",
           "aws_iam_role_policy = \"a-long-longpurpose-prd-rp-01\"",
           "aws_iam_user = \"a-long-longpurpose-prd-usr-01\"",
@@ -218354,9 +219872,11 @@
           "aws_lambda_alias = \"3tier-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"3tier-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"3tier-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"3tier-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"3tier-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"3tier-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"3tier-trade-prd-ip-01\"",
+          "aws_iam_policy = \"3tier-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"3tier-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"3tier-trade-prd-rp-01\"",
           "aws_iam_user = \"3tier-trade-prd-usr-01\"",
@@ -218730,6 +220250,10 @@
           "# INVALID: aws_elasticache_replication_group",
           "# INVALID: aws_rds_db_subnet_group",
           "# INVALID: aws_rds_option_group",
+          "# INVALID: aws_rds_db_parameter_group",
+          "# INVALID: aws_rds_db_proxy",
+          "# INVALID: aws_rds_db_proxy_endpoint",
+          "# INVALID: aws_rds_integration",
           "# INVALID: gcp_service_account",
           "# INVALID: gcp_compute_instance",
           "# INVALID: gcp_vpc_network",
@@ -219040,6 +220564,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -219053,9 +220581,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -219724,6 +221254,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -219737,9 +221271,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -220398,6 +221934,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -220411,9 +221951,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",
@@ -221082,6 +222624,10 @@
           "aws_elasticache_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_db_subnet_group = \"billing-trade-prd-kr-sng-01\"",
           "aws_rds_option_group = \"billing-trade-prd-kr-og-01\"",
+          "aws_rds_db_parameter_group = \"billing-trade-prd-kr-pg-01\"",
+          "aws_rds_db_proxy = \"billing-trade-prd-kr-prx-01\"",
+          "aws_rds_db_proxy_endpoint = \"billing-trade-prd-kr-pe-01\"",
+          "aws_rds_integration = \"billing-trade-prd-kr-int-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prd-kr-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prd-kr-dmn-01\"",
@@ -221095,9 +222641,11 @@
           "aws_lambda_alias = \"billing-trade-prd-kr-alias-01\"",
           "aws_lambda_function = \"billing-trade-prd-kr-fn-01\"",
           "aws_lambda_network_connector = \"billing-trade-prd-kr-nc-01\"",
+          "aws_lambda_capacity_provider = \"billing-trade-prd-kr-cp-01\"",
           "aws_iam_group = \"billing-trade-prd-grp-01\"",
           "aws_iam_group_policy = \"billing-trade-prd-gp-01\"",
           "aws_iam_instance_profile = \"billing-trade-prd-ip-01\"",
+          "aws_iam_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_managed_policy = \"billing-trade-prd-pol-01\"",
           "aws_iam_role_policy = \"billing-trade-prd-rp-01\"",
           "aws_iam_user = \"billing-trade-prd-usr-01\"",

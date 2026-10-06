@@ -38,6 +38,12 @@ export const EXISTING = {
 
 /** 손으로 넣은 규칙(src/core/rules/aws-manual.ts · D43) — API 참조에서 다시 읽고 넣은 타입. 손 규칙처럼 건너뛴다 */
 export const MANUAL = {
+  'AWS::IAM::Policy': 'aws.iam_policy',
+  'AWS::Lambda::CapacityProvider': 'aws.lambda_capacity_provider',
+  'AWS::RDS::DBParameterGroup': 'aws.rds_db_parameter_group',
+  'AWS::RDS::DBProxy': 'aws.rds_db_proxy',
+  'AWS::RDS::DBProxyEndpoint': 'aws.rds_db_proxy_endpoint',
+  'AWS::RDS::Integration': 'aws.rds_integration',
   'AWS::EC2::LaunchTemplate': 'aws.ec2_launch_template',
   'AWS::ElasticLoadBalancing::LoadBalancer': 'aws.elb_load_balancer',
   'AWS::ElasticLoadBalancingV2::LoadBalancer': 'aws.elbv2_load_balancer',
@@ -105,20 +111,14 @@ export const HAND_REVIEWED = {
   'AWS::EKS::Capability': 'reviewed by hand — unconfirmed (CreateCapability: "can contain alphanumeric characters, hyphens, and underscores." — no length)',
   'AWS::ElastiCache::User': 'reviewed by hand — unconfirmed (CreateUser: "Pattern: [a-zA-Z][a-zA-Z0-9\\-]*" and "Minimum length of 1." — no maximum)',
   'AWS::ElastiCache::UserGroup': 'reviewed by hand — not imported (CreateUserGroup states no length or character rule)',
-  'AWS::IAM::Policy': 'reviewed by hand — rule found, not added yet (PutUserPolicy · PutRolePolicy: length 1–128, "Pattern: [\\w+=,.@-]+")',
   'AWS::KMS::Alias': 'reviewed by hand — not imported (CreateAlias: "Pattern: ^alias/[a-zA-Z0-9/_-]+$" — every name starts with the fixed text alias/, which the composer does not add)',
-  'AWS::Lambda::CapacityProvider': 'reviewed by hand — rule found, not added yet (CreateCapacityProvider: length 1–140; the name branch of the pattern is [a-zA-Z0-9-_]+)',
   'AWS::Lambda::WebFunction': 'reviewed by hand — not imported (the Lambda API reference has no such operation; the CloudFormation page says "Property description not available.")',
   'AWS::Lambda::WebFunctionEndpoint': 'reviewed by hand — not imported (the Lambda API reference has no such operation; the CloudFormation page says "Property description not available.")',
   'AWS::Logs::QueryDefinition': 'reviewed by hand — unconfirmed (PutQueryDefinition: length 1–255 — no character rule)',
   'AWS::RDS::DBClusterEndpoint': 'reviewed by hand — unconfirmed (CreateDBClusterEndpoint states no length or character rule; the schema pattern has no reference-page anchor)',
   'AWS::RDS::DBClusterParameterGroup': 'reviewed by hand — not imported (CreateDBClusterParameterGroup states no length or character rule)',
-  'AWS::RDS::DBParameterGroup': "reviewed by hand — rule found, not added yet (CreateDBParameterGroup: \"Must be 1 to 255 letters, numbers, or hyphens.\" · \"First character must be a letter\" · \"Can't end with a hyphen or contain two consecutive hyphens\")",
-  'AWS::RDS::DBProxy': 'reviewed by hand — rule found, not added yet (CreateDBProxy: length 1–63, "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*"; the schema [0-z]* up to 64 is looser)',
-  'AWS::RDS::DBProxyEndpoint': 'reviewed by hand — rule found, not added yet (CreateDBProxyEndpoint: length 1–63, "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*")',
   'AWS::RDS::DBShardGroup': 'reviewed by hand — not imported (CreateDBShardGroup states no length or character rule)',
   'AWS::RDS::EventSubscription': 'reviewed by hand — unconfirmed (CreateEventSubscription: "The name must be less than 255 characters." — no character rule)',
-  'AWS::RDS::Integration': 'reviewed by hand — rule found, not added yet (CreateIntegration: length 1–63, "Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*"; the schema says up to 64)',
 };
 
 /** a 행 통과 · 실패 예 — pattern · 길이를 사람이 읽고 적었다 */
@@ -350,7 +350,7 @@ export function renderHeld(result) {
   out.push('- **Physical names** — imported only when the schema gives both a `pattern` and a `maxLength` for the name property. The pattern is kept verbatim and matched against the whole name (`^(?:…)$`; JSON Schema patterns are unanchored, the whole-name reading is narrower); `\\Z` is read as end of input. The schema has no field for the uniqueness scope, so IAM names and Multi-Region Access Points are placed at account scope and the rest at Region scope, with a note that the scope is not confirmed. `docUrl` is the property anchor on the CloudFormation template reference page (checked on 2026-10-06).');
   out.push('- **Name tags** — EC2 types use the existing EC2 `Name` tag rule (any characters, 1–256). Other services use the general tag-value characters (letters, numbers, spaces and `_ . : / = + - @`, 1–256), because S3, IAM, RDS and others reject more characters than EC2. A type whose schema has a writable `VpcId` or `SubnetId` property is placed under the VPC node, otherwise under the Region (placement only — tags are not unique).');
   out.push('- **Prefix (slug)** — the initials of the type name when it has two or more words (`NatGateway` → `ng`), otherwise its first three letters. Same rule as the Azure fallback.');
-  out.push('- **Reviewed by hand** — the held types were read again in each service\'s API reference (and the user guide or schema description where the API page is silent). Every held type was read again (the last 18 on 2026-10-06). Types with a complete rule were added by hand in `src/core/rules/aws-manual.ts` with the source sentence quoted; the reason of every held type starts with "reviewed by hand" — "rule found, not added yet" marks a complete rule in the API reference that is not in the rule table yet.');
+  out.push('- **Reviewed by hand** — the held types were read again in each service\'s API reference (and the user guide or schema description where the API page is silent). Every held type was read again (the last 18 on 2026-10-06). Types with a complete rule were added by hand in `src/core/rules/aws-manual.ts` with the source sentence quoted; the reason of every held type starts with "reviewed by hand". The six types whose API reference gave a complete rule (IAM inline policy, Lambda capacity provider, RDS DB parameter group, DB proxy, DB proxy endpoint and integration) are now hand-written rules.');
   out.push('');
   out.push('## Held types');
   out.push('');
