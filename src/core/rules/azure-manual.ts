@@ -16,8 +16,10 @@ const OBSOLETE: CoreMessage = { code: 'note.obsolete_source_applied' };
 const SEP: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
 
-/** policy* 리소스 이름 — "Resource name can't use: `#<>%&:\?/` or control characters. Can't end with period or space." */
-const POLICY_NAME = /^[^#<>%&:\\?/\x00-\x1F]{0,63}[^#<>%&:\\?/\x00-\x1F. ]$/;
+/** policy* 리소스 이름 — "Resource name can't use: `#<>%&:\?/` or control characters. Can't end with period or space."
+ *  control characters 는 C0 · DEL · C1 에 폭 없는 문자 · 양방향 제어 · BOM 까지 넓게 읽는다(생성기 INVISIBLE_CLASS · display.ts 와 같은 집합) */
+// oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
+const POLICY_NAME = /^[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]{0,63}[^#<>%&:\\?/\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF. ]$/;
 /** 영숫자로 시작 · 끝, `.` 뒤는 영숫자 — MobileNetwork dataNetworks · attachedDataNetworks */
 const DOTTED_64 = /^(?=.{1,64}$)[A-Za-z0-9](?:(?:[A-Za-z0-9-]|\.(?=[A-Za-z0-9]))*[A-Za-z0-9])?$/;
 
@@ -145,7 +147,8 @@ const RULES: AzureManualRule[] = [
   rule({ id: 'azure.synapse_workspaces_big_data_pools', displayName: 'Synapse workspace / Apache Spark pools', slug: 'bdp', minLength: 1, maxLength: 15, pattern: /^[A-Za-z][A-Za-z0-9]{0,14}$/,
     allowed: 'lower-digit', separator: '', caseRule: 'lower', startsWithLetter: true, reserved: true, scope: 'azure:synapse/workspaces', entity: 'Microsoft.Synapse/workspaces/bigDataPools', category: 'database', anchor: 'microsoftsynapse' }),
   // workspaces / sqlPools 1-60 "Can't contain `<>*%&:\/?@-` or control characters. Can't end with `.` or space. Can't contain reserved words." — 하이픈이 금지 목록에 있다
-  rule({ id: 'azure.synapse_workspaces_sql_pools', displayName: 'Synapse workspace / SQL pools', slug: 'sp', minLength: 1, maxLength: 60, pattern: /^[^<>*%&:\\/?@\x00-\x1F-]{0,59}[^<>*%&:\\/?@\x00-\x1F. -]$/,
+  // oxlint-disable-next-line no-control-regex -- 제어 문자를 막는 것이 이 정규식의 목적이다
+  rule({ id: 'azure.synapse_workspaces_sql_pools', displayName: 'Synapse workspace / SQL pools', slug: 'sp', minLength: 1, maxLength: 60, pattern: /^[^<>*%&:\\/?@\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF-]{0,59}[^<>*%&:\\/?@\x00-\x1F\x7F-\x9F\u061C\u200B-\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF. -]$/,
     allowed: 'lower-digit', separator: '', caseRule: 'lower', reserved: true, scope: 'azure:synapse/workspaces', entity: 'Microsoft.Synapse/workspaces/sqlPools', category: 'database', anchor: 'microsoftsynapse' }),
 
   // ── Microsoft.Web — "Alphanumeric, hyphens, and Unicode characters that can be mapped to Punycode" · "Unicode characters are parsed to Punycode using the IdnMapping.GetAscii method" ──

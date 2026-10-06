@@ -48,7 +48,7 @@ const RULES: ResourceRule[] = [
   // ── EC2 ──
   // LaunchTemplate 데이터형 "launchTemplateName — The name of the launch template. … Length Constraints: Minimum length of 3. Maximum length of 128. Pattern: [a-zA-Z0-9\(\)\.\-/_]+"
   // 요청(CreateLaunchTemplate)에는 "A name for the launch template." 뿐이다
-  rule({ id: 'aws.ec2_launch_template', displayName: 'EC2 Launch Template', slug: 'lt', minLength: 3, maxLength: 128, pattern: /^[a-zA-Z0-9().\/_-]{3,128}$/,
+  rule({ id: 'aws.ec2_launch_template', displayName: 'EC2 Launch Template', slug: 'lt', minLength: 3, maxLength: 128, pattern: /^[a-zA-Z0-9()./_-]{3,128}$/,
     scope: 'aws:region', entity: 'AWS::EC2::LaunchTemplate', category: 'compute', docUrl: 'https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_LaunchTemplate.html', notes: [SECONDARY, SCOPE] }),
 
   // ── Elastic Load Balancing ──

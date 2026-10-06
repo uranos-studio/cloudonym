@@ -133,11 +133,16 @@ export function parseCharacters(raw) {
   return spec;
 }
 
+/** 「control characters」를 보수적으로 읽은 집합 — C0 · DEL · C1(\\p{Cc}) 에 ALM · 폭 없는 문자 · 양방향 제어 · BOM 을 더한다.
+ *  src/core/display.ts INVISIBLE · rules/azure-manual.ts 의 손 규칙과 같은 집합이다(화면에서 다르게 보이는 이름을 막는다 — Trojan Source) */
+export const INVISIBLE_CLASS = '\\p{Cc}\\u061C\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF';
+const INVISIBLE_RE = new RegExp(`[${INVISIBLE_CLASS}]`, 'u');
+
 /** 이 문자를 쓸 수 있는가 (본문 기준) */
 export function allows(spec, ch) {
   if (spec.allow !== null) return spec.allow.includes(ch);
-  const code = ch.codePointAt(0);
-  if (spec.deny.control && (code < 0x20 || code === 0x7f)) return false;
+  // 금지형은 원문이 「control characters」를 말하지 않아도 보이지 않는 문자를 막는다 — 이름에 쓸 까닭이 없고, 받으면 화면과 실제 이름이 달라진다(보수적)
+  if (INVISIBLE_RE.test(ch)) return false;
   if (spec.deny.space && ch === ' ') return false;
   return !spec.deny.chars.includes(ch);
 }
@@ -159,7 +164,7 @@ function classBody(chars) {
 export function patternOf(spec) {
   const body = spec.allow !== null
     ? `[${classBody(spec.allow)}]`
-    : `[^${escClass(spec.deny.chars)}${spec.deny.space ? ' ' : ''}${spec.deny.control ? '\\p{Cc}' : ''}${dashLast(spec.deny.chars)}]`;
+    : `[^${escClass(spec.deny.chars)}${spec.deny.space ? ' ' : ''}${INVISIBLE_CLASS}${dashLast(spec.deny.chars)}]`;
   let p = '^';
   if (spec.noDoubleHyphen) p += '(?!.*--)';
   if (spec.start) p += `(?=[${classBody(spec.start)}])`;
@@ -444,7 +449,7 @@ export function renderTs(result, meta) {
   for (const [raw, c] of charClasses) {
     const g = c.gen;
     const ncs = c.spec.noDoubleHyphen ? ', noConsecutiveSeparator: true' : '';
-    // 금지형(Can't use … control characters)은 \p{Cc} 를 쓰려고 u 플래그 — U+0080-009F 도 거부한다(문서보다 넓게 · 보수적)
+    // 금지형(Can't use …)은 INVISIBLE_CLASS(\p{Cc} 와 \u 범위)를 쓰려고 u 플래그 — 원문이 control characters 를 말하지 않아도 막는다(문서보다 넓게 · 보수적)
     const flags = c.pattern.includes('\\p{') ? 'u' : '';
     if (!/^C[0-9]+$/.test(c.key)) throw new Error(`문자 규칙 키 꼴이 아니다: ${c.key}`);
     L.push(`  ${c.key}: { raw: ${dq(raw)}, pattern: ${regexLit(c.pattern, flags)}, allowed: ${sq(g.allowed)}, separator: ${sq(g.separator)}, caseRule: ${sq(g.caseRule)}, startsWithLetter: ${boolLit(g.startsWithLetter)}, endsWithAlnum: ${boolLit(g.endsWithAlnum)}${ncs} },`);
