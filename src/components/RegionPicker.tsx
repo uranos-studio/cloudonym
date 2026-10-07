@@ -3,7 +3,7 @@
 // 키보드 — ↓ ↑ 로 목록을 열고 옮긴다 · Enter 로 고른다 · Escape 로 닫는다
 import { useEffect, useId, useMemo, useState, type KeyboardEvent } from 'react';
 import type { Provider } from '../core/types';
-import { composeRegion, filterRegions, regionOptions, splitRegion, zoneAfter, type RegionOption } from './regionOptions';
+import { composeRegion, displayLabel, filterRegions, regionOptions, splitRegion, zoneAfter, type RegionOption } from './regionOptions';
 import { en } from '../messages/en';
 
 interface Props {
@@ -31,10 +31,11 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
   const listId = `${base}-list`;
   const optionId = (i: number) => `${base}-opt-${i}`;
 
-  // 움직인 항목이 목록 밖이면 보이게 — 목록 안에서만 스크롤한다
+  // 움직인 항목이 목록 밖이면 보이게 — 목록 안에서만 스크롤한다. 열림 · 움직인 항목이 바뀔 때만 돈다
+  const activeId = optionId(active);
   useEffect(() => {
-    if (open) document.getElementById(optionId(active))?.scrollIntoView({ block: 'nearest' });
-  });
+    if (open) document.getElementById(activeId)?.scrollIntoView({ block: 'nearest' });
+  }, [open, activeId]);
 
   const close = () => {
     setQuery(undefined);
@@ -104,7 +105,7 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
               <li key={o.value} id={optionId(i)} role="option" aria-selected={i === active} data-region-option={o.value}
                 onMouseDown={(e) => e.preventDefault()} onMouseEnter={() => setActive(i)} onClick={() => pick(o)} className={OPTION}>
                 <code className="font-mono">{o.value}</code>
-                <span className="text-zinc-600 dark:text-zinc-400">— {o.label || en.ui.region_global_label}</span>
+                <span className="text-zinc-600 dark:text-zinc-400">— {o.label ? displayLabel(o.label) : en.ui.region_global_label}</span>
                 {o.code && <span className="text-zinc-600 dark:text-zinc-400">· <code className="font-mono">{o.code}</code></span>}
               </li>
             ))}
@@ -112,7 +113,7 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
       </div>
       {region && region.value !== 'global' && (
         <p data-region-summary className="mt-1 truncate text-xs text-zinc-600 dark:text-zinc-400">
-          {region.label} · <code className="font-mono">{zone?.code ?? region.code}</code>
+          {displayLabel(region.label)} · <code className="font-mono">{zone?.code ?? region.code}</code>
         </p>
       )}
       {zones.length > 0 && !zone && <p data-zone-hint className="mt-1 text-xs text-amber-800 dark:text-amber-300">{en.ui.zone_hint}</p>}

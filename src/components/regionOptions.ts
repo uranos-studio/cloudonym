@@ -20,6 +20,15 @@ export function regionOptions(provider: Provider): RegionOption[] {
   return [...REGIONS[provider].map((r) => ({ value: r.region, code: r.code, label: r.label, zones: r.zones })), GLOBAL];
 }
 
+/** 지역 표 label 끝의 대륙 꼬리 — GCP label 은 「도시, 나라, 대륙」 꼴이다. 화면에 보일 때만 뗀다(표 · 거르기는 그대로라 「apac」 으로도 찾는다) */
+const CONTINENT_TAILS: ReadonlySet<string> = new Set(['APAC', 'Europe', 'Middle East', 'North America', 'South America', 'Africa']);
+
+/** 화면에 보일 위치 — 쉼표로 나뉜 마지막 조각이 대륙이면 뗀다(「Seoul, South Korea, APAC」 → 「Seoul, South Korea」). 조각이 하나면 그대로 */
+export function displayLabel(label: string): string {
+  const parts = label.split(', ');
+  return parts.length > 1 && CONTINENT_TAILS.has(parts.at(-1)!) ? parts.slice(0, -1).join(', ') : label;
+}
+
 /** 리전 이름 · 위치 · 코드 · 존 이름 · 존 코드의 부분 문자열로 거른다(대소문자 · 앞뒤 공백 무시). 빈 검색어는 전부 */
 export function filterRegions(options: readonly RegionOption[], query: string): RegionOption[] {
   const q = query.trim().toLowerCase();

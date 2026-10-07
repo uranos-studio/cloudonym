@@ -13,6 +13,13 @@ describe('treeOpen', () => {
     const deep = allScopes(gcp).filter((id) => !s.scopes.has(id));
     expect(deep.length).toBeGreaterThan(0); // 공허하지 않다 — 닫힌 범위가 있다
   });
+  it('링크로 연 선택 — 합친 행(gcp:project 에 놓인다)의 조상만 연다 · 존 범위 행(instance group)은 Zone 범위까지 연다', () => {
+    const merged = initialOpen(gcp, new Map([['global_address', { count: 1 }]]));
+    expect(isScopeOpen(merged, 'gcp:project')).toBe(true);
+    expect(isScopeOpen(merged, 'gcp:project_global')).toBe(false);
+    const zonal = initialOpen(gcp, new Map([['instance_group', { count: 1 }]]));
+    expect(isScopeOpen(zonal, 'gcp:project_zone')).toBe(true);
+  });
   it('모두 펼치기 — 범위 전부 열림 · 묶음 전부 열림', () => {
     const s = expandAll(gcp);
     expect(allScopes(gcp).every((id) => isScopeOpen(s, id))).toBe(true);
@@ -21,7 +28,7 @@ describe('treeOpen', () => {
   it('모두 접기 — 뿌리만 열림 · 묶음 전부 닫힘', () => {
     const s = collapseAll(gcp);
     expect([...s.scopes]).toEqual([gcp.scope.id]);
-    for (const n of [gcp, ...gcp.children]) for (const r of n.rules) expect(isGroupOpen(s, groupId(n.scope.id, r.category))).toBe(false);
+    for (const n of [gcp, ...gcp.children]) for (const r of n.rows) expect(isGroupOpen(s, groupId(n.scope.id, r.category))).toBe(false);
   });
   it('하나 열고 닫기 — 바뀌면 새 객체 · 같으면 같은 객체(toggle 되먹임이 멈춘다)', () => {
     const s = expandAll(gcp);

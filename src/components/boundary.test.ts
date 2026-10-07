@@ -71,6 +71,11 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
     expect(outside).toEqual([]);
     expect(all.filter((line) => INTERNAL.test(line))).toEqual([]);
   });
+  it('main.tsx 가 경로 셋을 그린다 — App · NamingDoc · Privacy (D57) · 문서 페이지도 같은 허용 목록 안이다', () => {
+    const main = specifiers(sources['../main.tsx'] ?? '');
+    for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/route']) expect(main, m).toContain(m);
+    for (const f of ['./NamingDoc.tsx', './Privacy.tsx', './DocPage.tsx', './route.ts']) expect(files, f).toContain(f);
+  });
   it('이름 규칙 · 길이 판정을 화면이 스스로 하지 않는다 — maxLength · pattern 으로 검사하는 코드가 없다', () => {
     // 규칙 숫자를 읽어 표시하는 것(r.rule.maxLength)은 되지만, 그 값으로 잘라 내거나 정규식으로 판정하는 코드는 엔진 몫이다
     const judging = /\.(?:slice|substring|substr)\([^)]*maxLength|new RegExp\([^)]*rule\.pattern[^)]*\)\.test/;

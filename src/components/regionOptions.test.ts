@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { composeRegion, filterRegions, regionOptions, splitRegion, zoneAfter } from './regionOptions';
+import { composeRegion, displayLabel, filterRegions, regionOptions, splitRegion, zoneAfter } from './regionOptions';
 import { canonicalRegion } from '../core/regions';
 import { REGIONS } from '../core/regions-data';
 
@@ -83,5 +83,27 @@ describe('zoneAfter — 리전을 바꿀 때의 존: 같은 글자가 새 리전
   it('존이 없었으면 none · global 로 가면 none', () => {
     expect(zoneAfter(undefined, byValue('asia-northeast3'))).toBeUndefined();
     expect(zoneAfter(byValue('asia-northeast3').zones[0], byValue('global'))).toBeUndefined();
+  });
+});
+
+
+describe('displayLabel — 화면의 위치에서 대륙 꼬리를 뗀다', () => {
+  it.each([
+    ['Seoul, South Korea, APAC', 'Seoul, South Korea'],
+    ['Hong Kong, APAC', 'Hong Kong'],
+    ['Osasco, São Paulo, Brazil, South America', 'Osasco, São Paulo, Brazil'],
+    ['Johannesburg, South Africa', 'Johannesburg, South Africa'],
+    ['Korea Central', 'Korea Central'],
+    ['Asia Pacific (Seoul)', 'Asia Pacific (Seoul)'],
+  ])('%s → %s', (label, shown) => {
+    expect(displayLabel(label)).toBe(shown);
+  });
+  it('GCP 43 리전 전부 — 보이는 위치에 대륙 낱말이 끝에 남지 않고 비지 않는다 · 거르기는 대륙으로도 된다', () => {
+    for (const r of REGIONS.gcp) {
+      const shown = displayLabel(r.label);
+      expect(shown, r.region).not.toMatch(/, (?:APAC|Europe|Middle East|North America|South America)$/);
+      expect(shown.length, r.region).toBeGreaterThan(0);
+    }
+    expect(filterRegions(regionOptions('gcp'), 'apac').length).toBeGreaterThan(1);
   });
 });

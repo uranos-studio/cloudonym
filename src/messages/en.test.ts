@@ -171,6 +171,30 @@ describe('영어 사전 (D24)', () => {
     expect(fillUi(en, 'kind_required_hint', { displayName: 'Resource Policy' })).toBe('Choose a kind to select Resource Policy');
     expect(fillUi(en, 'kind_label', { displayName: 'Cloud SQL Instance' })).toBe('Kind of Cloud SQL Instance');
   });
+  it('행 · 범위 · (i) · 표지 · 존 문구 (D50 · D53 · D54)', () => {
+    expect(fillUi(en, 'scope_choice_label', { displayName: 'IP Address' })).toBe('Scope of IP Address');
+    expect(en.ui.scope_choose).toBe('scope…');
+    expect(fillUi(en, 'scope_required_hint', { displayName: 'IP Address' })).toBe('Choose a scope to select IP Address');
+    expect(en.ui.zone_row_hint).toBe('Pick a zone in ② to name zonal resources');
+    expect(fillUi(en, 'kind_dropped_on_scope', { kind: 'GCE_VM_IP', scope: 'Global' })).toBe('Kind GCE_VM_IP does not exist at Global scope; it was cleared.');
+    expect(fillUi(en, 'info_toggle', { displayName: 'IP Address' })).toBe('About IP Address');
+    expect(en.ui.enter_name_at).toBe('Enter the name at');
+    expect(en.ui.badge_api_only).toBe('API only');
+    expect(en.ui.badge_preview).toBe('Preview');
+    expect(en.ui.api_only_filter).toBe('API only');
+  });
+  it('문서 · 개인정보 경로 자리 (D57) — 헤더 · 푸터 링크와 doc_ · privacy_ 블록', () => {
+    expect(en.ui.nav_naming_guide).toBe('Naming guide');
+    expect(en.ui.footer_privacy).toBe('Privacy');
+    const doc = UI_KEYS.filter((k) => k.startsWith('doc_'));
+    const privacy = UI_KEYS.filter((k) => k.startsWith('privacy_'));
+    expect(doc.length).toBeGreaterThan(0);
+    expect(privacy.length).toBeGreaterThan(0);
+    // 접두 블록은 이어져 있다 — 뒤 작업이 자기 블록 안에만 키를 더한다
+    const run = (keys: readonly string[]) => UI_KEYS.indexOf(keys.at(-1) as never) - UI_KEYS.indexOf(keys[0] as never) + 1;
+    expect(run(doc)).toBe(doc.length);
+    expect(run(privacy)).toBe(privacy.length);
+  });
   it('fillUi 는 {이름} 자리를 채우고 없는 이름은 그대로 둔다', () => {
     expect(fillUi(en, 'version_footer', { engine: '0.1.0', rules: '2026-09-29.1' })).toBe('Engine 0.1.0 · rules 2026-09-29.1');
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');

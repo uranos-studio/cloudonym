@@ -4,7 +4,7 @@ import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS } from '../core/regions';
-import { MAX_KIND_VALUE_CHARS } from '../core/catalog';
+import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 import { EXAMPLE_REGION } from './formContext';
 
@@ -98,7 +98,7 @@ export interface DecodedState {
 const isProvider = (v: unknown): v is Provider => typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
 
 /** r → 선택. 걸린 항목만 버린다: 값 꼴(수 · 문자열 밖) → 201번째부터 → validateSelection 의 index 달린 오류(모르는 type ·
- *  종류에 안 맞는 값 · 범위 밖 · 역할 꼴 · 종류 값(허용 밖 · 종류 표 없음 · 필수인데 없음)) → role 규칙에 수(기본 역할로 읽지 않는다) → Σ count 상한은 끝에서부터. 판정은 core 하나다 (D40 · D52).
+ *  종류에 안 맞는 값 · 범위 밖 · 역할 꼴 · 종류 값(허용 밖 · 종류 표 없음 · 필수인데 없음)) → role 규칙에 수(기본 역할로 읽지 않는다) · 같은 catalog 행의 둘째 키(D53) → Σ count 상한은 끝에서부터. 판정은 core 하나다 (D40 · D52).
  *  문자열은 `"n:값이름"` 꼴이면 수와 종류, 아니면 역할로 읽는다 — `"2:"` · `":POSTGRES"` 는 역할 꼴에도 맞지 않아 버려진다 */
 function decodeSelection(provider: Provider, r: unknown, rules?: readonly ResourceRule[]): { items: SelectionItem[]; dropped: number } {
   if (r === null || typeof r !== 'object' || Array.isArray(r)) return { items: [], dropped: 1 };
@@ -119,9 +119,12 @@ function decodeSelection(provider: Provider, r: unknown, rules?: readonly Resour
     const res = validateSelection(provider, raw, rules);
     if (res.ok) {
       const numericRole = new Set(res.items.flatMap((it, i) => (inputKind(it.rule) === 'role' && raw[i]?.count !== undefined ? [i] : [])));
-      if (numericRole.size === 0) return { items: res.items, dropped };
-      dropped += numericRole.size;
-      raw = raw.filter((_, i) => !numericRole.has(i));
+      // 화면 · hash 는 행마다 규칙 하나다 (D53) — 같은 catalog 행의 키가 둘 이상이면 catalog 규칙 순서의 첫 것만 남긴다
+      const sameRow = sameRowExtras(res.items);
+      if (numericRole.size === 0 && sameRow.size === 0) return { items: res.items, dropped };
+      const drop = new Set([...numericRole, ...sameRow]);
+      dropped += drop.size;
+      raw = raw.filter((_, i) => !drop.has(i));
       continue;
     }
     const bad = new Set(res.errors.flatMap((e) => ('params' in e && e.params && typeof (e.params as { index?: unknown }).index === 'number' ? [(e.params as { index: number }).index] : [])));
@@ -137,6 +140,22 @@ function decodeSelection(provider: Provider, r: unknown, rules?: readonly Resour
     }
   }
   return { items: [], dropped };
+}
+
+/** 같은 catalog 행의 항목 중 catalog 규칙 순서가 첫째가 아닌 것의 index (hash 의 키 순서와 무관하다) */
+function sameRowExtras(items: readonly SelectionItem[]): Set<number> {
+  const best = new Map<string, { i: number; order: number }>();
+  const extras = new Set<number>();
+  items.forEach((it, i) => {
+    const row = rowOf(it.rule.id);
+    if (!row) return;
+    const order = Object.keys(row.rules).indexOf(it.rule.id);
+    const cur = best.get(row.key);
+    if (cur === undefined) best.set(row.key, { i, order });
+    else if (order < cur.order) { extras.add(cur.i); best.set(row.key, { i, order }); }
+    else extras.add(i);
+  });
+  return extras;
 }
 
 /** r 의 항목 수 — 통째로 버릴 때 센다. 객체가 아니면 한 건 */

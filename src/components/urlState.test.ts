@@ -422,3 +422,40 @@ describe('hash v3 — 상한식에 종류 항(D55)', () => {
     expect(decodeState(hash, rules)?.selection).toHaveLength(MAX_ITEMS);
   });
 });
+
+import { MAX_COUNT } from '../core/selection';
+
+describe('hash — 한 행의 키가 둘이면 catalog 규칙 순서의 첫 것만 (D53)', () => {
+  const hashOf = (r: Record<string, unknown>) => `#state=${b64({ ...ctx, region: 'ane3', v: V2, p: 'gcp', r })}`;
+  it('address:1 + global_address:2 → address 만 · dropped 1', () => {
+    const d = decodeState(hashOf({ address: 1, global_address: 2 }))!;
+    expect(d.selection?.map((i) => [i.rule.resourceType, i.count])).toEqual([['address', 1]]);
+    expect(d.dropped).toBe(1);
+  });
+  it('hash 의 키 순서가 거꾸로여도 catalog 순서의 첫 것(address)이 남는다', () => {
+    const d = decodeState(hashOf({ global_address: 2, address: 1 }))!;
+    expect(d.selection?.map((i) => i.rule.resourceType)).toEqual(['address']);
+    expect(d.dropped).toBe(1);
+  });
+  it('세 규칙 행(NEG) — 셋 다 오면 하나만 · 다른 행은 그대로', () => {
+    const d = decodeState(hashOf({ region_network_endpoint_group: 1, global_network_endpoint_group: 1, network_endpoint_group: 1, compute_instance: 2 }))!;
+    expect(d.selection?.map((i) => i.rule.resourceType).sort()).toEqual(['compute_instance', 'network_endpoint_group']);
+    expect(d.dropped).toBe(2);
+  });
+  it('검사기 — 한 행에 키 하나면 아무것도 버리지 않는다', () => {
+    const d = decodeState(hashOf({ global_address: 2, compute_instance: 1 }))!;
+    expect(d.selection).toHaveLength(2);
+    expect(d.dropped).toBeUndefined();
+  });
+});
+
+describe('hash — 종류 값의 수 자리는 MAX_COUNT 와 맞다', () => {
+  const hashOf = (v: string) => `#state=${b64({ ...ctx, region: 'ane3', v: V2, p: 'gcp', r: { cloud_sql_instance: v } })}`;
+  it(`1 · ${MAX_COUNT} 는 받고 0 · ${MAX_COUNT + 1} 은 버린다`, () => {
+    expect(MAX_COUNT).toBeLessThan(100); // 정규식 [1-9]\d? 가 두 자리까지만 받는다 — 상한이 세 자리가 되면 이 시험과 정규식을 함께 고친다
+    expect(decodeState(hashOf('1:POSTGRES'))!.selection?.[0]?.count).toBe(1);
+    expect(decodeState(hashOf(`${MAX_COUNT}:POSTGRES`))!.selection?.[0]?.count).toBe(MAX_COUNT);
+    expect(decodeState(hashOf('0:POSTGRES'))!.dropped).toBe(1);
+    expect(decodeState(hashOf(`${MAX_COUNT + 1}:POSTGRES`))!.dropped).toBe(1);
+  });
+});

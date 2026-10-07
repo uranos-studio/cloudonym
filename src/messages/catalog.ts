@@ -29,6 +29,15 @@ export const UI_KEYS = [
   'select_resource_label', 'count_label', 'count_decrease', 'count_increase', 'count_fixed_hint',
   'role_label', 'role_hint', 'role_stale', 'tree_label',
   'kind_label', 'kind_default', 'kind_none', 'kind_choose', 'kind_required_hint',
+  // ResourceTree — 행 · 범위 · (i) · 표지 · 존 (D50 · D53 · D54)
+  'scope_choice_label', 'scope_choose', 'scope_required_hint', 'kind_dropped_on_scope', 'zone_row_hint',
+  'info_toggle', 'enter_name_at', 'badge_api_only', 'badge_api_only_title', 'badge_preview', 'badge_preview_title', 'api_only_filter',
+  // 헤더 · 푸터의 문서 경로 링크 (D57)
+  'nav_naming_guide', 'footer_privacy', 'back_to_app',
+  // NamingDoc — /docs/naming (D57)
+  'doc_title',
+  // Privacy — /privacy
+  'privacy_title',
   // NamesPanel
   'names_summary', 'names_empty_selection', 'copy_all_names', 'copy_all_names_skipped', 'copy_all_names_label',
   'copy_names_json_label', 'copy_names_json_blocked_label', 'conflict_prefix',

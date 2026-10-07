@@ -1,6 +1,7 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
 import { ENABLED_PROVIDERS, PROVIDERS, type Provider, type ResourceRule, type Token } from '../core/types';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
+import { rulesFor } from '../core/constraints';
 import { ENV_ALIASES } from '../core/normalize';
 import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
@@ -25,12 +26,13 @@ function joinNames(names: readonly string[]): string {
 export const SCOPE_MEANING = 'scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.';
 export const UNIQUENESS_MEANING = 'uniqueness "csp" means the provider requires the name to be unique within its scope; "none" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.';
 
-/** 범위 트리를 들여쓰기로 — 범위 한 줄(이름 · id · 근거 URL) 아래에 그 범위의 규칙(id · 입력 종류)과 자식 범위. 규칙 줄은 늘 들여쓰여 공식 · 제약 줄과 섞이지 않는다 */
+/** 범위 트리를 들여쓰기로 — 범위 한 줄(이름 · id · 근거 URL) 아래에 그 범위의 규칙(id · 입력 종류)과 자식 범위. 규칙 줄은 늘 들여쓰여 공식 · 제약 줄과 섞이지 않는다.
+ *  규칙은 자기 범위 아래에 적는다 — 화면 트리는 합친 행을 공통 조상에 두지만(D53) API 문서는 규칙 단위다 */
 function treeLines(node: TreeNode, depth = 0): string[] {
   const pad = '  '.repeat(depth);
   return [
     `${pad}- ${node.scope.displayName} (\`${node.scope.id}\`) — docs: ${node.scope.docUrl}`,
-    ...node.rules.map((r) => `${pad}  - \`${r.id}\` · input: ${inputKind(r)}${r.uniqueness === 'none' ? ' · uniqueness: none' : ''}`),
+    ...rulesFor(node.scope.provider).filter((r) => r.scope === node.scope.id).map((r) => `${pad}  - \`${r.id}\` · input: ${inputKind(r)}${r.uniqueness === 'none' ? ' · uniqueness: none' : ''}`),
     ...node.children.flatMap((c) => treeLines(c, depth + 1)),
   ];
 }

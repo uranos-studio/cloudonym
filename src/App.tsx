@@ -1,7 +1,7 @@
 // 네 단계 화면 (D42) — ① Cloud ② Context ③ Resources ④ Names · 상태 → URL hash 동기화 · 비콘.
 // 엔진은 브라우저에서 직접 부른다 (D17) — API 왕복 없음. 화면 문구는 사전(en)이 정본이다 (D24)
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, Cloud, FileText } from 'lucide-react';
+import { ArrowDown, BookOpen, Cloud, FileText } from 'lucide-react';
 import { generateMany, parseContext } from './core/engine';
 import { labelsFor } from './core/labels';
 import { buildTree } from './core/tree';
@@ -17,6 +17,7 @@ import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } fr
 import { encodeState, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
+import { NAMING_PATH, PRIVACY_PATH } from './components/route';
 import { DEFAULT_FORM, type FormContext } from './components/formContext';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
 import { en } from './messages/en';
@@ -59,6 +60,8 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   const ctx = parsed.ok ? parsed.context : undefined;
   const many = useMemo(() => (ctx && provider && items.length > 0 ? generateMany(ctx, provider, items) : undefined), [ctx, provider, items]);
   const labels = useMemo(() => (ctx && provider ? labelsFor(ctx, provider) : undefined), [ctx, provider]);
+  // 문맥에 존이 없다(리전만 · global) — 존 규칙 행을 새로 체크할 수 없다. 문맥이 불완전한 동안은 막지 않는다(존 칸이 아니라 다른 칸의 문제다) (D50)
+  const zoneMissing = ctx !== undefined && ctx.zone === undefined;
 
   // 상태 key — 다섯 값 + v + p + r. 링크 비교 · hash 쓰기에 쓴다. 비콘은 문맥 key 만 본다(선택 이벤트는 더하지 않는다)
   const stateKey = ctx ? encodeState(ctx, VERSION.rules, { provider, selection: items }) : '';
@@ -153,6 +156,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
           <nav aria-label={en.ui.nav_label} className="flex flex-wrap items-center gap-2">
             {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵) */}
             {ctx && <CopyButton text={shareUrl(ctx, window.location.origin + window.location.pathname, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+            <a href={NAMING_PATH} data-nav-naming className={LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
             <a href="/llms.txt" target="_blank" rel="noreferrer" className={LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
           </nav>
           {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
@@ -181,7 +185,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
           <div className="min-w-0 space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className={PANEL}>
               {provider && tree
-                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} />
+                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} zoneMissing={zoneMissing} />
                 : (
                   <section aria-labelledby="step-resources" className="space-y-2">
                     <h2 id="step-resources" className="text-base font-semibold"><span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">3</span>{en.ui.step_resources}</h2>
@@ -216,7 +220,10 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
       )}
 
       <footer className={`mx-auto max-w-7xl px-4 text-xs text-zinc-600 dark:text-zinc-400 ${provider && picked.size > 0 ? 'pb-24 lg:pb-6' : 'pb-6'}`}>
-        <p data-version>{fillUi(en, 'version_footer', VERSION)}</p>
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
+          <a href={PRIVACY_PATH} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+        </p>
       </footer>
     </div>
   );
