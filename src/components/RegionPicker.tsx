@@ -88,7 +88,7 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
             className={`${controlClass} font-mono`}
           />
         </div>
-        <div className="w-28 shrink-0">
+        <div className="w-36 shrink-0">
           <label htmlFor="field-zone" className={labelClass}>Zone</label>
           <select id="field-zone" name="zone" data-zone-select value={zone?.zone ?? ''} disabled={zones.length === 0}
             onChange={(e) => region && onChange(composeRegion(region, zones.find((z) => z.zone === e.target.value)))}
