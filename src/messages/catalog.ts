@@ -28,6 +28,7 @@ export const UI_KEYS = [
   'category_identity', 'category_security', 'category_management', 'category_containers',
   'select_resource_label', 'count_label', 'count_decrease', 'count_increase', 'count_fixed_hint',
   'role_label', 'role_hint', 'role_stale', 'tree_label',
+  'kind_label', 'kind_default', 'kind_none', 'kind_choose', 'kind_required_hint',
   // NamesPanel
   'names_summary', 'names_empty_selection', 'copy_all_names', 'copy_all_names_skipped', 'copy_all_names_label',
   'copy_names_json_label', 'copy_names_json_blocked_label', 'conflict_prefix',

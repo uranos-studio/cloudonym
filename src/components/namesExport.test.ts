@@ -44,6 +44,26 @@ describe('toNamesExport', () => {
   });
 });
 
+describe('toNamesExport — 종류 (D52)', () => {
+  const g: NamingContext = { owner: 'platform', system: 'payments', purpose: 'ledger', env: 'prod', region: 'ane3' };
+  const gpick = (r: unknown[]) => {
+    const res = validateSelection('gcp', r);
+    if (!res.ok) throw new Error(JSON.stringify(res.errors));
+    return res.items;
+  };
+  it('고른 종류는 항목에 kind(값 이름) · 고르지 않은 항목에는 키가 없다 · key 는 type_seq 그대로', () => {
+    const sel = gpick([{ type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'subnet' }]);
+    const out = toNamesExport(generateMany(g, 'gcp', sel), g, VERSION, sel);
+    expect(out.names.map((n) => [n.key, n.name, n.kind ?? null])).toEqual([
+      ['cloud_sql_instance_01', 'payments-ledger-prod-ane3-sql-pg-01', 'POSTGRES'],
+      ['cloud_sql_instance_02', 'payments-ledger-prod-ane3-sql-pg-02', 'POSTGRES'],
+      ['subnet_01', 'payments-ledger-prod-ane3-snet-01', null],
+    ]);
+    expect(Object.keys(out.names[0]!)).toEqual(['key', 'resource_type', 'seq', 'kind', 'scope', 'name']);
+    expect(out.names[2]).not.toHaveProperty('kind');
+  });
+});
+
 describe('allNamesText — 유효한 이름만 한 줄에 하나 · 건너뛴 수', () => {
   it('유효만 · 줄바꿈으로', () => {
     const sel = pick([{ type: 'virtual_machine', count: 2 }]);

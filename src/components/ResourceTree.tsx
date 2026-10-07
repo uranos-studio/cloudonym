@@ -1,13 +1,14 @@
 // ③ Resources — 이름 유일 범위 트리(D37) · 검색 · 분류 칩 · 「선택만 보기」 · 접기 · 체크 · 개수/역할.
 // 펼침은 두 벌이다 — 거르지 않은 보기와 걸러진 보기. 걸러진 보기는 필터가 바뀔 때마다 모두 펼쳐 시작하고, 필터를 지우면 거르지 않은 보기의 펼침이 그대로 돌아온다.
 // 선택 상태는 App 의 Map 하나이고 이 트리는 그것을 읽기만 한다. 바꾼 값은 onChange 로 넘기고 판정(core validateSelection)은 App 이 한다.
+// 종류(D52) — 종류 표가 있는 행에 select. 체크 전에 고른 값은 행이 들고 있다가 체크할 때 싣는다 · 필수 종류는 고르기 전 체크할 수 없다.
 // 키보드 — 행의 체크 상자에서 ↑ ↓ 로 행 이동 · 스페이스로 체크 · + - 로 개수 · 범위 머리(summary)에서 Enter · 스페이스로 접고 편다
 import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Minus, Plus, Search } from 'lucide-react';
 import { inputKind, type TreeNode } from '../core/tree';
 import { ROLE_PATTERN } from '../core/selection';
 import type { Category, Provider, ResourceRule } from '../core/types';
-import { canAdd, canIncrease, setCount, setRole, toggle, type Picked, type PickedEntry } from './selection';
+import { canAdd, canIncrease, kindChoices, kindSelectValue, needsKind, setCount, setKind, setRole, toggle, type KindChoices, type Picked, type PickedEntry } from './selection';
 import { categoryCounts, filterTree, isFiltering, type TreeFilter, type ViewNode } from './treeFilter';
 import { collapseAll, expandAll, groupId, initialOpen, isGroupOpen, isScopeOpen, setGroupOpen, setScopeOpen, type OpenState } from './treeOpen';
 import { providerName } from './providerName';
@@ -56,9 +57,10 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   // 행의 콜백이 매번 바뀌지 않게 최신 선택을 ref 로 읽는다 — 행은 memo 라 자기 값이 같으면 다시 그리지 않는다
   const pickedRef = useRef(picked);
   useLayoutEffect(() => { pickedRef.current = picked; }, [picked]);
-  const onToggleRule = useCallback((r: ResourceRule) => onChange(toggle(pickedRef.current, r)), [onChange]);
+  const onToggleRule = useCallback((r: ResourceRule, kind?: string) => onChange(toggle(pickedRef.current, r, kind)), [onChange]);
   const onCount = useCallback((r: ResourceRule, n: number) => onChange(setCount(pickedRef.current, r, n)), [onChange]);
   const onRole = useCallback((r: ResourceRule, role: string) => onChange(setRole(pickedRef.current, r, role)), [onChange]);
+  const onKind = useCallback((r: ResourceRule, kind: string | undefined) => onChange(setKind(pickedRef.current, r, kind)), [onChange]);
 
   const view = useMemo(() => filterTree(tree, filter, picked), [tree, filter, picked]);
   const counts = useMemo(() => categoryCounts(tree), [tree]);
@@ -104,7 +106,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
     const entry = picked.get(r.resourceType);
     return (
       <Row key={r.id} rule={r} entry={entry} canCheck={entry !== undefined || addable}
-        canInc={entry !== undefined && canIncrease(picked, r)} onToggle={onToggleRule} onCount={onCount} onRole={onRole} />
+        canInc={entry !== undefined && canIncrease(picked, r)} onToggle={onToggleRule} onCount={onCount} onRole={onRole} onKind={onKind} />
     );
   });
 
@@ -203,24 +205,41 @@ interface RowProps {
   entry: PickedEntry | undefined;
   canCheck: boolean;
   canInc: boolean;
-  onToggle: (r: ResourceRule) => void;
+  onToggle: (r: ResourceRule, kind?: string) => void;
   onCount: (r: ResourceRule, n: number) => void;
   onRole: (r: ResourceRule, role: string) => void;
+  onKind: (r: ResourceRule, kind: string | undefined) => void;
 }
 
-/** 행 하나 — 높이 44px(터치) · 체크 · 이름 · slug · 입력(개수 · 역할 · 1 고정) */
-const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount, onRole }: RowProps) {
+/** 행 하나 — 높이 44px(터치) · 체크 · 이름 · slug · 종류 select(종류 표가 있는 행) · 입력(개수 · 역할 · 1 고정) */
+const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount, onRole, onKind }: RowProps) {
   const checked = entry !== undefined;
   const kind = inputKind(rule);
   const name = { displayName: rule.displayName };
+  const choices = useMemo(() => kindChoices(rule), [rule]);
+  // 체크 전에 고른 종류 — 체크하면 선택에 싣고, 체크를 풀면 그 값을 다시 들고 있는다
+  const [draftKind, setDraftKind] = useState<string | undefined>(undefined);
+  const shownKind = checked ? entry.kind : draftKind;
+  const blocked = !checked && needsKind(rule, draftKind);
+  const hintId = useId();
+  const onCheck = () => {
+    if (checked) setDraftKind(entry.kind);
+    onToggle(rule, checked ? undefined : draftKind);
+  };
+  const onPickKind = (v: string) => {
+    const next = v === '' ? undefined : v;
+    if (checked) onKind(rule, next);
+    else setDraftKind(next);
+  };
   return (
     <div data-rule={rule.id} data-type={rule.resourceType} data-rule-category={rule.category} data-entity={rule.entity} data-checked={checked} className="flex min-h-11 flex-wrap items-center gap-x-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
       <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-sm">
-        <input type="checkbox" data-row-check checked={checked} disabled={!canCheck} onChange={() => onToggle(rule)}
-          aria-label={fillUi(en, 'select_resource_label', name)} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed" />
+        <input type="checkbox" data-row-check checked={checked} disabled={!canCheck || blocked} onChange={onCheck}
+          aria-label={fillUi(en, 'select_resource_label', name)} aria-describedby={blocked ? hintId : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed" />
         <span className="min-w-0 truncate text-zinc-900 dark:text-zinc-100">{rule.displayName}</span>
         {rule.slug && <code className="hidden shrink-0 font-mono text-xs text-zinc-500 sm:inline dark:text-zinc-400">{rule.slug}</code>}
       </label>
+      {choices && <KindSelect rule={rule} choices={choices} value={kindSelectValue(rule, shownKind)} onPick={onPickKind} />}
       {kind === 'count' && (
         <div role="group" aria-label={fillUi(en, 'count_label', name)} className="flex shrink-0 items-center gap-1">
           <button type="button" className={STEP} aria-label={fillUi(en, 'count_decrease', name)} data-dec
@@ -240,9 +259,27 @@ const Row = memo(function Row({ rule, entry, canCheck, canInc, onToggle, onCount
         </span>
       )}
       {kind === 'role' && <RoleInput rule={rule} value={entry?.role} disabled={!checked} onRole={onRole} />}
+      {blocked && (
+        <p id={hintId} data-kind-required className="basis-full pb-1 pl-6 text-xs text-zinc-600 dark:text-zinc-400">
+          {fillUi(en, 'kind_required_hint', name)}
+        </p>
+      )}
     </div>
   );
 });
+
+/** 종류 select — 빈 칸('')은 그 범위의 기본값 · 토큰 없음 · 아직 고르지 않음(필수) 중 하나이고, 나머지는 규칙의 allowed 값 이름이다 */
+function KindSelect({ rule, choices, value, onPick }: { rule: ResourceRule; choices: KindChoices; value: string; onPick: (v: string) => void }) {
+  const b = choices.blank;
+  const blank = b.type === 'default' ? fillUi(en, 'kind_default', { value: b.value }) : b.type === 'none' ? en.ui.kind_none : en.ui.kind_choose;
+  return (
+    <select data-kind-select value={value} onChange={(e) => onPick(e.target.value)} aria-label={fillUi(en, 'kind_label', { displayName: rule.displayName })}
+      className="max-w-[12rem] shrink-0 truncate rounded-md border border-zinc-300 bg-white px-1.5 py-1 font-mono text-xs focus-visible:outline-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-950">
+      <option value="" disabled={b.type === 'choose'}>{blank}</option>
+      {choices.options.map((v) => <option key={v} value={v}>{v}</option>)}
+    </select>
+  );
+}
 
 /** 역할 입력 — 꼴(ROLE_PATTERN)에 맞을 때만 선택에 반영한다. 무효인 동안은 aria-invalid 와 「이전 역할로 생성됨」 안내(행 아래 한 줄)를 보이고,
  *  blur 때 대문자를 소문자로 바꿔 맞으면 반영하고 아니면 칸을 마지막 유효 값으로 되돌린다 — 칸과 이름 · hash 가 다른 값을 보이지 않게 */

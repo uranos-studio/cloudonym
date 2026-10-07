@@ -259,14 +259,14 @@ describe('hash v2 — 최대 상태 왕복과 상한', () => {
     expect(validateSelection('azure', [{ type: 'managed_identity', role: 'r'.repeat(MAX_ROLE_CHARS) }]).ok).toBe(true);
     expect(validateSelection('azure', [{ type: 'managed_identity', role: 'r'.repeat(MAX_ROLE_CHARS + 1) }]).ok).toBe(false);
   });
-  it('encoder 가 만드는 최대 상태가 왕복하고, 그 표준 Base64(패딩 포함) 길이가 MAX_HASH_CHARS 와 같다', () => {
+  it('encoder 가 만드는 역할 최대 상태가 왕복하고, 그 표준 Base64(패딩 포함) 길이는 18219 — 종류 항(D55)이 더해진 MAX_HASH_CHARS 안이다', () => {
     const encoded = encodeState(worst, V, { provider: 'azure', selection: items });
     const hash = `#state=${encoded}`;
     expect(hash.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
     const bytes = new TextEncoder().encode(JSON.stringify(jsonOf(encoded)));
     const padded = `#state=${btoa(String.fromCharCode(...bytes))}`;
-    expect(padded.length).toBe(MAX_HASH_CHARS);
-    expect(MAX_HASH_CHARS).toBe(18219);
+    expect(padded.length).toBe(18219);
+    expect(padded.length).toBeLessThan(MAX_HASH_CHARS);
     const back = decodeState(hash, rules);
     expect(back?.context).toEqual(worst);
     expect(back?.rulesVersion).toBe(V);
@@ -321,5 +321,104 @@ describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다',
   it('켜진 목록을 넘기면 그것을 따른다 — 둘 이상 켜졌으면 p 없는 링크는 CSP 를 고르지 않는다', () => {
     expect(decodeEnabled(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
     expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: reset, dropped: 3, unavailable: 'azure' });
+  });
+});
+
+// ─── hash v3 — 종류 (D52 · D55) ───────────────────────────
+import { MAX_KIND_VALUE_CHARS } from '../core/catalog';
+import { inputKind } from '../core/tree';
+
+describe('hash v3 — r 의 종류 값 "n:값이름" (D55)', () => {
+  const gctx: NamingContext = { owner: 'platform', system: 'payments', purpose: 'ledger', env: 'prod', region: 'ane3' };
+  const openG = (r: unknown, rules?: readonly ResourceRule[]) => decodeState(`#state=${b64({ ...gctx, v: V2, p: 'gcp', r })}`, rules);
+  const kinds = (items: { rule: ResourceRule; count: number; kind?: string }[] | undefined) => (items ?? []).map((i) => [i.rule.resourceType, i.count, i.kind ?? null]);
+
+  it('count 규칙에 종류를 고르면 "2:POSTGRES" — 왕복한다', () => {
+    const items = sel('gcp', [{ type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'subnet', count: 3 }]);
+    const encoded = encodeState(gctx, V2, { provider: 'gcp', selection: items });
+    expect(jsonOf(encoded).r).toEqual({ cloud_sql_instance: '2:POSTGRES', subnet: 3 });
+    const back = decodeState(`#state=${encoded}`);
+    expect(kinds(back?.selection)).toEqual([['cloud_sql_instance', 2, 'POSTGRES'], ['subnet', 3, null]]);
+    expect(back?.dropped).toBeUndefined();
+  });
+  it('값 이름은 소문자 · 붙임표도 된다 — "1:snapshot-schedule" 왕복', () => {
+    const items = sel('gcp', [{ type: 'resource_policy', count: 1, kind: 'snapshot-schedule' }]);
+    const encoded = encodeState(gctx, V2, { provider: 'gcp', selection: items });
+    expect(jsonOf(encoded).r).toEqual({ resource_policy: '1:snapshot-schedule' });
+    expect(kinds(decodeState(`#state=${encoded}`)?.selection)).toEqual([['resource_policy', 1, 'snapshot-schedule']]);
+  });
+  it('종류를 고르지 않은 항목은 지금처럼 수 하나 — 옛 링크와 같은 꼴', () => {
+    const items = sel('gcp', [{ type: 'cloud_sql_instance', count: 2 }]);
+    expect(jsonOf(encodeState(gctx, V2, { provider: 'gcp', selection: items })).r).toEqual({ cloud_sql_instance: 2 });
+  });
+  it.each([['2:'], [':POSTGRES'], ['02:POSTGRES'], ['100:POSTGRES'], ['2:POSTGRES:x'], ['2:POST GRES'], [`2:${'A'.repeat(MAX_KIND_VALUE_CHARS + 1)}`]])('꼴이 틀린 값 %j 은 버린다', (v) => {
+    const d = openG({ cloud_sql_instance: v, subnet: 1 });
+    expect(kinds(d?.selection)).toEqual([['subnet', 1, null]]);
+    expect(d?.dropped).toBe(1);
+  });
+  it('토큰("2:pg")은 값 이름이 아니라 버린다 · 허용 밖 값 · 종류 표가 없는 규칙의 종류도 버린다', () => {
+    const d = openG({ cloud_sql_instance: '2:pg', subnet: '1:INTERNAL', vpc_network: '1:PRIVATE', firewall_rule: '1:EGRESS' });
+    expect(kinds(d?.selection)).toEqual([['firewall_rule', 1, 'EGRESS']]);
+    expect(d?.dropped).toBe(3);
+  });
+  it('필수 종류(리소스 정책)에 종류가 없으면 버린다', () => {
+    const d = openG({ resource_policy: 1, subnet: 1 });
+    expect(kinds(d?.selection)).toEqual([['subnet', 1, null]]);
+    expect(d?.dropped).toBe(1);
+  });
+  it('입력 없는 규칙은 1 또는 "1:값이름" — 시험 전용 종류 표로 왕복한다', () => {
+    const rg = rulesFor('azure').find((r) => r.resourceType === 'resource_group')!;
+    expect(inputKind(rg)).toBe('none');
+    const kinded: ResourceRule = { ...rg, kinds: { rule: 'only-when-chosen', default: null, allowed: ['shared-hub'], tokens: { 'shared-hub': 'hub' }, omitValues: [] } };
+    const rules = [...rulesFor('azure').filter((r) => r !== rg), kinded];
+    const items = sel('azure', [{ type: 'resource_group', kind: 'shared-hub' }], rules);
+    const encoded = encodeState(ctx, V2, { provider: 'azure', selection: items });
+    expect(jsonOf(encoded).r).toEqual({ resource_group: '1:shared-hub' });
+    expect(kinds(decodeState(`#state=${encoded}`, rules)?.selection)).toEqual([['resource_group', 1, 'shared-hub']]);
+    expect(jsonOf(encodeState(ctx, V2, { provider: 'azure', selection: sel('azure', [{ type: 'resource_group' }], rules) })).r).toEqual({ resource_group: 1 });
+  });
+  it('role 규칙에 "n:값" 이 오면 역할로 읽지 않고 버린다', () => {
+    const d = decodeState(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: { managed_identity: '1:db', key_vault: 1 } })}`);
+    expect(flat(d?.selection)).toEqual([['key_vault', 1, null]]);
+    expect(d?.dropped).toBe(1);
+  });
+  it('MAX_KIND_VALUE_CHARS 는 규칙 표의 가장 긴 값 이름과 같다', () => {
+    const longest = Math.max(...(['aws', 'gcp', 'azure'] as const).flatMap((p) => rulesFor(p).flatMap((r) => r.kinds?.allowed ?? [])).map((v) => v.length));
+    expect(MAX_KIND_VALUE_CHARS).toBe(longest);
+  });
+});
+
+describe('hash v3 — 상한식에 종류 항(D55)', () => {
+  // 시험 전용 count 규칙 200개 · resourceType 40자 · 값 이름 MAX_KIND_VALUE_CHARS 자 — Σ count 200 이라 항목마다 count 1 이 최대다
+  const neg = rulesFor('gcp').find((r) => r.resourceType === 'network_endpoint_group')!;
+  const longest = neg.kinds!.allowed.find((v) => v.length === MAX_KIND_VALUE_CHARS)!;
+  const rules: ResourceRule[] = Array.from({ length: MAX_ITEMS }, (_, i) => {
+    const type = `${'t'.repeat(MAX_RESOURCE_TYPE_CHARS - 3)}${String(i).padStart(3, '0')}`;
+    return { ...neg, id: `gcp.${type}`, resourceType: type };
+  });
+  const worst: NamingContext = { owner: '\u0001'.repeat(MAX_CONTEXT_CHARS), system: '\u0001'.repeat(MAX_CONTEXT_CHARS), purpose: '\u0001'.repeat(MAX_CONTEXT_CHARS), env: 'prod', region: 'global' };
+  const items = sel('gcp', rules.map((r) => ({ type: r.resourceType, count: 1, kind: longest })), rules);
+
+  it('MAX_HASH_CHARS 는 상한식(항목 최악 = 수 · 역할 · "99:<값이름>" 중 큰 쪽)의 값이다', () => {
+    const item = Math.max(`"${'t'.repeat(40)}":99,`.length, `"${'t'.repeat(40)}":"${'r'.repeat(16)}",`.length, `"${'t'.repeat(40)}":"99:${'k'.repeat(MAX_KIND_VALUE_CHARS)}",`.length);
+    expect(item).toBe(76);
+    const skeleton = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: '0000-00-00.00', p: 'azure', r: {} }).length;
+    const bytes = skeleton + 3 * MAX_CONTEXT_CHARS * 6 + MAX_ITEMS * item - 1;
+    expect(MAX_HASH_CHARS).toBe('#state='.length + Math.ceil(bytes / 3) * 4);
+    expect(MAX_HASH_CHARS).toBe(21951);
+  });
+  it('종류를 단 최대 선택(값 이름 27자 × 200)이 왕복하고 상한 안이다', () => {
+    const encoded = encodeState(worst, '2099-12-31.99', { provider: 'gcp', selection: items });
+    const hash = `#state=${encoded}`;
+    const bytes = new TextEncoder().encode(JSON.stringify(jsonOf(encoded)));
+    const padded = `#state=${btoa(String.fromCharCode(...bytes))}`;
+    // 이룰 수 있는 최대 — 항목마다 `"<40>":"1:<27>",` 75 바이트(식의 `99` 보다 1 바이트 짧다) · p 는 `gcp`(식은 `azure`)
+    expect(padded.length).toBe(21683);
+    expect(padded.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
+    const back = decodeState(padded, rules);
+    expect(back?.selection).toHaveLength(MAX_ITEMS);
+    expect(back?.selection?.every((i) => i.kind === longest)).toBe(true);
+    expect(back?.dropped).toBeUndefined();
+    expect(decodeState(hash, rules)?.selection).toHaveLength(MAX_ITEMS);
   });
 });

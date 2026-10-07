@@ -4,7 +4,8 @@ import type { SelectionItem } from '../core/selection';
 import type { NamingContext, Provider, ScopeId } from '../core/types';
 import type { Version } from '../version';
 
-export interface ExportedName { key: string; resource_type: string; seq?: string; role?: string; scope: ScopeId; name: string }
+/** kind 는 고른 종류 값 이름(POSTGRES — API 의 kind 와 같다 · D52) */
+export interface ExportedName { key: string; resource_type: string; seq?: string; role?: string; kind?: string; scope: ScopeId; name: string }
 export interface NamesExport {
   version: Version;
   provider: Provider;
@@ -29,6 +30,7 @@ export function toNamesExport(many: ManyResult, ctx: NamingContext, version: Ver
       key: it.key, resource_type: it.resourceType,
       ...(it.seq === undefined ? {} : { seq: it.seq }),
       ...(it.role === undefined ? {} : { role: it.role }),
+      ...(it.kind === undefined ? {} : { kind: it.kind }),
       scope, name: it.name,
     });
   }

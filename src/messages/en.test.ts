@@ -164,6 +164,13 @@ describe('영어 사전 (D24)', () => {
     expect(JSON.stringify(m)).toBe(before);
   });
 
+  it('종류 select 문구 (D52) — 빈 칸 셋 · 필수 안내', () => {
+    expect(fillUi(en, 'kind_default', { value: 'EXTERNAL' })).toBe('default (EXTERNAL)');
+    expect(en.ui.kind_none).toBe('none');
+    expect(en.ui.kind_choose).toBe('choose…');
+    expect(fillUi(en, 'kind_required_hint', { displayName: 'Resource Policy' })).toBe('Choose a kind to select Resource Policy');
+    expect(fillUi(en, 'kind_label', { displayName: 'Cloud SQL Instance' })).toBe('Kind of Cloud SQL Instance');
+  });
   it('fillUi 는 {이름} 자리를 채우고 없는 이름은 그대로 둔다', () => {
     expect(fillUi(en, 'version_footer', { engine: '0.1.0', rules: '2026-09-29.1' })).toBe('Engine 0.1.0 · rules 2026-09-29.1');
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');

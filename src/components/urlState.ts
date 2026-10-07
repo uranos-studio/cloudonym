@@ -4,6 +4,7 @@ import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS } from '../core/regions';
+import { MAX_KIND_VALUE_CHARS } from '../core/catalog';
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 import { EXAMPLE_REGION } from './formContext';
 
@@ -21,14 +22,19 @@ const V_PLACEHOLDER = '0000-00-00.00';
 /** 상한식이 기대는 두 수 — 규칙 표의 resourceType 길이(urlState.test 「상수 둘은 core 의 판정과 맞다」가 세 CSP 규칙 전부를 센다) · 역할 꼴(ROLE_PATTERN 의 16). 규칙이 늘어도 상한은 움직이지 않는다 (D42) */
 export const MAX_RESOURCE_TYPE_CHARS = 40;
 export const MAX_ROLE_CHARS = 16;
-/** r 의 항목 하나 최악 — 수(`"<40>":99,` 47 바이트)와 역할(`"<40>":"<16>",` 62 바이트) 중 큰 쪽. 값이 배타라 한 type 은 한 번만 나온다 */
-const MAX_ITEM_JSON_BYTES = Math.max(`"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":99,`.length, `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"${'r'.repeat(MAX_ROLE_CHARS)}",`.length);
+/** r 의 항목 하나 최악 — 수(`"<40>":99,` 47 바이트) · 역할(`"<40>":"<16>",` 62 바이트) · 종류(`"<40>":"99:<27>",` 76 바이트 — MAX_KIND_VALUE_CHARS) 중 큰 쪽.
+ *  값이 배타라 한 type 은 한 번만 나온다. Σ count 200 이라 200 항목이 모두 99 일 수는 없다 — 식은 넉넉한 쪽이다 (D55) */
+const MAX_ITEM_JSON_BYTES = Math.max(
+  `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":99,`.length,
+  `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"${'r'.repeat(MAX_ROLE_CHARS)}",`.length,
+  `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"99:${'k'.repeat(MAX_KIND_VALUE_CHARS)}",`.length,
+);
 /** 최악 JSON 바이트 — 뼈대(env `prod`(가장 긴 표준값 4자) · region 은 가장 긴 지역 코드(MAX_REGION_CHARS — 존 코드 ause1a · global 이 6자) · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
 const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, p: 'azure', r: {} }).length
   + FREE_FIELDS.length * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_ITEMS * MAX_ITEM_JSON_BYTES - 1;
 /** hash 전체 상한 — 화면 · API 가 받는 모든 입력(자유 입력 셋 각 MAX_CONTEXT_CHARS 자 · 아무 유니코드)과 최대 선택이 왕복하도록 최악 JSON 의
- *  표준 Base64(패딩 포함) 길이에 `#state=` 를 더한 값(18219 — urlState.test 가 잰다). 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게) */
+ *  표준 Base64(패딩 포함) 길이에 `#state=` 를 더한 값(urlState.test 가 잰다). 넘으면 디코딩하지 않는다 (매우 긴 링크가 여는 사람의 탭을 느리게 하지 않게) */
 export const MAX_HASH_CHARS = `#${HASH_KEY}=`.length + Math.ceil(MAX_JSON_BYTES / 3) * 4;
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -54,13 +60,17 @@ export interface PickState {
   selection?: readonly SelectionItem[];
 }
 
-/** r 의 값 — 항목마다 하나(배타 · D42): count 규칙은 수, role 규칙은 역할 문자열(기본 역할도 적는다), 입력 없는 규칙은 1 */
+/** r 의 값 — 항목마다 하나(배타 · D42 · D55): count 규칙은 수 또는 `"n:값이름"`, role 규칙은 역할 문자열(기본 역할도 적는다), 입력 없는 규칙은 1 또는 `"1:값이름"`.
+ *  역할 꼴(ROLE_PATTERN)에는 `:` 가 없어 문자열 값의 뜻이 하나로 정해진다 */
 function itemValue(item: SelectionItem): number | string {
-  const kind = inputKind(item.rule);
-  if (kind === 'count') return item.count;
-  if (kind === 'role') return item.role ?? DEFAULT_ROLE;
-  return 1;
+  const input = inputKind(item.rule);
+  if (input === 'role') return item.role ?? DEFAULT_ROLE;
+  const n = input === 'count' ? item.count : 1;
+  return item.kind === undefined ? n : `${n}:${item.kind}`;
 }
+
+/** `"n:값이름"` — n 은 1~99, 값 이름은 영숫자 · 밑줄 · 붙임표(`POSTGRES` · `snapshot-schedule`) MAX_KIND_VALUE_CHARS 자까지. 값이 그 규칙에 맞는지는 validateSelection 이 본다 */
+const KIND_VALUE_RE = new RegExp(`^([1-9]\\d?):([A-Za-z0-9_-]{1,${MAX_KIND_VALUE_CHARS}})$`);
 
 /** 다섯 필드를 고정 순서로 담고(region 은 존 코드가 있으면 그것 — D50 · D55), 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
  *  p 가 없으면 p · r 을 모두 빼고, 선택이 비면 r 을 뺀다 — 옛 링크(다섯 키 · v)와 같은 문자열이 나와 링크 상태가 유지된다 */
@@ -88,13 +98,16 @@ export interface DecodedState {
 const isProvider = (v: unknown): v is Provider => typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
 
 /** r → 선택. 걸린 항목만 버린다: 값 꼴(수 · 문자열 밖) → 201번째부터 → validateSelection 의 index 달린 오류(모르는 type ·
- *  종류에 안 맞는 값 · 범위 밖 · 역할 꼴) → role 규칙에 수(기본 역할로 읽지 않는다) → Σ count 상한은 끝에서부터. 판정은 core 하나다 (D40) */
+ *  종류에 안 맞는 값 · 범위 밖 · 역할 꼴 · 종류 값(허용 밖 · 종류 표 없음 · 필수인데 없음)) → role 규칙에 수(기본 역할로 읽지 않는다) → Σ count 상한은 끝에서부터. 판정은 core 하나다 (D40 · D52).
+ *  문자열은 `"n:값이름"` 꼴이면 수와 종류, 아니면 역할로 읽는다 — `"2:"` · `":POSTGRES"` 는 역할 꼴에도 맞지 않아 버려진다 */
 function decodeSelection(provider: Provider, r: unknown, rules?: readonly ResourceRule[]): { items: SelectionItem[]; dropped: number } {
   if (r === null || typeof r !== 'object' || Array.isArray(r)) return { items: [], dropped: 1 };
   let dropped = 0;
-  let raw: Array<{ type: string; count?: number; role?: string }> = [];
+  let raw: Array<{ type: string; count?: number; role?: string; kind?: string }> = [];
   for (const [type, v] of Object.entries(r)) {
+    const m = typeof v === 'string' ? KIND_VALUE_RE.exec(v) : null;
     if (typeof v === 'number') raw.push({ type, count: v });
+    else if (m) raw.push({ type, count: Number(m[1]), kind: m[2] });
     else if (typeof v === 'string') raw.push({ type, role: v });
     else dropped++;
   }
