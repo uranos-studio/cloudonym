@@ -20,7 +20,7 @@ describe('fit — 3단계 축소', () => {
   it('들어가면 손대지 않는다', () => {
     const rule = getRule('gcp', 'compute_instance')!;
     const ctx = { owner: 'sj', system: 'antigravity', purpose: 'sync', env: 'prd', region: 'kr' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prd-kr-vm-01' });
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prd-kr-gce-01' });
   });
   it('TC-AZ-02 Windows 노드풀 6자: tokenValues 경로로 npprod', () => {
     const rule = getRule('azure', 'aks_nodepool_windows')!;   // template [slug, purpose] · max 6 · separator ''
@@ -67,7 +67,7 @@ describe('fit — 3단계 축소', () => {
   it('축소하지 않은 1글자 입력(system a)은 MIN_TOKEN 으로 막지 않는다 (GCP VM)', () => {
     const rule = getRule('gcp', 'compute_instance')!;
     const ctx = { owner: 'sj', system: 'a', purpose: 'sync', env: 'prd', region: 'kr' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prd-kr-vm-01' });
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prd-kr-gce-01' });
   });
 });
 

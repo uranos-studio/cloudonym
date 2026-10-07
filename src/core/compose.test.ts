@@ -32,9 +32,9 @@ describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
     expect(tokenValues(ctx, sa).role).toBe('sync');
     expect(tokenValues(ctx, vm, {})).toEqual(tokenValues(ctx, vm));
   });
-  it("seq '07' 을 주면 …-vm-07", () => {
+  it("seq '07' 을 주면 …-gce-07", () => {
     const vm = getRule('gcp', 'compute_instance')!;
-    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prd-kr-vm-07');
+    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prd-kr-gce-07');
   });
   it("role 'db' 를 주면 …-sa-db", () => {
     const sa = getRule('gcp', 'service_account')!;

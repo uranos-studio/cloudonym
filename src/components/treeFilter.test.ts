@@ -16,6 +16,26 @@ describe('matchesQuery — displayName · resourceType · slug · entity 소문�
   });
 });
 
+describe('matchesQuery — catalog 의 aliases · 행 이름도 찾는다 (D54)', () => {
+  const gcp = (t: string) => rulesFor('gcp').find((r) => r.resourceType === t)!;
+  it.each([['google_compute_address', true], ['compute addresses', true], ['ip address', true], ['add', true], ['GOOGLE_COMPUTE_GLOBAL_ADDRESS', true]])('IP Address 규칙 · %s → %s', (q, hit) => {
+    expect(matchesQuery(gcp('address'), q)).toBe(hit);
+    // 같은 행의 다른 범위 규칙도 같은 검색어로 걸린다
+    expect(matchesQuery(gcp('global_address'), q)).toBe(hit);
+  });
+  it('검사기 자체 — 규칙의 네 칸 어디에도 없는 별칭이라야 aliases 덕분이다 · 다른 행은 안 걸린다', () => {
+    const r = gcp('address');
+    for (const q of ['google_compute_address', 'compute addresses', 'ip address']) {
+      expect([r.displayName, r.resourceType, r.slug, r.entity].some((s) => s.toLowerCase().includes(q)), q).toBe(false);
+      expect(matchesQuery(gcp('compute_instance'), q), q).toBe(false);
+    }
+  });
+  it('트리 거르기 — 별칭은 행 단위라 같은 행의 주소 두 규칙만 남는다', () => {
+    expect(ids(filterTree(buildTree('gcp'), { ...none, query: 'google_compute_address' }, new Map())).sort()).toEqual(['address', 'global_address']);
+    expect(ids(filterTree(buildTree('gcp'), { ...none, query: 'compute addresses' }, new Map())).sort()).toEqual(['address', 'global_address']);
+  });
+});
+
 describe('filterTree', () => {
   it('거르지 않으면 트리 그대로 — 빈 범위도 남는다', () => {
     expect(isFiltering(none)).toBe(false);

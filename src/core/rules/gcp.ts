@@ -2,6 +2,7 @@
 import type { ResourceRule, Token } from '../types';
 import { GCP_INTAKE_ROWS } from './gcp-intake';
 import { GCP_MANUAL_RULES } from './gcp-manual';
+import { GCP_CATALOG } from './gcp-catalog';
 
 /** Compute 디스커버리 문서 — insert.path 가 범위(global · regions/{region} · zones/{zone})를 준다 */
 const GCP_COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
@@ -123,9 +124,36 @@ function fromIntakeRow(r: (typeof GCP_INTAKE_ROWS)[number]): ResourceRule {
   };
 }
 
-/** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서 */
-export const GCP_RULES: Record<string, ResourceRule> = {
+/** catalog 를 덮기 전 규칙 표 — 손으로 쓴 규칙 다음에 들인 행 · 손으로 넣은 행(생성기 순서). 시험이 덮은 뒤와 대어 본다 */
+export const GCP_BASE_RULES: Record<string, ResourceRule> = {
   ...GCP_HAND_RULES,
   ...Object.fromEntries(GCP_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
   ...GCP_MANUAL_RULES,
 };
+
+/** 규칙 id → catalog 행 · 그 규칙의 칸 */
+const CATALOG_BY_RULE = new Map(GCP_CATALOG.flatMap((row) => Object.entries(row.rules).map(([id, spec]) => [id, { row, spec }] as const)));
+
+/** catalog 가 규칙 위에 덮는다 (D47) — 약어 · entity(행에 있을 때) · 지역 토큰 종류 · 종류 표.
+ *  지역 토큰이 none 이면 템플릿과 optional 에서 region 을 함께 뺀다(optional 은 template 에 있는 토큰만).
+ *  종류 토큰을 이름에 넣는 일 · 존 규칙의 optional 은 여기서 하지 않는다. category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
+export function applyCatalog(rule: ResourceRule): ResourceRule {
+  const hit = CATALOG_BY_RULE.get(rule.id);
+  if (!hit) throw new Error(`GCP rule not in catalog: ${rule.id}`);
+  const { row, spec } = hit;
+  const dropRegion = (ts: readonly Token[]): Token[] => (spec.regionToken === 'none' ? ts.filter((t) => t !== 'region') : [...ts]);
+  return {
+    ...rule,
+    slug: row.slug.value,
+    entity: row.entity ?? rule.entity,
+    template: dropRegion(rule.template),
+    optional: dropRegion(rule.optional),
+    regionToken: spec.regionToken,
+    ...(row.kind && spec.kinds ? {
+      kinds: { rule: row.kind.rule, default: spec.kinds.default, allowed: spec.kinds.allowed, tokens: row.kind.tokens, omitValues: row.kind.omitValues },
+    } : {}),
+  };
+}
+
+/** GCP 규칙 표 — catalog 를 덮은 뒤 */
+export const GCP_RULES: Record<string, ResourceRule> = Object.fromEntries(Object.entries(GCP_BASE_RULES).map(([id, r]) => [id, applyCatalog(r)]));

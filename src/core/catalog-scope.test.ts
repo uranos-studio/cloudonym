@@ -40,7 +40,25 @@ describe('범위별 허용 종류 = 출처 전사 (§4-5)', () => {
   it('전사는 종류 표가 있는 19행을 덮고, 행마다 tokens 의 값을 빠짐없이 옮겼다', () => {
     const kindRows = GCP_CATALOG.filter((r) => r.kind !== null);
     expect(Object.keys(SOURCES).sort()).toEqual(kindRows.map((r) => r.key).sort());
-    for (const row of kindRows) expect(SOURCES[row.key]!.map((s) => s.value).sort(), row.key).toEqual(Object.keys(row.kind!.tokens).sort());
+    // 범위마다 출처가 다른 값은 범위별 항목 둘로 적는다 — 값 집합으로 센다
+    for (const row of kindRows) expect([...new Set(SOURCES[row.key]!.map((s) => s.value))].sort(), row.key).toEqual(Object.keys(row.kind!.tokens).sort());
+  });
+
+  it('backend service · 포워딩 규칙 — 범위마다 그 범위 리소스의 Terraform 쪽을 출처로 단다(지역 · 전역 리소스 문서가 따로 있다)', () => {
+    const doc = (r: string) => `https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/${r}.html.markdown`;
+    const want: Record<string, Record<string, string>> = {
+      'gcp.backend_service': { global: doc('compute_backend_service'), region: doc('compute_region_backend_service') },
+      'gcp.forwarding_rule': { global: doc('compute_global_forwarding_rule'), region: doc('compute_forwarding_rule') },
+    };
+    for (const [key, byScope] of Object.entries(want)) for (const e of SOURCES[key]!) {
+      expect(e.scopes, `${key} ${e.value}`).toHaveLength(1);
+      expect(e.source, `${key} ${e.value} ${e.scopes[0]}`).toBe(byScope[e.scopes[0]!]);
+    }
+    // 같은 값이 두 범위에 있으면 항목도 둘 — 범위가 겹치지 않는다
+    for (const key of Object.keys(want)) {
+      const seen = SOURCES[key]!.map((e) => `${e.value}@${e.scopes[0]}`);
+      expect(new Set(seen).size, key).toBe(seen.length);
+    }
   });
 
   it('값마다 출처 URL · 원문 낱말이 있다', () => {

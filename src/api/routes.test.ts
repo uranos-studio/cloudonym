@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, json } from './test-support';
+import { req, jsonPost, json, fakeKv, fakeLimiter } from './test-support';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { ENABLED_PROVIDERS } from '../core/types';
+import { GCP_CATALOG, GCP_CATALOG_META } from '../core/rules/gcp-catalog';
+import { REGIONS } from '../core/regions-data';
+import { buildCatalogJson } from './catalog';
 import { afterEach, vi } from 'vitest';
 import { VERSION } from '../version';
 import { rulesFor } from '../core/constraints';
@@ -161,8 +167,8 @@ describe('POST /v1/names (D39)', () => {
     expect(az.valid).toBe(true);
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
-      'compute_instance_01=billing-trade-prd-kr-vm-01', 'compute_instance_02=billing-trade-prd-kr-vm-02',
-      'storage_bucket=platform-billing-trade-prd-bucket', 'service_account_db=billing-trade-prd-sa-db', 'project_id=platform-billing-trade-prd',
+      'compute_instance_01=billing-trade-prd-kr-gce-01', 'compute_instance_02=billing-trade-prd-kr-gce-02',
+      'storage_bucket=platform-billing-trade-prd-gcs', 'service_account_db=billing-trade-prd-sa-db', 'project_id=platform-billing-trade-prd',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
     expect(az.items[0]).toMatchObject({ resource_type: 'compute_instance', seq: '01', scope: 'gcp:project', uniqueness: 'csp' });
@@ -189,7 +195,7 @@ describe('POST /v1/names (D39)', () => {
   });
   it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
     const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
-    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'billing-trade-prd-kr-disk-01']);
+    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-gce-01', 'billing-trade-prd-kr-disk-01']);
     expect(g.conflicts).toEqual([]);
   });
   it('storage_bucket 에 count 2 → 400 selection.count_not_supported', async () => {
@@ -225,5 +231,62 @@ describe('POST /v1/names (D39)', () => {
     const [row] = JSON.parse(sent[0]!) as Record<string, unknown>[];
     expect(row).toMatchObject({ event: 'api_names', provider: 'gcp', resource_count: 2, name_count: 4, valid: true });
     expect(sent[0]).not.toContain('billing');
+  });
+});
+
+describe('GET /catalog.json — Worker 라우트 (D46)', () => {
+  it('200 · application/json · Cache-Control · CORS * · version · 켜진 CSP 의 행과 리전만 · 카운터 catalog_json_accessed', async () => {
+    const { kv, store } = fakeKv();
+    const { res, promises } = await req(app, '/catalog.json', undefined, { CLOUDONYM_KV: kv });
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/^application\/json;\s*charset=utf-8$/i);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=86400');
+    expect(res.headers.get('access-control-allow-origin')).toBe('*');
+    const body = await json(res);
+    expect(body.version).toEqual(VERSION);
+    expect(Object.keys(body.providers)).toEqual([...ENABLED_PROVIDERS]);
+    expect(body.providers.gcp.rows).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
+    expect(body.providers.gcp.rows).toHaveLength(100);
+    expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
+    expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
+    expect(body.providers.aws).toBeUndefined();
+    expect(body.providers.azure).toBeUndefined();
+    expect(promises).toHaveLength(1);
+    await promises[0];
+    expect([...store.keys()][0]).toMatch(/^stats:catalog_json_accessed:/);
+  });
+  it('켜진 CSP 목록을 바꾸면 그 CSP 만 싣는다 — 빌더 직접', () => {
+    const doc = JSON.parse(buildCatalogJson(['gcp', 'aws'], VERSION));
+    expect(Object.keys(doc.providers)).toEqual(['gcp', 'aws']);
+    // catalog 가 아직 없는 CSP 는 빈 행 · 리전 표는 싣는다
+    expect(doc.providers.aws.rows).toEqual([]);
+    expect(doc.providers.aws.regions).toHaveLength(REGIONS.aws.length);
+    expect(Object.keys(JSON.parse(buildCatalogJson([], VERSION)).providers)).toEqual([]);
+  });
+  it('HEAD 는 세지 않는다 — 헤더는 GET 과 같다', async () => {
+    const { kv, store } = fakeKv();
+    const { limiter, keys } = fakeLimiter('deny');
+    const { res, promises } = await req(app, '/catalog.json', { method: 'HEAD' }, { CLOUDONYM_KV: kv, API_LIMITER: limiter });
+    const { res: getRes } = await req(app, '/catalog.json');
+    expect(res.status).toBe(200);
+    expect(promises).toHaveLength(0);
+    expect(store.size).toBe(0);
+    expect(keys).toEqual([]);
+    expect(res.headers.get('content-type')).toBe(getRes.headers.get('content-type'));
+    expect(res.headers.get('cache-control')).toBe(getRes.headers.get('cache-control'));
+  });
+  it('IP 당 요청 제한을 넘으면 429 · Retry-After · CORS · 카운터 없음', async () => {
+    const { limiter, keys } = fakeLimiter('deny');
+    const { res, promises } = await req(app, '/catalog.json', { headers: { 'cf-connecting-ip': '203.0.113.9' } }, { API_LIMITER: limiter });
+    expect(res.status).toBe(429);
+    expect(res.headers.get('Retry-After')).toBe('60');
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect((await json(res)).errors[0].code).toBe('request.rate_limited');
+    expect(promises).toHaveLength(0);
+    expect(keys).toEqual(['203.0.113.9']);
+  });
+  it('wrangler.jsonc run_worker_first 에 /catalog.json 이 있다', () => {
+    const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
+    expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/catalog\.json"/);
   });
 });

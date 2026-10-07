@@ -55,7 +55,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "",
-      "basis": "No abbreviation in the name (unchanged)",
+      "basis": "No abbreviation: the project ID is the name itself",
       "previous": []
     },
     "entity": null,
@@ -556,7 +556,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "bb",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Backend Bucket",
       "previous": []
     },
     "entity": null,
@@ -615,7 +615,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "bs",
-      "basis": "Unchanged; counts too small to decide; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): be 24 / bs 13 / bes 5",
+      "basis": "Initialism of Backend Service; usage counts too small to prefer another candidate; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): be 24 / bs 13 / bes 5",
       "previous": []
     },
     "entity": null,
@@ -666,7 +666,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "csn",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Cross-Site Network",
       "previous": []
     },
     "entity": null,
@@ -700,7 +700,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "evg",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of External VPN Gateway",
       "previous": []
     },
     "entity": null,
@@ -851,7 +851,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "pdp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Public Delegated Prefix",
       "previous": []
     },
     "entity": null,
@@ -885,7 +885,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "gvep",
-      "basis": "Unchanged; distinguishes from zonal vep; principle 2",
+      "basis": "Initialism of Global VM Extension Policy; distinguishes it from the zonal vep; principle 2",
       "previous": []
     },
     "entity": null,
@@ -997,7 +997,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "hhc",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of HTTP Health Check",
       "previous": []
     },
     "entity": null,
@@ -1148,7 +1148,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ig",
-      "basis": "Unchanged; collision removed by moving interconnect group to icg",
+      "basis": "Initialism of Instance Group; interconnect group uses icg, so ig is unique",
       "previous": []
     },
     "entity": null,
@@ -1229,7 +1229,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "isg",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Instant Snapshot Group",
       "previous": []
     },
     "entity": null,
@@ -1303,7 +1303,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "iag",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Interconnect Attachment Group",
       "previous": []
     },
     "entity": null,
@@ -1486,7 +1486,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "lic",
-      "basis": "Unchanged",
+      "basis": "Short form of License",
       "previous": []
     },
     "entity": null,
@@ -1552,7 +1552,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "na",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Network Attachment",
       "previous": []
     },
     "entity": null,
@@ -1623,7 +1623,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "pm",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Packet Mirroring",
       "previous": []
     },
     "entity": null,
@@ -1657,7 +1657,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "pap",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Public Advertised Prefix",
       "previous": []
     },
     "entity": null,
@@ -1728,7 +1728,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "chc",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Composite Health Check",
       "previous": []
     },
     "entity": null,
@@ -1762,7 +1762,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "hap",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Health Aggregation Policy",
       "previous": []
     },
     "entity": null,
@@ -1796,7 +1796,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "hcs",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Health Check Service",
       "previous": []
     },
     "entity": null,
@@ -1825,7 +1825,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "hs",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Health Source",
       "previous": []
     },
     "entity": null,
@@ -1859,7 +1859,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ne",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Notification Endpoint",
       "previous": []
     },
     "entity": null,
@@ -2105,7 +2105,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "thp",
-      "basis": "Unchanged; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): https 1104 / proxy 264 / thp 2",
+      "basis": "Initialism of Target HTTP Proxy; https and proxy are not unique to this resource; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): https 1104 / proxy 264 / thp 2",
       "previous": []
     },
     "entity": null,
@@ -2188,7 +2188,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ttp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target TCP Proxy",
       "previous": []
     },
     "entity": null,
@@ -2314,7 +2314,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "rp",
-      "basis": "Unchanged; rollout plan moves instead; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): policy 51 / schedule 18 / rp 1",
+      "basis": "Initialism of Resource Policy; rollout plan uses rop, so rp is unique; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): policy 51 / schedule 18 / rp 1",
       "previous": []
     },
     "entity": null,
@@ -2563,7 +2563,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "sp",
-      "basis": "Unchanged; sp is now unique",
+      "basis": "Initialism of Storage Pool; Cloud Armor and SSL policies use waf and sslp, so sp is unique",
       "previous": []
     },
     "entity": null,
@@ -2597,7 +2597,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "tgp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target gRPC Proxy",
       "previous": []
     },
     "entity": null,
@@ -2631,7 +2631,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ti",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target Instance",
       "previous": []
     },
     "entity": null,
@@ -2665,7 +2665,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "tp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target Pool",
       "previous": []
     },
     "entity": null,
@@ -2699,7 +2699,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "tsp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target SSL Proxy",
       "previous": []
     },
     "entity": null,
@@ -2733,7 +2733,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "tvg",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Target VPN Gateway (the API resource behind Classic VPN)",
       "previous": []
     },
     "entity": null,
@@ -2767,7 +2767,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "vg",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of VPN Gateway",
       "previous": []
     },
     "entity": null,
@@ -2801,7 +2801,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "vt",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of VPN Tunnel",
       "previous": []
     },
     "entity": null,
@@ -2835,7 +2835,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "vep",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of VM Extension Policy",
       "previous": []
     },
     "entity": null,
@@ -2869,7 +2869,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ekm",
-      "basis": "Unchanged; not measured",
+      "basis": "EKM (External Key Manager), the official short name of the service",
       "previous": []
     },
     "entity": null,
@@ -2974,7 +2974,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ij",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Import Job",
       "previous": []
     },
     "entity": null,
@@ -3008,7 +3008,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ng",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Node Group",
       "previous": []
     },
     "entity": null,
@@ -3042,7 +3042,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "nt",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Node Template",
       "previous": []
     },
     "entity": null,
@@ -3110,7 +3110,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "neg",
-      "basis": "Unchanged; not measured",
+      "basis": "NEG, the official short name of Network Endpoint Group",
       "previous": []
     },
     "entity": null,
@@ -3171,7 +3171,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "fs",
-      "basis": "Unchanged; not measured",
+      "basis": "Short form of Firestore",
       "previous": []
     },
     "entity": null,
@@ -3216,7 +3216,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "spn",
-      "basis": "Unchanged; not measured",
+      "basis": "Short form of Spanner",
       "previous": []
     },
     "entity": null,
@@ -3328,7 +3328,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "db",
-      "basis": "Unchanged; collision removed by moving Cloud SQL to sql",
+      "basis": "Common short form of database; Cloud SQL uses sql, so db is unique",
       "previous": []
     },
     "entity": null,
@@ -3373,7 +3373,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "bkp",
-      "basis": "Unchanged; not measured",
+      "basis": "Common short form of backup",
       "previous": []
     },
     "entity": null,
@@ -3454,7 +3454,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "rule",
-      "basis": "Unchanged; no measured 3-char alternative",
+      "basis": "The word rule itself; no shorter form carries the meaning",
       "previous": []
     },
     "entity": null,
@@ -3562,7 +3562,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "oc",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of OAuth Client",
       "previous": []
     },
     "entity": null,
@@ -3596,7 +3596,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "occ",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of OAuth Client Credential",
       "previous": []
     },
     "entity": null,
@@ -3630,7 +3630,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "pb",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of Policy Binding",
       "previous": []
     },
     "entity": null,
@@ -3668,7 +3668,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "pab",
-      "basis": "Unchanged; not measured",
+      "basis": "PAB, the official short name of Principal Access Boundary",
       "previous": []
     },
     "entity": null,
@@ -3702,7 +3702,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "deny",
-      "basis": "Unchanged; no measured 3-char alternative",
+      "basis": "The word deny; no shorter form carries the meaning",
       "previous": []
     },
     "entity": null,
@@ -3772,7 +3772,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "wfp",
-      "basis": "Unchanged; not measured",
+      "basis": "Initialism of WorkForce Pool",
       "previous": []
     },
     "entity": null,
@@ -3896,7 +3896,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "wip",
-      "basis": "Unchanged; not measured",
+      "basis": "WIP, initialism of Workload Identity Pool",
       "previous": []
     },
     "entity": null,
@@ -3930,7 +3930,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "mi",
-      "basis": "Unchanged; collision removed by moving machine image",
+      "basis": "Initialism of Managed Identity; machine image uses mimg, so mi is unique",
       "previous": []
     },
     "entity": null,
@@ -3964,7 +3964,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "slug": {
       "value": "ns",
-      "basis": "Unchanged; not measured",
+      "basis": "Common short form of namespace",
       "previous": []
     },
     "entity": null,

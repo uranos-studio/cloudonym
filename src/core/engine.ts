@@ -47,12 +47,28 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
   return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
 }
 
+/** 같은 부류(entity)의 같은 이름을 찾아 그 항목마다 valid:false + name.conflict 를 단다 (D41 · D47). 요약(충돌마다 메시지 하나)을 돌려준다.
+ *  generate · generateMany 가 같이 쓴다 — 항목 위반은 요약의 복사본이다 */
+function markConflicts(items: readonly { key: string; rule: ResourceRule; result: NameResult }[]): CoreMessage[] {
+  const conflicts = findConflicts(items);
+  for (const c of conflicts) {
+    if (c.code !== 'name.conflict') continue;
+    for (const { key, result } of items) {
+      if (!c.params.keys.includes(key)) continue;
+      result.valid = false;
+      result.violations.push(structuredClone(c));
+    }
+  }
+  return conflicts;
+}
+
+/** 전체 카탈로그 — provider 마다 규칙 전부의 이름. 키는 resourceType 이고 충돌 검사도 그 키로 한다 */
 export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDERS]): GenerateOutput {
   const out: GenerateOutput = {};
   for (const p of providers) {
-    const byType: Record<string, NameResult> = {};
-    for (const rule of rulesFor(p)) byType[rule.resourceType] = generateOne(ctx, rule);
-    out[p] = byType;
+    const items = rulesFor(p).map((rule) => ({ key: rule.resourceType, rule, result: generateOne(ctx, rule) }));
+    markConflicts(items);
+    out[p] = Object.fromEntries(items.map(({ key, result }) => [key, result]));
   }
   return out;
 }
@@ -87,15 +103,7 @@ export function generateMany(ctx: NamingContext, provider: Provider, selection: 
     }
   }
 
-  const conflicts = findConflicts(items.map(({ item, rule }) => ({ key: item.key, rule, result: item })));
-  for (const c of conflicts) {
-    if (c.code !== 'name.conflict') continue;
-    for (const { item } of items) {
-      if (!c.params.keys.includes(item.key)) continue;
-      item.valid = false;
-      item.violations.push(structuredClone(c));
-    }
-  }
+  const conflicts = markConflicts(items.map(({ item, rule }) => ({ key: item.key, rule, result: item })));
   const out = items.map(({ item }) => item);
   return { provider, valid: out.every((i) => i.valid), items: out, conflicts };
 }

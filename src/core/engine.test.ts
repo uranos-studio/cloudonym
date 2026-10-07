@@ -23,7 +23,7 @@ describe('generate', () => {
   });
   it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유', () => {
     const vm = generate({ ...ctx, system: '3tier' }, ['gcp']).gcp!.compute_instance;
-    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prd-kr-vm-01', violations: [{ code: 'name.first_not_letter' }] });
+    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prd-kr-gce-01', violations: [{ code: 'name.first_not_letter' }] });
   });
   it('긴 owner 는 optional 생략으로 들어간다', () => {
     const p = generate({ ...ctx, owner: 'a'.repeat(40) }, ['gcp']).gcp!.project_id;   // owner 생략 → billing-trade-prd
@@ -38,14 +38,18 @@ describe('generate', () => {
     expect(s3.rule).toMatchObject({ maxLength: 63, allowed: 'lower-digit-hyphen', pattern: '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$' });
   });
   // GCP 에서 owner 가 든 규칙은 전부 owner 가 optional 이다
-  it('한글 owner 는 정제 뒤 비어도 optional 이라 GCP 규칙 전부 유효', () => {
+  it('한글 owner 는 정제 뒤 비어도 optional 이라 GCP 규칙 전부 유효 — 같은 이름인 함수 둘의 충돌만 남는다', () => {
     const out = generate({ ...ctx, owner: '홍길동' }, ['gcp']).gcp!;
-    for (const r of rulesFor('gcp')) expect(out[r.resourceType], r.id).toMatchObject({ valid: true, violations: [] });
+    const fns = new Set(['cloud_function_gen1', 'cloud_function']);
+    for (const r of rulesFor('gcp')) {
+      if (fns.has(r.resourceType)) expect(out[r.resourceType]!.violations.map((v) => v.code), r.id).toEqual(['name.conflict']);
+      else expect(out[r.resourceType], r.id).toMatchObject({ valid: true, violations: [] });
+    }
     expect(out.project_id).toMatchObject({ name: 'billing-trade-prd', isTransformed: true });
     expect(out.project_id.steps).toContainEqual({ code: 'step.normalized', field: 'owner', params: { from: '홍길동', to: '' } });
   });
   it('한 글자 system 은 축소 대상이 아니다 — GCP compute_instance 유효', () => {
-    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prd-kr-vm-01', valid: true });
+    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prd-kr-gce-01', valid: true });
   });
 });
 
@@ -215,6 +219,29 @@ describe('generateMany (D30\' · D41)', () => {
     expect(r.valid).toBe(r.items.every((i) => i.valid));
     // 항목 위반과 요약은 서로 다른 객체 — 한쪽을 고쳐도 다른 쪽이 바뀌지 않는다
     expect(r.items[0]!.violations[0]).not.toBe(r.conflicts[0]);
+  });
+});
+
+describe('함수 1 · 2세대 — entity 가 같아 같은 이름이면 충돌이다 (D47)', () => {
+  const keys = ['cloud_function_gen1', 'cloud_function'];
+  it('generateMany 로 같이 고르면 둘 다 valid:false + name.conflict', () => {
+    const r = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'cloud_function_gen1')!, count: 1 }, { rule: getRule('gcp', 'cloud_function')!, count: 1 }]);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prd-kr-gcf-01', 'billing-trade-prd-kr-gcf-01']);
+    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prd-kr-gcf-01', keys: ['cloud_function_gen1_01', 'cloud_function_01'] } };
+    for (const it of r.items) expect(it).toMatchObject({ valid: false, violations: [msg] });
+    expect(r.conflicts).toEqual([msg]);
+  });
+  it('generate(전체 카탈로그)에서도 둘 다 valid:false + name.conflict — 키는 resourceType', () => {
+    const gcp = generate(ctx, ['gcp']).gcp!;
+    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prd-kr-gcf-01', keys } };
+    for (const k of keys) expect(gcp[k]).toMatchObject({ name: 'billing-trade-prd-kr-gcf-01', valid: false, violations: [msg] });
+    // 둘 사이 항목 위반은 서로 다른 객체다
+    expect(gcp[keys[0]!]!.violations[0]).not.toBe(gcp[keys[1]!]!.violations[0]);
+  });
+  it('generate 의 충돌은 함수 둘뿐이다 — 세 CSP 기본 문맥', () => {
+    const out = generate(ctx);
+    const hit = Object.entries(out).flatMap(([p, byType]) => Object.entries(byType!).filter(([, r]) => r.violations.some((v) => v.code === 'name.conflict')).map(([t]) => `${p}.${t}`));
+    expect(hit).toEqual(['gcp.cloud_function_gen1', 'gcp.cloud_function']);
   });
 });
 

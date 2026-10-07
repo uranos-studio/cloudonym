@@ -41,6 +41,18 @@ export interface Forbidden {
 /** 트리의 표시 분류 (D37) */
 export type Category = 'compute' | 'networking' | 'storage' | 'database' | 'identity' | 'security' | 'management' | 'containers';
 
+/** 지역 자리에 무엇이 오나 (D47 · D51) — none 은 지역 토큰이 없는 규칙(전역 리소스 등) */
+export type RegionToken = 'none' | 'region' | 'zone';
+
+/** 규칙(= 범위) 하나의 종류 표 (D52) — catalog 가 덮는다. 이 단계에서는 데이터로만 싣고 이름에는 넣지 않는다 */
+export interface RuleKinds {
+  rule: 'omit-when-csp-default' | 'only-when-chosen' | 'required';
+  default: string | null;            // 이 범위의 CSP 기본값 — 토큰을 붙이지 않는다
+  allowed: readonly string[];        // 이 범위에서 고를 수 있는 값
+  tokens: Readonly<Record<string, string | null>>;   // 값 → 토큰(null 은 토큰 없음) — 행 공통
+  omitValues: readonly string[];     // 기본값과 같이 토큰을 붙이지 않는 값 묶음 — 행 공통
+}
+
 export interface ResourceRule {
   id: string;                 // 'gcp.service_account'
   provider: Provider;
@@ -66,6 +78,8 @@ export interface ResourceRule {
   uniquenessDocUrl?: string;  // 범위 근거가 docUrl 과 다른 쪽에 있을 때 그 URL
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
+  regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(catalog.ts regionTokenOf)
+  kinds?: RuleKinds;          // catalog 에 종류 표가 있는 규칙만
 }
 
 export interface NameResult {

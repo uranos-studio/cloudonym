@@ -36,10 +36,16 @@ export function regionTokenOf(rule: Pick<ResourceRule, 'id' | 'template'>): Regi
 /** 종류 값 → 이름에 넣을 토큰. 허용 밖이면 Error, 규칙 기본값 · 행의 omitValues 면 null(토큰 없음) */
 export function kindToken(rule: RuleRef, value: string): string | null | Error {
   const id = idOf(rule);
-  const row = rowOf(id);
+  return kindTokenOf(rowOf(id), id, value);
+}
+
+/** kindToken 의 본체 — 행을 인자로 받는다(시험이 고친 행을 넣는다).
+ *  허용 값인데 tokens 에 키가 없으면 catalog 데이터가 깨진 것이다(allowed ⊆ keys(tokens)) — 토큰 없음으로 삼키지 않고 던진다 */
+export function kindTokenOf(row: CatalogRow | undefined, id: string, value: string): string | null | Error {
   const kinds = row?.rules[id]?.kinds;
   if (!row?.kind || !kinds) return new Error(`kind not supported: ${id}`);
   if (!kinds.allowed.includes(value)) return new Error(`kind not allowed: ${id} ${value}`);
   if (value === kinds.default || row.kind.omitValues.includes(value)) return null;
-  return row.kind.tokens[value] ?? null;
+  if (!Object.hasOwn(row.kind.tokens, value)) throw new Error(`kind value missing from catalog tokens: ${id} ${value}`);
+  return row.kind.tokens[value]!;
 }

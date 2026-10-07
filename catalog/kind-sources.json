@@ -126,22 +126,38 @@
       {
         "value": "EXTERNAL",
         "scopes": [
-          "global",
-          "region"
+          "global"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
         "quote": "EXTERNAL",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "EXTERNAL",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
+        "quote": "EXTERNAL",
+        "checked": "2026-10-08"
       },
       {
         "value": "EXTERNAL_MANAGED",
         "scopes": [
-          "global",
-          "region"
+          "global"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
         "quote": "EXTERNAL_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "EXTERNAL_MANAGED",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
+        "quote": "EXTERNAL_MANAGED",
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL",
@@ -150,49 +166,81 @@
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
         "quote": "INTERNAL",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL_MANAGED",
         "scopes": [
-          "global",
-          "region"
+          "global"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
         "quote": "INTERNAL_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "INTERNAL_MANAGED",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
+        "quote": "INTERNAL_MANAGED",
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL_SELF_MANAGED",
         "scopes": [
-          "global",
-          "region"
+          "global"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
         "quote": "INTERNAL_SELF_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "INTERNAL_SELF_MANAGED",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
+        "quote": "INTERNAL_SELF_MANAGED",
+        "checked": "2026-10-08"
       }
     ],
     "gcp.forwarding_rule": [
       {
         "value": "EXTERNAL",
         "scopes": [
-          "global",
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_global_forwarding_rule.html.markdown",
+        "quote": "EXTERNAL",
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "EXTERNAL",
+        "scopes": [
           "region"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
         "quote": "EXTERNAL",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       },
       {
         "value": "EXTERNAL_MANAGED",
         "scopes": [
-          "global",
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_global_forwarding_rule.html.markdown",
+        "quote": "EXTERNAL_MANAGED",
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "EXTERNAL_MANAGED",
+        "scopes": [
           "region"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
         "quote": "EXTERNAL_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL",
@@ -201,17 +249,25 @@
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
         "quote": "INTERNAL",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL_MANAGED",
         "scopes": [
-          "global",
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_global_forwarding_rule.html.markdown",
+        "quote": "INTERNAL_MANAGED",
+        "checked": "2026-10-08"
+      },
+      {
+        "value": "INTERNAL_MANAGED",
+        "scopes": [
           "region"
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
         "quote": "INTERNAL_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       },
       {
         "value": "INTERNAL_SELF_MANAGED",
@@ -220,7 +276,7 @@
         ],
         "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_global_forwarding_rule.html.markdown",
         "quote": "INTERNAL_SELF_MANAGED",
-        "checked": "2026-10-07"
+        "checked": "2026-10-08"
       }
     ],
     "gcp.health_check": [

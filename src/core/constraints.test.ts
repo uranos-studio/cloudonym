@@ -8,6 +8,8 @@ import { AWS_MANUAL_RULES } from './rules/aws-manual';
 import { AZURE_MANUAL_ROWS } from './rules/azure-manual';
 import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_COMPUTER_NAME_DOC_URL, AZURE_RESERVED_DOC_URL, AWS_NAME_TAG } from './constraints';
 import { PROVIDERS } from './types';
+import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
+import { rowOf } from './catalog';
 
 describe('RULES 표 무결성', () => {
   it('모든 규칙에 docUrl(https) · 길이 순서 · id 형식이 있다', () => {
@@ -203,5 +205,67 @@ describe('2026-10-06 추가 11종 — 범위 · 부류 · 분류 · 근거', () 
   });
   it('키 페어는 범위(리전)가 미확인이라는 note 를 싣는다', () => {
     expect(RULES['aws.key_pair']!.notes?.map((n) => n.code)).toEqual(['note.aws_key_pair_scope_unconfirmed']);
+  });
+});
+
+describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
+  const specOf = (id: string) => rowOf(id)!.rules[id]!;
+
+  it('GCP 규칙 약어 = catalog 약어 · 지역 토큰 종류 = catalog', () => {
+    for (const r of rulesFor('gcp')) {
+      expect(r.slug, r.id).toBe(rowOf(r.id)!.slug.value);
+      expect(r.regionToken, r.id).toBe(specOf(r.id).regionToken);
+    }
+  });
+
+  it('함수 1 · 2세대는 entity 가 같다 — cloudfunctions.functions', () => {
+    expect(RULES['gcp.cloud_function_gen1']!.entity).toBe('cloudfunctions.functions');
+    expect(RULES['gcp.cloud_function']!.entity).toBe('cloudfunctions.functions');
+  });
+
+  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG 포함', () => {
+    const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
+    expect(none).toHaveLength(38);
+    for (const r of none) {
+      expect(r.template, r.id).not.toContain('region');
+      expect(r.optional, r.id).not.toContain('region');
+    }
+    const global = rulesFor('gcp').filter((r) => r.scope === 'gcp:project_global');
+    expect(global).toHaveLength(34);
+    for (const r of global) expect(r.template, r.id).not.toContain('region');
+    expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'seq']);
+  });
+
+  it('종류 표는 데이터로만 싣는다 — 종류 표가 있는 행의 규칙만 kinds 가 있고 템플릿에 kind 토큰이 없다', () => {
+    for (const r of rulesFor('gcp')) {
+      const row = rowOf(r.id)!;
+      expect(r.kinds !== undefined, r.id).toBe(row.kind !== null);
+      if (r.kinds) {
+        expect(r.kinds.allowed, r.id).toEqual(specOf(r.id).kinds!.allowed);
+        expect(r.kinds.default, r.id).toBe(specOf(r.id).kinds!.default);
+        expect(r.kinds.tokens, r.id).toEqual(row.kind!.tokens);
+        expect(r.kinds.omitValues, r.id).toEqual(row.kind!.omitValues);
+        expect(r.kinds.rule, r.id).toBe(row.kind!.rule);
+      }
+      expect(r.template as string[], r.id).not.toContain('kind');
+    }
+  });
+
+  it('덮기 전 · 뒤 규칙 표의 차이는 slug · entity · template · optional · regionToken · kinds 뿐이다', () => {
+    const allowed = new Set(['slug', 'entity', 'template', 'optional', 'regionToken', 'kinds']);
+    expect(Object.keys(GCP_BASE_RULES)).toEqual(Object.keys(GCP_RULES));
+    for (const id of Object.keys(GCP_RULES)) {
+      const before = GCP_BASE_RULES[id]! as unknown as Record<string, unknown>;
+      const after = GCP_RULES[id]! as unknown as Record<string, unknown>;
+      const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])].filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]) || String(before[k]) !== String(after[k]));
+      expect(changed.filter((k) => !allowed.has(k)), id).toEqual([]);
+    }
+  });
+
+  it('AWS · Azure 규칙은 덮지 않는다', () => {
+    for (const r of [...rulesFor('aws'), ...rulesFor('azure')]) {
+      expect(r.regionToken, r.id).toBeUndefined();
+      expect(r.kinds, r.id).toBeUndefined();
+    }
   });
 });

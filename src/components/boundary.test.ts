@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-// 화면은 엔진을 부르기만 한다 — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes)뿐이다.
+// 화면은 엔진을 부르기만 한다 — 컴포넌트 · App 이 core 에서 들여올 수 있는 것은 공개 API(engine · labels · types · tree · selection · scopes · catalog)뿐이다.
 // 시험 전용 fixture(src/dev)는 import.meta.env.DEV 분기 안의 동적 import 로만 들인다 — 운영 번들에서 빠진다
 // node:fs 는 tsconfig.app.json(브라우저 타입 · node 없음)이 거부하므로 Vite 의 ?raw 글롭으로 소스를 읽는다
 const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
@@ -11,7 +11,7 @@ const CALL_RE = /\b(?:import|require)\s*\(\s*['"]([^'"]+)['"]/g;
 const ALLOWED = [
   /^react$/, /^react-dom\/client$/,
   /^lucide-react$/,
-  /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 (D37 · D40)
+  /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes|catalog)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 · catalog 조회 (D37 · D40 · D54)
   /^\.\/index\.css$/, /^\.\/App\.tsx$/,              // main.tsx 의 진입
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)

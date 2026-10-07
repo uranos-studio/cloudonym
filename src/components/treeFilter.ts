@@ -3,6 +3,7 @@ import type { TreeNode } from '../core/tree';
 import type { Category, ResourceRule } from '../core/types';
 import type { ScopeDef } from '../core/scopes';
 import type { Picked } from './selection';
+import { rowOf } from '../core/catalog';
 
 /** 분류 칩 순서 — Category 유니언 순서 */
 export const CATEGORIES: readonly Category[] = ['compute', 'networking', 'storage', 'database', 'identity', 'security', 'management', 'containers'];
@@ -12,11 +13,14 @@ export interface ViewNode { scope: ScopeDef; rules: ResourceRule[]; children: Vi
 
 export const isFiltering = (f: TreeFilter): boolean => f.query.trim() !== '' || f.category !== undefined || f.selectedOnly;
 
-/** displayName · resourceType · slug · entity 를 소문자 부분 일치로 */
+/** displayName · resourceType · slug · entity 와 catalog 행의 이름 · aliases(Terraform 타입 · gcloud 그룹 · 옛 약어)를 소문자 부분 일치로.
+ *  aliases 는 행 단위라 합친 행의 규칙들이 같이 걸린다 */
 export function matchesQuery(rule: ResourceRule, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (q === '') return true;
-  return [rule.displayName, rule.resourceType, rule.slug, rule.entity].some((s) => s.toLowerCase().includes(q));
+  const row = rowOf(rule.id);
+  const fields = [rule.displayName, rule.resourceType, rule.slug, rule.entity, ...(row ? [row.displayName, ...row.aliases] : [])];
+  return fields.some((s) => s.toLowerCase().includes(q));
 }
 
 /** 걸러진 트리 — 거르는 중이면 행이 없는 범위를 뺀다(조상만 남는다). 아무 행도 없으면 undefined. 거르지 않으면 빈 범위도 그대로 */

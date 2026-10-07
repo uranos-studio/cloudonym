@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { rulesFor } from './constraints';
 import { SCOPES } from './scopes';
 import { GCP_INTAKE_ROWS, GCP_INTAKE_SCOPES } from './rules/gcp-intake';
+import { GCP_BASE_RULES } from './rules/gcp';
 
 interface SourceRow { api: string; method: string; resource?: string; schema?: string; path: string | null; pattern?: string | null; readOnly?: boolean; param?: string; description: string | null }
 const SNAP = JSON.parse(readFileSync(join(import.meta.dirname, '__fixtures__', 'gcp-intake.json'), 'utf-8')) as { revisions: { computeRevision: string; kmsRevision: string }; rows: SourceRow[] };
@@ -207,7 +208,8 @@ describe('들인 GCP 행 — 원문 스냅샷과 대조', () => {
     const missing: string[] = [];
     for (const [type, entities] of SUPPORT_SCOPE) {
       if (entities === null) { if (!tableTypes.has(type)) missing.push(`${type} — 표에 행이 없다`); continue; }
-      for (const e of entities) if (!rules.some((r) => r.entity === e)) missing.push(`${type} — 규칙 ${e} 없음`);
+      // entity 는 catalog 를 덮기 전 값(디스커버리 리소스 이름)으로 센다 — catalog 가 함수 1 · 2세대를 cloudfunctions.functions 하나로 묶는다(D47)
+      for (const e of entities) if (!Object.values(GCP_BASE_RULES).some((r) => r.entity === e)) missing.push(`${type} — 규칙 ${e} 없음`);
       if (tableTypes.has(type)) missing.push(`${type} — 규칙이 있는데 표에도 있다`);
     }
     expect(missing).toEqual([]);

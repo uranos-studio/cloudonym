@@ -26,7 +26,8 @@ describe('toTerraformLocals', () => {
     expect(hcl).toContain('  azure_storage_account = "stbillingtradeprd"\n');
     expect(hcl).toContain('  aws_tags = {\n');
     expect(hcl).toContain('  gcp_labels = {\n    owner = "infra"\n');
-    expect(hcl).not.toContain('INVALID');
+    // 전체 카탈로그에서 FAIL 은 같은 이름인 함수 1 · 2세대(name.conflict)뿐이다 — 그 둘만 # INVALID: 주석
+    expect(hcl.split('\n').filter((l) => l.includes('INVALID')).map((l) => l.trim().split(' — ')[0])).toEqual(['# INVALID: gcp_cloud_function_gen1', '# INVALID: gcp_cloud_function']);
     // provider 순서 = PROVIDERS (aws → gcp → azure)
     expect(hcl.indexOf('# aws')).toBeLessThan(hcl.indexOf('# gcp'));
     expect(hcl.indexOf('# gcp')).toBeLessThan(hcl.indexOf('# azure'));

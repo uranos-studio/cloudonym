@@ -4,10 +4,10 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import Ajv from 'ajv';
-import { GCP_RULES } from './rules/gcp';
+import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
 import { GCP_CATALOG } from './rules/gcp-catalog';
 import { REGIONS } from './regions-data';
-import { catalogFor, rowOf, allowedKinds, regionTokenOf, kindToken, MAX_KIND_CHARS } from './catalog';
+import { catalogFor, rowOf, allowedKinds, regionTokenOf, kindToken, kindTokenOf, MAX_KIND_CHARS } from './catalog';
 
 const CATALOG_DIR = join(import.meta.dirname, '..', '..', 'catalog');
 const readJson = (f: string) => JSON.parse(readFileSync(join(CATALOG_DIR, f), 'utf-8'));
@@ -18,11 +18,9 @@ const schema = readJson('schema.json');
 
 const ruleIdsOfCatalog = GCP_CATALOG.flatMap((r) => Object.keys(r.rules));
 
-/** 승인 데이터와 규칙 표가 어긋나는 자리 — 이름을 적어 두고 하나씩만 허용한다 */
-// 디스크 행은 gcp.disk(compute) 와 gcp.region_disk(storage) 를 합쳤다 — 행 category 는 첫 규칙을 따른다
+/** catalog 와 규칙 표가 어긋나는 자리 — 이름을 적어 두고 하나씩만 허용한다 */
+// 디스크 행은 gcp.disk(compute) 와 gcp.region_disk(storage) 를 합쳤다 — 행 category 는 첫 규칙을 따르고, applyCatalog 는 category 를 덮지 않는다(덮는 칸은 약어 · entity · 지역 토큰 · 종류뿐)
 const CATEGORY_EXCEPTIONS = new Set(['gcp.region_disk']);
-// 전역 NEG 는 손 규칙 템플릿에 region 이 있다 — catalog 를 규칙에 덮는 일(applyCatalog)이 들어오면 이 예외를 지운다
-const REGION_IN_TEMPLATE_EXCEPTIONS = new Set(['gcp.global_network_endpoint_group']);
 
 describe('catalog 스키마 (D46 ⑴)', () => {
   const ajv = new Ajv({ allErrors: true });
@@ -98,12 +96,17 @@ describe('regionToken 불변식 (§4-1)', () => {
   it('none 34 + 4 · zone 14 · region 69', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
     expect([count('none'), count('zone'), count('region')]).toEqual([38, 14, 69]);
+    // none 의 내역 — gcp:project_global 34 · 그 밖 4(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할)
+    const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
+    expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(34);
+    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global').sort()).toEqual(['gcp.iam_custom_role', 'gcp.project_id', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
   });
 
-  it('none 인 규칙의 템플릿에 region 이 없다 (이름 붙인 예외 하나)', () => {
-    const bad = specs.filter(([id, s]) => s.regionToken === 'none' && GCP_RULES[id]!.template.includes('region') && !REGION_IN_TEMPLATE_EXCEPTIONS.has(id)).map(([id]) => id);
+  it('none 인 규칙의 템플릿 · optional 에 region 이 없다 — 덮기 전 규칙 표에서 region 이 빠진 것은 전역 NEG 하나', () => {
+    const bad = specs.filter(([id, s]) => s.regionToken === 'none' && (GCP_RULES[id]!.template.includes('region') || GCP_RULES[id]!.optional.includes('region'))).map(([id]) => id);
     expect(bad).toEqual([]);
-    for (const id of REGION_IN_TEMPLATE_EXCEPTIONS) expect(GCP_RULES[id]!.template).toContain('region');
+    const removed = Object.keys(GCP_RULES).filter((id) => GCP_BASE_RULES[id]!.template.includes('region') && !GCP_RULES[id]!.template.includes('region'));
+    expect(removed).toEqual(['gcp.global_network_endpoint_group']);
   });
 
   it('zone 인 규칙은 gcp:project_zone 범위이거나 compute_instance 다', () => {
@@ -156,7 +159,7 @@ describe('행 데이터 (D47 · D52 · D54)', () => {
   it('공개 데이터에 한글 · 과정 표현이 없다', () => {
     const text = ['gcp.json', 'regions.json', 'kind-sources.json', 'schema.json'].map((f) => readFileSync(join(CATALOG_DIR, f), 'utf-8')).join('\n');
     expect(text).not.toMatch(/\p{Script=Hangul}/u);
-    expect(text).not.toMatch(/owner decision|codex|§|v1 said/i);
+    expect(text).not.toMatch(/owner decision|codex|§|v1 said|unchanged|not measured|is now/i);
   });
 });
 
@@ -249,5 +252,16 @@ describe('catalog.ts 순수 함수', () => {
     expect(kindToken(rule('gcp.region_network_endpoint_group'), 'GCE_VM_IP_PORT')).toBeInstanceOf(Error);
     expect(kindToken(rule('gcp.resource_policy'), 'instance-schedule')).toBe('isc');
     expect(kindToken(rule('gcp.vpc_network'), 'EXTERNAL')).toBeInstanceOf(Error);
+  });
+
+  it('kindTokenOf — 허용 값인데 tokens 에 키가 없으면 던진다(토큰 없음으로 삼키지 않는다) · 키가 있으면 그 값', () => {
+    const row = rowOf('gcp.address')!;
+    expect(kindTokenOf(row, 'gcp.address', 'INTERNAL')).toBe('int');
+    const { INTERNAL: _gone, ...rest } = row.kind!.tokens;
+    const broken = { ...row, kind: { ...row.kind!, tokens: rest } };
+    expect(() => kindTokenOf(broken, 'gcp.address', 'INTERNAL')).toThrow(/INTERNAL/);
+    // tokens 의 키가 있고 값이 null 이면 토큰 없음 — 기본값이 아닌 null 은 불변식 시험이 막지만, 함수는 그대로 돌려준다
+    const nulled = { ...row, kind: { ...row.kind!, tokens: { ...row.kind!.tokens, INTERNAL: null } } };
+    expect(kindTokenOf(nulled, 'gcp.address', 'INTERNAL')).toBeNull();
   });
 });

@@ -1,9 +1,11 @@
-// Worker 엔트리 — root 앱. /llms.txt 와 /v1/* 는 Hono 가 받고(wrangler run_worker_first), 나머지는 Workers Static Assets(SPA)가 서빙한다
+// Worker 엔트리 — root 앱. /llms.txt · /catalog.json 과 /v1/* 는 Hono 가 받고(wrangler run_worker_first), 나머지는 Workers Static Assets(SPA)가 서빙한다
 import { Hono } from 'hono';
 import { secureHeaders } from 'hono/secure-headers';
 import type { App } from './env';
 import { v1 } from './v1';
 import { RULES } from '../core/constraints';
+import { ENABLED_PROVIDERS } from '../core/types';
+import { buildCatalogJson } from './catalog';
 import { buildLlmsText } from './llms';
 import { VERSION } from '../version';
 import { logTelemetry } from './telemetry';
@@ -12,6 +14,7 @@ import { overLimit, tooManyRequests } from './ratelimit';
 
 // 모듈 로드 때 한 번 만든다 — 요청마다 만들지 않는다
 const LLMS_TEXT = buildLlmsText(Object.values(RULES), VERSION);
+const CATALOG_JSON = buildCatalogJson(ENABLED_PROVIDERS, VERSION);
 
 export const app = new Hono<App>();
 app.onError(internalError);
@@ -31,6 +34,14 @@ app.get('/llms.txt', async (c) => {
   // Hono 는 HEAD 를 GET 핸들러로 보낸다 — HEAD(curl -I · 헬스 검사)는 읽은 것이 아니므로 세지 않는다. 헤더는 GET 과 같다
   if (c.req.method !== 'HEAD') c.executionCtx.waitUntil(logTelemetry(c, 'llms_txt_accessed'));
   return c.text(LLMS_TEXT, 200, { 'Cache-Control': 'public, max-age=86400', ...cors });
+});
+
+// catalog 공개 (D46) — /llms.txt 와 같은 꼴: 한 번 만든 본문 · 하루 캐시 · CORS * · GET 만 요청 제한과 카운터
+app.get('/catalog.json', async (c) => {
+  const cors = { 'Access-Control-Allow-Origin': '*' };
+  if (c.req.method !== 'HEAD' && (await overLimit(c))) return tooManyRequests(c, cors);
+  if (c.req.method !== 'HEAD') c.executionCtx.waitUntil(logTelemetry(c, 'catalog_json_accessed'));
+  return c.body(CATALOG_JSON, 200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=86400', ...cors });
 });
 
 app.route('/v1', v1);
