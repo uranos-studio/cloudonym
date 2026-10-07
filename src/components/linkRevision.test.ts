@@ -79,9 +79,11 @@ describe('링크 키에 p · r 이 들어간다 (D42)', () => {
   it('꺼진 CSP(azure) 링크를 연 직후 — 선택을 버린 GCP 폼 키와 같아 hash 를 다시 쓰지 않는다 · 옛 v 안내는 남는다 (D55)', () => {
     const azure = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }]);
     if (!azure.ok) throw new Error('선택이 틀렸다');
-    const link = openV2(`#state=${encodeState(ctx, OLD, { provider: 'azure', selection: azure.items })}`);
-    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(false);
-    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBe(OLD);
+    // 링크의 지역은 azure 코드다 — 열면 예시 지역(asia-northeast3-a)으로 바뀐 GCP 폼이 된다
+    const link = openV2(`#state=${encodeState({ ...ctx, region: 'krc' }, OLD, { provider: 'azure', selection: azure.items })}`);
+    const reset: NamingContext = { ...ctx, region: 'ane3', zone: 'ane3a' };
+    expect(shouldRewriteHash(encodeState(reset, CURRENT, { provider: 'gcp' }), link)).toBe(false);
+    expect(mismatchedLinkVersion(encodeState(reset, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBe(OLD);
   });
 });
 

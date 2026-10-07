@@ -1,8 +1,11 @@
-// 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
-import type { CoreMessage, Env, NamingContext } from '../core/types';
+// 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env 는 select(정본 값만), region 은 지역 고르기(리전 콤보박스 + 존 · D49 · D50).
+// 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
+import type { CoreMessage, Env, Provider } from '../core/types';
 import { ENV_VALUES, MAX_CONTEXT_CHARS } from '../core/engine';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
+import { RegionPicker } from './RegionPicker';
+import type { FormContext } from './formContext';
 
 type TextKey = 'owner' | 'system' | 'purpose';
 const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; placeholder: string }> = [
@@ -13,13 +16,6 @@ const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; pl
 /** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름만 여기 둔다(Record 라 값이 늘면 typecheck 가 잡는다) */
 const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox' };
 const ENVS: ReadonlyArray<{ value: Env; label: string }> = ENV_VALUES.map((value) => ({ value, label: `${value} — ${ENV_NAMES[value]}` }));
-const REGIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: 'kr', label: 'kr — Korea' },
-  { value: 'us', label: 'us — United States' },
-  { value: 'jp', label: 'jp — Japan' },
-  { value: 'eu', label: 'eu — Europe' },
-  { value: 'global', label: en.ui.region_global_label },
-];
 
 const LABEL = 'block text-sm font-medium text-zinc-800 dark:text-zinc-200';
 const HINT = 'ml-1 text-xs font-normal text-zinc-600 dark:text-zinc-400';
@@ -29,14 +25,16 @@ const CONTROL =
   'aria-invalid:border-rose-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-400 dark:focus-visible:outline-indigo-400';
 
 interface Props {
-  value: NamingContext;
+  /** 지역 표를 고를 CSP — 아직 고르지 않았으면 App 이 켜진 CSP 의 첫째를 넘긴다 */
+  provider: Provider;
+  value: FormContext;
   /** parseContext 의 errors — 메시지 코드. field 로 나눠 보인다 */
   errors: CoreMessage[];
-  onChange: (next: NamingContext) => void;
+  onChange: (next: FormContext) => void;
 }
 
-export function ContextForm({ value, errors, onChange }: Props) {
-  const errorFor = (key: TextKey) => {
+export function ContextForm({ provider, value, errors, onChange }: Props) {
+  const errorFor = (key: TextKey | 'region') => {
     const e = errors.find((m) => 'field' in m && m.field === key);
     return e ? format(e, en) : undefined;
   };
@@ -78,22 +76,15 @@ export function ContextForm({ value, errors, onChange }: Props) {
           </div>
         );
       })}
-      {/* 옆 열(22rem)과 360px 에서 둘을 나란히 두면 「prod — Production」이 잘린다 — 넓은 한 열(sm~lg)에서만 나란히 */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-        <div>
-          <label htmlFor="field-env" className={LABEL}>Environment</label>
-          {/* 옵션은 정본 값만 — select 값은 항상 Env 다 */}
-          <select id="field-env" name="env" value={value.env} onChange={(e) => onChange({ ...value, env: e.target.value as Env })} className={CONTROL}>
-            {ENVS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="field-region" className={LABEL}>Region</label>
-          <select id="field-region" name="region" value={value.region} onChange={(e) => onChange({ ...value, region: e.target.value })} className={CONTROL}>
-            {REGIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
+      <div>
+        <label htmlFor="field-env" className={LABEL}>Environment</label>
+        {/* 옵션은 정본 값만 — select 값은 항상 Env 다 */}
+        <select id="field-env" name="env" value={value.env} onChange={(e) => onChange({ ...value, env: e.target.value as Env })} className={CONTROL}>
+          {ENVS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
       </div>
+      <RegionPicker provider={provider} value={value.region} onChange={(region) => onChange({ ...value, region })}
+        error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
     </form>
   );
 }

@@ -3,7 +3,9 @@
 import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind } from '../core/tree';
+import { MAX_REGION_CHARS } from '../core/regions';
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
+import { EXAMPLE_REGION } from './formContext';
 
 export const HASH_KEY = 'state';
 /** env · region 등 자유 입력이 아닌 필드의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다.
@@ -21,8 +23,8 @@ export const MAX_RESOURCE_TYPE_CHARS = 40;
 export const MAX_ROLE_CHARS = 16;
 /** r 의 항목 하나 최악 — 수(`"<40>":99,` 47 바이트)와 역할(`"<40>":"<16>",` 62 바이트) 중 큰 쪽. 값이 배타라 한 type 은 한 번만 나온다 */
 const MAX_ITEM_JSON_BYTES = Math.max(`"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":99,`.length, `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"${'r'.repeat(MAX_ROLE_CHARS)}",`.length);
-/** 최악 JSON 바이트 — 뼈대(env `prod`(가장 긴 표준값 4자) · region `global` · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
-const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prod', region: 'global', v: V_PLACEHOLDER, p: 'azure', r: {} }).length
+/** 최악 JSON 바이트 — 뼈대(env `prod`(가장 긴 표준값 4자) · region 은 가장 긴 지역 코드(MAX_REGION_CHARS — 존 코드 ause1a · global 이 6자) · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
+const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, p: 'azure', r: {} }).length
   + FREE_FIELDS.length * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_ITEMS * MAX_ITEM_JSON_BYTES - 1;
 /** hash 전체 상한 — 화면 · API 가 받는 모든 입력(자유 입력 셋 각 MAX_CONTEXT_CHARS 자 · 아무 유니코드)과 최대 선택이 왕복하도록 최악 JSON 의
@@ -60,10 +62,10 @@ function itemValue(item: SelectionItem): number | string {
   return 1;
 }
 
-/** 다섯 필드를 고정 순서로 담고, 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
+/** 다섯 필드를 고정 순서로 담고(region 은 존 코드가 있으면 그것 — D50 · D55), 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
  *  p 가 없으면 p · r 을 모두 빼고, 선택이 비면 r 을 뺀다 — 옛 링크(다섯 키 · v)와 같은 문자열이 나와 링크 상태가 유지된다 */
 export function encodeState(ctx: NamingContext, rulesVersion?: string, pick: PickState = {}): string {
-  const body: Record<string, unknown> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.region };
+  const body: Record<string, unknown> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.zone ?? ctx.region };
   if (rulesVersion !== undefined) body.v = rulesVersion;
   if (pick.provider !== undefined) {
     body.p = pick.provider;
@@ -130,8 +132,9 @@ const entryCount = (r: unknown): number => (r !== null && typeof r === 'object' 
 /** `#state=…` · `state=…` 를 받는다. 길이 상한 · 디코딩 · JSON · 모양 · parseContext 중 하나라도 실패하면 undefined.
  *  `v` 는 parseContext 가 읽지 않는다 — 꼴이 `YYYY-MM-DD.N` 일 때만 rulesVersion 으로 돌려주고, 아니면 없는 것으로 본다.
  *  `p` 가 셋 밖이면 없는 것으로 보고 `r` 은 판정할 수 없어 버린다. rules 는 기본이 규칙 표(시험 전용 fixture 가 다른 표를 넘긴다).
- *  enabled — 켜진 CSP (D45). `p` 가 꺼진 CSP 면(D55) 선택을 전부 버리고 unavailable 에 그 CSP 를 싣는다. 지역 칸은 건드리지 않는다.
- *  `p` 가 없거나 꺼진 CSP 이고 켜진 CSP 가 하나면 그것으로 푼다 — 화면이 그것을 자동으로 고르는 것과 같다 */
+ *  enabled — 켜진 CSP (D45). 지역은 CSP 마다 다른 표로 푼다 (D49) — 링크의 p 가 켜져 있으면 그 표, p 가 없으면 켜진 CSP 를 차례로 대어 처음 풀리는 표.
+ *  p 가 꺼진 CSP 면 (D55) ① p 로 원래 CSP 를 알고 ② 그 CSP 의 표로 풀리는지 본다(안 풀리면 깨진 링크) ③ 지역은 켜진 CSP 로 옮길 수 없어 예시(R0)로 바꾸고
+ *  ④ 선택은 전부 버린다 ⑤ 켜진 CSP 가 하나면 그것을 고르고 unavailable 에 원래 CSP 를 싣는다(화면이 안내 한 줄을 띄운다) */
 export function decodeState(hash: string, rules?: readonly ResourceRule[], enabled: readonly Provider[] = ENABLED_PROVIDERS): DecodedState | undefined {
   if (hash.length > MAX_HASH_CHARS) return undefined;
   const m = new RegExp(`^#?${HASH_KEY}=(.*)$`).exec(hash);
@@ -148,13 +151,13 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   if (FREE_FIELDS.some((f) => { const v = (raw as Record<string, unknown>)[f]; return typeof v === 'string' && v.length > MAX_CONTEXT_CHARS; })) return undefined;
   const { v, p, r } = raw as Record<string, unknown>;
-  // 지역은 CSP 마다 다른 표로 푼다 (D49) — 링크의 p 가 켜져 있으면 그 표, 아니면 켜진 CSP 를 차례로 대어 처음 풀리는 표
-  const tryAs = isProvider(p) && enabled.includes(p) ? [p] : enabled;
-  const parsed = tryAs.map((q) => parseContext(raw as RawContext, q)).find((x) => x.ok);
-  if (!parsed?.ok) return undefined;
-  const out: DecodedState = typeof v === 'string' && RULES_VERSION_RE.test(v) ? { context: parsed.context, rulesVersion: v } : { context: parsed.context };
+  const rulesVersion = typeof v === 'string' && RULES_VERSION_RE.test(v) ? { rulesVersion: v } : {};
+  const firstOk = (input: RawContext, tryAs: readonly Provider[]) => tryAs.map((q) => parseContext(input, q)).find((x) => x.ok);
+
   if (isProvider(p) && enabled.includes(p)) {
-    out.provider = p;
+    const parsed = firstOk(raw as RawContext, [p]);
+    if (!parsed?.ok) return undefined;
+    const out: DecodedState = { context: parsed.context, ...rulesVersion, provider: p };
     if (r !== undefined) {
       const { items, dropped } = decodeSelection(p, r, rules);
       if (items.length > 0) out.selection = items;
@@ -164,12 +167,21 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
   }
   // 고를 CSP 가 정해지지 않은 링크 — 켜진 것이 하나면 그것. 선택은 규칙 id 가 CSP 에 묶여 있어 옮기지 않는다
   const only = enabled.length === 1 ? enabled[0] : undefined;
+  const disabled = isProvider(p) ? p : undefined;
+  let input = raw as RawContext;
+  if (disabled !== undefined) {
+    if (!firstOk(input, [disabled])?.ok) return undefined;
+    input = { ...input, region: EXAMPLE_REGION };
+  }
+  const parsed = firstOk(input, only !== undefined ? [only] : enabled);
+  if (!parsed?.ok) return undefined;
+  const out: DecodedState = { context: parsed.context, ...rulesVersion };
   if (only !== undefined) out.provider = only;
   if (r !== undefined) {
     const n = entryCount(r);
     if (n > 0) out.dropped = n;
   }
-  if (isProvider(p)) out.unavailable = p;
+  if (disabled !== undefined) out.unavailable = disabled;
   return out;
 }
 

@@ -5,7 +5,7 @@ import { ArrowDown, Cloud, FileText } from 'lucide-react';
 import { generateMany, parseContext } from './core/engine';
 import { labelsFor } from './core/labels';
 import { buildTree } from './core/tree';
-import { ENABLED_PROVIDERS, type NamingContext, type Provider, type ResourceRule } from './core/types';
+import { ENABLED_PROVIDERS, type Provider, type ResourceRule } from './core/types';
 import { CloudPicker } from './components/CloudPicker';
 import { providerShort } from './components/providerName';
 import { ContextForm } from './components/ContextForm';
@@ -13,16 +13,16 @@ import { ResourceTree } from './components/ResourceTree';
 import { NamesPanel } from './components/NamesPanel';
 import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
-import { applyChange, clearForCloudSwitch, fromItems, toItems, totalNames, type Picked } from './components/selection';
-import { decodeState, encodeState, shareUrl } from './components/urlState';
-import { hashToRestore, hashToWrite, linkStateOf, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
+import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } from './components/selection';
+import { encodeState, shareUrl } from './components/urlState';
+import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
+import { openHash } from './components/openHash';
+import { DEFAULT_FORM, type FormContext } from './components/formContext';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
 import { en } from './messages/en';
 import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
-/** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다 */
-const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 /** 켜진 CSP 가 하나면 첫 그리기 때 그것을 고른다 (D45 · 오너 결정 C1). 둘 이상이면 고르지 않는다 — 숨은 기본값을 두지 않는다 */
 const AUTO_PROVIDER: Provider | undefined = ENABLED_PROVIDERS.length === 1 ? ENABLED_PROVIDERS[0] : undefined;
 const NO_PICK: Picked = new Map();
@@ -33,24 +33,12 @@ const LINK =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800';
 const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-interface Opened { form: NamingContext; provider?: Provider; picked: Picked; dropped: number; unavailable?: Provider; link: LinkState }
-
-/** 주소창의 hash 가 온전하면 그 상태 — 폼과 대어 볼 key 는 지금 규칙 버전 · 트리 순서로 만든다 (D27 ⑵ · D42).
- *  hash 의 r 순서가 트리 순서와 달라도 같은 선택이면 같은 key 다 — 링크를 연 직후 hash 를 덮어쓰지 않는다 */
-function openHash(hash: string, rules: readonly ResourceRule[] | undefined): Opened | undefined {
-  const d = decodeState(hash, rules);
-  if (!d) return undefined;
-  const picked = d.selection ? fromItems(d.selection) : NO_PICK;
-  const selection = d.provider ? toItems(buildTree(d.provider, rules?.filter((r) => r.provider === d.provider)), picked) : [];
-  const key = encodeState(d.context, VERSION.rules, { provider: d.provider, selection });
-  return { form: d.context, provider: d.provider, picked, dropped: d.dropped ?? 0, unavailable: d.unavailable, link: linkStateOf(d, hash, key) };
-}
-
 /** rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
 function App({ rules }: { rules?: readonly ResourceRule[] }) {
   // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (깨진 hash 는 decodeState 가 undefined 로 돌려준다)
   const [initial] = useState(() => openHash(window.location.hash, rules));
-  const [form, setForm] = useState<NamingContext>(() => initial?.form ?? DEFAULT_CONTEXT);
+  // 폼은 지역 입력 문자열을 든다 — 정규화된 문맥으로 덮지 않는다(존이 떨어진다 · D50). 예시는 존 이름(R0)이다
+  const [form, setForm] = useState<FormContext>(() => initial?.form ?? DEFAULT_FORM);
   const [provider, setProvider] = useState<Provider | undefined>(() => (initial ? initial.provider : AUTO_PROVIDER));
   const [picked, setPicked] = useState<Picked>(() => initial?.picked ?? NO_PICK);
   // 링크에서 버린 선택 수 — 사용자가 선택 · CSP 를 바꾸면 지운다
@@ -59,7 +47,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   const [unavailable, setUnavailable] = useState<Provider | undefined>(() => initial?.unavailable);
   // 링크에서 읽은 상태 — 폼과 따로 둔다. 사용자가 폼을 고치면 버린다 (D27 ⑵)
   const [link, setLink] = useState<LinkState | undefined>(() => initial?.link);
-  const editForm = (next: NamingContext) => {
+  const editForm = (next: FormContext) => {
     setLink(undefined);
     setForm(next);
   };
@@ -133,7 +121,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     const onHashChange = () => {
       const opened = openHash(window.location.hash, rules);
       if (opened) {
-        lastSentKey.current = encodeState(opened.form, VERSION.rules);
+        lastSentKey.current = encodeState(opened.context, VERSION.rules);
         setLink(opened.link);
         setForm(opened.form);
         setProvider(opened.provider);
@@ -187,7 +175,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
         {/* 좁은 화면은 ② → ③ → ④ → 태그 순서, 넓은 화면은 왼쪽 열(② · 태그) · 오른쪽 열(③ · ④) */}
         <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
           <div className={`${PANEL} lg:col-start-1 lg:row-start-1`}>
-            <ContextForm value={form} errors={parsed.ok ? [] : parsed.errors} onChange={editForm} />
+            <ContextForm provider={provider ?? ENABLED_PROVIDERS[0]!} value={form} errors={parsed.ok ? [] : parsed.errors} onChange={editForm} />
           </div>
 
           <div className="min-w-0 space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">

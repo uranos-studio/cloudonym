@@ -3,6 +3,7 @@ import { decodeState as decodeEnabled, encodeState, shareUrl, MAX_HASH_CHARS, MA
 import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import { PROVIDERS, type NamingContext, type ResourceRule } from '../core/types';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { MAX_REGION_CHARS } from '../core/regions';
 
 // region global — 세 CSP 표 모두가 받는 값이라 p 가 무엇이든 그대로 풀린다 (D49). CSP 별 지역은 별칭 시험이 본다
 const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'global' };
@@ -55,6 +56,20 @@ describe('decodeState — 깨진 hash 는 전부 undefined', () => {
   });
   it('별칭은 parseContext 가 정규화한다 — production · asia-northeast3 → prod · ane3', () => {
     expect(ctxOf(`#state=${b64({ ...ctx, env: 'production', region: 'asia-northeast3' })}`)).toEqual({ ...ctx, region: 'ane3' });
+  });
+});
+
+describe('지역 자리 (D50 · D55) — hash 의 region 은 존 코드(있으면) 아니면 리전 코드', () => {
+  it('zone 이 있으면 region 키에 존 코드를 싣고, 풀면 리전 · 존이 둘 다 돌아온다', () => {
+    const z: NamingContext = { ...ctx, region: 'ane3', zone: 'ane3a' };
+    const encoded = encodeState(z);
+    expect(JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')))).toMatchObject({ region: 'ane3a' });
+    expect(JSON.parse(atob(encoded.replace(/-/g, '+').replace(/_/g, '/')))).not.toHaveProperty('zone');
+    expect(decodeEnabled(`#state=${encoded}`)?.context).toEqual(z);
+  });
+  it('뼈대의 지역 자리는 MAX_REGION_CHARS(6) — 가장 긴 지역 코드 · global 과 같다', () => {
+    expect(MAX_REGION_CHARS).toBe(6);
+    expect('global'.length).toBeLessThanOrEqual(MAX_REGION_CHARS);
   });
 });
 
@@ -263,19 +278,31 @@ describe('hash v2 — 최대 상태 왕복과 상한', () => {
 
 describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다', () => {
   const vm = (n: number) => ({ virtual_machine: n, resource_group: 1, managed_identity: 'db' });
-  it('p 가 꺼진 CSP(azure)면 선택을 전부 버리고 켜진 GCP 로 푼다 · 버린 수 · 원래 CSP 를 돌려준다(안내용) · 문맥은 그대로', () => {
+  // 꺼진 CSP 링크는 지역을 예시(R0)로 바꾼다 — 그 CSP 의 지역 코드는 켜진 CSP 로 옮길 수 없다 (D55 ③)
+  const reset: NamingContext = { ...ctx, region: 'ane3', zone: 'ane3a' };
+  it('p 가 꺼진 CSP(azure)면 선택을 전부 버리고 켜진 GCP 로 푼다 · 버린 수 · 원래 CSP 를 돌려준다(안내용) · 지역은 예시로', () => {
     const d = decodeEnabled(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: vm(2) })}`);
-    expect(d).toEqual({ context: ctx, rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure' });
+    expect(d).toEqual({ context: reset, rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure' });
   });
   it('p 가 꺼진 CSP 이고 r 이 없으면 버린 것 없이 GCP · 안내는 낸다', () => {
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws' })}`)).toEqual({ context: ctx, provider: 'gcp', unavailable: 'aws' });
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws' })}`)).toEqual({ context: reset, provider: 'gcp', unavailable: 'aws' });
   });
   it('p 가 꺼진 CSP 이고 r 이 객체가 아니면 한 건을 버린다', () => {
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: ctx, provider: 'gcp', dropped: 1, unavailable: 'aws' });
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: reset, provider: 'gcp', dropped: 1, unavailable: 'aws' });
   });
-  it('지역 칸은 건드리지 않는다 — 지역 변환은 지역 체계 작업의 몫', () => {
-    const d = decodeEnabled(`#state=${b64({ ...ctx, region: 'ane1', p: 'azure', r: vm(1) })}`);
-    expect(d?.context.region).toBe('ane1');
+  it('D55 ①~⑤ — p azure · region krc · r: 자유 입력 셋과 env 는 그대로 · region 은 asia-northeast3-a · r 전부 버림 · gcp · 안내', () => {
+    const d = decodeEnabled(`#state=${b64({ owner: 'infra', system: 'ledger', purpose: 'batch', env: 'production', region: 'krc', v: V2, p: 'azure', r: vm(1) })}`);
+    expect(d).toEqual({
+      context: { owner: 'infra', system: 'ledger', purpose: 'batch', env: 'prod', region: 'ane3', zone: 'ane3a' },
+      rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure',
+    });
+  });
+  it('D55 ② — 꺼진 CSP 의 표로도 풀리지 않는 링크는 열지 않는다(옛 kr · 다른 CSP 의 지역 · 깨진 owner)', () => {
+    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'kr', p: 'azure', r: vm(1) })}`)).toBeUndefined();
+    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'asia-northeast3', p: 'azure' })}`)).toBeUndefined();
+    expect(decodeEnabled(`#state=${b64({ ...ctx, owner: '', region: 'krc', p: 'azure' })}`)).toBeUndefined();
+    // 검사기 자체 — 같은 링크가 azure 지역이면 열린다
+    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'krc', p: 'azure' })}`)?.context).toEqual(reset);
   });
   it('p 가 켜진 CSP(gcp)면 그대로 연다 — 안내 없음', () => {
     const d = decodeEnabled(`#state=${b64({ ...ctx, p: 'gcp', r: { compute_instance: 2, project_id: 1 } })}`);
@@ -293,6 +320,6 @@ describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다',
   });
   it('켜진 목록을 넘기면 그것을 따른다 — 둘 이상 켜졌으면 p 없는 링크는 CSP 를 고르지 않는다', () => {
     expect(decodeEnabled(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx, dropped: 3, unavailable: 'azure' });
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: reset, dropped: 3, unavailable: 'azure' });
   });
 });

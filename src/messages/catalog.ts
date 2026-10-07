@@ -12,6 +12,8 @@ export const UI_KEYS = [
   // ContextForm
   'form_title', 'form_hint', 'field_owner_hint', 'field_system_hint', 'field_purpose_hint',
   'field_owner_placeholder', 'field_system_placeholder', 'field_purpose_placeholder', 'region_global_label',
+  // RegionPicker (D49 · D50)
+  'region_search_placeholder', 'region_no_match', 'region_options_label', 'zone_none', 'zone_hint',
   // App — 네 단계 (D42)
   'tagline', 'nav_label', 'share_button', 'share_button_label', 'share_warning', 'results_title',
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
