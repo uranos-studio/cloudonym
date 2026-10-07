@@ -188,7 +188,7 @@ export const en: Catalog = {
     privacy_browser_session: 'One sessionStorage key, {key}, so that a visit is counted once per tab. It holds the value 1 and is cleared when the tab is closed.',
     privacy_browser_hash: 'Your input lives in the URL hash (the part after #). Browsers do not send the hash to the server, and the page computes names in your browser, so the values you type are not sent to Cloudonym. Anyone you give a share link to can read them.',
     privacy_api_title: 'What the API logs',
-    privacy_api_intro: 'Each event below adds one to a daily counter in Cloudflare KV and, when Axiom is configured, sends one record to Axiom.',
+    privacy_api_intro: 'When the deployment has them configured, each event below adds one to a daily counter in Cloudflare KV and sends one record to Axiom.',
     privacy_api_common: 'Every record carries the time (Korea Standard Time), the day, the event name, a client class (ai_agent, browser, cli or other, derived from the User-Agent, which itself is not stored) and whether the client is an AI agent.',
     privacy_col_event: 'Event',
     privacy_col_when: 'Sent when',

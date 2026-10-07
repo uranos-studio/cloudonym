@@ -88,7 +88,7 @@ v1.post('/validate', async (c) => {
 // 화면 비콘 (D17 · D56) — 문맥값은 받지 않는다. 카운터를 올리고, ui_copy 는 어느 버튼인가(target)만 싣는다.
 // 같은 출처가 아니면 403 — 다른 사이트에 심은 sendBeacon(cross-site) 과 헤더 없는 요청(curl 등)을 거른다. 화면이 유일한 정당한 발신자다.
 // curl 은 헤더를 꾸밀 수 있다 — 그쪽은 요청 제한이 비용을 묶는다. Fetch Metadata 를 보내지 않는 옛 브라우저의 비콘은 버려진다(근사치 · D16)
-// 브라우저는 안전한 출처(HTTPS · localhost · 127.0.0.1)에서만 Sec-Fetch-* 를 붙인다 — 개발 서버를 HTTP 로 다른 호스트 이름(Tailscale 등)에서 열면 비콘이 403 이다. 운영은 HTTPS 라 해당하지 않는다
+// 브라우저는 안전한 출처(HTTPS · localhost · 127.0.0.1)에서만 Sec-Fetch-* 를 붙인다 — 개발 서버를 HTTP 로 다른 호스트 이름에서 열면 비콘이 403 이다. 운영은 HTTPS 라 해당하지 않는다
 v1.post('/events', async (c) => {
   if (c.req.header('sec-fetch-site') !== 'same-origin') return fail(c, 403, [{ code: 'request.same_origin_only' }]);
   const read = await readJson(c);
