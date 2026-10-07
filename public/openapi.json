@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine for AWS, GCP and Azure. Generates, corrects and validates resource names against each provider's physical constraints. Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "description": "Multi-cloud resource naming engine. This release enables Google Cloud (gcp) only; AWS and Azure are in the rule table but not enabled, and a request for them is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names against each provider's physical constraints. Formulas, region and zone codes, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
     "version": "0.1.0"
   },
   "servers": [
@@ -12,6 +12,60 @@
     }
   ],
   "paths": {
+    "/catalog.json": {
+      "servers": [
+        {
+          "url": "/",
+          "description": "Site root — this path is not under /v1"
+        }
+      ],
+      "get": {
+        "summary": "Resource catalog and region table",
+        "operationId": "catalog",
+        "description": "The resource catalog and region table of the enabled providers, with version { engine, rules }. Cache-Control: public, max-age=86400 and Access-Control-Allow-Origin: *. GET counts toward the per-IP rate limit; HEAD does not.",
+        "responses": {
+          "200": {
+            "description": "Catalog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/generate": {
       "post": {
         "summary": "Generate cloud resource names",
@@ -81,7 +135,7 @@
             }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
             "headers": {
               "Retry-After": {
                 "description": "Seconds to wait before retrying",
@@ -201,7 +255,7 @@
             }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
             "headers": {
               "Retry-After": {
                 "description": "Seconds to wait before retrying",
@@ -294,7 +348,7 @@
             }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
             "headers": {
               "Retry-After": {
                 "description": "Seconds to wait before retrying",
@@ -385,7 +439,7 @@
             }
           },
           "429": {
-            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/* and GET /llms.txt). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
             "headers": {
               "Retry-After": {
                 "description": "Seconds to wait before retrying",
@@ -1238,6 +1292,20 @@
               "ui_copy"
             ],
             "example": "ui_visit"
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 1024,
+            "enum": [
+              "share-url",
+              "name",
+              "all-names",
+              "names-json",
+              "terraform",
+              "tags-json"
+            ],
+            "description": "Which copy button succeeded. Required when event is ui_copy (missing or unknown is 400 request.value_unsupported with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
+            "example": "names-json"
           }
         }
       },
@@ -1317,6 +1385,263 @@
               "type": "string"
             },
             "description": "Accepted values, present when a provider, resource_type, resources type, event or providers entry is unknown, or when providers is not a non-empty array (request.providers_not_array, request.providers_empty)"
+          }
+        }
+      },
+      "CatalogResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "providers"
+        ],
+        "description": "The resource catalog and region table of the enabled providers. Generated from catalog/*.json in the repository, the same data the engine and /llms.txt use.",
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          },
+          "providers": {
+            "type": "object",
+            "description": "Keyed by enabled provider (gcp in this release)",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "meta",
+                "rows",
+                "regions"
+              ],
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "nullable": true,
+                  "description": "Source versions the catalog was checked against (gcloud, Terraform provider, discovery revision)"
+                },
+                "rows": {
+                  "type": "array",
+                  "description": "One row per screen row",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "displayName",
+                      "category",
+                      "rules",
+                      "slug",
+                      "entity",
+                      "kind",
+                      "info",
+                      "enterNameAt",
+                      "badges",
+                      "aliases"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "example": "gcp.subnet"
+                      },
+                      "displayName": {
+                        "type": "string",
+                        "example": "Subnet"
+                      },
+                      "category": {
+                        "type": "string",
+                        "example": "networking"
+                      },
+                      "rules": {
+                        "type": "object",
+                        "description": "Rule id -> { scope, regionToken (none, region or zone), kinds? { default, allowed } }. A row with several rules asks for the scope; each rule is one resource_type of /v1/names",
+                        "additionalProperties": {
+                          "type": "object",
+                          "required": [
+                            "scope",
+                            "regionToken"
+                          ],
+                          "properties": {
+                            "scope": {
+                              "type": "string"
+                            },
+                            "regionToken": {
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "region",
+                                "zone"
+                              ]
+                            },
+                            "kinds": {
+                              "type": "object",
+                              "properties": {
+                                "default": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "allowed": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "slug": {
+                        "type": "object",
+                        "required": [
+                          "value",
+                          "basis"
+                        ],
+                        "description": "The abbreviation in the name and why it was chosen",
+                        "properties": {
+                          "value": {
+                            "type": "string",
+                            "example": "snet"
+                          },
+                          "basis": {
+                            "type": "string"
+                          },
+                          "previous": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "entity": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "kind": {
+                        "type": "object",
+                        "nullable": true,
+                        "description": "Kind value name -> token (null = no token), the values that add no token and the source",
+                        "properties": {
+                          "rule": {
+                            "type": "string"
+                          },
+                          "tokens": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string",
+                              "nullable": true
+                            }
+                          },
+                          "omitValues": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "defaultBasis": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "info": {
+                        "type": "string",
+                        "description": "One-line description"
+                      },
+                      "enterNameAt": {
+                        "type": "object",
+                        "required": [
+                          "gcloud",
+                          "terraform",
+                          "apiOnly"
+                        ],
+                        "properties": {
+                          "gcloud": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "terraform": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "apiOnly": {
+                            "type": "boolean"
+                          },
+                          "preview": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "badges": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "api-only",
+                            "preview"
+                          ]
+                        }
+                      },
+                      "aliases": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Search terms: Terraform type, gcloud group, product name, earlier abbreviation"
+                      }
+                    }
+                  }
+                },
+                "regions": {
+                  "type": "array",
+                  "description": "Regions with their code and zones",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "region",
+                      "code",
+                      "zones"
+                    ],
+                    "properties": {
+                      "region": {
+                        "type": "string",
+                        "example": "asia-northeast3"
+                      },
+                      "code": {
+                        "type": "string",
+                        "example": "ane3"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "zones": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "zone",
+                            "code"
+                          ],
+                          "properties": {
+                            "zone": {
+                              "type": "string",
+                              "example": "asia-northeast3-a"
+                            },
+                            "code": {
+                              "type": "string",
+                              "example": "ane3a"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

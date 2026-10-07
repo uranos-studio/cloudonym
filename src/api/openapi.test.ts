@@ -12,7 +12,8 @@ import { MESSAGE_CODES } from '../core/messages';
 import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { ENABLED_PROVIDERS } from '../core/types';
-import { MAX_KIND_CHARS } from '../core/catalog';
+import { MAX_KIND_CHARS, catalogFor } from '../core/catalog';
+import { UI_COPY_TARGETS } from './schemas';
 
 /** region 예시를 넣어 볼 문맥 — 나머지 넷은 정본 값 */
 const ctxExample = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
@@ -22,7 +23,8 @@ const SELECTION_CODES_IN_SAMPLES = MESSAGE_CODES.filter((c) => c.startsWith('sel
 // openapi.json 을 읽는 데 필요한 만큼만 타입을 둔다
 interface Schema { type?: string; maxLength?: number; description?: string; properties?: Record<string, Schema>; required?: string[]; enum?: string[]; items?: Schema; additionalProperties?: Schema | boolean; $ref?: string }
 interface Operation { requestBody: { content: Record<string, { example: unknown; schema: Schema }> }; responses: Record<string, unknown> }
-interface Spec { openapi: string; info: { version: string; description: string }; servers: { url: string }[]; paths: Record<string, { post?: Operation; get?: Operation }>; components: { schemas: Record<string, Schema> } }
+interface PathItem { post?: Operation; get?: Operation; servers?: { url: string }[] }
+interface Spec { openapi: string; info: { version: string; description: string }; servers: { url: string }[]; paths: Record<string, PathItem>; components: { schemas: Record<string, Schema> } }
 
 const spec = JSON.parse(readFileSync(join(import.meta.dirname, '../../public/openapi.json'), 'utf-8')) as Spec;
 const schemas = spec.components.schemas;
@@ -52,8 +54,12 @@ describe('public/openapi.json — 형식', () => {
     // 이름 예시에 옛 지역 토큰이 남지 않는다
     expect(JSON.stringify(spec)).not.toMatch(/-kr-/);
   });
-  it('다섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500 (D25 · D39)', () => {
-    expect(keys(spec.paths)).toEqual(['/events', '/generate', '/health', '/names', '/validate']);
+  it('여섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
+    expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/validate']);
+    // servers 가 /v1 이라 /catalog.json 은 경로 단위로 뿌리 서버를 덮어써야 /v1/catalog.json 으로 읽히지 않는다
+    expect(spec.paths['/catalog.json']!.servers).toEqual([expect.objectContaining({ url: '/' })]);
+    expect(keys(spec.paths['/catalog.json']!.get!.responses)).toEqual(['200', '429', '500']);
+    for (const p of ['/events', '/generate', '/health', '/names', '/validate']) expect(spec.paths[p]!.servers, p).toBeUndefined();
     for (const p of ['/generate', '/names', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
     expect(keys(spec.paths['/events']!.post!.responses)).toEqual(['200', '400', '403', '413', '429', '500']);
     expect(keys(spec.paths['/health']!.get!.responses)).toEqual(['200', '500']);
@@ -71,6 +77,18 @@ describe('public/openapi.json — 형식', () => {
     for (const f of ['provider', 'resource_type', 'name']) expect(schemas['ValidateRequest']!.properties![f]!.maxLength, f).toBe(1024);
     expect(schemas['EventRequest']!.properties!['event']!.maxLength).toBe(1024);
     for (const r of ['GenerateRequest', 'ValidateRequest']) expect(schemas[r]!.properties!['rules_version']!.maxLength, r).toBe(1024);
+  });
+  it('info 설명은 켜진 CSP 만 연다고 말한다 · /llms.txt · /catalog.json 을 가리킨다 (D45 · D46)', () => {
+    expect(spec.info.description).not.toMatch(/for AWS, GCP and Azure/);
+    expect(spec.info.description).toContain('request.provider_not_enabled');
+    expect(spec.info.description).toContain('/catalog.json');
+    expect(spec.info.description).toContain('/llms.txt');
+  });
+  it('EventRequest.target — ui_copy 의 여섯 값 그대로 · 설명이 ui_copy 에만 필요하다고 말한다 (D56)', () => {
+    const t = schemas['EventRequest']!.properties!['target']!;
+    expect(t.enum).toEqual([...UI_COPY_TARGETS]);
+    expect(t.description).toMatch(/ui_copy/);
+    expect(schemas['EventRequest']!.required).toEqual(['event']);
   });
   it('info.version = package.json version (D26)', () => {
     const pkg = JSON.parse(readFileSync(join(import.meta.dirname, '../../package.json'), 'utf-8')) as { version: string };
@@ -133,7 +151,7 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
   /** 경로 · 메서드 · 상태 코드의 응답 스키마 이름 — /llms.txt 는 명세 밖이라 ErrorResponse 로 본다 */
   function schemaNameOf(method: string, path: string, status: number): string {
     if (path === '/llms.txt') return 'ErrorResponse';
-    const op = spec.paths[path.replace(/^\/v1/, '')]![method.toLowerCase() as 'get' | 'post']!;
+    const op = spec.paths[path.replace(/^\/v1\//, '/')]![method.toLowerCase() as 'get' | 'post']!;
     const r = op.responses[String(status)] as { content?: Record<string, { schema: Schema }> } | undefined;
     expect(r, `${method} ${path} ${status} 가 명세에 없다`).toBeDefined();
     return r!.content!['application/json']!.schema.$ref!.split('/').pop()!;
@@ -188,6 +206,48 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     const conflict = samples.find((x) => x.id === 'names-conflict')!.body.data.gcp;
     expect(conflict.valid).toBe(false);
     expect(conflict.conflicts).toHaveLength(1);
+  });
+
+  it('events 표본 — ui_copy 여섯 target 은 200 · target 이 없거나 모르는 값이면 400 · 요청 본문은 EventRequest 에 맞는다 (D56)', () => {
+    for (const t of UI_COPY_TARGETS) {
+      const x = samples.find((s) => s.id === `events-ui-copy-${t}`);
+      expect(x?.status, t).toBe(200);
+      expect(validatorFor('EventRequest')({ event: 'ui_copy', target: t }), t).toBe(true);
+    }
+    expect(samples.find((s) => s.id === '400-events-ui-copy-no-target')!.status).toBe(400);
+    expect(samples.find((s) => s.id === '400-events-ui-copy-unknown-target')!.status).toBe(400);
+    expect(validatorFor('EventRequest')({ event: 'ui_copy', target: 'clipboard' })).toBe(false);
+  });
+
+  it('catalog 표본 — 200 본문은 CatalogResponse 에 맞고 켜진 CSP 의 행 수 그대로 · 429 도 명세에 있다 (D46)', () => {
+    const ok = samples.find((s) => s.id === 'catalog-json')!;
+    expect(ok.status).toBe(200);
+    expect(Object.keys(ok.body.providers)).toEqual([...ENABLED_PROVIDERS]);
+    for (const p of ENABLED_PROVIDERS) expect(ok.body.providers[p].rows, p).toHaveLength(catalogFor(p).length);
+    expect(samples.find((s) => s.id === '429-catalog-json')!.status).toBe(429);
+    // 검사기 자체 — 꼴이 틀리면 거부한다
+    expect(validatorFor('CatalogResponse')({ version: VERSION })).toBe(false);
+    expect(validatorFor('CatalogResponse')({ version: VERSION, providers: { gcp: { meta: null, rows: [{}], regions: [] } } })).toBe(false);
+  });
+
+  it('kind 표본 전부 — 켜진 CSP 에서 종류가 있는 규칙마다 허용 값 전부를 /v1/names 에 넣으면 요청 · 응답이 명세에 맞고 토큰이 kind_token 꼴이다 (D52)', async () => {
+    const reqV = validatorFor('NamesRequest');
+    const resV = validatorFor('NamesResponse');
+    let n = 0;
+    for (const p of ENABLED_PROVIDERS) {
+      for (const rule of rulesFor(p)) {
+        for (const kind of rule.kinds?.allowed ?? []) {
+          const body = { provider: p, context: { ...ctxExample, region: 'asia-northeast3-a' }, resources: [{ type: rule.resourceType, kind }] };
+          expect(reqV(body), `${rule.resourceType} ${kind} 요청: ${ajv.errorsText(reqV.errors)}`).toBe(true);
+          const res = await json((await req(app, '/v1/names', jsonPost(body))).res);
+          expect(resV(res), `${rule.resourceType} ${kind} 응답: ${ajv.errorsText(resV.errors)}`).toBe(true);
+          const item = res.data[p].items[0] as { kind?: string; kind_token?: string };
+          expect(item.kind, `${rule.resourceType} ${kind}`).toBe(kind);
+          n++;
+        }
+      }
+    }
+    expect(n).toBeGreaterThan(20);
   });
 
   it('rules_version 다섯 경우 — null · 숫자 · 객체 · 1025자는 400, 빈 문자열은 409 (명세의 상태 코드)', () => {

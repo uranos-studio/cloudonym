@@ -5,6 +5,7 @@ import { generateMany } from '../core/engine';
 import { labelsFor } from '../core/labels';
 import { CONFLICT_GCP_CONTEXT, CONFLICT_GCP_SELECTION } from '../core/__fixtures__/conflict';
 import { toWireNames } from './serialize';
+import { UI_COPY_TARGETS } from './schemas';
 import { VERSION } from '../version';
 
 /** Hono 의 ExecutionContext 타입은 props 를 요구한다 — 빼면 TS2345 */
@@ -150,6 +151,11 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await add('events-ok', 'POST', '/v1/events', beaconPost({ event: 'ui_visit' }));
   await add('400-events-unknown', 'POST', '/v1/events', beaconPost({ event: 'api_generate' }));
   await add('403-events-cross-site', 'POST', '/v1/events', beaconPost({ event: 'ui_visit' }, { 'sec-fetch-site': 'cross-site' }));
+  for (const t of UI_COPY_TARGETS) await add(`events-ui-copy-${t}`, 'POST', '/v1/events', beaconPost({ event: 'ui_copy', target: t }));
+  await add('400-events-ui-copy-no-target', 'POST', '/v1/events', beaconPost({ event: 'ui_copy' }));
+  await add('400-events-ui-copy-unknown-target', 'POST', '/v1/events', beaconPost({ event: 'ui_copy', target: 'clipboard' }));
+  await add('catalog-json', 'GET', '/catalog.json');
+  await add('429-catalog-json', 'GET', '/catalog.json', undefined, { API_LIMITER: fakeLimiter('deny').limiter });
   await add('429-generate', 'POST', '/v1/generate', jsonPost({ context: SAMPLE_CTX }), { API_LIMITER: fakeLimiter('deny').limiter });
   await add('429-llms-txt', 'GET', '/llms.txt', undefined, { API_LIMITER: fakeLimiter('deny').limiter });
   // ExecutionContext 없이 부르면 c.executionCtx 가 실제로 던진다 — 운영 라우트를 더하지 않고 500 경로를 탄다
