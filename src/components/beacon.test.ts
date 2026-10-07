@@ -84,14 +84,22 @@ describe('sendBeacon — navigator.sendBeacon 우선 · 없으면 fetch keepaliv
 });
 
 describe('sessionStore', () => {
-  it('sessionStorage 가 없는 환경(Node)에서는 undefined · 접근이 던져도 undefined', () => {
-    expect(sessionStore()).toBeUndefined();
-    // 브라우저는 window.sessionStorage 게터 자체가 SecurityError 를 던진다 — 게터로 흉내 낸다 (vi.stubGlobal 은 값만 둔다)
-    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, get() { throw new Error('SecurityError'); } });
+  it('sessionStorage 가 없는 환경에서는 undefined · 접근이 던져도 undefined', () => {
+    // Node 버전에 따라 전역 sessionStorage 가 있다 — 시험 안에서 「없음」 · 「던짐」을 만들고 끝나면 원래 서술자로 되돌린다
+    const original = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
     try {
+      Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, writable: true, value: undefined });
       expect(sessionStore()).toBeUndefined();
+      // 브라우저는 window.sessionStorage 게터 자체가 SecurityError 를 던진다 — 게터로 흉내 낸다 (vi.stubGlobal 은 값만 둔다)
+      Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, get() { throw new Error('SecurityError'); } });
+      expect(sessionStore()).toBeUndefined();
+      // 검사기 — 저장소가 있으면 그것을 돌려준다
+      const fake = { getItem: () => null, setItem: () => undefined };
+      Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, writable: true, value: fake });
+      expect(sessionStore()).toBe(fake);
     } finally {
-      Reflect.deleteProperty(globalThis, 'sessionStorage');
+      if (original) Object.defineProperty(globalThis, 'sessionStorage', original);
+      else Reflect.deleteProperty(globalThis, 'sessionStorage');
     }
   });
 });

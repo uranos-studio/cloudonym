@@ -17,7 +17,7 @@ import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } fr
 import { encodeState, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
-import { NAMING_PATH, PRIVACY_PATH } from './components/route';
+import { NAMING_PATH, PRIVACY_PATH, withStateHash } from './components/route';
 import { DEFAULT_FORM, type FormContext } from './components/formContext';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
 import { en } from './messages/en';
@@ -120,6 +120,10 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   useEffect(() => {
     currentHash.current = hashToRestore(stateKey, link, currentHash.current);
   }, [stateKey, link]);
+  // 주소창에 있는 hash — 문서 링크(Naming guide · Privacy)가 실어 가서 돌아올 때 그대로 연다. 문맥이 불완전한 동안은 마지막 온전한 hash 다(위 effect 와 같은 규칙)
+  const [addressHash, setAddressHash] = useState(() => window.location.hash);
+  const nextAddressHash = hashToRestore(stateKey, link, addressHash);
+  if (nextAddressHash !== addressHash) setAddressHash(nextAddressHash);
   useEffect(() => {
     const onHashChange = () => {
       const opened = openHash(window.location.hash, rules);
@@ -156,7 +160,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
           <nav aria-label={en.ui.nav_label} className="flex flex-wrap items-center gap-2">
             {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵) */}
             {ctx && <CopyButton text={shareUrl(ctx, window.location.origin + window.location.pathname, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
-            <a href={NAMING_PATH} data-nav-naming className={LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
+            <a href={withStateHash(NAMING_PATH, addressHash)} data-nav-naming className={LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
             <a href="/llms.txt" target="_blank" rel="noreferrer" className={LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
           </nav>
           {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
@@ -222,7 +226,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
       <footer className={`mx-auto max-w-7xl px-4 text-xs text-zinc-600 dark:text-zinc-400 ${provider && picked.size > 0 ? 'pb-24 lg:pb-6' : 'pb-6'}`}>
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
-          <a href={PRIVACY_PATH} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+          <a href={withStateHash(PRIVACY_PATH, addressHash)} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
         </p>
       </footer>
     </div>
