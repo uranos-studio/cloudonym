@@ -139,7 +139,7 @@ const AZURE_HAND_RULES: Record<string, ResourceRule> = {
     scope: 'azure:managed_cluster', entity: 'Microsoft.ContainerService/managedClusters/agentPools', category: 'containers', uniqueness: 'csp', uniquenessDocUrl: `${AZURE_RULES}#microsoftcontainerservice`,
     docUrl: AKS_FAQ, notes: [AZURE_RESERVED_AMBIGUOUS_NOTE],
   },
-  // 조사 11종 — 이름 규칙 표의 행 그대로. 예약어는 걸지 않는다: 리소스 이름이 DNS 이름이 되지 않는다(Public IP 의 FQDN 은 별도 DNS 라벨 속성이 만든다)
+  // 2026-10-06 추가 11종 — 이름 규칙 표의 행 그대로. 예약어는 걸지 않는다: 리소스 이름이 DNS 이름이 되지 않는다(Public IP 의 FQDN 은 별도 DNS 라벨 속성이 만든다)
   // NIC · PIP · NSG — 1-80 · "Alphanumerics, underscores, periods, and hyphens. Start with alphanumeric. End with alphanumeric or underscore." (azure.subnet 과 같은 문장)
   'azure.public_ip': {
     id: 'azure.public_ip', provider: 'azure', resourceType: 'public_ip',

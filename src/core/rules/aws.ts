@@ -69,7 +69,7 @@ const AWS_HAND_RULES: Record<string, ResourceRule> = {
     scope: 'aws:region', entity: 'rds.dbInstance', category: 'database', uniqueness: 'csp', uniquenessDocUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html',
     docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html',
   },
-  // 조사 11종 — Name 태그 셋은 aws.vpc 와 같은 규칙에 slug 만 다르다
+  // 2026-10-06 추가 11종 — Name 태그 셋은 aws.vpc 와 같은 규칙에 slug 만 다르다
   'aws.internet_gateway': {
     id: 'aws.internet_gateway', provider: 'aws', resourceType: 'internet_gateway',
     displayName: 'Internet Gateway (Name tag)', slug: 'igw', minLength: 1, maxLength: 256,

@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆을 재고 스크린샷을 남긴다 (개발 6단계 Task 4).
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆을 재고 스크린샷을 남긴다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
 스크린샷에는 중립 예시 값만 쓴다(INPUT · OTHER · 기호만 든 system).
@@ -185,7 +185,7 @@ with sync_playwright() as p:
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
     assert page.evaluate('document.documentElement.lang') == 'en'
-    # 첫 방문은 CSP 를 고르지 않는다(오너 결정) — 트리 대신 안내 · 선택된 라디오 없음
+    # 첫 방문은 CSP 를 고르지 않는다 — 트리 대신 안내 · 선택된 라디오 없음
     expect(page.locator('[role="radio"][aria-checked="true"]')).to_have_count(0)
     expect(page.locator('[data-pick-cloud]')).to_have_text('Choose a cloud above to see its resources.')
     expect(page.locator('[data-tree]')).to_have_count(0)

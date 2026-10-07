@@ -49,7 +49,7 @@ describe('toggle · setCount · setRole', () => {
 });
 
 describe('applyChange — 판정은 core validateSelection (D40)', () => {
-  it('seq 없는 규칙(none)은 개수 1 고정 — 2 는 받지 않는다(오너 결정)', () => {
+  it('seq 없는 규칙(none)은 개수 1 고정 — 2 는 받지 않는다', () => {
     const m = toggle(new Map(), rule('resource_group'));
     expect(applyChange('azure', azure, setCount(m, rule('resource_group'), 2))).toBeUndefined();
     expect(canIncrease(m, rule('resource_group'))).toBe(false);

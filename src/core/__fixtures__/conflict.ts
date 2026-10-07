@@ -1,6 +1,6 @@
 // 충돌 fixture (D41) — 시험 전용 규칙 둘. 같은 entity · 같은 template 이라 같은 문맥에서 같은 이름이 나온다.
 // 실제 규칙 표(RULES)에는 같은 이름을 내는 짝이 없어 충돌 검사가 「공허하게」 통과한다 — 검사기를 먼저 시험하려고 둔다.
-// 엔진(Task 2) · API 200 본문(Task 3) · 카드 · 내보내기(Task 4)가 같은 fixture 를 쓴다
+// 엔진 · API 200 본문 · 카드 · 내보내기가 같은 fixture 를 쓴다
 import { getRule } from '../constraints';
 import type { NamingContext, ResourceRule } from '../types';
 

@@ -99,11 +99,11 @@ describe('checkName', () => {
     expect(checkName('aksmanagedap', aksLinux)).toEqual([{ code: 'name.forbidden_exact', params: { value: 'aksmanagedap' } }]);
     expect(checkName('aksmanaged', aksLinux)).toEqual([]);
   });
-  it('M2: 첫 글자 검사는 대소문자를 보지 않는다 — 대소문자는 pattern 몫', () => {
+  it('첫 글자 검사는 대소문자를 보지 않는다 — 대소문자는 pattern 몫', () => {
     expect(checkName('Mydb', rds)).toEqual([]);
     expect(checkName('Abcdef', sa)).toEqual([{ code: 'name.pattern_mismatch', params: { pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$' } }]);
   });
-  it('M2: startsWithLetter 가 false 인 규칙은 숫자 첫 글자를 첫 글자 위반으로 말하지 않는다', () => {
+  it('startsWithLetter 가 false 인 규칙은 숫자 첫 글자를 첫 글자 위반으로 말하지 않는다', () => {
     expect(checkName('1bucket', s3)).toEqual([]);
     expect(checkName('1st', st)).toEqual([]);
   });
@@ -132,7 +132,7 @@ describe('checkName', () => {
   });
 });
 
-describe('조사 11종 — 경계 넷과 문서 문장의 판정 (Task 5)', () => {
+describe('2026-10-06 추가 11종 — 경계 넷과 문서 문장의 판정', () => {
   const NEW = [
     'aws.internet_gateway', 'aws.route_table', 'aws.security_group', 'aws.key_pair', 'aws.ebs_volume',
     'gcp.firewall_rule', 'gcp.disk',

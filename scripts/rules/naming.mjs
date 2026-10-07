@@ -26,7 +26,7 @@ export const DISPLAY_ACRONYMS = {
 };
 export const displayWords = (words) => words.map((w) => DISPLAY_ACRONYMS[w] ?? w);
 
-/** 한 글자 토막 — `_a_` 같은 type 은 읽을 수 없다(리뷰 지적). 생성기는 이런 후보를 고르지 않는다 */
+/** 한 글자 토막 — `_a_` 같은 type 은 읽을 수 없다. 생성기는 이런 후보를 고르지 않는다 */
 export const hasSingleLetterToken = (type) => /(^|_)[a-z](_|$)/.test(type);
 
 /** 40자를 넘는 type 을 읽을 수 있게 줄이는 낱말 약어 — 널리 쓰는 꼴만 */

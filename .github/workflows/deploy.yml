@@ -1,5 +1,5 @@
 # 태그 v* 가 붙을 때만 Cloudflare Workers 로 배포한다.
-# 배포는 항상 `npm run deploy`(빌드 포함)로 한다 (Global Constraints)
+# 배포는 항상 `npm run deploy`(빌드 포함)로 한다
 name: deploy
 
 on:

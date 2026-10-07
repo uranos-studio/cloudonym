@@ -1,4 +1,4 @@
-// 호환 불변식 — 기본 문맥(baseline 의 base)에서 만드는 이름 35개를(처음 24개 + 조사 11종 · Task 5) 문자열 리터럴로 고정한다.
+// 호환 불변식 — 기본 문맥(baseline 의 base)에서 만드는 이름 35개를(처음 24개 + 2026-10-06 에 더한 11종) 문자열 리터럴로 고정한다.
 // 순번 · 역할을 항목 입력으로 받게 되어도(D30') 기본값(count 1 → 01 · role sync)이면 지금 출력과 글자 하나 다르지 않아야 한다.
 // baseline.json 은 UPDATE_BASELINE 으로 다시 쓸 수 있지만 이 파일은 손으로만 바뀐다 — 바뀌었다면 이름이 달라진 것이다
 import { describe, it, expect } from 'vitest';
@@ -55,7 +55,7 @@ describe('호환 — 기본 문맥의 이름 35개 (리터럴)', () => {
     const parsed = parseContext(BASE);
     if (!parsed.ok) throw new Error('기본 문맥이 파싱되지 않는다');
     const out = generate(parsed.context);
-    // 리터럴에 있는 35종만 본다 — 뒤에 들인 규칙(Task 6 Azure 정형 행)은 이 불변식 밖이다
+    // 리터럴에 있는 35종만 본다 — 뒤에 들인 규칙(Azure 정형 행 등)은 이 불변식 밖이다
     const actual = Object.fromEntries(Object.entries(out).map(([p, byType]) => [p, Object.fromEntries(Object.entries(byType!)
       .filter(([t]) => t in (EXPECTED as Record<string, Record<string, string>>)[p]!).map(([t, r]) => [t, r.name]))]));
     expect(actual).toEqual(EXPECTED);

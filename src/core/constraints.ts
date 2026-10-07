@@ -1,5 +1,5 @@
 // CSP 리소스 이름 규칙 표 (D9 · D14 · D18 · D19 · D20)
-// 값은 CSP 공식 문서로 대조했다 — 표는 docs/규칙-대조-20260928.md, 고친 것은 docs/decisions.md.
+// 값은 CSP 공식 문서로 대조했다 — 표는 docs/rule-verification.md, 고친 것은 docs/decisions.md.
 // pattern · forbidden · 길이 = CSP 물리 규칙(검증), allowed = 우리가 생성할 때 쓰는 문자 집합.
 // 표 자체는 provider 별 파일(rules/gcp.ts · rules/aws.ts · rules/azure.ts)에 있고 여기서 합친다.
 import type { Provider, ResourceRule } from './types';

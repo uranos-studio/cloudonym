@@ -165,7 +165,7 @@ describe('표시 이름 · notes (D24 · 문구 코드화)', () => {
   });
 });
 
-describe('조사 11종 (Task 5) — 범위 · 부류 · 분류 · 근거', () => {
+describe('2026-10-06 추가 11종 — 범위 · 부류 · 분류 · 근거', () => {
   const want: [string, string, string, string, 'csp' | 'none'][] = [
     ['aws.internet_gateway', 'aws:region', 'ec2.internetGateway.NameTag', 'networking', 'none'],
     ['aws.route_table', 'aws:vpc', 'ec2.routeTable.NameTag', 'networking', 'none'],

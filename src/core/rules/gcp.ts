@@ -79,7 +79,7 @@ const GCP_HAND_RULES: Record<string, ResourceRule> = {
     docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
     notes: [{ code: 'note.gcs_dotted_names_222' }],
   },
-  // 조사 11종 — "The name must be 1-63 characters long, and comply with RFC1035" (REST 참조 name 필드) · 디스커버리 Firewall.name · Disk.name pattern 이 RFC1035 와 같다
+  // 2026-10-06 추가 11종 — "The name must be 1-63 characters long, and comply with RFC1035" (REST 참조 name 필드) · 디스커버리 Firewall.name · Disk.name pattern 이 RFC1035 와 같다
   'gcp.firewall_rule': {
     id: 'gcp.firewall_rule', provider: 'gcp', resourceType: 'firewall_rule',
     displayName: 'VPC Firewall Rule', slug: 'fw', minLength: 1, maxLength: 63,

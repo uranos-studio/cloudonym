@@ -87,26 +87,26 @@ describe('validateName', () => {
   });
 });
 
-describe('개발 1단계 마감 고침', () => {
-  it('I-1: rule.patternFlags 를 함께 내보내 wire 쪽에서 같은 정규식을 다시 만들 수 있다', () => {
+describe('2026-09-28 고침', () => {
+  it('rule.patternFlags 를 함께 내보내 wire 쪽에서 같은 정규식을 다시 만들 수 있다', () => {
     const rg = generate(ctx, ['azure']).azure?.resource_group;
     expect(rg?.rule.patternFlags).toBe('u');
     const re = new RegExp(rg!.rule.pattern, rg!.rule.patternFlags);
     expect(re.test('개발-1')).toBe(true);
     expect(re.test(rg!.name)).toBe(true);
   });
-  it('m-3: GCS 버킷은 연속 점(빈 구성요소)을 거부한다 · S3 도 거부한다', () => {
+  it('GCS 버킷은 연속 점(빈 구성요소)을 거부한다 · S3 도 거부한다', () => {
     expect(validateName('gcp', 'storage_bucket', 'a..b').valid).toBe(false);
     expect(validateName('gcp', 'storage_bucket', 'a.b').valid).toBe(true);
     expect(validateName('aws', 's3_bucket', 'a..b').valid).toBe(false);
   });
-  it('m-2: 리소스 그룹은 보조 평면 글자(U+10000 이상)를 거부하고 BMP 글자는 받는다', () => {
+  it('리소스 그룹은 보조 평면 글자(U+10000 이상)를 거부하고 BMP 글자는 받는다', () => {
     expect(validateName('azure', 'resource_group', 'rg-𝔸').valid).toBe(false);
     expect(validateName('azure', 'resource_group', '𝔸').valid).toBe(false);
     expect(validateName('azure', 'resource_group', '개발').valid).toBe(true);
     expect(validateName('azure', 'resource_group', 'rg-개발-1').valid).toBe(true);
   });
-  it('m-1: Azure VM(Linux · Windows)은 이름 어디에서도 점을 거부한다 — 문서 모순이라 보수적으로', () => {
+  it('Azure VM(Linux · Windows)은 이름 어디에서도 점을 거부한다 — 문서 모순이라 보수적으로', () => {
     for (const t of ['virtual_machine', 'virtual_machine_windows']) {
       expect(validateName('azure', t, 'a.b').valid, `${t} a.b`).toBe(false);
       expect(validateName('azure', t, 'vm-web-01').valid, `${t} vm-web-01`).toBe(true);

@@ -1,5 +1,5 @@
 // 리소스 트리 (D37) — SCOPES 와 RULES 에서 파생하는 순수 함수. 트리를 따로 적지 않는다.
-// 자식을 고른다고 부모가 자동으로 체크되지 않는다 — 그것은 묶음(유료)이다
+// 자식을 고른다고 부모가 자동으로 체크되지 않는다
 import { rulesFor } from './constraints';
 import { SCOPES, type ScopeDef } from './scopes';
 import type { Provider, ResourceRule } from './types';
