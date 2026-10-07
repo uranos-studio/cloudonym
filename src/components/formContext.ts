@@ -1,5 +1,5 @@
 // 폼의 값 (D50) — 문맥 다섯 칸. region 은 사용자가 넣은 지역 입력 문자열(리전 · 존의 이름 또는 코드)이고, 존은 그 안에 든다.
-// 정규화된 문맥(NamingContext — region 은 리전 코드, zone 은 따로)으로 폼을 덮지 않는다: 덮으면 존이 떨어진다 (codex #6)
+// 정규화된 문맥(NamingContext — region 은 리전 코드, zone 은 따로)으로 폼을 덮지 않는다: 덮으면 존이 떨어진다 (D50)
 import type { NamingContext } from '../core/types';
 
 export type FormContext = Omit<NamingContext, 'zone'>;

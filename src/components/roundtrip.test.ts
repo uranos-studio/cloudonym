@@ -1,4 +1,4 @@
-// 화면 수준 왕복 (D50 · D55 · codex #6) — 폼의 지역 입력 → parseContext → encodeState → (주소창) → openHash → 폼 → parseContext → generateMany.
+// 화면 수준 왕복 (D50 · D55) — 폼의 지역 입력 → parseContext → encodeState → (주소창) → openHash → 폼 → parseContext → generateMany.
 // App 이 하는 순서를 그대로 밟는다: 첫 로드 · 새로고침 · 같은 탭 hash 이동은 모두 openHash 를 지난다
 import { describe, it, expect } from 'vitest';
 import { generateMany, parseContext } from '../core/engine';
@@ -35,7 +35,7 @@ describe('첫 화면 예시 (R0) — 존 이름이라 존 행도 처음부터 �
   });
 });
 
-describe('공유 · 새로고침 왕복에서 존이 남는다 (D50 · codex #6)', () => {
+describe('공유 · 새로고침 왕복에서 존이 남는다 (D50)', () => {
   it('asia-northeast3-a → parseContext → encodeState → openHash → 폼 → parseContext → disk 이름이 같다', () => {
     const ctx = ctxOf({ ...DEFAULT_FORM, region: 'asia-northeast3-a' });
     expect(ctx).toMatchObject({ region: 'ane3', zone: 'ane3a' });
