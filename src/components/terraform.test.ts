@@ -6,7 +6,7 @@ import { validateSelection } from '../core/selection';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from '../core/__fixtures__/conflict';
 import type { GenerateOutput, LabelSet, NameResult, NamingContext } from '../core/types';
 
-const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' };
 const stub = (over: Partial<NameResult>): NameResult => ({
   ruleId: 'gcp.service_account', resourceType: 'service_account', displayName: 'Service Account', name: 'x', valid: true,
   isTruncated: false, isTransformed: false, original: 'x', violations: [], steps: [],
@@ -72,7 +72,7 @@ describe('toTerraformLocals — 고른 항목 (D41)', () => {
     const res = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }]);
     if (!res.ok) throw new Error('선택이 틀렸다');
     const hcl = toTerraformLocals(manyEntries(generateMany(ctx, 'azure', res.items)), { azure: labelsFor(ctx, 'azure') });
-    expect(hcl).toContain('  azure_virtual_machine_01 = "billing-trade-prod-kr-vm-01"\n  azure_virtual_machine_02 = "billing-trade-prod-kr-vm-02"\n');
+    expect(hcl).toContain('  azure_virtual_machine_01 = "billing-trade-prod-ane3-vm-01"\n  azure_virtual_machine_02 = "billing-trade-prod-ane3-vm-02"\n');
     expect(hcl).toContain('  azure_managed_identity_db = "billing-trade-prod-id-db"\n');
     expect(hcl).toContain('  azure_resource_group = "rg-billing-trade-prod"\n');
     expect(hcl).toContain('  azure_tags = {\n');

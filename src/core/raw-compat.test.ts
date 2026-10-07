@@ -14,9 +14,9 @@ const FILE = join(import.meta.dirname, '__fixtures__', 'raw-compat-v0.1.0.json')
 type Results = Record<string, Partial<Record<Provider, unknown>>>;
 
 /** 원시 입력 → 파서 결과 전체(성공이면 문맥 · 바뀐 값, 실패면 오류 — code · field · params 그대로).
- *  지역 · 존 파서가 provider 를 받게 되면 이 호출 한 줄이 바뀐다 */
-function parseFor(raw: RawContext, _provider: Provider): unknown {
-  const r = parseContext(raw);
+ *  지역은 provider 의 표로 푼다 (D49) */
+function parseFor(raw: RawContext, provider: Provider): unknown {
+  const r = parseContext(raw, provider);
   return r.ok ? { ok: true, context: r.context, transformed: r.transformed } : { ok: false, errors: r.errors };
 }
 
@@ -48,9 +48,10 @@ describe('원시 입력 호환 — 옛 원시 입력 20개 × provider', () => {
 
   it('검사기 자체 시험 — 기대값 한 글자 · 한 칸을 바꾸면 그 칸만 다르다고 보고한다', () => {
     const changed = structuredClone(expected);
-    const base = changed['base']!.gcp as { context: { region: string } };
-    base.context.region = `${base.context.region}x`;
-    expect(compatDiff(actual, changed)).toEqual(['base/gcp']);
+    // 옛 kr 입력은 이제 오류라 문맥이 남는 long-values(global)를 바꾼다
+    const row = changed['long-values']!.gcp as { context: { region: string } };
+    row.context.region = `${row.context.region}x`;
+    expect(compatDiff(actual, changed)).toEqual(['long-values/gcp']);
     const dropped = structuredClone(expected);
     delete dropped['parse-region-mars']!.azure;
     expect(compatDiff(actual, dropped)).toEqual(['parse-region-mars/azure']);

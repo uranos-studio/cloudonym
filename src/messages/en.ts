@@ -24,6 +24,7 @@ export const en: Catalog = {
     'step.separator_removed': () => 'Removed hyphens (this rule allows no separator)',
     'name.token_empty': (m) => `Required token '${m.field}' is empty after normalisation`,
     'name.cannot_fit': (m) => `Cannot be shortened to ${m.params.max} characters or fewer`,
+    'name.zone_required': (m) => `This resource is zonal: put a zone (zone name or zone code), not a region, in region (got '${m.params.region}')`,
     'rule.unknown_resource_type': (m) => `Unknown resource type for ${m.params.provider}; supported: ${list(m.params.supported)}`,
     'context.not_string': (m) => `'${m.field}' must be a string`,
     'context.empty': (m) => `'${m.field}' is empty`,

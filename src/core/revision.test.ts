@@ -11,7 +11,8 @@ import ts from 'typescript';
 import { RULES_REVISION } from './revision';
 import { RULES, LABEL_LIMITS, AWS_TAG_VALUE } from './constraints';
 import { SHORT_WORDS } from './shorten';
-import { ENV_ALIASES, REGION_ALIASES } from './normalize';
+import { ENV_ALIASES } from './normalize';
+import { REGIONS } from './regions-data';
 import { MIN_TOKEN, PROTECTED } from './types';
 import { coreBaseline, coreBaselineCodes } from './baseline-inputs';
 
@@ -84,7 +85,7 @@ function fingerprintOf(parts: unknown): string {
 
 function currentParts() {
   return {
-    rules: rulesData(), shortWords: SHORT_WORDS, envAliases: ENV_ALIASES, regionAliases: REGION_ALIASES,
+    rules: rulesData(), shortWords: SHORT_WORDS, envAliases: ENV_ALIASES, regions: REGIONS,
     protected: PROTECTED, minToken: MIN_TOKEN, labelLimits: LABEL_LIMITS, awsTagValue: AWS_TAG_VALUE,
     outputs: coreBaseline(), violationCodes: coreBaselineCodes(), sources: coreSources(),
   };

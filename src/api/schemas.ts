@@ -13,7 +13,8 @@ import { clipForDisplay } from '../core/display';
 export interface Rejection { status: 400 | 409; errors: Message[]; supported?: string[] }
 export type Parsed<T> = { ok: true; value: T } | { ok: false; rejection: Rejection };
 
-export interface GenerateInput { context: NamingContext; transformed: CoreMessage[]; providers: Provider[] }
+/** contexts — 지역을 CSP 마다 풀어(D49) provider 마다 문맥 하나. transformed 는 provider 순서로 모은 것(같은 기록은 한 번) */
+export interface GenerateInput { contexts: Partial<Record<Provider, NamingContext>>; transformed: CoreMessage[]; providers: Provider[] }
 export interface NamesInput { provider: Provider; context: NamingContext; transformed: CoreMessage[]; items: SelectionItem[] }
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
@@ -107,9 +108,21 @@ export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
     if (wrong.length > 0) return reject(wrong, enabledList());
     providers = [...new Set(body.providers.filter(isProvider))];
   }
-  const parsed = parseContext(body.context as RawContext);
-  if (!parsed.ok) return reject(parsed.errors);
-  return { ok: true, value: { context: parsed.context, transformed: parsed.transformed, providers } };
+  // 지역은 CSP 마다 다른 표로 푼다 (D49) — 하나라도 실패하면 400. 같은 오류 · 기록은 한 번만 싣는다
+  const contexts: Partial<Record<Provider, NamingContext>> = {};
+  const errors: CoreMessage[] = [];
+  const transformed: CoreMessage[] = [];
+  const addOnce = (into: CoreMessage[], ms: readonly CoreMessage[]) => {
+    for (const m of ms) if (!into.some((x) => JSON.stringify(x) === JSON.stringify(m))) into.push(m);
+  };
+  for (const p of providers) {
+    const parsed = parseContext(body.context as RawContext, p);
+    if (!parsed.ok) { addOnce(errors, parsed.errors); continue; }
+    contexts[p] = parsed.context;
+    addOnce(transformed, parsed.transformed);
+  }
+  if (errors.length > 0) return reject(errors);
+  return { ok: true, value: { contexts, transformed, providers } };
 }
 
 export function parseValidateBody(body: unknown): Parsed<ValidateInput> {
@@ -167,7 +180,7 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
   ];
   if (long.length > 0) return reject(long);
 
-  const parsed = parseContext(body.context as RawContext);
+  const parsed = parseContext(body.context as RawContext, provider);
   const selection = validateSelection(provider, body.resources);
   // 문맥 오류와 선택 오류를 함께 — 한 번에 고칠 수 있게. 문맥이 먼저다
   const errors: Message[] = [...(parsed.ok ? [] : parsed.errors), ...(selection.ok ? [] : selection.errors.map((m) => echoSafe(m, resources)))];

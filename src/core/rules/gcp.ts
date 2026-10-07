@@ -136,7 +136,8 @@ const CATALOG_BY_RULE = new Map(GCP_CATALOG.flatMap((row) => Object.entries(row.
 
 /** catalog 가 규칙 위에 덮는다 (D47) — 약어 · entity(행에 있을 때) · 지역 토큰 종류 · 종류 표.
  *  지역 토큰이 none 이면 템플릿과 optional 에서 region 을 함께 뺀다(optional 은 template 에 있는 토큰만).
- *  종류 토큰을 이름에 넣는 일 · 존 규칙의 optional 은 여기서 하지 않는다. category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
+ *  zone 이면 optional 에서만 뺀다 (D51) — 축소 1단계가 존 코드를 떼면 존만 다른 두 이름(ane3a · ane3b)이 같아진다.
+ *  종류 토큰을 이름에 넣는 일은 여기서 하지 않는다. category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
 export function applyCatalog(rule: ResourceRule): ResourceRule {
   const hit = CATALOG_BY_RULE.get(rule.id);
   if (!hit) throw new Error(`GCP rule not in catalog: ${rule.id}`);
@@ -147,7 +148,7 @@ export function applyCatalog(rule: ResourceRule): ResourceRule {
     slug: row.slug.value,
     entity: row.entity ?? rule.entity,
     template: dropRegion(rule.template),
-    optional: dropRegion(rule.optional),
+    optional: spec.regionToken === 'zone' ? rule.optional.filter((t) => t !== 'region') : dropRegion(rule.optional),
     regionToken: spec.regionToken,
     ...(row.kind && spec.kinds ? {
       kinds: { rule: row.kind.rule, default: spec.kinds.default, allowed: spec.kinds.allowed, tokens: row.kind.tokens, omitValues: row.kind.omitValues },

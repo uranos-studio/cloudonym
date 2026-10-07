@@ -3,12 +3,11 @@ import { describe, it, expect } from 'vitest';
 import { generate, parseContext, validateName } from '../core/engine';
 import { labelsFor } from '../core/labels';
 import { MESSAGE_CODES } from '../core/messages';
-import { PROVIDERS } from '../core/types';
 import { API_CODES } from './codes';
 import { en } from '../messages/en';
 import type { Catalog } from '../messages/catalog';
 import { toWireGenerate, toWireValidate, type ProviderResult } from './serialize';
-import { BASELINE_CONTEXTS, baselineValidateCases } from '../core/baseline-inputs';
+import { BASELINE_CONTEXTS, baselineProviders, baselineRaw, baselineValidateCases } from '../core/baseline-inputs';
 import { VERSION } from '../version';
 
 const stub = {
@@ -32,18 +31,20 @@ describe('사전을 바꿔도 이름 · 판정 · 코드 · params 는 같다', 
   });
   it('기준선 문맥 전부 — generate', () => {
     let n = 0;
-    for (const { raw } of BASELINE_CONTEXTS) {
-      const parsed = parseContext(raw);
-      if (!parsed.ok) continue;
-      const out = generate(parsed.context);
-      const results: ProviderResult[] = PROVIDERS.map((p) => ({ provider: p, names: out[p] ?? {}, labels: labelsFor(parsed.context, p) }));
-      const a = toWireGenerate(results, parsed.transformed, VERSION, en);
-      const b = toWireGenerate(results, parsed.transformed, VERSION, stub);
-      expect(withoutMessage(b)).toEqual(withoutMessage(a));
-      expect(JSON.stringify(b)).toContain('"message":"X"');
-      n++;
+    for (const c of BASELINE_CONTEXTS) {
+      for (const p of baselineProviders(c)) {
+        const parsed = parseContext(baselineRaw(c, p), p);
+        if (!parsed.ok) continue;
+        const out = generate(parsed.context, [p]);
+        const results: ProviderResult[] = [{ provider: p, names: out[p] ?? {}, labels: labelsFor(parsed.context, p) }];
+        const a = toWireGenerate(results, parsed.transformed, VERSION, en);
+        const b = toWireGenerate(results, parsed.transformed, VERSION, stub);
+        expect(withoutMessage(b)).toEqual(withoutMessage(a));
+        expect(JSON.stringify(b)).toContain('"message":"X"');
+        n++;
+      }
     }
-    expect(n).toBeGreaterThan(10);
+    expect(n).toBeGreaterThan(30);
   });
   it('기준선 검증 입력 전부 — validate', () => {
     for (const c of baselineValidateCases()) {

@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { generate, generateMany, validateName, parseContext } from './engine';
 import { getRule, rulesFor } from './constraints';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+import { REGIONS } from './regions-data';
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
 
 describe('generate', () => {
   it('① 응답 예시: GCP SA 는 축약, Azure Storage 는 변환(하이픈 제거)', () => {
     const out = generate(ctx, ['gcp', 'azure']);
-    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prod-sa-sync', valid: true, isTruncated: true, original: 'infra-billing-trade-prod-kr-sa-sync' });
+    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prod-sa-sync', valid: true, isTruncated: true, original: 'infra-billing-trade-prod-ane3-sa-sync' });
     expect(out.azure?.storage_account).toMatchObject({ name: 'stbillingtradeprod', valid: true, isTransformed: true });
     expect(out.azure?.storage_account.steps).toContainEqual({ code: 'step.separator_removed' });
     expect(out.aws).toBeUndefined();
@@ -23,7 +24,7 @@ describe('generate', () => {
   });
   it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유', () => {
     const vm = generate({ ...ctx, system: '3tier' }, ['gcp']).gcp!.compute_instance;
-    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prod-kr-gce-01', violations: [{ code: 'name.first_not_letter' }] });
+    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prod-ane3a-gce-01', violations: [{ code: 'name.first_not_letter' }] });
   });
   it('긴 owner 는 optional 생략으로 들어간다', () => {
     const p = generate({ ...ctx, owner: 'a'.repeat(40) }, ['gcp']).gcp!.project_id;   // owner 생략 → billing-trade-prod
@@ -49,29 +50,29 @@ describe('generate', () => {
     expect(out.project_id.steps).toContainEqual({ code: 'step.normalized', field: 'owner', params: { from: '홍길동', to: '' } });
   });
   it('한 글자 system 은 축소 대상이 아니다 — GCP compute_instance 유효', () => {
-    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prod-kr-gce-01', valid: true });
+    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prod-ane3a-gce-01', valid: true });
   });
 });
 
 describe('parseContext', () => {
   it('빈 purpose 는 막는다', () => {
-    expect(parseContext({ ...ctx, purpose: ' ' })).toMatchObject({ ok: false, errors: [{ code: 'context.empty', field: 'purpose' }] });
+    expect(parseContext({ ...ctx, purpose: ' ' }, 'gcp')).toMatchObject({ ok: false, errors: [{ code: 'context.empty', field: 'purpose' }] });
   });
   it('TC-COM-02 env 별칭은 변환 기록과 함께 통과', () => {
-    expect(parseContext({ ...ctx, env: 'production' })).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [{ code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' } }] });
+    expect(parseContext({ ...ctx, env: 'production' }, 'gcp')).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [{ code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' } }] });
   });
   it('옛 표준값 prd 는 별칭이다 — prod 로 바꾸고 기록한다 (D48)', () => {
-    expect(parseContext({ ...ctx, env: 'prd' })).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [{ code: 'context.normalized', field: 'env', params: { from: 'prd', to: 'prod' } }] });
+    expect(parseContext({ ...ctx, env: 'prd' }, 'gcp')).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [{ code: 'context.normalized', field: 'env', params: { from: 'prd', to: 'prod' } }] });
   });
   it('prod 는 표준값이라 바꾼 기록이 없다 (D48)', () => {
-    expect(parseContext({ ...ctx, env: 'prod' })).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [] });
+    expect(parseContext({ ...ctx, env: 'prod' }, 'gcp')).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [] });
   });
   it('모르는 env · 문자열 아닌 값', () => {
-    expect(parseContext({ ...ctx, env: 'qa' })).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] } }] });
-    expect(parseContext({ ...ctx, owner: 3 })).toMatchObject({ ok: false });
+    expect(parseContext({ ...ctx, env: 'qa' }, 'gcp')).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] } }] });
+    expect(parseContext({ ...ctx, owner: 3 }, 'gcp')).toMatchObject({ ok: false });
   });
   it('모르는 region 문구와 필드 순서', () => {
-    expect(parseContext({ ...ctx, region: 'mars', owner: '' })).toEqual({ ok: false, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: ['kr', 'us', 'jp', 'eu', 'global'] } }] });
+    expect(parseContext({ ...ctx, region: 'mars', owner: '' }, 'gcp')).toEqual({ ok: false, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: REGIONS.gcp.map((r) => r.region) } }] });
   });
 });
 
@@ -132,7 +133,7 @@ describe('2026-09-28 고침', () => {
   });
   it('숫자만 넣어도 generate 의 Windows VM 이름은 숫자만으로 되지 않는다 (slug vm 이 늘 든다)', () => {
     // env dev — prod(4자)면 12-34-prod-vm-01 이 16자라 축소에 실패한다(D48). 여기서 보는 것은 숫자만인 이름이 나오지 않는다는 것이다
-    const w = generate({ owner: '1', system: '12', purpose: '34', env: 'dev', region: 'kr' }, ['azure']).azure!.virtual_machine_windows;
+    const w = generate({ owner: '1', system: '12', purpose: '34', env: 'dev', region: 'krc' }, ['azure']).azure!.virtual_machine_windows;
     expect(w.valid).toBe(true);
     expect(w.name).not.toMatch(/^\d+$/);
     expect(validateName('azure', 'virtual_machine_windows', w.name).valid).toBe(true);
@@ -157,7 +158,7 @@ describe('2026-09-28 고침', () => {
 });
 
 describe('generateMany (D30\' · D41)', () => {
-  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
   const rule = (p: 'aws' | 'gcp' | 'azure', t: string) => getRule(p, t)!;
 
   it('항목 순서 = 선택 순서 → 순번 순서 · count 2 → 01 02', () => {
@@ -167,7 +168,7 @@ describe('generateMany (D30\' · D41)', () => {
     ]);
     expect(r.items.map((i) => i.key)).toEqual(['subnet_01', 'subnet_02', 'virtual_machine_01', 'virtual_machine_02']);
     expect(r.items.map((i) => i.seq)).toEqual(['01', '02', '01', '02']);
-    expect(r.items[3]!.name).toBe('billing-trade-prod-kr-vm-02');
+    expect(r.items[3]!.name).toBe('billing-trade-prod-ane3-vm-02');
     expect(r).toMatchObject({ provider: 'azure', valid: true, conflicts: [] });
   });
 
@@ -233,15 +234,15 @@ describe('함수 1 · 2세대 — entity 가 같아 같은 이름이면 충돌�
   const keys = ['cloud_function_gen1', 'cloud_function'];
   it('generateMany 로 같이 고르면 둘 다 valid:false + name.conflict', () => {
     const r = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'cloud_function_gen1')!, count: 1 }, { rule: getRule('gcp', 'cloud_function')!, count: 1 }]);
-    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-kr-gcf-01', 'billing-trade-prod-kr-gcf-01']);
-    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prod-kr-gcf-01', keys: ['cloud_function_gen1_01', 'cloud_function_01'] } };
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-ane3-gcf-01', 'billing-trade-prod-ane3-gcf-01']);
+    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prod-ane3-gcf-01', keys: ['cloud_function_gen1_01', 'cloud_function_01'] } };
     for (const it of r.items) expect(it).toMatchObject({ valid: false, violations: [msg] });
     expect(r.conflicts).toEqual([msg]);
   });
   it('generate(전체 카탈로그)에서도 둘 다 valid:false + name.conflict — 키는 resourceType', () => {
     const gcp = generate(ctx, ['gcp']).gcp!;
-    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prod-kr-gcf-01', keys } };
-    for (const k of keys) expect(gcp[k]).toMatchObject({ name: 'billing-trade-prod-kr-gcf-01', valid: false, violations: [msg] });
+    const msg = { code: 'name.conflict', params: { name: 'billing-trade-prod-ane3-gcf-01', keys } };
+    for (const k of keys) expect(gcp[k]).toMatchObject({ name: 'billing-trade-prod-ane3-gcf-01', valid: false, violations: [msg] });
     // 둘 사이 항목 위반은 서로 다른 객체다
     expect(gcp[keys[0]!]!.violations[0]).not.toBe(gcp[keys[1]!]!.violations[0]);
   });
@@ -253,7 +254,7 @@ describe('함수 1 · 2세대 — entity 가 같아 같은 이름이면 충돌�
 });
 
 describe('메시지에 되돌려 싣는 사용자 값은 이스케이프한 뒤 80자까지 (docs/decisions.md · 2026-10-06 응답 증폭)', () => {
-  const ctx0 = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+  const ctx0 = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' } as const;
   it('step.normalized 의 from 은 보이지 않는 문자를 \\uXXXX 로 바꾸고 80자 + … · to 도 같은 꼴', () => {
     const owner = `A${'\u200B'.repeat(200)}`;
     const r = generate({ ...ctx0, owner }, ['aws'])['aws']!['s3_bucket']!;
@@ -269,9 +270,73 @@ describe('메시지에 되돌려 싣는 사용자 값은 이스케이프한 뒤 
     expect(r.steps.find((m) => m.code === 'step.normalized')).toMatchObject({ params: { from: 'Team A', to: 'team-a' } });
   });
   it('context.value_unsupported 의 value · context.normalized 의 from 도 80자 + …', () => {
-    const bad = parseContext({ ...ctx0, env: 'q'.repeat(1024) });
+    const bad = parseContext({ ...ctx0, env: 'q'.repeat(1024) }, 'gcp');
     expect(bad).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: `${'q'.repeat(80)}…` } }] });
-    const padded = parseContext({ ...ctx0, region: `kr${' '.repeat(500)}` });
-    expect(padded.ok && padded.transformed[0]).toMatchObject({ code: 'context.normalized', field: 'region', params: { from: `kr${' '.repeat(78)}…`, to: 'kr' } });
+    const padded = parseContext({ ...ctx0, region: `asia-northeast3${' '.repeat(500)}` }, 'gcp');
+    expect(padded.ok && padded.transformed[0]).toMatchObject({ code: 'context.normalized', field: 'region', params: { from: `asia-northeast3${' '.repeat(65)}…`, to: 'ane3' } });
   });
+});
+
+describe('지역 · 존 (D49 · D50 · D51)', () => {
+  const raw = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
+  const parse = (region: string, p: 'gcp' | 'aws' | 'azure' = 'gcp') => parseContext({ ...raw, region }, p);
+  const ctxOf = (region: string) => {
+    const r = parse(region);
+    if (!r.ok) throw new Error(`parse failed: ${region}`);
+    return r.context;
+  };
+  const gcp = (t: string) => getRule('gcp', t)!;
+
+  it('리전 이름 → 리전 코드 · 바꾼 기록', () => {
+    expect(parse('asia-northeast3')).toEqual({ ok: true, context: { ...raw, region: 'ane3' },
+      transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'ane3' } }] });
+  });
+  it('존 이름 → 리전 코드 + 존 코드 · 바꾼 기록의 to 는 존 코드', () => {
+    expect(parse('asia-northeast3-a')).toEqual({ ok: true, context: { ...raw, region: 'ane3', zone: 'ane3a' },
+      transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3a' } }] });
+  });
+  it('코드 · global 은 바꾼 기록이 없다', () => {
+    expect(parse('ane3a')).toEqual({ ok: true, context: { ...raw, region: 'ane3', zone: 'ane3a' }, transformed: [] });
+    expect(parse('global')).toEqual({ ok: true, context: { ...raw, region: 'global' }, transformed: [] });
+  });
+  it("옛 나라 값 kr 은 거부 — supported 는 그 CSP 의 한국 리전 이름", () => {
+    expect(parse('kr')).toEqual({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'region', params: { value: 'kr', supported: ['asia-northeast3'] } }] });
+    expect(parse('kr', 'aws')).toMatchObject({ ok: false, errors: [{ params: { supported: ['ap-northeast-2'] } }] });
+    expect(parse('kr', 'azure')).toMatchObject({ ok: false, errors: [{ params: { supported: ['koreacentral', 'koreasouth'] } }] });
+  });
+  it('us 는 GCP 미국 리전 9개 · 모르는 값은 GCP 리전 이름 43개', () => {
+    const supported = (v: string) => { const r = parse(v); return r.ok ? [] : (r.errors[0] as { params: { supported: string[] } }).params.supported; };
+    expect(supported('us')).toHaveLength(9);
+    expect(supported('mars')).toHaveLength(43);
+    expect(supported('mars')[0]).toBe('africa-south1');
+  });
+  it('다른 CSP 의 리전 이름은 거부 — ap-northeast-2 를 GCP 에', () => {
+    expect(parse('ap-northeast-2')).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'region' }] });
+    expect(parse('ap-northeast-2', 'aws')).toMatchObject({ ok: true, context: { region: 'apne2' } });
+  });
+
+  it('존 규칙에 존이 없으면 valid:false + name.zone_required — generateMany', () => {
+    const r = generateMany(ctxOf('asia-northeast3'), 'gcp', [{ rule: gcp('disk'), count: 1 }]);
+    expect(r.items[0]).toMatchObject({ valid: false, name: '', violations: [{ code: 'name.zone_required', params: { region: 'ane3' } }] });
+  });
+  it('존 규칙에 존이 없으면 valid:false + name.zone_required — generate 도 같다 (14 규칙)', () => {
+    const out = generate(ctxOf('asia-northeast3'), ['gcp']).gcp!;
+    const zonal = rulesFor('gcp').filter((r) => r.regionToken === 'zone').map((r) => r.resourceType);
+    expect(zonal).toHaveLength(14);
+    for (const t of zonal) expect(out[t]!.violations.map((v) => v.code), t).toEqual(['name.zone_required']);
+  });
+  it('global 입력이면 존 규칙도 name.zone_required — 존이 없다', () => {
+    expect(generate(ctxOf('global'), ['gcp']).gcp!.disk).toMatchObject({ valid: false, violations: [{ code: 'name.zone_required', params: { region: 'global' } }] });
+  });
+  it('존이 있으면 존 규칙은 존 코드 · 리전 규칙은 리전 코드 · 전역 규칙은 지역 토큰 없음', () => {
+    const r = generateMany(ctxOf('asia-northeast3-a'), 'gcp', [
+      { rule: gcp('disk'), count: 1 }, { rule: gcp('subnet'), count: 1 }, { rule: gcp('vpc_network'), count: 1 }, { rule: gcp('compute_instance'), count: 1 },
+    ]);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-ane3a-disk-01', 'billing-trade-prod-ane3-snet-01', 'billing-trade-prod-vpc-01', 'billing-trade-prod-ane3a-gce-01']);
+    expect(r.valid).toBe(true);
+  });
+  it('global 입력이면 리전 규칙의 지역 토큰이 빈다', () => {
+    expect(generate(ctxOf('global'), ['gcp']).gcp!.subnet).toMatchObject({ valid: true, name: 'billing-trade-prod-snet-01' });
+  });
+  it('compute_instance 는 존 토큰 규칙이다', () => expect(gcp('compute_instance').regionToken).toBe('zone'));
 });

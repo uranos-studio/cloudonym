@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { compose, tokenValues } from './compose';
 import { getRule } from './constraints';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
 
 describe('tokenValues · compose', () => {
-  it('GCP SA 원본 조립은 ① 예시와 같다 (35자)', () => {
+  it('GCP SA 원본 조립은 ① 예시와 같다 (37자)', () => {
     const rule = getRule('gcp', 'service_account')!;
     const name = compose(tokenValues(ctx, rule), rule.template, rule.separator);
-    expect(name).toBe('infra-billing-trade-prod-kr-sa-sync');
-    expect(name.length).toBe(35);
+    expect(name).toBe('infra-billing-trade-prod-ane3-sa-sync');
+    expect(name.length).toBe(37);
   });
   it('Azure Storage 는 구분자 없이 st 앞', () => {
     const rule = getRule('azure', 'storage_account')!;
@@ -34,11 +34,11 @@ describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
   });
   it("seq '07' 을 주면 …-gce-07", () => {
     const vm = getRule('gcp', 'compute_instance')!;
-    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prod-kr-gce-07');
+    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prod-ane3a-gce-07');
   });
   it("role 'db' 를 주면 …-sa-db", () => {
     const sa = getRule('gcp', 'service_account')!;
-    expect(compose(tokenValues(ctx, sa, { role: 'db' }), sa.template, sa.separator)).toBe('infra-billing-trade-prod-kr-sa-db');
+    expect(compose(tokenValues(ctx, sa, { role: 'db' }), sa.template, sa.separator)).toBe('infra-billing-trade-prod-ane3-sa-db');
   });
   it('template 에 없는 토큰은 extra 로 주어도 담지 않는다', () => {
     const rg = getRule('azure', 'resource_group')!;

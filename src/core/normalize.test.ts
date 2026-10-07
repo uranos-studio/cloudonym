@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeToken, canonicalEnv, canonicalRegion } from './normalize';
+import { normalizeToken, canonicalEnv } from './normalize';
 
 describe('normalizeToken', () => {
   it('TC-AWS-01 대문자 → 소문자, 경계 하이픈 제거', () => {
@@ -33,9 +33,3 @@ describe('canonicalEnv (TC-COM-02)', () => {
   });
 });
 
-describe('canonicalRegion', () => {
-  it.each([['korea', 'kr'], ['koreacentral', 'kr'], ['asia-northeast3', 'kr'], ['us-east-1', 'us'], ['GLOBAL', 'global']])('%s → %s', (i, o) => {
-    expect(canonicalRegion(i)).toBe(o);
-  });
-  it('상속 프로퍼티는 undefined', () => expect(canonicalRegion('__proto__')).toBeUndefined());
-});

@@ -1,5 +1,5 @@
 // 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
-import type { CoreMessage, Env, NamingContext, Region } from '../core/types';
+import type { CoreMessage, Env, NamingContext } from '../core/types';
 import { ENV_VALUES, MAX_CONTEXT_CHARS } from '../core/engine';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -13,7 +13,7 @@ const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; pl
 /** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름만 여기 둔다(Record 라 값이 늘면 typecheck 가 잡는다) */
 const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox' };
 const ENVS: ReadonlyArray<{ value: Env; label: string }> = ENV_VALUES.map((value) => ({ value, label: `${value} — ${ENV_NAMES[value]}` }));
-const REGIONS: ReadonlyArray<{ value: Region; label: string }> = [
+const REGIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: 'kr', label: 'kr — Korea' },
   { value: 'us', label: 'us — United States' },
   { value: 'jp', label: 'jp — Japan' },
@@ -89,7 +89,7 @@ export function ContextForm({ value, errors, onChange }: Props) {
         </div>
         <div>
           <label htmlFor="field-region" className={LABEL}>Region</label>
-          <select id="field-region" name="region" value={value.region} onChange={(e) => onChange({ ...value, region: e.target.value as Region })} className={CONTROL}>
+          <select id="field-region" name="region" value={value.region} onChange={(e) => onChange({ ...value, region: e.target.value })} className={CONTROL}>
             {REGIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>

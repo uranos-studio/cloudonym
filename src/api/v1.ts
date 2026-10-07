@@ -50,9 +50,12 @@ v1.post('/generate', async (c) => {
   if (!read.ok) return notJson(c);
   const parsed = parseGenerateBody(read.body);
   if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
-  const { context, providers, transformed } = parsed.value;
-  const out = generate(context, providers);
-  const results: ProviderResult[] = providers.map((p) => ({ provider: p, names: out[p] ?? {}, labels: labelsFor(context, p) }));
+  const { contexts, providers, transformed } = parsed.value;
+  // provider 마다 그 CSP 로 푼 문맥으로 부른다 (D49)
+  const results: ProviderResult[] = providers.map((p) => {
+    const context = contexts[p]!;
+    return { provider: p, names: generate(context, [p])[p] ?? {}, labels: labelsFor(context, p) };
+  });
   c.executionCtx.waitUntil(logTelemetry(c, 'api_generate', { providers }));
   return c.json(toWireGenerate(results, transformed, VERSION));
 });

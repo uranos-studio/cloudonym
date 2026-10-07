@@ -30,7 +30,7 @@
                   "system": "billing",
                   "purpose": "trade",
                   "env": "prod",
-                  "region": "kr"
+                  "region": "asia-northeast3"
                 },
                 "providers": [
                   "gcp"
@@ -131,7 +131,7 @@
                   "system": "billing",
                   "purpose": "trade",
                   "env": "prod",
-                  "region": "kr"
+                  "region": "asia-northeast3-a"
                 },
                 "resources": [
                   {

@@ -4,7 +4,8 @@ import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import { PROVIDERS, type NamingContext, type ResourceRule } from '../core/types';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 
-const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+// region global — 세 CSP 표 모두가 받는 값이라 p 가 무엇이든 그대로 풀린다 (D49). CSP 별 지역은 별칭 시험이 본다
+const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'global' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
 /** 디코더 자체의 시험 — 세 CSP 가 모두 켜진 것으로 푼다. 켜진 CSP 에 따른 동작(D45 · D55)은 맨 아래 절이 기본값(decodeEnabled)으로 본다 */
 const decodeState = (hash: string, rules?: readonly ResourceRule[]) => decodeEnabled(hash, rules, PROVIDERS);
@@ -22,7 +23,7 @@ describe('encodeState — Base64url', () => {
     expect(ctxOf(`#state=${encodeState(ko)}`)).toEqual(ko);
   });
   it('필드 순서가 달라도 같은 문자열 — 다섯 필드만 고정 순서로 담는다', () => {
-    const shuffled = { region: 'kr', env: 'prod', purpose: 'trade', system: 'billing', owner: 'infra', extra: 'x' } as unknown as NamingContext;
+    const shuffled = { region: 'global', env: 'prod', purpose: 'trade', system: 'billing', owner: 'infra', extra: 'x' } as unknown as NamingContext;
     expect(encodeState(shuffled)).toBe(encodeState(ctx));
   });
 });
@@ -52,8 +53,8 @@ describe('decodeState — 깨진 hash 는 전부 undefined', () => {
     expect(stdPlus).toMatch(/[+/]/);
     expect(ctxOf(`state=${stdPlus}`)).toEqual(plus);
   });
-  it('별칭은 parseContext 가 정규화한다 — production · korea → prod · kr', () => {
-    expect(ctxOf(`#state=${b64({ ...ctx, env: 'production', region: 'korea' })}`)).toEqual(ctx);
+  it('별칭은 parseContext 가 정규화한다 — production · asia-northeast3 → prod · ane3', () => {
+    expect(ctxOf(`#state=${b64({ ...ctx, env: 'production', region: 'asia-northeast3' })}`)).toEqual({ ...ctx, region: 'ane3' });
   });
 });
 
@@ -273,8 +274,8 @@ describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다',
     expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: ctx, provider: 'gcp', dropped: 1, unavailable: 'aws' });
   });
   it('지역 칸은 건드리지 않는다 — 지역 변환은 지역 체계 작업의 몫', () => {
-    const d = decodeEnabled(`#state=${b64({ ...ctx, region: 'jp', p: 'azure', r: vm(1) })}`);
-    expect(d?.context.region).toBe('jp');
+    const d = decodeEnabled(`#state=${b64({ ...ctx, region: 'ane1', p: 'azure', r: vm(1) })}`);
+    expect(d?.context.region).toBe('ane1');
   });
   it('p 가 켜진 CSP(gcp)면 그대로 연다 — 안내 없음', () => {
     const d = decodeEnabled(`#state=${b64({ ...ctx, p: 'gcp', r: { compute_instance: 2, project_id: 1 } })}`);

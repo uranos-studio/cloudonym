@@ -27,6 +27,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'step.separator_removed': { code: 'step.separator_removed' },
   'name.token_empty': { code: 'name.token_empty', field: 'system' },
   'name.cannot_fit': { code: 'name.cannot_fit', params: { max: 15 } },
+  'name.zone_required': { code: 'name.zone_required', params: { region: 'ane3' } },
   'rule.unknown_resource_type': { code: 'rule.unknown_resource_type', params: { provider: 'AAA', supported: ['CCC', 'DDD'] } },
   'context.not_string': { code: 'context.not_string', field: 'owner' },
   'context.empty': { code: 'context.empty', field: 'owner' },
@@ -95,7 +96,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(75);
+    expect(codes).toHaveLength(76);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

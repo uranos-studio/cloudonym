@@ -6,7 +6,7 @@ import { validateSelection } from '../core/selection';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from '../core/__fixtures__/conflict';
 import type { NamingContext } from '../core/types';
 
-const ctx: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+const ctx: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'krc' };
 const VERSION = { engine: '9.9.9', rules: '2000-01-01.1' };
 const pick = (r: unknown[]) => {
   const res = validateSelection('azure', r);
@@ -22,8 +22,8 @@ describe('toNamesExport', () => {
     expect(out.provider).toBe('azure');
     expect(out.context).toEqual(ctx);
     expect(out.names).toEqual([
-      { key: 'virtual_machine_01', resource_type: 'virtual_machine', seq: '01', scope: 'azure:resource_group', name: 'billing-trade-prod-kr-vm-01' },
-      { key: 'virtual_machine_02', resource_type: 'virtual_machine', seq: '02', scope: 'azure:resource_group', name: 'billing-trade-prod-kr-vm-02' },
+      { key: 'virtual_machine_01', resource_type: 'virtual_machine', seq: '01', scope: 'azure:resource_group', name: 'billing-trade-prod-krc-vm-01' },
+      { key: 'virtual_machine_02', resource_type: 'virtual_machine', seq: '02', scope: 'azure:resource_group', name: 'billing-trade-prod-krc-vm-02' },
       { key: 'managed_identity_db', resource_type: 'managed_identity', role: 'db', scope: 'azure:resource_group', name: 'billing-trade-prod-id-db' },
       { key: 'resource_group', resource_type: 'resource_group', scope: 'azure:subscription', name: 'rg-billing-trade-prod' },
     ]);
@@ -47,7 +47,7 @@ describe('toNamesExport', () => {
 describe('allNamesText — 유효한 이름만 한 줄에 하나 · 건너뛴 수', () => {
   it('유효만 · 줄바꿈으로', () => {
     const sel = pick([{ type: 'virtual_machine', count: 2 }]);
-    expect(allNamesText(generateMany(ctx, 'azure', sel))).toEqual({ text: 'billing-trade-prod-kr-vm-01\nbilling-trade-prod-kr-vm-02', skipped: 0 });
+    expect(allNamesText(generateMany(ctx, 'azure', sel))).toEqual({ text: 'billing-trade-prod-krc-vm-01\nbilling-trade-prod-krc-vm-02', skipped: 0 });
   });
   it('충돌 fixture — 둘 다 건너뛴다', () => {
     expect(allNamesText(generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION))).toEqual({ text: '', skipped: 2 });

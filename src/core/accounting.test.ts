@@ -57,9 +57,9 @@ const MANY_SAMPLES: readonly { id: string; provider: Provider; raw: RawContext; 
   { id: 'conflict-fixture', provider: 'azure', raw: { ...CONFLICT_CONTEXT }, picks: () => [...CONFLICT_SELECTION] },
 ];
 
-/** 원시 입력 → 새 엔진의 문맥. 지역 · 존 파서가 provider 를 받게 되면 이 한 줄이 바뀐다 */
-function parseFor(raw: RawContext, _provider: Provider) {
-  const parsed = parseContext(raw);
+/** 원시 입력 → 새 엔진의 문맥. 지역은 provider 의 표로 푼다 (D49) */
+function parseFor(raw: RawContext, provider: Provider) {
+  const parsed = parseContext(raw, provider);
   if (!parsed.ok) throw new Error(`이전한 입력이 파싱되지 않는다: ${JSON.stringify(parsed.errors)}`);
   return parsed.context;
 }

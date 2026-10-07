@@ -4,10 +4,10 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BASELINE_CONTEXTS, coreBaseline } from './baseline-inputs';
+import { BASELINE_CONTEXTS, baselineProviders, baselineRaw, coreBaseline } from './baseline-inputs';
 import { generate, parseContext } from './engine';
 import { labelsFor } from './labels';
-import { PROVIDERS, type LabelSet, type Provider } from './types';
+import { PROVIDERS, type GenerateOutput, type LabelSet, type Provider } from './types';
 import { RULES } from './constraints';
 import { outputEntries, toTerraformLocals } from '../components/terraform';
 import { labelsJsonBlocked } from '../components/labelsGate';
@@ -24,15 +24,21 @@ function terraformSkeleton(hcl: string): { assignments: string[]; invalid: strin
 }
 
 function uiBaseline() {
-  return BASELINE_CONTEXTS.flatMap(({ id, raw }) => {
-    const parsed = parseContext(raw);
-    if (!parsed.ok) return [];
-    const out = generate(parsed.context);
+  // 지역을 CSP 마다 푼다 — 파싱된 CSP 만 모아 한 묶음으로 내보낸다
+  return BASELINE_CONTEXTS.flatMap((c) => {
+    const out: GenerateOutput = {};
     const labels: Partial<Record<Provider, LabelSet>> = {};
-    for (const p of PROVIDERS) labels[p] = labelsFor(parsed.context, p);
-    const blocked: Record<string, boolean> = { all: labelsJsonBlocked([...PROVIDERS], labels) };
-    for (const p of PROVIDERS) blocked[p] = labelsJsonBlocked([p], labels);
-    return [{ id, terraform: terraformSkeleton(toTerraformLocals(outputEntries(out), labels)), labelsJsonBlocked: blocked }];
+    for (const p of baselineProviders(c)) {
+      const parsed = parseContext(baselineRaw(c, p), p);
+      if (!parsed.ok) continue;
+      out[p] = generate(parsed.context, [p])[p];
+      labels[p] = labelsFor(parsed.context, p);
+    }
+    const ps = PROVIDERS.filter((p) => out[p]);
+    if (ps.length === 0) return [];
+    const blocked: Record<string, boolean> = { all: labelsJsonBlocked(ps, labels) };
+    for (const p of ps) blocked[p] = labelsJsonBlocked([p], labels);
+    return [{ id: c.id, terraform: terraformSkeleton(toTerraformLocals(outputEntries(out), labels)), labelsJsonBlocked: blocked }];
   });
 }
 
@@ -44,9 +50,10 @@ describe('기준선 — 이름 · 판정 · 제안 · 라벨 · 내보내기가 
   const actual = snapshot();
 
   it('표본이 비어 있지 않다 — 규칙 전부 · 경계 · 파싱 실패가 들어 있다', () => {
-    const base = actual.core.contexts.find((c) => c.id === 'base');
-    expect(base && 'names' in base).toBe(true);
-    const types = PROVIDERS.flatMap((p) => Object.keys((base as { names: Record<string, object> }).names[p] ?? {}));
+    const base = actual.core.contexts.filter((c) => c.id === 'base');
+    expect(base.map((c) => c.provider)).toEqual([...PROVIDERS]);
+    expect(base.every((c) => 'names' in c)).toBe(true);
+    const types = base.flatMap((c) => Object.keys((c as { names: Record<string, object> }).names));
     expect(types.length).toBe(Object.keys(RULES).length);
     expect(actual.core.validate.length).toBeGreaterThan(Object.keys(RULES).length * 10);
     expect(actual.core.contexts.filter((c) => !c.parse.ok).length).toBeGreaterThanOrEqual(5);

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { labelsFor } from './labels';
 import { AWS_TAG_VALUE } from './constraints';
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' } as const;
 
 describe('labelsFor', () => {
   it('공통 다섯 키', () => {

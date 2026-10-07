@@ -11,7 +11,7 @@ import { afterEach, vi } from 'vitest';
 import { VERSION } from '../version';
 import { rulesFor } from '../core/constraints';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
 const post = (body: unknown) => req(app, '/v1/generate', jsonPost(body));
 
 describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
@@ -47,7 +47,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(body.version).toEqual(VERSION);
     expect(body.data.gcp.service_account).toEqual({
       name: 'billing-trade-prod-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'infra-billing-trade-prod-kr-sa-sync', violations: [],
+      original: 'infra-billing-trade-prod-ane3-sa-sync', violations: [],
       steps: [
         { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
         { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
@@ -55,7 +55,10 @@ describe('POST /v1/generate (D15 wire)', () => {
       rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
     expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });
-    expect(body.metadata).toMatchObject({ label_violations: { gcp: [] }, label_transformed: { gcp: [] }, transformed: [] });
+    // 존 이름은 이름에 들어가는 존 코드로 바뀌고 그 기록이 남는다 (D49)
+    expect(body.metadata).toMatchObject({ label_violations: { gcp: [] }, label_transformed: { gcp: [] }, transformed: [
+      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3a' } },
+    ] });
   });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {
     const body = await json((await post({ context: ctx, providers: ['gcp'] })).res);
@@ -76,7 +79,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     const body = await json((await post({ context: { ...ctx, env: 'production', region: 'asia-northeast3' }, providers: ['gcp'] })).res);
     expect(body.metadata.transformed).toEqual([
       { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' }, message: "env 'production' normalised to 'prod'" },
-      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'kr' }, message: "region 'asia-northeast3' normalised to 'kr'" },
+      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'ane3' }, message: "region 'asia-northeast3' normalised to 'ane3'" },
     ]);
     expect(body.data.gcp.service_account.name).toBe('billing-trade-prod-sa-sync');
   });
@@ -151,7 +154,7 @@ describe('되돌려 싣는 사용자 값의 보이지 않는 문자', () => {
 });
 
 describe('POST /v1/names (D39)', () => {
-  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
   const names = (body: unknown, env = {}) => req(app, '/v1/names', jsonPost(body), env);
   afterEach(() => { vi.unstubAllGlobals(); });
 
@@ -167,7 +170,7 @@ describe('POST /v1/names (D39)', () => {
     expect(az.valid).toBe(true);
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
-      'compute_instance_01=billing-trade-prod-kr-gce-01', 'compute_instance_02=billing-trade-prod-kr-gce-02',
+      'compute_instance_01=billing-trade-prod-ane3a-gce-01', 'compute_instance_02=billing-trade-prod-ane3a-gce-02',
       'storage_bucket=platform-billing-trade-prod-gcs', 'service_account_db=billing-trade-prod-sa-db', 'project_id=platform-billing-trade-prod',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
@@ -195,7 +198,7 @@ describe('POST /v1/names (D39)', () => {
   });
   it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
     const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
-    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prod-kr-gce-01', 'billing-trade-prod-kr-disk-01']);
+    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prod-ane3a-gce-01', 'billing-trade-prod-ane3a-disk-01']);
     expect(g.conflicts).toEqual([]);
   });
   it('storage_bucket 에 count 2 → 400 selection.count_not_supported', async () => {

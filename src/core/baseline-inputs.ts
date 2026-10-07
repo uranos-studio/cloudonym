@@ -11,14 +11,22 @@ import { PROVIDERS, type Provider, type RawContext } from './types';
 const HANGUL_OWNER = String.fromCodePoint(0xac1c, 0xbc1c);
 const HANGUL_SYSTEM = String.fromCodePoint(0xb9e4, 0xb9e4); // 정제하면 빈 값이 된다
 
-const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+/** 기본 지역 — 지역은 CSP 마다 다른 표로 푼다 (D49). 서울 리전 이름 */
+const BASE_REGION: Readonly<Record<Provider, string>> = { gcp: 'asia-northeast3', aws: 'ap-northeast-2', azure: 'koreacentral' };
+/** region 이 없는 기본 문맥 — 표본이 region 을 주지 않으면 BASE_REGION(또는 표본의 region 표)을 provider 마다 넣는다 */
+const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
 
-/** 생성 입력 — parseContext 를 거쳐 generate · labelsFor 로 간다 */
-export const BASELINE_CONTEXTS: readonly { id: string; raw: RawContext }[] = [
+/** 생성 입력 표본 하나 — raw 에 region 이 있으면 모든 CSP 에 그 값, 없으면 region 표(없으면 BASE_REGION)의 그 CSP 값.
+ *  providers 가 있으면 그 CSP 에서만 돈다(존은 GCP 에만 있다) */
+export interface BaselineContext { id: string; raw: RawContext; region?: Readonly<Record<Provider, string>>; providers?: readonly Provider[] }
+
+/** 생성 입력 — provider 마다 parseContext 를 거쳐 generate · labelsFor 로 간다 */
+export const BASELINE_CONTEXTS: readonly BaselineContext[] = [
   { id: 'base', raw: BASE },
   { id: 'hangul-owner', raw: { ...BASE, owner: HANGUL_OWNER } },
   { id: 'space-quote-combining-owner', raw: { ...BASE, owner: ' Team "A" café ' } },
-  { id: 'alias-env-region', raw: { ...BASE, env: 'production', region: 'koreacentral' } },
+  // 별칭 env · 대소문자가 섞인 리전 이름 — 둘 다 바꾼 기록이 남는다
+  { id: 'alias-env-region', raw: { ...BASE, env: 'production' }, region: { gcp: 'Asia-Northeast3', aws: 'AP-NORTHEAST-2', azure: 'KoreaCentral' } },
   { id: 'reserved-windows', raw: { ...BASE, system: 'windows' } },
   { id: 'reserved-google', raw: { ...BASE, system: 'google' } },
   { id: 'reserved-azure', raw: { ...BASE, system: 'azure' } },
@@ -33,10 +41,24 @@ export const BASELINE_CONTEXTS: readonly { id: string; raw: RawContext }[] = [
   { id: 'label-gcp-transform', raw: { ...BASE, owner: 'In.Fra' } },
   { id: 'parse-env-qa', raw: { ...BASE, env: 'qa' } },
   { id: 'parse-region-mars', raw: { ...BASE, region: 'mars' } },
+  // 옛 나라 값은 받지 않는다 — supported 는 그 CSP 의 한국 리전 이름 (D49)
+  { id: 'region-country-kr', raw: { ...BASE, region: 'kr' } },
+  // 존 이름 — 존 규칙은 존 코드, 리전 규칙은 리전 코드 (D50)
+  { id: 'region-zone', raw: { ...BASE, region: 'asia-northeast3-a' }, providers: ['gcp'] },
   { id: 'parse-owner-empty', raw: { ...BASE, owner: '   ' } },
   { id: 'parse-owner-number', raw: { ...BASE, owner: 123 } },
   { id: 'parse-missing-all', raw: {} },
 ];
+
+/** 표본이 도는 CSP */
+export const baselineProviders = (c: BaselineContext): readonly Provider[] => c.providers ?? PROVIDERS;
+
+/** 표본의 그 CSP 원시 입력 */
+export function baselineRaw(c: BaselineContext, p: Provider): RawContext {
+  // 빈 문맥(parse-missing-all)은 다섯 필드가 모두 빠진 표본이라 region 도 넣지 않는다
+  if ('region' in c.raw || Object.keys(c.raw).length === 0) return c.raw;
+  return { ...c.raw, region: (c.region ?? BASE_REGION)[p] };
+}
 
 export interface ValidateCase { provider: Provider; resourceType: string; name: string }
 
@@ -70,49 +92,48 @@ export function baselineValidateCases(): ValidateCase[] {
 /** 여러 개 생성 입력 (D30' · D41) — 개수 · 역할 · 같은 부류 다른 이름(Linux+Windows VM) · 충돌 fixture.
  *  문맥은 base 하나(BASELINE_CONTEXTS 는 바꾸지 않는다) — 충돌 fixture 만 자기 문맥을 쓴다 */
 export function baselineMany(): { id: string; result: ManyResult }[] {
-  const base = parseContext(BASE);
-  if (!base.ok) throw new Error('base context must parse');
+  const base = (p: Provider) => {
+    const parsed = parseContext({ ...BASE, region: BASE_REGION[p] }, p);
+    if (!parsed.ok) throw new Error('base context must parse');
+    return parsed.context;
+  };
   const r = (p: Provider, t: string) => getRule(p, t)!;
   return [
-    { id: 'azure-vm2-subnet2-linux-windows-role', result: generateMany(base.context, 'azure', [
+    { id: 'azure-vm2-subnet2-linux-windows-role', result: generateMany(base('azure'), 'azure', [
       { rule: r('azure', 'virtual_machine'), count: 2 }, { rule: r('azure', 'subnet'), count: 2 },
       { rule: r('azure', 'virtual_machine_windows'), count: 1 }, { rule: r('azure', 'managed_identity'), count: 1, role: 'db' },
     ]) },
-    { id: 'gcp-vm2-sa-db', result: generateMany(base.context, 'gcp', [
+    { id: 'gcp-vm2-sa-db', result: generateMany(base('gcp'), 'gcp', [
       { rule: r('gcp', 'compute_instance'), count: 2 }, { rule: r('gcp', 'service_account'), count: 1, role: 'db' },
     ]) },
-    { id: 'aws-ec2-2-role-db', result: generateMany(base.context, 'aws', [
+    { id: 'aws-ec2-2-role-db', result: generateMany(base('aws'), 'aws', [
       { rule: r('aws', 'ec2_instance'), count: 2 }, { rule: r('aws', 'iam_role'), count: 1, role: 'db' },
     ]) },
     { id: 'conflict-fixture', result: generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION) },
   ];
 }
 
+/** 표본 × CSP — 지역을 CSP 마다 풀므로 파싱 · 생성도 CSP 마다 한다 */
+function eachContext() {
+  return BASELINE_CONTEXTS.flatMap((c) => baselineProviders(c).map((p) => ({ id: c.id, provider: p, parsed: parseContext(baselineRaw(c, p), p) })));
+}
+
 /** 엔진 쪽 기준선 — 이름 · 판정 · 제안 · 라벨. 문구 대신 개수를 담는다 */
 export function coreBaseline() {
-  const contexts = BASELINE_CONTEXTS.map(({ id, raw }) => {
-    const parsed = parseContext(raw);
-    if (!parsed.ok) return { id, parse: { ok: false, errors: parsed.errors.length } };
-    const names: Record<string, Record<string, unknown>> = {};
-    const out = generate(parsed.context);
-    for (const p of PROVIDERS) {
-      names[p] = {};
-      for (const [type, r] of Object.entries(out[p] ?? {})) {
-        names[p][type] = {
-          name: r.name, valid: r.valid, isTruncated: r.isTruncated, isTransformed: r.isTransformed, original: r.original,
-          violations: r.violations.length, steps: r.steps.length,
-        };
-      }
+  const contexts = eachContext().map(({ id, provider: p, parsed }) => {
+    if (!parsed.ok) return { id, provider: p, parse: { ok: false, errors: parsed.errors.length } };
+    const names: Record<string, unknown> = {};
+    for (const [type, r] of Object.entries(generate(parsed.context, [p])[p] ?? {})) {
+      names[type] = {
+        name: r.name, valid: r.valid, isTruncated: r.isTruncated, isTransformed: r.isTransformed, original: r.original,
+        violations: r.violations.length, steps: r.steps.length,
+      };
     }
-    const labels: Record<string, unknown> = {};
-    for (const p of PROVIDERS) {
-      const set = labelsFor(parsed.context, p);
-      labels[p] = { labels: set.labels, violations: set.violations.length, transformed: set.transformed.length };
-    }
+    const set = labelsFor(parsed.context, p);
     return {
-      id,
+      id, provider: p,
       parse: { ok: true, context: parsed.context, transformed: parsed.transformed.length },
-      names, labels,
+      names, labels: { labels: set.labels, violations: set.violations.length, transformed: set.transformed.length },
     };
   });
   const validate = baselineValidateCases().map((c) => {
@@ -133,17 +154,10 @@ export function coreBaseline() {
  *  같은 개수에서 다른 이유로 바뀌는 변경도 지문이 잡는다. 문장은 담지 않는다 (문장은 사전 몫이다) */
 export function coreBaselineCodes() {
   const codes = (ms: readonly { code: string }[]) => ms.map((m) => m.code);
-  const contexts = BASELINE_CONTEXTS.map(({ id, raw }) => {
-    const parsed = parseContext(raw);
-    if (!parsed.ok) return { id, errors: codes(parsed.errors) };
-    const out = generate(parsed.context);
-    const names: Record<string, Record<string, string[]>> = {};
-    const labels: Record<string, string[]> = {};
-    for (const p of PROVIDERS) {
-      names[p] = Object.fromEntries(Object.entries(out[p] ?? {}).map(([type, r]) => [type, codes(r.violations)]));
-      labels[p] = codes(labelsFor(parsed.context, p).violations);
-    }
-    return { id, names, labels };
+  const contexts = eachContext().map(({ id, provider: p, parsed }) => {
+    if (!parsed.ok) return { id, provider: p, errors: codes(parsed.errors) };
+    const names = Object.fromEntries(Object.entries(generate(parsed.context, [p])[p] ?? {}).map(([type, r]) => [type, codes(r.violations)]));
+    return { id, provider: p, names, labels: codes(labelsFor(parsed.context, p).violations) };
   });
   const validate = baselineValidateCases().map((c) => codes(validateName(c.provider, c.resourceType, c.name).violations));
   const many = baselineMany().map(({ id, result }) => ({ id, items: result.items.map((i) => codes(i.violations)), conflicts: codes(result.conflicts) }));

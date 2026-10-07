@@ -147,9 +147,11 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   if (FREE_FIELDS.some((f) => { const v = (raw as Record<string, unknown>)[f]; return typeof v === 'string' && v.length > MAX_CONTEXT_CHARS; })) return undefined;
-  const parsed = parseContext(raw as RawContext);
-  if (!parsed.ok) return undefined;
   const { v, p, r } = raw as Record<string, unknown>;
+  // 지역은 CSP 마다 다른 표로 푼다 (D49) — 링크의 p 가 켜져 있으면 그 표, 아니면 켜진 CSP 를 차례로 대어 처음 풀리는 표
+  const tryAs = isProvider(p) && enabled.includes(p) ? [p] : enabled;
+  const parsed = tryAs.map((q) => parseContext(raw as RawContext, q)).find((x) => x.ok);
+  if (!parsed?.ok) return undefined;
   const out: DecodedState = typeof v === 'string' && RULES_VERSION_RE.test(v) ? { context: parsed.context, rulesVersion: v } : { context: parsed.context };
   if (isProvider(p) && enabled.includes(p)) {
     out.provider = p;

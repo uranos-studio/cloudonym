@@ -1,4 +1,4 @@
-import type { Allowed, Env, Region } from './types';
+import type { Allowed, Env } from './types';
 import { lookup } from './dict';
 
 /** 표 순서가 표준값 순서다 — parseContext 의 supported · 화면의 env 고르기 · llms.txt 가 이 순서를 쓴다.
@@ -11,13 +11,6 @@ export const ENV_ALIASES: Record<string, Env> = {
 };
 /** env 표준값 — 별칭 표의 값을 표 순서대로 (prod · stg · dev · sbx) */
 export const ENV_VALUES: readonly Env[] = [...new Set(Object.values(ENV_ALIASES))];
-export const REGION_ALIASES: Record<string, Region> = {
-  kr: 'kr', korea: 'kr', koreacentral: 'kr', 'asia-northeast3': 'kr', 'ap-northeast-2': 'kr',
-  us: 'us', 'us-east-1': 'us', 'us-central1': 'us', eastus: 'us',
-  jp: 'jp', japan: 'jp', 'ap-northeast-1': 'jp', 'asia-northeast1': 'jp', japaneast: 'jp',
-  eu: 'eu', europe: 'eu', 'eu-west-1': 'eu', 'europe-west1': 'eu', westeurope: 'eu',
-  global: 'global',
-};
 
 const STRIP: Record<Allowed, RegExp> = {
   'lower-digit': /[^a-z0-9]/g,
@@ -37,7 +30,4 @@ export function normalizeToken(value: string, allowed: Allowed): { value: string
 
 export function canonicalEnv(raw: string): Env | undefined {
   return lookup(ENV_ALIASES, raw.trim().toLowerCase());
-}
-export function canonicalRegion(raw: string): Region | undefined {
-  return lookup(REGION_ALIASES, raw.trim().toLowerCase());
 }

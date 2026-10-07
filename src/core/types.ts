@@ -9,10 +9,11 @@ export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
  *  꺼진 CSP 는 데이터를 남기고 노출만 끈다. 다음 CSP 를 여는 것은 이 배열에 더하는 것이다 */
 export const ENABLED_PROVIDERS: readonly Provider[] = ['gcp'];
 export type Env = 'prod' | 'stg' | 'dev' | 'sbx';
-export type Region = 'kr' | 'us' | 'jp' | 'eu' | 'global';
 
+/** region 은 그 CSP 의 리전 코드(ane3 · apne2 · krc) 또는 'global' · zone 은 존 코드(ane3a) — 존 이름 · 존 코드를 넣었을 때만 (D49 · D50).
+ *  코드 표는 regions-data.ts 이고 parseContext 가 provider 마다 푼다 */
 export interface NamingContext {
-  owner: string; system: string; purpose: string; env: Env; region: Region;
+  owner: string; system: string; purpose: string; env: Env; region: string; zone?: string;
 }
 /** 사용자가 보낸 그대로 — env/region 은 별칭일 수 있다 */
 export interface RawContext {
@@ -20,8 +21,8 @@ export interface RawContext {
 }
 
 export type Token = 'owner' | 'system' | 'purpose' | 'env' | 'region' | 'slug' | 'seq' | 'role';
-/** 축소에서 손대지 않는 토큰 (D13) */
-export const PROTECTED: readonly Token[] = ['slug', 'seq', 'role', 'env'];
+/** 축소에서 손대지 않는 토큰 (D13 · D51) — region 은 2단계(단축 · 균등 예산)에서 자르지 않는다. 1단계는 optional 이면 통째로 뗀다 */
+export const PROTECTED: readonly Token[] = ['slug', 'seq', 'role', 'env', 'region'];
 /** 축소 뒤 가변 토큰의 최소 길이 (D13) */
 export const MIN_TOKEN = 2;
 
@@ -78,7 +79,7 @@ export interface ResourceRule {
   uniquenessDocUrl?: string;  // 범위 근거가 docUrl 과 다른 쪽에 있을 때 그 URL
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
-  regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(catalog.ts regionTokenOf)
+  regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(compose.ts regionTokenOfRule)
   kinds?: RuleKinds;          // catalog 에 종류 표가 있는 규칙만
 }
 

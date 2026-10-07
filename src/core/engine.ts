@@ -1,8 +1,9 @@
 // 엔진 공개 API — API 와 화면은 generate · validateName · parseContext · generateMany 넷을 부른다 (선택 검증은 selection.ts)
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { getRule, rulesFor } from './constraints';
-import { ENV_VALUES, REGION_ALIASES, canonicalEnv, canonicalRegion, normalizeToken } from './normalize';
-import { compose, tokenValues, type ItemExtra } from './compose';
+import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
+import { canonicalRegion, regionCandidates } from './regions';
+import { compose, regionTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { SelectionItem } from './selection';
 import { inputKind } from './tree';
@@ -33,6 +34,11 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
             // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게
             notes: (rule.notes ?? []).map((m) => structuredClone(m)) },
   };
+
+  // 존 규칙에 존이 없다 (D50) — generate · generateMany 둘 다 여기를 지난다. 빈 지역 자리를 token_empty 로 알리기 전에 본다
+  if (regionTokenOfRule(rule) === 'zone' && !ctx.zone) {
+    return { ...base, name: '', valid: false, isTruncated: false, violations: [{ code: 'name.zone_required', params: { region: ctx.region } }], steps };
+  }
 
   // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다
   const emptied = rule.template.filter((t) => !rule.optional.includes(t) && !values[t]);
@@ -135,9 +141,6 @@ export function validateName(provider: Provider, resourceType: string, name: str
 
 /** env 표준값 — 화면의 env 고르기가 쓰는 공개 API (D48). 정본은 normalize.ts 의 별칭 표다 */
 export { ENV_VALUES };
-/** 지원하는 표준값 — 별칭 표의 값에서 뽑는다(순서는 표 순서: env 는 ENV_VALUES / kr · us · jp · eu · global) */
-const REGION_VALUES = (): string[] => [...new Set(Object.values(REGION_ALIASES))];
-
 const FIELDS: readonly ContextField[] = ['owner', 'system', 'purpose', 'env', 'region'];
 
 /** 자유 입력(owner · system · purpose) 하나의 길이 상한 — 이름 규칙이 아니라 전송 위생이다. API 와 화면 입력 · 공유 hash 가 이 값을 쓴다.
@@ -145,7 +148,9 @@ const FIELDS: readonly ContextField[] = ['owner', 'system', 'purpose', 'env', 'r
  *  parseContext 는 길이를 보지 않는다 — 엔진을 직접 부르는 시험 · 기준선은 더 긴 값도 넣는다 */
 export const MAX_CONTEXT_CHARS = 64;
 
-export function parseContext(raw: RawContext):
+/** 원시 문맥 → 엔진 문맥. region 은 provider 의 지역 표로 푼다 (D49) — 리전 이름 · 존 이름 · 코드 · global.
+ *  받지 않는 지역이면 supported 에 후보(옛 나라 값이면 그 나라의 리전 이름, 아니면 그 CSP 리전 이름 전부) */
+export function parseContext(raw: RawContext, provider: Provider):
   { ok: true; context: NamingContext; transformed: CoreMessage[] } | { ok: false; errors: CoreMessage[] } {
   const errors: CoreMessage[] = [];
   const transformed: CoreMessage[] = [];
@@ -161,10 +166,13 @@ export function parseContext(raw: RawContext):
       if (c !== v) transformed.push({ code: 'context.normalized', field: 'env', params: { from: clipForDisplay(v), to: c } });
       vals[f] = c;
     } else if (f === 'region') {
-      const c = canonicalRegion(v);
-      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: clipForDisplay(v), supported: REGION_VALUES() } }); continue; }
-      if (c !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: clipForDisplay(v), to: c } });
-      vals[f] = c;
+      const c = canonicalRegion(v, provider);
+      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: clipForDisplay(v), supported: regionCandidates(v, provider) } }); continue; }
+      // 이름에 들어가는 코드(존이면 존 코드)와 입력이 다르면 기록한다 — 리전 · 존 이름은 코드로 바뀐다
+      const to = c.zone ?? c.region;
+      if (to !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: clipForDisplay(v), to } });
+      vals[f] = c.region;
+      if (c.zone) vals.zone = c.zone;
     } else {
       vals[f] = v.trim();
     }

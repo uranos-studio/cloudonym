@@ -57,9 +57,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(st).toMatch(/forbidden: prefixes login; contains microsoft windows; words access [^;]* azure /);
     expect(st).toContain('case-insensitive');
   });
-  it('허용값 절은 ENV_ALIASES · REGION_ALIASES 의 표준값과 별칭', () => {
+  it('허용값 절은 ENV_ALIASES · 켜진 CSP 지역 표의 표준값과 별칭', () => {
     expect(text).toContain('- `prod` — aliases: prd, production, real, live');
-    expect(text).toContain('- `kr` — aliases: korea, koreacentral, asia-northeast3, ap-northeast-2');
+    expect(text).toContain('- `ane3` — aliases: asia-northeast3');
+    expect(text).not.toContain('- `kr`');
     expect(text).toContain('- `global`');
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {

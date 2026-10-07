@@ -10,9 +10,9 @@ export const MESSAGE_CODES = [
   'name.empty', 'name.too_long', 'name.too_short', 'name.first_not_letter', 'name.last_not_alnum', 'name.pattern_mismatch',
   'name.consecutive_separator', 'name.forbidden_prefix', 'name.forbidden_suffix', 'name.forbidden_substring',
   'name.forbidden_exact', 'name.forbidden_word', 'name.ipv4_form',
-  // engine.ts (9)
+  // engine.ts (10)
   'step.normalized', 'step.separator_removed', 'name.token_empty', 'name.cannot_fit', 'rule.unknown_resource_type',
-  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized',
+  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.zone_required',
   // truncate.ts (3)
   'step.token_dropped', 'step.abbreviated', 'step.budget_shortened',
   // labels.ts (3)
@@ -50,6 +50,8 @@ export type CoreMessage =
   | { code: 'step.separator_removed' }
   | { code: 'name.token_empty'; field: Token }
   | { code: 'name.cannot_fit'; params: { max: number } }
+  /** 존 규칙(regionToken zone)에 존이 없다 — region 은 문맥의 리전 코드 또는 global (D50) */
+  | { code: 'name.zone_required'; params: { region: string } }
   | { code: 'rule.unknown_resource_type'; params: { provider: string; supported: string[] } }
   | { code: 'context.not_string'; field: ContextField }
   | { code: 'context.empty'; field: ContextField }

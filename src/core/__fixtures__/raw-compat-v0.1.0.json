@@ -1,61 +1,47 @@
 {
   "base": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -63,61 +49,47 @@
   },
   "hangul-owner": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "개발",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "개발",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "개발",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -125,61 +97,47 @@
   },
   "space-quote-combining-owner": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "Team \"A\" café",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "Team \"A\" café",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "Team \"A\" café",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -187,57 +145,106 @@
   },
   "alias-env-region": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
-          "params": {
-            "from": "production",
-            "to": "prod"
-          }
-        },
-        {
-          "code": "context.normalized",
+          "code": "context.value_unsupported",
           "field": "region",
           "params": {
-            "from": "koreacentral",
-            "to": "kr"
+            "value": "koreacentral",
+            "supported": [
+              "us-east-1",
+              "us-east-2",
+              "us-west-1",
+              "us-west-2",
+              "af-south-1",
+              "ap-east-1",
+              "ap-south-2",
+              "ap-southeast-3",
+              "ap-southeast-5",
+              "ap-southeast-4",
+              "ap-south-1",
+              "ap-southeast-6",
+              "ap-northeast-3",
+              "ap-northeast-2",
+              "ap-southeast-1",
+              "ap-southeast-2",
+              "ap-east-2",
+              "ap-southeast-7",
+              "ap-northeast-1",
+              "ca-central-1",
+              "ca-west-1",
+              "eu-central-1",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-south-1",
+              "eu-west-3",
+              "eu-south-2",
+              "eu-north-1",
+              "eu-central-2",
+              "il-central-1",
+              "mx-central-1",
+              "me-south-1",
+              "me-central-1",
+              "sa-east-1"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
-          "params": {
-            "from": "production",
-            "to": "prod"
-          }
-        },
-        {
-          "code": "context.normalized",
+          "code": "context.value_unsupported",
           "field": "region",
           "params": {
-            "from": "koreacentral",
-            "to": "kr"
+            "value": "koreacentral",
+            "supported": [
+              "africa-south1",
+              "asia-east1",
+              "asia-east2",
+              "asia-northeast1",
+              "asia-northeast2",
+              "asia-northeast3",
+              "asia-south1",
+              "asia-south2",
+              "asia-southeast1",
+              "asia-southeast2",
+              "asia-southeast3",
+              "australia-southeast1",
+              "australia-southeast2",
+              "europe-north1",
+              "europe-north2",
+              "europe-central2",
+              "europe-southwest1",
+              "europe-west1",
+              "europe-west2",
+              "europe-west3",
+              "europe-west4",
+              "europe-west6",
+              "europe-west8",
+              "europe-west9",
+              "europe-west10",
+              "europe-west12",
+              "me-central1",
+              "me-central2",
+              "me-west1",
+              "northamerica-northeast1",
+              "northamerica-northeast2",
+              "northamerica-south1",
+              "southamerica-east1",
+              "southamerica-west1",
+              "us-central1",
+              "us-east1",
+              "us-east4",
+              "us-east5",
+              "us-south1",
+              "us-west1",
+              "us-west2",
+              "us-west3",
+              "us-west4"
+            ]
           }
         }
       ]
@@ -249,7 +256,7 @@
         "system": "billing",
         "purpose": "trade",
         "env": "prod",
-        "region": "kr"
+        "region": "krc"
       },
       "transformed": [
         {
@@ -265,7 +272,7 @@
           "field": "region",
           "params": {
             "from": "koreacentral",
-            "to": "kr"
+            "to": "krc"
           }
         }
       ]
@@ -273,61 +280,47 @@
   },
   "reserved-windows": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "windows",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "windows",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "windows",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -335,61 +328,47 @@
   },
   "reserved-google": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "google",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "google",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "google",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -397,61 +376,47 @@
   },
   "reserved-azure": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "azure",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "azure",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "azure",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -459,61 +424,47 @@
   },
   "empty-after-normalize": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "매매",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "매매",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "매매",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -556,61 +507,47 @@
   },
   "shrink-fail": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "a-long",
-        "purpose": "longpurpose",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "a-long",
-        "purpose": "longpurpose",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "a-long",
-        "purpose": "longpurpose",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -618,61 +555,47 @@
   },
   "digit-first-system": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "3tier",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "3tier",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "platform",
-        "system": "3tier",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -680,61 +603,47 @@
   },
   "label-gcp-65": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -742,61 +651,47 @@
   },
   "label-aws-257": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -804,61 +699,47 @@
   },
   "label-aws-invalid-char": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "team#1",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "team#1",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "team#1",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -866,61 +747,47 @@
   },
   "label-gcp-transform": {
     "aws": {
-      "ok": true,
-      "context": {
-        "owner": "In.Fra",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
           }
         }
       ]
     },
     "gcp": {
-      "ok": true,
-      "context": {
-        "owner": "In.Fra",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
           }
         }
       ]
     },
     "azure": {
-      "ok": true,
-      "context": {
-        "owner": "In.Fra",
-        "system": "billing",
-        "purpose": "trade",
-        "env": "prod",
-        "region": "kr"
-      },
-      "transformed": [
+      "ok": false,
+      "errors": [
         {
-          "code": "context.normalized",
-          "field": "env",
+          "code": "context.value_unsupported",
+          "field": "region",
           "params": {
-            "from": "prd",
-            "to": "prod"
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
           }
         }
       ]
@@ -942,6 +809,16 @@
               "sbx"
             ]
           }
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
+          }
         }
       ]
     },
@@ -960,6 +837,16 @@
               "sbx"
             ]
           }
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
+          }
         }
       ]
     },
@@ -976,6 +863,17 @@
               "stg",
               "dev",
               "sbx"
+            ]
+          }
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
             ]
           }
         }
@@ -992,11 +890,40 @@
           "params": {
             "value": "mars",
             "supported": [
-              "kr",
-              "us",
-              "jp",
-              "eu",
-              "global"
+              "us-east-1",
+              "us-east-2",
+              "us-west-1",
+              "us-west-2",
+              "af-south-1",
+              "ap-east-1",
+              "ap-south-2",
+              "ap-southeast-3",
+              "ap-southeast-5",
+              "ap-southeast-4",
+              "ap-south-1",
+              "ap-southeast-6",
+              "ap-northeast-3",
+              "ap-northeast-2",
+              "ap-southeast-1",
+              "ap-southeast-2",
+              "ap-east-2",
+              "ap-southeast-7",
+              "ap-northeast-1",
+              "ca-central-1",
+              "ca-west-1",
+              "eu-central-1",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-south-1",
+              "eu-west-3",
+              "eu-south-2",
+              "eu-north-1",
+              "eu-central-2",
+              "il-central-1",
+              "mx-central-1",
+              "me-south-1",
+              "me-central-1",
+              "sa-east-1"
             ]
           }
         }
@@ -1011,11 +938,49 @@
           "params": {
             "value": "mars",
             "supported": [
-              "kr",
-              "us",
-              "jp",
-              "eu",
-              "global"
+              "africa-south1",
+              "asia-east1",
+              "asia-east2",
+              "asia-northeast1",
+              "asia-northeast2",
+              "asia-northeast3",
+              "asia-south1",
+              "asia-south2",
+              "asia-southeast1",
+              "asia-southeast2",
+              "asia-southeast3",
+              "australia-southeast1",
+              "australia-southeast2",
+              "europe-north1",
+              "europe-north2",
+              "europe-central2",
+              "europe-southwest1",
+              "europe-west1",
+              "europe-west2",
+              "europe-west3",
+              "europe-west4",
+              "europe-west6",
+              "europe-west8",
+              "europe-west9",
+              "europe-west10",
+              "europe-west12",
+              "me-central1",
+              "me-central2",
+              "me-west1",
+              "northamerica-northeast1",
+              "northamerica-northeast2",
+              "northamerica-south1",
+              "southamerica-east1",
+              "southamerica-west1",
+              "us-central1",
+              "us-east1",
+              "us-east4",
+              "us-east5",
+              "us-south1",
+              "us-west1",
+              "us-west2",
+              "us-west3",
+              "us-west4"
             ]
           }
         }
@@ -1030,11 +995,63 @@
           "params": {
             "value": "mars",
             "supported": [
-              "kr",
-              "us",
-              "jp",
-              "eu",
-              "global"
+              "australiacentral",
+              "australiacentral2",
+              "australiaeast",
+              "australiasoutheast",
+              "austriaeast",
+              "belgiumcentral",
+              "brazilsouth",
+              "brazilsoutheast",
+              "canadacentral",
+              "canadaeast",
+              "centralindia",
+              "centralus",
+              "chilecentral",
+              "denmarkeast",
+              "eastasia",
+              "eastus",
+              "eastus2",
+              "francecentral",
+              "francesouth",
+              "germanynorth",
+              "germanywestcentral",
+              "indiasouthcentral",
+              "indonesiacentral",
+              "israelcentral",
+              "italynorth",
+              "japaneast",
+              "japanwest",
+              "koreacentral",
+              "koreasouth",
+              "malaysiawest",
+              "mexicocentral",
+              "newzealandnorth",
+              "northcentralus",
+              "northeurope",
+              "norwayeast",
+              "norwaywest",
+              "polandcentral",
+              "qatarcentral",
+              "southafricanorth",
+              "southafricawest",
+              "southcentralus",
+              "southindia",
+              "southeastasia",
+              "spaincentral",
+              "swedencentral",
+              "switzerlandnorth",
+              "switzerlandwest",
+              "uaecentral",
+              "uaenorth",
+              "uksouth",
+              "ukwest",
+              "westcentralus",
+              "westeurope",
+              "westindia",
+              "westus",
+              "westus2",
+              "westus3"
             ]
           }
         }
@@ -1048,6 +1065,16 @@
         {
           "code": "context.empty",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
+          }
         }
       ]
     },
@@ -1057,6 +1084,16 @@
         {
           "code": "context.empty",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
+          }
         }
       ]
     },
@@ -1066,6 +1103,17 @@
         {
           "code": "context.empty",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
+          }
         }
       ]
     }
@@ -1077,6 +1125,16 @@
         {
           "code": "context.not_string",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "ap-northeast-2"
+            ]
+          }
         }
       ]
     },
@@ -1086,6 +1144,16 @@
         {
           "code": "context.not_string",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "asia-northeast3"
+            ]
+          }
         }
       ]
     },
@@ -1095,6 +1163,17 @@
         {
           "code": "context.not_string",
           "field": "owner"
+        },
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "kr",
+            "supported": [
+              "koreacentral",
+              "koreasouth"
+            ]
+          }
         }
       ]
     }

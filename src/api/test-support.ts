@@ -3,7 +3,7 @@ import type { Hono } from 'hono';
 import type { App, Bindings } from './env';
 import { generateMany } from '../core/engine';
 import { labelsFor } from '../core/labels';
-import { CONFLICT_CONTEXT, CONFLICT_GCP_SELECTION } from '../core/__fixtures__/conflict';
+import { CONFLICT_GCP_CONTEXT, CONFLICT_GCP_SELECTION } from '../core/__fixtures__/conflict';
 import { toWireNames } from './serialize';
 import { VERSION } from '../version';
 
@@ -74,7 +74,7 @@ export function fakeLimiter(mode: 'ok' | 'deny' | 'throw' = 'ok'): { limiter: Ra
 /** 대표 응답 한 건 — 계약 시험(openapi.test)과 한글 0 시험(no-hangul.test)이 같은 표본을 쓴다 */
 export interface Sample { id: string; method: 'GET' | 'POST'; path: string; status: number; body: Loose }
 
-const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
 
 /**
  * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 16KB · 403 · 429(v1 · /llms.txt) ·
@@ -122,7 +122,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await names('names-pinned-current', { ...pick([{ type: 'project_id' }]), rules_version: rulesVersion });
   // 충돌 fixture (D41) — 시험 전용 규칙은 HTTP 로 닿지 않으므로(규칙 표에 없다) 라우터와 같은 직렬화기로 직접 만든다. HTTP 쪽은 names-conflict.test
   out.push({ id: 'names-conflict', method: 'POST', path: '/v1/names', status: 200,
-    body: JSON.parse(JSON.stringify(toWireNames(generateMany(CONFLICT_CONTEXT, 'gcp', CONFLICT_GCP_SELECTION), CONFLICT_GCP_SELECTION.map((i) => i.rule), labelsFor(CONFLICT_CONTEXT, 'gcp'), [], VERSION))) as Loose });
+    body: JSON.parse(JSON.stringify(toWireNames(generateMany(CONFLICT_GCP_CONTEXT, 'gcp', CONFLICT_GCP_SELECTION), CONFLICT_GCP_SELECTION.map((i) => i.rule), labelsFor(CONFLICT_GCP_CONTEXT, 'gcp'), [], VERSION))) as Loose });
   await names('400-names-provider', { ...pick([{ type: 'vpc_network' }]), provider: 'oci' });
   await names('400-names-not-array', pick('compute_instance'));
   await names('400-names-empty', pick([]));

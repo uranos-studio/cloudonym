@@ -29,7 +29,7 @@ const FILLERS: [string, string][] = [
 describe('POST /v1/names 응답 증폭', () => {
   it('예전 상한의 최악 입력(자유 입력 셋 각 ZWSP 1024자) → 400 field_too_long 셋, 응답이 작다', async () => {
     const z = '\u200B'.repeat(1024);
-    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: { owner: z, system: z, purpose: z, env: 'prod', region: 'kr' }, resources: worstSelection('gcp') }));
+    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: { owner: z, system: z, purpose: z, env: 'prod', region: 'asia-northeast3-a' }, resources: worstSelection('gcp') }));
     expect(res.status).toBe(400);
     expect(await bytes(res.clone())).toBeLessThan(MAX_ERROR_RESPONSE_BYTES);
     expect((await json(res)).errors.map((e: { field: string }) => e.field)).toEqual(['owner', 'system', 'purpose']);
@@ -39,7 +39,7 @@ describe('POST /v1/names 응답 증폭', () => {
     for (const [label, ch] of FILLERS) {
       it(`${p} · 상한(${MAX_CONTEXT_CHARS}자) ${label} × 3 · 이름 200개 → 응답 ${MAX_NAMES_RESPONSE_BYTES / 1024}KB 안`, async () => {
         const v = ch.repeat(MAX_CONTEXT_CHARS / ch.length);
-        const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: v, system: v, purpose: v, env: 'prod', region: 'kr' }, resources: worstSelection(p) }));
+        const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: v, system: v, purpose: v, env: 'prod', region: 'asia-northeast3-a' }, resources: worstSelection(p) }));
         expect(res.status).toBe(200);
         expect(await bytes(res)).toBeLessThan(MAX_NAMES_RESPONSE_BYTES);
       });
@@ -47,7 +47,7 @@ describe('POST /v1/names 응답 증폭', () => {
   }
 
   it('자유 입력이 상한을 1자 넘으면 400 field_too_long (max 는 상한)', async () => {
-    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: { owner: 'a'.repeat(MAX_CONTEXT_CHARS + 1), system: 'b', purpose: 'c', env: 'prod', region: 'kr' }, resources: [{ type: 'project_id' }] }));
+    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: { owner: 'a'.repeat(MAX_CONTEXT_CHARS + 1), system: 'b', purpose: 'c', env: 'prod', region: 'asia-northeast3-a' }, resources: [{ type: 'project_id' }] }));
     expect(res.status).toBe(400);
     expect((await json(res)).errors).toEqual([{ code: 'request.field_too_long', field: 'owner', params: { max: MAX_CONTEXT_CHARS }, message: `'owner' is longer than ${MAX_CONTEXT_CHARS} characters` }]);
   });

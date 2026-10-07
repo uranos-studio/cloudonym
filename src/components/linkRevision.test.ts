@@ -6,7 +6,7 @@ import type { NamingContext } from '../core/types';
 
 const CURRENT = '2026-09-29.1';
 const OLD = '2000-01-01.1';
-const ctx: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+const ctx: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' };
 const other: NamingContext = { ...ctx, owner: 'infra' };
 
 /** 링크 hash 를 연 상태 — App 이 하는 것과 같다 */

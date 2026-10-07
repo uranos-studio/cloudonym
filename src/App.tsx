@@ -66,7 +66,8 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
 
   const tree = useMemo(() => (provider ? buildTree(provider, rules?.filter((r) => r.provider === provider)) : undefined), [provider, rules]);
   const items = useMemo(() => (tree ? toItems(tree, picked) : []), [tree, picked]);
-  const parsed = useMemo(() => parseContext(form), [form]);
+  // 지역은 고른 CSP 의 표로 푼다 (D49) — 아직 고르지 않았으면 켜진 CSP 의 첫째
+  const parsed = useMemo(() => parseContext(form, provider ?? ENABLED_PROVIDERS[0]!), [form, provider]);
   const ctx = parsed.ok ? parsed.context : undefined;
   const many = useMemo(() => (ctx && provider && items.length > 0 ? generateMany(ctx, provider, items) : undefined), [ctx, provider, items]);
   const labels = useMemo(() => (ctx && provider ? labelsFor(ctx, provider) : undefined), [ctx, provider]);

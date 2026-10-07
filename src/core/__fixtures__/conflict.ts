@@ -9,7 +9,7 @@ const vm = getRule('azure', 'virtual_machine')!;
 export const CONFLICT_RULE_A: ResourceRule = { ...vm, id: 'azure.test_conflict_a', resourceType: 'test_conflict_a', displayName: 'Test Conflict A' };
 export const CONFLICT_RULE_B: ResourceRule = { ...vm, id: 'azure.test_conflict_b', resourceType: 'test_conflict_b', displayName: 'Test Conflict B' };
 
-export const CONFLICT_CONTEXT: NamingContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+export const CONFLICT_CONTEXT: NamingContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'krc' };
 
 /** 둘 다 count 1 — 같은 이름 하나씩 */
 export const CONFLICT_SELECTION = [
@@ -22,6 +22,10 @@ const gcpVm = getRule('gcp', 'compute_instance')!;
 
 export const CONFLICT_GCP_RULE_A: ResourceRule = { ...gcpVm, id: 'gcp.test_conflict_a', resourceType: 'test_conflict_a', displayName: 'Test Conflict A' };
 export const CONFLICT_GCP_RULE_B: ResourceRule = { ...gcpVm, id: 'gcp.test_conflict_b', resourceType: 'test_conflict_b', displayName: 'Test Conflict B' };
+
+/** GCP 짝의 문맥 — VM 규칙의 사본이라 존 토큰 규칙이다(D50). API 에 보내는 원시 입력(존 이름)과 그것을 GCP 표로 푼 문맥 */
+export const CONFLICT_GCP_RAW = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
+export const CONFLICT_GCP_CONTEXT: NamingContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' };
 
 /** 둘 다 count 1 — 같은 이름 하나씩 */
 export const CONFLICT_GCP_SELECTION = [

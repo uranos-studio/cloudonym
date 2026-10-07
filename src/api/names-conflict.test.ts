@@ -20,7 +20,7 @@ vi.mock('../core/constraints', async (importOriginal) => {
 const { app } = await import('./index');
 const { req, jsonPost, json } = await import('./test-support');
 const { rulesFor } = await import('../core/constraints');
-const { CONFLICT_GCP_RULE_A, CONFLICT_GCP_RULE_B, CONFLICT_CONTEXT } = await import('../core/__fixtures__/conflict');
+const { CONFLICT_GCP_RULE_A, CONFLICT_GCP_RULE_B, CONFLICT_GCP_RAW } = await import('../core/__fixtures__/conflict');
 
 describe('POST /v1/names — 충돌 fixture (D41)', () => {
   it('시험 전제 — 덧붙인 규칙이 __fixtures__/conflict.ts 의 GCP 두 규칙과 같다', () => {
@@ -29,7 +29,7 @@ describe('POST /v1/names — 충돌 fixture (D41)', () => {
     expect(gcp.find((r) => r.id === 'gcp.test_conflict_b')).toEqual(CONFLICT_GCP_RULE_B);
   });
   it('두 항목 모두 valid:false + name.conflict · 본문 conflicts 한 건 · 전체 valid:false · 상태 200 · 명세의 NamesResponse 에 맞는다', async () => {
-    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: CONFLICT_CONTEXT, resources: [{ type: 'test_conflict_a' }, { type: 'test_conflict_b' }, { type: 'project_id' }] }));
+    const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: CONFLICT_GCP_RAW, resources: [{ type: 'test_conflict_a' }, { type: 'test_conflict_b' }, { type: 'project_id' }] }));
     expect(res.status).toBe(200);
     const body = await json(res);
     const az = body.data.gcp;

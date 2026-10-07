@@ -75,22 +75,24 @@ describe('findConflicts — 검사기를 먼저 시험한다', () => {
 
 describe('실제 데이터 — 공허한 통과가 아니라는 대조', () => {
   // env dev — prod(4자)면 Windows VM(15자)이 축소에 실패해(D48) 「둘 다 유효한데 이름이 다르다」를 볼 수 없다
-  const base = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'dev', region: 'kr' });
+  const base = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'dev', region: 'koreacentral' }, 'azure');
   if (!base.ok) throw new Error('base context');
   it('Linux VM + Windows VM 은 같은 entity 지만 이름이 달라 충돌 0', () => {
     const lin = getRule('azure', 'virtual_machine')!;
     const win = getRule('azure', 'virtual_machine_windows')!;
     expect(lin.entity).toBe(win.entity);
     const r = generateMany(base.context, 'azure', [{ rule: lin, count: 1 }, { rule: win, count: 1 }]);
-    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-dev-kr-vm-01', 'bi-tr-dev-vm-01']);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-dev-krc-vm-01', 'bi-tr-dev-vm-01']);
     expect(r.conflicts).toEqual([]);
     expect(r.valid).toBe(true);
   });
   it('seq 는 보호 토큰이라 같은 규칙 안에서 축소가 이름을 접지 않는다 — count 규칙 전부 · 긴 문맥 · count 3', () => {
-    const long = parseContext({ owner: 'platformengineering', system: 'paymentsettlement', purpose: 'reconciliation', env: 'dev', region: 'global' });
-    if (!long.ok) throw new Error('long context');
+    // GCP 는 존 이름 — 존 규칙도 이름이 나와야 센다(global 이면 name.zone_required)
+    const region = { gcp: 'asia-northeast3-a', aws: 'global', azure: 'global' } as const;
     let checked = 0;
     for (const p of PROVIDERS) {
+      const long = parseContext({ owner: 'platformengineering', system: 'paymentsettlement', purpose: 'reconciliation', env: 'dev', region: region[p] }, p);
+      if (!long.ok) throw new Error('long context');
       for (const rule of rulesFor(p).filter((r) => inputKind(r) === 'count')) {
         const r = generateMany(long.context, p, [{ rule, count: 3 }]);
         const names = r.items.filter((i) => i.valid).map((i) => i.name);

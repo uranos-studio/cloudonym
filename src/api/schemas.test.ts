@@ -3,13 +3,16 @@ import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } 
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { ENABLED_PROVIDERS } from '../core/types';
+import { REGIONS } from '../core/regions-data';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+// 존 코드 — 이름에 들어가는 꼴 그대로라 바꾼 기록이 없다. 풀면 리전 코드 + 존 코드 (D49 · D50)
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3a' };
+const parsedCtx = { ...ctx, region: 'ane3', zone: 'ane3a' };
 
 describe('parseGenerateBody', () => {
   it('정상 — providers 는 중복을 없앤다', () => {
     const r = parseGenerateBody({ context: ctx, providers: ['gcp', 'gcp'] });
-    expect(r).toEqual({ ok: true, value: { context: ctx, transformed: [], providers: ['gcp'] } });
+    expect(r).toEqual({ ok: true, value: { contexts: { gcp: parsedCtx }, transformed: [], providers: ['gcp'] } });
   });
   it('providers 생략 → 켜진 것만 (D45)', () => {
     const r = parseGenerateBody({ context: ctx });
@@ -40,7 +43,7 @@ describe('parseGenerateBody', () => {
   });
   it('parseContext 의 오류를 그대로 전달한다 (owner → region 순서)', () => {
     const r = parseGenerateBody({ context: { ...ctx, owner: '', region: 'mars' } });
-    expect(r).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: ['kr', 'us', 'jp', 'eu', 'global'] } }] } });
+    expect(r).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: REGIONS.gcp.map((x) => x.region) } }] } });
   });
 });
 
@@ -134,7 +137,7 @@ describe('parseNamesBody (D39)', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.value.provider).toBe('gcp');
-    expect(r.value.context).toEqual(ctx);
+    expect(r.value.context).toEqual(parsedCtx);
     expect(r.value.items.map((i) => [i.rule.id, i.count])).toEqual([['gcp.compute_instance', 2], ['gcp.project_id', 1]]);
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', () => {

@@ -1,7 +1,8 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
 import { ENABLED_PROVIDERS, PROVIDERS, type Provider, type ResourceRule, type Token } from '../core/types';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
-import { ENV_ALIASES, REGION_ALIASES } from '../core/normalize';
+import { ENV_ALIASES } from '../core/normalize';
+import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { MAX_FIELD_CHARS } from './schemas';
 import { formatNotes, type Catalog } from '../messages/catalog';
@@ -37,12 +38,20 @@ export function formulaOf(rule: ResourceRule): string {
   return rule.template.map(part).join(rule.separator);
 }
 
-/** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES · REGION_ALIASES 가 정본) */
+/** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES · 지역 표가 정본) */
 function allowedValues(dict: Record<string, string>): string[] {
   return [...new Set(Object.values(dict))].map((canon) => {
     const aliases = Object.entries(dict).filter(([k, v]) => v === canon && k !== canon).map(([k]) => k);
     return aliases.length > 0 ? `- \`${canon}\` — aliases: ${aliases.join(', ')}` : `- \`${canon}\``;
   });
+}
+
+/** 켜진 CSP 의 지역 — 리전 코드가 표준값이고 리전 이름이 별칭이다 (D49). global 은 모든 CSP 에서 받는다 */
+function regionDict(providers: readonly Provider[]): Record<string, string> {
+  const dict: Record<string, string> = {};
+  for (const p of providers) for (const r of REGIONS[p]) { dict[r.code] = r.code; dict[r.region] = r.code; }
+  dict.global = 'global';
+  return dict;
 }
 
 function constraintLine(rule: ResourceRule, catalog: Catalog): string {
@@ -95,7 +104,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
       lines.push(`- \`${r.id}\`: \`${formulaOf(r)}\`${r.optional.length > 0 ? ` · optional: ${r.optional.join(', ')}` : ''}`);
     }
   }
-  lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region', ...allowedValues(REGION_ALIASES));
+  lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region', ...allowedValues(regionDict(order)));
   lines.push('', '## Provider Constraints');
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
