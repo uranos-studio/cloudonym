@@ -326,6 +326,14 @@ describe('지역 · 존 (D49 · D50 · D51)', () => {
     expect(zonal).toHaveLength(14);
     for (const t of zonal) expect(out[t]!.violations.map((v) => v.code), t).toEqual(['name.zone_required']);
   });
+  it('이름이 빈 항목(zone_required)에는 kindToken 을 싣지 않는다 — 고른 kind 는 남는다', () => {
+    const r = generateMany(ctxOf('asia-northeast3'), 'gcp', [{ rule: gcp('network_endpoint_group'), count: 1, kind: 'GCE_VM_IP' }]);
+    expect(r.items[0]).toMatchObject({ valid: false, name: '', kind: 'GCE_VM_IP', violations: [{ code: 'name.zone_required' }] });
+    expect('kindToken' in r.items[0]!).toBe(false);
+    // 존이 있으면 토큰이 붙는다 — 위 단언이 「토큰이 없는 값」이라 지나가는 것이 아님을 보인다
+    const z = generateMany(ctxOf('asia-northeast3-a'), 'gcp', [{ rule: gcp('network_endpoint_group'), count: 1, kind: 'GCE_VM_IP' }]);
+    expect(z.items[0]!.kindToken).toBeTruthy();
+  });
   it('global 입력이면 존 규칙도 name.zone_required — 존이 없다', () => {
     expect(generate(ctxOf('global'), ['gcp']).gcp!.disk).toMatchObject({ valid: false, violations: [{ code: 'name.zone_required', params: { region: 'global' } }] });
   });

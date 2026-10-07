@@ -104,18 +104,23 @@ export function generateMany(ctx: NamingContext, provider: Provider, selection: 
     // 종류 — 허용 밖이면 여기서 던진다(validateSelection 을 거친 선택에는 없다)
     const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
     const k: ItemExtra = kind === undefined ? {} : { kind };
-    const kindFields = { ...(kind === undefined ? {} : { kind }), ...(token === null ? {} : { kindToken: token }) };
+    // 이름이 빈 항목(zone_required)에는 토큰을 싣지 않는다 — 이름에 들어가지 않은 토큰이다. 고른 값 이름은 남긴다
+    const kindFields = (res: NameResult) => ({ ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }) });
+    const one = (extra: ItemExtra, meta: { key: string; seq?: string; role?: string }): NameItem => {
+      const res = generateOne(ctx, rule, { ...k, ...extra });
+      return { ...res, ...meta, ...kindFields(res) };
+    };
     const input = inputKind(rule);
     if (input === 'count') {
       for (let i = 1; i <= count; i++) {
         const seq = seqOf(i);
-        items.push({ rule, item: { ...generateOne(ctx, rule, { ...k, seq }), key: `${rule.resourceType}_${seq}`, seq, ...kindFields } });
+        items.push({ rule, item: one({ seq }, { key: `${rule.resourceType}_${seq}`, seq }) });
       }
     } else if (input === 'role') {
       const r = role ?? DEFAULT_ROLE;
-      items.push({ rule, item: { ...generateOne(ctx, rule, { ...k, role: r }), key: `${rule.resourceType}_${r}`, role: r, ...kindFields } });
+      items.push({ rule, item: one({ role: r }, { key: `${rule.resourceType}_${r}`, role: r }) });
     } else {
-      items.push({ rule, item: { ...generateOne(ctx, rule, k), key: rule.resourceType, ...kindFields } });
+      items.push({ rule, item: one({}, { key: rule.resourceType }) });
     }
   }
 

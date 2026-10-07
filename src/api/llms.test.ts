@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { buildLlmsText, formulaOf } from './llms';
+import { buildLlmsText, formulaOf, kindLines } from './llms';
 import { RULES } from '../core/constraints';
 import { app } from './index';
 import { req, fakeKv } from './test-support';
@@ -116,6 +116,14 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     }
     expect(section.join('\n')).toContain('`gcp.resource_policy`');
     expect(section.join('\n')).toMatch(/needs a kind/);
+  });
+  it('「## Kind tokens」 — 종류 표가 있는 행인데 규칙 하나에 kinds 가 없으면 그 규칙 줄만 빼고 던지지 않는다', () => {
+    const row = GCP_CATALOG.find((r) => r.key === 'gcp.cloud_sql_instance')!;
+    const [id, spec] = Object.entries(row.rules)[0]!;
+    const broken = { ...row, rules: { [id]: { scope: spec.scope, regionToken: spec.regionToken } } };
+    const out = kindLines(['gcp'], () => [broken]);
+    expect(out.some((l) => l.startsWith(`- \`${row.key}\``))).toBe(true);
+    expect(out.some((l) => l.startsWith(`  - \`${id}\``))).toBe(false);
   });
   it('/v1/names 줄에 kind · /v1/generate 는 종류 · 존이 필요한 규칙을 valid:false 로 돌려준다는 한 줄 (D52)', () => {
     expect(text).toContain('"kind"?: string');

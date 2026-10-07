@@ -6,7 +6,7 @@ import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { regionTokenOfRule } from '../core/compose';
 import { catalogFor } from '../core/catalog';
-import { GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
+import { GCP_KIND_CHECKED, type CatalogRow } from '../core/rules/gcp-catalog';
 import { MAX_FIELD_CHARS } from './schemas';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -70,7 +70,7 @@ function regionLines(rules: readonly ResourceRule[], order: readonly Provider[])
 
 /** 「## Kind tokens」 절 (D52) — 종류 표가 있는 catalog 행마다 한 줄(값 → 토큰 · 기본값 근거 · 확인일), 그 아래 규칙(= 범위)마다 기본값 · 허용 값.
  *  표는 catalog 가 정본이고 확인일은 kind-sources.json 의 전사 날(생성 파일 GCP_KIND_CHECKED)이다 */
-function kindLines(order: readonly Provider[]): string[] {
+export function kindLines(order: readonly Provider[], rowsOf: (p: Provider) => readonly CatalogRow[] = catalogFor): string[] {
   const lines = [
     '', '## Kind tokens', '',
     '`kind` on `/v1/names` takes a value name from the list below (`POSTGRES`, `snapshot-schedule`), not the token. The token goes right after the abbreviation: `…-<slug>-<kind>-<seq>`. The provider default of the scope, and values marked (no token), add no token even when sent. A rule that needs a kind (`required`) comes back `valid: false` with `name.kind_required` without one; `/v1/names` rejects that request first (400 `selection.kind_required`). One kind per item.',
@@ -78,18 +78,19 @@ function kindLines(order: readonly Provider[]): string[] {
   ];
   const checked: Readonly<Record<string, string | null>> = GCP_KIND_CHECKED;
   for (const p of order) {
-    const rows = catalogFor(p).filter((r) => r.kind !== null);
+    const rows = rowsOf(p).flatMap((row) => (row.kind === null ? [] : [{ row, k: row.kind }]));
     if (rows.length === 0) continue;
     lines.push('', `### ${p.toUpperCase()}`);
-    for (const row of rows) {
-      const k = row.kind!;
+    for (const { row, k } of rows) {
       const values = Object.entries(k.tokens).map(([v, t]) => (t === null ? `\`${v}\` (no token)` : `\`${v}\` → \`${t}\``)).join(' · ');
       const rule = k.rule === 'required' ? 'required' : k.rule === 'only-when-chosen' ? 'only when chosen' : 'omitted when it is the provider default';
       // 「- `id` (」 는 제약 줄 · 「- `id`: `」 는 공식 줄의 꼴이라 겹치지 않게 「- `key` · slug」 로 쓴다
       lines.push(`- \`${row.key}\` · slug \`${row.slug.value}\`: ${values} — ${rule} · basis: ${k.defaultBasis} · checked ${checked[row.key] ?? 'unknown'}`);
       for (const [id, spec] of Object.entries(row.rules)) {
-        const d = spec.kinds!.default;
-        lines.push(`  - \`${id}\` (${spec.scope}): ${d === null ? 'no default' : `default \`${d}\``} · accepts ${spec.kinds!.allowed.map((v) => `\`${v}\``).join(', ')}`);
+        // 행에 종류 표가 있어도 규칙에 kinds 가 없으면 적을 기본값 · 허용 값이 없다 — 그 줄만 뺀다
+        const kinds = spec.kinds;
+        if (!kinds) continue;
+        lines.push(`  - \`${id}\` (${spec.scope}): ${kinds.default === null ? 'no default' : `default \`${kinds.default}\``} · accepts ${kinds.allowed.map((v) => `\`${v}\``).join(', ')}`);
       }
     }
   }
