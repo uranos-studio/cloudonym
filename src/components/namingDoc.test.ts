@@ -9,7 +9,7 @@ import { ENV_VALUES } from '../core/engine';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 import { treeRules } from './selection';
-import { NAMING_DOC_SECTIONS, namingDocModel, zoneCodeMismatches, type NamingDocInput, type NamingDocModel } from './namingDocModel';
+import { ABBR_PRINCIPLES, NAMING_DOC_SECTIONS, namingDocModel, zoneCodeMismatches, type NamingDocInput, type NamingDocModel } from './namingDocModel';
 import { NamingDoc } from './NamingDoc';
 
 const HANGUL = /\p{Script=Hangul}/u;
@@ -87,6 +87,22 @@ describe('namingDocModel', () => {
     expect(neg.cells[3]).toContain('zone: GCE_VM_IP_PORT');   // 범위마다 기본값이 다르면 범위를 붙인다
   });
 
+  it('약어 원칙 — catalog 근거가 가리키는 「principle N」의 N 이 모두 약어 절의 원칙 목록에 있다 (검사기 자체 시험 포함)', () => {
+    const cited = (basis: string): number[] =>
+      [...basis.matchAll(/principles? (\d+(?:\s*(?:,|and)\s*\d+)*)/gi)].flatMap((m) => m[1]!.split(/\s*(?:,|and)\s*/).map(Number));
+    expect(cited('meaning (principle 1) before frequency; principles 1, 3 and 5')).toEqual([1, 1, 3, 5]);
+    const abbr = section(model, 'abbreviations');
+    expect(abbr.subheading).toBe('Abbreviation principles');
+    expect(abbr.ordered).toBe(true);
+    expect(abbr.items).toEqual(ABBR_PRINCIPLES.map((k) => en.ui[k]));
+    const defined = new Set(abbr.items!.map((_, i) => i + 1));
+    const all = real.catalog.flatMap((row) => cited(row.slug.basis).map((n) => ({ key: row.key, n })));
+    expect(all.length).toBeGreaterThan(20);
+    expect(all.filter(({ n }) => !defined.has(n))).toEqual([]);
+    // 원칙 목록에 없는 번호는 잡는다
+    expect(cited('principle 5').filter((n) => !defined.has(n))).toEqual([5]);
+  });
+
   it('존 — 존 코드는 리전 코드 + 존 글자다(데이터로 확인) · 존 리소스 목록은 catalog 에서', () => {
     expect(zoneCodeMismatches(REGIONS.gcp)).toEqual([]);
     // 검사기 자체 — 틀린 코드를 넣으면 잡는다
@@ -124,5 +140,7 @@ describe('/docs/naming 화면', () => {
     for (const id of NAMING_DOC_SECTIONS) expect(html, id).toContain(`id="doc-${id}"`);
     const text = html.replace(/<[^>]+>/g, ' ').replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&gt;/g, '>').replace(/\s+/g, ' ');
     expect(text).toContain(en.ui.pass_meaning);
+    // 푸터 Privacy 링크 — 앱 푸터와 같은 꼴(상태 hash 가 없으면 경로만)
+    expect(html).toMatch(/<a href="\/privacy" data-footer-privacy/);
   });
 });

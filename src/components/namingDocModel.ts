@@ -24,6 +24,8 @@ export interface DocSection {
   id: NamingDocSectionId;
   title: string;
   paragraphs: readonly string[];
+  /** 소절 제목(h3) — 목록 앞에 온다 */
+  subheading?: string;
   /** 목록 머리 문장 · 목록 · 순서 있는 목록인지 */
   listLead?: string;
   items?: readonly string[];
@@ -48,6 +50,8 @@ const TOKEN_MEANING: Record<Token, UiKey> = {
   slug: 'doc_token_slug', kind: 'doc_token_kind', seq: 'doc_token_seq', role: 'doc_token_role',
 };
 const ENV_MEANING: Record<Env, UiKey> = { prod: 'doc_env_prod', stg: 'doc_env_stg', dev: 'doc_env_dev', sbx: 'doc_env_sbx' };
+/** 약어 원칙 — 번호가 곧 순서다. catalog 의 slug.basis 가 「principle N」으로 가리킨다(시험이 N 이 모두 여기 있는지 센다) */
+export const ABBR_PRINCIPLES: readonly UiKey[] = ['doc_abbr_principle_1', 'doc_abbr_principle_2', 'doc_abbr_principle_3', 'doc_abbr_principle_4'];
 const KIND_RULE: Record<NonNullable<CatalogRow['kind']>['rule'], UiKey> = {
   'omit-when-csp-default': 'doc_kind_rule_omit', 'only-when-chosen': 'doc_kind_rule_chosen', required: 'doc_kind_rule_required',
 };
@@ -145,6 +149,7 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
     },
     {
       id: 'abbreviations', title: ui.doc_abbr_title, paragraphs: [ui.doc_abbr_body],
+      subheading: ui.doc_abbr_principles_title, ordered: true, items: ABBR_PRINCIPLES.map((k) => ui[k]),
       table: {
         caption: fill('doc_abbr_caption', { n: catalog.length, provider: name }),
         columns: [ui.doc_col_resource, ui.doc_col_abbr, ui.doc_col_basis, ui.doc_col_previous], mono: [false, true, false, true],

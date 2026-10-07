@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VERSION } from '../version';
-import { withStateHash } from './route';
+import { PRIVACY_PATH, withStateHash } from './route';
 
 export function DocPage({ title, children }: { title: string; children?: ReactNode }) {
   return (
@@ -18,7 +18,11 @@ export function DocPage({ title, children }: { title: string; children?: ReactNo
         {children}
       </main>
       <footer className="mx-auto max-w-3xl px-4 pb-6 text-xs text-zinc-600 dark:text-zinc-400">
-        <p data-version>{fillUi(en, 'version_footer', VERSION)}</p>
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
+          {/* 앱 푸터와 같은 꼴 — 상태 hash 를 실어 간다 */}
+          <a href={withStateHash(PRIVACY_PATH, window.location.hash)} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+        </p>
       </footer>
     </div>
   );

@@ -43,6 +43,7 @@ function Section({ section }: { section: DocSection }) {
     <section id={`doc-${section.id}`} aria-labelledby={titleId} className="space-y-3">
       <h2 id={titleId} className="text-lg font-semibold">{section.title}</h2>
       {section.paragraphs.map((p) => <p key={p} data-doc-paragraph={section.id}>{p}</p>)}
+      {section.subheading && <h3 className="text-base font-semibold">{section.subheading}</h3>}
       {section.listLead && <p>{section.listLead}</p>}
       {section.items && (
         <List data-doc-list={section.id} className={`space-y-1 pl-5 ${section.ordered ? 'list-decimal' : 'list-disc'}`}>
