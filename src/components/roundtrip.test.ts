@@ -113,3 +113,21 @@ describe('꺼진 CSP 링크 (D55 ①~⑤) — 공유 → 열기 → 재파싱 �
     expect(again.unavailable).toBeUndefined();
   });
 });
+
+import { buildTree } from '../core/tree';
+import { toItems } from './selection';
+import { hashToWrite, mismatchedLinkVersion } from './linkRevision';
+
+describe('기본값 종류를 적은 손 링크(「2:MYSQL」) — 상태는 종류 없음 · 링크 상태(D27 ⑵)는 그대로', () => {
+  it('옛 v 링크를 열면 picked 에 kind 가 없고, App 의 stateKey 가 링크 key 와 같아 hash 를 덮지 않고 버전 안내가 남는다', () => {
+    const old = '2026-09-01.1';
+    const hash = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3a', v: old, p: 'gcp', r: { cloud_sql_instance: '2:MYSQL' } }))}`;
+    const o = openHash(hash, undefined)!;
+    expect(o.picked.get('cloud_sql_instance')).toEqual({ count: 2 });
+    // App 이 첫 그리기에서 만드는 key — 폼을 다시 파싱한 문맥 · 트리 순서의 선택
+    const stateKey = encodeState(ctxOf(o.form), VERSION.rules, { provider: 'gcp', selection: toItems(buildTree('gcp'), o.picked) });
+    expect(stateKey).toBe(o.link.key);
+    expect(hashToWrite(stateKey, o.link)).toBeUndefined();
+    expect(mismatchedLinkVersion(stateKey, o.link, VERSION.rules)).toBe(old);
+  });
+});
