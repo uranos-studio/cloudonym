@@ -94,20 +94,20 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
     .map(([key, f]) => ({ key, cells: [f.formula, f.optional, String(f.count)] }));
 
   const tokens = Object.keys(TOKEN_MEANING) as Token[];
-  const tokenVars = { max: MAX_CONTEXT_CHARS, maxCount: MAX_COUNT, role: DEFAULT_ROLE, hint: ui.role_hint };
+  // 순번 자릿수 — 상한의 자릿수(엔진은 이 폭으로 0 을 채운다 · 시험이 generateMany 에 대어 본다)
+  const seqWidth = String(MAX_COUNT).length;
+  const tokenVars = { max: MAX_CONTEXT_CHARS, maxCount: MAX_COUNT, width: seqWidth, first: '1'.padStart(seqWidth, '0'), role: DEFAULT_ROLE, hint: ui.role_hint };
 
   const zoneCount = regions.reduce((n, r) => n + r.zones.length, 0);
   const sample = regions.find((r) => r.zones.length > 0);
   const example = sample ? `${sample.zones[0]!.zone} → ${sample.zones[0]!.code}` : none;
   const zonalRows = catalog.filter((row) => Object.values(row.rules).some((s) => s.regionToken === 'zone'));
 
-  // 축소 1단계의 생략 토큰 — 규칙에 적힌 것을 처음 나온 순서대로
-  const optionalTokens = [...new Set(rules.flatMap((r) => r.optional))];
   const kindRows = catalog.filter((row) => row.kind !== null);
 
   const sections: DocSection[] = [
     {
-      id: 'formula', title: ui.doc_formula_title, paragraphs: [ui.doc_formula_body],
+      id: 'formula', title: ui.doc_formula_title, paragraphs: [fill('doc_formula_body', { optional: ui.doc_col_optional })],
       table: {
         caption: fill('doc_formula_caption', { n: formulaRows.length, count: rules.length, provider: name }),
         columns: [ui.doc_col_formula, ui.doc_col_optional, ui.doc_col_rule_count], mono: [true, true, false], rows: formulaRows,
@@ -142,7 +142,7 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
     {
       id: 'shrink', title: ui.doc_shrink_title, paragraphs: [ui.doc_shrink_body], ordered: true,
       items: [
-        fill('doc_shrink_step1', { tokens: optionalTokens.length > 0 ? optionalTokens.join(', ') : none }),
+        fill('doc_shrink_step1', { optional: ui.doc_col_optional }),
         fill('doc_shrink_step2', { protected: PROTECTED.join(', '), min: MIN_TOKEN }),
         ui.doc_shrink_step3,
       ],

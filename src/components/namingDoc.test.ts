@@ -5,7 +5,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { catalogFor } from '../core/catalog';
 import { REGIONS } from '../core/regions-data';
 import { buildTree } from '../core/tree';
-import { ENV_VALUES } from '../core/engine';
+import { ENV_VALUES, generateMany, parseContext } from '../core/engine';
+import { PROTECTED, type ResourceRule } from '../core/types';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 import { treeRules } from './selection';
@@ -123,6 +124,67 @@ describe('namingDocModel', () => {
     const all = strings(model);
     expect(all.length).toBeGreaterThan(500);
     expect(all.filter((s) => HANGUL.test(s))).toEqual([]);
+  });
+});
+
+describe('페이지 문장이 엔진이 하는 일과 같다', () => {
+  const model = namingDocModel(real);
+  const ctxOf = (raw: Record<string, string>) => {
+    const p = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a', ...raw }, 'gcp');
+    if (!p.ok) throw new Error('context');
+    return p.context;
+  };
+  const one = (rule: ResourceRule, raw: Record<string, string> = {}, count = 1) =>
+    generateMany(ctxOf(raw), 'gcp', [{ rule, count, ...(rule.kinds?.rule === 'required' ? { kind: rule.kinds.allowed[0]! } : {}) }]).items;
+  const sa = real.rules.find((r) => r.id === 'gcp.service_account')!;
+
+  it('축소 1단계 — 규칙의 optional 순서로 뗀다(service_account 는 공식에서 뒤인 region 을 먼저) · 문장은 공식 순서라 하지 않는다', () => {
+    expect(sa.template.indexOf('owner')).toBeLessThan(sa.template.indexOf('region'));
+    expect(sa.optional[0]).toBe('region');
+    const long = 'x'.repeat(20);
+    const dropped = one(sa, { owner: long, system: long })[0]!.steps.filter((m) => m.code === 'step.token_dropped').map((m) => m.field);
+    expect(dropped[0]).toBe('region');
+    const step1 = section(model, 'shrink').items![0]!;
+    expect(step1).toContain(en.ui.doc_col_optional);
+    expect(step1).not.toMatch(/order the formula lists/);
+    // 공식 표의 생략 칸은 규칙의 optional 순서 그대로다
+    const row = rowsOf(model, 'formula').find((r) => r.cells[0] === `<${sa.template.join('>-<')}>`)!;
+    expect(row.cells[1]).toBe(sa.optional.join(', '));
+  });
+
+  it('빈 토큰 — 필수 토큰이 비면 FAIL(name.token_empty) · 생략 토큰 · 종류만 건너뛴다고 말한다', () => {
+    const items = one(sa, { system: '!!!' });
+    expect(items[0]!.valid).toBe(false);
+    expect(items[0]!.violations.map((v) => v.code)).toContain('name.token_empty');
+    const body = section(model, 'formula').paragraphs[0]!;
+    expect(body).toContain('fails');
+    expect(body).not.toMatch(/A token with no value is skipped/);
+  });
+
+  it('global — 지역 토큰 없이 PASS, 존 리소스만 name.zone_required · 문장도 그렇게 말한다', () => {
+    const codes = new Set<string>();
+    for (const r of real.rules) {
+      const it0 = one(r, { region: 'global' })[0]!;
+      if (r.regionToken === 'zone') expect(it0.violations.map((v) => v.code), r.id).toEqual(['name.zone_required']);
+      else { expect(it0.valid, r.id).toBe(true); codes.add('pass'); }
+    }
+    expect(codes.has('pass')).toBe(true);
+    expect(section(model, 'regions').paragraphs[0]).toMatch(/zonal resources need a zone, so with global their names fail/);
+  });
+
+  it('축소 2단계 — 보호 토큰은 줄이지 않되 1단계가 그 가운데 optional 은 뗄 수 있다고 말한다', () => {
+    expect(real.rules.some((r) => r.optional.some((t) => PROTECTED.includes(t)))).toBe(true);
+    const step2 = section(model, 'shrink').items![1]!;
+    expect(step2).toContain('never shortened (step 1 may still drop the optional ones among them)');
+    expect(step2).not.toMatch(/never cut/);
+  });
+
+  it('순번 — 문장의 자릿수 · 처음 값이 엔진이 만든 seq 와 같다', () => {
+    const vm = real.rules.find((r) => r.id === 'gcp.compute_instance')!;
+    const seqs = one(vm, {}, 2).map((i) => i.seq);
+    const meaning = rowsOf(model, 'tokens').find((r) => r.key === 'seq')!.cells[1]!;
+    expect(meaning).toContain(`zero-padded to ${seqs[0]!.length} digits`);
+    expect(meaning).toContain(`from ${seqs[0]} to`);
   });
 });
 
