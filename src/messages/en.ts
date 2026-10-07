@@ -170,6 +170,7 @@ export const en: Catalog = {
     scope_required_hint: 'Choose a scope to select {displayName}',
     kind_dropped_on_scope: 'Kind {kind} does not exist at {scope} scope; it was cleared.',
     zone_row_hint: 'Pick a zone in ② to name zonal resources',
+    zone_row_hint_global: 'Pick a region with zones in ② to name zonal resources',
     info_toggle: 'About {displayName}',
     enter_name_at: 'Enter the name at',
     badge_api_only: 'API only',

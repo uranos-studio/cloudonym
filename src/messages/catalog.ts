@@ -30,7 +30,7 @@ export const UI_KEYS = [
   'role_label', 'role_hint', 'role_stale', 'tree_label',
   'kind_label', 'kind_default', 'kind_none', 'kind_choose', 'kind_required_hint',
   // ResourceTree — 행 · 범위 · (i) · 표지 · 존 (D50 · D53 · D54)
-  'scope_choice_label', 'scope_choose', 'scope_required_hint', 'kind_dropped_on_scope', 'zone_row_hint',
+  'scope_choice_label', 'scope_choose', 'scope_required_hint', 'kind_dropped_on_scope', 'zone_row_hint', 'zone_row_hint_global',
   'info_toggle', 'enter_name_at', 'badge_api_only', 'badge_api_only_title', 'badge_preview', 'badge_preview_title', 'api_only_filter',
   // 헤더 · 푸터의 문서 경로 링크 (D57)
   'nav_naming_guide', 'footer_privacy', 'back_to_app',

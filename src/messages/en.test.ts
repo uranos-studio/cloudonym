@@ -176,6 +176,7 @@ describe('영어 사전 (D24)', () => {
     expect(en.ui.scope_choose).toBe('scope…');
     expect(fillUi(en, 'scope_required_hint', { displayName: 'IP Address' })).toBe('Choose a scope to select IP Address');
     expect(en.ui.zone_row_hint).toBe('Pick a zone in ② to name zonal resources');
+    expect(en.ui.zone_row_hint_global).toBe('Pick a region with zones in ② to name zonal resources');
     expect(fillUi(en, 'kind_dropped_on_scope', { kind: 'GCE_VM_IP', scope: 'Global' })).toBe('Kind GCE_VM_IP does not exist at Global scope; it was cleared.');
     expect(fillUi(en, 'info_toggle', { displayName: 'IP Address' })).toBe('About IP Address');
     expect(en.ui.enter_name_at).toBe('Enter the name at');

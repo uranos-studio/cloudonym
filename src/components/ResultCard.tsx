@@ -1,10 +1,11 @@
 // 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
-// 제목에 종류 토큰 · 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01` · `Address · int · 01`) data-key 로 항목을 가리킨다
+// 제목에 종류 토큰 · 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01` · `IP Address · int · 01`) data-key 로 항목을 가리킨다
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
 import { CopyButton } from './CopyButton';
 import { visibleSteps } from './steps';
 import type { NameItem } from '../core/engine';
 import type { NameResult } from '../core/types';
+import { rowOf } from '../core/catalog';
 import { fillUi, format, formatNotes } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -16,8 +17,8 @@ export function ResultCard({ result: r }: { result: NameResult | NameItem }) {
   const item = 'key' in r ? r : undefined;
   const key = item?.key ?? r.resourceType;
   const id = `card-${r.ruleId.replace('.', '-')}-${key}`;
-  // 제목 — 이름 · 종류 토큰(붙었을 때만 · D52) · 순번 또는 역할
-  const title = [r.displayName, item?.kindToken, item?.seq ?? item?.role].filter((x) => x !== undefined).join(' · ');
+  // 제목 — 이름(catalog 행 이름 — 트리 행과 같다. 행이 없으면 규칙 이름) · 종류 토큰(붙었을 때만 · D52) · 순번 또는 역할
+  const title = [rowOf(r.ruleId)?.displayName ?? r.displayName, item?.kindToken, item?.seq ?? item?.role].filter((x) => x !== undefined).join(' · ');
   const stepsText = visibleSteps(r.steps).map((m) => format(m, en)).join(' · ');
   // aria-invalid 는 폼 위젯 역할에만 허용된다 — 카드는 data-valid 로 상태를 들고 PASS/FAIL 글자가 뜻을 전한다
   return (

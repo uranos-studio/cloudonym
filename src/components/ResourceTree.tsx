@@ -50,13 +50,15 @@ interface Props {
   onChange: (next: Picked) => void;
   /** 문맥에 존이 없다(리전만 · global) — 존 규칙 행을 새로 체크할 수 없다 (D50) */
   zoneMissing: boolean;
+  /** 지역이 global — 존 select 가 없으므로 존 안내는 「존이 있는 리전을 고르라」고 한다 */
+  regionGlobal: boolean;
 }
 
 /** 행 key → 체크 전에 고른 범위 · 종류와, 범위를 바꿔 버린 종류(안내 한 줄) */
 type Drafts = ReadonlyMap<string, RowDraft & { droppedKind?: string }>;
 const NO_DRAFT: RowDraft = {};
 
-function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing }: Props) {
+function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing, regionGlobal }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
   // 펼침 두 벌 — plain 은 거르지 않은 보기, filtered 는 걸러진 보기(필터가 바뀔 때마다 모두 펼침으로 다시 시작)
   const [plain, setPlain] = useState<OpenState>(() => initialOpen(tree, picked));
@@ -158,7 +160,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing }: Pro
     const entry = p && picked.get(p.resourceType);
     return (
       <Row key={row.key} row={row} rule={activeRule(row, picked, d)} entry={entry} draft={d} droppedKind={drafts.get(row.key)?.droppedKind}
-        block={rowBlock(row, picked, d, zoneMissing)} zoneMissing={zoneMissing} canInc={p !== undefined && canIncrease(picked, p)}
+        block={rowBlock(row, picked, d, zoneMissing)} zoneMissing={zoneMissing} regionGlobal={regionGlobal} canInc={p !== undefined && canIncrease(picked, p)}
         onToggle={onToggleRow} onScope={onScope} onDraftKind={onDraftKind} onCount={onCount} onRole={onRole} onKind={onKind} />
     );
   });
@@ -269,6 +271,7 @@ interface RowProps {
   droppedKind: string | undefined;
   block: RowBlock | undefined;
   zoneMissing: boolean;
+  regionGlobal: boolean;
   canInc: boolean;
   onToggle: (row: TreeRow) => void;
   onScope: (row: TreeRow, scope: ScopeId) => void;
@@ -279,7 +282,7 @@ interface RowProps {
 }
 
 /** 행 하나 — 높이 44px(터치) · 체크 · 이름 · slug · (i) · 표지 · 범위 select(합친 행) · 종류 select · 입력(개수 · 역할 · 1 고정) · 안내 */
-const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zoneMissing, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
+const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zoneMissing, regionGlobal, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
   const checked = entry !== undefined;
   const shape = rule ?? row.rules[0]!;
   const input = inputKind(shape);
@@ -294,7 +297,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zon
   const zoneHint = block === 'zone' || (checked && rule !== undefined && zoneMissing && isZonal(rule));
   const hint = block === 'scope' ? fillUi(en, 'scope_required_hint', name)
     : block === 'kind' ? fillUi(en, 'kind_required_hint', name)
-      : zoneHint ? en.ui.zone_row_hint : undefined;
+      : zoneHint ? (regionGlobal ? en.ui.zone_row_hint_global : en.ui.zone_row_hint) : undefined;
   const hintKind = block === 'scope' ? 'scope' : block === 'kind' ? 'kind' : 'zone';
   const onPickKind = (v: string) => {
     const next = v === '' ? undefined : v;
@@ -312,7 +315,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zon
         {shape.slug && <code className="hidden shrink-0 font-mono text-xs text-zinc-500 sm:inline dark:text-zinc-400">{shape.slug}</code>}
       </label>
       {cat && (
-        <button type="button" data-info-toggle aria-expanded={infoOpen} aria-controls={infoId} aria-label={fillUi(en, 'info_toggle', name)}
+        <button type="button" data-info-toggle aria-expanded={infoOpen} aria-controls={infoOpen ? infoId : undefined} aria-label={fillUi(en, 'info_toggle', name)}
           onClick={() => setInfoOpen((o) => !o)}
           className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 aria-expanded:text-indigo-700 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:aria-expanded:text-indigo-300">
           <Info aria-hidden="true" className="size-4" />

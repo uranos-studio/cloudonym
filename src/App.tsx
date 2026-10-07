@@ -185,7 +185,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
           <div className="min-w-0 space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className={PANEL}>
               {provider && tree
-                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} zoneMissing={zoneMissing} />
+                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} zoneMissing={zoneMissing} regionGlobal={ctx?.region === 'global'} />
                 : (
                   <section aria-labelledby="step-resources" className="space-y-2">
                     <h2 id="step-resources" className="text-base font-semibold"><span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">3</span>{en.ui.step_resources}</h2>

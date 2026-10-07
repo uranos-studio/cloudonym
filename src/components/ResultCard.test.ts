@@ -25,12 +25,23 @@ describe('ResultCard — 제목 · 복사', () => {
     ]);
     const [kinded, plain] = many.items;
     expect(kinded!.kindToken).toBe('int');
-    expect(title(html(kinded!))).toBe(`${kinded!.displayName} · int · 01`);
-    expect(title(html(plain!))).toBe(`${plain!.displayName} · 01`);
+    expect(title(html(kinded!))).toBe('IP Address · int · 01');
+    expect(title(html(plain!))).toBe('IP Address · 01');
   });
   it('기본값을 고른 항목(kind 만 있고 kindToken 없음)은 제목에 종류가 없다', () => {
     const it0 = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'cloud_sql_instance')!, count: 1, kind: 'MYSQL' }]).items[0]!;
-    expect(title(html(it0))).toBe(`${it0.displayName} · 01`);
+    expect(title(html(it0))).toBe('Cloud SQL Instance · 01');
+  });
+  it('제목 이름은 catalog 행 이름(트리 행과 같다) — 규칙 이름과 달라도 · 복사 버튼 이름도 같다 · catalog 없는 AWS · Azure 는 규칙 이름', () => {
+    const vm = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'compute_instance')!, count: 1 }]).items[0]!;
+    expect(vm.displayName).not.toBe('VM Instance'); // 검사기 — 규칙 이름이 다르다
+    const m = html(vm);
+    expect(title(m)).toBe('VM Instance · 01');
+    expect(m).toContain('aria-label="Copy VM Instance · 01 name"');
+    for (const p of ['aws', 'azure'] as const) {
+      const r = Object.values(generate({ ...ctx, region: p === 'aws' ? 'apne2' : 'krc', zone: undefined }, [p])[p]!)[0]!;
+      expect(title(html(r)), p).toBe(r.displayName);
+    }
   });
   it('유효한 카드는 복사할 수 있고, name.kind_required FAIL 카드는 이름이 있어도 복사 버튼이 꺼져 있다', () => {
     const ok = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'resource_policy')!, count: 1, kind: 'snapshot-schedule' }]).items[0]!;
