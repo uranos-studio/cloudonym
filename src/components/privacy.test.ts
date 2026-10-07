@@ -58,7 +58,18 @@ describe('/privacy', () => {
     expect(text).toContain('never collected');
     for (const w of ['owner', 'system', 'purpose', 'environment', 'region', 'URL hash', 'raw User-Agent', 'cookies', 'identifier']) expect(text, w).toContain(w);
   });
-  it('Workers Logs — 호스팅 제공자로서 요청 메타데이터를 처리할 수 있다', () => {
-    expect(pageText()).toContain('As the hosting provider, Cloudflare may process request metadata');
+  it('Workers Logs — 호스팅 제공자로서 요청 메타데이터를 처리할 수 있다 · 로그에는 본문 · 헤더를 쓰지 않는다(오류는 그대로 남는다)', () => {
+    const text = pageText();
+    expect(text).toContain('As the hosting provider, Cloudflare may process request metadata');
+    expect(text).toContain('does not write request bodies or headers to its logs');
+    // errors.ts 는 처리하지 못한 예외를 통째로 기록한다 — 시험이 덮지 못하는 「로그에 문맥값이 없다」 단정은 쓰지 않는다
+    expect(text).not.toMatch(/carry no context values/);
+  });
+  it('IP 를 읽는 범위는 요청 제한이 도는 곳과 같다 — POST /v1/ · GET /llms.txt · GET /catalog.json', () => {
+    const ip = sentences(pageText()).find((s) => s.includes('reads the client IP'))!;
+    for (const w of ['POST request to /v1/', '/llms.txt', '/catalog.json']) expect(ip, w).toContain(w);
+  });
+  it('AI 에이전트 요청은 ai_agent 일자 카운터에도 하나 더한다(telemetry.ts bump stats:ai_agent_hits)', () => {
+    expect(pageText()).toContain('when the client class is ai_agent, one to a daily AI-agent counter as well');
   });
 });

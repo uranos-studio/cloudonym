@@ -1022,7 +1022,7 @@ with sync_playwright() as p:
     resp27 = page27.goto(BASE + '/privacy', wait_until='networkidle')
     assert resp27 is not None and resp27.status == 200, resp27 and resp27.status
     expect(page27.locator('h1')).to_have_text('Privacy')
-    expect(page27.locator('[data-privacy-ip]')).to_have_text("Cloudonym reads the client IP address of each API request (the cf-connecting-ip header Cloudflare sets) only to pass it as the key of Cloudflare's rate-limiting binding (60 requests per 60 seconds); it is not stored in telemetry, KV or Axiom.")
+    expect(page27.locator('[data-privacy-ip]')).to_have_text("Cloudonym reads the client IP address of each POST request to /v1/ and each GET request for /llms.txt or /catalog.json (the cf-connecting-ip header Cloudflare sets) only to pass it as the key of Cloudflare's rate-limiting binding (60 requests per 60 seconds); it is not stored in telemetry, KV or Axiom.")
     expect(page27.locator('[data-privacy-kv]')).to_have_text('KV daily counters expire 366 days after their last update.')
     expect(page27.locator('[data-privacy-axiom]')).to_contain_text('the retention configured on the Axiom dataset')
     expect(page27.locator('[data-privacy-never]')).to_contain_text('never collected')
