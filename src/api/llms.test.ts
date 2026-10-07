@@ -11,6 +11,8 @@ import { SCOPES } from '../core/scopes';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { inputKind } from '../core/tree';
 import { ENABLED_PROVIDERS, PROVIDERS } from '../core/types';
+import { REGIONS } from '../core/regions-data';
+import { regionTokenOfRule } from '../core/compose';
 import { rulesFor } from '../core/constraints';
 import { AZURE_INTAKE_ROWS } from '../core/rules/azure-intake';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
@@ -35,6 +37,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(enabledRules).toHaveLength(rulesFor('gcp').length);
     expect(rulesFor('gcp')).toHaveLength(121);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
+    expect(lines.filter((l) => l === '### GCP')).toHaveLength(4); // 공식 · 지역 · 제약 · 트리
     expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
     expect(lines.filter((l) => l.includes('planned'))).toEqual(['> AWS and Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
     expect(text).toContain('"providers"?: ["gcp"]');
@@ -57,11 +60,33 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(st).toMatch(/forbidden: prefixes login; contains microsoft windows; words access [^;]* azure /);
     expect(st).toContain('case-insensitive');
   });
-  it('허용값 절은 ENV_ALIASES · 켜진 CSP 지역 표의 표준값과 별칭', () => {
+  it('허용값 절은 ENV_ALIASES 의 표준값과 별칭 · region 은 「## Regions」 절을 가리키고 global 을 적는다', () => {
     expect(text).toContain('- `prod` — aliases: prd, production, real, live');
-    expect(text).toContain('- `ane3` — aliases: asia-northeast3');
+    const region = lines.slice(lines.indexOf('### region') + 1, lines.indexOf('## Regions')).filter((l) => l.startsWith('- '));
+    expect(region).toEqual(['- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`']);
     expect(text).not.toContain('- `kr`');
-    expect(text).toContain('- `global`');
+  });
+  it('「## Regions」 절 — 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존) · 존 규칙 문장 (D49 · D50)', () => {
+    const start = lines.indexOf('## Regions');
+    expect(start).toBeGreaterThan(lines.indexOf('## Canonical Allowed Values'));
+    const end = lines.findIndex((l, i) => i > start && l.startsWith('## '));
+    const section = lines.slice(start, end);
+    const rows = section.filter((l) => /^- `[a-z0-9-]+` · `[a-z0-9]+` — /.test(l));
+    expect(REGIONS.gcp).toHaveLength(43);
+    expect(rows).toHaveLength(REGIONS.gcp.length);
+    expect(rows).toContain('- `asia-northeast3` · `ane3` — Seoul, South Korea, APAC · zones: `asia-northeast3-a` `ane3a`, `asia-northeast3-b` `ane3b`, `asia-northeast3-c` `ane3c`');
+    for (const r of REGIONS.gcp) expect(rows.some((l) => l.startsWith(`- \`${r.region}\` · \`${r.code}\` — ${r.label}`)), r.region).toBe(true);
+    const body = section.join('\n');
+    // 코드 규칙 · 받는 꼴 · 거부하는 옛 값 · global
+    expect(body).toContain('zone code is the region code followed by the zone letter');
+    expect(body).toContain('`kr`, `us`, `jp` and `eu` are rejected');
+    expect(body).toContain('`global` puts no region token');
+    // 존 규칙 문장 — 규칙 표에서 존 토큰 규칙을 세어 적는다
+    const zonal = enabledRules.filter((r) => regionTokenOfRule(r) === 'zone').map((r) => `\`${r.id}\``);
+    expect(zonal).toHaveLength(14);
+    const sentence = section.find((l) => l.startsWith('Zonal resources'))!;
+    expect(sentence).toContain('`name.zone_required`');
+    expect(sentence).toContain(zonal.join(', '));
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;

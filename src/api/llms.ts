@@ -4,6 +4,7 @@ import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { ENV_ALIASES } from '../core/normalize';
 import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { regionTokenOfRule } from '../core/compose';
 import { MAX_FIELD_CHARS } from './schemas';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -38,7 +39,7 @@ export function formulaOf(rule: ResourceRule): string {
   return rule.template.map(part).join(rule.separator);
 }
 
-/** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES · 지역 표가 정본) */
+/** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES 가 정본) */
 function allowedValues(dict: Record<string, string>): string[] {
   return [...new Set(Object.values(dict))].map((canon) => {
     const aliases = Object.entries(dict).filter(([k, v]) => v === canon && k !== canon).map(([k]) => k);
@@ -46,12 +47,23 @@ function allowedValues(dict: Record<string, string>): string[] {
   });
 }
 
-/** 켜진 CSP 의 지역 — 리전 코드가 표준값이고 리전 이름이 별칭이다 (D49). global 은 모든 CSP 에서 받는다 */
-function regionDict(providers: readonly Provider[]): Record<string, string> {
-  const dict: Record<string, string> = {};
-  for (const p of providers) for (const r of REGIONS[p]) { dict[r.code] = r.code; dict[r.region] = r.code; }
-  dict.global = 'global';
-  return dict;
+/** 「## Regions」 절 (D49 · D50) — 받는 꼴 · 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존) · 존 규칙 문장. 표는 지역 표(regions-data)가 정본이다 */
+function regionLines(rules: readonly ResourceRule[], order: readonly Provider[]): string[] {
+  const zonal = rules.filter((r) => order.includes(r.provider) && regionTokenOfRule(r) === 'zone').map((r) => `\`${r.id}\``);
+  const lines = [
+    '', '## Regions', '',
+    '`region` takes a region or a zone of the provider you name, by name or by code, in any case: `asia-northeast3`, `asia-northeast3-a`, `ane3` or `ane3a`, or `global`. Country values such as `kr`, `us`, `jp` and `eu` are rejected (400 `context.value_unsupported`, with the matching region names in `supported`), and so are region names of another provider.',
+    'Names carry a short code, not the region name: each region has the code listed below, and a zone code is the region code followed by the zone letter (`asia-northeast3-a` -> `ane3a`). A region or zone name you send is reported once as `context.normalized`. `global` puts no region token in any name.',
+    `Zonal resources carry the zone code and need a zone: given only a region, they come back \`valid: false\` with \`name.zone_required\` — ${zonal.join(', ')}. Regional resources carry the region code (or drop it first when the name is too long); global resources carry none.`,
+  ];
+  for (const p of order) {
+    lines.push('', `### ${p.toUpperCase()}`);
+    for (const r of REGIONS[p]) {
+      const zones = r.zones.length > 0 ? ` · zones: ${r.zones.map((z) => `\`${z.zone}\` \`${z.code}\``).join(', ')}` : '';
+      lines.push(`- \`${r.region}\` · \`${r.code}\` — ${r.label}${zones}`);
+    }
+  }
+  return lines;
 }
 
 function constraintLine(rule: ResourceRule, catalog: Catalog): string {
@@ -104,7 +116,9 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
       lines.push(`- \`${r.id}\`: \`${formulaOf(r)}\`${r.optional.length > 0 ? ` · optional: ${r.optional.join(', ')}` : ''}`);
     }
   }
-  lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region', ...allowedValues(regionDict(order)));
+  lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region',
+    '- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`');
+  lines.push(...regionLines(rules, order));
   lines.push('', '## Provider Constraints');
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);

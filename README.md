@@ -15,7 +15,7 @@ Multi-cloud resource naming engine for **AWS · GCP · Azure**. From five contex
 
 One line above the names says what **PASS** means (see [What PASS means](#what-pass-means)). The footer shows the engine and rules versions; a share link made with older rules shows a notice until you change the input.
 
-Allowed values — env: `prod` · `stg` · `dev` · `sbx` (aliases such as `prd`, `staging` are accepted) · region: `kr` · `us` · `jp` · `eu` · `global` (aliases such as `asia-northeast3`, `ap-northeast-2`, `koreacentral` are accepted). The full alias list is in `/llms.txt`.
+Allowed values — env: `prod` · `stg` · `dev` · `sbx` (aliases such as `prd`, `staging` are accepted) · region: a region or a zone of the provider, by name or by code (`asia-northeast3`, `asia-northeast3-a`, `ane3`, `ane3a`), or `global` — zonal resources need a zone. The region table is in `/llms.txt`.
 
 ### Share URL — your input is readable by anyone with the link
 
@@ -282,7 +282,7 @@ See the LICENSE file for details.
 
 스크린샷 — [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png).
 
-허용값 — env: `prod` · `stg` · `dev` · `sbx`(`prd` · `staging` 같은 별칭도 받는다) · region: `kr` · `us` · `jp` · `eu` · `global`(`asia-northeast3` · `ap-northeast-2` · `koreacentral` 같은 별칭도 받는다). 별칭 전체는 `/llms.txt` 에 있다.
+허용값 — env: `prod` · `stg` · `dev` · `sbx`(`prd` · `staging` 같은 별칭도 받는다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존 리소스는 존이 있어야 한다. 지역 표는 `/llms.txt` 에 있다.
 
 ### API 세 줄
 

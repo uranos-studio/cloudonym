@@ -242,7 +242,7 @@
               "example": {
                 "provider": "gcp",
                 "resource_type": "service_account",
-                "name": "platform-billing-trade-prod-kr-sa-sync"
+                "name": "platform-billing-trade-prod-ane3-sa-sync"
               }
             }
           }
@@ -483,8 +483,8 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: kr, us, jp, eu, global. Provider region codes are accepted and normalised (asia-northeast3, ap-northeast-2, koreacentral -> kr; us-east-1, us-central1, eastus -> us; ap-northeast-1, asia-northeast1, japaneast -> jp; eu-west-1, europe-west1, westeurope -> eu).",
-                "example": "kr"
+                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the code: ane3 for the region, ane3a for the zone. Zonal resources need a zone; given only a region they come back valid: false with name.zone_required. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
+                "example": "asia-northeast3-a"
               }
             }
           },
@@ -629,7 +629,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prod-kr-sa-sync"
+            "example": "platform-billing-trade-prod-ane3-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -700,8 +700,8 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: kr, us, jp, eu, global. Provider region codes are accepted and normalised (asia-northeast3, ap-northeast-2, koreacentral -> kr; us-east-1, us-central1, eastus -> us; ap-northeast-1, asia-northeast1, japaneast -> jp; eu-west-1, europe-west1, westeurope -> eu).",
-                "example": "kr"
+                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the code: ane3 for the region, ane3a for the zone. Zonal resources need a zone; given only a region they come back valid: false with name.zone_required. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
+                "example": "asia-northeast3-a"
               }
             }
           },
@@ -985,7 +985,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prod-kr-sa-sync"
+            "example": "platform-billing-trade-prod-ane3-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -1151,7 +1151,7 @@
             "type": "string",
             "maxLength": 1024,
             "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).",
-            "example": "platform-billing-trade-prod-kr-sa-sync"
+            "example": "platform-billing-trade-prod-ane3-sa-sync"
           },
           "rules_version": {
             "type": "string",
@@ -1197,7 +1197,7 @@
           "suggested_name": {
             "type": "string",
             "description": "Present only when the name is invalid and a fix is possible",
-            "example": "billing-trade-prod-kr-sa-sync"
+            "example": "billing-trade-prod-ane3-sa-sync"
           }
         }
       },

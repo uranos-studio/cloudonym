@@ -9,9 +9,12 @@ import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
 import { rulesFor } from '../core/constraints';
 import { MESSAGE_CODES } from '../core/messages';
-import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { ENABLED_PROVIDERS } from '../core/types';
+
+/** region 예시를 넣어 볼 문맥 — 나머지 넷은 정본 값 */
+const ctxExample = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
 
 const SELECTION_CODES_IN_SAMPLES = MESSAGE_CODES.filter((c) => c.startsWith('selection.'));
 
@@ -36,6 +39,17 @@ describe('public/openapi.json — 형식', () => {
     expect(ctx['env']!.enum).toBeUndefined();
     expect(ctx['region']!.enum).toBeUndefined();
     expect(JSON.stringify(spec)).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
+  });
+  it('region 설명 · 예시 — 옛 나라 값(kr)이 없고 존 입력을 말한다 · 예시는 켜진 CSP 에서 풀린다 (D49 · D50)', () => {
+    for (const r of ['GenerateRequest', 'NamesRequest']) {
+      const region = schemas[r]!.properties!['context']!.properties!['region']! as Schema & { example?: string };
+      expect(region.description, r).not.toMatch(/\bkr\b/);
+      expect(region.description, r).toMatch(/zone/i);
+      expect(region.description, r).toContain('/llms.txt');
+      for (const p of ENABLED_PROVIDERS) expect(parseContext({ ...ctxExample, region: region.example }, p).ok, `${r} ${p}`).toBe(true);
+    }
+    // 이름 예시에 옛 지역 토큰이 남지 않는다
+    expect(JSON.stringify(spec)).not.toMatch(/-kr-/);
   });
   it('다섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500 (D25 · D39)', () => {
     expect(keys(spec.paths)).toEqual(['/events', '/generate', '/health', '/names', '/validate']);
