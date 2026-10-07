@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cloudonym resource catalog",
+  "description": "Schema for catalog/gcp.json. catalog/regions.json and catalog/kind-sources.json are described under definitions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "rows"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "schema", "sources"],
+      "properties": {
+        "provider": { "enum": ["gcp", "aws", "azure"] },
+        "schema": { "const": 1 },
+        "sources": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "rows": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/row" } }
+  },
+  "definitions": {
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "scopeChoice": { "type": "string", "pattern": "^(namespace|project|location|global|region|zone|in [a-z0-9_]+)$" },
+    "kindValue": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "displayName", "category", "rules", "slug", "entity", "kind", "info", "enterNameAt", "badges", "aliases"],
+      "properties": {
+        "key": { "type": "string", "pattern": "^gcp\\.[a-z0-9_]+$" },
+        "displayName": { "$ref": "#/definitions/nonEmpty" },
+        "category": { "enum": ["compute", "networking", "storage", "database", "identity", "security", "management", "containers"] },
+        "rules": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^gcp\\.[a-z0-9_]+$" },
+          "additionalProperties": { "$ref": "#/definitions/ruleSpec" }
+        },
+        "slug": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "basis", "previous"],
+          "properties": {
+            "value": { "type": "string", "pattern": "^[a-z0-9]*$" },
+            "basis": { "$ref": "#/definitions/nonEmpty" },
+            "previous": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9]+$" }, "uniqueItems": true }
+          }
+        },
+        "entity": { "type": ["string", "null"], "pattern": "^[a-z0-9]+\\.[A-Za-z0-9.]+$" },
+        "kind": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/kindSpec" }] },
+        "info": { "$ref": "#/definitions/nonEmpty" },
+        "enterNameAt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gcloud", "terraform", "apiOnly", "preview"],
+          "properties": {
+            "gcloud": { "type": "array", "items": { "$ref": "#/definitions/nonEmpty" } },
+            "terraform": { "type": "array", "items": { "$ref": "#/definitions/nonEmpty" } },
+            "apiOnly": { "type": "boolean" },
+            "preview": { "type": "boolean" }
+          }
+        },
+        "badges": { "type": "array", "items": { "enum": ["api-only", "preview"] }, "uniqueItems": true },
+        "aliases": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9_ .-]+$" }, "uniqueItems": true }
+      }
+    },
+    "ruleSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "regionToken"],
+      "properties": {
+        "scope": { "$ref": "#/definitions/scopeChoice" },
+        "regionToken": { "enum": ["none", "region", "zone"] },
+        "kinds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["default", "allowed"],
+          "properties": {
+            "default": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/kindValue" }] },
+            "allowed": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/kindValue" }, "uniqueItems": true }
+          }
+        }
+      }
+    },
+    "kindSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "defaultBasis", "tokens", "omitValues", "source"],
+      "properties": {
+        "rule": { "enum": ["omit-when-csp-default", "only-when-chosen", "required"] },
+        "defaultBasis": { "$ref": "#/definitions/nonEmpty" },
+        "tokens": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/definitions/kindValue" },
+          "additionalProperties": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[a-z0-9]{1,5}$" }] }
+        },
+        "omitValues": { "type": "array", "items": { "$ref": "#/definitions/kindValue" }, "uniqueItems": true },
+        "source": { "$ref": "#/definitions/nonEmpty" }
+      }
+    },
+    "regions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meta", "gcp", "aws", "azure"],
+      "properties": {
+        "meta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gcp", "aws", "azure"],
+          "patternProperties": {
+            "^(gcp|aws|azure)$": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status", "source"],
+              "properties": { "status": { "enum": ["final", "draft"] }, "source": { "type": "string", "pattern": "^https://" } }
+            }
+          }
+        },
+        "gcp": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["region", "code", "location", "zones"],
+            "properties": {
+              "region": { "type": "string", "pattern": "^[a-z]+-[a-z]+[0-9]+$" },
+              "code": { "type": "string", "pattern": "^[a-z0-9]{2,5}$" },
+              "location": { "$ref": "#/definitions/nonEmpty" },
+              "zones": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["zone", "code"],
+                  "properties": { "zone": { "type": "string", "pattern": "^[a-z]+-[a-z]+[0-9]+-[a-z]$" }, "code": { "type": "string", "pattern": "^[a-z0-9]{3,6}$" } }
+                }
+              }
+            }
+          }
+        },
+        "aws": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["region", "code", "displayName"],
+            "properties": { "region": { "$ref": "#/definitions/nonEmpty" }, "code": { "type": "string", "pattern": "^[a-z0-9]{2,5}$" }, "displayName": { "$ref": "#/definitions/nonEmpty" } }
+          }
+        },
+        "azure": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["region", "code", "displayName", "location"],
+            "properties": {
+              "region": { "$ref": "#/definitions/nonEmpty" },
+              "code": { "type": "string", "pattern": "^[a-z0-9]{2,5}$" },
+              "displayName": { "$ref": "#/definitions/nonEmpty" },
+              "location": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "kindSources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meta", "rows"],
+      "properties": {
+        "meta": { "type": "object" },
+        "rows": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["value", "scopes", "source", "quote", "checked"],
+              "properties": {
+                "value": { "$ref": "#/definitions/kindValue" },
+                "scopes": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/scopeChoice" }, "uniqueItems": true },
+                "source": { "type": "string", "pattern": "^https://" },
+                "quote": { "$ref": "#/definitions/nonEmpty" },
+                "checked": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+                "conflict": { "$ref": "#/definitions/nonEmpty" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

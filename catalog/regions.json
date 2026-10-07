@@ -1,0 +1,1355 @@
+{
+  "meta": {
+    "gcp": {
+      "status": "final",
+      "source": "https://cloud.google.com/compute/docs/regions-zones"
+    },
+    "aws": {
+      "status": "draft",
+      "source": "https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions.html"
+    },
+    "azure": {
+      "status": "draft",
+      "source": "https://learn.microsoft.com/en-us/azure/reliability/regions-list"
+    }
+  },
+  "gcp": [
+    {
+      "region": "africa-south1",
+      "code": "afs1",
+      "location": "Johannesburg, South Africa",
+      "zones": [
+        {
+          "zone": "africa-south1-a",
+          "code": "afs1a"
+        },
+        {
+          "zone": "africa-south1-b",
+          "code": "afs1b"
+        },
+        {
+          "zone": "africa-south1-c",
+          "code": "afs1c"
+        }
+      ]
+    },
+    {
+      "region": "asia-east1",
+      "code": "ae1",
+      "location": "Changhua County, Taiwan, APAC",
+      "zones": [
+        {
+          "zone": "asia-east1-a",
+          "code": "ae1a"
+        },
+        {
+          "zone": "asia-east1-b",
+          "code": "ae1b"
+        },
+        {
+          "zone": "asia-east1-c",
+          "code": "ae1c"
+        }
+      ]
+    },
+    {
+      "region": "asia-east2",
+      "code": "ae2",
+      "location": "Hong Kong, APAC",
+      "zones": [
+        {
+          "zone": "asia-east2-a",
+          "code": "ae2a"
+        },
+        {
+          "zone": "asia-east2-b",
+          "code": "ae2b"
+        },
+        {
+          "zone": "asia-east2-c",
+          "code": "ae2c"
+        }
+      ]
+    },
+    {
+      "region": "asia-northeast1",
+      "code": "ane1",
+      "location": "Tokyo, Japan, APAC",
+      "zones": [
+        {
+          "zone": "asia-northeast1-a",
+          "code": "ane1a"
+        },
+        {
+          "zone": "asia-northeast1-b",
+          "code": "ane1b"
+        },
+        {
+          "zone": "asia-northeast1-c",
+          "code": "ane1c"
+        }
+      ]
+    },
+    {
+      "region": "asia-northeast2",
+      "code": "ane2",
+      "location": "Osaka, Japan, APAC",
+      "zones": [
+        {
+          "zone": "asia-northeast2-a",
+          "code": "ane2a"
+        },
+        {
+          "zone": "asia-northeast2-b",
+          "code": "ane2b"
+        },
+        {
+          "zone": "asia-northeast2-c",
+          "code": "ane2c"
+        }
+      ]
+    },
+    {
+      "region": "asia-northeast3",
+      "code": "ane3",
+      "location": "Seoul, South Korea, APAC",
+      "zones": [
+        {
+          "zone": "asia-northeast3-a",
+          "code": "ane3a"
+        },
+        {
+          "zone": "asia-northeast3-b",
+          "code": "ane3b"
+        },
+        {
+          "zone": "asia-northeast3-c",
+          "code": "ane3c"
+        }
+      ]
+    },
+    {
+      "region": "asia-south1",
+      "code": "as1",
+      "location": "Mumbai, India, APAC",
+      "zones": [
+        {
+          "zone": "asia-south1-a",
+          "code": "as1a"
+        },
+        {
+          "zone": "asia-south1-b",
+          "code": "as1b"
+        },
+        {
+          "zone": "asia-south1-c",
+          "code": "as1c"
+        }
+      ]
+    },
+    {
+      "region": "asia-south2",
+      "code": "as2",
+      "location": "Delhi, India, APAC",
+      "zones": [
+        {
+          "zone": "asia-south2-a",
+          "code": "as2a"
+        },
+        {
+          "zone": "asia-south2-b",
+          "code": "as2b"
+        },
+        {
+          "zone": "asia-south2-c",
+          "code": "as2c"
+        }
+      ]
+    },
+    {
+      "region": "asia-southeast1",
+      "code": "ase1",
+      "location": "Jurong West, Singapore, APAC",
+      "zones": [
+        {
+          "zone": "asia-southeast1-a",
+          "code": "ase1a"
+        },
+        {
+          "zone": "asia-southeast1-b",
+          "code": "ase1b"
+        },
+        {
+          "zone": "asia-southeast1-c",
+          "code": "ase1c"
+        }
+      ]
+    },
+    {
+      "region": "asia-southeast2",
+      "code": "ase2",
+      "location": "Jakarta, Indonesia, APAC",
+      "zones": [
+        {
+          "zone": "asia-southeast2-a",
+          "code": "ase2a"
+        },
+        {
+          "zone": "asia-southeast2-b",
+          "code": "ase2b"
+        },
+        {
+          "zone": "asia-southeast2-c",
+          "code": "ase2c"
+        }
+      ]
+    },
+    {
+      "region": "asia-southeast3",
+      "code": "ase3",
+      "location": "Bangkok, Thailand, APAC",
+      "zones": [
+        {
+          "zone": "asia-southeast3-a",
+          "code": "ase3a"
+        },
+        {
+          "zone": "asia-southeast3-b",
+          "code": "ase3b"
+        },
+        {
+          "zone": "asia-southeast3-c",
+          "code": "ase3c"
+        }
+      ]
+    },
+    {
+      "region": "australia-southeast1",
+      "code": "ause1",
+      "location": "Sydney, Australia, APAC",
+      "zones": [
+        {
+          "zone": "australia-southeast1-a",
+          "code": "ause1a"
+        },
+        {
+          "zone": "australia-southeast1-b",
+          "code": "ause1b"
+        },
+        {
+          "zone": "australia-southeast1-c",
+          "code": "ause1c"
+        }
+      ]
+    },
+    {
+      "region": "australia-southeast2",
+      "code": "ause2",
+      "location": "Melbourne, Australia, APAC",
+      "zones": [
+        {
+          "zone": "australia-southeast2-a",
+          "code": "ause2a"
+        },
+        {
+          "zone": "australia-southeast2-b",
+          "code": "ause2b"
+        },
+        {
+          "zone": "australia-southeast2-c",
+          "code": "ause2c"
+        }
+      ]
+    },
+    {
+      "region": "europe-north1",
+      "code": "eun1",
+      "location": "Hamina, Finland, Europe",
+      "zones": [
+        {
+          "zone": "europe-north1-a",
+          "code": "eun1a"
+        },
+        {
+          "zone": "europe-north1-b",
+          "code": "eun1b"
+        },
+        {
+          "zone": "europe-north1-c",
+          "code": "eun1c"
+        }
+      ]
+    },
+    {
+      "region": "europe-north2",
+      "code": "eun2",
+      "location": "Stockholm, Sweden, Europe",
+      "zones": [
+        {
+          "zone": "europe-north2-a",
+          "code": "eun2a"
+        },
+        {
+          "zone": "europe-north2-b",
+          "code": "eun2b"
+        },
+        {
+          "zone": "europe-north2-c",
+          "code": "eun2c"
+        }
+      ]
+    },
+    {
+      "region": "europe-central2",
+      "code": "euc2",
+      "location": "Warsaw, Poland, Europe",
+      "zones": [
+        {
+          "zone": "europe-central2-a",
+          "code": "euc2a"
+        },
+        {
+          "zone": "europe-central2-b",
+          "code": "euc2b"
+        },
+        {
+          "zone": "europe-central2-c",
+          "code": "euc2c"
+        }
+      ]
+    },
+    {
+      "region": "europe-southwest1",
+      "code": "eusw1",
+      "location": "Madrid, Spain, Europe",
+      "zones": [
+        {
+          "zone": "europe-southwest1-a",
+          "code": "eusw1a"
+        },
+        {
+          "zone": "europe-southwest1-b",
+          "code": "eusw1b"
+        },
+        {
+          "zone": "europe-southwest1-c",
+          "code": "eusw1c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west1",
+      "code": "euw1",
+      "location": "St. Ghislain, Belgium, Europe",
+      "zones": [
+        {
+          "zone": "europe-west1-b",
+          "code": "euw1b"
+        },
+        {
+          "zone": "europe-west1-c",
+          "code": "euw1c"
+        },
+        {
+          "zone": "europe-west1-d",
+          "code": "euw1d"
+        }
+      ]
+    },
+    {
+      "region": "europe-west2",
+      "code": "euw2",
+      "location": "London, England, Europe",
+      "zones": [
+        {
+          "zone": "europe-west2-a",
+          "code": "euw2a"
+        },
+        {
+          "zone": "europe-west2-b",
+          "code": "euw2b"
+        },
+        {
+          "zone": "europe-west2-c",
+          "code": "euw2c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west3",
+      "code": "euw3",
+      "location": "Frankfurt, Germany, Europe",
+      "zones": [
+        {
+          "zone": "europe-west3-a",
+          "code": "euw3a"
+        },
+        {
+          "zone": "europe-west3-b",
+          "code": "euw3b"
+        },
+        {
+          "zone": "europe-west3-c",
+          "code": "euw3c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west4",
+      "code": "euw4",
+      "location": "Eemshaven, Netherlands, Europe",
+      "zones": [
+        {
+          "zone": "europe-west4-a",
+          "code": "euw4a"
+        },
+        {
+          "zone": "europe-west4-b",
+          "code": "euw4b"
+        },
+        {
+          "zone": "europe-west4-c",
+          "code": "euw4c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west6",
+      "code": "euw6",
+      "location": "Zurich, Switzerland, Europe",
+      "zones": [
+        {
+          "zone": "europe-west6-a",
+          "code": "euw6a"
+        },
+        {
+          "zone": "europe-west6-b",
+          "code": "euw6b"
+        },
+        {
+          "zone": "europe-west6-c",
+          "code": "euw6c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west8",
+      "code": "euw8",
+      "location": "Milan, Italy, Europe",
+      "zones": [
+        {
+          "zone": "europe-west8-a",
+          "code": "euw8a"
+        },
+        {
+          "zone": "europe-west8-b",
+          "code": "euw8b"
+        },
+        {
+          "zone": "europe-west8-c",
+          "code": "euw8c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west9",
+      "code": "euw9",
+      "location": "Paris, France, Europe",
+      "zones": [
+        {
+          "zone": "europe-west9-a",
+          "code": "euw9a"
+        },
+        {
+          "zone": "europe-west9-b",
+          "code": "euw9b"
+        },
+        {
+          "zone": "europe-west9-c",
+          "code": "euw9c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west10",
+      "code": "euw10",
+      "location": "Berlin, Germany, Europe",
+      "zones": [
+        {
+          "zone": "europe-west10-a",
+          "code": "euw10a"
+        },
+        {
+          "zone": "europe-west10-b",
+          "code": "euw10b"
+        },
+        {
+          "zone": "europe-west10-c",
+          "code": "euw10c"
+        }
+      ]
+    },
+    {
+      "region": "europe-west12",
+      "code": "euw12",
+      "location": "Turin, Italy, Europe",
+      "zones": [
+        {
+          "zone": "europe-west12-a",
+          "code": "euw12a"
+        },
+        {
+          "zone": "europe-west12-b",
+          "code": "euw12b"
+        },
+        {
+          "zone": "europe-west12-c",
+          "code": "euw12c"
+        }
+      ]
+    },
+    {
+      "region": "me-central1",
+      "code": "mec1",
+      "location": "Doha, Qatar, Middle East",
+      "zones": [
+        {
+          "zone": "me-central1-a",
+          "code": "mec1a"
+        },
+        {
+          "zone": "me-central1-b",
+          "code": "mec1b"
+        },
+        {
+          "zone": "me-central1-c",
+          "code": "mec1c"
+        }
+      ]
+    },
+    {
+      "region": "me-central2",
+      "code": "mec2",
+      "location": "Dammam, Saudi Arabia, Middle East",
+      "zones": [
+        {
+          "zone": "me-central2-a",
+          "code": "mec2a"
+        },
+        {
+          "zone": "me-central2-b",
+          "code": "mec2b"
+        },
+        {
+          "zone": "me-central2-c",
+          "code": "mec2c"
+        }
+      ]
+    },
+    {
+      "region": "me-west1",
+      "code": "mew1",
+      "location": "Tel Aviv, Israel, Middle East",
+      "zones": [
+        {
+          "zone": "me-west1-a",
+          "code": "mew1a"
+        },
+        {
+          "zone": "me-west1-b",
+          "code": "mew1b"
+        },
+        {
+          "zone": "me-west1-c",
+          "code": "mew1c"
+        }
+      ]
+    },
+    {
+      "region": "northamerica-northeast1",
+      "code": "nane1",
+      "location": "Montréal, Québec, North America",
+      "zones": [
+        {
+          "zone": "northamerica-northeast1-a",
+          "code": "nane1a"
+        },
+        {
+          "zone": "northamerica-northeast1-b",
+          "code": "nane1b"
+        },
+        {
+          "zone": "northamerica-northeast1-c",
+          "code": "nane1c"
+        }
+      ]
+    },
+    {
+      "region": "northamerica-northeast2",
+      "code": "nane2",
+      "location": "Toronto, Ontario, North America",
+      "zones": [
+        {
+          "zone": "northamerica-northeast2-a",
+          "code": "nane2a"
+        },
+        {
+          "zone": "northamerica-northeast2-b",
+          "code": "nane2b"
+        },
+        {
+          "zone": "northamerica-northeast2-c",
+          "code": "nane2c"
+        }
+      ]
+    },
+    {
+      "region": "northamerica-south1",
+      "code": "nas1",
+      "location": "Queretaro, Mexico, North America",
+      "zones": [
+        {
+          "zone": "northamerica-south1-a",
+          "code": "nas1a"
+        },
+        {
+          "zone": "northamerica-south1-b",
+          "code": "nas1b"
+        },
+        {
+          "zone": "northamerica-south1-c",
+          "code": "nas1c"
+        }
+      ]
+    },
+    {
+      "region": "southamerica-east1",
+      "code": "sae1",
+      "location": "Osasco, São Paulo, Brazil, South America",
+      "zones": [
+        {
+          "zone": "southamerica-east1-a",
+          "code": "sae1a"
+        },
+        {
+          "zone": "southamerica-east1-b",
+          "code": "sae1b"
+        },
+        {
+          "zone": "southamerica-east1-c",
+          "code": "sae1c"
+        }
+      ]
+    },
+    {
+      "region": "southamerica-west1",
+      "code": "saw1",
+      "location": "Santiago, Chile, South America",
+      "zones": [
+        {
+          "zone": "southamerica-west1-a",
+          "code": "saw1a"
+        },
+        {
+          "zone": "southamerica-west1-b",
+          "code": "saw1b"
+        },
+        {
+          "zone": "southamerica-west1-c",
+          "code": "saw1c"
+        }
+      ]
+    },
+    {
+      "region": "us-central1",
+      "code": "usc1",
+      "location": "Council Bluffs, Iowa, North America",
+      "zones": [
+        {
+          "zone": "us-central1-a",
+          "code": "usc1a"
+        },
+        {
+          "zone": "us-central1-b",
+          "code": "usc1b"
+        },
+        {
+          "zone": "us-central1-c",
+          "code": "usc1c"
+        },
+        {
+          "zone": "us-central1-f",
+          "code": "usc1f"
+        }
+      ]
+    },
+    {
+      "region": "us-east1",
+      "code": "use1",
+      "location": "Moncks Corner, South Carolina, North America",
+      "zones": [
+        {
+          "zone": "us-east1-b",
+          "code": "use1b"
+        },
+        {
+          "zone": "us-east1-c",
+          "code": "use1c"
+        },
+        {
+          "zone": "us-east1-d",
+          "code": "use1d"
+        }
+      ]
+    },
+    {
+      "region": "us-east4",
+      "code": "use4",
+      "location": "Ashburn, Virginia, North America",
+      "zones": [
+        {
+          "zone": "us-east4-a",
+          "code": "use4a"
+        },
+        {
+          "zone": "us-east4-b",
+          "code": "use4b"
+        },
+        {
+          "zone": "us-east4-c",
+          "code": "use4c"
+        }
+      ]
+    },
+    {
+      "region": "us-east5",
+      "code": "use5",
+      "location": "Columbus, Ohio, North America",
+      "zones": [
+        {
+          "zone": "us-east5-a",
+          "code": "use5a"
+        },
+        {
+          "zone": "us-east5-b",
+          "code": "use5b"
+        },
+        {
+          "zone": "us-east5-c",
+          "code": "use5c"
+        }
+      ]
+    },
+    {
+      "region": "us-south1",
+      "code": "uss1",
+      "location": "Dallas, Texas, North America",
+      "zones": [
+        {
+          "zone": "us-south1-a",
+          "code": "uss1a"
+        },
+        {
+          "zone": "us-south1-b",
+          "code": "uss1b"
+        },
+        {
+          "zone": "us-south1-c",
+          "code": "uss1c"
+        }
+      ]
+    },
+    {
+      "region": "us-west1",
+      "code": "usw1",
+      "location": "The Dalles, Oregon, North America",
+      "zones": [
+        {
+          "zone": "us-west1-a",
+          "code": "usw1a"
+        },
+        {
+          "zone": "us-west1-b",
+          "code": "usw1b"
+        },
+        {
+          "zone": "us-west1-c",
+          "code": "usw1c"
+        }
+      ]
+    },
+    {
+      "region": "us-west2",
+      "code": "usw2",
+      "location": "Los Angeles, California, North America",
+      "zones": [
+        {
+          "zone": "us-west2-a",
+          "code": "usw2a"
+        },
+        {
+          "zone": "us-west2-b",
+          "code": "usw2b"
+        },
+        {
+          "zone": "us-west2-c",
+          "code": "usw2c"
+        }
+      ]
+    },
+    {
+      "region": "us-west3",
+      "code": "usw3",
+      "location": "Salt Lake City, Utah, North America",
+      "zones": [
+        {
+          "zone": "us-west3-a",
+          "code": "usw3a"
+        },
+        {
+          "zone": "us-west3-b",
+          "code": "usw3b"
+        },
+        {
+          "zone": "us-west3-c",
+          "code": "usw3c"
+        }
+      ]
+    },
+    {
+      "region": "us-west4",
+      "code": "usw4",
+      "location": "Las Vegas, Nevada, North America",
+      "zones": [
+        {
+          "zone": "us-west4-a",
+          "code": "usw4a"
+        },
+        {
+          "zone": "us-west4-b",
+          "code": "usw4b"
+        },
+        {
+          "zone": "us-west4-c",
+          "code": "usw4c"
+        }
+      ]
+    }
+  ],
+  "aws": [
+    {
+      "region": "us-east-1",
+      "code": "use1",
+      "displayName": "US East (N. Virginia)"
+    },
+    {
+      "region": "us-east-2",
+      "code": "use2",
+      "displayName": "US East (Ohio)"
+    },
+    {
+      "region": "us-west-1",
+      "code": "usw1",
+      "displayName": "US West (N. California)"
+    },
+    {
+      "region": "us-west-2",
+      "code": "usw2",
+      "displayName": "US West (Oregon)"
+    },
+    {
+      "region": "af-south-1",
+      "code": "afs1",
+      "displayName": "Africa (Cape Town)"
+    },
+    {
+      "region": "ap-east-1",
+      "code": "ape1",
+      "displayName": "Asia Pacific (Hong Kong)"
+    },
+    {
+      "region": "ap-south-2",
+      "code": "aps2",
+      "displayName": "Asia Pacific (Hyderabad)"
+    },
+    {
+      "region": "ap-southeast-3",
+      "code": "apse3",
+      "displayName": "Asia Pacific (Jakarta)"
+    },
+    {
+      "region": "ap-southeast-5",
+      "code": "apse5",
+      "displayName": "Asia Pacific (Malaysia)"
+    },
+    {
+      "region": "ap-southeast-4",
+      "code": "apse4",
+      "displayName": "Asia Pacific (Melbourne)"
+    },
+    {
+      "region": "ap-south-1",
+      "code": "aps1",
+      "displayName": "Asia Pacific (Mumbai)"
+    },
+    {
+      "region": "ap-southeast-6",
+      "code": "apse6",
+      "displayName": "Asia Pacific (New Zealand)"
+    },
+    {
+      "region": "ap-northeast-3",
+      "code": "apne3",
+      "displayName": "Asia Pacific (Osaka)"
+    },
+    {
+      "region": "ap-northeast-2",
+      "code": "apne2",
+      "displayName": "Asia Pacific (Seoul)"
+    },
+    {
+      "region": "ap-southeast-1",
+      "code": "apse1",
+      "displayName": "Asia Pacific (Singapore)"
+    },
+    {
+      "region": "ap-southeast-2",
+      "code": "apse2",
+      "displayName": "Asia Pacific (Sydney)"
+    },
+    {
+      "region": "ap-east-2",
+      "code": "ape2",
+      "displayName": "Asia Pacific (Taipei)"
+    },
+    {
+      "region": "ap-southeast-7",
+      "code": "apse7",
+      "displayName": "Asia Pacific (Thailand)"
+    },
+    {
+      "region": "ap-northeast-1",
+      "code": "apne1",
+      "displayName": "Asia Pacific (Tokyo)"
+    },
+    {
+      "region": "ca-central-1",
+      "code": "cac1",
+      "displayName": "Canada (Central)"
+    },
+    {
+      "region": "ca-west-1",
+      "code": "caw1",
+      "displayName": "Canada West (Calgary)"
+    },
+    {
+      "region": "eu-central-1",
+      "code": "euc1",
+      "displayName": "Europe (Frankfurt)"
+    },
+    {
+      "region": "eu-west-1",
+      "code": "euw1",
+      "displayName": "Europe (Ireland)"
+    },
+    {
+      "region": "eu-west-2",
+      "code": "euw2",
+      "displayName": "Europe (London)"
+    },
+    {
+      "region": "eu-south-1",
+      "code": "eus1",
+      "displayName": "Europe (Milan)"
+    },
+    {
+      "region": "eu-west-3",
+      "code": "euw3",
+      "displayName": "Europe (Paris)"
+    },
+    {
+      "region": "eu-south-2",
+      "code": "eus2",
+      "displayName": "Europe (Spain)"
+    },
+    {
+      "region": "eu-north-1",
+      "code": "eun1",
+      "displayName": "Europe (Stockholm)"
+    },
+    {
+      "region": "eu-central-2",
+      "code": "euc2",
+      "displayName": "Europe (Zurich)"
+    },
+    {
+      "region": "il-central-1",
+      "code": "ilc1",
+      "displayName": "Israel (Tel Aviv)"
+    },
+    {
+      "region": "mx-central-1",
+      "code": "mxc1",
+      "displayName": "Mexico (Central)"
+    },
+    {
+      "region": "me-south-1",
+      "code": "mes1",
+      "displayName": "Middle East (Bahrain)"
+    },
+    {
+      "region": "me-central-1",
+      "code": "mec1",
+      "displayName": "Middle East (UAE)"
+    },
+    {
+      "region": "sa-east-1",
+      "code": "sae1",
+      "displayName": "South America (São Paulo)"
+    }
+  ],
+  "azure": [
+    {
+      "region": "australiacentral",
+      "code": "acl",
+      "displayName": "Australia Central",
+      "location": "Canberra"
+    },
+    {
+      "region": "australiacentral2",
+      "code": "acl2",
+      "displayName": "Australia Central 2",
+      "location": "Canberra"
+    },
+    {
+      "region": "australiaeast",
+      "code": "ae",
+      "displayName": "Australia East",
+      "location": "New South Wales"
+    },
+    {
+      "region": "australiasoutheast",
+      "code": "ase",
+      "displayName": "Australia Southeast",
+      "location": "Victoria"
+    },
+    {
+      "region": "austriaeast",
+      "code": "aue",
+      "displayName": "Austria East",
+      "location": "Vienna"
+    },
+    {
+      "region": "belgiumcentral",
+      "code": "bec",
+      "displayName": "Belgium Central",
+      "location": "Brussels"
+    },
+    {
+      "region": "brazilsouth",
+      "code": "brs",
+      "displayName": "Brazil South",
+      "location": "Sao Paulo State"
+    },
+    {
+      "region": "brazilsoutheast",
+      "code": "bse",
+      "displayName": "Brazil Southeast",
+      "location": "Rio"
+    },
+    {
+      "region": "canadacentral",
+      "code": "cnc",
+      "displayName": "Canada Central",
+      "location": "Toronto"
+    },
+    {
+      "region": "canadaeast",
+      "code": "cne",
+      "displayName": "Canada East",
+      "location": "Quebec"
+    },
+    {
+      "region": "centralindia",
+      "code": "inc",
+      "displayName": "Central India",
+      "location": "Pune"
+    },
+    {
+      "region": "centralus",
+      "code": "cus",
+      "displayName": "Central US",
+      "location": "Iowa"
+    },
+    {
+      "region": "chilecentral",
+      "code": "clc",
+      "displayName": "Chile Central",
+      "location": "Santiago"
+    },
+    {
+      "region": "denmarkeast",
+      "code": "dke",
+      "displayName": "Denmark East",
+      "location": "Copenhagen"
+    },
+    {
+      "region": "eastasia",
+      "code": "ea",
+      "displayName": "East Asia",
+      "location": "Hong Kong"
+    },
+    {
+      "region": "eastus",
+      "code": "eus",
+      "displayName": "East US",
+      "location": "Virginia"
+    },
+    {
+      "region": "eastus2",
+      "code": "eus2",
+      "displayName": "East US 2",
+      "location": "Virginia"
+    },
+    {
+      "region": "francecentral",
+      "code": "frc",
+      "displayName": "France Central",
+      "location": "Paris"
+    },
+    {
+      "region": "francesouth",
+      "code": "frs",
+      "displayName": "France South",
+      "location": "Marseille"
+    },
+    {
+      "region": "germanynorth",
+      "code": "gn",
+      "displayName": "Germany North",
+      "location": "Berlin"
+    },
+    {
+      "region": "germanywestcentral",
+      "code": "gwc",
+      "displayName": "Germany West Central",
+      "location": "Frankfurt"
+    },
+    {
+      "region": "indiasouthcentral",
+      "code": "insc",
+      "displayName": "India South Central",
+      "location": "Hyderabad"
+    },
+    {
+      "region": "indonesiacentral",
+      "code": "idc",
+      "displayName": "Indonesia Central",
+      "location": "Jakarta"
+    },
+    {
+      "region": "israelcentral",
+      "code": "ilc",
+      "displayName": "Israel Central",
+      "location": "Israel"
+    },
+    {
+      "region": "italynorth",
+      "code": "itn",
+      "displayName": "Italy North",
+      "location": "Milan"
+    },
+    {
+      "region": "japaneast",
+      "code": "jpe",
+      "displayName": "Japan East",
+      "location": "Tokyo, Saitama"
+    },
+    {
+      "region": "japanwest",
+      "code": "jpw",
+      "displayName": "Japan West",
+      "location": "Osaka"
+    },
+    {
+      "region": "koreacentral",
+      "code": "krc",
+      "displayName": "Korea Central",
+      "location": "Seoul"
+    },
+    {
+      "region": "koreasouth",
+      "code": "krs",
+      "displayName": "Korea South",
+      "location": "Busan"
+    },
+    {
+      "region": "malaysiawest",
+      "code": "myw",
+      "displayName": "Malaysia West",
+      "location": "Kuala Lumpur"
+    },
+    {
+      "region": "mexicocentral",
+      "code": "mxc",
+      "displayName": "Mexico Central",
+      "location": "Querétaro State"
+    },
+    {
+      "region": "newzealandnorth",
+      "code": "nzn",
+      "displayName": "New Zealand North",
+      "location": "Auckland"
+    },
+    {
+      "region": "northcentralus",
+      "code": "ncus",
+      "displayName": "North Central US",
+      "location": "Illinois"
+    },
+    {
+      "region": "northeurope",
+      "code": "ne",
+      "displayName": "North Europe",
+      "location": "Ireland"
+    },
+    {
+      "region": "norwayeast",
+      "code": "nwe",
+      "displayName": "Norway East",
+      "location": "Norway"
+    },
+    {
+      "region": "norwaywest",
+      "code": "nww",
+      "displayName": "Norway West",
+      "location": "Norway"
+    },
+    {
+      "region": "polandcentral",
+      "code": "plc",
+      "displayName": "Poland Central",
+      "location": "Warsaw"
+    },
+    {
+      "region": "qatarcentral",
+      "code": "qac",
+      "displayName": "Qatar Central",
+      "location": "Doha"
+    },
+    {
+      "region": "southafricanorth",
+      "code": "san",
+      "displayName": "South Africa North",
+      "location": "Johannesburg"
+    },
+    {
+      "region": "southafricawest",
+      "code": "saw",
+      "displayName": "South Africa West",
+      "location": "Cape Town"
+    },
+    {
+      "region": "southcentralus",
+      "code": "scus",
+      "displayName": "South Central US",
+      "location": "Texas"
+    },
+    {
+      "region": "southindia",
+      "code": "ins",
+      "displayName": "South India",
+      "location": "Chennai"
+    },
+    {
+      "region": "southeastasia",
+      "code": "sea",
+      "displayName": "Southeast Asia",
+      "location": "Singapore"
+    },
+    {
+      "region": "spaincentral",
+      "code": "spc",
+      "displayName": "Spain Central",
+      "location": "Madrid"
+    },
+    {
+      "region": "swedencentral",
+      "code": "sdc",
+      "displayName": "Sweden Central",
+      "location": "Gävle"
+    },
+    {
+      "region": "switzerlandnorth",
+      "code": "szn",
+      "displayName": "Switzerland North",
+      "location": "Zurich"
+    },
+    {
+      "region": "switzerlandwest",
+      "code": "szw",
+      "displayName": "Switzerland West",
+      "location": "Geneva"
+    },
+    {
+      "region": "uaecentral",
+      "code": "uac",
+      "displayName": "UAE Central",
+      "location": "Abu Dhabi"
+    },
+    {
+      "region": "uaenorth",
+      "code": "uan",
+      "displayName": "UAE North",
+      "location": "Dubai"
+    },
+    {
+      "region": "uksouth",
+      "code": "uks",
+      "displayName": "UK South",
+      "location": "London"
+    },
+    {
+      "region": "ukwest",
+      "code": "ukw",
+      "displayName": "UK West",
+      "location": "Cardiff"
+    },
+    {
+      "region": "westcentralus",
+      "code": "wcus",
+      "displayName": "West Central US",
+      "location": "Wyoming"
+    },
+    {
+      "region": "westeurope",
+      "code": "we",
+      "displayName": "West Europe",
+      "location": "Netherlands"
+    },
+    {
+      "region": "westindia",
+      "code": "inw",
+      "displayName": "West India",
+      "location": "Mumbai"
+    },
+    {
+      "region": "westus",
+      "code": "wus",
+      "displayName": "West US",
+      "location": "California"
+    },
+    {
+      "region": "westus2",
+      "code": "wus2",
+      "displayName": "West US 2",
+      "location": "Washington"
+    },
+    {
+      "region": "westus3",
+      "code": "wus3",
+      "displayName": "West US 3",
+      "location": "Phoenix"
+    }
+  ]
+}

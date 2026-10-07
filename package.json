@@ -12,7 +12,8 @@
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "test": "vitest run",
-    "test:rules": "node --test scripts/rules/*.test.mjs",
+    "test:rules": "node --test scripts/rules/*.test.mjs scripts/catalog/*.test.mjs",
+    "catalog": "node scripts/catalog/build-catalog.mjs",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {

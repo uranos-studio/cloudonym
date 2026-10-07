@@ -1,0 +1,4114 @@
+// 생성 파일 — 손으로 고치지 않는다. scripts/catalog/build-catalog.mjs 가 catalog/gcp.json 에서 만든다 (D46).
+// 행 하나 = 화면 행 하나. rules 는 규칙 id → 그 규칙의 범위 · 지역 토큰 종류 · 허용 종류(D52). 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
+import type { Category } from '../types';
+
+/** 범위 선택지 — 'namespace' · 'project' · 'location' · 'global' · 'region' · 'zone' · 'in <부모 resourceType>' */
+export type ScopeChoice = string;
+export type RegionToken = 'none' | 'region' | 'zone';
+
+export interface RuleKinds { default: string | null; allowed: readonly string[] }
+export interface CatalogRuleSpec { scope: ScopeChoice; regionToken: RegionToken; kinds?: RuleKinds }
+
+/** 행 공통 종류 표 — 값 → 토큰(null 은 토큰 없음). 어느 값이 기본인지 · 되는지는 규칙의 kinds 가 정한다 */
+export interface KindSpec {
+  rule: 'omit-when-csp-default' | 'only-when-chosen' | 'required';
+  defaultBasis: string;
+  tokens: Readonly<Record<string, string | null>>;
+  omitValues: readonly string[];
+  source: string;
+}
+
+export interface CatalogRow {
+  key: string;
+  displayName: string;
+  category: Category;
+  rules: Readonly<Record<string, CatalogRuleSpec>>;
+  slug: { value: string; basis: string; previous: readonly string[] };
+  entity: string | null;
+  kind: KindSpec | null;
+  info: string;
+  enterNameAt: { gcloud: readonly string[]; terraform: readonly string[]; apiOnly: boolean; preview: boolean };
+  badges: readonly ('api-only' | 'preview')[];
+  aliases: readonly string[];
+}
+
+export const GCP_CATALOG_META = {
+  "provider": "gcp",
+  "schema": 1,
+  "sources": {
+    "gcloud": "Google Cloud SDK 587.0.0",
+    "terraform": "hashicorp/google 8.6.0",
+    "computeDiscovery": "compute v1 20260922"
+  }
+} as const;
+
+export const GCP_CATALOG: readonly CatalogRow[] = [
+  {
+    "key": "gcp.project_id",
+    "displayName": "Project ID",
+    "category": "management",
+    "rules": {
+      "gcp.project_id": {
+        "scope": "namespace",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "",
+      "basis": "No abbreviation in the name (unchanged)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The project itself: its ID is globally unique across Google Cloud and cannot be changed after creation.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud projects create"
+      ],
+      "terraform": [
+        "google_project.project_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_project",
+      "projects"
+    ]
+  },
+  {
+    "key": "gcp.service_account",
+    "displayName": "Service Account",
+    "category": "identity",
+    "rules": {
+      "gcp.service_account": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sa",
+      "basis": "Blueprint prefix sa-; most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): sa 1984 / svc 158 / sva 3",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A non-human identity that workloads use to call Google Cloud APIs; the name becomes the email local part (max 30 chars).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam service-accounts create"
+      ],
+      "terraform": [
+        "google_service_account.account_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_service_account",
+      "iam service-accounts"
+    ]
+  },
+  {
+    "key": "gcp.compute_instance",
+    "displayName": "VM Instance",
+    "category": "compute",
+    "rules": {
+      "gcp.compute_instance": {
+        "scope": "project",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "gce",
+      "basis": "gce pairs with AWS ec2; meaning (principle 1) before frequency; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): vm 1652 / gce 185 / inst 20",
+      "previous": [
+        "vm"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Compute Engine virtual machine; lives in one zone, but its name must be unique in the project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instances create"
+      ],
+      "terraform": [
+        "google_compute_instance.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_instance",
+      "compute instances",
+      "vm"
+    ]
+  },
+  {
+    "key": "gcp.vpc_network",
+    "displayName": "VPC Network",
+    "category": "networking",
+    "rules": {
+      "gcp.vpc_network": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "vpc",
+      "basis": "Blueprint prefix vpc-; most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): vpc 1736 / net 158",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A global virtual network; subnets, firewall rules and routes all belong to one VPC network.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute networks create"
+      ],
+      "terraform": [
+        "google_compute_network.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_network",
+      "compute networks"
+    ]
+  },
+  {
+    "key": "gcp.subnet",
+    "displayName": "Subnet",
+    "category": "networking",
+    "rules": {
+      "gcp.subnet": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": "PRIVATE",
+          "allowed": [
+            "PRIVATE",
+            "REGIONAL_MANAGED_PROXY",
+            "GLOBAL_MANAGED_PROXY",
+            "PRIVATE_SERVICE_CONNECT",
+            "PRIVATE_NAT"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "snet",
+      "basis": "4-char exception, same as Azure CAF snet; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): subnet 1536 / sub 117 / snet 18 / sn 5",
+      "previous": [
+        "subnet"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "API Subnetwork.purpose: PRIVATE = \"Regular user created or automatically created subnet\"",
+      "tokens": {
+        "PRIVATE": null,
+        "REGIONAL_MANAGED_PROXY": "proxy",
+        "GLOBAL_MANAGED_PROXY": "proxy",
+        "PRIVATE_SERVICE_CONNECT": "psc",
+        "PRIVATE_NAT": "nat"
+      },
+      "omitValues": [
+        "PRIVATE"
+      ],
+      "source": "gcloud --purpose / terraform google_compute_subnetwork.purpose / API Subnetwork.purpose"
+    },
+    "info": "An IP range inside a VPC network in one region; its purpose decides whether it serves VMs, proxies, PSC or NAT.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute networks subnets create"
+      ],
+      "terraform": [
+        "google_compute_subnetwork.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_subnetwork",
+      "compute networks subnets",
+      "subnet"
+    ]
+  },
+  {
+    "key": "gcp.cloud_sql_instance",
+    "displayName": "Cloud SQL Instance",
+    "category": "database",
+    "rules": {
+      "gcp.cloud_sql_instance": {
+        "scope": "project",
+        "regionToken": "region",
+        "kinds": {
+          "default": "MYSQL",
+          "allowed": [
+            "MYSQL",
+            "POSTGRES",
+            "SQLSERVER"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "sql",
+      "basis": "Product name; db collides with Spanner database; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): db 1512 / sql 796 / csql 17",
+      "previous": [
+        "db"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud sql instances create --database-version default=\"MYSQL_8_0\" (terraform: required)",
+      "tokens": {
+        "MYSQL": null,
+        "POSTGRES": "pg",
+        "SQLSERVER": "ms"
+      },
+      "omitValues": [
+        "MYSQL"
+      ],
+      "source": "gcloud --database-version (family prefix) / terraform database_version"
+    },
+    "info": "A managed MySQL, PostgreSQL or SQL Server instance; the engine is the kind token, not a separate row.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud sql instances create"
+      ],
+      "terraform": [
+        "google_sql_database_instance.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_sql_database_instance",
+      "sql instances",
+      "db"
+    ]
+  },
+  {
+    "key": "gcp.storage_bucket",
+    "displayName": "Cloud Storage Bucket",
+    "category": "storage",
+    "rules": {
+      "gcp.storage_bucket": {
+        "scope": "namespace",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "gcs",
+      "basis": "Most used; blueprint uses bkt-; principle 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): bucket 1668 / gcs 388 / bkt 38",
+      "previous": [
+        "bucket"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An object storage bucket; its name is global across all of Cloud Storage, so it must not collide with anyone else's.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud storage buckets create"
+      ],
+      "terraform": [
+        "google_storage_bucket.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_storage_bucket",
+      "storage buckets",
+      "bucket"
+    ]
+  },
+  {
+    "key": "gcp.firewall_rule",
+    "displayName": "VPC Firewall Rule",
+    "category": "networking",
+    "rules": {
+      "gcp.firewall_rule": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": "INGRESS",
+          "allowed": [
+            "INGRESS",
+            "EGRESS"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "fw",
+      "basis": "Blueprint prefix fw-; most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): fw 421 / fwr 14",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --direction: \"If direction is NOT specified, then default is to apply on incoming traffic\"",
+      "tokens": {
+        "INGRESS": null,
+        "EGRESS": "egr"
+      },
+      "omitValues": [
+        "INGRESS"
+      ],
+      "source": "terraform google_compute_firewall.direction / gcloud --direction"
+    },
+    "info": "One allow or deny rule attached to a VPC network, applied to either incoming or outgoing traffic.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute firewall-rules create"
+      ],
+      "terraform": [
+        "google_compute_firewall.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_firewall",
+      "compute firewall-rules"
+    ]
+  },
+  {
+    "key": "gcp.disk",
+    "displayName": "Persistent Disk",
+    "category": "compute",
+    "rules": {
+      "gcp.disk": {
+        "scope": "zone",
+        "regionToken": "zone"
+      },
+      "gcp.region_disk": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "disk",
+      "basis": "Most used; 3-char candidates unused; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): disk 567 / pd 28 / dsk 0 / dis 0",
+      "previous": [
+        "dis"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A block storage volume for VMs; zonal (one zone) or regional (replicated across two zones in a region).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute disks create"
+      ],
+      "terraform": [
+        "google_compute_disk.name",
+        "google_compute_region_disk.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_disk",
+      "google_compute_region_disk",
+      "compute disks",
+      "dis"
+    ]
+  },
+  {
+    "key": "gcp.address",
+    "displayName": "IP Address",
+    "category": "networking",
+    "rules": {
+      "gcp.address": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "INTERNAL"
+          ]
+        }
+      },
+      "gcp.global_address": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "INTERNAL"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "ip",
+      "basis": "Most used; add reads as a verb; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): regional ip 1068 / addr 46 / add 34; global ip 1480 / addr 13 / add 27",
+      "previous": [
+        "add"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "terraform google_compute_address.address_type \"Default value: EXTERNAL\"",
+      "tokens": {
+        "EXTERNAL": null,
+        "INTERNAL": "int"
+      },
+      "omitValues": [
+        "EXTERNAL"
+      ],
+      "source": "terraform address_type / gcloud: internal when --subnet (regional) or --network (global) is given"
+    },
+    "info": "A reserved static IP: regional or global, external (public) by default or internal (private) from a subnet or VPC range.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute addresses create"
+      ],
+      "terraform": [
+        "google_compute_address.name",
+        "google_compute_global_address.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_address",
+      "google_compute_global_address",
+      "compute addresses",
+      "add"
+    ]
+  },
+  {
+    "key": "gcp.autoscaler",
+    "displayName": "Autoscaler",
+    "category": "compute",
+    "rules": {
+      "gcp.autoscaler": {
+        "scope": "zone",
+        "regionToken": "zone"
+      },
+      "gcp.region_autoscaler": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "as",
+      "basis": "aut is meaningless; low usage either way; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): autoscaler 53 / as 7 / aut 0",
+      "previous": [
+        "aut"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Scaling settings for one managed instance group; gcloud creates it without a name, only Terraform asks for one.",
+    "enterNameAt": {
+      "gcloud": [],
+      "terraform": [
+        "google_compute_autoscaler.name",
+        "google_compute_region_autoscaler.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_autoscaler",
+      "google_compute_region_autoscaler",
+      "aut"
+    ]
+  },
+  {
+    "key": "gcp.backend_bucket",
+    "displayName": "Backend Bucket",
+    "category": "networking",
+    "rules": {
+      "gcp.backend_bucket": {
+        "scope": "global",
+        "regionToken": "none"
+      },
+      "gcp.region_backend_bucket": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "bb",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Lets an HTTP(S) load balancer serve content from a Cloud Storage bucket instead of VMs.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute backend-buckets create"
+      ],
+      "terraform": [
+        "google_compute_backend_bucket.name",
+        "google_compute_region_backend_bucket.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_backend_bucket",
+      "google_compute_region_backend_bucket",
+      "compute backend-buckets"
+    ]
+  },
+  {
+    "key": "gcp.backend_service",
+    "displayName": "Backend Service",
+    "category": "networking",
+    "rules": {
+      "gcp.backend_service": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "EXTERNAL_MANAGED",
+            "INTERNAL_MANAGED",
+            "INTERNAL_SELF_MANAGED"
+          ]
+        }
+      },
+      "gcp.region_backend_service": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "EXTERNAL_MANAGED",
+            "INTERNAL",
+            "INTERNAL_MANAGED",
+            "INTERNAL_SELF_MANAGED"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "bs",
+      "basis": "Unchanged; counts too small to decide; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): be 24 / bs 13 / bes 5",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --load-balancing-scheme default=\"EXTERNAL\"",
+      "tokens": {
+        "EXTERNAL": null,
+        "EXTERNAL_MANAGED": null,
+        "INTERNAL": "int",
+        "INTERNAL_MANAGED": "int",
+        "INTERNAL_SELF_MANAGED": "int"
+      },
+      "omitValues": [
+        "EXTERNAL",
+        "EXTERNAL_MANAGED"
+      ],
+      "source": "terraform load_balancing_scheme / gcloud --load-balancing-scheme"
+    },
+    "info": "Groups backends (instance groups, NEGs) behind a load balancer and holds its health check and balancing settings.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute backend-services create"
+      ],
+      "terraform": [
+        "google_compute_backend_service.name",
+        "google_compute_region_backend_service.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_backend_service",
+      "google_compute_region_backend_service",
+      "compute backend-services"
+    ]
+  },
+  {
+    "key": "gcp.cross_site_network",
+    "displayName": "Cross-Site Network",
+    "category": "networking",
+    "rules": {
+      "gcp.cross_site_network": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "csn",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Connects your own sites to each other over Cloud Interconnect (a global resource under interconnects).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute interconnects cross-site-networks create"
+      ],
+      "terraform": [
+        "google_compute_cross_site_network.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_cross_site_network",
+      "compute interconnects cross-site-networks"
+    ]
+  },
+  {
+    "key": "gcp.external_vpn_gateway",
+    "displayName": "External VPN Gateway",
+    "category": "networking",
+    "rules": {
+      "gcp.external_vpn_gateway": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "evg",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Describes the peer (on-premises or other cloud) VPN device that an HA VPN gateway connects to.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute external-vpn-gateways create"
+      ],
+      "terraform": [
+        "google_compute_external_vpn_gateway.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_external_vpn_gateway",
+      "compute external-vpn-gateways"
+    ]
+  },
+  {
+    "key": "gcp.forwarding_rule",
+    "displayName": "Forwarding Rule",
+    "category": "networking",
+    "rules": {
+      "gcp.forwarding_rule": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "EXTERNAL_MANAGED",
+            "INTERNAL",
+            "INTERNAL_MANAGED"
+          ]
+        }
+      },
+      "gcp.global_forwarding_rule": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": "EXTERNAL",
+          "allowed": [
+            "EXTERNAL",
+            "EXTERNAL_MANAGED",
+            "INTERNAL_MANAGED",
+            "INTERNAL_SELF_MANAGED"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "fwd",
+      "basis": "fr collides with future reservation; fwd used more; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): lb 920 / rule 310 / fwd 80 / fr 33",
+      "previous": [
+        "fr"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --load-balancing-scheme: \"defaults to EXTERNAL\"",
+      "tokens": {
+        "EXTERNAL": null,
+        "EXTERNAL_MANAGED": null,
+        "INTERNAL": "int",
+        "INTERNAL_MANAGED": "int",
+        "INTERNAL_SELF_MANAGED": "int"
+      },
+      "omitValues": [
+        "EXTERNAL",
+        "EXTERNAL_MANAGED"
+      ],
+      "source": "terraform load_balancing_scheme / gcloud --load-balancing-scheme"
+    },
+    "info": "The load balancer frontend: an IP (and port) that sends matching traffic to a target proxy, backend service, VPN gateway or VM.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute forwarding-rules create"
+      ],
+      "terraform": [
+        "google_compute_forwarding_rule.name",
+        "google_compute_global_forwarding_rule.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_forwarding_rule",
+      "google_compute_global_forwarding_rule",
+      "compute forwarding-rules",
+      "fr"
+    ]
+  },
+  {
+    "key": "gcp.future_reservation",
+    "displayName": "Future Reservation",
+    "category": "compute",
+    "rules": {
+      "gcp.future_reservation": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "frsv",
+      "basis": "Pairs with reservation rsv; avoids fr collision; principles 1, 2",
+      "previous": [
+        "fr"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Requests VM capacity for a future start time; becomes a normal reservation when that time arrives.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute future-reservations create"
+      ],
+      "terraform": [
+        "google_compute_future_reservation.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_future_reservation",
+      "compute future-reservations",
+      "fr"
+    ]
+  },
+  {
+    "key": "gcp.public_delegated_prefix",
+    "displayName": "Public Delegated Prefix",
+    "category": "networking",
+    "rules": {
+      "gcp.global_public_delegated_prefix": {
+        "scope": "global",
+        "regionToken": "none"
+      },
+      "gcp.public_delegated_prefix": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pdp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A slice of a public advertised prefix delegated to one scope (global or one region) so addresses can be allocated from it.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute public-delegated-prefixes create"
+      ],
+      "terraform": [
+        "google_compute_public_delegated_prefix.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_public_delegated_prefix",
+      "compute public-delegated-prefixes"
+    ]
+  },
+  {
+    "key": "gcp.global_vm_extension_policy",
+    "displayName": "VM Extension Policy (global)",
+    "category": "compute",
+    "rules": {
+      "gcp.global_vm_extension_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "gvep",
+      "basis": "Unchanged; distinguishes from zonal vep; principle 2",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Installs and manages VM extensions on matching VMs across all zones (separate gcloud command from the zonal policy).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute global-vm-extension-policies create"
+      ],
+      "terraform": [
+        "google_compute_global_vm_extension_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_global_vm_extension_policy",
+      "compute global-vm-extension-policies"
+    ]
+  },
+  {
+    "key": "gcp.health_check",
+    "displayName": "Health Check",
+    "category": "networking",
+    "rules": {
+      "gcp.health_check": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "grpc",
+            "grpc-with-tls",
+            "http",
+            "http2",
+            "https",
+            "ssl",
+            "tcp"
+          ]
+        }
+      },
+      "gcp.region_health_check": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "grpc",
+            "grpc-with-tls",
+            "http",
+            "http2",
+            "https",
+            "ssl",
+            "tcp"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "hc",
+      "basis": "Most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): health 1328 / hc 111",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "protocol is a gcloud subcommand; no default",
+      "tokens": {
+        "grpc": "grpc",
+        "grpc-with-tls": "grpcs",
+        "http": "http",
+        "http2": "h2",
+        "https": "https",
+        "ssl": "ssl",
+        "tcp": "tcp"
+      },
+      "omitValues": [],
+      "source": "gcloud subcommand of compute health-checks create / terraform *_health_check block"
+    },
+    "info": "Probes load-balanced backends over one protocol; the protocol is chosen as a gcloud subcommand and is the kind token.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute health-checks create {grpc, grpc-with-tls, http, http2, https, ssl, tcp}"
+      ],
+      "terraform": [
+        "google_compute_health_check.name",
+        "google_compute_region_health_check.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_health_check",
+      "google_compute_region_health_check",
+      "compute health-checks"
+    ]
+  },
+  {
+    "key": "gcp.http_health_check",
+    "displayName": "Legacy HTTP Health Check",
+    "category": "networking",
+    "rules": {
+      "gcp.http_health_check": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "hhc",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Legacy HTTP-only health check; still required for target-pool backends of an external passthrough Network Load Balancer.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute http-health-checks create"
+      ],
+      "terraform": [
+        "google_compute_http_health_check.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_http_health_check",
+      "compute http-health-checks"
+    ]
+  },
+  {
+    "key": "gcp.https_health_check",
+    "displayName": "Legacy HTTPS Health Check",
+    "category": "networking",
+    "rules": {
+      "gcp.https_health_check": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "hhcs",
+      "basis": "Distinguishes from legacy HTTP hhc; principle 2",
+      "previous": [
+        "hhc"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Legacy HTTPS-only health check; use the regular Health Check for new load balancers.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute https-health-checks create"
+      ],
+      "terraform": [
+        "google_compute_https_health_check.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_https_health_check",
+      "compute https-health-checks",
+      "hhc"
+    ]
+  },
+  {
+    "key": "gcp.image",
+    "displayName": "Image",
+    "category": "compute",
+    "rules": {
+      "gcp.image": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "img",
+      "basis": "ima is meaningless; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): image 150 / img 4 / ima 0",
+      "previous": [
+        "ima"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A boot disk image used to create new VMs or disks; captures one disk.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute images create"
+      ],
+      "terraform": [
+        "google_compute_image.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_image",
+      "compute images",
+      "ima"
+    ]
+  },
+  {
+    "key": "gcp.instance_group_manager",
+    "displayName": "Managed Instance Group",
+    "category": "compute",
+    "rules": {
+      "gcp.instance_group_manager": {
+        "scope": "zone",
+        "regionToken": "zone"
+      },
+      "gcp.region_instance_group_manager": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "mig",
+      "basis": "Official term MIG; most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): mig 75 / igm 35",
+      "previous": [
+        "igm"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A group of identical VMs created from an instance template, with autohealing and autoscaling; zonal or regional.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instance-groups managed create"
+      ],
+      "terraform": [
+        "google_compute_instance_group_manager.name",
+        "google_compute_region_instance_group_manager.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_instance_group_manager",
+      "google_compute_region_instance_group_manager",
+      "compute instance-groups managed",
+      "igm"
+    ]
+  },
+  {
+    "key": "gcp.instance_group",
+    "displayName": "Unmanaged Instance Group",
+    "category": "compute",
+    "rules": {
+      "gcp.instance_group": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "ig",
+      "basis": "Unchanged; collision removed by moving interconnect group to icg",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A hand-picked set of existing VMs in one zone, used as a load balancer backend; no template or autoscaling.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instance-groups unmanaged create"
+      ],
+      "terraform": [
+        "google_compute_instance_group.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_instance_group",
+      "compute instance-groups unmanaged"
+    ]
+  },
+  {
+    "key": "gcp.instance_template",
+    "displayName": "Instance Template",
+    "category": "compute",
+    "rules": {
+      "gcp.instance_template": {
+        "scope": "global",
+        "regionToken": "none"
+      },
+      "gcp.region_instance_template": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tpl",
+      "basis": "it reads as a pronoun; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): template 645 / tpl 21 / tmpl 20 / it 10",
+      "previous": [
+        "it"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A saved VM configuration (machine type, image, disks) that managed instance groups use to create VMs; global or regional.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instance-templates create"
+      ],
+      "terraform": [
+        "google_compute_instance_template.name",
+        "google_compute_region_instance_template.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_instance_template",
+      "google_compute_region_instance_template",
+      "compute instance-templates",
+      "it"
+    ]
+  },
+  {
+    "key": "gcp.instant_snapshot_group",
+    "displayName": "Instant Snapshot Group",
+    "category": "storage",
+    "rules": {
+      "gcp.instant_snapshot_group": {
+        "scope": "zone",
+        "regionToken": "zone"
+      },
+      "gcp.region_instant_snapshot_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "isg",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A crash-consistent set of instant snapshots taken together from a disk consistency group.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instant-snapshot-groups create"
+      ],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "compute instant-snapshot-groups"
+    ]
+  },
+  {
+    "key": "gcp.instant_snapshot",
+    "displayName": "Instant Snapshot",
+    "category": "storage",
+    "rules": {
+      "gcp.instant_snapshot": {
+        "scope": "zone",
+        "regionToken": "zone"
+      },
+      "gcp.region_instant_snapshot": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "isn",
+      "basis": "is reads as a verb; principle 1",
+      "previous": [
+        "is"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A fast, in-place point-in-time copy of a disk kept in the same zone or region as the disk.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute instant-snapshots create"
+      ],
+      "terraform": [
+        "google_compute_instant_snapshot.name",
+        "google_compute_region_instant_snapshot.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_instant_snapshot",
+      "google_compute_region_instant_snapshot",
+      "compute instant-snapshots",
+      "is"
+    ]
+  },
+  {
+    "key": "gcp.interconnect_attachment_group",
+    "displayName": "Interconnect Attachment Group",
+    "category": "networking",
+    "rules": {
+      "gcp.interconnect_attachment_group": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "iag",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Groups VLAN attachments to analyze and expand a highly available Interconnect deployment.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute interconnects attachments groups create"
+      ],
+      "terraform": [
+        "google_compute_interconnect_attachment_group.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_interconnect_attachment_group",
+      "compute interconnects attachments groups"
+    ]
+  },
+  {
+    "key": "gcp.interconnect_attachment",
+    "displayName": "VLAN Attachment",
+    "category": "networking",
+    "rules": {
+      "gcp.interconnect_attachment": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "DEDICATED",
+            "PARTNER",
+            "PARTNER_PROVIDER",
+            "L2_DEDICATED"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "vl",
+      "basis": "Blueprint prefix vl-; API calls it a VLAN attachment; principle 1",
+      "previous": [
+        "ia"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud splits into attachments dedicated | partner subcommands; no default",
+      "tokens": {
+        "DEDICATED": "ded",
+        "PARTNER": "par",
+        "PARTNER_PROVIDER": "pp",
+        "L2_DEDICATED": "l2"
+      },
+      "omitValues": [],
+      "source": "terraform google_compute_interconnect_attachment.type / gcloud attachments dedicated | partner"
+    },
+    "info": "A VLAN on an Interconnect that connects it to a Cloud Router in one region; dedicated or partner.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute interconnects attachments dedicated create"
+      ],
+      "terraform": [
+        "google_compute_interconnect_attachment.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_interconnect_attachment",
+      "compute interconnects attachments dedicated",
+      "ia"
+    ]
+  },
+  {
+    "key": "gcp.interconnect_group",
+    "displayName": "Interconnect Group",
+    "category": "networking",
+    "rules": {
+      "gcp.interconnect_group": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "icg",
+      "basis": "Pairs with ic; avoids ig collision; principle 1",
+      "previous": [
+        "ig"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Groups physical Interconnect connections to analyze and expand redundant topologies.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute interconnects groups create"
+      ],
+      "terraform": [
+        "google_compute_interconnect_group.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_interconnect_group",
+      "compute interconnects groups",
+      "ig"
+    ]
+  },
+  {
+    "key": "gcp.interconnect",
+    "displayName": "Interconnect",
+    "category": "networking",
+    "rules": {
+      "gcp.interconnect": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "DEDICATED",
+            "PARTNER",
+            "IT_PRIVATE"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "ic",
+      "basis": "Blueprint prefix ic-; int collides with the internal kind token; principle 1",
+      "previous": [
+        "int"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud --interconnect-type \"must be one of\"; terraform required",
+      "tokens": {
+        "DEDICATED": "ded",
+        "PARTNER": "par",
+        "IT_PRIVATE": "itp"
+      },
+      "omitValues": [],
+      "source": "terraform google_compute_interconnect.interconnect_type / gcloud --interconnect-type"
+    },
+    "info": "A physical Dedicated or Partner connection to Google at a colocation facility (its location is a facility, not a region).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute interconnects create"
+      ],
+      "terraform": [
+        "google_compute_interconnect.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_interconnect",
+      "compute interconnects",
+      "int"
+    ]
+  },
+  {
+    "key": "gcp.license",
+    "displayName": "License",
+    "category": "compute",
+    "rules": {
+      "gcp.license": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "lic",
+      "basis": "Unchanged",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "For third-party partners who build Cloud Marketplace images only. Created only through the Compute Engine API (licenses.insert); no gcloud or Terraform.",
+    "enterNameAt": {
+      "gcloud": [],
+      "terraform": [],
+      "apiOnly": true,
+      "preview": false
+    },
+    "badges": [
+      "api-only"
+    ],
+    "aliases": []
+  },
+  {
+    "key": "gcp.machine_image",
+    "displayName": "Machine Image",
+    "category": "compute",
+    "rules": {
+      "gcp.machine_image": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "mimg",
+      "basis": "Pairs with img; mi kept for managed identity; principles 1, 2",
+      "previous": [
+        "mi"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A copy of a whole VM (all disks, configuration and metadata), unlike an Image which captures one disk.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute machine-images create"
+      ],
+      "terraform": [
+        "google_compute_machine_image.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_machine_image",
+      "compute machine-images",
+      "mi"
+    ]
+  },
+  {
+    "key": "gcp.network_attachment",
+    "displayName": "Network Attachment",
+    "category": "networking",
+    "rules": {
+      "gcp.network_attachment": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "na",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The consumer-side subnet hook that lets a producer's Private Service Connect interface reach into your VPC.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute network-attachments create"
+      ],
+      "terraform": [
+        "google_compute_network_attachment.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_network_attachment",
+      "compute network-attachments"
+    ]
+  },
+  {
+    "key": "gcp.network_edge_security_service",
+    "displayName": "Network Edge Security Service",
+    "category": "networking",
+    "rules": {
+      "gcp.network_edge_security_service": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nes",
+      "basis": "4-char current value had no exception reason; principle 2",
+      "previous": [
+        "ness"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional Cloud Armor service that applies network edge security policies to external passthrough load balancers.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute network-edge-security-services create"
+      ],
+      "terraform": [
+        "google_compute_network_edge_security_service.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_network_edge_security_service",
+      "compute network-edge-security-services",
+      "ness"
+    ]
+  },
+  {
+    "key": "gcp.packet_mirroring",
+    "displayName": "Packet Mirroring",
+    "category": "networking",
+    "rules": {
+      "gcp.packet_mirroring": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pm",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Copies traffic from selected VMs or subnets in one region to a collector for inspection.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute packet-mirrorings create"
+      ],
+      "terraform": [
+        "google_compute_packet_mirroring.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_packet_mirroring",
+      "compute packet-mirrorings"
+    ]
+  },
+  {
+    "key": "gcp.public_advertised_prefix",
+    "displayName": "Public Advertised Prefix",
+    "category": "networking",
+    "rules": {
+      "gcp.public_advertised_prefix": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "pap",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An aggregated public IP prefix that you bring to Google Cloud and advertise.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute public-advertised-prefixes create"
+      ],
+      "terraform": [
+        "google_compute_public_advertised_prefix.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_public_advertised_prefix",
+      "compute public-advertised-prefixes"
+    ]
+  },
+  {
+    "key": "gcp.region_commitment",
+    "displayName": "Commitment",
+    "category": "compute",
+    "rules": {
+      "gcp.region_commitment": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cmt",
+      "basis": "From gcloud group commitments; cud source unverified; principle 1",
+      "previous": [
+        "com"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A committed use contract for Compute Engine resources in one region.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute commitments create"
+      ],
+      "terraform": [
+        "google_compute_region_commitment.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_commitment",
+      "compute commitments",
+      "com"
+    ]
+  },
+  {
+    "key": "gcp.region_composite_health_check",
+    "displayName": "Composite Health Check",
+    "category": "networking",
+    "rules": {
+      "gcp.region_composite_health_check": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "chc",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional health check that combines health sources into one health signal.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute composite-health-checks create"
+      ],
+      "terraform": [
+        "google_compute_region_composite_health_check.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_composite_health_check",
+      "compute composite-health-checks"
+    ]
+  },
+  {
+    "key": "gcp.region_health_aggregation_policy",
+    "displayName": "Health Aggregation Policy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_health_aggregation_policy": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "hap",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional policy that defines how individual backend health results are aggregated.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute health-aggregation-policies create"
+      ],
+      "terraform": [
+        "google_compute_region_health_aggregation_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_health_aggregation_policy",
+      "compute health-aggregation-policies"
+    ]
+  },
+  {
+    "key": "gcp.region_health_check_service",
+    "displayName": "Health Check Service",
+    "category": "networking",
+    "rules": {
+      "gcp.region_health_check_service": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "hcs",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional service that collects endpoint health of NEGs through several health checks and sends it to notification endpoints. Created only through the API (regionHealthCheckServices.insert).",
+    "enterNameAt": {
+      "gcloud": [],
+      "terraform": [],
+      "apiOnly": true,
+      "preview": false
+    },
+    "badges": [
+      "api-only"
+    ],
+    "aliases": []
+  },
+  {
+    "key": "gcp.region_health_source",
+    "displayName": "Health Source",
+    "category": "networking",
+    "rules": {
+      "gcp.region_health_source": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "hs",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional source of health signals that composite health checks combine.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute health-sources create"
+      ],
+      "terraform": [
+        "google_compute_region_health_source.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_health_source",
+      "compute health-sources"
+    ]
+  },
+  {
+    "key": "gcp.region_notification_endpoint",
+    "displayName": "Notification Endpoint",
+    "category": "networking",
+    "rules": {
+      "gcp.region_notification_endpoint": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ne",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional endpoint that a health check service sends health status changes to over gRPC. Created only through the API (regionNotificationEndpoints.insert).",
+    "enterNameAt": {
+      "gcloud": [],
+      "terraform": [],
+      "apiOnly": true,
+      "preview": false
+    },
+    "badges": [
+      "api-only"
+    ],
+    "aliases": []
+  },
+  {
+    "key": "gcp.security_policy",
+    "displayName": "Cloud Armor Policy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_security_policy": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "CLOUD_ARMOR",
+            "CLOUD_ARMOR_NETWORK"
+          ]
+        }
+      },
+      "gcp.security_policy": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "CLOUD_ARMOR",
+            "CLOUD_ARMOR_EDGE"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "waf",
+      "basis": "Cloud Armor policy is a WAF policy; sp collided five ways; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): armor 125 / policy 113 / waf 98 / ca 2 / sp 0",
+      "previous": [
+        "sp"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud --type has no default",
+      "tokens": {
+        "CLOUD_ARMOR": "ca",
+        "CLOUD_ARMOR_EDGE": "edg",
+        "CLOUD_ARMOR_NETWORK": "net"
+      },
+      "omitValues": [],
+      "source": "terraform type / gcloud --type"
+    },
+    "info": "A Cloud Armor (WAF) policy of allow/deny rules attached to backend services; global or regional.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute security-policies create"
+      ],
+      "terraform": [
+        "google_compute_region_security_policy.name",
+        "google_compute_security_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_security_policy",
+      "google_compute_security_policy",
+      "compute security-policies",
+      "sp"
+    ]
+  },
+  {
+    "key": "gcp.region_snapshot",
+    "displayName": "Snapshot (regional)",
+    "category": "storage",
+    "rules": {
+      "gcp.region_snapshot": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "snap",
+      "basis": "Same concept as snapshot; principles 1, 2",
+      "previous": [
+        "sna"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A snapshot bound to one region (Preview). Created with gcloud beta compute snapshots create --region or the API; the name is unique only within its region.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud beta compute snapshots create --region (Preview)"
+      ],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": true
+    },
+    "badges": [
+      "preview"
+    ],
+    "aliases": [
+      "compute snapshots",
+      "sna"
+    ]
+  },
+  {
+    "key": "gcp.ssl_certificate",
+    "displayName": "SSL Certificate",
+    "category": "networking",
+    "rules": {
+      "gcp.region_ssl_certificate": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "SELF_MANAGED"
+          ]
+        }
+      },
+      "gcp.ssl_certificate": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "SELF_MANAGED",
+            "MANAGED"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "cert",
+      "basis": "ssl overlaps SSL policy and health check kind; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): ssl 477 / cert 279 / sc 2",
+      "previous": [
+        "sc"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud --certificate vs --domains; separate terraform resources",
+      "tokens": {
+        "SELF_MANAGED": "self",
+        "MANAGED": "mgd"
+      },
+      "omitValues": [],
+      "source": "terraform: google_compute_ssl_certificate vs google_compute_managed_ssl_certificate / gcloud --certificate vs --domains"
+    },
+    "info": "A TLS certificate for target HTTPS/SSL proxies, either uploaded by you (self-managed) or issued by Google (managed).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute ssl-certificates create"
+      ],
+      "terraform": [
+        "google_compute_region_ssl_certificate.name",
+        "google_compute_ssl_certificate.name",
+        "google_compute_managed_ssl_certificate.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_ssl_certificate",
+      "google_compute_ssl_certificate",
+      "google_compute_managed_ssl_certificate",
+      "compute ssl-certificates",
+      "sc"
+    ]
+  },
+  {
+    "key": "gcp.ssl_policy",
+    "displayName": "SSL Policy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_ssl_policy": {
+        "scope": "region",
+        "regionToken": "region"
+      },
+      "gcp.ssl_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "sslp",
+      "basis": "ssl is taken by the health check kind token; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): ssl 229 / sslp 0 / sp 0",
+      "previous": [
+        "sp"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Sets the minimum TLS version and cipher profile that a target HTTPS or SSL proxy accepts.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute ssl-policies create"
+      ],
+      "terraform": [
+        "google_compute_region_ssl_policy.name",
+        "google_compute_ssl_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_ssl_policy",
+      "google_compute_ssl_policy",
+      "compute ssl-policies",
+      "sp"
+    ]
+  },
+  {
+    "key": "gcp.target_http_proxy",
+    "displayName": "Target HTTP Proxy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_target_http_proxy": {
+        "scope": "region",
+        "regionToken": "region"
+      },
+      "gcp.target_http_proxy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "thp",
+      "basis": "Unchanged; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): https 1104 / proxy 264 / thp 2",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The plain-HTTP proxy of an application load balancer: takes requests from a forwarding rule and routes them by URL map.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-http-proxies create"
+      ],
+      "terraform": [
+        "google_compute_region_target_http_proxy.name",
+        "google_compute_target_http_proxy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_target_http_proxy",
+      "google_compute_target_http_proxy",
+      "compute target-http-proxies"
+    ]
+  },
+  {
+    "key": "gcp.target_https_proxy",
+    "displayName": "Target HTTPS Proxy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_target_https_proxy": {
+        "scope": "region",
+        "regionToken": "region"
+      },
+      "gcp.target_https_proxy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "thps",
+      "basis": "Distinguishes from HTTP thp; principle 2",
+      "previous": [
+        "thp"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The HTTPS proxy of an application load balancer: terminates TLS with SSL certificates, then routes by URL map.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-https-proxies create"
+      ],
+      "terraform": [
+        "google_compute_region_target_https_proxy.name",
+        "google_compute_target_https_proxy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_target_https_proxy",
+      "google_compute_target_https_proxy",
+      "compute target-https-proxies",
+      "thp"
+    ]
+  },
+  {
+    "key": "gcp.target_tcp_proxy",
+    "displayName": "Target TCP Proxy",
+    "category": "networking",
+    "rules": {
+      "gcp.region_target_tcp_proxy": {
+        "scope": "region",
+        "regionToken": "region"
+      },
+      "gcp.target_tcp_proxy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "ttp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Proxy load balancer target for plain TCP traffic (no TLS termination); global or regional.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-tcp-proxies create"
+      ],
+      "terraform": [
+        "google_compute_region_target_tcp_proxy.name",
+        "google_compute_target_tcp_proxy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_target_tcp_proxy",
+      "google_compute_target_tcp_proxy",
+      "compute target-tcp-proxies"
+    ]
+  },
+  {
+    "key": "gcp.url_map",
+    "displayName": "URL Map",
+    "category": "networking",
+    "rules": {
+      "gcp.region_url_map": {
+        "scope": "region",
+        "regionToken": "region"
+      },
+      "gcp.url_map": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "url",
+      "basis": "Used as the first word of url-map names; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): url 1422 / map 314 / urlmap 38 / um 3",
+      "previous": [
+        "um"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The routing table of an application load balancer: matches host and path to backend services or buckets.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute url-maps create"
+      ],
+      "terraform": [
+        "google_compute_region_url_map.name",
+        "google_compute_url_map.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_region_url_map",
+      "google_compute_url_map",
+      "compute url-maps",
+      "um"
+    ]
+  },
+  {
+    "key": "gcp.reservation",
+    "displayName": "Reservation",
+    "category": "compute",
+    "rules": {
+      "gcp.reservation": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "rsv",
+      "basis": "res is ambiguous; principle 1",
+      "previous": [
+        "res"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Holds VM capacity in one zone now, so instances with matching properties can always start.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute reservations create"
+      ],
+      "terraform": [
+        "google_compute_reservation.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_reservation",
+      "compute reservations",
+      "res"
+    ]
+  },
+  {
+    "key": "gcp.resource_policy",
+    "displayName": "Resource Policy",
+    "category": "compute",
+    "rules": {
+      "gcp.resource_policy": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "snapshot-schedule",
+            "instance-schedule",
+            "group-placement",
+            "disk-consistency-group",
+            "workload-policy"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "rp",
+      "basis": "Unchanged; rollout plan moves instead; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): policy 51 / schedule 18 / rp 1",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "required",
+      "defaultBasis": "one policy is one kind; without the kind the name has no meaning",
+      "tokens": {
+        "snapshot-schedule": "snap",
+        "instance-schedule": "isc",
+        "group-placement": "plc",
+        "disk-consistency-group": "dcg",
+        "workload-policy": "wkl"
+      },
+      "omitValues": [],
+      "source": "gcloud subcommand of compute resource-policies create (5) = terraform blocks (5) = API fields (5)"
+    },
+    "info": "A schedule or placement policy attached to disks or VMs (snapshot schedule, instance schedule, placement, consistency group).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute resource-policies create {disk-consistency-group, group-placement, instance-schedule, snapshot-schedule, workload-policy}"
+      ],
+      "terraform": [
+        "google_compute_resource_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_resource_policy",
+      "compute resource-policies"
+    ]
+  },
+  {
+    "key": "gcp.rollout_plan",
+    "displayName": "Rollout Plan",
+    "category": "compute",
+    "rules": {
+      "gcp.rollout_plan": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "rop",
+      "basis": "Avoids rp collision; principle 1",
+      "previous": [
+        "rp"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A global plan that defines the order and pace of a staged rollout across zones or regions.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute rollout-plans create"
+      ],
+      "terraform": [
+        "google_compute_rollout_plan.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_rollout_plan",
+      "compute rollout-plans",
+      "rp"
+    ]
+  },
+  {
+    "key": "gcp.router",
+    "displayName": "Cloud Router",
+    "category": "networking",
+    "rules": {
+      "gcp.router": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cr",
+      "basis": "Blueprint prefix cr-; rou unused; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): router 878 / cr 44 / rtr 28 / rou 0",
+      "previous": [
+        "rou"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A regional BGP router that exchanges routes for VPN, Interconnect and Cloud NAT; not the same as a Route.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute routers create"
+      ],
+      "terraform": [
+        "google_compute_router.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_router",
+      "compute routers",
+      "rou"
+    ]
+  },
+  {
+    "key": "gcp.route",
+    "displayName": "Route",
+    "category": "networking",
+    "rules": {
+      "gcp.route": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "rt",
+      "basis": "Same as CAF rt; rou unused; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): route 369 / rt 32 / rou 0",
+      "previous": [
+        "rou"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "One static route in a VPC network's routing table (destination range and next hop); global.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute routes create"
+      ],
+      "terraform": [
+        "google_compute_route.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_route",
+      "compute routes",
+      "rou"
+    ]
+  },
+  {
+    "key": "gcp.service_attachment",
+    "displayName": "PSC Service Attachment",
+    "category": "networking",
+    "rules": {
+      "gcp.service_attachment": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "psc",
+      "basis": "Most used; sa is the service account; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): psc 107 / attachment 5 / sa 2",
+      "previous": [
+        "sa"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The producer side of Private Service Connect: publishes an internal load balancer so other VPCs can reach it privately.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute service-attachments create"
+      ],
+      "terraform": [
+        "google_compute_service_attachment.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_service_attachment",
+      "compute service-attachments",
+      "sa"
+    ]
+  },
+  {
+    "key": "gcp.snapshot",
+    "displayName": "Snapshot",
+    "category": "storage",
+    "rules": {
+      "gcp.snapshot": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": "STANDARD",
+          "allowed": [
+            "STANDARD",
+            "ARCHIVE"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "snap",
+      "basis": "Same as CAF snap; sna is meaningless; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): sna 0 / snap 0 / ss 0",
+      "previous": [
+        "sna"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --snapshot-type: \"If a snapshot type is not specified, a STANDARD snapshot will be created\"",
+      "tokens": {
+        "STANDARD": null,
+        "ARCHIVE": "arc"
+      },
+      "omitValues": [
+        "STANDARD"
+      ],
+      "source": "terraform google_compute_snapshot.snapshot_type / gcloud --snapshot-type"
+    },
+    "info": "A global, incremental backup of a disk stored apart from the disk; standard or archive class.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute snapshots create"
+      ],
+      "terraform": [
+        "google_compute_snapshot.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_snapshot",
+      "compute snapshots",
+      "sna"
+    ]
+  },
+  {
+    "key": "gcp.storage_pool",
+    "displayName": "Storage Pool",
+    "category": "storage",
+    "rules": {
+      "gcp.storage_pool": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "sp",
+      "basis": "Unchanged; sp is now unique",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A zonal pool of block storage capacity that disks in the same zone can be created in.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute storage-pools create"
+      ],
+      "terraform": [
+        "google_compute_storage_pool.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_storage_pool",
+      "compute storage-pools"
+    ]
+  },
+  {
+    "key": "gcp.target_grpc_proxy",
+    "displayName": "Target gRPC Proxy",
+    "category": "networking",
+    "rules": {
+      "gcp.target_grpc_proxy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "tgp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Target for proxyless gRPC services that points a forwarding rule at a URL map.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-grpc-proxies create"
+      ],
+      "terraform": [
+        "google_compute_target_grpc_proxy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_target_grpc_proxy",
+      "compute target-grpc-proxies"
+    ]
+  },
+  {
+    "key": "gcp.target_instance",
+    "displayName": "Target Instance",
+    "category": "networking",
+    "rules": {
+      "gcp.target_instance": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "ti",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Points a forwarding rule at a single VM in one zone, without a backend service.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-instances create"
+      ],
+      "terraform": [
+        "google_compute_target_instance.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_target_instance",
+      "compute target-instances"
+    ]
+  },
+  {
+    "key": "gcp.target_pool",
+    "displayName": "Target Pool",
+    "category": "networking",
+    "rules": {
+      "gcp.target_pool": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Legacy regional pool of VMs behind an external passthrough Network Load Balancer, checked by legacy HTTP health checks.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-pools create"
+      ],
+      "terraform": [
+        "google_compute_target_pool.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_target_pool",
+      "compute target-pools"
+    ]
+  },
+  {
+    "key": "gcp.target_ssl_proxy",
+    "displayName": "Target SSL Proxy",
+    "category": "networking",
+    "rules": {
+      "gcp.target_ssl_proxy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "tsp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Global proxy load balancer target that terminates TLS for non-HTTP TCP traffic.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-ssl-proxies create"
+      ],
+      "terraform": [
+        "google_compute_target_ssl_proxy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_target_ssl_proxy",
+      "compute target-ssl-proxies"
+    ]
+  },
+  {
+    "key": "gcp.target_vpn_gateway",
+    "displayName": "Classic VPN Gateway",
+    "category": "networking",
+    "rules": {
+      "gcp.target_vpn_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tvg",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Classic VPN gateway; note Terraform calls it google_compute_vpn_gateway while the HA gateway is google_compute_ha_vpn_gateway.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute target-vpn-gateways create"
+      ],
+      "terraform": [
+        "google_compute_vpn_gateway.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_vpn_gateway",
+      "compute target-vpn-gateways"
+    ]
+  },
+  {
+    "key": "gcp.vpn_gateway",
+    "displayName": "HA VPN Gateway",
+    "category": "networking",
+    "rules": {
+      "gcp.vpn_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vg",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Highly available (HA) VPN gateway; API and gcloud call it \"VPN gateway\", Terraform calls it google_compute_ha_vpn_gateway.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute vpn-gateways create"
+      ],
+      "terraform": [
+        "google_compute_ha_vpn_gateway.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_ha_vpn_gateway",
+      "compute vpn-gateways"
+    ]
+  },
+  {
+    "key": "gcp.vpn_tunnel",
+    "displayName": "VPN Tunnel",
+    "category": "networking",
+    "rules": {
+      "gcp.vpn_tunnel": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vt",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "One IPsec tunnel from a VPN gateway to a peer gateway, in one region.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute vpn-tunnels create"
+      ],
+      "terraform": [
+        "google_compute_vpn_tunnel.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_vpn_tunnel",
+      "compute vpn-tunnels"
+    ]
+  },
+  {
+    "key": "gcp.zone_vm_extension_policy",
+    "displayName": "VM Extension Policy (zonal)",
+    "category": "compute",
+    "rules": {
+      "gcp.zone_vm_extension_policy": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "vep",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Installs and manages VM extensions on matching VMs in one zone (separate gcloud command from the global policy).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute zone-vm-extension-policies create"
+      ],
+      "terraform": [
+        "google_compute_zone_vm_extension_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_zone_vm_extension_policy",
+      "compute zone-vm-extension-policies"
+    ]
+  },
+  {
+    "key": "gcp.kms_ekm_connection",
+    "displayName": "KMS EKM Connection",
+    "category": "security",
+    "rules": {
+      "gcp.kms_ekm_connection": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ekm",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Connection from Cloud KMS to an external key manager in one location, used by externally managed keys.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud kms ekm-connections create"
+      ],
+      "terraform": [
+        "google_kms_ekm_connection.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_kms_ekm_connection",
+      "kms ekm-connections"
+    ]
+  },
+  {
+    "key": "gcp.kms_key_ring",
+    "displayName": "KMS Key Ring",
+    "category": "security",
+    "rules": {
+      "gcp.kms_key_ring": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ring",
+      "basis": "ring (kr equals the old region value kr; kms names the service, not the key ring); principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): keyring 124 / ring 81 / kms 79 / kr 5",
+      "previous": [
+        "kr"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A named container that groups KMS crypto keys in one location; keys are named inside it.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud kms keyrings create"
+      ],
+      "terraform": [
+        "google_kms_key_ring.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_kms_key_ring",
+      "kms keyrings",
+      "kr"
+    ]
+  },
+  {
+    "key": "gcp.kms_crypto_key",
+    "displayName": "KMS Crypto Key",
+    "category": "security",
+    "rules": {
+      "gcp.kms_crypto_key": {
+        "scope": "in kms_key_ring",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "key",
+      "basis": "Most used; IAM provider keys move instead; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): key 447 / kms 105 / cmek 58 / ck 9",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An encryption key inside one key ring; its name only has to be unique within that key ring.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud kms keys create"
+      ],
+      "terraform": [
+        "google_kms_crypto_key.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_kms_crypto_key",
+      "kms keys"
+    ]
+  },
+  {
+    "key": "gcp.kms_import_job",
+    "displayName": "KMS Import Job",
+    "category": "security",
+    "rules": {
+      "gcp.kms_import_job": {
+        "scope": "in kms_key_ring",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ij",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A one-time wrapping key and job for importing your own key material into a key ring.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud kms import-jobs create"
+      ],
+      "terraform": [
+        "google_kms_key_ring_import_job.import_job_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_kms_key_ring_import_job",
+      "kms import-jobs"
+    ]
+  },
+  {
+    "key": "gcp.node_group",
+    "displayName": "Sole-Tenant Node Group",
+    "category": "compute",
+    "rules": {
+      "gcp.node_group": {
+        "scope": "zone",
+        "regionToken": "zone"
+      }
+    },
+    "slug": {
+      "value": "ng",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A zonal group of dedicated physical servers (sole-tenant nodes) that only your VMs run on.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute sole-tenancy node-groups create"
+      ],
+      "terraform": [
+        "google_compute_node_group.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_node_group",
+      "compute sole-tenancy node-groups"
+    ]
+  },
+  {
+    "key": "gcp.node_template",
+    "displayName": "Sole-Tenant Node Template",
+    "category": "compute",
+    "rules": {
+      "gcp.node_template": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nt",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Regional template that defines the node type and affinity labels for sole-tenant node groups.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute sole-tenancy node-templates create"
+      ],
+      "terraform": [
+        "google_compute_node_template.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_node_template",
+      "compute sole-tenancy node-templates"
+    ]
+  },
+  {
+    "key": "gcp.network_endpoint_group",
+    "displayName": "Network Endpoint Group",
+    "category": "networking",
+    "rules": {
+      "gcp.network_endpoint_group": {
+        "scope": "zone",
+        "regionToken": "zone",
+        "kinds": {
+          "default": "GCE_VM_IP_PORT",
+          "allowed": [
+            "GCE_VM_IP_PORT",
+            "GCE_VM_IP",
+            "NON_GCP_PRIVATE_IP_PORT",
+            "GCE_VM_IP_DEDICATED_BACKEND"
+          ]
+        }
+      },
+      "gcp.global_network_endpoint_group": {
+        "scope": "global",
+        "regionToken": "none",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "INTERNET_IP_PORT",
+            "INTERNET_FQDN_PORT"
+          ]
+        }
+      },
+      "gcp.region_network_endpoint_group": {
+        "scope": "region",
+        "regionToken": "region",
+        "kinds": {
+          "default": "SERVERLESS",
+          "allowed": [
+            "SERVERLESS",
+            "PRIVATE_SERVICE_CONNECT",
+            "GCE_VM_IP_PORTMAP",
+            "INTERNET_IP_PORT",
+            "INTERNET_FQDN_PORT"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "neg",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "zonal: gcloud default=\"gce-vm-ip-port\", terraform \"Default value: GCE_VM_IP_PORT\"; regional: terraform \"Default value: SERVERLESS\"; global: no default (choose)",
+      "tokens": {
+        "GCE_VM_IP_PORT": null,
+        "SERVERLESS": null,
+        "GCE_VM_IP": "vmip",
+        "GCE_VM_IP_PORTMAP": "pmap",
+        "GCE_VM_IP_DEDICATED_BACKEND": "ded",
+        "NON_GCP_PRIVATE_IP_PORT": "hyb",
+        "INTERNET_IP_PORT": "inet",
+        "INTERNET_FQDN_PORT": "fqdn",
+        "PRIVATE_SERVICE_CONNECT": "psc"
+      },
+      "omitValues": [],
+      "source": "terraform network_endpoint_type / gcloud --network-endpoint-type"
+    },
+    "info": "A load balancer backend listing endpoints (VM IP:port, serverless service, internet FQDN, PSC); allowed types depend on scope.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute network-endpoint-groups create"
+      ],
+      "terraform": [
+        "google_compute_network_endpoint_group.name",
+        "google_compute_global_network_endpoint_group.name",
+        "google_compute_region_network_endpoint_group.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_network_endpoint_group",
+      "google_compute_global_network_endpoint_group",
+      "google_compute_region_network_endpoint_group",
+      "compute network-endpoint-groups"
+    ]
+  },
+  {
+    "key": "gcp.firestore_database",
+    "displayName": "Firestore Database",
+    "category": "database",
+    "rules": {
+      "gcp.firestore_database": {
+        "scope": "project",
+        "regionToken": "region",
+        "kinds": {
+          "default": "FIRESTORE_NATIVE",
+          "allowed": [
+            "FIRESTORE_NATIVE",
+            "DATASTORE_MODE"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "fs",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --type default=\"firestore-native\" (terraform: required)",
+      "tokens": {
+        "FIRESTORE_NATIVE": null,
+        "DATASTORE_MODE": "ds"
+      },
+      "omitValues": [
+        "FIRESTORE_NATIVE"
+      ],
+      "source": "terraform google_firestore_database.type / gcloud --type"
+    },
+    "info": "A Firestore database in Native or Datastore mode; omitting the name creates the special \"(default)\" database.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud firestore databases create"
+      ],
+      "terraform": [
+        "google_firestore_database.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_firestore_database",
+      "firestore databases"
+    ]
+  },
+  {
+    "key": "gcp.spanner_instance",
+    "displayName": "Spanner Instance",
+    "category": "database",
+    "rules": {
+      "gcp.spanner_instance": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "spn",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Spanner compute capacity in an instance configuration; databases live inside it.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud spanner instances create"
+      ],
+      "terraform": [
+        "google_spanner_instance.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_spanner_instance",
+      "spanner instances"
+    ]
+  },
+  {
+    "key": "gcp.spanner_instance_config",
+    "displayName": "Spanner Instance Config",
+    "category": "database",
+    "rules": {
+      "gcp.spanner_instance_config": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "custom",
+      "basis": "Pattern requires the custom- prefix",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A user-managed instance configuration (replica placement); its name must start with \"custom-\".",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud spanner instance-configs create"
+      ],
+      "terraform": [
+        "google_spanner_instance_config.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_spanner_instance_config",
+      "spanner instance-configs"
+    ]
+  },
+  {
+    "key": "gcp.spanner_instance_partition",
+    "displayName": "Spanner Instance Partition",
+    "category": "database",
+    "rules": {
+      "gcp.spanner_instance_partition": {
+        "scope": "in spanner_instance",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ptn",
+      "basis": "ip is taken by IP address; principle 1",
+      "previous": [
+        "ip"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Extra Spanner capacity in a different configuration, added to an existing instance.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud spanner instance-partitions create"
+      ],
+      "terraform": [
+        "google_spanner_instance_partition.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_spanner_instance_partition",
+      "spanner instance-partitions",
+      "ip"
+    ]
+  },
+  {
+    "key": "gcp.spanner_database",
+    "displayName": "Spanner Database",
+    "category": "database",
+    "rules": {
+      "gcp.spanner_database": {
+        "scope": "in spanner_instance",
+        "regionToken": "region",
+        "kinds": {
+          "default": "GOOGLE_STANDARD_SQL",
+          "allowed": [
+            "GOOGLE_STANDARD_SQL",
+            "POSTGRESQL"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "db",
+      "basis": "Unchanged; collision removed by moving Cloud SQL to sql",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "omit-when-csp-default",
+      "defaultBasis": "gcloud --database-dialect: \"GOOGLE_STANDARD_SQL is the default\"",
+      "tokens": {
+        "GOOGLE_STANDARD_SQL": null,
+        "POSTGRESQL": "pg"
+      },
+      "omitValues": [
+        "GOOGLE_STANDARD_SQL"
+      ],
+      "source": "terraform google_spanner_database.database_dialect / gcloud --database-dialect"
+    },
+    "info": "A database inside a Spanner instance, using the GoogleSQL or PostgreSQL dialect.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud spanner databases create"
+      ],
+      "terraform": [
+        "google_spanner_database.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_spanner_database",
+      "spanner databases"
+    ]
+  },
+  {
+    "key": "gcp.spanner_backup",
+    "displayName": "Spanner Backup",
+    "category": "database",
+    "rules": {
+      "gcp.spanner_backup": {
+        "scope": "in spanner_instance",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "bkp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A backup of one Spanner database, stored in the instance (gcloud only; no Terraform resource).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud spanner backups create"
+      ],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "spanner backups"
+    ]
+  },
+  {
+    "key": "gcp.gke_cluster",
+    "displayName": "GKE Cluster",
+    "category": "containers",
+    "rules": {
+      "gcp.gke_cluster": {
+        "scope": "location",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "STANDARD",
+            "AUTOPILOT"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "gke",
+      "basis": "Most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): gke 1608 / cluster 746 / k8s 234",
+      "previous": []
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud container clusters create vs create-auto; no default",
+      "tokens": {
+        "STANDARD": "std",
+        "AUTOPILOT": "auto"
+      },
+      "omitValues": [],
+      "source": "gcloud container clusters create vs create-auto / terraform enable_autopilot"
+    },
+    "info": "A Kubernetes cluster, Standard (you manage nodes) or Autopilot (Google manages nodes); name up to 40 characters.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud container clusters create"
+      ],
+      "terraform": [
+        "google_container_cluster.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_container_cluster",
+      "container clusters"
+    ]
+  },
+  {
+    "key": "gcp.artifact_registry_rule",
+    "displayName": "Artifact Registry Rule",
+    "category": "containers",
+    "rules": {
+      "gcp.artifact_registry_rule": {
+        "scope": "in artifact_registry_repository",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rule",
+      "basis": "Unchanged; no measured 3-char alternative",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A rule inside one Artifact Registry repository (for example a download rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud artifacts rules create"
+      ],
+      "terraform": [
+        "google_artifact_registry_rule.rule_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_artifact_registry_rule",
+      "artifacts rules"
+    ]
+  },
+  {
+    "key": "gcp.cloud_function_gen1",
+    "displayName": "Cloud Function (1st gen)",
+    "category": "compute",
+    "rules": {
+      "gcp.cloud_function_gen1": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "gcf",
+      "basis": "Most used; same concept as 2nd gen; principles 1, 3; GitHub code search 2026-10-07 (google_cloudfunctions_function): gcf 26 / fn 11 / gen1 4 / v1 4",
+      "previous": [
+        "fn"
+      ]
+    },
+    "entity": "cloudfunctions.functions",
+    "kind": null,
+    "info": "A 1st-gen Cloud Function; unlike 2nd gen its name may contain uppercase letters and underscores. 1st and 2nd gen functions share one name space in the same region and project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud functions deploy"
+      ],
+      "terraform": [
+        "google_cloudfunctions_function.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloudfunctions_function",
+      "functions",
+      "fn"
+    ]
+  },
+  {
+    "key": "gcp.cloud_function",
+    "displayName": "Cloud Function (2nd gen)",
+    "category": "compute",
+    "rules": {
+      "gcp.cloud_function": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "gcf",
+      "basis": "Most used; same concept as 1st gen; principles 1, 3; GitHub code search 2026-10-07 (google_cloudfunctions2_function): gcf 179 / cf 84 / fn 82 / v2 44 / func 21 / gen2 20",
+      "previous": [
+        "fn"
+      ]
+    },
+    "entity": "cloudfunctions.functions",
+    "kind": null,
+    "info": "A 2nd-gen Cloud Function (deployed with --gen2); lowercase letters, digits and hyphens only. 1st and 2nd gen functions share one name space in the same region and project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud functions deploy"
+      ],
+      "terraform": [
+        "google_cloudfunctions2_function.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloudfunctions2_function",
+      "functions",
+      "fn"
+    ]
+  },
+  {
+    "key": "gcp.iam_oauth_client",
+    "displayName": "IAM OAuth Client",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_oauth_client": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "oc",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An OAuth application registration used with workforce identity federation.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam oauth-clients create"
+      ],
+      "terraform": [
+        "google_iam_oauth_client.oauth_client_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_oauth_client",
+      "iam oauth-clients"
+    ]
+  },
+  {
+    "key": "gcp.iam_oauth_client_credential",
+    "displayName": "IAM OAuth Client Credential",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_oauth_client_credential": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "occ",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A client secret belonging to one IAM OAuth client.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam oauth-clients credentials create"
+      ],
+      "terraform": [
+        "google_iam_oauth_client_credential.oauth_client_credential_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_oauth_client_credential",
+      "iam oauth-clients credentials"
+    ]
+  },
+  {
+    "key": "gcp.iam_policy_binding",
+    "displayName": "IAM Policy Binding",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_policy_binding": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pb",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Binds a principal access boundary policy to a set of principals at project, folder or organization level.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam policy-bindings create"
+      ],
+      "terraform": [
+        "google_iam_projects_policy_binding.policy_binding_id",
+        "google_iam_folders_policy_binding.policy_binding_id",
+        "google_iam_organizations_policy_binding.policy_binding_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_projects_policy_binding",
+      "google_iam_folders_policy_binding",
+      "google_iam_organizations_policy_binding",
+      "iam policy-bindings"
+    ]
+  },
+  {
+    "key": "gcp.iam_principal_access_boundary_policy",
+    "displayName": "Principal Access Boundary Policy",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_principal_access_boundary_policy": {
+        "scope": "namespace",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pab",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Organization-level policy that limits which resources a set of principals can access at all.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam principal-access-boundary-policies create"
+      ],
+      "terraform": [
+        "google_iam_principal_access_boundary_policy.principal_access_boundary_policy_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_principal_access_boundary_policy",
+      "iam principal-access-boundary-policies"
+    ]
+  },
+  {
+    "key": "gcp.iam_deny_policy",
+    "displayName": "IAM Deny Policy",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_deny_policy": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "deny",
+      "basis": "Unchanged; no measured 3-char alternative",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Denies chosen permissions to principals regardless of their allow policies, at the attachment point it is created on.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam policies create"
+      ],
+      "terraform": [
+        "google_iam_deny_policy.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_deny_policy",
+      "iam policies"
+    ]
+  },
+  {
+    "key": "gcp.iam_custom_role",
+    "displayName": "IAM Custom Role",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_custom_role": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "role",
+      "basis": "Same as AWS role; blueprint rl is the alternative; principles 1, 2",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A role you define from a chosen list of permissions; ID allows letters, digits, underscores and periods only (no hyphens).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam roles create"
+      ],
+      "terraform": [
+        "google_project_iam_custom_role.role_id",
+        "google_organization_iam_custom_role.role_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_project_iam_custom_role",
+      "google_organization_iam_custom_role",
+      "iam roles"
+    ]
+  },
+  {
+    "key": "gcp.iam_workforce_pool",
+    "displayName": "Workforce Pool",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_workforce_pool": {
+        "scope": "namespace",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "wfp",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Organization-level pool of human users from an external identity provider (workforce identity federation).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workforce-pools create"
+      ],
+      "terraform": [
+        "google_iam_workforce_pool.workforce_pool_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workforce_pool",
+      "iam workforce-pools"
+    ]
+  },
+  {
+    "key": "gcp.iam_workforce_pool_provider",
+    "displayName": "Workforce Pool Provider",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_workforce_pool_provider": {
+        "scope": "in workforce_pool",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "OIDC",
+            "SAML"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "wfpp",
+      "basis": "Pairs with wfp; avoids wpp collision; principles 1, 2",
+      "previous": [
+        "wpp"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud providers create-oidc | create-saml; no default",
+      "tokens": {
+        "OIDC": "oidc",
+        "SAML": "saml"
+      },
+      "omitValues": [],
+      "source": "gcloud providers create-oidc | create-saml"
+    },
+    "info": "The OIDC or SAML identity provider trusted by one workforce pool.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workforce-pools providers create-oidc"
+      ],
+      "terraform": [
+        "google_iam_workforce_pool_provider.provider_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workforce_pool_provider",
+      "iam workforce-pools providers",
+      "wpp"
+    ]
+  },
+  {
+    "key": "gcp.iam_workforce_pool_provider_key",
+    "displayName": "Workforce Pool Provider Key",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_workforce_pool_provider_key": {
+        "scope": "in workforce_pool",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "wfpk",
+      "basis": "Pairs with wfpp; avoids key collision; principles 1, 2",
+      "previous": [
+        "key"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A key that belongs to one workforce pool provider.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workforce-pools providers keys create"
+      ],
+      "terraform": [
+        "google_iam_workforce_pool_provider_key.key_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workforce_pool_provider_key",
+      "iam workforce-pools providers keys",
+      "key"
+    ]
+  },
+  {
+    "key": "gcp.iam_workload_identity_pool",
+    "displayName": "Workload Identity Pool",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_workload_identity_pool": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "wip",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "Project-level pool of external workloads (AWS, OIDC, SAML, X.509) that can impersonate Google identities.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workload-identity-pools create"
+      ],
+      "terraform": [
+        "google_iam_workload_identity_pool.workload_identity_pool_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workload_identity_pool",
+      "iam workload-identity-pools"
+    ]
+  },
+  {
+    "key": "gcp.iam_wip_managed_identity",
+    "displayName": "WIP Managed Identity",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_wip_managed_identity": {
+        "scope": "in workload_identity_pool",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "mi",
+      "basis": "Unchanged; collision removed by moving machine image",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A managed workload identity inside a workload identity pool namespace.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workload-identity-pools managed-identities create"
+      ],
+      "terraform": [
+        "google_iam_workload_identity_pool_managed_identity.workload_identity_pool_managed_identity_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workload_identity_pool_managed_identity",
+      "iam workload-identity-pools managed-identities"
+    ]
+  },
+  {
+    "key": "gcp.iam_wip_namespace",
+    "displayName": "WIP Namespace",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_wip_namespace": {
+        "scope": "in workload_identity_pool",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ns",
+      "basis": "Unchanged; not measured",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A namespace inside a workload identity pool that groups managed identities.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workload-identity-pools namespaces create"
+      ],
+      "terraform": [
+        "google_iam_workload_identity_pool_namespace.workload_identity_pool_namespace_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workload_identity_pool_namespace",
+      "iam workload-identity-pools namespaces"
+    ]
+  },
+  {
+    "key": "gcp.iam_wip_provider",
+    "displayName": "Workload Identity Pool Provider",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_wip_provider": {
+        "scope": "in workload_identity_pool",
+        "regionToken": "region",
+        "kinds": {
+          "default": null,
+          "allowed": [
+            "OIDC",
+            "SAML",
+            "AWS",
+            "X509"
+          ]
+        }
+      }
+    },
+    "slug": {
+      "value": "wipp",
+      "basis": "Pairs with wip; avoids wpp collision; principles 1, 2",
+      "previous": [
+        "wpp"
+      ]
+    },
+    "entity": null,
+    "kind": {
+      "rule": "only-when-chosen",
+      "defaultBasis": "gcloud providers create-oidc | create-saml | create-aws | create-x509; no default",
+      "tokens": {
+        "OIDC": "oidc",
+        "SAML": "saml",
+        "AWS": "aws",
+        "X509": "x509"
+      },
+      "omitValues": [],
+      "source": "gcloud providers create-oidc | create-saml | create-aws | create-x509"
+    },
+    "info": "The external identity provider (OIDC, SAML, AWS or X.509) trusted by one workload identity pool.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workload-identity-pools providers create-oidc"
+      ],
+      "terraform": [
+        "google_iam_workload_identity_pool_provider.workload_identity_pool_provider_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_iam_workload_identity_pool_provider",
+      "iam workload-identity-pools providers",
+      "wpp"
+    ]
+  },
+  {
+    "key": "gcp.iam_wip_provider_key",
+    "displayName": "Workload Identity Pool Provider Key",
+    "category": "identity",
+    "rules": {
+      "gcp.iam_wip_provider_key": {
+        "scope": "in workload_identity_pool",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "wipk",
+      "basis": "Pairs with wipp; avoids key collision; principles 1, 2",
+      "previous": [
+        "key"
+      ]
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A key a workload identity pool provider uses (gcloud only; no Terraform resource).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud iam workload-identity-pools providers keys create"
+      ],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam workload-identity-pools providers keys",
+      "key"
+    ]
+  },
+  {
+    "key": "gcp.secret",
+    "displayName": "Secret Manager Secret",
+    "category": "security",
+    "rules": {
+      "gcp.secret": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "secret",
+      "basis": "dominant long word kept; principle 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): secret 872 / sec 11 / sm 2 / scrt 0",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A named secret in Secret Manager whose versions hold the secret data.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud secrets create"
+      ],
+      "terraform": [
+        "google_secret_manager_secret.secret_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_secret_manager_secret",
+      "secrets"
+    ]
+  }
+];

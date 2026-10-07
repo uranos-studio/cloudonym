@@ -1,0 +1,695 @@
+{
+  "meta": {
+    "provider": "gcp",
+    "note": "Manual transcription of the scopes in which each kind value is accepted. Official Google Cloud documentation wins over Terraform schemas; disagreements are kept in conflict."
+  },
+  "rows": {
+    "gcp.subnet": [
+      {
+        "value": "PRIVATE",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_subnetwork.html.markdown",
+        "quote": "PRIVATE",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "REGIONAL_MANAGED_PROXY",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_subnetwork.html.markdown",
+        "quote": "REGIONAL_MANAGED_PROXY",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "GLOBAL_MANAGED_PROXY",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_subnetwork.html.markdown",
+        "quote": "GLOBAL_MANAGED_PROXY",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "PRIVATE_SERVICE_CONNECT",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_subnetwork.html.markdown",
+        "quote": "PRIVATE_SERVICE_CONNECT",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "PRIVATE_NAT",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_subnetwork.html.markdown",
+        "quote": "PRIVATE_NAT",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.cloud_sql_instance": [
+      {
+        "value": "MYSQL",
+        "scopes": [
+          "project"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/sql_database_instance.html.markdown",
+        "quote": "MYSQL_8_0",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "POSTGRES",
+        "scopes": [
+          "project"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/sql_database_instance.html.markdown",
+        "quote": "POSTGRES_17",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "SQLSERVER",
+        "scopes": [
+          "project"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/sql_database_instance.html.markdown",
+        "quote": "SQLSERVER_2022_STANDARD",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.firewall_rule": [
+      {
+        "value": "INGRESS",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_firewall.html.markdown",
+        "quote": "INGRESS",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "EGRESS",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_firewall.html.markdown",
+        "quote": "EGRESS",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.address": [
+      {
+        "value": "EXTERNAL",
+        "scopes": [
+          "region",
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_address.html.markdown",
+        "quote": "EXTERNAL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL",
+        "scopes": [
+          "region",
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_address.html.markdown",
+        "quote": "INTERNAL",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.backend_service": [
+      {
+        "value": "EXTERNAL",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
+        "quote": "EXTERNAL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "EXTERNAL_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
+        "quote": "EXTERNAL_MANAGED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_backend_service.html.markdown",
+        "quote": "INTERNAL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
+        "quote": "INTERNAL_MANAGED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL_SELF_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_backend_service.html.markdown",
+        "quote": "INTERNAL_SELF_MANAGED",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.forwarding_rule": [
+      {
+        "value": "EXTERNAL",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
+        "quote": "EXTERNAL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "EXTERNAL_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
+        "quote": "EXTERNAL_MANAGED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
+        "quote": "INTERNAL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_forwarding_rule.html.markdown",
+        "quote": "INTERNAL_MANAGED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNAL_SELF_MANAGED",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_global_forwarding_rule.html.markdown",
+        "quote": "INTERNAL_SELF_MANAGED",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.health_check": [
+      {
+        "value": "grpc",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "grpc_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "grpc-with-tls",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "grpc_tls_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "http",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "http_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "http2",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "http2_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "https",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "https_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "ssl",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "ssl_health_check",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "tcp",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_region_health_check.html.markdown",
+        "quote": "tcp_health_check",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.interconnect_attachment": [
+      {
+        "value": "DEDICATED",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect_attachment.html.markdown",
+        "quote": "DEDICATED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "PARTNER",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect_attachment.html.markdown",
+        "quote": "PARTNER",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "PARTNER_PROVIDER",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect_attachment.html.markdown",
+        "quote": "PARTNER_PROVIDER",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "L2_DEDICATED",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect_attachment.html.markdown",
+        "quote": "L2_DEDICATED",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.interconnect": [
+      {
+        "value": "DEDICATED",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect.html.markdown",
+        "quote": "DEDICATED",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "PARTNER",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect.html.markdown",
+        "quote": "PARTNER",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "IT_PRIVATE",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_interconnect.html.markdown",
+        "quote": "IT_PRIVATE",
+        "checked": "2026-10-07",
+        "conflict": "Terraform: \"a value IT_PRIVATE has been deprecated in favor of DEDICATED\""
+      }
+    ],
+    "gcp.security_policy": [
+      {
+        "value": "CLOUD_ARMOR",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/armor/docs/security-policy-overview",
+        "quote": "Backend security policy",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "CLOUD_ARMOR_EDGE",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://docs.cloud.google.com/armor/docs/security-policy-overview",
+        "quote": "Edge security policy",
+        "checked": "2026-10-07",
+        "conflict": "Terraform google_compute_region_security_policy.type also lists CLOUD_ARMOR_EDGE; the official scope tables list edge policies only under globally scoped policies"
+      },
+      {
+        "value": "CLOUD_ARMOR_NETWORK",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/armor/docs/security-policy-overview",
+        "quote": "Network edge security policy",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.ssl_certificate": [
+      {
+        "value": "SELF_MANAGED",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/ssl-certificates",
+        "quote": "self-managed",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "MANAGED",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/ssl-certificates",
+        "quote": "only global Compute Engine sslCertificates resources support Google-managed SSL certificates; regionSslCertificates don't support them",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.resource_policy": [
+      {
+        "value": "snapshot-schedule",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_resource_policy.html.markdown",
+        "quote": "snapshot_schedule_policy",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "instance-schedule",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_resource_policy.html.markdown",
+        "quote": "instance_schedule_policy",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "group-placement",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_resource_policy.html.markdown",
+        "quote": "group_placement_policy",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "disk-consistency-group",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_resource_policy.html.markdown",
+        "quote": "disk_consistency_group_policy",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "workload-policy",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_resource_policy.html.markdown",
+        "quote": "workload_policy",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.snapshot": [
+      {
+        "value": "STANDARD",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_snapshot.html.markdown",
+        "quote": "STANDARD",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "ARCHIVE",
+        "scopes": [
+          "global"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_snapshot.html.markdown",
+        "quote": "ARCHIVE",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.network_endpoint_group": [
+      {
+        "value": "GCE_VM_IP_PORT",
+        "scopes": [
+          "zone"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Zonal",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "GCE_VM_IP",
+        "scopes": [
+          "zone"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Zonal",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "NON_GCP_PRIVATE_IP_PORT",
+        "scopes": [
+          "zone"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Zonal",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "GCE_VM_IP_DEDICATED_BACKEND",
+        "scopes": [
+          "zone"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/compute_network_endpoint_group.html.markdown",
+        "quote": "GCE_VM_IP_DEDICATED_BACKEND",
+        "checked": "2026-10-07",
+        "conflict": "Terraform only: listed in google_compute_network_endpoint_group.network_endpoint_type; absent from the official NEG scope table"
+      },
+      {
+        "value": "SERVERLESS",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Regional",
+        "checked": "2026-10-07",
+        "conflict": "Terraform google_compute_network_endpoint_group (zonal) also accepts SERVERLESS; the official scope table says Regional"
+      },
+      {
+        "value": "PRIVATE_SERVICE_CONNECT",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Regional",
+        "checked": "2026-10-07",
+        "conflict": "Terraform google_compute_network_endpoint_group (zonal) also accepts PRIVATE_SERVICE_CONNECT; the official scope table says Regional"
+      },
+      {
+        "value": "GCE_VM_IP_PORTMAP",
+        "scopes": [
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Regional",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "INTERNET_IP_PORT",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Global or regional",
+        "checked": "2026-10-07",
+        "conflict": "Terraform google_compute_network_endpoint_group (zonal) also accepts INTERNET_IP_PORT; the official scope table says Global or regional"
+      },
+      {
+        "value": "INTERNET_FQDN_PORT",
+        "scopes": [
+          "global",
+          "region"
+        ],
+        "source": "https://docs.cloud.google.com/load-balancing/docs/negs",
+        "quote": "Global or regional",
+        "checked": "2026-10-07",
+        "conflict": "Terraform google_compute_network_endpoint_group (zonal) also accepts INTERNET_FQDN_PORT; the official scope table says Global or regional"
+      }
+    ],
+    "gcp.firestore_database": [
+      {
+        "value": "FIRESTORE_NATIVE",
+        "scopes": [
+          "project"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/firestore_database.html.markdown",
+        "quote": "FIRESTORE_NATIVE",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "DATASTORE_MODE",
+        "scopes": [
+          "project"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/firestore_database.html.markdown",
+        "quote": "DATASTORE_MODE",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.spanner_database": [
+      {
+        "value": "GOOGLE_STANDARD_SQL",
+        "scopes": [
+          "in spanner_instance"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/spanner_database.html.markdown",
+        "quote": "GOOGLE_STANDARD_SQL",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "POSTGRESQL",
+        "scopes": [
+          "in spanner_instance"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/spanner_database.html.markdown",
+        "quote": "POSTGRESQL",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.gke_cluster": [
+      {
+        "value": "STANDARD",
+        "scopes": [
+          "location"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/container_cluster.html.markdown",
+        "quote": "Defaults to `false`",
+        "checked": "2026-10-07",
+        "conflict": "Terraform enable_autopilot defaults to false (Standard); the catalog keeps no default because gcloud splits create and create-auto"
+      },
+      {
+        "value": "AUTOPILOT",
+        "scopes": [
+          "location"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/container_cluster.html.markdown",
+        "quote": "enable_autopilot",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.iam_workforce_pool_provider": [
+      {
+        "value": "OIDC",
+        "scopes": [
+          "in workforce_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workforce_pool_provider.html.markdown",
+        "quote": "oidc",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "SAML",
+        "scopes": [
+          "in workforce_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workforce_pool_provider.html.markdown",
+        "quote": "saml",
+        "checked": "2026-10-07"
+      }
+    ],
+    "gcp.iam_wip_provider": [
+      {
+        "value": "OIDC",
+        "scopes": [
+          "in workload_identity_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workload_identity_pool_provider.html.markdown",
+        "quote": "oidc",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "SAML",
+        "scopes": [
+          "in workload_identity_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workload_identity_pool_provider.html.markdown",
+        "quote": "saml",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "AWS",
+        "scopes": [
+          "in workload_identity_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workload_identity_pool_provider.html.markdown",
+        "quote": "aws",
+        "checked": "2026-10-07"
+      },
+      {
+        "value": "X509",
+        "scopes": [
+          "in workload_identity_pool"
+        ],
+        "source": "https://raw.githubusercontent.com/hashicorp/terraform-provider-google/main/website/docs/r/iam_workload_identity_pool_provider.html.markdown",
+        "quote": "x509",
+        "checked": "2026-10-07"
+      }
+    ]
+  }
+}
