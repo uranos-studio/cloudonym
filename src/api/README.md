@@ -1,9 +1,25 @@
+The Hono-based Worker API (`/v1/*`), `/llms.txt` and telemetry — the Worker entry is `src/api/index.ts`. `/openapi.json` is a static asset in `public/`.
+
+- Every message in a response is `{ code, field?, params?, message }` (`toWireMessage` in `serialize.ts`) — sentences come from the `src/messages/` dictionary
+- **Every failure response goes through the single `fail()` in `errors.ts`** (400 · 403 · 409 · 413 · 429 · 500). New failure paths use `fail()` too — `no-hangul.test` and `openapi.test` validate sample responses against the spec
+- Responses carry `version` (`src/version.ts`). When a request's `rules_version` differs from the current rules revision, the answer is 409 (`schemas.ts`)
+- Routes — `POST /v1/generate` (catalog: every rule of the provider · sequence `01`) · `POST /v1/names` (picked resources and counts · D39) · `POST /v1/validate` · `GET /v1/health` · `POST /v1/events` (UI beacon) · `GET /llms.txt`
+- A required field that is absent is 400 `request.field_missing` (no `params`); a value outside the list is `request.value_unsupported` with the value echoed back
+- `/v1/names` — `parseNamesBody` checks only the shape of provider and context and passes `resources` to core `validateSelection`. A 400 carries the core `selection.*` codes as they are (no API-only codes), and echoed `type` · `role` values are rebuilt from the original input, cut to 80 characters and written as `\uXXXX`. Each item's `scope` (placement scope) and `uniqueness` are added from the rule by `toWireNames` — the sentences describing these two fields live in `SCOPE_MEANING` · `UNIQUENESS_MEANING` in `llms.ts`, and `openapi.json` uses the same sentences
+- The conflict fixtures (two test-only rules) are not in the rule table and cannot be reached over HTTP — `names-conflict.test.ts` mocks `rulesFor` to check them. Production code has no test hooks
+- **Only enabled providers are accepted** (D45) — `providers` defaults to `ENABLED_PROVIDERS`; a provider that is not enabled is 400 `request.provider_not_enabled` + `supported` on `/v1/generate`, `/v1/names` and `/v1/validate`
+- `GET /catalog.json` (`catalog.ts` — D46) — the catalog rows and region table of the enabled providers, serialized to JSON once at module load. Same shape as `/llms.txt` (one-day cache · CORS `*` · rate limit on GET only · counter `catalog_json_accessed`). The path must be in `run_worker_first` in `wrangler.jsonc` for the Worker to receive it
+- Telemetry (`telemetry.ts` — D56) — instead of the raw UA it records only the four `client_class` values from `classifyClient(ua)` (`ai_agent` · `browser` · `cli` · `other`) and `is_ai_agent`. The `ui_copy` beacon requires `target` (the six `UI_COPY_TARGETS` in `schemas.ts`); `target` on other events is dropped. The client IP is passed by `ratelimit.ts` only as the key of the rate-limit binding and is stored nowhere — the `/privacy` text (`src/messages/en.ts`) must state the same
+
+## 한국어
+
 Hono 기반 Worker API(`/v1/*`)와 `/llms.txt`, 텔레메트리 — Worker 엔트리는 `src/api/index.ts` 다. `/openapi.json` 은 `public/` 의 정적 자산이다.
 
 - 응답의 메시지는 전부 `{ code, field?, params?, message }`(`serialize.ts` 의 `toWireMessage`) — 문장은 `src/messages/` 사전이 만든다
 - **모든 실패 응답은 `errors.ts` 의 `fail()` 하나를 지난다** (400 · 403 · 409 · 413 · 429 · 500). 새 실패 경로도 `fail()` 로 낸다 — `no-hangul.test` · `openapi.test` 가 표본 응답을 명세로 검증한다
 - 응답에 `version`(`src/version.ts`)을 싣는다. 요청의 `rules_version` 이 지금 규칙 버전과 다르면 409 (`schemas.ts`)
 - 라우트 — `POST /v1/generate`(카탈로그: provider 의 규칙 전부 · 순번 `01`) · `POST /v1/names`(고른 리소스와 개수 · D39) · `POST /v1/validate` · `GET /v1/health` · `POST /v1/events`(화면 비콘) · `GET /llms.txt`
+- 반드시 있어야 할 필드가 없으면 400 `request.field_missing`(`params` 없음), 목록 밖 값이면 `request.value_unsupported` 가 그 값을 되돌려 싣는다
 - `/v1/names` — `parseNamesBody` 는 provider · context 모양만 보고 `resources` 는 core `validateSelection` 에 넘긴다. 400 은 core `selection.*` 를 그대로 싣고(API 전용 코드 없음) 되돌려 싣는 `type` · `role` 값은 원래 입력에서 80자 · `\uXXXX` 로 다시 만든다. 항목의 `scope`(배치 범위) · `uniqueness` 는 `toWireNames` 가 규칙에서 붙인다 — 두 필드의 설명 문장은 `llms.ts` 의 `SCOPE_MEANING` · `UNIQUENESS_MEANING` 이 정본이고 `openapi.json` 이 같은 문장을 쓴다
 - 충돌 fixture(시험 전용 규칙 둘)는 규칙 표에 없어 HTTP 로 닿지 않는다 — `names-conflict.test.ts` 가 `rulesFor` 를 mock 해 본다. 운영 코드에 시험용 훅을 두지 않는다
 - **켜진 CSP 만 받는다** (D45) — `providers` 기본값은 `ENABLED_PROVIDERS`, 꺼진 provider 는 `/v1/generate` · `/v1/names` · `/v1/validate` 모두 400 `request.provider_not_enabled` + `supported`

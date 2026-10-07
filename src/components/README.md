@@ -1,3 +1,12 @@
+React UI components (`.tsx`) — Tailwind CSS and lucide-react. They call the engine (`src/core/`) directly and hold no naming rules.
+
+- **Routes** (D57) — `main.tsx` draws one of `App` (the four steps), `NamingDoc` (`/docs/naming`) or `Privacy` (`/privacy`) from `routeOf(location.pathname)` in `route.ts`. There is no router dependency. The naming guide draws a model that pure functions in `namingDocModel.ts` build from the generated catalog, the region table, the dictionary and the version — no hand-written numbers or tables
+- **Share hash v3** (D55 · `urlState.ts`) — the region input code (the zone code for a zone) · an `r` value of `n` or `"n:kindName"`. The cap `MAX_HASH_CHARS` is a fixed formula measured by `urlState.test`. A link for a provider that is not enabled keeps the three free fields and `env`, drops the region and the selection, and says so in one line
+- **A tree row is a catalog row** (D53 · `selection.ts` · `ResourceTree.tsx`) — a row with more than one rule picks the scope first, and kinds are filtered again by that scope's `allowed`. Without a zone a zonal row cannot be newly checked (rows already picked stay and a FAIL card shows why)
+- UI text comes only from `src/messages/en.ts` — `no-hangul.test.ts` counts literals and JSX text
+
+## 한국어
+
 React UI 컴포넌트(`.tsx`) — Tailwind CSS · lucide-react 를 쓴다. 엔진(`src/core/`)을 직접 부르고 이름 규칙을 여기에 두지 않는다.
 
 - **경로** (D57) — `main.tsx` 가 `route.ts` 의 `routeOf(location.pathname)` 로 `App`(네 단계) · `NamingDoc`(`/docs/naming`) · `Privacy`(`/privacy`) 중 하나를 그린다. 라우터 의존성은 없다. 이름 안내는 `namingDocModel.ts` 의 순수 함수가 생성 catalog · 지역 표 · 사전 · 버전에서 만든 모델을 그린다 — 손으로 쓴 숫자 · 표가 없다
