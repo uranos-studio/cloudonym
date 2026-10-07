@@ -1,0 +1,10 @@
+{
+  "migration": {
+    "env": { "prd": "prod" },
+    "region": {
+      "kr": { "gcp": "asia-northeast3", "aws": "ap-northeast-2", "azure": "koreacentral" },
+      "global": "global"
+    }
+  },
+  "items": {}
+}

@@ -1,0 +1,828 @@
+{
+  "base": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "hangul-owner": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "개발",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "개발",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "개발",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "space-quote-combining-owner": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "Team \"A\" café",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "Team \"A\" café",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "Team \"A\" café",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "alias-env-region": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "production",
+            "to": "prd"
+          }
+        },
+        {
+          "code": "context.normalized",
+          "field": "region",
+          "params": {
+            "from": "koreacentral",
+            "to": "kr"
+          }
+        }
+      ]
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "production",
+            "to": "prd"
+          }
+        },
+        {
+          "code": "context.normalized",
+          "field": "region",
+          "params": {
+            "from": "koreacentral",
+            "to": "kr"
+          }
+        }
+      ]
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "production",
+            "to": "prd"
+          }
+        },
+        {
+          "code": "context.normalized",
+          "field": "region",
+          "params": {
+            "from": "koreacentral",
+            "to": "kr"
+          }
+        }
+      ]
+    }
+  },
+  "reserved-windows": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "windows",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "windows",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "windows",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "reserved-google": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "google",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "google",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "google",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "reserved-azure": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "azure",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "azure",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "azure",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "empty-after-normalize": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "매매",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "매매",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "매매",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "long-values": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platformengineering",
+        "system": "paymentsettlement",
+        "purpose": "reconciliation",
+        "env": "dev",
+        "region": "global"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platformengineering",
+        "system": "paymentsettlement",
+        "purpose": "reconciliation",
+        "env": "dev",
+        "region": "global"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platformengineering",
+        "system": "paymentsettlement",
+        "purpose": "reconciliation",
+        "env": "dev",
+        "region": "global"
+      },
+      "transformed": []
+    }
+  },
+  "shrink-fail": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "a-long",
+        "purpose": "longpurpose",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "a-long",
+        "purpose": "longpurpose",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "a-long",
+        "purpose": "longpurpose",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "digit-first-system": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "3tier",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "3tier",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "platform",
+        "system": "3tier",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "label-gcp-65": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "label-aws-257": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "label-aws-invalid-char": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "team#1",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "team#1",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "team#1",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "label-gcp-transform": {
+    "aws": {
+      "ok": true,
+      "context": {
+        "owner": "In.Fra",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "gcp": {
+      "ok": true,
+      "context": {
+        "owner": "In.Fra",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    },
+    "azure": {
+      "ok": true,
+      "context": {
+        "owner": "In.Fra",
+        "system": "billing",
+        "purpose": "trade",
+        "env": "prd",
+        "region": "kr"
+      },
+      "transformed": []
+    }
+  },
+  "parse-env-qa": {
+    "aws": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "env",
+          "params": {
+            "value": "qa",
+            "supported": [
+              "prd",
+              "stg",
+              "dev",
+              "sbx"
+            ]
+          }
+        }
+      ]
+    },
+    "gcp": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "env",
+          "params": {
+            "value": "qa",
+            "supported": [
+              "prd",
+              "stg",
+              "dev",
+              "sbx"
+            ]
+          }
+        }
+      ]
+    },
+    "azure": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "env",
+          "params": {
+            "value": "qa",
+            "supported": [
+              "prd",
+              "stg",
+              "dev",
+              "sbx"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "parse-region-mars": {
+    "aws": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "mars",
+            "supported": [
+              "kr",
+              "us",
+              "jp",
+              "eu",
+              "global"
+            ]
+          }
+        }
+      ]
+    },
+    "gcp": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "mars",
+            "supported": [
+              "kr",
+              "us",
+              "jp",
+              "eu",
+              "global"
+            ]
+          }
+        }
+      ]
+    },
+    "azure": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.value_unsupported",
+          "field": "region",
+          "params": {
+            "value": "mars",
+            "supported": [
+              "kr",
+              "us",
+              "jp",
+              "eu",
+              "global"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "parse-owner-empty": {
+    "aws": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.empty",
+          "field": "owner"
+        }
+      ]
+    },
+    "gcp": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.empty",
+          "field": "owner"
+        }
+      ]
+    },
+    "azure": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.empty",
+          "field": "owner"
+        }
+      ]
+    }
+  },
+  "parse-owner-number": {
+    "aws": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        }
+      ]
+    },
+    "gcp": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        }
+      ]
+    },
+    "azure": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        }
+      ]
+    }
+  },
+  "parse-missing-all": {
+    "aws": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        },
+        {
+          "code": "context.not_string",
+          "field": "system"
+        },
+        {
+          "code": "context.not_string",
+          "field": "purpose"
+        },
+        {
+          "code": "context.not_string",
+          "field": "env"
+        },
+        {
+          "code": "context.not_string",
+          "field": "region"
+        }
+      ]
+    },
+    "gcp": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        },
+        {
+          "code": "context.not_string",
+          "field": "system"
+        },
+        {
+          "code": "context.not_string",
+          "field": "purpose"
+        },
+        {
+          "code": "context.not_string",
+          "field": "env"
+        },
+        {
+          "code": "context.not_string",
+          "field": "region"
+        }
+      ]
+    },
+    "azure": {
+      "ok": false,
+      "errors": [
+        {
+          "code": "context.not_string",
+          "field": "owner"
+        },
+        {
+          "code": "context.not_string",
+          "field": "system"
+        },
+        {
+          "code": "context.not_string",
+          "field": "purpose"
+        },
+        {
+          "code": "context.not_string",
+          "field": "env"
+        },
+        {
+          "code": "context.not_string",
+          "field": "region"
+        }
+      ]
+    }
+  }
+}
