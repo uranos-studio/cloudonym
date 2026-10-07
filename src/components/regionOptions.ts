@@ -1,5 +1,5 @@
-// 지역 고르기의 판정 (D49 · D50 · 계획 6-2) — 콤보박스(RegionPicker.tsx)가 그리는 항목 · 거르기 · 폼의 지역 문자열 하나 ↔ 리전 + 존.
-// 표는 core 의 지역 표가 정본이다. 존은 따로 칸을 두지 않고 region 문자열 하나에 든다(오너 결정 Z2)
+// 지역 고르기의 판정 (D49 · D50) — 콤보박스(RegionPicker.tsx)가 그리는 항목 · 거르기 · 폼의 지역 문자열 하나 ↔ 리전 + 존.
+// 표는 core 의 지역 표가 정본이다. 존은 따로 칸을 두지 않고 region 문자열 하나에 든다(D50)
 import { REGIONS, type ZoneEntry } from '../core/regions-data';
 import type { Provider } from '../core/types';
 

@@ -1,4 +1,4 @@
-// ② 의 지역 고르기 (D49 · D50 · 계획 6-2) — 리전 콤보박스(입력 상자 + 걸러진 목록) + 존 select. 둘이 합쳐 폼의 region 문자열 하나를 만든다(오너 결정 Z2).
+// ② 의 지역 고르기 (D49 · D50) — 리전 콤보박스(입력 상자 + 걸러진 목록) + 존 select. 둘이 합쳐 폼의 region 문자열 하나를 만든다(D50).
 // 입력 상자는 검색어다 — 목록에서 고를 때(클릭 · Enter)만 값을 바꾸고, Escape · 포커스 이탈은 검색어를 버린다. 그래서 폼의 지역은 늘 core 가 받는 값이다.
 // 키보드 — ↓ ↑ 로 목록을 열고 옮긴다 · Enter 로 고른다 · Escape 로 닫는다
 import { useEffect, useId, useMemo, useState, type KeyboardEvent } from 'react';

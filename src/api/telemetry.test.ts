@@ -201,7 +201,7 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
       expect(Object.keys(row!).sort(), event).toEqual([...COMMON, ...(META_KEYS[event] ?? [])].sort());
     }
   });
-  it('허용 표는 계획의 필드 표와 같다', () => {
+  it('허용 표는 D56 의 필드 표와 같다', () => {
     expect(META_KEYS).toEqual({
       ui_visit: [], ui_generate: [], ui_copy: ['target'],
       api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],

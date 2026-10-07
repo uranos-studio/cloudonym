@@ -235,7 +235,7 @@ with sync_playwright() as p:
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
     assert page.evaluate('document.documentElement.lang') == 'en'
-    # 버튼은 셋 다 그린다 — 켜진 것이 하나(GCP)라 첫 그리기 때 그것이 골라지고 트리가 바로 보인다 (D45 · 오너 결정 C1)
+    # 버튼은 셋 다 그린다 — 켜진 것이 하나(GCP)라 첫 그리기 때 그것이 골라지고 트리가 바로 보인다 (D45)
     assert page.eval_on_selector_all('[role="radio"]', 'els => els.map(e => e.dataset.cloud)') == ['aws', 'gcp', 'azure']
     expect(page.locator('[role="radio"][aria-checked="true"]')).to_have_count(1)
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')

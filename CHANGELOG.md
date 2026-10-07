@@ -27,7 +27,7 @@ Rules revision for this release: 2026-10-07.11.
 These changes were made before any public deployment, so no released name depends on the earlier scheme.
 
 - The canonical environment is **`prod`** (D48); `prd`, `production`, `real` and `live` are accepted as aliases.
-- The five country values `kr`, `us`, `jp` and `eu` are no longer accepted for `region`; the error lists the matching region names. `global` now leaves the region slot empty instead of writing the word `global` into the name.
+- The country values `kr`, `us`, `jp` and `eu` are no longer accepted for `region`; the error lists the matching region names. `global` now leaves the region slot empty instead of writing the word `global` into the name.
 - Abbreviations come from the catalog, for example a Compute Engine VM is `gce` (was `vm`).
 - `providers` defaults to the enabled providers; a request for a provider that is not enabled is 400 `request.provider_not_enabled` with the supported list.
 - Share links use hash v3 (D55): old links with a country region do not open, and a link made for a provider that is not enabled keeps the free fields and `env` and resets the region and the selection.

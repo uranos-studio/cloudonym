@@ -199,6 +199,14 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(text).toContain('409 `request.rules_version_mismatch`');
     expect(text).toContain('`GET /v1/health`');
   });
+  it('API 절에 GET /catalog.json 한 줄 — 켜진 CSP 의 행과 리전 · version (D46)', () => {
+    const api = text.slice(text.indexOf('## API'));
+    const line = api.split('\n').find((l) => l.startsWith('- `GET /catalog.json`'));
+    expect(line).toBeDefined();
+    expect(line).toMatch(/enabled providers/);
+    expect(line).toMatch(/region/);
+    expect(line).toContain('`version: { engine, rules }`');
+  });
   it('D19 문장이 있고 우리 도메인을 박지 않는다', () => {
     expect(text).toContain("does not replace the provider's final verdict");
     expect(text).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);

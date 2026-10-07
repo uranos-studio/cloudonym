@@ -6,7 +6,7 @@ import { REGIONS } from '../core/regions-data';
 const gcp = regionOptions('gcp');
 const byValue = (v: string) => gcp.find((o) => o.value === v)!;
 
-describe('regionOptions — 그 CSP 의 리전 표 + global (D49 · 계획 6-2)', () => {
+describe('regionOptions — 그 CSP 의 리전 표 + global (D49)', () => {
   it('GCP 43 + global 44 · 표 순서 그대로 · global 은 맨 끝', () => {
     expect(gcp).toHaveLength(REGIONS.gcp.length + 1);
     expect(REGIONS.gcp).toHaveLength(43);
@@ -44,7 +44,7 @@ describe('filterRegions — 리전 이름 · 위치 · 코드로 거른다 (대�
   });
 });
 
-describe('splitRegion · composeRegion — 폼의 지역 문자열 하나 ↔ 리전 + 존 (D50 · 오너 결정 Z2)', () => {
+describe('splitRegion · composeRegion — 폼의 지역 문자열 하나 ↔ 리전 + 존 (D50)', () => {
   it.each([
     ['asia-northeast3-a', 'asia-northeast3', 'asia-northeast3-a'],
     ['ane3a', 'asia-northeast3', 'asia-northeast3-a'],

@@ -24,7 +24,7 @@ import { en } from './messages/en';
 import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
-/** 켜진 CSP 가 하나면 첫 그리기 때 그것을 고른다 (D45 · 오너 결정 C1). 둘 이상이면 고르지 않는다 — 숨은 기본값을 두지 않는다 */
+/** 켜진 CSP 가 하나면 첫 그리기 때 그것을 고른다 (D45). 둘 이상이면 고르지 않는다 — 숨은 기본값을 두지 않는다 */
 const AUTO_PROVIDER: Provider | undefined = ENABLED_PROVIDERS.length === 1 ? ENABLED_PROVIDERS[0] : undefined;
 const NO_PICK: Picked = new Map();
 
