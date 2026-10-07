@@ -134,10 +134,18 @@ export const GCP_BASE_RULES: Record<string, ResourceRule> = {
 /** 규칙 id → catalog 행 · 그 규칙의 칸 */
 const CATALOG_BY_RULE = new Map(GCP_CATALOG.flatMap((row) => Object.entries(row.rules).map(([id, spec]) => [id, { row, spec }] as const)));
 
+/** slug 바로 뒤에 kind — 새 배열을 돌려준다(GLOBAL_TEMPLATE · PLACED_TEMPLATE 는 여러 규칙이 나눠 쓴다) */
+function withKind(ts: Token[]): Token[] {
+  const at = ts.indexOf('slug');
+  if (at < 0) throw new Error(`template without slug cannot take a kind: ${ts.join(',')}`);
+  return [...ts.slice(0, at + 1), 'kind', ...ts.slice(at + 1)];
+}
+
 /** catalog 가 규칙 위에 덮는다 (D47) — 약어 · entity(행에 있을 때) · 지역 토큰 종류 · 종류 표.
  *  지역 토큰이 none 이면 템플릿과 optional 에서 region 을 함께 뺀다(optional 은 template 에 있는 토큰만).
  *  zone 이면 optional 에서만 뺀다 (D51) — 축소 1단계가 존 코드를 떼면 존만 다른 두 이름(ane3a · ane3b)이 같아진다.
- *  종류 토큰을 이름에 넣는 일은 여기서 하지 않는다. category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
+ *  종류 표가 있으면 템플릿의 slug 바로 뒤에 kind 를 끼운다 (D52) — optional 에는 넣지 않는다(보호 토큰).
+ *  category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
 export function applyCatalog(rule: ResourceRule): ResourceRule {
   const hit = CATALOG_BY_RULE.get(rule.id);
   if (!hit) throw new Error(`GCP rule not in catalog: ${rule.id}`);
@@ -147,7 +155,7 @@ export function applyCatalog(rule: ResourceRule): ResourceRule {
     ...rule,
     slug: row.slug.value,
     entity: row.entity ?? rule.entity,
-    template: dropRegion(rule.template),
+    template: row.kind && spec.kinds ? withKind(dropRegion(rule.template)) : dropRegion(rule.template),
     optional: spec.regionToken === 'zone' ? rule.optional.filter((t) => t !== 'region') : dropRegion(rule.optional),
     regionToken: spec.regionToken,
     ...(row.kind && spec.kinds ? {

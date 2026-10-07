@@ -24,9 +24,10 @@ export interface WireGenerate {
     transformed: WireMessage[];
   };
 }
-/** /v1/names 항목 — WireName 앞에 키 · 유형 · 순번/역할 · 배치 범위 · 고유성 (D39) */
+/** /v1/names 항목 — WireName 앞에 키 · 유형 · 순번/역할 · 종류 · 배치 범위 · 고유성 (D39 · D52).
+ *  kind 는 고른 값 이름 · kind_token 은 이름에 넣은 토큰 — 기본값을 고르면 kind 만 있다 */
 export interface WireNameItem extends WireName {
-  key: string; resource_type: string; seq?: string; role?: string; scope: ScopeId; uniqueness: 'csp' | 'none';
+  key: string; resource_type: string; seq?: string; role?: string; kind?: string; kind_token?: string; scope: ScopeId; uniqueness: 'csp' | 'none';
 }
 export interface WireNamesProvider { valid: boolean; items: WireNameItem[]; conflicts: WireMessage[] }
 export interface WireNames extends Omit<WireGenerate, 'data'> { data: Partial<Record<Provider, WireNamesProvider>> }
@@ -89,6 +90,8 @@ export function toWireNames(result: ManyResult, rules: readonly ResourceRule[], 
       key: it.key, resource_type: it.resourceType,
       ...(it.seq !== undefined ? { seq: it.seq } : {}),
       ...(it.role !== undefined ? { role: it.role } : {}),
+      ...(it.kind !== undefined ? { kind: it.kind } : {}),
+      ...(it.kindToken !== undefined ? { kind_token: it.kindToken } : {}),
       scope: rule.scope, uniqueness: rule.uniqueness,
       ...toWireName(it, catalog),
     };

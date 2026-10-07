@@ -47,3 +47,27 @@ describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
     expect('role' in v).toBe(false);
   });
 });
+
+describe('tokenValues — 종류 토큰 (D52)', () => {
+  const sql = () => getRule('gcp', 'cloud_sql_instance')!;
+  const name = (kind?: string) => compose(tokenValues(ctx, sql(), kind === undefined ? {} : { kind }), sql().template, sql().separator);
+
+  it("kind 'POSTGRES' → 약어 바로 뒤에 pg — …-sql-pg-01", () => {
+    expect(name('POSTGRES')).toBe('billing-trade-prod-ane3-sql-pg-01');
+  });
+  it('kind 가 없으면 지금 이름 그대로 — …-sql-01', () => {
+    expect(name()).toBe('billing-trade-prod-ane3-sql-01');
+  });
+  it('CSP 기본값(MYSQL)을 명시해도 토큰이 붙지 않는다', () => {
+    expect(name('MYSQL')).toBe('billing-trade-prod-ane3-sql-01');
+  });
+  it('행의 omitValues(EXTERNAL_MANAGED)는 토큰 없음 · 내부 묶음은 int', () => {
+    const bs = getRule('gcp', 'backend_service')!;
+    expect(compose(tokenValues(ctx, bs, { kind: 'EXTERNAL_MANAGED' }), bs.template, bs.separator)).toBe('billing-trade-prod-bs-01');
+    expect(compose(tokenValues(ctx, bs, { kind: 'INTERNAL_MANAGED' }), bs.template, bs.separator)).toBe('billing-trade-prod-bs-int-01');
+  });
+  it('허용 밖 값 · 종류 표가 없는 규칙에 값을 주면 던진다', () => {
+    expect(() => tokenValues(ctx, sql(), { kind: 'pg' })).toThrow(/pg/);
+    expect(() => tokenValues(ctx, getRule('gcp', 'vpc_network')!, { kind: 'POSTGRES' })).toThrow(/vpc_network/);
+  });
+});

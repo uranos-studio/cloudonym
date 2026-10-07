@@ -78,7 +78,7 @@ const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env
 
 /**
  * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 16KB · 403 · 429(v1 · /llms.txt) ·
- * rules_version 409 · 400 · 500 · validate 무효/유효 · names(정상 · 항목 FAIL · Name 태그 · 충돌 · selection.* 400 · 409) · health. 입력이 ASCII 라 응답의 한글은 전부 시스템 문구다(면제가 필요 없다)
+ * rules_version 409 · 400 · 500 · validate 무효/유효 · names(정상 · 항목 FAIL · Name 태그 · 충돌 · 종류 · selection.* 400 · 409) · health. 입력이 ASCII 라 응답의 한글은 전부 시스템 문구다(면제가 필요 없다)
  */
 export async function collectSamples(app: Requestable, rulesVersion: string): Promise<Sample[]> {
   const out: Sample[] = [];
@@ -130,6 +130,11 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await names('400-names-item-shapes', pick([1, { type: 'nope' }, { type: 'project_id' }, { type: 'project_id' }, { type: 'compute_instance', count: 0 }, { type: 'storage_bucket', count: 2 }, { type: 'iam_custom_role', role: 'db' }, { type: 'service_account', role: 'Sync' }]));
   await names('400-names-too-many-names', pick([{ type: 'compute_instance', count: 99 }, { type: 'disk', count: 99 }, { type: 'subnet', count: 3 }]));
   await names('400-names-context-and-selection', { provider: 'gcp', context: { ...SAMPLE_CTX, env: 'qa' }, resources: [{ type: 'service_account', count: 2 }] });
+  // 종류 (D52) — 토큰이 붙는 값 · 기본값 · 필수 종류 · 토큰을 값 이름 자리에 넣은 400 · 필수 누락 400 · 종류 없는 규칙의 kind 400
+  await names('names-kinds', { ...pick([{ type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'resource_policy', kind: 'snapshot-schedule' }, { type: 'backend_service', kind: 'EXTERNAL_MANAGED' }]), context: { ...SAMPLE_CTX, region: 'asia-northeast3' } });
+  await names('400-names-kind-token-not-value', pick([{ type: 'cloud_sql_instance', count: 2, kind: 'pg' }]));
+  await names('400-names-kind-required', pick([{ type: 'cloud_sql_instance', kind: 'POSTGRES' }, { type: 'resource_policy' }]));
+  await names('400-names-kind-not-supported', pick([{ type: 'vpc_network', kind: 'PRIVATE' }]));
   await names('409-names-rules-version', { ...pick([{ type: 'project_id' }]), rules_version: '2026-01-01.1' });
   await val('validate-invalid-too-long', { provider: 'gcp', resource_type: 'service_account', name: 'platform-billing-trade-prod-kr-sa-sync' });
   await val('validate-invalid-goog', { provider: 'gcp', resource_type: 'storage_bucket', name: 'goog-billing' });

@@ -133,3 +133,46 @@ describe('validateSelection — rules 인자 (화면 fixture 진입점)', () => 
     expect(codes(validateSelection('aws', [{ type: 'fx_extra' }], [extra]))).toEqual(['selection.unknown_type']);
   });
 });
+
+describe('validateSelection — 종류 (D52)', () => {
+  const errs = (r: ReturnType<typeof validateSelection>) => (r.ok ? [] : r.errors);
+  const kindOf = (r: ReturnType<typeof validateSelection>) => (r.ok ? r.items.map((i) => i.kind) : null);
+
+  it('종류 표가 없는 규칙에 kind → kind_not_supported', () => {
+    expect(errs(validateSelection('gcp', [{ type: 'vpc_network', kind: 'PRIVATE' }]))).toEqual([
+      { code: 'selection.kind_not_supported', params: { index: 0, type: 'vpc_network' } },
+    ]);
+  });
+  it("값 이름이 아니라 토큰(pg)을 넣으면 unknown_kind — supported 는 그 규칙의 allowed", () => {
+    expect(errs(validateSelection('gcp', [{ type: 'cloud_sql_instance', kind: 'pg' }]))).toEqual([
+      { code: 'selection.unknown_kind', params: { index: 0, type: 'cloud_sql_instance', value: 'pg', supported: ['MYSQL', 'POSTGRES', 'SQLSERVER'] } },
+    ]);
+  });
+  it('문자열이 아닌 kind 도 unknown_kind (value 는 표시용 문자열)', () => {
+    expect(errs(validateSelection('gcp', [{ type: 'cloud_sql_instance', kind: 3 }]))[0]).toMatchObject({ code: 'selection.unknown_kind', params: { value: '3' } });
+  });
+  it('리소스 정책에 kind 가 없으면 kind_required — supported 는 다섯 값', () => {
+    expect(errs(validateSelection('gcp', [{ type: 'resource_policy' }]))).toEqual([
+      { code: 'selection.kind_required', params: { index: 0, type: 'resource_policy', supported: ['snapshot-schedule', 'instance-schedule', 'group-placement', 'disk-consistency-group', 'workload-policy'] } },
+    ]);
+  });
+  it('전역 NEG 는 INTERNET_* 둘만 — GCE_VM_IP 는 unknown_kind', () => {
+    expect(errs(validateSelection('gcp', [{ type: 'global_network_endpoint_group', kind: 'GCE_VM_IP' }]))[0]).toMatchObject({
+      code: 'selection.unknown_kind', params: { supported: ['INTERNET_IP_PORT', 'INTERNET_FQDN_PORT'] },
+    });
+  });
+  it('영역 NEG 는 SERVERLESS 를 받지 않는다 · 지역 NEG 는 받는다(기본값)', () => {
+    expect(codes(validateSelection('gcp', [{ type: 'network_endpoint_group', kind: 'SERVERLESS' }]))).toEqual(['selection.unknown_kind']);
+    expect(kindOf(validateSelection('gcp', [{ type: 'region_network_endpoint_group', kind: 'SERVERLESS' }]))).toEqual(['SERVERLESS']);
+  });
+  it('backend service EXTERNAL_MANAGED · INTERNAL_MANAGED 통과 — kind 를 항목에 싣는다 · 주지 않으면 kind 키가 없다', () => {
+    const r = validateSelection('gcp', [{ type: 'backend_service', kind: 'EXTERNAL_MANAGED' }, { type: 'region_backend_service', kind: 'INTERNAL_MANAGED' }, { type: 'subnet' }]);
+    expect(kindOf(r)).toEqual(['EXTERNAL_MANAGED', 'INTERNAL_MANAGED', undefined]);
+    expect(r.ok && 'kind' in r.items[2]!).toBe(false);
+  });
+  it('한 요청의 여러 항목 오류를 index 순으로 모두 낸다', () => {
+    expect(codes(validateSelection('gcp', [{ type: 'resource_policy' }, { type: 'vpc_network', kind: 'x' }, { type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'snapshot', kind: 'X' }]))).toEqual([
+      'selection.kind_required', 'selection.kind_not_supported', 'selection.unknown_kind',
+    ]);
+  });
+});

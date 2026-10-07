@@ -182,6 +182,10 @@ describe('parseNamesBody (D39)', () => {
     expect(parseNamesBody({ ...ok, resources: [{ type: 'compute_instance' }, { type: 'x'.repeat(1025) }] }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'resources[1].type', params: { max: 1024 } }] } });
   });
+  it('kind 문자열이 1024자를 넘으면 400 request.field_too_long (field 는 resources[i].kind) — 엔진까지 가지 않는다', () => {
+    expect(parseNamesBody({ ...ok, resources: [{ type: 'cloud_sql_instance', kind: 'K'.repeat(1025) }] }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'resources[0].kind', params: { max: 1024 } }] } });
+  });
   it('toString 이 호출 불가능한 type → 500 이 아니라 400 selection.unknown_type', () => {
     const r = parseNamesBody({ ...ok, resources: [{ type: { toString: 1 } }] });
     expect(r).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.unknown_type', params: { value: '{"toString":1}' } }] } });

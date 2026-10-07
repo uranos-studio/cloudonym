@@ -20,9 +20,10 @@ export interface RawContext {
   owner?: unknown; system?: unknown; purpose?: unknown; env?: unknown; region?: unknown;
 }
 
-export type Token = 'owner' | 'system' | 'purpose' | 'env' | 'region' | 'slug' | 'seq' | 'role';
-/** 축소에서 손대지 않는 토큰 (D13 · D51) — region 은 2단계(단축 · 균등 예산)에서 자르지 않는다. 1단계는 optional 이면 통째로 뗀다 */
-export const PROTECTED: readonly Token[] = ['slug', 'seq', 'role', 'env', 'region'];
+export type Token = 'owner' | 'system' | 'purpose' | 'env' | 'region' | 'slug' | 'kind' | 'seq' | 'role';
+/** 축소에서 손대지 않는 토큰 (D13 · D51 · D52) — region 은 2단계(단축 · 균등 예산)에서 자르지 않는다. 1단계는 optional 이면 통째로 뗀다.
+ *  kind 는 종류 토큰(pg · int …)이다 — 자르면 뜻이 사라진다 */
+export const PROTECTED: readonly Token[] = ['slug', 'kind', 'seq', 'role', 'env', 'region'];
 /** 축소 뒤 가변 토큰의 최소 길이 (D13) */
 export const MIN_TOKEN = 2;
 
@@ -45,7 +46,7 @@ export type Category = 'compute' | 'networking' | 'storage' | 'database' | 'iden
 /** 지역 자리에 무엇이 오나 (D47 · D51) — none 은 지역 토큰이 없는 규칙(전역 리소스 등) */
 export type RegionToken = 'none' | 'region' | 'zone';
 
-/** 규칙(= 범위) 하나의 종류 표 (D52) — catalog 가 덮는다. 이 단계에서는 데이터로만 싣고 이름에는 넣지 않는다 */
+/** 규칙(= 범위) 하나의 종류 표 (D52) — catalog 가 덮는다. 종류 토큰은 약어 바로 뒤에 온다(…-{slug}-{kind}-{seq}) */
 export interface RuleKinds {
   rule: 'omit-when-csp-default' | 'only-when-chosen' | 'required';
   default: string | null;            // 이 범위의 CSP 기본값 — 토큰을 붙이지 않는다

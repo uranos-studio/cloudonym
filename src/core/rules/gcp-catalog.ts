@@ -4112,3 +4112,27 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     ]
   }
 ];
+
+/** 종류 표의 출처(기본값 근거 포함)를 사람이 마지막으로 열어 본 날 — 행 key → kind-sources.json 의 checked 가운데 가장 늦은 날 (D52 · §4-5).
+ *  llms.txt 「Kind tokens」 절이 싣는다. 전사에 날이 없으면 null */
+export const GCP_KIND_CHECKED: Readonly<Record<string, string | null>> = {
+  "gcp.subnet": "2026-10-07",
+  "gcp.cloud_sql_instance": "2026-10-07",
+  "gcp.firewall_rule": "2026-10-07",
+  "gcp.address": "2026-10-07",
+  "gcp.backend_service": "2026-10-08",
+  "gcp.forwarding_rule": "2026-10-08",
+  "gcp.health_check": "2026-10-07",
+  "gcp.interconnect_attachment": "2026-10-07",
+  "gcp.interconnect": "2026-10-07",
+  "gcp.security_policy": "2026-10-07",
+  "gcp.ssl_certificate": "2026-10-07",
+  "gcp.resource_policy": "2026-10-07",
+  "gcp.snapshot": "2026-10-07",
+  "gcp.network_endpoint_group": "2026-10-07",
+  "gcp.firestore_database": "2026-10-07",
+  "gcp.spanner_database": "2026-10-07",
+  "gcp.gke_cluster": "2026-10-07",
+  "gcp.iam_workforce_pool_provider": "2026-10-07",
+  "gcp.iam_wip_provider": "2026-10-07"
+};

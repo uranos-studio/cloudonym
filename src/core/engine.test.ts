@@ -39,11 +39,12 @@ describe('generate', () => {
     expect(s3.rule).toMatchObject({ maxLength: 63, allowed: 'lower-digit-hyphen', pattern: '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$' });
   });
   // GCP 에서 owner 가 든 규칙은 전부 owner 가 optional 이다
-  it('한글 owner 는 정제 뒤 비어도 optional 이라 GCP 규칙 전부 유효 — 같은 이름인 함수 둘의 충돌만 남는다', () => {
+  it('한글 owner 는 정제 뒤 비어도 optional 이라 GCP 규칙 전부 유효 — 같은 이름인 함수 둘의 충돌 · 종류 없는 리소스 정책만 남는다', () => {
     const out = generate({ ...ctx, owner: '홍길동' }, ['gcp']).gcp!;
     const fns = new Set(['cloud_function_gen1', 'cloud_function']);
     for (const r of rulesFor('gcp')) {
       if (fns.has(r.resourceType)) expect(out[r.resourceType]!.violations.map((v) => v.code), r.id).toEqual(['name.conflict']);
+      else if (r.resourceType === 'resource_policy') expect(out[r.resourceType]!.violations.map((v) => v.code), r.id).toEqual(['name.kind_required']);
       else expect(out[r.resourceType], r.id).toMatchObject({ valid: true, violations: [] });
     }
     expect(out.project_id).toMatchObject({ name: 'billing-trade-prod', isTransformed: true });
@@ -339,4 +340,58 @@ describe('지역 · 존 (D49 · D50 · D51)', () => {
     expect(generate(ctxOf('global'), ['gcp']).gcp!.subnet).toMatchObject({ valid: true, name: 'billing-trade-prod-snet-01' });
   });
   it('compute_instance 는 존 토큰 규칙이다', () => expect(gcp('compute_instance').regionToken).toBe('zone'));
+});
+
+describe('종류 토큰 (D52)', () => {
+  const base = { owner: 'platform', system: 'payments', purpose: 'ledger', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
+  const rule = (t: string) => getRule('gcp', t)!;
+
+  it('generateMany — 항목에 kind(값 이름) · kindToken · key 는 type_seq 그대로', () => {
+    const r = generateMany(base, 'gcp', [{ rule: rule('cloud_sql_instance'), count: 2, kind: 'POSTGRES' }, { rule: rule('resource_policy'), count: 1, kind: 'snapshot-schedule' }]);
+    expect(r.items.map((i) => [i.key, i.name, i.kind, i.kindToken, i.valid])).toEqual([
+      ['cloud_sql_instance_01', 'payments-ledger-prod-ane3-sql-pg-01', 'POSTGRES', 'pg', true],
+      ['cloud_sql_instance_02', 'payments-ledger-prod-ane3-sql-pg-02', 'POSTGRES', 'pg', true],
+      ['resource_policy_01', 'payments-ledger-prod-ane3-rp-snap-01', 'snapshot-schedule', 'snap', true],
+    ]);
+  });
+  it('기본값 · omitValues 를 고르면 kind 는 싣고 kindToken 은 없다 · 고르지 않으면 둘 다 없다', () => {
+    const r = generateMany(base, 'gcp', [{ rule: rule('backend_service'), count: 1, kind: 'EXTERNAL_MANAGED' }, { rule: rule('subnet'), count: 1 }]);
+    expect(r.items[0]).toMatchObject({ name: 'payments-ledger-prod-bs-01', kind: 'EXTERNAL_MANAGED' });
+    expect('kindToken' in r.items[0]!).toBe(false);
+    expect('kind' in r.items[1]! || 'kindToken' in r.items[1]!).toBe(false);
+  });
+  it('다른 규칙(방화벽 EGRESS)도 약어 바로 뒤 — fw-egr', () => {
+    const r = generateMany(base, 'gcp', [{ rule: rule('firewall_rule'), count: 1, kind: 'EGRESS' }]);
+    expect(r.items[0]).toMatchObject({ name: 'payments-ledger-prod-fw-egr-01', kind: 'EGRESS', kindToken: 'egr' });
+  });
+  it('필수 종류(리소스 정책)가 없으면 두 경로 모두 valid:false + name.kind_required — 이름은 종류 없이 만든 것 그대로', () => {
+    const g = generate(base, ['gcp']).gcp!.resource_policy!;
+    expect(g).toMatchObject({ valid: false, name: 'payments-ledger-prod-ane3-rp-01' });
+    expect(g.violations).toEqual([{ code: 'name.kind_required', params: { supported: ['snapshot-schedule', 'instance-schedule', 'group-placement', 'disk-consistency-group', 'workload-policy'] } }]);
+    const m = generateMany(base, 'gcp', [{ rule: rule('resource_policy'), count: 1 }]);
+    expect(m.items[0]).toMatchObject({ valid: false, name: 'payments-ledger-prod-ane3-rp-01' });
+    expect(m.items[0]!.violations.map((v) => v.code)).toEqual(['name.kind_required']);
+    expect(m.valid).toBe(false);
+  });
+  it('종류를 넣지 않은 generate — 종류 표가 있는 규칙 중 리소스 정책만 FAIL 이고 나머지는 token_empty 가 아니다', () => {
+    const all = generate(base, ['gcp']).gcp!;
+    const kinded = rulesFor('gcp').filter((r) => r.kinds);
+    expect(kinded.length).toBeGreaterThan(20);
+    for (const r of kinded) {
+      const n = all[r.resourceType]!;
+      expect(n.violations.map((v) => v.code), r.id).not.toContain('name.token_empty');
+      expect(n.name, r.id).not.toBe('');
+    }
+    expect(kinded.filter((r) => !all[r.resourceType]!.valid).map((r) => r.id)).toEqual(['gcp.resource_policy']);
+  });
+  it('허용 밖 값 · 종류 표 없는 규칙의 값을 엔진에 직접 넣으면 던진다(validateSelection 이 앞에서 거른다)', () => {
+    expect(() => generateMany(base, 'gcp', [{ rule: rule('cloud_sql_instance'), count: 1, kind: 'pg' }])).toThrow(/pg/);
+    expect(() => generateMany(base, 'gcp', [{ rule: rule('vpc_network'), count: 1, kind: 'PRIVATE' }])).toThrow(/vpc_network/);
+  });
+  it('종류 토큰은 축소에서 보호된다 — 균등 예산(3)이 토큰(proxy 5자)보다 작아도 자르지 않는다', () => {
+    // 상한을 26 으로 줄인 시험 규칙 — region 을 뗀 뒤 고정 env · slug · kind · seq 15자 + 구분자 5 → 가변 둘에 3자씩
+    const tight = { ...rule('subnet'), maxLength: 26 };
+    const r = generateMany({ ...base, system: 'paymentsettlement', purpose: 'reconciliation' }, 'gcp', [{ rule: tight, count: 1, kind: 'REGIONAL_MANAGED_PROXY' }]);
+    expect(r.items[0]).toMatchObject({ name: 'pay-rec-prod-snet-proxy-01', valid: true, isTruncated: true });
+  });
 });

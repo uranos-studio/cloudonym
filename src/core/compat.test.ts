@@ -2,7 +2,8 @@
 // 순번 · 역할을 항목 입력으로 받게 되어도(D30') 기본값(count 1 → 01 · role sync)이면 지금 출력과 글자 하나 다르지 않아야 한다.
 // baseline.json 은 UPDATE_BASELINE 으로 다시 쓸 수 있지만 이 파일은 손으로만 바뀐다 — 바뀌었다면 이름이 달라진 것이다
 import { describe, it, expect } from 'vitest';
-import { generate, parseContext } from './engine';
+import { generate, generateMany, parseContext } from './engine';
+import { getRule } from './constraints';
 import { PROVIDERS, type GenerateOutput } from './types';
 
 const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
@@ -71,5 +72,17 @@ describe('호환 — 기본 문맥의 이름 35개 (리터럴)', () => {
     expect(actual).toEqual(EXPECTED);
     expect(Object.values(EXPECTED).flatMap((byType) => Object.keys(byType))).toHaveLength(35);
     for (const [p, byType] of Object.entries(out)) for (const [t, r] of Object.entries(byType!)) if (t in (EXPECTED as Record<string, Record<string, string>>)[p]!) expect(r.valid, r.ruleId).toBe(!CANNOT_FIT.has(r.ruleId));
+  });
+});
+
+describe('호환 — 종류 토큰 (D52)', () => {
+  it('종류를 고르면 약어 바로 뒤에 토큰 · 기본값을 고르면 위 리터럴과 글자 하나 다르지 않다', () => {
+    const parsed = parseContext({ ...BASE, region: REGION.gcp }, 'gcp');
+    if (!parsed.ok) throw new Error('기본 문맥이 파싱되지 않는다');
+    const r = generateMany(parsed.context, 'gcp', [
+      { rule: getRule('gcp', 'cloud_sql_instance')!, count: 1, kind: 'POSTGRES' }, { rule: getRule('gcp', 'subnet')!, count: 1, kind: 'PRIVATE' },
+      { rule: getRule('gcp', 'firewall_rule')!, count: 1, kind: 'EGRESS' },
+    ]);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-ane3-sql-pg-01', EXPECTED.gcp!.subnet, 'billing-trade-prod-fw-egr-01']);
   });
 });

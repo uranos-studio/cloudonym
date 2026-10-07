@@ -12,6 +12,7 @@ import { MESSAGE_CODES } from '../core/messages';
 import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { ENABLED_PROVIDERS } from '../core/types';
+import { MAX_KIND_CHARS } from '../core/catalog';
 
 /** region 예시를 넣어 볼 문맥 — 나머지 넷은 정본 값 */
 const ctxExample = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
@@ -101,12 +102,17 @@ describe('public/openapi.json — /names (D39)', () => {
     const it0 = r.properties['resources']!.items! as Schema & { properties: Record<string, Schema & { minimum?: number; maximum?: number; pattern?: string }> };
     expect(it0.properties['count']).toMatchObject({ type: 'integer', minimum: 1, maximum: 99 });
     expect(it0.properties['role']!.pattern).toBe('^[a-z0-9]{2,16}$');
+    // kind 는 값 이름(대문자 · 소문자-하이픈 둘 다 있다)이라 pattern 을 두지 않고 길이만 건다 — 판정은 selection.unknown_kind (D52)
+    expect(it0.properties['kind']).toMatchObject({ type: 'string', maxLength: 1024 });
+    expect(it0.properties['kind']!.pattern).toBeUndefined();
     expect(r.properties['context']).toEqual(schemas['GenerateRequest']!.properties!['context']);
   });
   it('NameItem — scope enum 은 ScopeId 전부 · uniqueness enum 둘 · 설명은 llms.txt 와 같은 문장', () => {
     expect(item()['scope']!.enum!.sort()).toEqual(Object.keys(SCOPES).sort());
     expect(Object.keys(SCOPES).length).toBeGreaterThan(14); // 손 16 + 들인 Azure 부모 리소스 범위 — 수는 scopes.test 가 센다
     expect(item()['uniqueness']!.enum).toEqual(['csp', 'none']);
+    expect(item()['kind']).toMatchObject({ type: 'string' });
+    expect(item()['kind_token']).toMatchObject({ type: 'string', pattern: `^[a-z0-9]{1,${MAX_KIND_CHARS}}$` });
     expect(item()['scope']!.description).toBe(SCOPE_MEANING);
     expect(item()['uniqueness']!.description).toBe(UNIQUENESS_MEANING);
     // ResourceItem 의 키를 전부 가진다 — 같은 이름 결과에 키를 더한 것
@@ -162,17 +168,23 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     expect(failures).toEqual([]);
   });
 
-  it('names 표본 — 정상 · 항목 FAIL · 꺼진 CSP · 충돌 · 400 selection.* 11개 전부 · 409', () => {
+  it('names 표본 — 정상 · 항목 FAIL · 꺼진 CSP · 충돌 · 종류 · 400 selection.* 14개 전부 · 409', () => {
     const ids = samples.map((x) => x.id);
-    for (const id of ['names-ok', 'names-item-fail', '400-names-provider-not-enabled', 'names-conflict', '400-names-provider', '409-names-rules-version']) expect(ids, id).toContain(id);
+    for (const id of ['names-ok', 'names-item-fail', '400-names-provider-not-enabled', 'names-conflict', 'names-kinds', '400-names-provider', '409-names-rules-version']) expect(ids, id).toContain(id);
     const codesSeen = new Set(samples.filter((x) => x.path === '/v1/names' && x.status === 400).flatMap((x) => (x.body.errors as { code: string }[]).map((e) => e.code)));
-    expect(SELECTION_CODES_IN_SAMPLES).toHaveLength(11);
+    expect(SELECTION_CODES_IN_SAMPLES).toHaveLength(14);
     for (const c of SELECTION_CODES_IN_SAMPLES) expect([...codesSeen], c).toContain(c);
     // uniqueness "none"(AWS Name 태그)은 꺼진 CSP 에만 있다 — 켜진 GCP 의 항목은 전부 csp (D45)
     const ok = samples.find((x) => x.id === 'names-ok')!.body.data.gcp.items as { uniqueness: string }[];
     expect(ok.length).toBeGreaterThan(0);
     for (const i of ok) expect(i.uniqueness).toBe('csp');
     expect(samples.find((x) => x.id === '400-names-provider-not-enabled')!.body.errors[0].code).toBe('request.provider_not_enabled');
+    // 종류 — 토큰이 붙은 항목은 kind · kind_token 둘 다, 기본값 항목은 kind 만 (D52)
+    const kinds = samples.find((x) => x.id === 'names-kinds')!.body.data.gcp.items as { name: string; kind?: string; kind_token?: string }[];
+    expect(kinds.map((i) => [i.name, i.kind, i.kind_token])).toEqual([
+      ['billing-trade-prod-ane3-sql-pg-01', 'POSTGRES', 'pg'], ['billing-trade-prod-ane3-sql-pg-02', 'POSTGRES', 'pg'],
+      ['billing-trade-prod-ane3-rp-snap-01', 'snapshot-schedule', 'snap'], ['billing-trade-prod-bs-01', 'EXTERNAL_MANAGED', undefined],
+    ]);
     const conflict = samples.find((x) => x.id === 'names-conflict')!.body.data.gcp;
     expect(conflict.valid).toBe(false);
     expect(conflict.conflicts).toHaveLength(1);

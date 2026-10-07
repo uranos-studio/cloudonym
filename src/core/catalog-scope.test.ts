@@ -84,3 +84,11 @@ describe('범위별 허용 종류 = 출처 전사 (§4-5)', () => {
     expect(e.conflict).toMatch(/Terraform only/);
   });
 });
+
+describe('출처 전사 검사기 — 전사에서 값을 지우면 잡는다 (§4-5)', () => {
+  it('전사 한 값(지역 NEG 의 GCE_VM_IP_PORTMAP)을 지우면 allowed 에만 있는 값으로 실패한다', () => {
+    const cut = structuredClone(SOURCES);
+    cut['gcp.network_endpoint_group'] = cut['gcp.network_endpoint_group']!.filter((s) => s.value !== 'GCE_VM_IP_PORTMAP');
+    expect(mismatches(GCP_CATALOG, cut)).toEqual(['gcp.region_network_endpoint_group: +GCE_VM_IP_PORTMAP']);
+  });
+});

@@ -26,10 +26,10 @@ describe('toTerraformLocals', () => {
     expect(hcl).toContain('  azure_storage_account = "stbillingtradeprod"\n');
     expect(hcl).toContain('  aws_tags = {\n');
     expect(hcl).toContain('  gcp_labels = {\n    owner = "infra"\n');
-    // 전체 카탈로그에서 FAIL 은 같은 이름인 함수 1 · 2세대(name.conflict)와, env prod(4자)로 축소 예산이 MIN_TOKEN 아래가 된
-    // Azure 짧은 규칙 둘(Windows VM 15자 · App Configuration replica 10자 — name.cannot_fit, D48)뿐이다 — 그 넷만 # INVALID: 주석
+    // 전체 카탈로그에서 FAIL 은 종류가 필수인 리소스 정책(name.kind_required · D52), 같은 이름인 함수 1 · 2세대(name.conflict)와, env prod(4자)로 축소 예산이 MIN_TOKEN 아래가 된
+    // Azure 짧은 규칙 둘(Windows VM 15자 · App Configuration replica 10자 — name.cannot_fit, D48)뿐이다 — 그 다섯만 # INVALID: 주석
     expect(hcl.split('\n').filter((l) => l.includes('INVALID')).map((l) => l.trim().split(' — ')[0])).toEqual([
-      '# INVALID: gcp_cloud_function_gen1', '# INVALID: gcp_cloud_function',
+      '# INVALID: gcp_resource_policy', '# INVALID: gcp_cloud_function_gen1', '# INVALID: gcp_cloud_function',
       '# INVALID: azure_virtual_machine_windows', '# INVALID: azure_app_configuration_stores_replicas',
     ]);
     // provider 순서 = PROVIDERS (aws → gcp → azure)

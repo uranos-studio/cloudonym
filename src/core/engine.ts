@@ -3,7 +3,7 @@ import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, ty
 import { getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
 import { canonicalRegion, regionCandidates } from './regions';
-import { compose, regionTokenOfRule, tokenValues, type ItemExtra } from './compose';
+import { compose, kindTokenOfRule, regionTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { SelectionItem } from './selection';
 import { inputKind } from './tree';
@@ -40,8 +40,9 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
     return { ...base, name: '', valid: false, isTruncated: false, violations: [{ code: 'name.zone_required', params: { region: ctx.region } }], steps };
   }
 
-  // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다
-  const emptied = rule.template.filter((t) => !rule.optional.includes(t) && !values[t]);
+  // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다.
+  // 종류 자리는 비는 것이 정상이다 — 종류를 주지 않았거나 기본값이면 토큰이 없다 (D52). 필수 종류는 아래 kind_required 가 본다
+  const emptied = rule.template.filter((t) => t !== 'kind' && !rule.optional.includes(t) && !values[t]);
   if (emptied.length > 0) {
     return { ...base, name: '', valid: false, isTruncated: false, violations: emptied.map((t): CoreMessage => ({ code: 'name.token_empty', field: t })), steps };
   }
@@ -50,6 +51,9 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
   steps.push(...f.steps);
   // 축소 실패면 이유는 그 하나만 (checkName 을 부르지 않는다)
   const violations: CoreMessage[] = f.fits ? checkName(f.name, rule) : [{ code: 'name.cannot_fit', params: { max: rule.maxLength } }];
+  // 종류가 필수인 규칙(리소스 정책)에 종류가 없다 (D52) — generate · generateMany 둘 다 여기를 지난다.
+  // 이름 · 단계는 종류 없이 만든 그대로 두고 판정만 FAIL 로 한다(쓸 수 있는 이름이 아니다)
+  if (rule.kinds?.rule === 'required' && extra.kind === undefined) violations.unshift({ code: 'name.kind_required', params: { supported: [...rule.kinds.allowed] } });
   return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
 }
 
@@ -79,8 +83,10 @@ export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDE
   return out;
 }
 
-/** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음) */
-export interface NameItem extends NameResult { key: string; seq?: string; role?: string }
+/** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음).
+ *  종류가 달라도 key 는 같은 꼴이다(한 행에 종류 하나 — 오너 결정 K2).
+ *  kind 는 고른 값 이름(POSTGRES) · kindToken 은 이름에 넣은 토큰(pg) — 기본값 · omitValues 를 고르면 kind 만 있고 kindToken 은 없다 (D52) */
+export interface NameItem extends NameResult { key: string; seq?: string; role?: string; kind?: string; kindToken?: string }
 export interface ManyResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
 
 /** 순번은 두 자리 고정 (D40) — 한 항목의 이름이 같은 자리수를 써서 축소 경로가 같다 */
@@ -93,19 +99,23 @@ export const DEFAULT_ROLE = 'sync';
  *  같은 부류(entity)의 같은 이름은 그 항목마다 valid:false + name.conflict 이고, conflicts 는 그 요약이다 — 전체 valid 는 항목 전부의 valid 다 */
 export function generateMany(ctx: NamingContext, provider: Provider, selection: readonly SelectionItem[]): ManyResult {
   const items: { item: NameItem; rule: ResourceRule }[] = [];
-  for (const { rule, count, role } of selection) {
+  for (const { rule, count, role, kind } of selection) {
     if (rule.provider !== provider) throw new Error(`rule ${rule.id} is not a ${provider} rule`);
-    const kind = inputKind(rule);
-    if (kind === 'count') {
+    // 종류 — 허용 밖이면 여기서 던진다(validateSelection 을 거친 선택에는 없다)
+    const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
+    const k: ItemExtra = kind === undefined ? {} : { kind };
+    const kindFields = { ...(kind === undefined ? {} : { kind }), ...(token === null ? {} : { kindToken: token }) };
+    const input = inputKind(rule);
+    if (input === 'count') {
       for (let i = 1; i <= count; i++) {
         const seq = seqOf(i);
-        items.push({ rule, item: { ...generateOne(ctx, rule, { seq }), key: `${rule.resourceType}_${seq}`, seq } });
+        items.push({ rule, item: { ...generateOne(ctx, rule, { ...k, seq }), key: `${rule.resourceType}_${seq}`, seq, ...kindFields } });
       }
-    } else if (kind === 'role') {
+    } else if (input === 'role') {
       const r = role ?? DEFAULT_ROLE;
-      items.push({ rule, item: { ...generateOne(ctx, rule, { role: r }), key: `${rule.resourceType}_${r}`, role: r } });
+      items.push({ rule, item: { ...generateOne(ctx, rule, { ...k, role: r }), key: `${rule.resourceType}_${r}`, role: r, ...kindFields } });
     } else {
-      items.push({ rule, item: { ...generateOne(ctx, rule), key: rule.resourceType } });
+      items.push({ rule, item: { ...generateOne(ctx, rule, k), key: rule.resourceType, ...kindFields } });
     }
   }
 

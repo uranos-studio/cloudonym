@@ -5,6 +5,8 @@ import { ENV_ALIASES } from '../core/normalize';
 import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { regionTokenOfRule } from '../core/compose';
+import { catalogFor } from '../core/catalog';
+import { GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
 import { MAX_FIELD_CHARS } from './schemas';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -66,6 +68,34 @@ function regionLines(rules: readonly ResourceRule[], order: readonly Provider[])
   return lines;
 }
 
+/** 「## Kind tokens」 절 (D52) — 종류 표가 있는 catalog 행마다 한 줄(값 → 토큰 · 기본값 근거 · 확인일), 그 아래 규칙(= 범위)마다 기본값 · 허용 값.
+ *  표는 catalog 가 정본이고 확인일은 kind-sources.json 의 전사 날(생성 파일 GCP_KIND_CHECKED)이다 */
+function kindLines(order: readonly Provider[]): string[] {
+  const lines = [
+    '', '## Kind tokens', '',
+    '`kind` on `/v1/names` takes a value name from the list below (`POSTGRES`, `snapshot-schedule`), not the token. The token goes right after the abbreviation: `…-<slug>-<kind>-<seq>`. The provider default of the scope, and values marked (no token), add no token even when sent. A rule that needs a kind (`required`) comes back `valid: false` with `name.kind_required` without one; `/v1/names` rejects that request first (400 `selection.kind_required`). One kind per item.',
+    'Each line: the catalogue row, its values (value → token), the kind rule, the basis for the provider default and the date the sources were last checked. Under it, one line per rule (scope): its default and the values it accepts — the same value can be accepted in one scope and not another.',
+  ];
+  const checked: Readonly<Record<string, string | null>> = GCP_KIND_CHECKED;
+  for (const p of order) {
+    const rows = catalogFor(p).filter((r) => r.kind !== null);
+    if (rows.length === 0) continue;
+    lines.push('', `### ${p.toUpperCase()}`);
+    for (const row of rows) {
+      const k = row.kind!;
+      const values = Object.entries(k.tokens).map(([v, t]) => (t === null ? `\`${v}\` (no token)` : `\`${v}\` → \`${t}\``)).join(' · ');
+      const rule = k.rule === 'required' ? 'required' : k.rule === 'only-when-chosen' ? 'only when chosen' : 'omitted when it is the provider default';
+      // 「- `id` (」 는 제약 줄 · 「- `id`: `」 는 공식 줄의 꼴이라 겹치지 않게 「- `key` · slug」 로 쓴다
+      lines.push(`- \`${row.key}\` · slug \`${row.slug.value}\`: ${values} — ${rule} · basis: ${k.defaultBasis} · checked ${checked[row.key] ?? 'unknown'}`);
+      for (const [id, spec] of Object.entries(row.rules)) {
+        const d = spec.kinds!.default;
+        lines.push(`  - \`${id}\` (${spec.scope}): ${d === null ? 'no default' : `default \`${d}\``} · accepts ${spec.kinds!.allowed.map((v) => `\`${v}\``).join(', ')}`);
+      }
+    }
+  }
+  return lines;
+}
+
 function constraintLine(rule: ResourceRule, catalog: Catalog): string {
   const f = rule.forbidden;
   const forbidden = f
@@ -108,7 +138,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '',
     '## Naming Formulas',
     '',
-    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`).',
+    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`), `<kind>` is empty unless `kind` on `/v1/names` picks a value with a token (see `## Kind tokens`).',
   ];
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -119,6 +149,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
   lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region',
     '- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`');
   lines.push(...regionLines(rules, order));
+  lines.push(...kindLines(order));
   lines.push('', '## Provider Constraints');
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -138,13 +169,13 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '## API',
     '',
     `- \`POST /v1/generate\` — body \`{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: [${order.map((p) => `"${p}"`).join(', ')}], "rules_version"?: string }\``,
-    '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
+    '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string, "kind"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `kind` and `kind_token` when a kind was picked (`kind_token` only when the name carries one), `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
     `- \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\``,
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
     '',
-    '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`); `/v1/names` is the selection. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
+    '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`, no kind); `/v1/names` is the selection. Rules that need a kind or a zone come back `valid: false` there (`name.kind_required`, `name.zone_required`) — use `/v1/names` with `kind` and a zone for them. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
     'Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
     'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',

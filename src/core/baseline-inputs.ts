@@ -89,7 +89,7 @@ export function baselineValidateCases(): ValidateCase[] {
   return cases;
 }
 
-/** 여러 개 생성 입력 (D30' · D41) — 개수 · 역할 · 같은 부류 다른 이름(Linux+Windows VM) · 충돌 fixture.
+/** 여러 개 생성 입력 (D30' · D41 · D52) — 개수 · 역할 · 같은 부류 다른 이름(Linux+Windows VM) · 충돌 fixture · 종류.
  *  문맥은 base 하나(BASELINE_CONTEXTS 는 바꾸지 않는다) — 충돌 fixture 만 자기 문맥을 쓴다 */
 export function baselineMany(): { id: string; result: ManyResult }[] {
   const base = (p: Provider) => {
@@ -110,6 +110,13 @@ export function baselineMany(): { id: string; result: ManyResult }[] {
       { rule: r('aws', 'ec2_instance'), count: 2 }, { rule: r('aws', 'iam_role'), count: 1, role: 'db' },
     ]) },
     { id: 'conflict-fixture', result: generateMany(CONFLICT_CONTEXT, 'azure', CONFLICT_SELECTION) },
+    // 종류 (D52) — 토큰이 붙는 값 · 기본값 · omitValues · 필수 종류(리소스 정책) · 범위별 기본값(지역 NEG SERVERLESS)
+    { id: 'gcp-kinds', result: generateMany(base('gcp'), 'gcp', [
+      { rule: r('gcp', 'cloud_sql_instance'), count: 2, kind: 'POSTGRES' }, { rule: r('gcp', 'resource_policy'), count: 1, kind: 'snapshot-schedule' },
+      { rule: r('gcp', 'backend_service'), count: 1, kind: 'EXTERNAL_MANAGED' }, { rule: r('gcp', 'region_backend_service'), count: 1, kind: 'INTERNAL_MANAGED' },
+      { rule: r('gcp', 'region_network_endpoint_group'), count: 1, kind: 'SERVERLESS' }, { rule: r('gcp', 'subnet'), count: 1, kind: 'REGIONAL_MANAGED_PROXY' },
+      { rule: r('gcp', 'health_check'), count: 1, kind: 'grpc-with-tls' }, { rule: r('gcp', 'firewall_rule'), count: 1, kind: 'INGRESS' },
+    ]) },
   ];
 }
 
@@ -145,7 +152,7 @@ export function coreBaseline() {
   });
   const many = baselineMany().map(({ id, result }) => ({
     id, provider: result.provider, valid: result.valid, conflicts: result.conflicts.length,
-    items: result.items.map((i) => ({ key: i.key, name: i.name, valid: i.valid, violations: i.violations.length })),
+    items: result.items.map((i) => ({ key: i.key, name: i.name, valid: i.valid, violations: i.violations.length, ...(i.kind === undefined ? {} : { kind: i.kind }), ...(i.kindToken === undefined ? {} : { kindToken: i.kindToken }) })),
   }));
   return { contexts, validate, many };
 }

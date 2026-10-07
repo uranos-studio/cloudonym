@@ -28,6 +28,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'name.token_empty': { code: 'name.token_empty', field: 'system' },
   'name.cannot_fit': { code: 'name.cannot_fit', params: { max: 15 } },
   'name.zone_required': { code: 'name.zone_required', params: { region: 'ane3' } },
+  'name.kind_required': { code: 'name.kind_required', params: { supported: ['CCC', 'DDD'] } },
   'rule.unknown_resource_type': { code: 'rule.unknown_resource_type', params: { provider: 'AAA', supported: ['CCC', 'DDD'] } },
   'context.not_string': { code: 'context.not_string', field: 'owner' },
   'context.empty': { code: 'context.empty', field: 'owner' },
@@ -71,6 +72,9 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'selection.role_not_supported': { code: 'selection.role_not_supported', params: { index: 3, type: 'BBB' } },
   'selection.invalid_role': { code: 'selection.invalid_role', params: { index: 3, value: 'BBB', pattern: 'AAA' } },
   'selection.too_many_names': { code: 'selection.too_many_names', params: { max: 200, actual: 201 } },
+  'selection.kind_not_supported': { code: 'selection.kind_not_supported', params: { index: 3, type: 'BBB' } },
+  'selection.unknown_kind': { code: 'selection.unknown_kind', params: { index: 3, type: 'BBB', value: 'AAA', supported: ['CCC', 'DDD'] } },
+  'selection.kind_required': { code: 'selection.kind_required', params: { index: 3, type: 'BBB', supported: ['CCC', 'DDD'] } },
   'request.body_not_json': { code: 'request.body_not_json' },
   'request.body_not_object': { code: 'request.body_not_object' },
   'request.body_too_large': { code: 'request.body_too_large', params: { max_bytes: 16384 } },
@@ -96,7 +100,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(76);
+    expect(codes).toHaveLength(80);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

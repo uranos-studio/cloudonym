@@ -7,7 +7,7 @@ import Ajv from 'ajv';
 import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
 import { GCP_CATALOG } from './rules/gcp-catalog';
 import { REGIONS } from './regions-data';
-import { catalogFor, rowOf, allowedKinds, regionTokenOf, kindToken, kindTokenOf, MAX_KIND_CHARS } from './catalog';
+import { catalogFor, rowOf, allowedKinds, regionTokenOf, kindToken, kindTokenOf, MAX_KIND_CHARS, MAX_KIND_VALUE_CHARS } from './catalog';
 
 const CATALOG_DIR = join(import.meta.dirname, '..', '..', 'catalog');
 const readJson = (f: string) => JSON.parse(readFileSync(join(CATALOG_DIR, f), 'utf-8'));
@@ -198,6 +198,18 @@ describe('종류 표 (D52)', () => {
   it(`토큰 길이 ≤ MAX_KIND_CHARS(${MAX_KIND_CHARS}) · 소문자 · 숫자`, () => {
     expect(MAX_KIND_CHARS).toBe(5);
     for (const row of kindRows) for (const t of Object.values(row.kind!.tokens)) if (t !== null) expect(t, row.key).toMatch(/^[a-z0-9]{1,5}$/);
+  });
+
+  it(`값 이름 길이 ≤ MAX_KIND_VALUE_CHARS(${MAX_KIND_VALUE_CHARS}) — 상수는 catalog 의 가장 긴 값 이름과 같다 · 값 이름은 대문자 · 숫자 · _ 또는 소문자 · 숫자 · -`, () => {
+    const values = kindRows.flatMap((row) => Object.keys(row.kind!.tokens));
+    expect(MAX_KIND_VALUE_CHARS).toBe(Math.max(...values.map((v) => v.length)));
+    for (const v of values) expect(v).toMatch(/^(?:[A-Z][A-Z0-9_]*|[a-z][a-z0-9-]*)$/);
+  });
+
+  it('required 행의 규칙 default 는 전부 null · NEG 세 규칙의 default 는 GCE_VM_IP_PORT · SERVERLESS · null', () => {
+    for (const row of kindRows.filter((r) => r.kind!.rule === 'required')) for (const [id, spec] of Object.entries(row.rules)) expect(spec.kinds!.default, id).toBeNull();
+    const neg = rowOf('gcp.network_endpoint_group')!.rules;
+    expect(['gcp.network_endpoint_group', 'gcp.region_network_endpoint_group', 'gcp.global_network_endpoint_group'].map((id) => neg[id]!.kinds!.default)).toEqual(['GCE_VM_IP_PORT', 'SERVERLESS', null]);
   });
 
   it('정정 — instance-schedule → isc · NEG SERVERLESS 토큰 없음 · backend service · 포워딩 규칙 omitValues 둘', () => {

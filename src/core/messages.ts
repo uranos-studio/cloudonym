@@ -10,9 +10,9 @@ export const MESSAGE_CODES = [
   'name.empty', 'name.too_long', 'name.too_short', 'name.first_not_letter', 'name.last_not_alnum', 'name.pattern_mismatch',
   'name.consecutive_separator', 'name.forbidden_prefix', 'name.forbidden_suffix', 'name.forbidden_substring',
   'name.forbidden_exact', 'name.forbidden_word', 'name.ipv4_form',
-  // engine.ts (10)
+  // engine.ts (11)
   'step.normalized', 'step.separator_removed', 'name.token_empty', 'name.cannot_fit', 'rule.unknown_resource_type',
-  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.zone_required',
+  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.zone_required', 'name.kind_required',
   // truncate.ts (3)
   'step.token_dropped', 'step.abbreviated', 'step.budget_shortened',
   // labels.ts (3)
@@ -26,10 +26,10 @@ export const MESSAGE_CODES = [
   'note.variant_narrowed', 'note.secondary_source', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
   // conflict.ts (1)
   'name.conflict',
-  // selection.ts (11)
+  // selection.ts (14)
   'selection.not_array', 'selection.empty', 'selection.too_many_items', 'selection.item_not_object', 'selection.unknown_type',
   'selection.duplicate_type', 'selection.count_out_of_range', 'selection.count_not_supported', 'selection.role_not_supported',
-  'selection.invalid_role', 'selection.too_many_names',
+  'selection.invalid_role', 'selection.too_many_names', 'selection.kind_not_supported', 'selection.unknown_kind', 'selection.kind_required',
 ] as const;
 
 export type CoreMessage =
@@ -52,6 +52,8 @@ export type CoreMessage =
   | { code: 'name.cannot_fit'; params: { max: number } }
   /** 존 규칙(regionToken zone)에 존이 없다 — region 은 문맥의 리전 코드 또는 global (D50) */
   | { code: 'name.zone_required'; params: { region: string } }
+  /** 종류가 필수인 규칙(리소스 정책)에 종류가 없다 — supported 는 그 규칙의 허용 값 (D52). 이름은 종류 없이 만든 것을 싣는다 */
+  | { code: 'name.kind_required'; params: { supported: string[] } }
   | { code: 'rule.unknown_resource_type'; params: { provider: string; supported: string[] } }
   | { code: 'context.not_string'; field: ContextField }
   | { code: 'context.empty'; field: ContextField }
@@ -96,7 +98,11 @@ export type CoreMessage =
   | { code: 'selection.count_not_supported'; params: { index: number; type: string } }
   | { code: 'selection.role_not_supported'; params: { index: number; type: string } }
   | { code: 'selection.invalid_role'; params: { index: number; value: string; pattern: string } }
-  | { code: 'selection.too_many_names'; params: { max: number; actual: number } };
+  | { code: 'selection.too_many_names'; params: { max: number; actual: number } }
+  /** 종류 (D52) — supported 는 그 규칙(= 범위)의 허용 값 이름. 규칙마다 다르므로 항목에 싣는다(많아야 아홉 값) */
+  | { code: 'selection.kind_not_supported'; params: { index: number; type: string } }
+  | { code: 'selection.unknown_kind'; params: { index: number; type: string; value: string; supported: string[] } }
+  | { code: 'selection.kind_required'; params: { index: number; type: string; supported: string[] } };
 
 export type CoreCode = CoreMessage['code'];
 

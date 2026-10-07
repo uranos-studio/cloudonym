@@ -24,6 +24,7 @@ export const en: Catalog = {
     'step.separator_removed': () => 'Removed hyphens (this rule allows no separator)',
     'name.token_empty': (m) => `Required token '${m.field}' is empty after normalisation`,
     'name.cannot_fit': (m) => `Cannot be shortened to ${m.params.max} characters or fewer`,
+    'name.kind_required': (m) => `This resource needs a kind; pick one of ${list(m.params.supported)} (kind on /v1/names)`,
     'name.zone_required': (m) => `This resource is zonal: put a zone (zone name or zone code), not a region, in region (got '${m.params.region}')`,
     'rule.unknown_resource_type': (m) => `Unknown resource type for ${m.params.provider}; supported: ${list(m.params.supported)}`,
     'context.not_string': (m) => `'${m.field}' must be a string`,
@@ -73,6 +74,9 @@ export const en: Catalog = {
     'selection.role_not_supported': (m) => `resources[${m.params.index}]: '${m.params.type}' takes no role`,
     'selection.invalid_role': (m) => `resources[${m.params.index}]: role '${m.params.value}' does not match ${m.params.pattern}`,
     'selection.too_many_names': (m) => `The request would create ${m.params.actual} names; the maximum is ${m.params.max}`,
+    'selection.kind_not_supported': (m) => `resources[${m.params.index}]: '${m.params.type}' takes no kind`,
+    'selection.unknown_kind': (m) => `resources[${m.params.index}]: '${m.params.value}' is not a kind of '${m.params.type}'; use one of ${list(m.params.supported)}`,
+    'selection.kind_required': (m) => `resources[${m.params.index}]: '${m.params.type}' needs a kind; use one of ${list(m.params.supported)}`,
     // API
     'request.body_not_json': () => 'Request body is not JSON',
     'request.body_not_object': () => 'Request body must be a JSON object',

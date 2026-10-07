@@ -4,14 +4,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { loadCatalog, renderGcpCatalog, renderRegions, validateCatalog } from './build-catalog.mjs';
+import { kindChecked, loadCatalog, renderGcpCatalog, renderRegions, validateCatalog } from './build-catalog.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => readFileSync(join(root, p), 'utf-8');
 
 test('생성 파일이 catalog/*.json 에서 다시 만든 것과 같다', () => {
-  const { gcp, regions } = loadCatalog(root);
-  assert.equal(renderGcpCatalog(gcp), read('src/core/rules/gcp-catalog.ts'));
+  const { gcp, regions, kindSources } = loadCatalog(root);
+  assert.equal(renderGcpCatalog(gcp, kindSources), read('src/core/rules/gcp-catalog.ts'));
   assert.equal(renderRegions(regions), read('src/core/regions-data.ts'));
 });
 
@@ -37,4 +37,18 @@ test('문자열 값은 JSON 리터럴로만 들어가 코드로 새지 않는다
   const out = renderGcpCatalog(evil);
   assert.ok(out.includes(JSON.stringify("x'; throw 1; //\u2028y").replace(/\u2028/g, '\\u2028')));
   assert.ok(!out.includes('\u2028'));
+});
+
+test('종류 확인일 — 행마다 전사 checked 의 가장 늦은 날 · 종류 표가 있는 행만 · 전사의 날을 바꾸면 따라 바뀐다', () => {
+  const { gcp, kindSources } = loadCatalog(root);
+  const checked = kindChecked(gcp, kindSources);
+  assert.deepEqual(Object.keys(checked).sort(), gcp.rows.filter((r) => r.kind).map((r) => r.key).sort());
+  assert.equal(checked['gcp.backend_service'], '2026-10-08');
+  assert.equal(checked['gcp.cloud_sql_instance'], '2026-10-07');
+  const moved = structuredClone(kindSources);
+  moved.rows['gcp.cloud_sql_instance'][1].checked = '2026-11-01';
+  assert.equal(kindChecked(gcp, moved)['gcp.cloud_sql_instance'], '2026-11-01');
+  const empty = structuredClone(kindSources);
+  for (const e of empty.rows['gcp.snapshot']) e.checked = null;
+  assert.equal(kindChecked(gcp, empty)['gcp.snapshot'], null);
 });

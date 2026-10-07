@@ -233,10 +233,10 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     const global = rulesFor('gcp').filter((r) => r.scope === 'gcp:project_global');
     expect(global).toHaveLength(34);
     for (const r of global) expect(r.template, r.id).not.toContain('region');
-    expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'seq']);
+    expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'kind', 'seq']);
   });
 
-  it('종류 표는 데이터로만 싣는다 — 종류 표가 있는 행의 규칙만 kinds 가 있고 템플릿에 kind 토큰이 없다', () => {
+  it('종류 표가 있는 행의 규칙만 kinds 가 있고, 그 규칙만 템플릿의 slug 바로 뒤에 kind 가 있다 · optional 에는 없다 (D52)', () => {
     for (const r of rulesFor('gcp')) {
       const row = rowOf(r.id)!;
       expect(r.kinds !== undefined, r.id).toBe(row.kind !== null);
@@ -247,7 +247,12 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
         expect(r.kinds.omitValues, r.id).toEqual(row.kind!.omitValues);
         expect(r.kinds.rule, r.id).toBe(row.kind!.rule);
       }
-      expect(r.template as string[], r.id).not.toContain('kind');
+      const at = r.template.indexOf('kind');
+      if (r.kinds) expect(at, r.id).toBe(r.template.indexOf('slug') + 1);
+      else expect(at, r.id).toBe(-1);
+      expect(r.optional, r.id).not.toContain('kind');
+      // 덮기 전 템플릿에서 region(none 이면) · kind 만 다르다
+      expect(r.template.filter((t) => t !== 'kind'), r.id).toEqual(GCP_BASE_RULES[r.id]!.template.filter((t) => r.regionToken !== 'none' || t !== 'region'));
     }
   });
 

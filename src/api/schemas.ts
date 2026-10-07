@@ -158,6 +158,7 @@ function echoSafe(m: CoreMessage, resources: unknown[]): CoreMessage {
   const entry = (i: number): Record<string, unknown> => (isRecord(resources[i]) ? resources[i] : {});
   if (m.code === 'selection.unknown_type') return { ...m, params: { ...m.params, value: describe(entry(m.params.index).type) } };
   if (m.code === 'selection.invalid_role') return { ...m, params: { ...m.params, value: describe(entry(m.params.index).role) } };
+  if (m.code === 'selection.unknown_kind') return { ...m, params: { ...m.params, value: describe(entry(m.params.index).kind) } };
   return m;
 }
 
@@ -173,10 +174,10 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
   if (badProvider || !isProvider(provider)) return reject(badProvider ? [badProvider] : [], enabledList());
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
   const resources = Array.isArray(body.resources) ? (body.resources as unknown[]) : [];
-  // 항목 안 문자열도 전송 위생 상한을 건다 — 1024 를 넘는 type · role 을 엔진까지 보내지 않는다
+  // 항목 안 문자열도 전송 위생 상한을 건다 — 1024 를 넘는 type · role · kind 를 엔진까지 보내지 않는다
   const long = [
     ...contextTooLong(body.context),
-    ...resources.flatMap((r, i) => (isRecord(r) ? tooLong({ [`resources[${i}].type`]: r.type, [`resources[${i}].role`]: r.role }) : [])),
+    ...resources.flatMap((r, i) => (isRecord(r) ? tooLong({ [`resources[${i}].type`]: r.type, [`resources[${i}].role`]: r.role, [`resources[${i}].kind`]: r.kind }) : [])),
   ];
   if (long.length > 0) return reject(long);
 

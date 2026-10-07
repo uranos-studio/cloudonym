@@ -15,7 +15,7 @@
     "/generate": {
       "post": {
         "summary": "Generate cloud resource names",
-        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated. Every violation, step and note is a Message: branch on code, show message to people.",
+        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated. Every violation, step and note is a Message: branch on code, show message to people. This is the catalogue: rules that need a kind (resource policies) or a zone come back valid=false here (name.kind_required, name.zone_required); use /names with kind and a zone for them.",
         "operationId": "generateNames",
         "requestBody": {
           "required": true,
@@ -115,7 +115,7 @@
     "/names": {
       "post": {
         "summary": "Generate names for the resources you pick",
-        "description": "Generates names for the selected resource types of one provider, count names each (sequence 01..99) or one per role. One request stands for one instance of each parent scope (one resource group, one project, one VPC): two items of the same kind of resource with the same name are each marked valid=false with name.conflict, and conflicts lists each collision once. Items that fail or collide are still returned with the reasons (status 200). Every violation, step and note is a Message: branch on code, show message to people.",
+        "description": "Generates names for the selected resource types of one provider, count names each (sequence 01..99) or one per role, with an optional kind (a value name such as POSTGRES) whose short token goes right after the abbreviation. One request stands for one instance of each parent scope (one resource group, one project, one VPC): two items of the same kind of resource with the same name are each marked valid=false with name.conflict, and conflicts lists each collision once. Items that fail or collide are still returned with the reasons (status 200). Every violation, step and note is a Message: branch on code, show message to people.",
         "operationId": "generateSelectedNames",
         "requestBody": {
           "required": true,
@@ -148,6 +148,11 @@
                   },
                   {
                     "type": "project_id"
+                  },
+                  {
+                    "type": "cloud_sql_instance",
+                    "count": 2,
+                    "kind": "POSTGRES"
                   }
                 ]
               }
@@ -166,7 +171,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, provider is unknown or not enabled yet (request.provider_not_enabled; supported lists the enabled providers), context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
+            "description": "Body is not JSON or not an object, provider is unknown or not enabled yet (request.provider_not_enabled; supported lists the enabled providers), context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, a kind on a rule that takes none (selection.kind_not_supported), a kind that is not one of the rule's values (selection.unknown_kind; params.supported lists them), no kind on a rule that needs one (selection.kind_required; params.supported), or more than 200 names in total (selection.* codes)",
             "content": {
               "application/json": {
                 "schema": {
@@ -735,6 +740,12 @@
                   "pattern": "^[a-z0-9]{2,16}$",
                   "description": "Only on role rules (input role). Default sync",
                   "example": "db"
+                },
+                "kind": {
+                  "type": "string",
+                  "maxLength": 1024,
+                  "description": "Only on rules with a kind table (see /llms.txt Kind tokens): a value name of that rule, such as POSTGRES or snapshot-schedule, not the token. The value that is the provider default for that scope adds no token. Required on resource_policy",
+                  "example": "POSTGRES"
                 }
               }
             }
@@ -809,7 +820,7 @@
       "NameItem": {
         "type": "object",
         "additionalProperties": false,
-        "description": "One generated name of /names: a ResourceItem with the item key, resource type, sequence or role, placement scope and uniqueness",
+        "description": "One generated name of /names: a ResourceItem with the item key, resource type, sequence or role, kind, placement scope and uniqueness",
         "required": [
           "key",
           "resource_type",
@@ -845,6 +856,17 @@
             "pattern": "^[a-z0-9]{2,16}$",
             "description": "Present on role rules: the requested role or the default sync",
             "example": "db"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Present when the item asked for a kind: the value name as sent",
+            "example": "POSTGRES"
+          },
+          "kind_token": {
+            "type": "string",
+            "pattern": "^[a-z0-9]{1,5}$",
+            "description": "Present when the kind puts a token in the name (absent for the provider default of that scope)",
+            "example": "pg"
           },
           "scope": {
             "type": "string",

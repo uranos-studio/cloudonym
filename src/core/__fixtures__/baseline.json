@@ -2152,11 +2152,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -8239,11 +8239,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -14326,11 +14326,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -20413,11 +20413,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -26500,11 +26500,11 @@
           },
           "resource_policy": {
             "name": "windows-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "windows-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -32587,11 +32587,11 @@
           },
           "resource_policy": {
             "name": "google-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -38674,11 +38674,11 @@
           },
           "resource_policy": {
             "name": "azure-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "azure-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -50848,11 +50848,11 @@
           },
           "resource_policy": {
             "name": "paymentsettlement-reconciliation-dev-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -56935,11 +56935,11 @@
           },
           "resource_policy": {
             "name": "a-long-longpurpose-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -63026,7 +63026,7 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "3tier-trade-prod-ane3-rp-01",
-            "violations": 1,
+            "violations": 2,
             "steps": 0
           },
           "rollout_plan": {
@@ -69109,11 +69109,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -75196,11 +75196,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -81283,11 +81283,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -87370,11 +87370,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -91981,11 +91981,11 @@
           },
           "resource_policy": {
             "name": "billing-trade-prod-ane3-rp-01",
-            "valid": true,
+            "valid": false,
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-rp-01",
-            "violations": 0,
+            "violations": 1,
             "steps": 0
           },
           "rollout_plan": {
@@ -215654,6 +215654,83 @@
             "violations": 1
           }
         ]
+      },
+      {
+        "id": "gcp-kinds",
+        "provider": "gcp",
+        "valid": true,
+        "conflicts": 0,
+        "items": [
+          {
+            "key": "cloud_sql_instance_01",
+            "name": "billing-trade-prod-ane3-sql-pg-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "POSTGRES",
+            "kindToken": "pg"
+          },
+          {
+            "key": "cloud_sql_instance_02",
+            "name": "billing-trade-prod-ane3-sql-pg-02",
+            "valid": true,
+            "violations": 0,
+            "kind": "POSTGRES",
+            "kindToken": "pg"
+          },
+          {
+            "key": "resource_policy_01",
+            "name": "billing-trade-prod-ane3-rp-snap-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "snapshot-schedule",
+            "kindToken": "snap"
+          },
+          {
+            "key": "backend_service_01",
+            "name": "billing-trade-prod-bs-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "EXTERNAL_MANAGED"
+          },
+          {
+            "key": "region_backend_service_01",
+            "name": "billing-trade-prod-ane3-bs-int-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "INTERNAL_MANAGED",
+            "kindToken": "int"
+          },
+          {
+            "key": "region_network_endpoint_group_01",
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "SERVERLESS"
+          },
+          {
+            "key": "subnet_01",
+            "name": "billing-trade-prod-ane3-snet-proxy-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "REGIONAL_MANAGED_PROXY",
+            "kindToken": "proxy"
+          },
+          {
+            "key": "health_check_01",
+            "name": "billing-trade-prod-hc-grpcs-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "grpc-with-tls",
+            "kindToken": "grpcs"
+          },
+          {
+            "key": "firewall_rule_01",
+            "name": "billing-trade-prod-fw-01",
+            "valid": true,
+            "violations": 0,
+            "kind": "INGRESS"
+          }
+        ]
       }
     ]
   },
@@ -215893,7 +215970,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -216340,6 +216416,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -216593,7 +216670,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -217040,6 +217116,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -217287,7 +217364,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -217735,6 +217811,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -217988,7 +218065,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -218435,6 +218511,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -218688,7 +218765,6 @@
           "gcp_region_target_https_proxy = \"windows-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"windows-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"windows-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"windows-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"windows-trade-prod-rop-01\"",
           "gcp_router = \"windows-trade-prod-ane3-cr-01\"",
           "gcp_route = \"windows-trade-prod-rt-01\"",
@@ -219090,6 +219166,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -219386,7 +219463,6 @@
           "gcp_region_target_https_proxy = \"google-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"google-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"google-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"google-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"google-trade-prod-rop-01\"",
           "gcp_router = \"google-trade-prod-ane3-cr-01\"",
           "gcp_route = \"google-trade-prod-rt-01\"",
@@ -219835,6 +219911,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -220088,7 +220165,6 @@
           "gcp_region_target_https_proxy = \"azure-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"azure-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"azure-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"azure-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"azure-trade-prod-rop-01\"",
           "gcp_router = \"azure-trade-prod-ane3-cr-01\"",
           "gcp_route = \"azure-trade-prod-rt-01\"",
@@ -220497,6 +220573,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -221488,7 +221565,6 @@
           "gcp_region_target_https_proxy = \"paymentsettlement-reconciliation-dev-thps-01\"",
           "gcp_region_target_tcp_proxy = \"paymentsettlement-reconciliation-dev-ttp-01\"",
           "gcp_region_url_map = \"paymentsettlement-reconciliation-dev-url-01\"",
-          "gcp_resource_policy = \"paymentsettlement-reconciliation-dev-rp-01\"",
           "gcp_rollout_plan = \"paymentsettlement-reconciliation-dev-rop-01\"",
           "gcp_router = \"paymentsettlement-reconciliation-dev-cr-01\"",
           "gcp_route = \"paymentsettlement-reconciliation-dev-rt-01\"",
@@ -221937,6 +222013,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -222188,7 +222265,6 @@
           "gcp_region_target_https_proxy = \"a-long-longpurpose-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"a-long-longpurpose-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"a-long-longpurpose-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"a-long-longpurpose-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"a-long-longpurpose-prod-rop-01\"",
           "gcp_router = \"a-long-longpurpose-prod-ane3-cr-01\"",
           "gcp_route = \"a-long-longpurpose-prod-rt-01\"",
@@ -222632,6 +222708,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -223588,7 +223665,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -224029,6 +224105,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -224277,7 +224354,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -224713,6 +224789,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -224962,7 +225039,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -225410,6 +225486,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -225663,7 +225740,6 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -226110,6 +226186,7 @@
           "# INVALID: gcp_instant_snapshot_group",
           "# INVALID: gcp_instant_snapshot",
           "# INVALID: gcp_reservation",
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_storage_pool",
           "# INVALID: gcp_target_instance",
           "# INVALID: gcp_zone_vm_extension_policy",
@@ -226197,7 +226274,6 @@
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
           "gcp_reservation = \"billing-trade-prod-ane3a-rsv-01\"",
-          "gcp_resource_policy = \"billing-trade-prod-ane3-rp-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -226259,6 +226335,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
+          "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function"
         ]

@@ -19,6 +19,7 @@ import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
 import { AWS_INTAKE_ROWS } from '../core/rules/aws-intake';
 import { GCP_MANUAL_RULES } from '../core/rules/gcp-manual';
 import { AWS_MANUAL_RULES } from '../core/rules/aws-manual';
+import { GCP_CATALOG, GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
 import { AZURE_MANUAL_ROWS } from '../core/rules/azure-manual';
 
 const rules = Object.values(RULES);
@@ -37,7 +38,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(enabledRules).toHaveLength(rulesFor('gcp').length);
     expect(rulesFor('gcp')).toHaveLength(121);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
-    expect(lines.filter((l) => l === '### GCP')).toHaveLength(4); // 공식 · 지역 · 제약 · 트리
+    expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
     expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
     expect(lines.filter((l) => l.includes('planned'))).toEqual(['> AWS and Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
     expect(text).toContain('"providers"?: ["gcp"]');
@@ -87,6 +88,44 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const sentence = section.find((l) => l.startsWith('Zonal resources'))!;
     expect(sentence).toContain('`name.zone_required`');
     expect(sentence).toContain(zonal.join(', '));
+  });
+  it('「## Kind tokens」 절 — 종류 표가 있는 19행 · 행마다 값 → 토큰 · 규칙(범위)마다 기본값과 허용 값 · 기본값 근거 · 확인일 (D52)', () => {
+    const start = lines.indexOf('## Kind tokens');
+    expect(start).toBeGreaterThan(lines.indexOf('## Regions'));
+    const end = lines.indexOf('## Provider Constraints');
+    expect(end).toBeGreaterThan(start);
+    const section = lines.slice(start, end);
+    const kindRows = GCP_CATALOG.filter((r) => r.kind !== null);
+    expect(kindRows).toHaveLength(19);
+    const rowLines = section.filter((l) => l.startsWith('- `gcp.'));
+    expect(rowLines).toHaveLength(19);
+    for (const row of kindRows) {
+      const at = section.findIndex((l) => l.startsWith(`- \`${row.key}\``));
+      expect(at, row.key).toBeGreaterThan(-1);
+      const head = section[at]!;
+      for (const [v, t] of Object.entries(row.kind!.tokens)) expect(head, `${row.key} ${v}`).toContain(t === null ? `\`${v}\` (no token)` : `\`${v}\` → \`${t}\``);
+      expect(head).toContain(`basis: ${row.kind!.defaultBasis}`);
+      expect(head).toContain(`checked ${GCP_KIND_CHECKED[row.key]}`);
+      // 규칙(범위)마다 들여쓴 한 줄 — 기본값과 허용 값
+      for (const [id, spec] of Object.entries(row.rules)) {
+        const sub = section.find((l) => l.startsWith(`  - \`${id}\``));
+        expect(sub, id).toBeDefined();
+        expect(sub, id).toContain(spec.kinds!.default === null ? 'no default' : `default \`${spec.kinds!.default}\``);
+        expect(sub, id).toContain(`accepts ${spec.kinds!.allowed.map((v) => `\`${v}\``).join(', ')}`);
+      }
+    }
+    expect(section.join('\n')).toContain('`gcp.resource_policy`');
+    expect(section.join('\n')).toMatch(/needs a kind/);
+  });
+  it('/v1/names 줄에 kind · /v1/generate 는 종류 · 존이 필요한 규칙을 valid:false 로 돌려준다는 한 줄 (D52)', () => {
+    expect(text).toContain('"kind"?: string');
+    expect(text).toContain('`name.kind_required`');
+    expect(text).toMatch(/come back `valid: false` there .*use `\/v1\/names`/);
+  });
+  it('공식에 종류 자리가 있다 — 종류 표가 있는 규칙만 <kind> 가 약어 바로 뒤', () => {
+    expect(lines.some((l) => l.startsWith(`- \`gcp.cloud_sql_instance\`: \`${formulaOf(RULES['gcp.cloud_sql_instance']!)}\``))).toBe(true);
+    expect(formulaOf(RULES['gcp.cloud_sql_instance']!)).toBe('<system>-<purpose>-<env>-<region>-sql-<kind>-<seq>');
+    expect(formulaOf(RULES['gcp.vpc_network']!)).not.toContain('<kind>');
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
@@ -141,7 +180,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(section).toContain('        - `aws.ec2_instance` · input: count · uniqueness: none');
   });
   it('seq · role 설명과 /v1/names 줄 · 한 요청 = 한 부모 범위 · 충돌의 뜻', () => {
-    expect(text).toContain('`<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`).');
+    expect(text).toContain('`<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`), `<kind>` is empty unless `kind` on `/v1/names` picks a value with a token (see `## Kind tokens`).');
     expect(text).toContain('- `POST /v1/names` — body');
     expect(text).toContain('One `/v1/names` request stands for one instance of each parent scope');
     expect(text).toContain('`name.conflict`');

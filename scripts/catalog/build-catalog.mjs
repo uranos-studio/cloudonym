@@ -1,5 +1,5 @@
 // catalog 생성기 (D46) — catalog/gcp.json · catalog/regions.json(정본)을 스키마로 검사한 뒤
-// src/core/rules/gcp-catalog.ts · src/core/regions-data.ts 를 쓴다. 개발 때만 돈다 — 엔진은 JSON 을 읽지 않고 생성 TS 를 들여온다(D9).
+// src/core/rules/gcp-catalog.ts · src/core/regions-data.ts 를 쓴다(종류 표의 확인일은 kind-sources.json 에서). 개발 때만 돈다 — 엔진은 JSON 을 읽지 않고 생성 TS 를 들여온다(D9).
 // 사용: node scripts/catalog/build-catalog.mjs   (npm run catalog)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -28,7 +28,18 @@ function literal(v) {
   return JSON.stringify(v, null, 2).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
 }
 
-export function renderGcpCatalog(gcp) {
+/** 종류 표가 있는 행마다 kind-sources.json 의 checked 가운데 가장 늦은 날 — 전사가 없거나 날이 없으면 null */
+export function kindChecked(gcp, kindSources) {
+  const out = {};
+  for (const row of gcp.rows) {
+    if (!row.kind) continue;
+    const dates = (kindSources.rows[row.key] ?? []).map((e) => e.checked).filter((d) => typeof d === 'string').sort();
+    out[row.key] = dates.length > 0 ? dates[dates.length - 1] : null;
+  }
+  return out;
+}
+
+export function renderGcpCatalog(gcp, kindSources = { rows: {} }) {
   return `${HEADER}gcp.json 에서 만든다 (D46).
 // 행 하나 = 화면 행 하나. rules 는 규칙 id → 그 규칙의 범위 · 지역 토큰 종류 · 허용 종류(D52). 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
 import type { Category } from '../types';
@@ -66,6 +77,10 @@ export interface CatalogRow {
 export const GCP_CATALOG_META = ${literal(gcp.meta)} as const;
 
 export const GCP_CATALOG: readonly CatalogRow[] = ${literal(gcp.rows)};
+
+/** 종류 표의 출처(기본값 근거 포함)를 사람이 마지막으로 열어 본 날 — 행 key → kind-sources.json 의 checked 가운데 가장 늦은 날 (D52 · §4-5).
+ *  llms.txt 「Kind tokens」 절이 싣는다. 전사에 날이 없으면 null */
+export const GCP_KIND_CHECKED: Readonly<Record<string, string | null>> = ${literal(kindChecked(gcp, kindSources))};
 `;
 }
 
@@ -92,7 +107,7 @@ if (isMain) {
   const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
   const catalog = loadCatalog(root);
   validateCatalog(catalog);
-  writeFileSync(join(root, 'src/core/rules/gcp-catalog.ts'), renderGcpCatalog(catalog.gcp));
+  writeFileSync(join(root, 'src/core/rules/gcp-catalog.ts'), renderGcpCatalog(catalog.gcp, catalog.kindSources));
   writeFileSync(join(root, 'src/core/regions-data.ts'), renderRegions(catalog.regions));
   console.log(`gcp-catalog.ts ${catalog.gcp.rows.length}행 · regions-data.ts gcp ${catalog.regions.gcp.length} · aws ${catalog.regions.aws.length} · azure ${catalog.regions.azure.length}`);
 }

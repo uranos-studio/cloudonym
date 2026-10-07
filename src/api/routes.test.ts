@@ -225,6 +225,42 @@ describe('POST /v1/names (D39)', () => {
     expect(body.errors[1].params.value).toBe('a\\u202Eb');
     expect(JSON.stringify(body)).not.toContain(rlo);
   });
+  it('종류 (D52) — POSTGRES ×2 · 리소스 정책 snapshot-schedule → 200 · 약어 바로 뒤 토큰 · kind · kind_token 은 seq 뒤', async () => {
+    const ctx = { ...base, system: 'payments', purpose: 'ledger', region: 'asia-northeast3' };
+    const { res } = await names({ provider: 'gcp', context: ctx, resources: [{ type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'resource_policy', kind: 'snapshot-schedule' }, { type: 'backend_service', kind: 'EXTERNAL_MANAGED' }] });
+    expect(res.status).toBe(200);
+    const g = (await json(res)).data.gcp;
+    expect(g.valid).toBe(true);
+    expect(g.items.map((i: { key: string; name: string; kind?: string; kind_token?: string }) => [i.key, i.name, i.kind, i.kind_token])).toEqual([
+      ['cloud_sql_instance_01', 'payments-ledger-prod-ane3-sql-pg-01', 'POSTGRES', 'pg'],
+      ['cloud_sql_instance_02', 'payments-ledger-prod-ane3-sql-pg-02', 'POSTGRES', 'pg'],
+      ['resource_policy_01', 'payments-ledger-prod-ane3-rp-snap-01', 'snapshot-schedule', 'snap'],
+      ['backend_service_01', 'payments-ledger-prod-bs-01', 'EXTERNAL_MANAGED', undefined],
+    ]);
+    expect(Object.keys(g.items[0]).slice(0, 5)).toEqual(['key', 'resource_type', 'seq', 'kind', 'kind_token']);
+    expect('kind_token' in g.items[3]).toBe(false);
+  });
+  it('종류 (D52) — 토큰(pg)을 넣으면 400 selection.unknown_kind · 리소스 정책에 종류가 없으면 400 selection.kind_required · 종류 없는 규칙에 kind 는 kind_not_supported', async () => {
+    const { res } = await names({ provider: 'gcp', context: base, resources: [{ type: 'cloud_sql_instance', count: 2, kind: 'pg' }, { type: 'resource_policy' }, { type: 'vpc_network', kind: 'PRIVATE' }] });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ success: false, errors: [
+      { code: 'selection.unknown_kind', params: { index: 0, type: 'cloud_sql_instance', value: 'pg', supported: ['MYSQL', 'POSTGRES', 'SQLSERVER'] }, message: "resources[0]: 'pg' is not a kind of 'cloud_sql_instance'; use one of MYSQL, POSTGRES, SQLSERVER" },
+      { code: 'selection.kind_required', params: { index: 1, type: 'resource_policy', supported: ['snapshot-schedule', 'instance-schedule', 'group-placement', 'disk-consistency-group', 'workload-policy'] }, message: "resources[1]: 'resource_policy' needs a kind; use one of snapshot-schedule, instance-schedule, group-placement, disk-consistency-group, workload-policy" },
+      { code: 'selection.kind_not_supported', params: { index: 2, type: 'vpc_network' }, message: "resources[2]: 'vpc_network' takes no kind" },
+    ] });
+  });
+  it('종류 (D52) — 되돌려 싣는 kind 는 80자로 자르고 보이지 않는 문자를 \\uXXXX 로 · 비문자열은 JSON', async () => {
+    const rlo = String.fromCodePoint(0x202e);
+    const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'cloud_sql_instance', kind: `${'x'.repeat(100)}${rlo}` }, { type: 'snapshot', kind: { a: 1 } }] })).res);
+    expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual([`${'x'.repeat(80)}…`, '{"a":1}']);
+    expect(JSON.stringify(body)).not.toContain(rlo);
+  });
+  it('/v1/generate — 리소스 정책은 종류를 받을 길이 없어 늘 valid:false + name.kind_required (D52)', async () => {
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...base, region: 'asia-northeast3' } }));
+    const rp = (await json(res)).data.gcp.resource_policy;
+    expect(rp).toMatchObject({ name: 'billing-trade-prod-ane3-rp-01', valid: false });
+    expect(rp.violations.map((v: { code: string }) => v.code)).toEqual(['name.kind_required']);
+  });
   it('텔레메트리 api_names — { provider, resource_count, name_count, valid } · 문맥값은 싣지 않는다', async () => {
     const sent: string[] = [];
     vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { sent.push(init.body); return Promise.resolve(new Response('{"ingested":1,"failed":0}')); });

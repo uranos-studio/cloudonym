@@ -5,7 +5,8 @@ import type { CoreMessage } from './messages';
 import { inputKind } from './tree';
 import type { Provider, ResourceRule } from './types';
 
-export interface SelectionItem { rule: ResourceRule; count: number; role?: string }
+/** kind 는 종류 값 이름(POSTGRES) — 그 규칙의 kinds.allowed 안이다 (D52) */
+export interface SelectionItem { rule: ResourceRule; count: number; role?: string; kind?: string }
 
 /** 한 요청의 항목 수 · 이름 수(Σ count) · 항목 하나의 개수 상한. 200 은 화면 · 링크 길이의 상한이지 응답 크기 보장이 아니다 */
 export const MAX_ITEMS = 200;
@@ -23,7 +24,8 @@ const shown = (v: unknown): string => {
   }
 };
 
-/** 검사 순서: 배열 → 비어 있지 않음 → 항목 수 → 항목마다(객체 · type · 중복 · count · 입력 종류 · role 꼴) → Σ count. 오류는 index 순으로 모두 낸다.
+/** 검사 순서: 배열 → 비어 있지 않음 → 항목 수 → 항목마다(객체 · type · 중복 · count · 입력 종류 · role 꼴 · 종류) → Σ count. 오류는 index 순으로 모두 낸다.
+ *  종류(D52) — 종류 표 없는 규칙에 kind 면 kind_not_supported, 그 범위의 allowed 밖이면 unknown_kind, 필수 종류(리소스 정책)가 없으면 kind_required.
  *  rules 는 기본이 규칙 표 — 화면의 시험 전용 fixture 가 다른 표를 넘긴다. 다른 provider 규칙은 거른다 */
 export function validateSelection(provider: Provider, raw: unknown, table: readonly ResourceRule[] = rulesFor(provider)):
   { ok: true; items: SelectionItem[] } | { ok: false; errors: CoreMessage[] } {
@@ -37,7 +39,7 @@ export function validateSelection(provider: Provider, raw: unknown, table: reado
   const seen = new Set<string>();
   raw.forEach((entry: unknown, index) => {
     if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) { errors.push({ code: 'selection.item_not_object', params: { index } }); return; }
-    const { type, count, role } = entry as { type?: unknown; count?: unknown; role?: unknown };
+    const { type, count, role, kind } = entry as { type?: unknown; count?: unknown; role?: unknown; kind?: unknown };
     const rule = typeof type === 'string' ? rules.find((r) => r.resourceType === type) : undefined;
     if (!rule) { errors.push({ code: 'selection.unknown_type', params: { index, value: shown(type) } }); return; }
     if (seen.has(rule.resourceType)) { errors.push({ code: 'selection.duplicate_type', params: { index, value: rule.resourceType } }); return; }
@@ -45,17 +47,28 @@ export function validateSelection(provider: Provider, raw: unknown, table: reado
 
     const before = errors.length;
     const n = count === undefined ? 1 : count;
-    const kind = inputKind(rule);
+    const input = inputKind(rule);
     if (typeof n !== 'number' || !Number.isInteger(n) || n < 1 || n > MAX_COUNT) {
       errors.push({ code: 'selection.count_out_of_range', params: { index, min: 1, max: MAX_COUNT } });
-    } else if (n > 1 && kind !== 'count') {
+    } else if (n > 1 && input !== 'count') {
       errors.push({ code: 'selection.count_not_supported', params: { index, type: rule.resourceType } });
     }
     if (role !== undefined) {
-      if (kind !== 'role') errors.push({ code: 'selection.role_not_supported', params: { index, type: rule.resourceType } });
+      if (input !== 'role') errors.push({ code: 'selection.role_not_supported', params: { index, type: rule.resourceType } });
       else if (typeof role !== 'string' || !ROLE_PATTERN.test(role)) errors.push({ code: 'selection.invalid_role', params: { index, value: shown(role), pattern: ROLE_PATTERN.source } });
     }
-    if (errors.length === before) items.push(role === undefined ? { rule, count: n as number } : { rule, count: n as number, role: role as string });
+    const kinds = rule.kinds;
+    if (kind !== undefined) {
+      if (!kinds) errors.push({ code: 'selection.kind_not_supported', params: { index, type: rule.resourceType } });
+      else if (typeof kind !== 'string' || !kinds.allowed.includes(kind)) {
+        errors.push({ code: 'selection.unknown_kind', params: { index, type: rule.resourceType, value: shown(kind), supported: [...kinds.allowed] } });
+      }
+    } else if (kinds?.rule === 'required') {
+      errors.push({ code: 'selection.kind_required', params: { index, type: rule.resourceType, supported: [...kinds.allowed] } });
+    }
+    if (errors.length === before) {
+      items.push({ rule, count: n as number, ...(role === undefined ? {} : { role: role as string }), ...(kind === undefined ? {} : { kind: kind as string }) });
+    }
   });
 
   const total = items.reduce((s, i) => s + i.count, 0);

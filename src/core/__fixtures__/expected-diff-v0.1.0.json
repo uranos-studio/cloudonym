@@ -640,7 +640,7 @@
     "gen/gcp/region_target_tcp_proxy": {"causes":["env","region"],"expected":{"name":"billing-trade-prod-ane3-ttp-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
     "gen/gcp/region_url_map": {"causes":["slug","env","region"],"expected":{"name":"billing-trade-prod-ane3-url-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
     "gen/gcp/reservation": {"causes":["slug","env","zone-required"],"expected":{"name":"","valid":false,"codes":["name.zone_required"],"isTruncated":false,"steps":[],"conflictKeys":[]}},
-    "gen/gcp/resource_policy": {"causes":["env","region"],"expected":{"name":"billing-trade-prod-ane3-rp-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
+    "gen/gcp/resource_policy": {"causes":["env","region","kind-required"],"expected":{"name":"billing-trade-prod-ane3-rp-01","valid":false,"codes":["name.kind_required"],"isTruncated":false,"steps":[],"conflictKeys":[]}},
     "gen/gcp/rollout_plan": {"causes":["slug","env"],"expected":{"name":"billing-trade-prod-rop-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
     "gen/gcp/route": {"causes":["slug","env"],"expected":{"name":"billing-trade-prod-rt-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
     "gen/gcp/router": {"causes":["slug","env","region"],"expected":{"name":"billing-trade-prod-ane3-cr-01","valid":true,"codes":[],"isTruncated":false,"steps":[],"conflictKeys":[]}},
