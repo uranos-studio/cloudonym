@@ -36,6 +36,17 @@ export const UI_KEYS = [
   'nav_naming_guide', 'footer_privacy', 'back_to_app',
   // NamingDoc — /docs/naming (D57)
   'doc_title',
+  'doc_intro', 'doc_formula_title', 'doc_formula_body', 'doc_formula_caption', 'doc_col_formula', 'doc_col_optional',
+  'doc_col_rule_count', 'doc_tokens_title', 'doc_tokens_body', 'doc_tokens_caption', 'doc_col_token', 'doc_col_meaning',
+  'doc_token_owner', 'doc_token_system', 'doc_token_purpose', 'doc_token_env', 'doc_token_region', 'doc_token_slug',
+  'doc_token_kind', 'doc_token_seq', 'doc_token_role', 'doc_regions_title', 'doc_regions_body', 'doc_regions_caption',
+  'doc_col_region', 'doc_col_code', 'doc_col_location', 'doc_col_zones', 'doc_zones_title', 'doc_zones_body',
+  'doc_zones_list', 'doc_env_title', 'doc_env_body', 'doc_env_caption', 'doc_col_value', 'doc_env_prod', 'doc_env_stg',
+  'doc_env_dev', 'doc_env_sbx', 'doc_shrink_title', 'doc_shrink_body', 'doc_shrink_step1', 'doc_shrink_step2',
+  'doc_shrink_step3', 'doc_abbr_title', 'doc_abbr_body', 'doc_abbr_caption', 'doc_col_resource', 'doc_col_abbr',
+  'doc_col_basis', 'doc_col_previous', 'doc_kinds_title', 'doc_kinds_body', 'doc_kinds_caption', 'doc_col_values',
+  'doc_col_default', 'doc_col_kind_rule', 'doc_kind_rule_omit', 'doc_kind_rule_chosen', 'doc_kind_rule_required',
+  'doc_pass_title', 'doc_none', 'doc_no_token',
   // Privacy — /privacy (D56)
   'privacy_title',
   'privacy_intro', 'privacy_browser_title', 'privacy_browser_session', 'privacy_browser_hash',

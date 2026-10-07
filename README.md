@@ -29,6 +29,7 @@ The page keeps its state (the five values, the provider and the selection) in th
 | [Mobile, 360 px](docs/screenshots/02-mobile-360.png) | The same selection on a narrow screen, with the bar that jumps to the names |
 | [Desktop, dark](docs/screenshots/03-desktop-dark.png) | The same share link opened in dark mode |
 | [FAIL cards](docs/screenshots/04-fail-card.png) | A `system` made only of symbols — every name fails with the reason and cannot be copied |
+| [Naming guide](docs/screenshots/05-naming-guide.png) | `/docs/naming` — formulas, tokens, region codes, abbreviations and kind tokens, generated from the same data as the engine |
 
 ## API in three lines
 
@@ -284,7 +285,7 @@ See the LICENSE file for details.
 
 **공유 URL 주의** — 화면 상태(다섯 값 · CSP · 선택)는 URL hash 에 있고 **Share URL** 은 그 링크를 복사한다. hash 는 버튼을 누르지 않아도 입력하는 대로 주소창에 쓰인다. **Base64 는 암호화가 아니다** — 링크를 받은 사람은 owner · system · purpose 등 입력값을 그대로 읽는다. 링크를 넘길 생각이면 회사 내부 이름 같은 민감한 값을 넣지 않는다. 화면도 버튼 옆에 같은 경고를 보인다.
 
-스크린샷 — [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png).
+스크린샷 — [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
 
 허용값 — env: `prod` · `stg` · `dev` · `sbx`(`prd` · `staging` 같은 별칭도 받는다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존 리소스는 존이 있어야 한다. 지역 표는 `/llms.txt` 에 있다.
 

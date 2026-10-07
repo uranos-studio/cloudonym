@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉗ · ㉙ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -1035,6 +1035,29 @@ with sync_playwright() as p:
     no_hangul(page27)
     ctx27.close()
 
+    # ── ㉘ /docs/naming — 200 · 절 아홉 · 표 행 수(약어 100 · 리전 43 · 종류 토큰 19 · 환경 4 · 토큰 9) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
+    ctx28 = browser.new_context(viewport={'width': 360, 'height': 800})
+    page28 = ctx28.new_page()
+    page28.on('pageerror', lambda e: errors.append(str(e)))
+    resp28 = page28.goto(BASE + '/docs/naming', wait_until='networkidle')
+    assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
+    expect(page28.locator('h1')).to_have_text('Naming guide')
+    expect(page28.locator('[data-naming-doc] > section')).to_have_count(9)
+    for table_id, rows in {'abbreviations': 100, 'regions': 43, 'kinds': 19, 'env': 4, 'tokens': 9}.items():
+        expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
+    expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
+    expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
+    expect(page28.locator('[data-doc-paragraph="pass"]')).to_have_text(re.compile(r'^PASS / `valid: true` means the name satisfies'))
+    expect(page28.locator('[data-doc-table="kinds"] tr[data-row="gcp.cloud_sql_instance"]')).to_contain_text('POSTGRES → pg')
+    assert page28.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '360px 에서 가로 스크롤이 생긴다'
+    no_hangul(page28)
+    ctx28.close()
+    ctx28d = browser.new_context(viewport={'width': 1280, 'height': 900})
+    page28d = ctx28d.new_page()
+    page28d.goto(BASE + '/docs/naming', wait_until='networkidle')
+    page28d.screenshot(path=str(OUT / '05-naming-guide.png'))
+    ctx28d.close()
+
     # ── ㉙ 꺼진 CSP(Azure) 로 만든 링크 → GCP 로 열리고 지역은 예시로 · 선택은 비운다 · 자유 입력 셋과 환경은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
     ctx20 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page20 = ctx20.new_page()
@@ -1058,4 +1081,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒆ · ⒇~㉗ · ㉕-2 · ㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ · ㉕-2 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
