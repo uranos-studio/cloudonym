@@ -84,7 +84,7 @@ export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDE
 }
 
 /** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음).
- *  종류가 달라도 key 는 같은 꼴이다(한 행에 종류 하나 — 오너 결정 K2).
+ *  종류가 달라도 key 는 같은 꼴이다(한 행에 종류 하나 — D52).
  *  kind 는 고른 값 이름(POSTGRES) · kindToken 은 이름에 넣은 토큰(pg) — 기본값 · omitValues 를 고르면 kind 만 있고 kindToken 은 없다 (D52) */
 export interface NameItem extends NameResult { key: string; seq?: string; role?: string; kind?: string; kindToken?: string }
 export interface ManyResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
