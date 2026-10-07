@@ -1,6 +1,7 @@
 // catalog 조회 (D46 · D52) — 생성 파일 rules/gcp-catalog.ts 를 읽는 순수 함수. 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
 import type { Provider, ResourceRule } from './types';
 import { GCP_CATALOG, type CatalogRow, type RegionToken } from './rules/gcp-catalog';
+import { regionTokenOfRule } from './compose';
 
 /** 종류 토큰 길이 상한 — proxy · grpcs · https 가 5자다 */
 export const MAX_KIND_CHARS = 5;
@@ -28,9 +29,9 @@ export function allowedKinds(rule: RuleRef): readonly string[] {
   return rowOf(id)?.rules[id]?.kinds?.allowed ?? [];
 }
 
-/** 지역 자리에 무엇이 오나 — catalog 값, catalog 밖 규칙은 템플릿에 region 이 있으면 region */
+/** 지역 자리에 무엇이 오나 — catalog 행의 값을 규칙에 얹어 엔진과 같은 판정(compose.regionTokenOfRule)에 넘긴다 */
 export function regionTokenOf(rule: Pick<ResourceRule, 'id' | 'template'>): RegionToken {
-  return rowOf(rule.id)?.rules[rule.id]?.regionToken ?? (rule.template.includes('region') ? 'region' : 'none');
+  return regionTokenOfRule({ regionToken: rowOf(rule.id)?.rules[rule.id]?.regionToken, template: rule.template });
 }
 
 /** 종류 값 → 이름에 넣을 토큰. 허용 밖이면 Error, 규칙 기본값 · 행의 omitValues 면 null(토큰 없음) */

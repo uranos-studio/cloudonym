@@ -9,7 +9,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getRule } from './constraints';
 import { generate, generateMany, parseContext } from './engine';
-import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
+import { CONFLICT_SELECTION } from './__fixtures__/conflict';
 import { PROVIDERS, type NameResult, type Provider, type RawContext } from './types';
 import type { SelectionItem } from './selection';
 
@@ -41,6 +41,8 @@ function outcomeOf(r: NameResult): Outcome {
 }
 
 const BASE: RawContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+/** 충돌 fixture 의 옛 원시 입력 — a0600cb 의 CONFLICT_CONTEXT 그대로 얼려 둔다. 지금 fixture 값(이미 이전된 값)을 쓰면 이전 매핑을 지나지 않는다 */
+const CONFLICT_RAW_BEFORE: RawContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 
 /** 여러 개 생성 표본 — baseline-inputs.ts 의 baselineMany 와 같은 선택이다. 그쪽은 안에서 옛 원시 입력을 파싱하므로 쓰지 않고 선택만 옮겨 둔다 */
 const MANY_SAMPLES: readonly { id: string; provider: Provider; raw: RawContext; picks: () => SelectionItem[] }[] = [
@@ -54,7 +56,7 @@ const MANY_SAMPLES: readonly { id: string; provider: Provider; raw: RawContext; 
   { id: 'aws-ec2-2-role-db', provider: 'aws', raw: BASE, picks: () => [
     { rule: getRule('aws', 'ec2_instance')!, count: 2 }, { rule: getRule('aws', 'iam_role')!, count: 1, role: 'db' },
   ] },
-  { id: 'conflict-fixture', provider: 'azure', raw: { ...CONFLICT_CONTEXT }, picks: () => [...CONFLICT_SELECTION] },
+  { id: 'conflict-fixture', provider: 'azure', raw: CONFLICT_RAW_BEFORE, picks: () => [...CONFLICT_SELECTION] },
 ];
 
 /** 원시 입력 → 새 엔진의 문맥. 지역은 provider 의 표로 푼다 (D49) */
