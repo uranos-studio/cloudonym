@@ -25,7 +25,7 @@ The page keeps its state (the five values, the provider and the selection) in th
 
 | | |
 |---|---|
-| [Desktop, light](docs/screenshots/01-desktop-light.png) | Azure, four resources picked (the tree shows the selected rows only) |
+| [Desktop, light](docs/screenshots/01-desktop-light.png) | GCP, four resources picked (the tree shows the selected rows only) |
 | [Mobile, 360 px](docs/screenshots/02-mobile-360.png) | The same selection on a narrow screen, with the bar that jumps to the names |
 | [Desktop, dark](docs/screenshots/03-desktop-dark.png) | The same share link opened in dark mode |
 | [FAIL cards](docs/screenshots/04-fail-card.png) | A `system` made only of symbols — every name fails with the reason and cannot be copied |

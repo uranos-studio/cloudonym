@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒇을 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉖ · ㉙ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -17,6 +17,7 @@ playwright 는 1.63.0 으로 고정한다 — 다른 버전은 맞는 Chromium �
 """
 import base64
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -27,10 +28,16 @@ BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
 
-# ⑴ 의 입력 — 기본값(platform · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
-INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prod', 'region': 'kr'}
+# ⑴ 의 입력 — 기본값(platform · billing · trade · asia-northeast3-a)과 달라야 시험이 공허하지 않다. SA 원본 40자 → region 생략 → owner 생략 (엔진 실측)
+# region 은 hash 에 싣는 꼴(존 코드 — urlState.encodeState)이다. 폼에서는 리전 콤보박스와 존 select 둘로 나뉜다(REGION_FORM)
+INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prod', 'region': 'euw1b'}
 # 같은 탭 공유 URL 이동의 입력 — INPUT 과 다섯 값이 모두 다르다
-OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'jp'}
+OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'ane1c'}
+# hash 의 지역 코드 → 폼의 (리전 · 존) — 존이 없으면 ''(존 select 의 none)
+REGION_FORM = {'euw1b': ('europe-west1', 'europe-west1-b'), 'euw1': ('europe-west1', ''), 'ane1c': ('asia-northeast1', 'asia-northeast1-c'),
+               'ane3a': ('asia-northeast3', 'asia-northeast3-a')}
+# 첫 화면 · 깨진 hash · 꺼진 CSP 링크의 문맥 (R0 · D55)
+DEFAULT = {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prod', 'region': 'ane3a'}
 # ⑾ 에서 고르는 GCP 선택 — 트리 순서(Global namespace → Project)
 PICK = {'project_id': 1, 'storage_bucket': 1, 'service_account': 'db', 'compute_instance': 2}
 
@@ -65,7 +72,7 @@ def hash_state(hash_or_url):
 SELECT_FIT_JS = '''() => {
   const ctx = document.createElement('canvas').getContext('2d');
   const out = [];
-  for (const sel of document.querySelectorAll('#field-env, #field-region')) {
+  for (const sel of document.querySelectorAll('#field-env, #field-zone')) {
     const cs = getComputedStyle(sel);
     ctx.font = cs.font;
     const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24;
@@ -78,8 +85,27 @@ SELECT_FIT_JS = '''() => {
 }'''
 
 
+# 존 select 는 지금 리전의 존만 든다 — 표의 모든 존 글자(RegionPicker 의 「a — ane3a」 꼴)를 같은 상자 · 같은 글꼴로 잰다
+ZONE_FIT_JS = '''(labels) => {
+  const sel = document.getElementById('field-zone');
+  const cs = getComputedStyle(sel);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = cs.font;
+  const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24;
+  return labels.map((t) => [t, ctx.measureText(t).width]).filter(([, w]) => w > avail).map(([t, w]) => `field-zone 「${t}」 ${w.toFixed(1)}px > ${avail.toFixed(1)}px`);
+}'''
+
+
+def zone_labels(page):
+    """/llms.txt 지역 표(GCP)의 모든 존 → 존 select 의 글자"""
+    text = page.request.get(BASE + '/llms.txt').text()
+    zones = re.findall(r'`((?:[a-z]+-)+[a-z]+[0-9]+-([a-z]))` `([a-z0-9]+)`', text)
+    assert len(zones) > 100, len(zones)  # 공허하지 않다
+    return sorted({f'{letter} — {code}' for _, letter, code in zones})
+
+
 def assert_selects_fit(page, width):
-    clipped = page.evaluate(SELECT_FIT_JS)
+    clipped = page.evaluate(SELECT_FIT_JS) + page.evaluate(ZONE_FIT_JS, ZONE_LABELS)
     assert clipped == [], f'폭 {width}px 에서 select 글자가 잘린다: {clipped}'
 
 
@@ -103,11 +129,27 @@ def events_of(page):
     return sent
 
 
+def pick_region(page, region, zone):
+    """② 지역 — 콤보박스에 리전 이름을 쳐서 그 항목을 누르고, 존은 늘 명시한다(리전을 바꾸면 같은 글자의 존을 이어 받으므로)"""
+    page.fill('#field-region', region)
+    page.click(f'[data-region-option="{region}"]')
+    page.select_option('#field-zone', zone)
+
+
 def fill_five(page, ctx):
     for key in ('owner', 'system', 'purpose'):
         page.fill(f'#field-{key}', ctx[key])
     page.select_option('#field-env', ctx['env'])
-    page.select_option('#field-region', ctx['region'])
+    pick_region(page, *REGION_FORM[ctx['region']])
+
+
+def expect_ctx(page, ctx):
+    """폼이 문맥(hash 꼴)을 보이는가 — 지역은 리전 칸 · 존 칸 둘로 본다"""
+    for key in ('owner', 'system', 'purpose', 'env'):
+        expect(page.locator(f'#field-{key}')).to_have_value(ctx[key])
+    region, zone = REGION_FORM[ctx['region']]
+    expect(page.locator('#field-region')).to_have_value(region)
+    expect(page.locator('#field-zone')).to_have_value(zone)
 
 
 def row(page, rtype):
@@ -118,24 +160,30 @@ def check(page, rtype):
     row(page, rtype).locator('input[data-row-check]').check()
 
 
+def row_key(page, key):
+    """catalog 행 — 범위를 고르기 전 합친 행에는 data-type 이 없어 행 key 로 찾는다"""
+    return page.locator(f'[data-tree] [data-row="{key}"]')
+
+
 def tree_rows(page):
-    return page.locator('[data-tree] [data-rule]')
+    return page.locator('[data-tree] [data-row]')
 
 
-def visible_types(page):
-    return page.eval_on_selector_all('[data-tree] [data-rule]', 'els => els.filter(e => e.checkVisibility()).map(e => e.dataset.type)')
+def visible_rows(page):
+    return page.eval_on_selector_all('[data-tree] [data-row]', 'els => els.filter(e => e.checkVisibility()).map(e => e.dataset.row)')
 
 
-# 트리의 행 — 타입 · 분류 · entity · 보이는 글자 · 보이는가 · 범위 깊이(뿌리 = 0, 걸러진 트리에서도 조상 범위가 남으므로 같다)
+# 트리의 행 — 행 key · 규칙 타입(합친 행은 범위를 고르기 전 없음) · 분류 · 보이는 글자 · 보이는가 · 범위 묶음 수 · 범위 깊이(뿌리 = 0, 걸러진 트리에서도 조상 범위가 남으므로 같다)
 ROWS_JS = '''els => els.map(e => {
   let depth = -1;
   for (let d = e.closest('details[data-scope]'); d; d = d.parentElement.closest('details[data-scope]')) depth++;
-  return { type: e.dataset.type, category: e.dataset.ruleCategory, entity: e.dataset.entity, text: e.innerText, visible: e.checkVisibility(), depth };
+  const scopes = e.querySelectorAll('[data-scope-select] option:not([value=""])').length;
+  return { key: e.dataset.row, type: e.dataset.type, category: e.dataset.ruleCategory, text: e.innerText, visible: e.checkVisibility(), scopes, depth };
 })'''
 
 
 def rows_info(page):
-    return page.eval_on_selector_all('[data-tree] [data-rule]', ROWS_JS)
+    return page.eval_on_selector_all('[data-tree] [data-row]', ROWS_JS)
 
 
 def llms_tree(page, provider):
@@ -182,6 +230,7 @@ with sync_playwright() as p:
     sent = events_of(page)
     goto_ready(page, BASE + '/')
     VERSION = page.request.get(BASE + '/v1/health').json()['version']
+    ZONE_LABELS = zone_labels(page)
     RULES = VERSION['rules']
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
@@ -216,8 +265,8 @@ with sync_playwright() as p:
     expect(page.locator('[data-names-empty]')).to_have_text('Pick resources in step 3 to generate their names.')
     check(page, 'service_account')
     sa = page.locator(SA_CARD)
-    expect(sa.locator('[data-name]')).to_have_text('payments-ledger-prd-sa-sync')
-    expect(sa.locator('[data-steps]')).to_contain_text("Shortened — Dropped optional token 'region' · Dropped optional token 'owner' (originally 37 characters)")
+    expect(sa.locator('[data-name]')).to_have_text('payments-ledger-prod-sa-sync')
+    expect(sa.locator('[data-steps]')).to_contain_text("Shortened — Dropped optional token 'region' · Dropped optional token 'owner' (originally 40 characters)")
     expect(sa).to_have_attribute('data-valid', 'true')
     expect(sa.locator('h4')).to_have_text('Service Account · sync')
     page.wait_for_timeout(1500)  # 디바운스 1초 뒤에 ui_generate 가 한 번
@@ -254,19 +303,25 @@ with sync_playwright() as p:
     assert '    owner = "devops"\n' in tags_only and tags_only.endswith('  }\n}\n'), tags_only
     assert 'gcp_project_id' not in tags_only and 'INVALID' not in tags_only, tags_only
 
-    # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드 ──
-    # 처음엔 뿌리 바로 아래 한 단계만 펼친다 — Resource group 안은 닫혀 있다
-    # 기대값은 /llms.txt 의 트리 — 깊이 0 · 1 의 규칙이 전부 보이고 그보다 깊은 규칙은 하나도 보이지 않는다(규칙이 늘어도 뜻이 같다)
+    # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드(↑ ↓ 는 체크할 수 없는 행을 건너뛴다) ──
+    # 화면은 catalog 행 하나가 한 줄이다 — 범위만 다른 규칙 여럿은 한 행(합친 행)으로 묶여 범위 select 를 갖는다 (D53)
+    # 기대값은 /llms.txt 의 규칙 트리 — 단일 행은 (타입 · 깊이)가 규칙과 같고, 합친 행의 범위 수를 더하면 규칙 수가 된다(규칙이 늘어도 뜻이 같다)
     GCP_TREE = llms_tree(page, 'gcp')
-    shallow = sorted(t for t, d in GCP_TREE if d <= 1)
-    assert {'project_id', 'storage_bucket', 'service_account', 'compute_instance'} <= set(shallow), shallow  # 앵커 — 이 시나리오가 쓰는 행
-    assert sorted(visible_types(page)) == shallow, (visible_types(page), shallow)
-    assert any(d >= 2 for _, d in GCP_TREE), '깊이 2 이상 규칙이 없으면 「처음엔 닫혀 있다」를 잰 것이 아니다'
+    INITIAL = rows_info(page)
+    singles = [r for r in INITIAL if r['scopes'] == 0]
+    merged = [r for r in INITIAL if r['scopes'] > 0]
+    assert merged and all(r['type'] is None and r['scopes'] >= 2 for r in merged), merged  # 범위를 고르기 전 합친 행은 규칙을 가리키지 않는다
+    assert set((r['type'], r['depth']) for r in singles) <= set(GCP_TREE), [r for r in singles if (r['type'], r['depth']) not in GCP_TREE]
+    assert len(singles) + sum(r['scopes'] for r in merged) == len(GCP_TREE), (len(singles), sum(r['scopes'] for r in merged), len(GCP_TREE))
+    assert {r['depth'] for r in merged} == {1}, {r['key']: r['depth'] for r in merged}  # 합친 행은 범위들의 공통 조상(Project)에 놓인다
+    assert chip_count(page, 'all') == len(INITIAL), (chip_count(page, 'all'), len(INITIAL))
+    # 처음엔 뿌리 바로 아래 한 단계만 펼친다 — 깊이 0 · 1 의 행이 전부 보이고 그보다 깊은 행은 하나도 보이지 않는다
+    assert {'gcp.project_id', 'gcp.storage_bucket', 'gcp.service_account', 'gcp.compute_instance'} <= {r['key'] for r in INITIAL if r['depth'] <= 1}
+    assert sorted(visible_rows(page)) == sorted(r['key'] for r in INITIAL if r['depth'] <= 1), visible_rows(page)
+    assert any(r['depth'] >= 2 for r in INITIAL), '깊이 2 이상 행이 없으면 「처음엔 닫혀 있다」를 잰 것이 아니다'
     page.click('[data-expand-all]')
     ALL_ROWS = rows_info(page)
-    # 펼친 트리 = /llms.txt 의 트리(타입 · 깊이) — 화면이 규칙을 빼거나 엉뚱한 범위에 그리면 여기서 걸린다
-    assert sorted((r['type'], r['depth']) for r in ALL_ROWS) == sorted(GCP_TREE), (ALL_ROWS, GCP_TREE)
-    assert all(r['visible'] for r in ALL_ROWS), [r['type'] for r in ALL_ROWS if not r['visible']]
+    assert all(r['visible'] for r in ALL_ROWS), [r['key'] for r in ALL_ROWS if not r['visible']]
     expect(row(page, 'subnet')).to_be_visible()
     for t in ('project_id', 'storage_bucket', 'service_account', 'compute_instance'):
         check(page, t)
@@ -275,15 +330,23 @@ with sync_playwright() as p:
     for _ in range(2):
         vm_row.locator('[data-inc]').click()
     expect(vm_row.locator('[data-count]')).to_have_text('3')
-    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('payments-ledger-prd-kr-vm-03')
-    expect(page.locator('article[data-key="compute_instance_03"] h4')).to_have_text('Compute Engine Instance · 03')
+    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-03')
+    expect(page.locator('article[data-key="compute_instance_03"] h4')).to_have_text('VM Instance · 03')  # 카드 제목 = catalog 행 이름
     vm_row.locator('input[data-row-check]').focus()
     page.keyboard.press('-')
     expect(vm_row.locator('[data-count]')).to_have_text('2')
     expect(page.locator('article[data-key="compute_instance_03"]')).to_have_count(0)
-    shown = visible_types(page)
-    page.keyboard.press('ArrowDown')  # 화면에 보이는 다음 행으로 — 기대값은 지금 보이는 행 순서에서 VM 바로 다음
-    assert page.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == shown[shown.index('compute_instance') + 1], shown
+    # ↓ 는 보이는 다음 행 중 체크 상자가 켜진 첫 행으로 — VM 바로 다음 행들은 범위를 고르지 않은 합친 행이라 체크 상자가 꺼져 있어 건너뛴다
+    order = page.eval_on_selector_all('[data-tree] [data-row]', 'els => els.filter(e => e.checkVisibility()).map(e => [e.dataset.row, e.querySelector("input[data-row-check]").disabled])')
+    i_vm = [k for k, _ in order].index('gcp.compute_instance')
+    skipped = 0
+    while order[i_vm + 1 + skipped][1]:
+        skipped += 1
+    assert skipped > 0, order[i_vm:i_vm + 4]  # 공허하지 않다 — 건너뛸 행이 실제로 있다
+    page.keyboard.press('ArrowDown')
+    assert page.evaluate("document.activeElement.closest('[data-row]')?.dataset.row") == order[i_vm + 1 + skipped][0], (order[i_vm:i_vm + skipped + 2], skipped)
+    page.keyboard.press('ArrowUp')
+    assert page.evaluate("document.activeElement.closest('[data-row]')?.dataset.row") == 'gcp.compute_instance'
     role_input = row(page, 'service_account').locator('[data-role-input]')
     expect(role_input).to_have_value('sync')
     role_input.fill('D')  # 꼴이 틀리면 반영하지 않고 aria-invalid
@@ -307,7 +370,7 @@ with sync_playwright() as p:
     role_input.blur()
     expect(role_input).to_have_value('web')
     role_input.fill('db')
-    expect(page.locator('article[data-key="service_account_db"] [data-name]')).to_have_text('payments-ledger-prd-sa-db')
+    expect(page.locator('article[data-key="service_account_db"] [data-name]')).to_have_text('payments-ledger-prod-sa-db')
     expect(page.locator('[data-names-summary]')).to_have_text('4 resources · 5 names · 5/5 PASS')
     # 범위 경로 머리글 — 트리 순서
     assert page.locator('[data-scope-path]').all_inner_texts() == ['Global namespace', 'Global namespace › Project'], page.locator('[data-scope-path]').all_inner_texts()
@@ -325,22 +388,22 @@ with sync_playwright() as p:
     head = hcl.split('\n')
     assert head[0] == f"# Generated by Cloudonym — engine {VERSION['engine']} · rules {RULES}", head[:3]
     assert head[1].startswith('# PASS means') and head[2] == 'locals {', head[:3]
-    assert '  # gcp\n  gcp_project_id = "devops-payments-ledger-prd"\n  gcp_storage_bucket = "devops-payments-ledger-prd-bucket"\n  gcp_service_account_db = "payments-ledger-prd-sa-db"\n  gcp_compute_instance_01 = "payments-ledger-prd-kr-vm-01"\n  gcp_compute_instance_02 = "payments-ledger-prd-kr-vm-02"\n' in hcl, hcl
+    assert '  # gcp\n  gcp_project_id = "devops-payments-ledger-prod"\n  gcp_storage_bucket = "devops-payments-ledger-prod-gcs"\n  gcp_service_account_db = "payments-ledger-prod-sa-db"\n  gcp_compute_instance_01 = "payments-ledger-prod-euw1b-gce-01"\n  gcp_compute_instance_02 = "payments-ledger-prod-euw1b-gce-02"\n' in hcl, hcl
     assert '  gcp_labels = {\n' in hcl and 'INVALID' not in hcl and 'azure' not in hcl and 'aws' not in hcl, hcl
     page.click('[data-copy="names-json"]')
     names = json.loads(page.evaluate('navigator.clipboard.readText()'))
-    assert names['version'] == VERSION and names['provider'] == 'gcp' and names['context'] == INPUT, names
+    assert names['version'] == VERSION and names['provider'] == 'gcp' and names['context'] == {**{k: INPUT[k] for k in ('owner', 'system', 'purpose', 'env')}, 'region': 'euw1', 'zone': 'euw1b'}, names
     assert [n['key'] for n in names['names']] == ['project_id', 'storage_bucket', 'service_account_db', 'compute_instance_01', 'compute_instance_02'], names['names']
-    assert names['names'][3] == {'key': 'compute_instance_01', 'resource_type': 'compute_instance', 'seq': '01', 'scope': 'gcp:project', 'name': 'payments-ledger-prd-kr-vm-01'}, names['names'][3]
+    assert names['names'][3] == {'key': 'compute_instance_01', 'resource_type': 'compute_instance', 'seq': '01', 'scope': 'gcp:project', 'name': 'payments-ledger-prod-euw1b-gce-01'}, names['names'][3]
     assert names['invalid'] == [], names['invalid']
     expect(page.locator('[data-copy="all-names"]')).to_have_text('Copy all names')
     page.click('[data-copy="all-names"]')
-    assert page.evaluate('navigator.clipboard.readText()') == 'devops-payments-ledger-prd\ndevops-payments-ledger-prd-bucket\npayments-ledger-prd-sa-db\npayments-ledger-prd-kr-vm-01\npayments-ledger-prd-kr-vm-02'
+    assert page.evaluate('navigator.clipboard.readText()') == 'devops-payments-ledger-prod\ndevops-payments-ledger-prod-gcs\npayments-ledger-prod-sa-db\npayments-ledger-prod-euw1b-gce-01\npayments-ledger-prod-euw1b-gce-02'
     page.click('[data-copy="tags-json"]')
     copied_tags = json.loads(page.evaluate('navigator.clipboard.readText()'))
-    assert copied_tags == {'version': VERSION, 'labels': {'gcp': {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'environment': 'prd', 'managed_by': 'cloudonym'}}}, copied_tags
+    assert copied_tags == {'version': VERSION, 'labels': {'gcp': {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'environment': 'prod', 'managed_by': 'cloudonym'}}}, copied_tags
     page.click(f'{VM1} [data-copy="name:compute_instance_01"]')
-    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prd-kr-vm-01'
+    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prod-euw1b-gce-01'
     page.click('[data-copy="share-url"]')
     copied_url = page.evaluate('navigator.clipboard.readText()')
     assert copied_url == share_url, (copied_url, share_url)
@@ -348,45 +411,43 @@ with sync_playwright() as p:
     # ── ⑿ 검색 · 분류 칩 · 선택만 보기 ──
     search = page.locator('[data-tree-search]')
     search.fill('subnet')
-    # 검색 일치(displayName · type · slug · entity 소문자 부분 일치)를 펼친 전체 행에서 따로 계산해 화면과 맞춘다
-    hit = lambda r: 'subnet' in (r['type'] + ' ' + r['text'] + ' ' + r['entity']).lower()
-    want = sorted(r['type'] for r in ALL_ROWS if hit(r))
-    assert 'subnet' in want and len(want) < len(ALL_ROWS), want  # 공허하지 않다 — 일치가 있고 걸러지는 행도 있다
-    expect(tree_rows(page)).to_have_count(len(want))
-    assert sorted(visible_types(page)) == want, visible_types(page)  # 일치하는 행만 남고 그 조상은 펼친다
+    # 검색 일치(행 이름 · key · 규칙의 타입 · slug · entity · 별칭)는 화면 밖에서 다 알 수 없다 — 앵커 하나가 걸리고, 걸러지는 행이 있고, 걸린 행은 전부 보인다
+    want = sorted(page.eval_on_selector_all('[data-tree] [data-row]', 'els => els.map(e => e.dataset.row)'))
+    assert 'gcp.subnet' in want and len(want) < len(ALL_ROWS), want  # 공허하지 않다 — 일치가 있고 걸러지는 행도 있다
+    assert sorted(visible_rows(page)) == want, visible_rows(page)  # 일치하는 행만 남고 그 조상은 펼친다
     # 걸러진 동안에도 범위 머리(summary)를 누르면 접히고 다시 누르면 펼친다 — 늦게 오는 toggle 이벤트가 되돌리지 않는다
     page.locator('[data-tree] details[data-scope] > summary').first.click()
     page.wait_for_timeout(100)
     assert not page.eval_on_selector('[data-tree] details[data-scope]', 'e => e.open'), '걸러진 트리의 뿌리가 접히지 않았다'
-    assert visible_types(page) == [], visible_types(page)
+    assert visible_rows(page) == [], visible_rows(page)
     page.locator('[data-tree] details[data-scope] > summary').first.click()
     page.wait_for_timeout(100)
-    assert sorted(visible_types(page)) == want, visible_types(page)
+    assert sorted(visible_rows(page)) == want, visible_rows(page)
     search.fill('zzz-none')
     expect(page.locator('[data-search-empty]')).to_have_text('No resource matches. A resource missing from this list is not supported yet.')
     search.fill('')
-    # 분류 칩 — 누르면 그 분류의 행만 전부 보인다 · 칩의 수 = 그 수 · 앵커 둘이 들어 있다
-    net = sorted(r['type'] for r in ALL_ROWS if r['category'] == 'networking')
-    assert {'subnet', 'vpc_network'} <= set(net) and len(net) < len(ALL_ROWS), net
+    # 분류 칩 — 누르면 그 분류의 행만 전부 보인다 · 칩의 수 = 그 행 수 · 앵커 둘이 들어 있다
+    net = sorted(r['key'] for r in ALL_ROWS if r['category'] == 'networking')
+    assert {'gcp.subnet', 'gcp.vpc_network', 'gcp.address'} <= set(net) and len(net) < len(ALL_ROWS), net
     assert chip_count(page, 'networking') == len(net), (chip_count(page, 'networking'), net)
     page.click('button[data-category="networking"]')
     assert all(r['category'] == 'networking' for r in rows_info(page)), rows_info(page)
-    assert sorted(visible_types(page)) == net, visible_types(page)
+    assert sorted(visible_rows(page)) == net, visible_rows(page)
     page.click('button[data-category="all"]')
     page.check('[data-selected-only]')
-    assert visible_types(page) == ['project_id', 'storage_bucket', 'service_account', 'compute_instance'], visible_types(page)
+    assert visible_rows(page) == ['gcp.project_id', 'gcp.storage_bucket', 'gcp.service_account', 'gcp.compute_instance'], visible_rows(page)
     page.uncheck('[data-selected-only]')
-    expect(tree_rows(page)).to_have_count(len(GCP_TREE))
-    assert chip_count(page, 'all') == len(GCP_TREE), chip_count(page, 'all')
+    expect(tree_rows(page)).to_have_count(len(ALL_ROWS))
+    assert chip_count(page, 'all') == len(ALL_ROWS), chip_count(page, 'all')
     # 검색을 지우면 필터 전 펼침으로 돌아간다 — 걸러진 동안 접고 편 것은 거르지 않은 보기에 남지 않는다
     assert page.eval_on_selector('[data-tree] details[data-scope]', 'e => e.open')
-    page.click('[data-collapse-all]')  # 뿌리만 열어 두고 분류 묶음은 전부 접는다 — 깊이 0 의 규칙 중 묶음 밖 것만 보인다
-    roots = sorted(t for t, d in GCP_TREE if d == 0)
-    assert {'project_id', 'storage_bucket'} <= set(roots) and len(roots) < len(GCP_TREE), roots
+    page.click('[data-collapse-all]')  # 뿌리만 열어 두고 분류 묶음은 전부 접는다 — 깊이 0 의 행 중 묶음 밖 것만 보인다
+    roots = sorted(r['key'] for r in ALL_ROWS if r['depth'] == 0)
+    assert {'gcp.project_id', 'gcp.storage_bucket'} <= set(roots) and len(roots) < len(ALL_ROWS), roots
     groups = page.eval_on_selector_all('[data-tree] details[data-group]', 'els => els.map(e => e.open)')
     assert len(groups) > 0 and not any(groups), groups  # 공허하지 않다 — 묶음이 있고 전부 닫혔다
-    in_group = page.eval_on_selector_all('[data-tree] details[data-group] [data-rule]', 'els => els.map(e => e.dataset.type)')
-    assert sorted(visible_types(page)) == sorted(t for t in roots if t not in in_group), (visible_types(page), roots, in_group)
+    in_group = page.eval_on_selector_all('[data-tree] details[data-group] [data-row]', 'els => els.map(e => e.dataset.row)')
+    assert sorted(visible_rows(page)) == sorted(k for k in roots if k not in in_group), (visible_rows(page), roots, in_group)
     page.click('[data-expand-all]')
 
     # ── ⑿-2 걸러진 동안에도 모두 펼치기 · 모두 접기 · summary · 키보드가 걸러진 보기 안에서 돈다. 필터를 지우면 필터 전 펼침 ──
@@ -413,7 +474,7 @@ with sync_playwright() as p:
     def header_counts_match():
         """범위 머리 (n) = 그 범위 안의 걸러진 행 수 — 접힌 범위도 몇 개가 걸렸는지 보인다"""
         pairs = page.eval_on_selector_all('[data-tree] details[data-scope]',
-                                          'els => els.map(e => [e.querySelector(":scope > summary").textContent, e.querySelectorAll("[data-rule]").length])')
+                                          'els => els.map(e => [e.querySelector(":scope > summary").textContent, e.querySelectorAll("[data-row]").length])')
         assert pairs and all(t.rstrip().endswith(f'({n})') for t, n in pairs), pairs
 
     # 필터 전 펼침을 기본과 다르게 만든다 — 모두 접기 뒤 Project 하나만 연다(복원을 재는 시험이 공허하지 않게)
@@ -422,7 +483,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(100)
     before = open_map()
     assert before['gcp:project'] and not before['gcp:project_region'], before
-    for q in ('subnet', 'address'):
+    for q in ('subnet', 'policy'):
         search.fill(q)
         n_all = len(open_map())
         assert n_all >= 3, (q, open_map())  # 공허하지 않다 — 걸러진 보기에도 접을 범위가 있다
@@ -430,12 +491,15 @@ with sync_playwright() as p:
         header_counts_match()
         page.click('[data-collapse-all]')
         settled(open_count, 1, f'{q} 모두 접기 — 뿌리만 남는다')
-        assert visible_types(page) == [], visible_types(page)
+        # 보이는 행은 뿌리(깊이 0)에 바로 놓이고 분류 묶음 밖인 걸린 행뿐이다
+        at_root = page.eval_on_selector_all('[data-tree] [data-row]', 'els => els.filter(e => !e.closest("details[data-group]") && !e.parentElement.closest("details[data-scope]").parentElement.closest("details[data-scope]")).map(e => e.dataset.row)')
+        assert sorted(visible_rows(page)) == sorted(at_root), (visible_rows(page), at_root)
+        assert len(visible_rows(page)) < page.locator('[data-tree] [data-row]').count(), q  # 공허하지 않다 — 접혀 숨은 행이 있다
         header_counts_match()
         ax_matches_dom()
         page.click('[data-expand-all]')
         settled(open_count, n_all, f'{q} 모두 펼치기')
-        assert visible_types(page), visible_types(page)
+        assert visible_rows(page), visible_rows(page)
         ax_matches_dom()
     # 키보드 — summary 에 초점을 두고 Enter 로 접고 Space 로 편다 · 접힌 범위 머리에 걸린 수가 남는다
     deep = page.locator('[data-tree] details[data-scope]').last
@@ -469,10 +533,9 @@ with sync_playwright() as p:
     page2.on('pageerror', lambda e: errors.append(str(e)))
     sent2 = events_of(page2)
     goto_ready(page2, copied_url)
-    for key, val in INPUT.items():
-        expect(page2.locator(f'#field-{key}')).to_have_value(val)
+    expect_ctx(page2, INPUT)
     expect(page2.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page2.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
+    expect(page2.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
     expect(page2.locator('article[data-key]')).to_have_count(5)
     page2.wait_for_timeout(1300)
     assert sent2 == ['ui_visit'], f'복원 로드는 ui_visit 1회뿐이어야 한다(첫 화면은 ui_generate 를 세지 않는다): {sent2}'
@@ -483,10 +546,9 @@ with sync_playwright() as p:
     generated_before = sent.count('ui_generate')
     other_hash = state_hash(OTHER, RULES, 'gcp', {'compute_instance': 3})
     page.evaluate('h => { location.hash = h; }', other_hash)
-    for key, val in OTHER.items():
-        expect(page.locator(f'#field-{key}')).to_have_value(val)
+    expect_ctx(page, OTHER)
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('billing-batch-stg-jp-vm-03')
+    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('billing-batch-stg-ane1c-gce-03')
     page.wait_for_timeout(1300)
     assert sent.count('ui_generate') == generated_before, f'hash 이동 복원이 ui_generate 를 셌다: {sent}'
     assert page.evaluate('location.hash') == other_hash, (page.evaluate('location.hash'), other_hash)
@@ -494,7 +556,7 @@ with sync_playwright() as p:
     page.wait_for_function('h => location.hash === h', arg=other_hash)
     expect(page.locator('#field-owner')).to_have_value(OTHER['owner'])
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
-    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
 
     # ── ⑺ 자유 입력은 64자에서 멈춘다 · 라벨 한도 위반(GCP 라벨 값 63자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 ──
     page.evaluate('h => { location.hash = h; }', other_hash)
@@ -510,7 +572,7 @@ with sync_playwright() as p:
     expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
     expect(page.locator('[data-json-blocked]')).to_have_count(0)
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
-    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
 
     # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — 켜진 CSP(GCP)가 자동 선택 ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
@@ -523,7 +585,7 @@ with sync_playwright() as p:
         expect(page3.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
         expect(page3.locator('[data-pick-cloud]')).to_have_count(0)
         # 깨진 hash 는 기본 상태의 hash 로 바뀐다 — 다시 공유해도 깨진 값이 퍼지지 않는다
-        assert hash_state(page3.evaluate('location.hash')) == {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prd', 'region': 'kr', 'v': RULES, 'p': 'gcp'}, page3.evaluate('location.hash')
+        assert hash_state(page3.evaluate('location.hash')) == {**DEFAULT, 'v': RULES, 'p': 'gcp'}, page3.evaluate('location.hash')
         ctx3.close()
 
     # ── ⑷ 정제 뒤 빈 토큰 → FAIL 카드 · 복사 버튼 비활성 · 내보내기 셋에서 빠진다 ──
@@ -578,7 +640,7 @@ with sync_playwright() as p:
     page4 = dark.new_page()
     page4.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(page4, share_url)
-    expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prd-kr-vm-01')
+    expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
     bg = page4.evaluate('getComputedStyle(document.body).backgroundColor')
     assert bg not in ('rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)'), f'다크 모드 배경이 아니다: {bg}'
     expect(page4.locator('[data-share-warning]')).to_be_visible()
@@ -595,8 +657,7 @@ with sync_playwright() as p:
     goto_ready(page8, BASE + '/' + old_hash)
     notice = page8.locator('[data-rules-mismatch]')
     expect(notice).to_have_text(f'This link was made with rules {OLD_RULES}; the current rules are {RULES}. Names may differ.')
-    for key, val in INPUT.items():
-        expect(page8.locator(f'#field-{key}')).to_have_value(val)
+    expect_ctx(page8, INPUT)
     page8.wait_for_timeout(300)
     assert page8.evaluate('location.hash') == old_hash, page8.evaluate('location.hash')
     page8.reload(wait_until='networkidle')
@@ -616,8 +677,7 @@ with sync_playwright() as p:
     other_old = state_hash(OTHER, OLD_RULES)
     page8.evaluate('h => { location.hash = h; }', other_old)
     expect(notice).to_be_visible()
-    for key, val in OTHER.items():
-        expect(page8.locator(f'#field-{key}')).to_have_value(val)
+    expect_ctx(page8, OTHER)
     page8.wait_for_timeout(300)
     assert page8.evaluate('location.hash') == other_old, page8.evaluate('location.hash')
     page8.fill('#field-purpose', 'ledger')
@@ -627,8 +687,7 @@ with sync_playwright() as p:
     v1_hash = state_hash(INPUT)
     goto_ready(page8, BASE + '/?' + v1_hash)  # 경로를 바꿔 새로 불러온다
     goto_ready(page8, BASE + '/' + v1_hash)
-    for key, val in INPUT.items():
-        expect(page8.locator(f'#field-{key}')).to_have_value(val)
+    expect_ctx(page8, INPUT)
     expect(page8.locator('[role="radio"][aria-checked="true"]')).to_have_count(1)
     expect(page8.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(page8.locator('[data-tree]')).to_have_count(1)
@@ -695,16 +754,16 @@ with sync_playwright() as p:
       for (let i = 0; i < boxes.length - 1; i++) {
         if (boxes[i].disabled || !boxes[i + 1].disabled) continue;
         const j = boxes.findIndex((b, k) => k > i && !b.disabled);
-        if (j > 0) return { from: boxes[i].closest('[data-rule]').dataset.type, to: boxes[j].closest('[data-rule]').dataset.type, skipped: j - i - 1 };
+        if (j > 0) return { from: boxes[i].closest('[data-row]').dataset.type, to: boxes[j].closest('[data-row]').dataset.type, skipped: j - i - 1 };
       }
       return null;
     }''')
     assert plan and plan['skipped'] > 0, plan
     row(page19, plan['from']).locator('input[data-row-check]').focus()
     page19.keyboard.press('ArrowDown')
-    assert page19.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == plan['to'], plan
+    assert page19.evaluate("document.activeElement.closest('[data-row]')?.dataset.type") == plan['to'], plan
     page19.keyboard.press('ArrowUp')
-    assert page19.evaluate("document.activeElement.closest('[data-rule]')?.dataset.type") == plan['from'], plan
+    assert page19.evaluate("document.activeElement.closest('[data-row]')?.dataset.type") == plan['from'], plan
     ctx19.close()
 
     # ── ⒃ 충돌 fixture(시험 전용 규칙 둘 · ?fixture=conflict) → 두 카드 FAIL · 충돌 줄 · Copy all names 의 skipped 수 (D41) ──
@@ -723,27 +782,257 @@ with sync_playwright() as p:
     expect(page16.locator('[data-names-summary]')).to_have_text('3 resources · 3 names · 1/3 PASS')
     ctx16.close()
 
-    # ── ⒇ 꺼진 CSP(Azure) 로 만든 링크 → GCP 로 열리고 선택은 비운다 · 문맥은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
+    # ── ⒇~㉖ 행 · 범위 · 종류 · (i) · 표지 · 존 가드 · 지역 콤보박스 (D49 · D50 · D53 · D54) ──
+    # 이름 기대값은 화면 밖(/v1/names — 같은 엔진)에서 받는다. 화면 출력을 베끼지 않는다
+    ctxR = browser.new_context(viewport={'width': 1280, 'height': 900})
+    ctxR.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
+    pr = ctxR.new_page()
+    pr.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(pr, BASE + '/' + state_hash(INPUT, RULES, 'gcp'))
+    expect_ctx(pr, INPUT)
+    pr.click('[data-expand-all]')
+
+    def api(resources, region=INPUT['region']):
+        res = pr.request.post(BASE + '/v1/names', data={'provider': 'gcp', 'context': {**INPUT, 'region': region}, 'resources': resources})
+        assert res.ok, res.text()
+        return {i['key']: i for i in res.json()['data']['gcp']['items']}
+
+    def card(key):
+        return pr.locator(f'article[data-key="{key}"]')
+
+    def wait_for(fn, want_value, label):
+        """주소창 hash 는 렌더 뒤에 쓰인다 — 3초 안에 기대값이 되는지 본다"""
+        deadline = time.time() + 3
+        while fn() != want_value:
+            assert time.time() < deadline, (label, fn(), want_value)
+            pr.wait_for_timeout(50)
+
+    r_of = lambda: hash_state(pr.url).get('r')
+
+    # ⒇ 범위 고르기 — IP Address 는 Region · Global 두 규칙을 한 행에 묶는다. 고르기 전 체크 불가 · 고르면 그 규칙 · 바꾸면 hash r 의 키가 바뀐다
+    ip = row_key(pr, 'gcp.address')
+    ip_box = ip.locator('input[data-row-check]')
+    expect(ip_box).to_be_disabled()
+    expect(ip.locator('[data-scope-required]')).to_have_text('Choose a scope to select IP Address')
+    expect(ip_box).to_have_attribute('aria-describedby', ip.locator('[data-scope-required]').get_attribute('id'))
+    assert ip.get_attribute('data-type') is None
+    assert ip.locator('[data-scope-select] option').evaluate_all('es => es.map(e => [e.value, e.text, e.disabled])') == [
+        ['', 'scope…', True], ['gcp:project_region', 'Region', False], ['gcp:project_global', 'Global', False]]
+    expect(ip.locator('[data-kind-select]')).to_have_count(0)  # 종류 목록은 고른 범위의 규칙에서 나온다 — 범위 전에는 없다
+    ip_box.click(force=True)  # 꺼진 상자는 눌러도 고르지 않는다
+    expect(pr.locator('[data-selected-count]')).to_have_text('0 selected')
+    ip.locator('[data-scope-select]').select_option('gcp:project_global')
+    expect(ip).to_have_attribute('data-type', 'global_address')
+    expect(ip_box).to_be_enabled()
+    expect(ip.locator('[data-scope-required]')).to_have_count(0)
+    ip_box.check()
+    want = api([{'type': 'global_address'}])
+    expect(card('global_address_01').locator('[data-name]')).to_have_text(want['global_address_01']['name'])
+    expect(card('global_address_01').locator('h4')).to_have_text('IP Address · 01')
+    wait_for(r_of, {'global_address': 1}, '전역 범위')
+    ip.locator('[data-scope-select]').select_option('gcp:project_region')
+    expect(ip).to_have_attribute('data-type', 'address')
+    expect(ip_box).to_be_checked()  # 범위를 바꿔도 선택은 남는다 — 키만 옮긴다
+    expect(card('global_address_01')).to_have_count(0)
+    want = api([{'type': 'address'}])
+    expect(card('address_01').locator('[data-name]')).to_have_text(want['address_01']['name'])
+    assert want['address_01']['name'].endswith('-euw1-ip-01'), want  # 리전 규칙이라 지역 토큰이 붙는다 — 전역 이름과 다르다
+    wait_for(r_of, {'address': 1}, '리전 범위')
+
+    # ㉑ 종류 고르기 → 이름 — 기본값(EXTERNAL)은 토큰이 없고 INTERNAL 을 고르면 카드 · 이름 · hash 에 종류가 붙는다
+    kind = ip.locator('[data-kind-select]')
+    expect(kind).to_have_value('')
+    assert kind.locator('option').first.inner_text() == 'default (EXTERNAL)', kind.locator('option').all_inner_texts()
+    assert 'INTERNAL' in kind.locator('option').all_inner_texts(), kind.locator('option').all_inner_texts()
+    kind.select_option('INTERNAL')
+    want = api([{'type': 'address', 'kind': 'INTERNAL'}])
+    assert '-ip-int-' in want['address_01']['name'], want
+    expect(card('address_01').locator('[data-name]')).to_have_text(want['address_01']['name'])
+    expect(card('address_01').locator('h4')).to_have_text('IP Address · int · 01')
+    wait_for(r_of, {'address': '1:INTERNAL'}, '종류')
+    pr.click('[data-copy="names-json"]')
+    exported = {n['key']: n for n in json.loads(pr.evaluate('navigator.clipboard.readText()'))['names']}
+    assert exported['address_01'].get('kind') == 'INTERNAL' and exported['address_01']['name'] == want['address_01']['name'], exported
+    # 범위를 바꿔 고른 종류가 새 범위에 없으면 버리고 한 줄 안내 — NEG 존 범위의 GCE_VM_IP 는 전역 범위에 없다
+    neg = row_key(pr, 'gcp.network_endpoint_group')
+    neg.locator('[data-scope-select]').select_option('gcp:project_zone')
+    neg.locator('[data-kind-select]').select_option('GCE_VM_IP')
+    neg.locator('input[data-row-check]').check()
+    neg.locator('[data-scope-select]').select_option('gcp:project_global')
+    expect(neg.locator('[data-kind-dropped]')).to_have_text('Kind GCE_VM_IP does not exist at Global scope; it was cleared.')
+    assert 'GCE_VM_IP' not in neg.locator('[data-kind-select] option').all_inner_texts(), neg.locator('[data-kind-select] option').all_inner_texts()
+    expect(neg.locator('[data-kind-select]')).to_have_value('')
+    neg.locator('input[data-row-check]').uncheck()
+
+    # ㉒ 종류가 필수인 행(Resource Policy) — 종류를 고르기 전 체크 불가 · 고르면 체크되고 이름에 종류 토큰
+    rp = row_key(pr, 'gcp.resource_policy')
+    rp_box = rp.locator('input[data-row-check]')
+    expect(rp_box).to_be_disabled()
+    expect(rp.locator('[data-kind-required]')).to_have_text('Choose a kind to select Resource Policy')
+    first = rp.locator('[data-kind-select] option').first
+    assert (first.get_attribute('value'), first.inner_text(), first.evaluate('e => e.disabled')) == ('', 'choose…', True)
+    rp_box.click(force=True)
+    expect(rp_box).not_to_be_checked()
+    expect(card('resource_policy_01')).to_have_count(0)
+    rp.locator('[data-kind-select]').select_option('snapshot-schedule')
+    expect(rp_box).to_be_enabled()
+    expect(rp.locator('[data-kind-required]')).to_have_count(0)
+    rp_box.check()
+    want = api([{'type': 'resource_policy', 'kind': 'snapshot-schedule'}])
+    expect(card('resource_policy_01').locator('[data-name]')).to_have_text(want['resource_policy_01']['name'])
+    expect(card('resource_policy_01').locator('h4')).to_have_text('Resource Policy · snap · 01')
+    wait_for(r_of, {'address': '1:INTERNAL', 'resource_policy': '1:snapshot-schedule'}, '필수 종류')
+
+    # ㉓ (i) 펼침 — 버튼 aria-expanded · 펼친 뒤에만 aria-controls · 설명 한 줄과 입력 위치
+    vmr = row_key(pr, 'gcp.compute_instance')
+    tog = vmr.locator('[data-info-toggle]')
+    expect(tog).to_have_attribute('aria-label', 'About VM Instance')
+    expect(tog).to_have_attribute('aria-expanded', 'false')
+    assert tog.get_attribute('aria-controls') is None
+    expect(vmr.locator('[data-info]')).to_have_count(0)
+    tog.click()
+    expect(tog).to_have_attribute('aria-expanded', 'true')
+    expect(tog).to_have_attribute('aria-controls', vmr.locator('[data-info]').get_attribute('id'))
+    expect(vmr.locator('[data-info]')).to_contain_text('A Compute Engine virtual machine')
+    expect(vmr.locator('[data-enter-name-at]')).to_have_text('Enter the name at: gcloud compute instances create · google_compute_instance.name')
+    tog.focus()
+    pr.keyboard.press('Enter')  # 키보드로도 접힌다
+    expect(tog).to_have_attribute('aria-expanded', 'false')
+    expect(vmr.locator('[data-info]')).to_have_count(0)
+
+    # ㉔ 표지 칩 · 「API only」 거르기 칩 — 기본은 꺼져 있고 그 행도 접지 않고 보인다. 켜면 그 행만 남는다
+    chip = pr.locator('[data-api-only-filter]')
+    api_rows = sorted(pr.eval_on_selector_all('[data-tree] [data-row]:has([data-badge="api-only"])', 'els => els.map(e => e.dataset.row)'))
+    assert len(api_rows) == 3, api_rows
+    expect(chip).to_have_text(f'API only ({len(api_rows)})')
+    expect(chip).to_have_attribute('aria-pressed', 'false')
+    assert set(api_rows) <= set(visible_rows(pr)), visible_rows(pr)
+    badge = row_key(pr, api_rows[0]).locator('[data-badge="api-only"]')
+    expect(badge).to_have_text('API only')
+    expect(badge).to_have_attribute('title', 'No gcloud command or Terraform resource — create it through the API')
+    expect(pr.locator('[data-badge="preview"]').first).to_have_text('Preview')
+    n_rows = len(visible_rows(pr))
+    chip.click()
+    expect(chip).to_have_attribute('aria-pressed', 'true')
+    assert sorted(visible_rows(pr)) == api_rows, visible_rows(pr)
+    chip.click()
+    expect(chip).to_have_attribute('aria-pressed', 'false')
+    assert len(visible_rows(pr)) == n_rows, (len(visible_rows(pr)), n_rows)
+
+    # ㉕ 존 가드 — 존이 없으면 고르지 않은 존 행은 체크 불가 + 안내 · 존을 고르면 체크할 수 있다
+    disk = row_key(pr, 'gcp.disk')
+    disk_box = disk.locator('input[data-row-check]')
+    disk.locator('[data-scope-select]').select_option('gcp:project_zone')
+    expect(disk_box).to_be_enabled()
+    pr.select_option('#field-zone', '')
+    wait_for(lambda: hash_state(pr.url)['region'], 'euw1', '존 none → 리전 코드')
+    expect(pr.locator('[data-zone-hint]')).to_have_text('Zonal resources (VMs, disks) need a zone')
+    expect(disk_box).to_be_disabled()
+    expect(disk.locator('[data-zone-required]')).to_have_text('Pick a zone in ② to name zonal resources')
+    expect(disk_box).to_have_attribute('aria-describedby', disk.locator('[data-zone-required]').get_attribute('id'))
+    expect(row_key(pr, 'gcp.compute_instance').locator('input[data-row-check]')).to_be_disabled()  # 단일 존 행도 같다
+    pr.select_option('#field-zone', 'europe-west1-c')
+    expect(disk_box).to_be_enabled()
+    expect(disk.locator('[data-zone-required]')).to_have_count(0)
+    expect(pr.locator('[data-zone-hint]')).to_have_count(0)
+    pr.select_option('#field-zone', 'europe-west1-b')
+
+    # ㉕-2 VM 2 를 고른 뒤 존을 none 으로 → 선택 유지 · 카드 둘 FAIL(name.zone_required) · 존을 다시 고르면 PASS · 체크 해제는 된다
+    vm_box = vmr.locator('input[data-row-check]')
+    vm_box.check()
+    vmr.locator('[data-inc]').click()
+    expect(vmr.locator('[data-count]')).to_have_text('2')
+    want = api([{'type': 'compute_instance', 'count': 2}])
+    for k in ('compute_instance_01', 'compute_instance_02'):
+        expect(card(k)).to_have_attribute('data-valid', 'true')
+        expect(card(k).locator('[data-name]')).to_have_text(want[k]['name'])
+    pr.select_option('#field-zone', '')
+    no_zone = api([{'type': 'compute_instance', 'count': 2}], region='euw1')
+    assert all(no_zone[k]['violations'][0]['code'] == 'name.zone_required' for k in ('compute_instance_01', 'compute_instance_02')), no_zone
+    expect(vm_box).to_be_checked()
+    expect(vm_box).to_be_enabled()  # 고른 행은 체크 해제만 된다
+    expect(vmr.locator('[data-zone-required]')).to_have_text('Pick a zone in ② to name zonal resources')
+    expect(vmr.locator('[data-count]')).to_have_text('2')
+    for k in ('compute_instance_01', 'compute_instance_02'):
+        expect(card(k)).to_have_attribute('data-valid', 'false')
+        expect(card(k).locator('[data-violations]')).to_contain_text("This resource is zonal: put a zone (zone name or zone code), not a region, in region (got 'euw1')")
+        expect(card(k).locator('button[data-copy]')).to_be_disabled()
+    pr.click('[data-copy="names-json"]')
+    inv = json.loads(pr.evaluate('navigator.clipboard.readText()'))['invalid']
+    assert {'key': 'compute_instance_01', 'codes': ['name.zone_required']} in inv and {'key': 'compute_instance_02', 'codes': ['name.zone_required']} in inv, inv
+    pr.select_option('#field-zone', 'europe-west1-b')
+    for k in ('compute_instance_01', 'compute_instance_02'):
+        expect(card(k)).to_have_attribute('data-valid', 'true')
+        expect(card(k).locator('[data-name]')).to_have_text(want[k]['name'])
+    expect(vmr.locator('[data-zone-required]')).to_have_count(0)
+    pr.select_option('#field-zone', '')
+    expect(card('compute_instance_01')).to_have_attribute('data-valid', 'false')
+    vm_box.uncheck()
+    expect(vm_box).not_to_be_checked()
+    expect(card('compute_instance_01')).to_have_count(0)
+    expect(vm_box).to_be_disabled()  # 끈 뒤에는 존이 없어 다시 고를 수 없다
+    pr.select_option('#field-zone', 'europe-west1-b')
+    expect(vm_box).to_be_enabled()
+
+    # ㉖ 지역 콤보박스 — 열기 · 리전 이름 · 위치 · 코드로 거르기 · 없음 안내 · Escape 는 검색어를 버린다 · 방향키 + Enter 로 고르면 같은 글자의 존을 잇는다
+    region_box = pr.locator('#field-region')
+    listbox = pr.locator('[role="listbox"]')
+    expect(region_box).to_have_attribute('aria-expanded', 'false')
+    expect(listbox).to_be_hidden()
+    region_box.click()
+    expect(region_box).to_have_attribute('aria-expanded', 'true')
+    expect(listbox).to_be_visible()
+    all_opts = pr.eval_on_selector_all('[data-region-option]', 'els => els.map(e => e.dataset.regionOption)')
+    assert len(all_opts) == 44 and 'global' in all_opts and len(set(all_opts)) == 44, all_opts  # GCP 리전 43 + global
+    opt_text = lambda: [' '.join(t.split()) for t in pr.locator('[data-region-option]').all_inner_texts()]
+    region_box.fill('tokyo')  # 위치
+    assert opt_text() == ['asia-northeast1 — Tokyo, Japan · ane1'], opt_text()
+    region_box.fill('ane3')  # 코드
+    assert opt_text() == ['asia-northeast3 — Seoul, South Korea · ane3'], opt_text()  # 대륙 꼬리 없이
+    region_box.fill('zzz-none')
+    expect(pr.locator('[data-region-empty]')).to_have_text('No region matches — type a region name, a city or a code')
+    pr.keyboard.press('Escape')
+    expect(region_box).to_have_attribute('aria-expanded', 'false')
+    expect(region_box).to_have_value('europe-west1')
+    expect(pr.locator('#field-zone')).to_have_value('europe-west1-b')
+    region_box.fill('asia-northeast')  # 리전 이름
+    names_shown = pr.eval_on_selector_all('[data-region-option]', 'els => els.map(e => e.dataset.regionOption)')
+    assert len(names_shown) >= 2 and all(v.startswith('asia-northeast') for v in names_shown), names_shown
+    pr.keyboard.press('ArrowDown')
+    expect(region_box).to_have_attribute('aria-activedescendant', pr.locator(f'[data-region-option="{names_shown[1]}"]').get_attribute('id'))
+    pr.keyboard.press('Enter')
+    expect(region_box).to_have_attribute('aria-expanded', 'false')
+    expect(region_box).to_have_value(names_shown[1])
+    expect(pr.locator('#field-zone')).to_have_value(names_shown[1] + '-b')  # europe-west1-b 의 b 를 잇는다
+    wait_for(lambda: hash_state(pr.url)['region'], {'asia-northeast2': 'ane2b', 'asia-northeast3': 'ane3b'}.get(names_shown[1]), '콤보박스로 고른 지역')
+    region_box.fill('seoul')
+    pr.keyboard.press('Enter')
+    expect(region_box).to_have_value('asia-northeast3')
+    expect(pr.locator('[data-region-summary]')).to_have_text('Seoul, South Korea · ane3b')
+    no_hangul(pr)
+    ctxR.close()
+
+    # ── ㉙ 꺼진 CSP(Azure) 로 만든 링크 → GCP 로 열리고 지역은 예시로 · 선택은 비운다 · 자유 입력 셋과 환경은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
     ctx20 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page20 = ctx20.new_page()
     page20.on('pageerror', lambda e: errors.append(str(e)))
-    az_link = state_hash(INPUT, RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})
+    az_link = state_hash({**INPUT, 'region': 'koreacentral'}, RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})  # Azure 가 풀 수 있는 지역이라야 이 분기다
     goto_ready(page20, BASE + '/' + az_link)
     expect(page20.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(page20.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'false')
-    expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the selection was cleared.')
+    expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the region was reset to the example and the selection was cleared.')
     expect(page20.locator('[data-selection-dropped]')).to_have_count(0)  # 안내는 한 줄 — 버린 선택은 위 문장이 말한다
-    for key, val in INPUT.items():  # 지역 칸을 포함해 문맥은 그대로
-        expect(page20.locator(f'#field-{key}')).to_have_value(val)
+    reset = {**INPUT, 'region': DEFAULT['region']}
+    expect_ctx(page20, reset)  # 자유 입력 셋 · 환경은 링크 그대로, 지역은 예시 asia-northeast3-a
     expect(page20.locator('[data-selected-count]')).to_have_text('0 selected')
     expect(page20.locator('article[data-key]')).to_have_count(0)
     no_hangul(page20)
     check(page20, 'project_id')
     expect(page20.locator('[data-provider-unavailable]')).to_have_count(0)
     page20.wait_for_function('h => location.hash !== h', arg=az_link)
-    assert hash_state(page20.url) == {**INPUT, 'v': RULES, 'p': 'gcp', 'r': {'project_id': 1}}, hash_state(page20.url)
+    assert hash_state(page20.url) == {**reset, 'v': RULES, 'p': 'gcp', 'r': {'project_id': 1}}, hash_state(page20.url)
     ctx20.close()
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒇ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ · ⒇~㉖ · ㉕-2 · ㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

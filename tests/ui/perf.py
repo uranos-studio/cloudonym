@@ -4,12 +4,12 @@
 패스 ② 실제 규칙 — fixture 없이 켜진 CSP(화면 ① 에서 고를 수 있는 것) 중 트리 행이 가장 많은 CSP. 행 수는 적어 두지 않고 그 자리에서 잰다(규칙은 늘어난다).
 켜진 CSP 는 화면의 버튼(꺼진 것은 disabled)에서 읽는다 — 꺼진 CSP 링크는 화면이 켜진 CSP 로 바꿔 열기 때문이다(D45 · D55).
 조건: 헤드리스 Chromium · 이 기계 · Vite dev 서버(React 개발 빌드) · 항목마다 새로 불러온 페이지에서 5회 · 중앙값.
-먼저 `[data-tree] [data-rule]` 이 기대한 행 수인지 단언한 뒤 잰다(공허한 측정을 막는다).
+먼저 `[data-tree] [data-row]` 이 기대한 행 수인지 단언한 뒤 잰다(공허한 측정을 막는다).
   ⑴ 첫 그리기 — 탐색 시작 → 트리 행 N 개가 DOM 에 생긴 시각 (performance.now 원점 = 탐색 시작)
   ⑵ 검색 한 글자 — 입력 → 걸러진 행이 반영된 첫 프레임
   ⑶ 전부 펼치기 — 「Expand all」 → N 행이 모두 보이는 첫 프레임
   ⑷ 이름 200개(상한까지) 선택 뒤 문맥 한 글자 수정 — 입력 → 카드 이름이 바뀐 첫 프레임
-     fixture 는 앞 200개를 hash 로 고른다. 실제 규칙은 펼친 트리에서 상한에 닿을 때까지 체크해 그 hash 를 잡아 쓴다
+     fixture 는 앞 200개를 hash 로 고른다. 실제 규칙은 펼친 트리에서 체크할 수 있는 행을 다 체크하고 개수 +1 로 상한까지 채워 그 hash 를 잡아 쓴다
 허용치는 1,000 · 100 · 500 · 200 ms — 어느 패스든 중앙값이 하나라도 넘으면 JSON 을 적은 뒤 exit 1 이다.
 `CLOUDONYM_PERF_SCALE`(기본 1)을 곱해 허용치를 줄이면 검사기가 실제로 실패하는지 볼 수 있다(예: 0.001).
 
@@ -26,7 +26,8 @@ from playwright.sync_api import sync_playwright
 
 BASE = sys.argv[1].rstrip('/')
 RUNS = 5
-CTX = {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prd', 'region': 'kr'}
+# 첫 화면의 예시와 같다(R0) — region 은 hash 꼴(존 코드)이라 존 행도 이름이 나온다
+CTX = {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prod', 'region': 'ane3a'}
 SCALE = float(os.environ.get('CLOUDONYM_PERF_SCALE', '1'))
 LIMITS = {k: v * SCALE for k, v in {'first_render': 1000, 'search_one_char': 100, 'expand_all': 500, 'context_edit_200_names': 200}.items()}
 
@@ -45,7 +46,7 @@ SELECT_200 = {f'fx500_{i:03d}': ('sync' if i % 4 == 2 else 1) for i in range(200
 # 행 수 N 은 탐색마다 window.__rowsWant 로 넘긴다(init script 는 페이지마다 다시 돈다)
 WATCH_ROWS = '''new MutationObserver((_, obs) => {
   const want = Number(sessionStorage.getItem('__rowsWant') || 0);
-  if (want > 0 && document.querySelectorAll('[data-tree] [data-rule]').length >= want) { window.__tRows = performance.now(); obs.disconnect(); }
+  if (want > 0 && document.querySelectorAll('[data-tree] [data-row]').length >= want) { window.__tRows = performance.now(); obs.disconnect(); }
 }).observe(document, { childList: true, subtree: true });'''
 
 # 입력 → 조건이 처음 참인 프레임까지. React 의 제어 입력은 네이티브 setter + input 이벤트로 바꾼다
@@ -77,9 +78,17 @@ SELECT_TO_CAP = '''async () => {
     box.click();
     await new Promise((r) => setTimeout(r, 0));
   }
+  // 체크만으로는 상한에 못 닿는다(범위를 고르지 않은 합친 행은 체크할 수 없다) — 개수 +1 을 상한까지 누른다
+  for (;;) {
+    const inc = [...document.querySelectorAll('[data-tree] [data-inc]')].find((b) => !b.disabled);
+    if (!inc) break;
+    inc.click();
+    await new Promise((r) => setTimeout(r, 0));
+  }
   return location.hash;
 }'''
-ROWS = "document.querySelectorAll('[data-tree] [data-rule]')"
+# 트리의 행은 catalog 행 하나가 한 줄이다(합친 행은 범위를 고르기 전 data-rule 이 없다) — 행 수는 [data-row] 로 센다
+ROWS = "document.querySelectorAll('[data-tree] [data-row]')"
 CARDS = "document.querySelectorAll('article[data-key]')"
 
 
@@ -87,7 +96,7 @@ def open_page(page, url, rows):
     page.evaluate('n => sessionStorage.setItem("__rowsWant", String(n))', rows)
     page.goto(url, wait_until='load')
     page.wait_for_function('window.__tRows !== undefined')
-    assert page.locator('[data-tree] [data-rule]').count() == rows
+    assert page.locator('[data-tree] [data-row]').count() == rows
 
 
 def measure(page, query, provider, rows, selected_hash):
@@ -101,7 +110,7 @@ def measure(page, query, provider, rows, selected_hash):
         # ⑵ 검색 한 글자 — 「7」 이 든 행만 남는다(fixture) · 실제 규칙은 「a」
         ch = '7' if query else 'a'
         res['search_one_char'].append(page.evaluate(TIME_INPUT, ['[data-tree-search]', ch, f'return {ROWS}.length > 0 && {ROWS}.length < {rows}']))
-        n = page.locator('[data-tree] [data-rule]').count()
+        n = page.locator('[data-tree] [data-row]').count()
         assert 0 < n < rows, n
 
     for i in range(RUNS):
@@ -150,7 +159,7 @@ with sync_playwright() as p:
     assert enabled, '켜진 CSP 가 없다'
     for prov in enabled:
         page.goto(BASE + f'/?size={prov}' + state_hash(prov), wait_until='networkidle')
-        sizes[prov] = page.locator('[data-tree] [data-rule]').count()
+        sizes[prov] = page.locator('[data-tree] [data-row]').count()
     prov = max(sizes, key=sizes.get)
     rows = sizes[prov]
     assert rows > 0 and rows != 500, sizes
