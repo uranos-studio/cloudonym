@@ -74,8 +74,11 @@ code="$(fetch GET /)"
 if expect_status "${name}" "${code}" 200; then
   ctype="$(header content-type)"
   if [[ "${ctype}" != text/html* ]]; then fail "${name}" "content-type '${ctype}'"
+  elif [ ! -s "${body}" ]; then fail "${name}" "empty body"
+  elif ! grep -q 'id="root"' "${body}"; then fail "${name}" "no id=\"root\" mount point"
   elif ! perl -CSD -ne '$h = 1 if /\p{Script=Hangul}/; END { exit($h ? 1 : 0) }' "${body}"; then fail "${name}" "Hangul in body"
-  else pass "${name} (200, ${ctype}, no Hangul)"; fi
+  else pass "${name} (200, ${ctype}, id=\"root\", no Hangul)"; fi
+  cp "${body}" "${work}/root.html"
   name='_headers on /'
   if [ "$(header content-security-policy)" != "${CSP}" ]; then fail "${name}" "Content-Security-Policy is '$(header content-security-policy)'"
   elif [ "$(header x-content-type-options)" != "nosniff" ]; then fail "${name}" "X-Content-Type-Options is '$(header x-content-type-options)'"
@@ -122,11 +125,23 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (provider enums [\"gcp\"] in generate, names, validate)"; fi
 fi
 
-# 5. 화면 라우트
-for route in /docs/naming /privacy; do
-  code="$(fetch GET "${route}")"
-  if expect_status "GET ${route}" "${code}" 200; then pass "GET ${route} (200)"; fi
-done
+# 5. 화면 경로 — /docs/naming · /privacy 는 클라이언트 라우팅(React)이라 서버는 어느 경로에나 같은 index.html 을 준다
+#    (wrangler.jsonc assets.not_found_handling: "single-page-application"). 그래서 서버 응답으로는 그 쪽이 있는지 가릴 수 없다 —
+#    없는 경로 /does-not-exist-<랜덤> 과 본문이 같은지만 보고 「SPA 로 서빙됨」만 확인한다. 쪽의 내용은 화면 시험이 본다
+control="/does-not-exist-${RANDOM}${RANDOM}"
+code="$(fetch GET "${control}")"
+if expect_status "GET ${control} (control)" "${code}" 200; then
+  cp "${body}" "${work}/control.html"
+  for route in /docs/naming /privacy; do
+    name="GET ${route} served by the SPA"
+    code="$(fetch GET "${route}")"
+    if expect_status "${name}" "${code}" 200; then
+      if [ ! -f "${work}/root.html" ] || ! cmp -s "${body}" "${work}/root.html"; then fail "${name}" "body differs from /"
+      elif ! cmp -s "${body}" "${work}/control.html"; then fail "${name}" "body differs from ${control}"
+      else pass "${name} (200, same index.html as / and ${control}; the route itself is not verifiable from the server)"; fi
+    fi
+  done
+fi
 
 # 6. POST /v1/names — 이름 셋 글자 그대로
 name='POST /v1/names'
