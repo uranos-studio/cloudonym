@@ -45,9 +45,10 @@ describe('fit — 3단계 축소', () => {
   });
   it('slice 가 토큰 끝에 남긴 하이픈을 지워 -- 를 만들지 않는다 (Key Vault 24자)', () => {
     const rule = getRule('azure', 'key_vault')!;   // template [slug, system, purpose, env] · optional []
-    const r = fit({ slug: 'kv', system: 'abcdefg-hij', purpose: 'longpurpose', env: 'prod' }, rule);
-    // 31자 → 고정 kv+prod=6 · 구분자 3 · B=⌊15/2⌋=7 → system 'abcdefg' · purpose 'longpur'
-    expect(r).toMatchObject({ fits: true, name: 'kv-abcdefg-longpur-prod' });
+    const r = fit({ slug: 'kv', system: 'abcdef-ghij', purpose: 'longpurpose', env: 'prod' }, rule);
+    // 31자 → 고정 kv+prod=6 · 구분자 3 · B=⌊15/2⌋=7 → system 'abcdef-'(7번째 글자가 하이픈)→'abcdef' · purpose 'longpur'
+    expect(r.values.system).toBe('abcdef');
+    expect(r).toMatchObject({ fits: true, name: 'kv-abcdef-longpur-prod' });
     expect(r.name).not.toMatch(/--/);
   });
   it('slice 뒤 토큰이 1글자가 되면 fits:false (D13 — Windows VM · system a-long)', () => {

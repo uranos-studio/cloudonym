@@ -5,8 +5,8 @@ import type { NameResult } from '../core/types';
 const version = { engine: '0.1.0', rules: '2026-09-29.1' };
 const base: NameResult = {
   ruleId: 'gcp.service_account', resourceType: 'service_account', displayName: 'Service Account',
-  name: 'billing-trade-prd-sa-sync', valid: true, isTruncated: true, isTransformed: false,
-  original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
+  name: 'billing-trade-prod-sa-sync', valid: true, isTruncated: true, isTransformed: false,
+  original: 'infra-billing-trade-prod-kr-sa-sync', violations: [],
   steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }],
   rule: { minLength: 6, maxLength: 30, pattern: '^[a-z]$', patternFlags: 'u', allowed: 'lower-digit-hyphen', docUrl: 'https://example.invalid/doc', notes: [] },
 };
@@ -24,8 +24,8 @@ describe('toWireMessage (D25)', () => {
 describe('toWireName (D15 · D25)', () => {
   it('snake_case · steps 는 메시지 배열 · notes 는 항상 있다 · reason 은 없다', () => {
     expect(toWireName(base)).toEqual({
-      name: 'billing-trade-prd-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
+      name: 'billing-trade-prod-sa-sync', valid: true, is_truncated: true, is_transformed: false,
+      original: 'infra-billing-trade-prod-kr-sa-sync', violations: [],
       steps: [
         { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
         { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
@@ -45,7 +45,7 @@ describe('toWireGenerate', () => {
     const w = toWireGenerate([
       { provider: 'azure', names: { storage_account: base }, labels },
       { provider: 'gcp', names: { service_account: base }, labels: { ...labels, violations: [{ code: 'label.too_long', field: 'owner', params: { actual: 64, max: 63 } }] } },
-    ], [{ code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prd' } }], version);
+    ], [{ code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' } }], version);
     expect(w.success).toBe(true);
     expect(w.version).toEqual(version);
     expect(Object.keys(w)).toEqual(['success', 'version', 'data', 'metadata']);
@@ -57,7 +57,7 @@ describe('toWireGenerate', () => {
       { code: 'label.too_long', field: 'owner', params: { actual: 64, max: 63 }, message: "Label 'owner' is 64 characters long; the maximum is 63" },
     ]);
     expect(w.metadata.transformed).toEqual([
-      { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prd' }, message: "env 'production' normalised to 'prd'" },
+      { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' }, message: "env 'production' normalised to 'prod'" },
     ]);
     expect(w.data.azure?.storage_account.is_truncated).toBe(true);
   });

@@ -131,10 +131,10 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await names('400-names-too-many-names', pick([{ type: 'compute_instance', count: 99 }, { type: 'disk', count: 99 }, { type: 'subnet', count: 3 }]));
   await names('400-names-context-and-selection', { provider: 'gcp', context: { ...SAMPLE_CTX, env: 'qa' }, resources: [{ type: 'service_account', count: 2 }] });
   await names('409-names-rules-version', { ...pick([{ type: 'project_id' }]), rules_version: '2026-01-01.1' });
-  await val('validate-invalid-too-long', { provider: 'gcp', resource_type: 'service_account', name: 'platform-billing-trade-prd-kr-sa-sync' });
+  await val('validate-invalid-too-long', { provider: 'gcp', resource_type: 'service_account', name: 'platform-billing-trade-prod-kr-sa-sync' });
   await val('validate-invalid-goog', { provider: 'gcp', resource_type: 'storage_bucket', name: 'goog-billing' });
   await val('validate-invalid-many', { provider: 'gcp', resource_type: 'storage_bucket', name: 'google-192.168.0.1' });
-  await val('validate-valid', { provider: 'gcp', resource_type: 'project_id', name: 'billing-trade-prd' });
+  await val('validate-valid', { provider: 'gcp', resource_type: 'project_id', name: 'billing-trade-prod' });
   await val('400-validate-unknown-type', { provider: 'gcp', resource_type: 'nope', name: 'x' });
   await val('400-validate-unknown-provider', { provider: 'oci', resource_type: 'x', name: 'y' });
   await val('400-validate-provider-not-enabled', { provider: 'azure', resource_type: 'storage_account', name: 'microsoft123' });
