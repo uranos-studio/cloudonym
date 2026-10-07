@@ -349,9 +349,13 @@ with sync_playwright() as p:
     assert 'subnet' in want and len(want) < len(ALL_ROWS), want  # 공허하지 않다 — 일치가 있고 걸러지는 행도 있다
     expect(tree_rows(page)).to_have_count(len(want))
     assert sorted(visible_types(page)) == want, visible_types(page)  # 일치하는 행만 남고 그 조상은 펼친다
-    # 걸러진 동안 범위 머리(summary)를 눌러도 접히지 않는다 — <details> DOM 과 React 상태가 어긋나지 않게
+    # 걸러진 동안에도 범위 머리(summary)를 누르면 접히고 다시 누르면 펼친다 — 늦게 오는 toggle 이벤트가 되돌리지 않는다
     page.locator('[data-tree] details[data-scope] > summary').first.click()
-    assert page.eval_on_selector_all('[data-tree] details', 'els => els.every(e => e.open)'), '걸러진 트리의 details 가 닫혔다'
+    page.wait_for_timeout(100)
+    assert not page.eval_on_selector('[data-tree] details[data-scope]', 'e => e.open'), '걸러진 트리의 뿌리가 접히지 않았다'
+    assert visible_types(page) == [], visible_types(page)
+    page.locator('[data-tree] details[data-scope] > summary').first.click()
+    page.wait_for_timeout(100)
     assert sorted(visible_types(page)) == want, visible_types(page)
     search.fill('zzz-none')
     expect(page.locator('[data-search-empty]')).to_have_text('No resource matches. A resource missing from this list is not supported yet.')
@@ -369,7 +373,7 @@ with sync_playwright() as p:
     page.uncheck('[data-selected-only]')
     expect(tree_rows(page)).to_have_count(len(AZ_TREE))
     assert chip_count(page, 'all') == len(AZ_TREE), chip_count(page, 'all')
-    # 검색을 지운 뒤에도 뿌리 범위는 열려 있다(걸러진 동안 누른 summary 가 DOM 만 닫아 두지 않았다)
+    # 검색을 지우면 필터 전 펼침으로 돌아간다 — 걸러진 동안 접고 편 것은 거르지 않은 보기에 남지 않는다
     assert page.eval_on_selector('[data-tree] details[data-scope]', 'e => e.open')
     page.click('[data-collapse-all]')  # 뿌리만 열어 두고 분류 묶음은 전부 접는다 — 깊이 0 의 규칙 중 묶음 밖 것만 보인다
     roots = sorted(t for t, d in AZ_TREE if d == 0)
@@ -378,6 +382,80 @@ with sync_playwright() as p:
     assert len(groups) > 0 and not any(groups), groups  # 공허하지 않다 — 묶음이 있고 전부 닫혔다
     in_group = page.eval_on_selector_all('[data-tree] details[data-group] [data-rule]', 'els => els.map(e => e.dataset.type)')
     assert sorted(visible_types(page)) == sorted(t for t in roots if t not in in_group), (visible_types(page), roots, in_group)
+    page.click('[data-expand-all]')
+
+    # ── ⑿-2 걸러진 동안에도 모두 펼치기 · 모두 접기 · summary · 키보드가 걸러진 보기 안에서 돈다. 필터를 지우면 필터 전 펼침 ──
+    # 판정은 즉시 한 번 · 100ms 뒤 한 번 — <details> 의 toggle 은 늦게 오므로 잘못 이어지면 「잠깐 맞고 되돌아간다」
+    OPEN_MAP_JS = 'els => Object.fromEntries(els.map(e => [e.dataset.scope ?? e.dataset.group, e.open]))'
+    open_map = lambda: page.eval_on_selector_all('[data-tree] details', OPEN_MAP_JS)
+    open_count = lambda: sum(open_map().values())
+
+    def settled(fn, want_value, label):
+        assert fn() == want_value, (label, fn(), want_value)
+        page.wait_for_timeout(100)
+        assert fn() == want_value, (label + ' (100ms 뒤)', fn(), want_value)
+
+    cdp = ctx1.new_cdp_session(page)
+
+    def ax_matches_dom():
+        """보이는 범위 머리마다 접근성 트리의 expanded(summary = DisclosureTriangle) 가 details.open 과 같다 — aria-expanded 를 따로 두지 않고 브라우저가 노출한다"""
+        nodes = cdp.send('Accessibility.getFullAXTree')['nodes']
+        ax = [next((x['value'].get('value') for x in n.get('properties', []) if x['name'] == 'expanded'), None)
+              for n in nodes if n.get('role', {}).get('value') == 'DisclosureTriangle']
+        dom = page.eval_on_selector_all('[data-tree] details', 'els => els.filter(e => e.querySelector(":scope > summary").checkVisibility()).map(e => e.open)')  # 접힌 범위 안의 머리는 접근성 트리에 없다
+        assert len(ax) == len(dom) and ax == dom, (ax, dom)
+
+    def header_counts_match():
+        """범위 머리 (n) = 그 범위 안의 걸러진 행 수 — 접힌 범위도 몇 개가 걸렸는지 보인다"""
+        pairs = page.eval_on_selector_all('[data-tree] details[data-scope]',
+                                          'els => els.map(e => [e.querySelector(":scope > summary").textContent, e.querySelectorAll("[data-rule]").length])')
+        assert pairs and all(t.rstrip().endswith(f'({n})') for t, n in pairs), pairs
+
+    # 필터 전 펼침을 기본과 다르게 만든다 — 모두 접기 뒤 Subscription 하나만 연다(복원을 재는 시험이 공허하지 않게)
+    page.click('[data-collapse-all]')
+    page.locator('[data-tree] details[data-scope="azure:subscription"] > summary').click()
+    page.wait_for_timeout(100)
+    before = open_map()
+    assert before['azure:subscription'] and not before['azure:resource_group'], before
+    for q in ('subnet', 'address'):
+        search.fill(q)
+        n_all = len(open_map())
+        assert n_all >= 3, (q, open_map())  # 공허하지 않다 — 걸러진 보기에도 접을 범위가 있다
+        settled(open_count, n_all, f'{q} 처음엔 걸러진 결과를 모두 펼친다')
+        header_counts_match()
+        page.click('[data-collapse-all]')
+        settled(open_count, 1, f'{q} 모두 접기 — 뿌리만 남는다')
+        assert visible_types(page) == [], visible_types(page)
+        header_counts_match()
+        ax_matches_dom()
+        page.click('[data-expand-all]')
+        settled(open_count, n_all, f'{q} 모두 펼치기')
+        assert visible_types(page), visible_types(page)
+        ax_matches_dom()
+    # 키보드 — summary 에 초점을 두고 Enter 로 접고 Space 로 편다 · 접힌 범위 머리에 걸린 수가 남는다
+    deep = page.locator('[data-tree] details[data-scope]').last
+    deep_id = deep.get_attribute('data-scope')
+    deep.locator(':scope > summary').focus()
+    page.keyboard.press('Enter')
+    settled(lambda: open_map()[deep_id], False, 'Enter 로 접기')
+    ax_matches_dom()
+    header_counts_match()
+    page.keyboard.press('Space')
+    settled(lambda: open_map()[deep_id], True, 'Space 로 펴기')
+    ax_matches_dom()
+    search.fill('')
+    settled(open_map, before, '검색을 지우면 필터 전 펼침')
+    # 분류 칩도 같다 — 걸러진 보기 안에서 접고 펴고, 칩을 풀면 필터 전 펼침
+    page.click('button[data-category="networking"]')
+    n_net = len(open_map())
+    assert n_net >= 3, open_map()
+    settled(open_count, n_net, '칩 — 처음엔 모두 펼친다')
+    page.click('[data-collapse-all]')
+    settled(open_count, 1, '칩 — 모두 접기')
+    page.click('[data-expand-all]')
+    settled(open_count, n_net, '칩 — 모두 펼치기')
+    page.click('button[data-category="all"]')
+    settled(open_map, before, '칩을 풀면 필터 전 펼침')
     page.click('[data-expand-all]')
 
     # ── ⑵ 공유 URL 을 새 탭(새 컨텍스트 = 빈 sessionStorage)에 붙이면 문맥 · CSP · 선택이 복원된다 ──

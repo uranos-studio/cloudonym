@@ -1,13 +1,15 @@
 // ③ Resources — 이름 유일 범위 트리(D37) · 검색 · 분류 칩 · 「선택만 보기」 · 접기 · 체크 · 개수/역할.
+// 펼침은 두 벌이다 — 거르지 않은 보기와 걸러진 보기. 걸러진 보기는 필터가 바뀔 때마다 모두 펼쳐 시작하고, 필터를 지우면 거르지 않은 보기의 펼침이 그대로 돌아온다.
 // 선택 상태는 App 의 Map 하나이고 이 트리는 그것을 읽기만 한다. 바꾼 값은 onChange 로 넘기고 판정(core validateSelection)은 App 이 한다.
-// 키보드 — 행의 체크 상자에서 ↑ ↓ 로 행 이동 · 스페이스로 체크 · + - 로 개수
-import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+// 키보드 — 행의 체크 상자에서 ↑ ↓ 로 행 이동 · 스페이스로 체크 · + - 로 개수 · 범위 머리(summary)에서 Enter · 스페이스로 접고 편다
+import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Minus, Plus, Search } from 'lucide-react';
-import { inputKind, scopePath, type TreeNode } from '../core/tree';
+import { inputKind, type TreeNode } from '../core/tree';
 import { ROLE_PATTERN } from '../core/selection';
 import type { Category, Provider, ResourceRule } from '../core/types';
 import { canAdd, canIncrease, setCount, setRole, toggle, type Picked, type PickedEntry } from './selection';
 import { categoryCounts, filterTree, isFiltering, type TreeFilter, type ViewNode } from './treeFilter';
+import { collapseAll, expandAll, groupId, initialOpen, isGroupOpen, isScopeOpen, setGroupOpen, setScopeOpen, type OpenState } from './treeOpen';
 import { providerName } from './providerName';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -37,32 +39,17 @@ interface Props {
   onChange: (next: Picked) => void;
 }
 
-/** 처음 펼침 — 뿌리와 그 바로 아래 한 단계. 링크로 연 선택이 있으면 그 행의 조상 범위도 연다 — 고른 행이 접힌 채 숨지 않게 */
-function initialOpen(tree: TreeNode, picked: Picked): Set<string> {
-  const open = new Set<string>([tree.scope.id, ...tree.children.map((c) => c.scope.id)]);
-  const walk = (n: TreeNode) => {
-    for (const r of n.rules) if (picked.has(r.resourceType)) for (const s of scopePath(r)) open.add(s.id);
-    n.children.forEach(walk);
-  };
-  walk(tree);
-  return open;
-}
-const allScopeIds = (n: TreeNode): string[] => [n.scope.id, ...n.children.flatMap(allScopeIds)];
-/** 분류 묶음 id 전부 — 「모두 접기」가 묶음도 접는다. 걸러진 트리는 묶음 판정이 달라질 수 있어 범위 × 분류 전부를 담는다(없는 id 는 쓰이지 않을 뿐이다) */
-const allGroupIds = (n: TreeNode): string[] => [...new Set(n.rules.map((r) => `${n.scope.id}/${r.category}`)), ...n.children.flatMap(allGroupIds)];
-/** 걸러진 동안 summary 를 눌러도 접지 않는다 — open 은 그동안 늘 true 라 React 가 DOM 을 다시 쓰지 않아, 접힌 DOM 과 상태가 어긋난다 */
-const keepOpenWhile = (filtering: boolean) => (e: MouseEvent<HTMLElement>) => { if (filtering) e.preventDefault(); };
-
 function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
-  const [open, setOpen] = useState<Set<string>>(() => initialOpen(tree, picked));
-  const [closedGroups, setClosedGroups] = useState<Set<string>>(() => new Set());
+  // 펼침 두 벌 — plain 은 거르지 않은 보기, filtered 는 걸러진 보기(필터가 바뀔 때마다 모두 펼침으로 다시 시작)
+  const [plain, setPlain] = useState<OpenState>(() => initialOpen(tree, picked));
+  const [filtered, setFiltered] = useState<OpenState>(() => expandAll(tree));
   // 트리가 바뀌면(CSP 전환) 펼침을 처음으로 — 렌더 중 이전 값과 대어 본다(React 문서의 「props 가 바뀔 때 state 조정」)
   const [shownTree, setShownTree] = useState(tree);
   if (shownTree !== tree) {
     setShownTree(tree);
-    setOpen(initialOpen(tree, picked));
-    setClosedGroups(new Set());
+    setPlain(initialOpen(tree, picked));
+    setFiltered(expandAll(tree));
     setFilter({ query: '', selectedOnly: false });
   }
 
@@ -79,18 +66,14 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   const filtering = isFiltering(filter);
   const addable = canAdd(picked);
 
-  const setScopeOpen = (id: string, isOpen: boolean) => setOpen((prev) => {
-    if (prev.has(id) === isOpen) return prev;
-    const next = new Set(prev);
-    if (isOpen) next.add(id); else next.delete(id);
-    return next;
-  });
-  const setGroupOpen = (id: string, isOpen: boolean) => setClosedGroups((prev) => {
-    if (prev.has(id) === !isOpen) return prev;
-    const next = new Set(prev);
-    if (isOpen) next.delete(id); else next.add(id);
-    return next;
-  });
+  // 지금 보이는 보기의 펼침 — 걸러진 동안은 filtered, 아니면 plain 을 읽고 쓴다
+  const shown = filtering ? filtered : plain;
+  const setShown = filtering ? setFiltered : setPlain;
+  /** 필터를 바꾼다 — 걸러진 보기의 펼침은 모두 펼침으로 다시 시작한다(새로 걸린 행이 접힌 채 숨지 않게) */
+  const changeFilter = (fn: (f: TreeFilter) => TreeFilter) => {
+    setFilter(fn);
+    setFiltered(expandAll(tree));
+  };
 
   const containerRef = useRef<HTMLDivElement>(null);
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -127,22 +110,22 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
 
   const renderNode = (n: ViewNode, depth: number) => {
     const id = n.scope.id;
-    const isOpen = filtering || open.has(id);
+    const isOpen = isScopeOpen(shown, id);
     const cats = [...new Set(n.rules.map((r) => r.category))];
     const grouped = n.rules.length > GROUP_AT && cats.length > 1;
     return (
-      <details key={id} open={isOpen} data-scope={id} onToggle={(e) => { if (!filtering) setScopeOpen(id, e.currentTarget.open); }}>
-        <summary onClick={keepOpenWhile(filtering)} className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
+      <details key={id} open={isOpen} data-scope={id} onToggle={(e) => { const o = e.currentTarget.open; setShown((s) => setScopeOpen(s, id, o)); }}>
+        <summary className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
           <ChevronRight aria-hidden="true" data-chevron className="size-4 shrink-0 text-zinc-500" />{n.scope.displayName} <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">({n.total})</span>
         </summary>
         <div className={depth === 0 ? 'pl-1' : 'ml-2 border-l border-zinc-200 pl-2 dark:border-zinc-800'}>
           {grouped
             ? cats.map((c) => {
-              const gid = `${id}/${c}`;
+              const gid = groupId(id, c);
               const rules = n.rules.filter((r) => r.category === c);
               return (
-                <details key={gid} open={filtering || !closedGroups.has(gid)} data-group={gid} onToggle={(e) => { if (!filtering) setGroupOpen(gid, e.currentTarget.open); }}>
-                  <summary onClick={keepOpenWhile(filtering)} className="flex min-h-8 cursor-pointer items-center gap-1 px-1 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+                <details key={gid} open={isGroupOpen(shown, gid)} data-group={gid} onToggle={(e) => { const o = e.currentTarget.open; setShown((s) => setGroupOpen(s, gid, o)); }}>
+                  <summary className="flex min-h-8 cursor-pointer items-center gap-1 px-1 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
                     <ChevronRight aria-hidden="true" data-chevron className="size-3.5 shrink-0" />{CATEGORY_LABEL[c]} ({rules.length})
                   </summary>
                   <div className="ml-2 border-l border-zinc-200 pl-2 dark:border-zinc-800">{renderRows(rules)}</div>
@@ -172,32 +155,32 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
             <Search aria-hidden="true" className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-500" />
             <input
               type="search" data-tree-search value={filter.query} placeholder={en.ui.search_placeholder}
-              onChange={(e) => setFilter((f) => ({ ...f, query: e.target.value }))}
+              onChange={(e) => { const query = e.target.value; changeFilter((f) => ({ ...f, query })); }}
               className="block w-full rounded-md border border-zinc-300 bg-white py-2 pr-3 pl-8 text-sm placeholder:text-zinc-500 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-950 dark:placeholder:text-zinc-400"
             />
           </label>
           <label className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300">
-            <input type="checkbox" data-selected-only checked={filter.selectedOnly} onChange={(e) => setFilter((f) => ({ ...f, selectedOnly: e.target.checked }))} className="size-4 accent-indigo-600" />
+            <input type="checkbox" data-selected-only checked={filter.selectedOnly} onChange={(e) => { const selectedOnly = e.target.checked; changeFilter((f) => ({ ...f, selectedOnly })); }} className="size-4 accent-indigo-600" />
             {en.ui.selected_only}
           </label>
         </div>
         <div role="group" aria-label={en.ui.category_filter_label} className="flex gap-1.5 overflow-x-auto pb-1">
-          <button type="button" aria-pressed={filter.category === undefined} className={CHIP} onClick={() => setFilter((f) => ({ ...f, category: undefined }))} data-category="all">
+          <button type="button" aria-pressed={filter.category === undefined} className={CHIP} onClick={() => changeFilter((f) => ({ ...f, category: undefined }))} data-category="all">
             {en.ui.category_all} ({total})
           </button>
           {[...counts].map(([c, n]) => (
             <button key={c} type="button" aria-pressed={filter.category === c} className={CHIP} data-category={c}
-              onClick={() => setFilter((f) => ({ ...f, category: f.category === c ? undefined : c }))}>
+              onClick={() => changeFilter((f) => ({ ...f, category: f.category === c ? undefined : c }))}>
               {CATEGORY_LABEL[c]} ({n})
             </button>
           ))}
         </div>
         <div className="flex gap-2">
           <button type="button" className={SMALL_BUTTON} data-expand-all
-            onClick={() => { setOpen(new Set(allScopeIds(tree))); setClosedGroups(new Set()); }}>
+            onClick={() => setShown(expandAll(tree))}>
             <ChevronsUpDown aria-hidden="true" className="size-3.5" />{en.ui.expand_all}
           </button>
-          <button type="button" className={SMALL_BUTTON} data-collapse-all onClick={() => { setOpen(new Set([tree.scope.id])); setClosedGroups(new Set(allGroupIds(tree))); }}>
+          <button type="button" className={SMALL_BUTTON} data-collapse-all onClick={() => setShown(collapseAll(tree))}>
             <ChevronsDownUp aria-hidden="true" className="size-3.5" />{en.ui.collapse_all}
           </button>
         </div>
