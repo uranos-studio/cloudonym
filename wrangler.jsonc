@@ -41,7 +41,9 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+	// Axiom 데이터셋 이름 — 비밀이 아니라 vars 에 둔다. 토큰은 `wrangler secret put AXIOM_API_KEY`(없으면 Axiom 으로 보내지 않는다).
+	// 데이터셋의 보존 기간을 정하면 src/components/privacyModel.ts 의 PRIVACY_AXIOM_RETENTION_DAYS 에 같은 값을 적는다(/privacy 안내)
+	"vars": { "AXIOM_DATASET": "cloudonym" },
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

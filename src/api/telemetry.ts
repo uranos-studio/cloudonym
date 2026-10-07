@@ -1,4 +1,4 @@
-// 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
+// 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17 · D56). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
 import type { Bindings } from './env';
 
 /** Hono Context 가 이 모양을 만족한다 — 시험은 평범한 객체를 넣는다 */
@@ -11,20 +11,38 @@ export type FormatParts = (d: Date) => Intl.DateTimeFormatPart[];
 /** 시험이 시계 · fetch · 시각 포매터를 주입하는 자리 — 운영 코드는 넘기지 않는다 */
 export interface TelemetryDeps { now?: Date; fetchFn?: FetchLike; formatParts?: FormatParts }
 
-/** Axiom 에 싣는 UA 상한 — 수 KB 짜리 UA 로 수집량을 부풀리지 못하게 */
-export const MAX_USER_AGENT_CHARS = 256;
-// oxlint-disable-next-line no-control-regex -- 제어 문자를 찾는 것이 이 정규식의 목적이다
-const CONTROL_CHARS = /[\u0000-\u001F\u007F]/g;
-/** 제어 문자를 지우고 256자로 자른다. 없으면 'unknown' */
-export function cleanUserAgent(raw: string | undefined): string {
-  return (raw ?? 'unknown').replace(CONTROL_CHARS, '').slice(0, MAX_USER_AGENT_CHARS);
-}
-
 /** ① 의 UA 정규식 그대로 (D17) */
 export const AI_AGENT_UA = /Cursor|Windsurf|Claude|GPTBot|Copilot/i;
 export function isAiAgent(userAgent: string): boolean {
   return AI_AGENT_UA.test(userAgent);
 }
+
+/** UA 원문은 싣지 않는다 (D56) — UA 에는 아무 글자나 넣을 수 있다. 대신 네 값 중 하나 */
+export type ClientClass = 'ai_agent' | 'browser' | 'cli' | 'other';
+/** 앞머리에 도구 이름이 오고 바로 / 또는 끝 — 「my curl/8」 · 「nodejs-x」 는 cli 가 아니다 */
+const CLI_UA = /^(?:curl|wget|python-requests|go-http-client|node)(?:\/|$)/i;
+/** ai_agent 를 먼저 본다 — GPTBot 처럼 Mozilla/ 로 시작하는 에이전트가 browser 로 가지 않게 */
+export function classifyClient(userAgent: string | undefined): ClientClass {
+  const ua = userAgent ?? '';
+  if (isAiAgent(ua)) return 'ai_agent';
+  if (ua.startsWith('Mozilla/')) return 'browser';
+  if (CLI_UA.test(ua)) return 'cli';
+  return 'other';
+}
+
+/** 이벤트마다 Axiom 에 싣는 meta 키 (D56 필드 표) — 표에 없는 키 · 표에 없는 이벤트의 meta 는 싣지 않는다 */
+export const META_KEYS: Readonly<Record<string, readonly string[]>> = {
+  ui_visit: [], ui_generate: [], ui_copy: ['target'],
+  api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
+  llms_txt_accessed: [], catalog_json_accessed: [],
+};
+function allowedMeta(event: string, meta: Record<string, unknown>): Record<string, unknown> {
+  const keys = Object.hasOwn(META_KEYS, event) ? META_KEYS[event]! : [];
+  return Object.fromEntries(keys.filter((k) => Object.hasOwn(meta, k)).map((k) => [k, meta[k]]));
+}
+
+/** KV 일자 카운터의 수명 — 366일 뒤 Cloudflare 가 지운다 (D56 · /privacy 의 보존 기간) */
+export const KV_TTL_SECONDS = 366 * 86400;
 
 const KST = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
@@ -48,7 +66,7 @@ export function kstStamp(now: Date, formatParts: FormatParts = (d) => KST.format
 async function bump(kv: KVNamespace, key: string): Promise<void> {
   const n = Number.parseInt((await kv.get(key)) ?? '0', 10);
   const current = Number.isFinite(n) ? n : 0;
-  await kv.put(key, String(current + 1));
+  await kv.put(key, String(current + 1), { expirationTtl: KV_TTL_SECONDS });
 }
 
 async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean): Promise<void> {
@@ -95,8 +113,8 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
   try {
     const now = deps.now ?? new Date();
     const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
-    const userAgent = cleanUserAgent(c.req.header('user-agent'));
-    const ai = isAiAgent(userAgent);
+    const clientClass = classifyClient(c.req.header('user-agent'));
+    const ai = clientClass === 'ai_agent';
     const { day, time } = kstStamp(now, deps.formatParts);
     const { CLOUDONYM_KV: kv, AXIOM_API_KEY: apiKey, AXIOM_DATASET: dataset } = c.env;
 
@@ -105,8 +123,8 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
     if (kv) parts.push(countKv(kv, event, day, ai));
     if (apiKey && dataset) {
       // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다.
-      // meta 를 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · user_agent · is_ai_agent)을 meta 가 덮어쓰지 못한다
-      parts.push(sendAxiom(fetchFn, apiKey, dataset, [{ ...meta, _time: time, kst_day: day, event, user_agent: userAgent, is_ai_agent: ai }]));
+      // meta 는 허용 표로 거른 뒤 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · client_class · is_ai_agent)을 meta 가 덮어쓰지 못한다
+      parts.push(sendAxiom(fetchFn, apiKey, dataset, [{ ...allowedMeta(event, meta), _time: time, kst_day: day, event, client_class: clientClass, is_ai_agent: ai }]));
     }
     await Promise.allSettled(parts);
   } catch (e) {

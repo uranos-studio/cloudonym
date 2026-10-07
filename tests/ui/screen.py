@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉖ · ㉙ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉗ · ㉙ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -302,6 +302,8 @@ with sync_playwright() as p:
     assert '  # gcp\n  gcp_labels = {\n' in tags_only, tags_only
     assert '    owner = "devops"\n' in tags_only and tags_only.endswith('  }\n}\n'), tags_only
     assert 'gcp_project_id' not in tags_only and 'INVALID' not in tags_only, tags_only
+    page.wait_for_timeout(300)  # 복사가 되면 ui_copy(target=terraform) 비콘 한 번 (D56)
+    assert sent.count('ui_copy') == 1, f'ui_copy 가 {sent.count("ui_copy")}회 — Terraform 복사 한 번에 한 번: {sent}'
 
     # ── ⑾ 개수 → 이름 끝 · seq 없는 규칙은 1 고정 · 역할 · 키보드(↑ ↓ 는 체크할 수 없는 행을 건너뛴다) ──
     # 화면은 catalog 행 하나가 한 줄이다 — 범위만 다른 규칙 여럿은 한 행(합친 행)으로 묶여 범위 select 를 갖는다 (D53)
@@ -1012,6 +1014,27 @@ with sync_playwright() as p:
     no_hangul(pr)
     ctxR.close()
 
+    # ── ㉗ /privacy — 200 · IP 문장(읽어서 제한 키로 넘기고 저장하지 않는다) · KV 366 · Axiom 은 데이터셋에 설정한 보존 · 계측 표 여덟 줄 · 휴대폰 폭 (D56) ──
+    ctx27 = browser.new_context(viewport={'width': 360, 'height': 800})
+    page27 = ctx27.new_page()
+    page27.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(page27, BASE + '/privacy')
+    resp27 = page27.goto(BASE + '/privacy', wait_until='networkidle')
+    assert resp27 is not None and resp27.status == 200, resp27 and resp27.status
+    expect(page27.locator('h1')).to_have_text('Privacy')
+    expect(page27.locator('[data-privacy-ip]')).to_have_text("Cloudonym reads the client IP address of each API request (the cf-connecting-ip header Cloudflare sets) only to pass it as the key of Cloudflare's rate-limiting binding (60 requests per 60 seconds); it is not stored in telemetry, KV or Axiom.")
+    expect(page27.locator('[data-privacy-kv]')).to_have_text('KV daily counters expire 366 days after their last update.')
+    expect(page27.locator('[data-privacy-axiom]')).to_contain_text('the retention configured on the Axiom dataset')
+    expect(page27.locator('[data-privacy-never]')).to_contain_text('never collected')
+    expect(page27.locator('[data-privacy-events] tr[data-event]')).to_have_count(8)
+    expect(page27.locator('[data-privacy-events] tr[data-event="ui_copy"]')).to_contain_text('target')
+    privacy_text = page27.inner_text('main')
+    for sentence in re.split(r'(?<=\.)\s+', privacy_text):
+        assert not (re.search(r'\bIP\b', sentence) and re.search(r'does not read|never reads|not read', sentence, re.I)), sentence
+    assert page27.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '360px 에서 가로 스크롤이 생긴다'
+    no_hangul(page27)
+    ctx27.close()
+
     # ── ㉙ 꺼진 CSP(Azure) 로 만든 링크 → GCP 로 열리고 지역은 예시로 · 선택은 비운다 · 자유 입력 셋과 환경은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
     ctx20 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page20 = ctx20.new_page()
@@ -1035,4 +1058,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒆ · ⒇~㉖ · ㉕-2 · ㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ · ⒇~㉗ · ㉕-2 · ㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

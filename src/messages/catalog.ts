@@ -36,8 +36,15 @@ export const UI_KEYS = [
   'nav_naming_guide', 'footer_privacy', 'back_to_app',
   // NamingDoc — /docs/naming (D57)
   'doc_title',
-  // Privacy — /privacy
+  // Privacy — /privacy (D56)
   'privacy_title',
+  'privacy_intro', 'privacy_browser_title', 'privacy_browser_session', 'privacy_browser_hash',
+  'privacy_api_title', 'privacy_api_intro', 'privacy_api_common', 'privacy_col_event',
+  'privacy_col_when', 'privacy_col_fields', 'privacy_when_ui_visit', 'privacy_when_ui_generate',
+  'privacy_when_ui_copy', 'privacy_when_api_generate', 'privacy_when_api_names', 'privacy_when_api_validate',
+  'privacy_when_llms_txt_accessed', 'privacy_when_catalog_json_accessed', 'privacy_target_note', 'privacy_never_title',
+  'privacy_never_body', 'privacy_retention_title', 'privacy_retention_kv', 'privacy_retention_axiom',
+  'privacy_retention_axiom_unset', 'privacy_hosting_title', 'privacy_ip', 'privacy_hosting',
   // NamesPanel
   'names_summary', 'names_empty_selection', 'copy_all_names', 'copy_all_names_skipped', 'copy_all_names_label',
   'copy_names_json_label', 'copy_names_json_blocked_label', 'conflict_prefix',

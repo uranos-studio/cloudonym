@@ -19,6 +19,11 @@ export interface NamesInput { provider: Provider; context: NamingContext; transf
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
 export type UiEvent = (typeof UI_EVENTS)[number];
+/** ui_copy 의 target — 어느 복사 버튼인가 (D56). 항목 키 · 리소스 종류는 싣지 않는다. 화면 쪽 같은 목록은 beacon.ts 의 COPY_TARGETS(beacon.test 가 둘을 대어 본다) */
+export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json'] as const;
+export type UiCopyTarget = (typeof UI_COPY_TARGETS)[number];
+/** 비콘 한 건 — target 은 ui_copy 에만 있다. 다른 이벤트에 온 target 은 버린다 */
+export interface EventInput { event: UiEvent; target?: UiCopyTarget }
 
 function reject(errors: Message[], supported?: string[], status: 400 | 409 = 400): { ok: false; rejection: Rejection } {
   return { ok: false, rejection: { status, errors, ...(supported ? { supported } : {}) } };
@@ -142,7 +147,7 @@ export function parseValidateBody(body: unknown): Parsed<ValidateInput> {
   return { ok: true, value: { provider, resourceType, name } };
 }
 
-export function parseEventBody(body: unknown): Parsed<UiEvent> {
+export function parseEventBody(body: unknown): Parsed<EventInput> {
   if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
   const event = body.event;
   const long = tooLong({ event });
@@ -150,7 +155,14 @@ export function parseEventBody(body: unknown): Parsed<UiEvent> {
   if (typeof event !== 'string' || !(UI_EVENTS as readonly string[]).includes(event)) {
     return reject([{ code: 'request.value_unsupported', field: 'event', params: { value: describe(event) } }], [...UI_EVENTS]);
   }
-  return { ok: true, value: event as UiEvent };
+  if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent } };
+  const target = body.target;
+  const longTarget = tooLong({ target });
+  if (longTarget.length > 0) return reject(longTarget);
+  if (typeof target !== 'string' || !(UI_COPY_TARGETS as readonly string[]).includes(target)) {
+    return reject([{ code: 'request.value_unsupported', field: 'target', params: { value: describe(target) } }], [...UI_COPY_TARGETS]);
+  }
+  return { ok: true, value: { event, target: target as UiCopyTarget } };
 }
 
 /** selection 오류의 사용자 값(value)을 원래 입력에서 다시 만든다 — 80자 · 보이지 않는 문자 · 비문자열은 JSON (다른 요청 오류와 같은 표시 · 8775326) */

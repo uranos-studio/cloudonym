@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { isAiAgent, kstStamp, logTelemetry, type FetchLike, type TelemetrySource } from './telemetry';
+import { classifyClient, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, META_KEYS, type FetchLike, type TelemetrySource } from './telemetry';
 import { fakeKv } from './test-support';
 
 // 고정 시각 — 실제 시계를 쓰지 않는다. UTC 09-28 15:30 = KST 09-29 00:30 (자정 경계)
@@ -60,7 +60,7 @@ describe('logTelemetry', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]!.url).toBe('https://api.axiom.co/v1/datasets/ds/ingest');
     expect(calls[0]!.init.headers.Authorization).toBe('Bearer k');
-    expect(JSON.parse(calls[0]!.init.body)).toEqual([{ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'api_validate', user_agent: 'Cursor/1.0', is_ai_agent: true, provider: 'gcp' }]);
+    expect(JSON.parse(calls[0]!.init.body)).toEqual([{ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'api_validate', client_class: 'ai_agent', is_ai_agent: true, provider: 'gcp' }]);
   });
   it('자정 경계 한 번 호출 — KV 키 일자 · _time · kst_day 가 모두 KST 09-29 (Axiom 이 _time 을 UTC 로 저장해도 kst_day 로 KV 와 같은 날로 묶인다)', async () => {
     const { kv, store } = fakeKv();
@@ -164,14 +164,72 @@ describe('logTelemetry', () => {
   });
 });
 
-describe('Axiom 에 싣는 User-Agent', () => {
-  it('256자로 자르고 제어 문자를 지운다 — 판정(is_ai_agent)도 자른 값으로 한다', async () => {
-    const { fetchFn, calls } = fakeFetch();
-    const ua = `Claude\n\r\u0000${'x'.repeat(1000)}`;
-    await logTelemetry(source({ AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' }, ua), 'api_generate', {}, { now: NOW, fetchFn });
-    const sent = JSON.parse(calls[0]!.init.body)[0];
-    expect(sent.user_agent).toHaveLength(256);
-    expect(sent.user_agent).toMatch(/^Claudex+$/);
-    expect(sent.is_ai_agent).toBe(true);
+describe('classifyClient — UA 원문 대신 네 값 중 하나 (D56)', () => {
+  it('ai_agent 를 먼저 본다 — Mozilla 로 시작해도 GPTBot 이면 ai_agent', () => {
+    expect(classifyClient('Claude-User')).toBe('ai_agent');
+    expect(classifyClient('Mozilla/5.0 (compatible; GPTBot/1.0)')).toBe('ai_agent');
+    expect(classifyClient('Cursor/1.0')).toBe('ai_agent');
+  });
+  it('browser · cli · other', () => {
+    expect(classifyClient('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/130')).toBe('browser');
+    for (const ua of ['curl/8', 'curl/8.7.1', 'Wget/1.21', 'python-requests/2.32', 'Go-http-client/2.0', 'node']) expect(classifyClient(ua), ua).toBe('cli');
+    for (const ua of ['', undefined, 'terraform-provider-http/3.4', 'nodejs-thing/1', 'my curl/8', 'Mozilla']) expect(classifyClient(ua), String(ua)).toBe('other');
+  });
+});
+
+describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56)', () => {
+  const env = { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' };
+  const COMMON = ['_time', 'kst_day', 'event', 'client_class', 'is_ai_agent'];
+  it('KV put 은 366일 expirationTtl 을 단다 — 이벤트 키 · ai_agent_hits 키 모두', async () => {
+    expect(KV_TTL_SECONDS).toBe(366 * 86400);
+    const { kv, puts } = fakeKv();
+    await logTelemetry(source({ CLOUDONYM_KV: kv }, 'Claude-User'), 'api_generate', {}, { now: NOW });
+    expect(puts.map((p) => p.key)).toEqual(['stats:api_generate:2026-09-29', 'stats:ai_agent_hits:2026-09-29']);
+    for (const p of puts) expect(p.options).toEqual({ expirationTtl: 366 * 86400 });
+  });
+  it('이벤트마다 Axiom 한 건의 키 집합 = 공통 다섯 + 그 이벤트의 허용 meta — 모르는 meta 키 · 모르는 이벤트의 meta 는 버린다', async () => {
+    const full: Record<string, Record<string, unknown>> = {
+      ui_copy: { target: 'terraform' },
+      api_generate: { providers: ['gcp'] },
+      api_names: { provider: 'gcp', resource_count: 2, name_count: 3, valid: true },
+      api_validate: { provider: 'gcp', resource_type: 'project_id', valid: false },
+    };
+    for (const event of [...Object.keys(META_KEYS), 'unknown_event']) {
+      const { fetchFn, calls } = fakeFetch();
+      await logTelemetry(source(env), event, { ...full[event], owner: 'example-team', user_agent: 'x', extra: 1 }, { now: NOW, fetchFn });
+      const [row] = JSON.parse(calls[0]!.init.body) as Record<string, unknown>[];
+      expect(Object.keys(row!).sort(), event).toEqual([...COMMON, ...(META_KEYS[event] ?? [])].sort());
+    }
+  });
+  it('허용 표는 계획의 필드 표와 같다', () => {
+    expect(META_KEYS).toEqual({
+      ui_visit: [], ui_generate: [], ui_copy: ['target'],
+      api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
+      llms_txt_accessed: [], catalog_json_accessed: [],
+    });
+  });
+  it('UA 에 문맥 글자를 넣어도 payload 전체 문자열 · console.error 인자 어디에도 그 글자가 없다 (Axiom 이 본문을 그대로 돌려주며 거부해도)', async () => {
+    const ua = 'Mozilla/5.0 owner=example-team system=payroll';
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      // 거부 응답의 본문이 요청 본문을 그대로 되돌려 준다 — 그 본문이 console.error 로 간다
+      const calls: Call[] = [];
+      const echo: FetchLike = (url, init) => { calls.push({ url, init }); return Promise.resolve({ ok: false, status: 400, text: () => Promise.resolve(init.body) }); };
+      const { kv, puts } = fakeKv();
+      await logTelemetry(source({ ...env, CLOUDONYM_KV: kv }, ua), 'api_names', { provider: 'gcp', resource_count: 1, name_count: 1, valid: true }, { now: NOW, fetchFn: echo });
+      expect(calls).toHaveLength(1);
+      expect(errors).toHaveBeenCalledTimes(1);   // 검사기 — 거부 경로를 실제로 탔다
+      const sent = calls[0]!.init.body;
+      const logged = JSON.stringify(errors.mock.calls);
+      const stored = JSON.stringify(puts);
+      for (const word of ['example-team', 'payroll', 'owner=', 'system=']) {
+        expect(sent.includes(word), `payload: ${word}`).toBe(false);
+        expect(logged.includes(word), `console.error: ${word}`).toBe(false);
+        expect(stored.includes(word), `KV: ${word}`).toBe(false);
+      }
+      expect(JSON.parse(sent)[0]).toMatchObject({ client_class: 'browser', is_ai_agent: false });
+    } finally {
+      errors.mockRestore();
+    }
   });
 });

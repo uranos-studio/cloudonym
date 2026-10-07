@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } from './schemas';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, UI_COPY_TARGETS } from './schemas';
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -70,10 +70,22 @@ describe('parseValidateBody', () => {
 
 describe('parseEventBody', () => {
   it('셋만 받는다 — 그 외 400 + supported', () => {
-    for (const e of ['ui_visit', 'ui_generate', 'ui_copy']) expect(parseEventBody({ event: e })).toEqual({ ok: true, value: e });
+    for (const e of ['ui_visit', 'ui_generate']) expect(parseEventBody({ event: e })).toEqual({ ok: true, value: { event: e } });
+    expect(parseEventBody({ event: 'ui_copy', target: 'terraform' })).toEqual({ ok: true, value: { event: 'ui_copy', target: 'terraform' } });
     expect(parseEventBody({ event: 'api_generate' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'api_generate' } }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
     expect(parseEventBody(null)).toMatchObject({ ok: false });
+  });
+  it('ui_copy 의 target — 여섯 중 하나만 · 없거나 모르면 400 + supported 여섯 · 다른 이벤트의 target 은 버린다 (D56)', () => {
+    expect(UI_COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json']);
+    for (const target of UI_COPY_TARGETS) expect(parseEventBody({ event: 'ui_copy', target })).toEqual({ ok: true, value: { event: 'ui_copy', target } });
+    expect(parseEventBody({ event: 'ui_copy' }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'target', params: { value: 'undefined' } }], supported: [...UI_COPY_TARGETS] } });
+    expect(parseEventBody({ event: 'ui_copy', target: 'name:gcp.project_id' }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'target', params: { value: 'name:gcp.project_id' } }], supported: [...UI_COPY_TARGETS] } });
+    expect(parseEventBody({ event: 'ui_copy', target: 'x'.repeat(2000) })).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'target' }] } });
+    expect(parseEventBody({ event: 'ui_visit', target: 'terraform' })).toEqual({ ok: true, value: { event: 'ui_visit' } });
+    expect(parseEventBody({ event: 'ui_generate', target: 'nonsense' })).toEqual({ ok: true, value: { event: 'ui_generate' } });
   });
 });
 

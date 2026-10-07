@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { debounce, sendBeacon, sessionStore, visitOnce, EVENTS_PATH, VISIT_KEY, type StorageLike, type UiBeacon } from './beacon';
+import { COPY_TARGETS } from './copyTargets';
+import { copyTarget, debounce, sendBeacon, sessionStore, visitOnce, EVENTS_PATH, VISIT_KEY, type StorageLike, type UiBeacon } from './beacon';
 
 function fakeStorage(mode: 'ok' | 'throw' = 'ok'): { storage: StorageLike; map: Map<string, string> } {
   const map = new Map<string, string>();
@@ -100,6 +101,33 @@ describe('sessionStore', () => {
     } finally {
       if (original) Object.defineProperty(globalThis, 'sessionStorage', original);
       else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
+  });
+});
+
+describe('ui_copy — 어느 복사 버튼인가만 보낸다 (D56)', () => {
+  it('여섯 — API 가 받는 목록과 같은지는 src/api/privacy-sync.test.ts 가 본다', () => {
+    expect(COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json']);
+  });
+  it('copyKey → target — name:<항목 키> 는 name 으로(항목 키 · 리소스 종류를 싣지 않는다) · 모르는 키는 undefined', () => {
+    expect(copyTarget('share-url')).toBe('share-url');
+    expect(copyTarget('name:gcp.compute_instance#2')).toBe('name');
+    expect(copyTarget('all-names')).toBe('all-names');
+    expect(copyTarget('names-json')).toBe('names-json');
+    expect(copyTarget('terraform')).toBe('terraform');
+    expect(copyTarget('tags-json')).toBe('tags-json');
+    for (const k of [undefined, '', 'name', 'names', 'owner', 'name-x']) expect(copyTarget(k), String(k)).toBeUndefined();
+  });
+  it('본문은 { event, target } 뿐 — 문맥값 · 항목 키가 없다', () => {
+    const calls: [string, unknown][] = [];
+    vi.stubGlobal('navigator', { sendBeacon: (url: string, body: unknown) => { calls.push([url, body]); return true; } });
+    try {
+      sendBeacon('ui_copy', { target: copyTarget('name:gcp.project_id')! });
+      expect(calls).toEqual([[EVENTS_PATH, '{"event":"ui_copy","target":"name"}']]);
+      expect(Object.keys(JSON.parse(calls[0]![1] as string))).toEqual(['event', 'target']);
+      for (const w of ['gcp', 'project_id', 'owner', 'example']) expect(calls[0]![1] as string).not.toContain(w);
+    } finally {
+      vi.unstubAllGlobals();
     }
   });
 });

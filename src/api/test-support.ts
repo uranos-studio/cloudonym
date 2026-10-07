@@ -39,18 +39,20 @@ export function isPending(p: Promise<unknown>): Promise<boolean> {
   return Promise.race([p.then(() => false, () => false), new Promise<boolean>((r) => setTimeout(() => r(true), 0))]);
 }
 
-/** 가짜 KV — mode: ok(정상) · throw(get 이 던진다) · hang(put 이 영원히 끝나지 않는다) */
-export function fakeKv(mode: 'ok' | 'throw' | 'hang' = 'ok'): { kv: KVNamespace; store: Map<string, string> } {
+/** 가짜 KV — mode: ok(정상) · throw(get 이 던진다) · hang(put 이 영원히 끝나지 않는다). puts 는 put 의 세 번째 인자(옵션)까지 모은다 */
+export function fakeKv(mode: 'ok' | 'throw' | 'hang' = 'ok'): { kv: KVNamespace; store: Map<string, string>; puts: { key: string; value: string; options?: KVNamespacePutOptions }[] } {
   const store = new Map<string, string>();
+  const puts: { key: string; value: string; options?: KVNamespacePutOptions }[] = [];
   const kv = {
     get: (key: string): Promise<string | null> => (mode === 'throw' ? Promise.reject(new Error('kv get 실패')) : Promise.resolve(store.get(key) ?? null)),
-    put: (key: string, value: string): Promise<void> => {
+    put: (key: string, value: string, options?: KVNamespacePutOptions): Promise<void> => {
+      puts.push({ key, value, ...(options ? { options } : {}) });
       if (mode === 'hang') return new Promise<void>(() => {});
       store.set(key, value);
       return Promise.resolve();
     },
   };
-  return { kv: kv as unknown as KVNamespace, store };
+  return { kv: kv as unknown as KVNamespace, store, puts };
 }
 
 /** 화면 비콘과 같은 요청 — 브라우저가 붙이는 Sec-Fetch-Site: same-origin 을 싣는다. /v1/events 는 이 헤더가 없으면 403 이다 */
