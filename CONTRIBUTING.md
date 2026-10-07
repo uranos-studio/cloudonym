@@ -19,7 +19,7 @@ npm test           # Vitest
 npm run typecheck  # tsc -b --noEmit
 npm run lint       # oxlint
 npm run build      # tsc -b && vite build && node scripts/check-bundle.mjs
-npm run test:rules # node --test scripts/rules/*.test.mjs (rule generators and source checks)
+npm run test:rules # node --test scripts/rules/*.test.mjs scripts/catalog/*.test.mjs (rule and catalog generators, source checks)
 ```
 
 All five must pass before you open a pull request. Add or update tests for any behaviour you change.
@@ -63,6 +63,23 @@ Rules are typed `const` data in `src/core/rules/` — no rule is parsed from doc
    CI runs `node scripts/check-rules-revision.mjs <main's fingerprint> src/core/rules-fingerprint.json` and fails if the fingerprint changed without a new revision or the other way round.
 7. **Check** — `npm test`, `npm run test:rules`, `npm run typecheck`, `npm run lint` and `npm run build`. `/llms.txt` and the resource tree are generated from the rule table, so a new rule appears there without further edits.
 
+## Editing the catalog (abbreviations, kinds, regions, descriptions)
+
+For Google Cloud, the abbreviation in each name, the uniqueness class, whether a rule takes a region, a zone or no region token, the allowed kinds and their tokens, the one-line description, where the name is entered and the search aliases come from the **catalog**, not from the rule files (decisions D46, D47 and D54). The catalog also holds the region and zone codes of every provider.
+
+| File | What it holds |
+|---|---|
+| `catalog/gcp.json` | One row per screen row: rule ids, abbreviation and its basis, kinds, description, `enterNameAt`, badges, aliases |
+| `catalog/regions.json` | Regions and zones with their codes, for all three providers |
+| `catalog/kind-sources.json` | Where each kind list and default was read, and when |
+| `catalog/schema.json` | JSON Schema for the three files above |
+| `src/core/rules/gcp-catalog.ts`, `src/core/regions-data.ts` | **Generated** — do not edit by hand |
+
+1. Edit the JSON. An abbreviation needs a `basis` that names the principle and an official or measured source; a kind list needs its source in `kind-sources.json`. Write in English.
+2. Run **`npm run catalog`** (`node scripts/catalog/build-catalog.mjs`). It validates the JSON against the schema and rewrites the two generated files.
+3. Run `npm test`. `src/core/catalog.test.ts` checks the JSON against the schema, that the generated files hold the same data as the JSON, and that catalog rule ids and the rule table cover each other; `src/core/catalog-collision.test.ts` rejects an abbreviation or kind token that equals another one, a region or zone code, or an environment value.
+4. A catalog change changes names, so bump the rules revision and rewrite the fingerprint and the baseline as in step 6 above. `/llms.txt`, `/catalog.json` and the `/docs/naming` page are built from the generated files and need no further edits.
+
 ## Pull requests
 
 - Keep each pull request focused on one change and describe what changed and why.
@@ -90,6 +107,7 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 
 - **issue · PR 모두 환영한다.** 큰 변경(새 provider · 새 리소스 · API 변경)은 issue 로 먼저 방향을 맞춘다. 보안 문제는 [SECURITY.md](SECURITY.md) 를 따른다
 - **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run test:rules` 다섯을 통과시킨 뒤 PR 을 연다
+- **catalog 고치기** — GCP 의 약어 · 고유성 부류 · 지역 토큰 종류 · 종류와 토큰 · 설명 · 별칭과 세 CSP 의 리전 · 존 코드는 `catalog/*.json` 이 정본이다. JSON 을 고치고 **`npm run catalog`** 로 생성 파일(`src/core/rules/gcp-catalog.ts` · `src/core/regions-data.ts`)을 다시 쓴 뒤 `npm test`(`catalog.test.ts` · `catalog-collision.test.ts`)를 돌린다. 이름이 바뀌므로 규칙 버전도 올린다
 - **규칙 더하기** — 공식 문장을 찾아 `docUrl` · `entity` · `scope` 를 정한다 → 생성 행은 `scripts/rules/build-<provider>-rules.mjs` 를 다시 돌리고(`*-intake.ts` 는 손으로 고치지 않는다), 손 행은 `src/core/rules/<provider>-manual.ts` 에 원문을 인용해 넣는다 → 규칙마다 허용 · 거부 예가 있어야 `rule-cases.test.ts` 가 통과한다 → 출처를 새로 받았으면 `check-sources.mjs … --write` 로 `docs/rule-sources.lock.json` 을 고친다 → `RULES_REVISION` 을 올리고 `UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts` (기준선이 바뀌었으면 `UPDATE_BASELINE=1 npx vitest run src/core/baseline.test.ts`) 로 지문을 다시 쓴다
 - **규칙 숫자에는 CSP 공식 문서 URL(`docUrl`)이 붙는다.** 출처 없는 길이 · 정규식은 받지 않는다. 무효인 이름을 유효로 표시하지 않는다 — 문서가 모호하면 보수적으로 잡고 [docs/decisions.md](docs/decisions.md) 에 적는다
 - **규칙을 바꾸면 규칙 버전을 올린다** — 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경은 `src/core/revision.ts` 의 `RULES_REVISION` 을 올리고 `src/core/rules-fingerprint.json` 을 다시 쓴다. CI 가 `main` 과 대어 본다

@@ -1,0 +1,44 @@
+# Changelog
+
+All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
+
+## [0.1.0] - Unreleased
+
+The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".
+
+Rules revision for this release: 2026-10-07.11.
+
+### Added
+
+- **Naming engine** for 121 Google Cloud resource types: generates a name from five context values (owner · system · purpose · env · region), shortens it in three steps (drop optional tokens → abbreviate and share the length budget → fail) and validates it against the provider's documented length, characters and reserved words. A name that cannot fit is returned with `valid: false` and the reasons; it is never cut into something the provider would reject. Every limit cites an official document.
+- **Web UI in four steps** — ① Cloud ② Context ③ Resources (a tree grouped by the scope in which Google Cloud requires a name to be unique, with search, categories, a count per resource, a scope choice for merged rows, a one-line description and where the name is entered) ④ Names (PASS / FAIL per name with the reasons, copy one name, all valid names, names JSON, Terraform locals or the standard labels). The state lives in the URL hash, so a link restores the same screen.
+- **API** — `POST /v1/generate` (every resource type), `POST /v1/names` (the picked resources, with count, role and kind), `POST /v1/validate`, `GET /v1/health`, `POST /v1/events`. Successful responses carry `version: { engine, rules }`; `rules_version` in a request turns a rules change into a 409.
+- **For AI coding agents** — `GET /llms.txt` (formulas, canonical values, regions, kind tokens, abbreviations with their sources, every rule), `GET /openapi.json` and `GET /catalog.json` (the resource catalog and region table of the enabled providers), all generated from the same data as the engine.
+- **Region and zone codes per provider** (D49, D50) — `asia-northeast3` → `ane3`, `asia-northeast3-a` → `ane3a`. The `region` field takes a region or a zone, by name or by code, or `global`. Zonal resources need a zone (`name.zone_required` without one); global resources carry no region token.
+- **Kind token** (D52) — an optional value such as `POSTGRES` adds a short token after the abbreviation (`…-sql-pg-01`) when it differs from the provider default. Resource policies require one (`name.kind_required`).
+- **Resource catalog** (D46, D47, D54) — `catalog/gcp.json` and `catalog/regions.json` are the source for abbreviations, uniqueness classes, region-token kind, allowed kinds, descriptions and search aliases; `npm run catalog` writes the typed constants the engine uses. A collision test keeps abbreviations, kind tokens, region codes and environment values apart.
+- **Same-name conflicts** (D41, D47) — two items of the same uniqueness class with the same name are both `valid: false` with `name.conflict`, on `/v1/names` and on `/v1/generate`.
+- **Naming guide** at `/docs/naming` (D57) — formulas, tokens, the region table, shortening, abbreviations and kind tokens, rendered from the engine's own data.
+- **Privacy page** at `/privacy` and usage counting that does not collect what you type (D56): KV day counters and, when configured, Axiom events with a client class instead of the User-Agent.
+- **Terraform example** (`examples/terraform/`) that calls `/v1/generate` and blocks `apply` unless the name is valid.
+
+### Changed
+
+These changes were made before any public deployment, so no released name depends on the earlier scheme.
+
+- The canonical environment is **`prod`** (D48); `prd`, `production`, `real` and `live` are accepted as aliases.
+- The five country values `kr`, `us`, `jp` and `eu` are no longer accepted for `region`; the error lists the matching region names. `global` now leaves the region slot empty instead of writing the word `global` into the name.
+- Abbreviations come from the catalog, for example a Compute Engine VM is `gce` (was `vm`).
+- `providers` defaults to the enabled providers; a request for a provider that is not enabled is 400 `request.provider_not_enabled` with the supported list.
+- Share links use hash v3 (D55): old links with a country region do not open, and a link made for a provider that is not enabled keeps the free fields and `env` and resets the region and the selection.
+
+### Security
+
+- Telemetry never stores generated names, the five context values, the URL hash, the raw User-Agent, cookies or identifiers; tests check the whole payload text, the KV writes and the console logs, not only the keys (D56).
+- The client IP is read only as the key of Cloudflare's rate-limit binding (60 requests per 60 seconds for `POST /v1/*`, `GET /llms.txt` and `GET /catalog.json`) and is not stored.
+- `owner`, `system` and `purpose` are capped at 64 characters, and echoed user values are escaped and cut to 80 characters, to bound response size.
+- Every rule pattern is tested for slow backtracking, and one definition of invisible characters is applied to every rule that would otherwise accept them.
+
+### History
+
+Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.

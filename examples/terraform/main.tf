@@ -83,12 +83,12 @@ variable "purpose" {
 
 variable "env" {
   type        = string
-  description = "Environment. Canonical codes: prd, stg, dev, sbx (the API also accepts common aliases such as prod)."
+  description = "Environment. Canonical codes: prod, stg, dev, sbx (the API also accepts common aliases such as prd or production)."
 }
 
 variable "region" {
   type        = string
-  description = "Cloudonym region code used in the name: kr, us, jp, eu, global. This is NOT a GCP location - see gcp_zone."
+  description = "Region input for the name: a Google Cloud zone (asia-northeast3-a) or its code (ane3a). A VM is zonal, so a region alone makes the name invalid (name.zone_required). It only shapes the name - the VM is placed by gcp_zone, so keep the two the same."
 }
 
 # ---------------------------------------------------------------------------
