@@ -87,6 +87,7 @@ export const en: Catalog = {
     'request.providers_empty': () => "'providers' is empty",
     'request.value_unsupported': (m) => `Unsupported ${m.field} '${m.params.value}'`,
     'request.field_not_string': (m) => `'${m.field}' must be a string`,
+    'request.field_missing': (m) => `'${m.field}' is required`,
     'request.provider_not_enabled': (m) => `Provider '${m.params.provider}' is not available yet; 'supported' lists the providers you can use`,
     'request.same_origin_only': () => 'Only same-origin requests from the Cloudonym page are accepted',
     'request.rate_limited': (m) => `Too many requests; retry after ${m.params.retry_after} seconds`,

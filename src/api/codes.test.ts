@@ -3,8 +3,8 @@ import { API_CODES } from './codes';
 import { MESSAGE_CODES } from '../core/messages';
 
 describe('API 메시지 코드 (D23)', () => {
-  it('14개 · 중복 없음 · 꼴 영역.이름 · 엔진 코드와 겹치지 않는다', () => {
-    expect(API_CODES).toHaveLength(15);
+  it('16개 · 중복 없음 · 꼴 영역.이름 · 엔진 코드와 겹치지 않는다', () => {
+    expect(API_CODES).toHaveLength(16);
     expect(new Set(API_CODES).size).toBe(API_CODES.length);
     for (const c of API_CODES) expect(c).toMatch(/^[a-z]+\.[a-z_0-9]+$/);
     expect(API_CODES.filter((c) => (MESSAGE_CODES as readonly string[]).includes(c))).toEqual([]);

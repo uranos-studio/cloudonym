@@ -1304,7 +1304,7 @@
               "terraform",
               "tags-json"
             ],
-            "description": "Which copy button succeeded. Required when event is ui_copy (missing or unknown is 400 request.value_unsupported with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
+            "description": "Which copy button succeeded. Required when event is ui_copy (missing is 400 request.field_missing, unknown is 400 request.value_unsupported, both with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
             "example": "names-json"
           }
         }

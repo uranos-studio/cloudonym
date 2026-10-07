@@ -4,7 +4,7 @@
 export const API_CODES = [
   'request.body_not_json', 'request.body_not_object', 'request.body_too_large', 'request.context_not_object',
   'request.field_too_long', 'request.providers_not_array', 'request.providers_empty', 'request.value_unsupported',
-  'request.field_not_string', 'request.provider_not_enabled', 'request.same_origin_only', 'request.rate_limited', 'request.rules_version_mismatch',
+  'request.field_not_string', 'request.field_missing', 'request.provider_not_enabled', 'request.same_origin_only', 'request.rate_limited', 'request.rules_version_mismatch',
   'request.not_found', 'server.internal_error',
 ] as const;
 
@@ -19,6 +19,8 @@ export type ApiMessage =
   /** field 는 providers[i] · provider · resource_type · event. value 는 표시용 문자열(80자 자름 · 비문자열은 JSON 문자열화) */
   | { code: 'request.value_unsupported'; field: string; params: { value: string } }
   | { code: 'request.field_not_string'; field: string }
+  /** 반드시 있어야 할 필드가 본문에 없다 — field 는 provider · resource_type · event · target. 값이 없으니 params 도 없다 */
+  | { code: 'request.field_missing'; field: string }
   /** 아는 provider 인데 아직 켜지지 않았다 (D45) — field 는 providers[i] · provider. 모르는 값은 request.value_unsupported 다 */
   | { code: 'request.provider_not_enabled'; field: string; params: { provider: string } }
   | { code: 'request.same_origin_only' }

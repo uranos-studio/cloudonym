@@ -41,9 +41,14 @@ function isEnabled(v: Provider): boolean {
 /** supported 에 싣는 목록 — 켜진 CSP 만 */
 const enabledList = (): string[] => [...ENABLED_PROVIDERS];
 
-/** provider 하나의 판정 — 모르는 값은 value_unsupported, 아는데 꺼졌으면 provider_not_enabled. 통과면 undefined */
+/** 목록 밖 값의 판정 — 필드가 아예 없으면 field_missing(값 자리에 "undefined" 를 싣지 않는다), 있으면 value_unsupported */
+function unsupported(v: unknown, field: string): ApiMessage {
+  return v === undefined ? { code: 'request.field_missing', field } : { code: 'request.value_unsupported', field, params: { value: describe(v) } };
+}
+
+/** provider 하나의 판정 — 없으면 field_missing, 모르는 값은 value_unsupported, 아는데 꺼졌으면 provider_not_enabled. 통과면 undefined */
 function providerError(v: unknown, field: string): ApiMessage | undefined {
-  if (!isProvider(v)) return { code: 'request.value_unsupported', field, params: { value: describe(v) } };
+  if (!isProvider(v)) return unsupported(v, field);
   if (!isEnabled(v)) return { code: 'request.provider_not_enabled', field, params: { provider: v } };
   return undefined;
 }
@@ -141,7 +146,7 @@ export function parseValidateBody(body: unknown): Parsed<ValidateInput> {
   if (bad || !isProvider(provider)) return reject(bad ? [bad] : [], enabledList());
   const types = rulesFor(provider).map((r) => r.resourceType);
   if (typeof resourceType !== 'string' || !types.includes(resourceType)) {
-    return reject([{ code: 'request.value_unsupported', field: 'resource_type', params: { value: describe(resourceType) } }], types);
+    return reject([unsupported(resourceType, 'resource_type')], types);
   }
   if (typeof name !== 'string') return reject([{ code: 'request.field_not_string', field: 'name' }]);
   return { ok: true, value: { provider, resourceType, name } };
@@ -153,14 +158,14 @@ export function parseEventBody(body: unknown): Parsed<EventInput> {
   const long = tooLong({ event });
   if (long.length > 0) return reject(long);
   if (typeof event !== 'string' || !(UI_EVENTS as readonly string[]).includes(event)) {
-    return reject([{ code: 'request.value_unsupported', field: 'event', params: { value: describe(event) } }], [...UI_EVENTS]);
+    return reject([unsupported(event, 'event')], [...UI_EVENTS]);
   }
   if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent } };
   const target = body.target;
   const longTarget = tooLong({ target });
   if (longTarget.length > 0) return reject(longTarget);
   if (typeof target !== 'string' || !(UI_COPY_TARGETS as readonly string[]).includes(target)) {
-    return reject([{ code: 'request.value_unsupported', field: 'target', params: { value: describe(target) } }], [...UI_COPY_TARGETS]);
+    return reject([unsupported(target, 'target')], [...UI_COPY_TARGETS]);
   }
   return { ok: true, value: { event, target: target as UiCopyTarget } };
 }

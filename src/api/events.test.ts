@@ -49,6 +49,7 @@ describe('POST /v1/events — ui_copy 의 target (D56)', () => {
   it('target 이 없으면 400 · 모르는 target 이면 400 + supported 여섯 · 카운터를 올리지 않는다', async () => {
     const missing = await req(app, '/v1/events', beaconPost({ event: 'ui_copy' }));
     expect(missing.res.status).toBe(400);
+    expect(await missing.res.json()).toEqual({ success: false, errors: [{ code: 'request.field_missing', field: 'target', message: "'target' is required" }], supported: ['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json'] });
     expect(missing.promises).toHaveLength(0);
     const unknown = await req(app, '/v1/events', beaconPost({ event: 'ui_copy', target: 'owner' }));
     expect(unknown.res.status).toBe(400);

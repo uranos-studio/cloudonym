@@ -76,11 +76,22 @@ describe('parseEventBody', () => {
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'api_generate' } }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
     expect(parseEventBody(null)).toMatchObject({ ok: false });
   });
+  it('필드가 없으면 request.field_missing — 값 자리에 "undefined" 를 싣지 않는다', () => {
+    expect(parseEventBody({}))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'event' }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
+    expect(parseValidateBody({ resource_type: 'project_id', name: 'x' }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'provider' }], supported: ['gcp'] } });
+    expect(parseValidateBody({ provider: 'gcp', name: 'x' }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'resource_type' }], supported: rulesFor('gcp').map((r) => r.resourceType) } });
+    // null 은 보낸 값이다 — 목록 밖 값으로 되돌려 싣는다
+    expect(parseEventBody({ event: null }))
+      .toMatchObject({ rejection: { errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'null' } }] } });
+  });
   it('ui_copy 의 target — 여섯 중 하나만 · 없거나 모르면 400 + supported 여섯 · 다른 이벤트의 target 은 버린다 (D56)', () => {
     expect(UI_COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json']);
     for (const target of UI_COPY_TARGETS) expect(parseEventBody({ event: 'ui_copy', target })).toEqual({ ok: true, value: { event: 'ui_copy', target } });
     expect(parseEventBody({ event: 'ui_copy' }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'target', params: { value: 'undefined' } }], supported: [...UI_COPY_TARGETS] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'target' }], supported: [...UI_COPY_TARGETS] } });
     expect(parseEventBody({ event: 'ui_copy', target: 'name:gcp.project_id' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'target', params: { value: 'name:gcp.project_id' } }], supported: [...UI_COPY_TARGETS] } });
     expect(parseEventBody({ event: 'ui_copy', target: 'x'.repeat(2000) })).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_too_long', field: 'target' }] } });
@@ -156,10 +167,10 @@ describe('parseNamesBody (D39)', () => {
     expect(parseNamesBody({ ...ok, provider: 'azure', resources: [{ type: 'virtual_machine' }] }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ['gcp'] } });
   });
-  it('provider 없음 · 모르는 값 → 400 request.value_unsupported + supported 는 켜진 것', () => {
+  it('provider 없음 → 400 request.field_missing · 모르는 값 → request.value_unsupported · supported 는 켜진 것', () => {
     const supported = ['gcp'];
     expect(parseNamesBody({ ...ok, provider: undefined }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'undefined' } }], supported } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'provider' }], supported } });
     expect(parseNamesBody({ ...ok, provider: 'oci' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported } });
   });

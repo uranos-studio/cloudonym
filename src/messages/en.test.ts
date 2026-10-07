@@ -84,6 +84,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'request.providers_empty': { code: 'request.providers_empty' },
   'request.value_unsupported': { code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'BBB' } },
   'request.field_not_string': { code: 'request.field_not_string', field: 'name' },
+  'request.field_missing': { code: 'request.field_missing', field: 'target' },
   'request.provider_not_enabled': { code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'AAA' } },
   'request.same_origin_only': { code: 'request.same_origin_only' },
   'request.rate_limited': { code: 'request.rate_limited', params: { retry_after: 42 } },
@@ -100,7 +101,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(80);
+    expect(codes).toHaveLength(81);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });
