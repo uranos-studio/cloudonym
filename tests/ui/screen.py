@@ -28,7 +28,7 @@ OUT = Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
 
 # ⑴ 의 입력 — 기본값(platform · billing · trade)과 달라야 시험이 공허하지 않다. SA 원본 37자 → region 생략 → owner 생략 (엔진 실측)
-INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prd', 'region': 'kr'}
+INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prod', 'region': 'kr'}
 # 같은 탭 공유 URL 이동의 입력 — INPUT 과 다섯 값이 모두 다르다
 OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'jp'}
 # ⑾ 에서 고르는 GCP 선택 — 트리 순서(Global namespace → Project)

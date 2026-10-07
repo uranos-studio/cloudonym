@@ -21,8 +21,8 @@ export const MAX_RESOURCE_TYPE_CHARS = 40;
 export const MAX_ROLE_CHARS = 16;
 /** r 의 항목 하나 최악 — 수(`"<40>":99,` 47 바이트)와 역할(`"<40>":"<16>",` 62 바이트) 중 큰 쪽. 값이 배타라 한 type 은 한 번만 나온다 */
 const MAX_ITEM_JSON_BYTES = Math.max(`"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":99,`.length, `"${'t'.repeat(MAX_RESOURCE_TYPE_CHARS)}":"${'r'.repeat(MAX_ROLE_CHARS)}",`.length);
-/** 최악 JSON 바이트 — 뼈대(env `prd` · region `global` · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
-const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prd', region: 'global', v: V_PLACEHOLDER, p: 'azure', r: {} }).length
+/** 최악 JSON 바이트 — 뼈대(env `prod`(가장 긴 표준값 4자) · region `global` · `v` 13자 · p `azure`(가장 긴 provider) · 빈 r) + 자유 입력 셋이 모두 상한 + 항목 200개(마지막 항목은 쉼표가 없다) */
+const MAX_JSON_BYTES = JSON.stringify({ owner: '', system: '', purpose: '', env: 'prod', region: 'global', v: V_PLACEHOLDER, p: 'azure', r: {} }).length
   + FREE_FIELDS.length * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_ITEMS * MAX_ITEM_JSON_BYTES - 1;
 /** hash 전체 상한 — 화면 · API 가 받는 모든 입력(자유 입력 셋 각 MAX_CONTEXT_CHARS 자 · 아무 유니코드)과 최대 선택이 왕복하도록 최악 JSON 의

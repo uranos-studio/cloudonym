@@ -4,7 +4,7 @@ import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { ENABLED_PROVIDERS } from '../core/types';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 
 describe('parseGenerateBody', () => {
   it('정상 — providers 는 중복을 없앤다', () => {

@@ -5,7 +5,7 @@ import { app } from './index';
 import { RATE_LIMIT } from './ratelimit';
 import { req, jsonPost, beaconPost, json, fakeKv, fakeLimiter } from './test-support';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 const TOO_MANY = { success: false, errors: [{ code: 'request.rate_limited', params: { retry_after: 60 }, message: 'Too many requests; retry after 60 seconds' }] };
 const ip = (h: Record<string, string> = {}) => ({ 'cf-connecting-ip': '203.0.113.7', ...h });
 

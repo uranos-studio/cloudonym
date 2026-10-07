@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { labelsFor } from './labels';
 import { AWS_TAG_VALUE } from './constraints';
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
 
 describe('labelsFor', () => {
   it('공통 다섯 키', () => {
-    expect(labelsFor(ctx, 'aws').labels).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(labelsFor(ctx, 'aws').labels).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });
+  });
+  it('environment 값은 정본 env 그대로 — 세 CSP 모두 prod (D48)', () => {
+    for (const p of ['aws', 'gcp', 'azure'] as const) expect(labelsFor(ctx, p).labels.environment, p).toBe('prod');
   });
   it('TC-AWS-02 값 한도 초과는 자르지 않고 violations (AWS 256 · Azure 256 · GCP 63)', () => {
     const big = { ...ctx, owner: 'a'.repeat(257) };

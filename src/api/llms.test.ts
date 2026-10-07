@@ -58,7 +58,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(st).toContain('case-insensitive');
   });
   it('허용값 절은 ENV_ALIASES · REGION_ALIASES 의 표준값과 별칭', () => {
-    expect(text).toContain('- `prd` — aliases: prod, production, real, live');
+    expect(text).toContain('- `prod` — aliases: prd, production, real, live');
     expect(text).toContain('- `kr` — aliases: korea, koreacentral, asia-northeast3, ap-northeast-2');
     expect(text).toContain('- `global`');
   });

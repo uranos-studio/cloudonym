@@ -1,7 +1,7 @@
 // 엔진 공개 API — API 와 화면은 generate · validateName · parseContext · generateMany 넷을 부른다 (선택 검증은 selection.ts)
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { getRule, rulesFor } from './constraints';
-import { ENV_ALIASES, REGION_ALIASES, canonicalEnv, canonicalRegion, normalizeToken } from './normalize';
+import { ENV_VALUES, REGION_ALIASES, canonicalEnv, canonicalRegion, normalizeToken } from './normalize';
 import { compose, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { SelectionItem } from './selection';
@@ -133,8 +133,9 @@ export function validateName(provider: Provider, resourceType: string, name: str
   return { valid: false, violations };
 }
 
-/** 지원하는 표준값 — 별칭 표의 값에서 뽑는다(순서는 표 순서: prd · stg · dev · sbx / kr · us · jp · eu · global) */
-const ENV_VALUES = (): string[] => [...new Set(Object.values(ENV_ALIASES))];
+/** env 표준값 — 화면의 env 고르기가 쓰는 공개 API (D48). 정본은 normalize.ts 의 별칭 표다 */
+export { ENV_VALUES };
+/** 지원하는 표준값 — 별칭 표의 값에서 뽑는다(순서는 표 순서: env 는 ENV_VALUES / kr · us · jp · eu · global) */
 const REGION_VALUES = (): string[] => [...new Set(Object.values(REGION_ALIASES))];
 
 const FIELDS: readonly ContextField[] = ['owner', 'system', 'purpose', 'env', 'region'];
@@ -156,7 +157,7 @@ export function parseContext(raw: RawContext):
     if (v.trim() === '') { errors.push({ code: 'context.empty', field: f }); continue; }
     if (f === 'env') {
       const c = canonicalEnv(v);
-      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'env', params: { value: clipForDisplay(v), supported: ENV_VALUES() } }); continue; }
+      if (!c) { errors.push({ code: 'context.value_unsupported', field: 'env', params: { value: clipForDisplay(v), supported: [...ENV_VALUES] } }); continue; }
       if (c !== v) transformed.push({ code: 'context.normalized', field: 'env', params: { from: clipForDisplay(v), to: c } });
       vals[f] = c;
     } else if (f === 'region') {

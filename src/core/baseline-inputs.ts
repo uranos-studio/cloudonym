@@ -11,7 +11,7 @@ import { PROVIDERS, type Provider, type RawContext } from './types';
 const HANGUL_OWNER = String.fromCodePoint(0xac1c, 0xbc1c);
 const HANGUL_SYSTEM = String.fromCodePoint(0xb9e4, 0xb9e4); // 정제하면 빈 값이 된다
 
-const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 
 /** 생성 입력 — parseContext 를 거쳐 generate · labelsFor 로 간다 */
 export const BASELINE_CONTEXTS: readonly { id: string; raw: RawContext }[] = [
@@ -24,7 +24,7 @@ export const BASELINE_CONTEXTS: readonly { id: string; raw: RawContext }[] = [
   { id: 'reserved-azure', raw: { ...BASE, system: 'azure' } },
   { id: 'empty-after-normalize', raw: { ...BASE, system: HANGUL_SYSTEM } },
   { id: 'long-values', raw: { owner: 'platformengineering', system: 'paymentsettlement', purpose: 'reconciliation', env: 'dev', region: 'global' } },
-  // 축소 실패 — Windows VM(15자)에서 예산 2 로 자르면 'a-' 가 한 글자가 된다 (name.cannot_fit)
+  // 축소 실패 — Windows VM(15자)에서 env prod(4자)면 예산이 1 이라 들어가지 않는다 (name.cannot_fit · D48). 3자 env 였을 때는 예산 2 로 'a-' 가 한 글자가 되어 실패했다
   { id: 'shrink-fail', raw: { ...BASE, system: 'a-long', purpose: 'longpurpose' } },
   { id: 'digit-first-system', raw: { ...BASE, system: '3tier' } },
   { id: 'label-gcp-65', raw: { ...BASE, owner: 'o'.repeat(65) } },

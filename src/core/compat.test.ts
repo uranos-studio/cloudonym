@@ -4,49 +4,53 @@
 import { describe, it, expect } from 'vitest';
 import { generate, parseContext } from './engine';
 
-const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
+
+/** 리터럴 가운데 유효하지 않은 것 — env prod(4자)로 Windows VM(15자)의 축소 예산이 MIN_TOKEN 아래가 되어 name.cannot_fit (D48).
+ *  이름 리터럴은 축소를 포기한 그 이름이다 */
+const CANNOT_FIT = new Set(['azure.virtual_machine_windows']);
 
 const EXPECTED: Record<string, Record<string, string>> = {
   aws: {
-    s3_bucket: 'platform-billing-trade-prd-bucket',
-    iam_role: 'billing-trade-prd-role-sync',
-    vpc: 'billing-trade-prd-kr-vpc-01',
-    subnet: 'billing-trade-prd-kr-subnet-01',
-    ec2_instance: 'billing-trade-prd-kr-vm-01',
-    rds_instance: 'billing-trade-prd-kr-db-01',
-    internet_gateway: 'billing-trade-prd-kr-igw-01',
-    route_table: 'billing-trade-prd-kr-rt-01',
-    security_group: 'billing-trade-prd-kr-sg-01',
-    key_pair: 'billing-trade-prd-kr-key-01',
-    ebs_volume: 'billing-trade-prd-kr-vol-01',
+    s3_bucket: 'platform-billing-trade-prod-bucket',
+    iam_role: 'billing-trade-prod-role-sync',
+    vpc: 'billing-trade-prod-kr-vpc-01',
+    subnet: 'billing-trade-prod-kr-subnet-01',
+    ec2_instance: 'billing-trade-prod-kr-vm-01',
+    rds_instance: 'billing-trade-prod-kr-db-01',
+    internet_gateway: 'billing-trade-prod-kr-igw-01',
+    route_table: 'billing-trade-prod-kr-rt-01',
+    security_group: 'billing-trade-prod-kr-sg-01',
+    key_pair: 'billing-trade-prod-kr-key-01',
+    ebs_volume: 'billing-trade-prod-kr-vol-01',
   },
   gcp: {
-    project_id: 'platform-billing-trade-prd',
-    service_account: 'billing-trade-prd-sa-sync',
-    compute_instance: 'billing-trade-prd-kr-gce-01',
-    vpc_network: 'billing-trade-prd-vpc-01',
-    subnet: 'billing-trade-prd-kr-snet-01',
-    cloud_sql_instance: 'billing-trade-prd-kr-sql-01',
-    storage_bucket: 'platform-billing-trade-prd-gcs',
-    firewall_rule: 'billing-trade-prd-fw-01',
-    disk: 'billing-trade-prd-kr-disk-01',
+    project_id: 'platform-billing-trade-prod',
+    service_account: 'billing-trade-prod-sa-sync',
+    compute_instance: 'billing-trade-prod-kr-gce-01',
+    vpc_network: 'billing-trade-prod-vpc-01',
+    subnet: 'billing-trade-prod-kr-snet-01',
+    cloud_sql_instance: 'billing-trade-prod-kr-sql-01',
+    storage_bucket: 'platform-billing-trade-prod-gcs',
+    firewall_rule: 'billing-trade-prod-fw-01',
+    disk: 'billing-trade-prod-kr-disk-01',
   },
   azure: {
-    resource_group: 'rg-billing-trade-prd',
-    storage_account: 'stbillingtradeprd',
-    key_vault: 'kv-billing-trade-prd',
-    managed_identity: 'billing-trade-prd-id-sync',
-    virtual_machine: 'billing-trade-prd-kr-vm-01',
-    virtual_machine_windows: 'bi-tr-prd-vm-01',
-    virtual_network: 'billing-trade-prd-kr-vnet-01',
-    subnet: 'billing-trade-prd-kr-snet-01',
-    sql_server: 'billing-trade-prd-kr-sql-01',
-    aks_nodepool_linux: 'nptradeprd',
+    resource_group: 'rg-billing-trade-prod',
+    storage_account: 'stbillingtradeprod',
+    key_vault: 'kv-billing-trade-prod',
+    managed_identity: 'billing-trade-prod-id-sync',
+    virtual_machine: 'billing-trade-prod-kr-vm-01',
+    virtual_machine_windows: 'billing-trd-prod-vm-01',
+    virtual_network: 'billing-trade-prod-kr-vnet-01',
+    subnet: 'billing-trade-prod-kr-snet-01',
+    sql_server: 'billing-trade-prod-kr-sql-01',
+    aks_nodepool_linux: 'nptradeprod',
     aks_nodepool_windows: 'nptrd',
-    public_ip: 'billing-trade-prd-kr-pip-01',
-    network_security_group: 'billing-trade-prd-kr-nsg-01',
-    network_interface: 'billing-trade-prd-kr-nic-01',
-    os_disk: 'billing-trade-prd-kr-osdisk-01',
+    public_ip: 'billing-trade-prod-kr-pip-01',
+    network_security_group: 'billing-trade-prod-kr-nsg-01',
+    network_interface: 'billing-trade-prod-kr-nic-01',
+    os_disk: 'billing-trade-prod-kr-osdisk-01',
   },
 };
 
@@ -60,6 +64,6 @@ describe('호환 — 기본 문맥의 이름 35개 (리터럴)', () => {
       .filter(([t]) => t in (EXPECTED as Record<string, Record<string, string>>)[p]!).map(([t, r]) => [t, r.name]))]));
     expect(actual).toEqual(EXPECTED);
     expect(Object.values(EXPECTED).flatMap((byType) => Object.keys(byType))).toHaveLength(35);
-    for (const [p, byType] of Object.entries(out)) for (const [t, r] of Object.entries(byType!)) if (t in (EXPECTED as Record<string, Record<string, string>>)[p]!) expect(r.valid, r.ruleId).toBe(true);
+    for (const [p, byType] of Object.entries(out)) for (const [t, r] of Object.entries(byType!)) if (t in (EXPECTED as Record<string, Record<string, string>>)[p]!) expect(r.valid, r.ruleId).toBe(!CANNOT_FIT.has(r.ruleId));
   });
 });

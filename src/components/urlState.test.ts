@@ -4,7 +4,7 @@ import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
 import { PROVIDERS, type NamingContext, type ResourceRule } from '../core/types';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 
-const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
 /** 디코더 자체의 시험 — 세 CSP 가 모두 켜진 것으로 푼다. 켜진 CSP 에 따른 동작(D45 · D55)은 맨 아래 절이 기본값(decodeEnabled)으로 본다 */
 const decodeState = (hash: string, rules?: readonly ResourceRule[]) => decodeEnabled(hash, rules, PROVIDERS);
@@ -22,7 +22,7 @@ describe('encodeState — Base64url', () => {
     expect(ctxOf(`#state=${encodeState(ko)}`)).toEqual(ko);
   });
   it('필드 순서가 달라도 같은 문자열 — 다섯 필드만 고정 순서로 담는다', () => {
-    const shuffled = { region: 'kr', env: 'prd', purpose: 'trade', system: 'billing', owner: 'infra', extra: 'x' } as unknown as NamingContext;
+    const shuffled = { region: 'kr', env: 'prod', purpose: 'trade', system: 'billing', owner: 'infra', extra: 'x' } as unknown as NamingContext;
     expect(encodeState(shuffled)).toBe(encodeState(ctx));
   });
 });
@@ -34,7 +34,7 @@ describe('decodeState — 깨진 hash 는 전부 undefined', () => {
     [`#state=${b64('billing')}`, 'JSON 이 객체가 아니다(문자열)'],
     [`#state=${b64(['a'])}`, 'JSON 이 배열이다'],
     [`#state=${b64(null)}`, 'JSON 이 null 이다'],
-    [`#state=${b64({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd' })}`, 'region 이 빠졌다'],
+    [`#state=${b64({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod' })}`, 'region 이 빠졌다'],
     [`#state=${b64({ ...ctx, owner: 42 })}`, '값이 숫자다'],
     [`#state=${b64({ ...ctx, env: 'qa' })}`, 'env 가 지원 밖이다'],
     ['', '빈 hash'],
@@ -52,7 +52,7 @@ describe('decodeState — 깨진 hash 는 전부 undefined', () => {
     expect(stdPlus).toMatch(/[+/]/);
     expect(ctxOf(`state=${stdPlus}`)).toEqual(plus);
   });
-  it('별칭은 parseContext 가 정규화한다 — production · korea → prd · kr', () => {
+  it('별칭은 parseContext 가 정규화한다 — production · korea → prod · kr', () => {
     expect(ctxOf(`#state=${b64({ ...ctx, env: 'production', region: 'korea' })}`)).toEqual(ctx);
   });
 });
@@ -66,7 +66,7 @@ describe('shareUrl', () => {
 });
 
 describe('decodeState 길이 상한', () => {
-  const at = (s: string): NamingContext => ({ owner: s, system: s, purpose: s, env: 'prd', region: 'global' });
+  const at = (s: string): NamingContext => ({ owner: s, system: s, purpose: s, env: 'prod', region: 'global' });
   /** 가장 긴 v — N 두 자리 */
   const V = '2099-12-31.99';
   const hashOf = (c: NamingContext) => `#${'state'}=${encodeState(c, V)}`;
@@ -79,8 +79,8 @@ describe('decodeState 길이 상한', () => {
     expect((ctxOf(`#state=${b64({ ...ctx, [f]: 'a'.repeat(MAX_CONTEXT_CHARS) })}`) as Record<string, string> | undefined)?.[f]).toBe('a'.repeat(MAX_CONTEXT_CHARS));
   });
   it('env 는 1024자까지 받는다(앞뒤 공백은 정본 값으로) · 넘으면 undefined', () => {
-    expect(ctxOf(`#state=${b64({ ...ctx, env: `prd${' '.repeat(1021)}` })}`)?.env).toBe('prd');
-    expect(ctxOf(`#state=${b64({ ...ctx, env: `prd${' '.repeat(1022)}` })}`)).toBeUndefined();
+    expect(ctxOf(`#state=${b64({ ...ctx, env: `prod${' '.repeat(1020)}` })}`)?.env).toBe('prod');
+    expect(ctxOf(`#state=${b64({ ...ctx, env: `prod${' '.repeat(1021)}` })}`)).toBeUndefined();
   });
   it.each([
     ['ASCII 64자 × 3', 'a'.repeat(64)],
@@ -93,10 +93,10 @@ describe('decodeState 길이 상한', () => {
     expect(h.length).toBeLessThanOrEqual(MAX_HASH_CHARS);
     expect(ctxOf(h)).toEqual(c);
   });
-  it('선택 없는 최악 문맥(필드당 6바이트 × 64 × 3 · region global · v 13자)은 1659자 — v2 상한(선택 포함 · 아래 절) 안이다', () => {
+  it('선택 없는 최악 문맥(필드당 6바이트 × 64 × 3 · region global · v 13자)은 1661자 — v2 상한(선택 포함 · 아래 절) 안이다', () => {
     const worst = at('\u0001'.repeat(64));
     const url = hashOf(worst);
-    expect(url.length).toBe(1659); // 87 + 1152 = 1239 바이트는 3 의 배수라 패딩이 없다
+    expect(url.length).toBe(1661); // 88 + 1152 = 1240 바이트 → Base64url(패딩 없음) 1654자 + `#state=` 7자
     expect(url.length).toBeLessThan(MAX_HASH_CHARS);
     expect(decodeState(url)).toEqual({ context: worst, rulesVersion: V });
   });
@@ -233,7 +233,7 @@ describe('hash v2 — 최대 상태 왕복과 상한', () => {
     const type = `${'t'.repeat(MAX_RESOURCE_TYPE_CHARS - 3)}${String(i).padStart(3, '0')}`;
     return { ...mi, id: `azure.${type}`, resourceType: type };
   });
-  const worst: NamingContext = { owner: '\u0001'.repeat(MAX_CONTEXT_CHARS), system: '\u0001'.repeat(MAX_CONTEXT_CHARS), purpose: '\u0001'.repeat(MAX_CONTEXT_CHARS), env: 'prd', region: 'global' };
+  const worst: NamingContext = { owner: '\u0001'.repeat(MAX_CONTEXT_CHARS), system: '\u0001'.repeat(MAX_CONTEXT_CHARS), purpose: '\u0001'.repeat(MAX_CONTEXT_CHARS), env: 'prod', region: 'global' };
   const items = sel('azure', rules.map((r) => ({ type: r.resourceType, role: 'r'.repeat(MAX_ROLE_CHARS) })), rules);
   const V = '2099-12-31.99';
 

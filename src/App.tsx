@@ -22,7 +22,7 @@ import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
 /** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다 */
-const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 /** 켜진 CSP 가 하나면 첫 그리기 때 그것을 고른다 (D45 · 오너 결정 C1). 둘 이상이면 고르지 않는다 — 숨은 기본값을 두지 않는다 */
 const AUTO_PROVIDER: Provider | undefined = ENABLED_PROVIDERS.length === 1 ? ENABLED_PROVIDERS[0] : undefined;
 const NO_PICK: Picked = new Map();

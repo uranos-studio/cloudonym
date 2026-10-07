@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { app } from './index';
 import { req, jsonPost, beaconPost, fakeKv, isPending } from './test-support';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 
 describe('POST /v1/events (D17 비콘)', () => {
   it('ui_visit → 200 { ok:true } · waitUntil 1건 · KV 키 stats:ui_visit:<KST 일자>', async () => {

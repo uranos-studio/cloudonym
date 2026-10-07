@@ -1,12 +1,16 @@
 import type { Allowed, Env, Region } from './types';
 import { lookup } from './dict';
 
+/** 표 순서가 표준값 순서다 — parseContext 의 supported · 화면의 env 고르기 · llms.txt 가 이 순서를 쓴다.
+ *  prd 는 0.1.0 전의 표준값이라 별칭으로 남긴다 (D48) */
 export const ENV_ALIASES: Record<string, Env> = {
-  prd: 'prd', prod: 'prd', production: 'prd', real: 'prd', live: 'prd',
+  prod: 'prod', prd: 'prod', production: 'prod', real: 'prod', live: 'prod',
   stg: 'stg', stage: 'stg', staging: 'stg',
   dev: 'dev', develop: 'dev', development: 'dev',
   sbx: 'sbx', sandbox: 'sbx',
 };
+/** env 표준값 — 별칭 표의 값을 표 순서대로 (prod · stg · dev · sbx) */
+export const ENV_VALUES: readonly Env[] = [...new Set(Object.values(ENV_ALIASES))];
 export const REGION_ALIASES: Record<string, Region> = {
   kr: 'kr', korea: 'kr', koreacentral: 'kr', 'asia-northeast3': 'kr', 'ap-northeast-2': 'kr',
   us: 'us', 'us-east-1': 'us', 'us-central1': 'us', eastus: 'us',

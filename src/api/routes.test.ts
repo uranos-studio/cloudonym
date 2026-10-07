@@ -11,7 +11,7 @@ import { afterEach, vi } from 'vitest';
 import { VERSION } from '../version';
 import { rulesFor } from '../core/constraints';
 
-const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 const post = (body: unknown) => req(app, '/v1/generate', jsonPost(body));
 
 describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
@@ -46,15 +46,15 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(body.success).toBe(true);
     expect(body.version).toEqual(VERSION);
     expect(body.data.gcp.service_account).toEqual({
-      name: 'billing-trade-prd-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'infra-billing-trade-prd-kr-sa-sync', violations: [],
+      name: 'billing-trade-prod-sa-sync', valid: true, is_truncated: true, is_transformed: false,
+      original: 'infra-billing-trade-prod-kr-sa-sync', violations: [],
       steps: [
         { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
         { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
       ],
       rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
-    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });
     expect(body.metadata).toMatchObject({ label_violations: { gcp: [] }, label_transformed: { gcp: [] }, transformed: [] });
   });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {
@@ -75,15 +75,15 @@ describe('POST /v1/generate (D15 wire)', () => {
   it('env · region 별칭은 통과하고 metadata.transformed 에 남는다 (TC-COM-02)', async () => {
     const body = await json((await post({ context: { ...ctx, env: 'production', region: 'asia-northeast3' }, providers: ['gcp'] })).res);
     expect(body.metadata.transformed).toEqual([
-      { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prd' }, message: "env 'production' normalised to 'prd'" },
+      { code: 'context.normalized', field: 'env', params: { from: 'production', to: 'prod' }, message: "env 'production' normalised to 'prod'" },
       { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'kr' }, message: "region 'asia-northeast3' normalised to 'kr'" },
     ]);
-    expect(body.data.gcp.service_account.name).toBe('billing-trade-prd-sa-sync');
+    expect(body.data.gcp.service_account.name).toBe('billing-trade-prod-sa-sync');
   });
   it('잘못된 env → 400 { success:false, errors }', async () => {
     const { res } = await post({ context: { ...ctx, env: 'qa' } });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prd', 'stg', 'dev', 'sbx'] }, message: "env 'qa' is not supported (prd, stg, dev, sbx)" }] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] }, message: "env 'qa' is not supported (prod, stg, dev, sbx)" }] });
   });
   it('본문이 JSON 이 아니면 400', async () => {
     const { res } = await req(app, '/v1/generate', { method: 'POST', body: 'not json' });
@@ -151,7 +151,7 @@ describe('되돌려 싣는 사용자 값의 보이지 않는 문자', () => {
 });
 
 describe('POST /v1/names (D39)', () => {
-  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+  const base = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
   const names = (body: unknown, env = {}) => req(app, '/v1/names', jsonPost(body), env);
   afterEach(() => { vi.unstubAllGlobals(); });
 
@@ -167,8 +167,8 @@ describe('POST /v1/names (D39)', () => {
     expect(az.valid).toBe(true);
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
-      'compute_instance_01=billing-trade-prd-kr-gce-01', 'compute_instance_02=billing-trade-prd-kr-gce-02',
-      'storage_bucket=platform-billing-trade-prd-gcs', 'service_account_db=billing-trade-prd-sa-db', 'project_id=platform-billing-trade-prd',
+      'compute_instance_01=billing-trade-prod-kr-gce-01', 'compute_instance_02=billing-trade-prod-kr-gce-02',
+      'storage_bucket=platform-billing-trade-prod-gcs', 'service_account_db=billing-trade-prod-sa-db', 'project_id=platform-billing-trade-prod',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
     expect(az.items[0]).toMatchObject({ resource_type: 'compute_instance', seq: '01', scope: 'gcp:project', uniqueness: 'csp' });
@@ -176,7 +176,7 @@ describe('POST /v1/names (D39)', () => {
     expect(az.items[2].seq).toBeUndefined();
     expect(az.items[3]).toMatchObject({ role: 'db', scope: 'gcp:project' });
     expect(az.items[4]).toMatchObject({ scope: 'gcp:namespace' });
-    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });
   });
   it('항목 하나가 FAIL 이면 200 · valid:false · 항목 전부와 이유', async () => {
     const { res } = await names({ provider: 'gcp', context: { ...base, owner: 'goog' }, resources: [{ type: 'storage_bucket' }, { type: 'compute_instance', count: 2 }] });
@@ -195,7 +195,7 @@ describe('POST /v1/names (D39)', () => {
   });
   it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
     const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
-    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-gce-01', 'billing-trade-prd-kr-disk-01']);
+    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prod-kr-gce-01', 'billing-trade-prod-kr-disk-01']);
     expect(g.conflicts).toEqual([]);
   });
   it('storage_bucket 에 count 2 → 400 selection.count_not_supported', async () => {

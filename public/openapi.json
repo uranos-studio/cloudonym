@@ -29,7 +29,7 @@
                   "owner": "platform",
                   "system": "billing",
                   "purpose": "trade",
-                  "env": "prd",
+                  "env": "prod",
                   "region": "kr"
                 },
                 "providers": [
@@ -130,7 +130,7 @@
                   "owner": "platform",
                   "system": "billing",
                   "purpose": "trade",
-                  "env": "prd",
+                  "env": "prod",
                   "region": "kr"
                 },
                 "resources": [
@@ -242,7 +242,7 @@
               "example": {
                 "provider": "gcp",
                 "resource_type": "service_account",
-                "name": "platform-billing-trade-prd-kr-sa-sync"
+                "name": "platform-billing-trade-prod-kr-sa-sync"
               }
             }
           }
@@ -477,8 +477,8 @@
               "env": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: prd, stg, dev, sbx. Common aliases are accepted and normalised (production, prod, live -> prd; staging -> stg; development -> dev; sandbox -> sbx).",
-                "example": "prd"
+                "description": "Canonical: prod, stg, dev, sbx. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx).",
+                "example": "prod"
               },
               "region": {
                 "type": "string",
@@ -588,7 +588,7 @@
             "items": {
               "$ref": "#/components/schemas/Message"
             },
-            "description": "Context values normalised from aliases (context.normalized, e.g. env 'production' -> 'prd')"
+            "description": "Context values normalised from aliases (context.normalized, e.g. env 'production' -> 'prod')"
           }
         }
       },
@@ -609,7 +609,7 @@
           "name": {
             "type": "string",
             "description": "Final name. Empty when a required token became empty after normalisation.",
-            "example": "billing-trade-prd-sa-sync"
+            "example": "billing-trade-prod-sa-sync"
           },
           "valid": {
             "type": "boolean",
@@ -629,7 +629,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prd-kr-sa-sync"
+            "example": "platform-billing-trade-prod-kr-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -694,8 +694,8 @@
               "env": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: prd, stg, dev, sbx. Common aliases are accepted and normalised (production, prod, live -> prd; staging -> stg; development -> dev; sandbox -> sbx).",
-                "example": "prd"
+                "description": "Canonical: prod, stg, dev, sbx. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx).",
+                "example": "prod"
               },
               "region": {
                 "type": "string",
@@ -965,7 +965,7 @@
           "name": {
             "type": "string",
             "description": "Final name. Empty when a required token became empty after normalisation.",
-            "example": "billing-trade-prd-sa-sync"
+            "example": "billing-trade-prod-sa-sync"
           },
           "valid": {
             "type": "boolean",
@@ -985,7 +985,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prd-kr-sa-sync"
+            "example": "platform-billing-trade-prod-kr-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -1151,7 +1151,7 @@
             "type": "string",
             "maxLength": 1024,
             "description": "Longer than 1024 characters returns 400. Up to 1024, a name over the rule's max_length is judged by the engine (valid=false with a length violation).",
-            "example": "platform-billing-trade-prd-kr-sa-sync"
+            "example": "platform-billing-trade-prod-kr-sa-sync"
           },
           "rules_version": {
             "type": "string",
@@ -1197,7 +1197,7 @@
           "suggested_name": {
             "type": "string",
             "description": "Present only when the name is invalid and a fix is possible",
-            "example": "billing-trade-prd-kr-sa-sync"
+            "example": "billing-trade-prod-kr-sa-sync"
           }
         }
       },
@@ -1279,13 +1279,13 @@
                 "params": {
                   "value": "qa",
                   "supported": [
-                    "prd",
+                    "prod",
                     "stg",
                     "dev",
                     "sbx"
                   ]
                 },
-                "message": "env 'qa' is not supported (prd, stg, dev, sbx)"
+                "message": "env 'qa' is not supported (prod, stg, dev, sbx)"
               }
             ]
           },

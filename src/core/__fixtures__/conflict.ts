@@ -9,7 +9,7 @@ const vm = getRule('azure', 'virtual_machine')!;
 export const CONFLICT_RULE_A: ResourceRule = { ...vm, id: 'azure.test_conflict_a', resourceType: 'test_conflict_a', displayName: 'Test Conflict A' };
 export const CONFLICT_RULE_B: ResourceRule = { ...vm, id: 'azure.test_conflict_b', resourceType: 'test_conflict_b', displayName: 'Test Conflict B' };
 
-export const CONFLICT_CONTEXT: NamingContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+export const CONFLICT_CONTEXT: NamingContext = { owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 
 /** 둘 다 count 1 — 같은 이름 하나씩 */
 export const CONFLICT_SELECTION = [

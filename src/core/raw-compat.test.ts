@@ -1,11 +1,11 @@
-// 원시 입력 호환 — 기준선의 옛 원시 입력 20개(BASELINE_CONTEXTS)를 provider 마다 문맥 파서에 넣은 결과를 고정한다.
+// 원시 입력 호환 — 기준선의 옛 원시 입력 20개(__fixtures__/raw-inputs-before-v0.1.0.ts 에 얼린 사본)를 provider 마다 문맥 파서에 넣은 결과를 고정한다.
 // 0.1.0 작업 동안 환경 값(prd → prod)과 지역 값(나라 값 → provider 별 리전 · 존 코드)이 바뀌면 이 결과도 바뀐다 —
 // 그때마다 fixture 의 기대값을 그 변경에 맞게 고쳐 쓰고, 고친 차이를 커밋에서 읽는다.
 // 기대값 갱신: UPDATE_RAW_COMPAT=1 npx vitest run src/core/raw-compat.test.ts (변경 회계 fixture 와 함께 0.1.0 마감 검토 뒤 지운다)
 import { describe, it, expect } from 'vitest';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BASELINE_CONTEXTS } from './baseline-inputs';
+import { RAW_INPUTS_BEFORE } from './__fixtures__/raw-inputs-before-v0.1.0';
 import { parseContext } from './engine';
 import { PROVIDERS, type Provider, type RawContext } from './types';
 
@@ -21,7 +21,7 @@ function parseFor(raw: RawContext, _provider: Provider): unknown {
 }
 
 function collect(): Results {
-  return Object.fromEntries(BASELINE_CONTEXTS.map(({ id, raw }) => [id, Object.fromEntries(PROVIDERS.map((p) => [p, parseFor(raw, p)]))]));
+  return Object.fromEntries(RAW_INPUTS_BEFORE.map(({ id, raw }) => [id, Object.fromEntries(PROVIDERS.map((p) => [p, parseFor(raw, p)]))]));
 }
 
 /** 다른 칸의 목록 — `${id}/${provider}` */

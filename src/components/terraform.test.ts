@@ -6,7 +6,7 @@ import { validateSelection } from '../core/selection';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from '../core/__fixtures__/conflict';
 import type { GenerateOutput, LabelSet, NameResult, NamingContext } from '../core/types';
 
-const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 const stub = (over: Partial<NameResult>): NameResult => ({
   ruleId: 'gcp.service_account', resourceType: 'service_account', displayName: 'Service Account', name: 'x', valid: true,
   isTruncated: false, isTransformed: false, original: 'x', violations: [], steps: [],
@@ -22,12 +22,16 @@ describe('toTerraformLocals', () => {
     const hcl = toTerraformLocals(entriesOf(out), labels);
     expect(hcl.startsWith('locals {\n')).toBe(true);
     expect(hcl.endsWith('\n}\n')).toBe(true);
-    expect(hcl).toContain('  gcp_service_account = "billing-trade-prd-sa-sync"\n');
-    expect(hcl).toContain('  azure_storage_account = "stbillingtradeprd"\n');
+    expect(hcl).toContain('  gcp_service_account = "billing-trade-prod-sa-sync"\n');
+    expect(hcl).toContain('  azure_storage_account = "stbillingtradeprod"\n');
     expect(hcl).toContain('  aws_tags = {\n');
     expect(hcl).toContain('  gcp_labels = {\n    owner = "infra"\n');
-    // 전체 카탈로그에서 FAIL 은 같은 이름인 함수 1 · 2세대(name.conflict)뿐이다 — 그 둘만 # INVALID: 주석
-    expect(hcl.split('\n').filter((l) => l.includes('INVALID')).map((l) => l.trim().split(' — ')[0])).toEqual(['# INVALID: gcp_cloud_function_gen1', '# INVALID: gcp_cloud_function']);
+    // 전체 카탈로그에서 FAIL 은 같은 이름인 함수 1 · 2세대(name.conflict)와, env prod(4자)로 축소 예산이 MIN_TOKEN 아래가 된
+    // Azure 짧은 규칙 둘(Windows VM 15자 · App Configuration replica 10자 — name.cannot_fit, D48)뿐이다 — 그 넷만 # INVALID: 주석
+    expect(hcl.split('\n').filter((l) => l.includes('INVALID')).map((l) => l.trim().split(' — ')[0])).toEqual([
+      '# INVALID: gcp_cloud_function_gen1', '# INVALID: gcp_cloud_function',
+      '# INVALID: azure_virtual_machine_windows', '# INVALID: azure_app_configuration_stores_replicas',
+    ]);
     // provider 순서 = PROVIDERS (aws → gcp → azure)
     expect(hcl.indexOf('# aws')).toBeLessThan(hcl.indexOf('# gcp'));
     expect(hcl.indexOf('# gcp')).toBeLessThan(hcl.indexOf('# azure'));
@@ -68,9 +72,9 @@ describe('toTerraformLocals — 고른 항목 (D41)', () => {
     const res = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }]);
     if (!res.ok) throw new Error('선택이 틀렸다');
     const hcl = toTerraformLocals(manyEntries(generateMany(ctx, 'azure', res.items)), { azure: labelsFor(ctx, 'azure') });
-    expect(hcl).toContain('  azure_virtual_machine_01 = "billing-trade-prd-kr-vm-01"\n  azure_virtual_machine_02 = "billing-trade-prd-kr-vm-02"\n');
-    expect(hcl).toContain('  azure_managed_identity_db = "billing-trade-prd-id-db"\n');
-    expect(hcl).toContain('  azure_resource_group = "rg-billing-trade-prd"\n');
+    expect(hcl).toContain('  azure_virtual_machine_01 = "billing-trade-prod-kr-vm-01"\n  azure_virtual_machine_02 = "billing-trade-prod-kr-vm-02"\n');
+    expect(hcl).toContain('  azure_managed_identity_db = "billing-trade-prod-id-db"\n');
+    expect(hcl).toContain('  azure_resource_group = "rg-billing-trade-prod"\n');
     expect(hcl).toContain('  azure_tags = {\n');
     expect(hcl).not.toContain('aws');
   });

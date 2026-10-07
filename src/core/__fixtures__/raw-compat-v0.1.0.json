@@ -6,10 +6,19 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -17,10 +26,19 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -28,10 +46,19 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "hangul-owner": {
@@ -41,10 +68,19 @@
         "owner": "개발",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -52,10 +88,19 @@
         "owner": "개발",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -63,10 +108,19 @@
         "owner": "개발",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "space-quote-combining-owner": {
@@ -76,10 +130,19 @@
         "owner": "Team \"A\" café",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -87,10 +150,19 @@
         "owner": "Team \"A\" café",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -98,10 +170,19 @@
         "owner": "Team \"A\" café",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "alias-env-region": {
@@ -111,7 +192,7 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
       "transformed": [
@@ -120,7 +201,7 @@
           "field": "env",
           "params": {
             "from": "production",
-            "to": "prd"
+            "to": "prod"
           }
         },
         {
@@ -139,7 +220,7 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
       "transformed": [
@@ -148,7 +229,7 @@
           "field": "env",
           "params": {
             "from": "production",
-            "to": "prd"
+            "to": "prod"
           }
         },
         {
@@ -167,7 +248,7 @@
         "owner": "platform",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
       "transformed": [
@@ -176,7 +257,7 @@
           "field": "env",
           "params": {
             "from": "production",
-            "to": "prd"
+            "to": "prod"
           }
         },
         {
@@ -197,10 +278,19 @@
         "owner": "platform",
         "system": "windows",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -208,10 +298,19 @@
         "owner": "platform",
         "system": "windows",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -219,10 +318,19 @@
         "owner": "platform",
         "system": "windows",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "reserved-google": {
@@ -232,10 +340,19 @@
         "owner": "platform",
         "system": "google",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -243,10 +360,19 @@
         "owner": "platform",
         "system": "google",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -254,10 +380,19 @@
         "owner": "platform",
         "system": "google",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "reserved-azure": {
@@ -267,10 +402,19 @@
         "owner": "platform",
         "system": "azure",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -278,10 +422,19 @@
         "owner": "platform",
         "system": "azure",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -289,10 +442,19 @@
         "owner": "platform",
         "system": "azure",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "empty-after-normalize": {
@@ -302,10 +464,19 @@
         "owner": "platform",
         "system": "매매",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -313,10 +484,19 @@
         "owner": "platform",
         "system": "매매",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -324,10 +504,19 @@
         "owner": "platform",
         "system": "매매",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "long-values": {
@@ -372,10 +561,19 @@
         "owner": "platform",
         "system": "a-long",
         "purpose": "longpurpose",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -383,10 +581,19 @@
         "owner": "platform",
         "system": "a-long",
         "purpose": "longpurpose",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -394,10 +601,19 @@
         "owner": "platform",
         "system": "a-long",
         "purpose": "longpurpose",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "digit-first-system": {
@@ -407,10 +623,19 @@
         "owner": "platform",
         "system": "3tier",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -418,10 +643,19 @@
         "owner": "platform",
         "system": "3tier",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -429,10 +663,19 @@
         "owner": "platform",
         "system": "3tier",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "label-gcp-65": {
@@ -442,10 +685,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -453,10 +705,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -464,10 +725,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "label-aws-257": {
@@ -477,10 +747,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -488,10 +767,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -499,10 +787,19 @@
         "owner": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "label-aws-invalid-char": {
@@ -512,10 +809,19 @@
         "owner": "team#1",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -523,10 +829,19 @@
         "owner": "team#1",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -534,10 +849,19 @@
         "owner": "team#1",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "label-gcp-transform": {
@@ -547,10 +871,19 @@
         "owner": "In.Fra",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "gcp": {
       "ok": true,
@@ -558,10 +891,19 @@
         "owner": "In.Fra",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     },
     "azure": {
       "ok": true,
@@ -569,10 +911,19 @@
         "owner": "In.Fra",
         "system": "billing",
         "purpose": "trade",
-        "env": "prd",
+        "env": "prod",
         "region": "kr"
       },
-      "transformed": []
+      "transformed": [
+        {
+          "code": "context.normalized",
+          "field": "env",
+          "params": {
+            "from": "prd",
+            "to": "prod"
+          }
+        }
+      ]
     }
   },
   "parse-env-qa": {
@@ -585,7 +936,7 @@
           "params": {
             "value": "qa",
             "supported": [
-              "prd",
+              "prod",
               "stg",
               "dev",
               "sbx"
@@ -603,7 +954,7 @@
           "params": {
             "value": "qa",
             "supported": [
-              "prd",
+              "prod",
               "stg",
               "dev",
               "sbx"
@@ -621,7 +972,7 @@
           "params": {
             "value": "qa",
             "supported": [
-              "prd",
+              "prod",
               "stg",
               "dev",
               "sbx"

@@ -5,47 +5,55 @@ import { tokenValues } from './compose';
 import type { ResourceRule } from './types';
 
 describe('fit — 3단계 축소', () => {
-  it('TC-GCP-01 39자 SA → region·owner 를 떼고 28자', () => {
+  it('TC-GCP-01 40자 SA → region·owner 를 떼고 29자', () => {
     const rule = getRule('gcp', 'service_account')!;
-    const ctx = { owner: 'example', system: 'antigravity', purpose: 'sync', env: 'prd', region: 'kr' } as const;
-    const r = fit(tokenValues(ctx, rule), rule);      // example-antigravity-sync-prd-kr-sa-sync = 39자
-    expect(r).toMatchObject({ fits: true, truncated: true, name: 'antigravity-sync-prd-sa-sync', steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }] });
-    expect(r.name.length).toBe(28);
+    const ctx = { owner: 'example', system: 'antigravity', purpose: 'sync', env: 'prod', region: 'kr' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);      // example-antigravity-sync-prod-kr-sa-sync = 40자
+    expect(r).toMatchObject({ fits: true, truncated: true, name: 'antigravity-sync-prod-sa-sync', steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }] });
+    expect(r.name.length).toBe(29);
   });
-  it('① 예시: 34자 SA → region 만 떼면 31, owner 까지 떼면 25', () => {
+  it('① 예시: 35자 SA → region 만 떼면 32, owner 까지 떼면 26', () => {
     const rule = getRule('gcp', 'service_account')!;
-    const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
-    expect(fit(tokenValues(ctx, rule), rule).name).toBe('billing-trade-prd-sa-sync');
+    const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' } as const;
+    expect(fit(tokenValues(ctx, rule), rule).name).toBe('billing-trade-prod-sa-sync');
   });
   it('들어가면 손대지 않는다', () => {
     const rule = getRule('gcp', 'compute_instance')!;
-    const ctx = { owner: 'sj', system: 'antigravity', purpose: 'sync', env: 'prd', region: 'kr' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prd-kr-gce-01' });
+    const ctx = { owner: 'sj', system: 'antigravity', purpose: 'sync', env: 'prod', region: 'kr' } as const;
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prod-kr-gce-01' });
   });
   it('TC-AZ-02 Windows 노드풀 6자: tokenValues 경로로 npprod', () => {
     const rule = getRule('azure', 'aks_nodepool_windows')!;   // template [slug, purpose] · max 6 · separator ''
-    const ctx = { owner: 'x', system: 'y', purpose: 'production', env: 'prd', region: 'kr' } as const;
+    const ctx = { owner: 'x', system: 'y', purpose: 'production', env: 'prod', region: 'kr' } as const;
     const r = fit(tokenValues(ctx, rule), rule);              // 고정 = np(2) 만. seq·role 은 template 에 없다
     expect(r).toMatchObject({ fits: true, name: 'npprod', steps: [{ code: 'step.budget_shortened', params: { budget: 4 } }] });
   });
-  it('env 는 보호 토큰 — Windows VM 15자에서도 prd 가 남는다 (D13)', () => {
+  // 3자 env(dev) 로 본다 — prod(4자)면 예산이 1 이라 들어가지 않는다(아래 「env prod 는 Windows VM 15자에 들어가지 않는다」)
+  it('env 는 보호 토큰 — Windows VM 15자에서도 dev 가 남는다 (D13)', () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;
-    const ctx = { owner: 'x', system: 'longsystem', purpose: 'longpurpose', env: 'prd', region: 'kr' } as const;
-    const r = fit(tokenValues(ctx, rule), rule);   // region 생략 → 32자 → 고정 prd+vm+01=7 · 구분자 4 · B=⌊4/2⌋=2
-    expect(r).toMatchObject({ fits: true, name: 'lo-lo-prd-vm-01' });
-    expect(r.values.env).toBe('prd');
+    const ctx = { owner: 'x', system: 'longsystem', purpose: 'longpurpose', env: 'dev', region: 'kr' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);   // region 생략 → 32자 → 고정 dev+vm+01=7 · 구분자 4 · B=⌊4/2⌋=2
+    expect(r).toMatchObject({ fits: true, name: 'lo-lo-dev-vm-01' });
+    expect(r.values.env).toBe('dev');
+  });
+  it('env prod 는 Windows VM 15자에 들어가지 않는다 — 보호 토큰이라 줄이지 않고 fits:false (D48)', () => {
+    const rule = getRule('azure', 'virtual_machine_windows')!;
+    const ctx = { owner: 'x', system: 'longsystem', purpose: 'longpurpose', env: 'prod', region: 'kr' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);   // 고정 prod+vm+01=8 · 구분자 4 · B=⌊3/2⌋=1 < MIN_TOKEN
+    expect(r).toMatchObject({ fits: false, name: 'longsystem-longpurpose-prod-vm-01' });
+    expect(r.values.env).toBe('prod');
   });
   it('slice 가 토큰 끝에 남긴 하이픈을 지워 -- 를 만들지 않는다 (Key Vault 24자)', () => {
     const rule = getRule('azure', 'key_vault')!;   // template [slug, system, purpose, env] · optional []
-    const r = fit({ slug: 'kv', system: 'abcdefg-hij', purpose: 'longpurpose', env: 'prd' }, rule);
-    // 30자 → 고정 kv+prd=5 · 구분자 3 · B=⌊16/2⌋=8 → system 'abcdefg-'→'abcdefg' · purpose 'longpurp'
-    expect(r).toMatchObject({ fits: true, name: 'kv-abcdefg-longpurp-prd' });
+    const r = fit({ slug: 'kv', system: 'abcdefg-hij', purpose: 'longpurpose', env: 'prod' }, rule);
+    // 31자 → 고정 kv+prod=6 · 구분자 3 · B=⌊15/2⌋=7 → system 'abcdefg' · purpose 'longpur'
+    expect(r).toMatchObject({ fits: true, name: 'kv-abcdefg-longpur-prod' });
     expect(r.name).not.toMatch(/--/);
   });
   it('slice 뒤 토큰이 1글자가 되면 fits:false (D13 — Windows VM · system a-long)', () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;
-    const ctx = { owner: 'x', system: 'a-long', purpose: 'longpurpose', env: 'prd', region: 'kr' } as const;
-    const r = fit(tokenValues(ctx, rule), rule);   // B=2 → system 'a-'→'a' (1글자) → 불변조건 위반
+    const ctx = { owner: 'x', system: 'a-long', purpose: 'longpurpose', env: 'dev', region: 'kr' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);   // env dev 로 B=2 → system 'a-'→'a' (1글자) → 불변조건 위반
     expect(r.fits).toBe(false);
   });
   it('예산이 2 미만이면 자르지 않고 fits:false (한 글자 토큰 금지)', () => {
@@ -56,26 +64,31 @@ describe('fit — 3단계 축소', () => {
   });
   it('불변조건: 정제 안 된 입력(a-)도 fits:false 로 잡는다', () => {
     const rule = getRule('azure', 'key_vault')!;
-    expect(fit({ slug: 'kv', system: 'a-', purpose: 'bb', env: 'prd' }, rule).fits).toBe(false);   // kv-a--bb-prd
+    expect(fit({ slug: 'kv', system: 'a-', purpose: 'bb', env: 'prod' }, rule).fits).toBe(false);   // kv-a--bb-prod
   });
   // MIN_TOKEN 은 축소가 만든 토큰에만, 빈 선택 토큰은 가변 토큰으로 세지 않는다 (D13)
   it('정제로 비워진 선택 토큰(owner \'\')은 가변 토큰으로 세지 않는다 (SA)', () => {
     const rule = getRule('gcp', 'service_account')!;
-    const r = fit({ owner: '', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr', slug: 'sa', role: 'sync' }, rule);
-    expect(r).toMatchObject({ fits: true, truncated: false, name: 'billing-trade-prd-kr-sa-sync' });
+    const r = fit({ owner: '', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr', slug: 'sa', role: 'sync' }, rule);
+    expect(r).toMatchObject({ fits: true, truncated: false, name: 'billing-trade-prod-kr-sa-sync' });
   });
   it('축소하지 않은 1글자 입력(system a)은 MIN_TOKEN 으로 막지 않는다 (GCP VM)', () => {
     const rule = getRule('gcp', 'compute_instance')!;
-    const ctx = { owner: 'sj', system: 'a', purpose: 'sync', env: 'prd', region: 'kr' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prd-kr-gce-01' });
+    const ctx = { owner: 'sj', system: 'a', purpose: 'sync', env: 'prod', region: 'kr' } as const;
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prod-kr-gce-01' });
   });
 });
 
 describe('fit — 순번 자리수와 Windows VM 15자 (실측 고정)', () => {
-  const ctx = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' } as const;
-  it("seq '01' 은 들어간다 — bi-tr-prd-vm-01", () => {
+  // 순번 자리수를 보려고 3자 env(dev) 로 둔다 — prod 는 seq 두 자리에서도 들어가지 않는다(아래 첫 시험)
+  const ctx = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'dev', region: 'kr' } as const;
+  it("env prod 면 seq '01' 도 들어가지 않는다 — 고정 prod+vm+01 이 예산을 MIN_TOKEN 아래로 (D48)", () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;
-    expect(fit(tokenValues(ctx, rule, { seq: '01' }), rule)).toMatchObject({ fits: true, name: 'bi-tr-prd-vm-01' });
+    expect(fit(tokenValues({ ...ctx, env: 'prod' }, rule, { seq: '01' }), rule)).toMatchObject({ fits: false, name: 'billing-trd-prod-vm-01' });
+  });
+  it("seq '01' 은 들어간다 — bi-tr-dev-vm-01", () => {
+    const rule = getRule('azure', 'virtual_machine_windows')!;
+    expect(fit(tokenValues(ctx, rule, { seq: '01' }), rule)).toMatchObject({ fits: true, name: 'bi-tr-dev-vm-01' });
   });
   it("seq '099' 는 축소를 포기한다 — 세 자리면 가변 토큰 예산이 MIN_TOKEN 아래", () => {
     const rule = getRule('azure', 'virtual_machine_windows')!;

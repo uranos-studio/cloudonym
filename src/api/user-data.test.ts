@@ -47,7 +47,7 @@ describe('사용자 값 — API 출력이 기준선 fixture 와 같다', () => {
 describe('사용자 값은 params · 이름 · 라벨에 있고 code · field 에는 없다', () => {
   it('한글 owner — original · 라벨 · step.normalized 의 params.from 에 그대로', async () => {
     const owner = BASELINE_CONTEXTS.find((c) => c.id === 'hangul-owner')!.raw.owner as string;
-    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner, system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' }, providers: ['gcp'] }))).res);
+    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner, system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' }, providers: ['gcp'] }))).res);
     const pid = body.data.gcp.project_id;
     expect(pid.original.startsWith(owner)).toBe(true);
     expect(body.metadata.generated_labels.gcp.owner).toBe(owner);
@@ -61,14 +61,14 @@ describe('사용자 값은 params · 이름 · 라벨에 있고 code · field �
   });
   it('공백 · 따옴표 · 결합 문자 owner — GCP 라벨 변환의 params.from 에 원래 값, message 에도 같은 값', async () => {
     const owner = BASELINE_CONTEXTS.find((c) => c.id === 'space-quote-combining-owner')!.raw.owner as string;
-    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner, system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' }, providers: ['gcp'] }))).res);
+    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner, system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' }, providers: ['gcp'] }))).res);
     const t = body.metadata.label_transformed.gcp[0];
     expect(t).toMatchObject({ code: 'label.normalized', field: 'owner' });
     expect(t.params.from).toBe(owner.trim());
     expect(t.message).toContain(owner.trim());
   });
   it('요청 오류의 value 는 표시용 문자열 — 비문자열은 JSON 문자열로, 80자에서 자른다 (D23)', async () => {
-    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner: 'a', system: 'b', purpose: 'c', env: 'prd', region: 'kr' }, providers: [{ x: 1 }, 'q'.repeat(100)] }))).res);
+    const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner: 'a', system: 'b', purpose: 'c', env: 'prod', region: 'kr' }, providers: [{ x: 1 }, 'q'.repeat(100)] }))).res);
     expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual(['{"x":1}', `${'q'.repeat(80)}…`]);
   });
 });

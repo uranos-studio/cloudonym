@@ -1,6 +1,6 @@
 // 다섯 문맥값 입력 — owner · system · purpose 는 텍스트, env · region 은 select(정본 값만). 검증은 하지 않는다 — 오류는 parseContext 가 준 코드를 사전으로 문장으로 만들어 보인다
 import type { CoreMessage, Env, NamingContext, Region } from '../core/types';
-import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { ENV_VALUES, MAX_CONTEXT_CHARS } from '../core/engine';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -10,12 +10,9 @@ const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; pl
   { key: 'system', label: 'System', hint: en.ui.field_system_hint, placeholder: en.ui.field_system_placeholder },
   { key: 'purpose', label: 'Purpose', hint: en.ui.field_purpose_hint, placeholder: en.ui.field_purpose_placeholder },
 ];
-const ENVS: ReadonlyArray<{ value: Env; label: string }> = [
-  { value: 'prd', label: 'prd — Production' },
-  { value: 'stg', label: 'stg — Staging' },
-  { value: 'dev', label: 'dev — Development' },
-  { value: 'sbx', label: 'sbx — Sandbox' },
-];
+/** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름만 여기 둔다(Record 라 값이 늘면 typecheck 가 잡는다) */
+const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox' };
+const ENVS: ReadonlyArray<{ value: Env; label: string }> = ENV_VALUES.map((value) => ({ value, label: `${value} — ${ENV_NAMES[value]}` }));
 const REGIONS: ReadonlyArray<{ value: Region; label: string }> = [
   { value: 'kr', label: 'kr — Korea' },
   { value: 'us', label: 'us — United States' },
@@ -81,7 +78,7 @@ export function ContextForm({ value, errors, onChange }: Props) {
           </div>
         );
       })}
-      {/* 옆 열(22rem)과 360px 에서 둘을 나란히 두면 「prd — Production」이 잘린다 — 넓은 한 열(sm~lg)에서만 나란히 */}
+      {/* 옆 열(22rem)과 360px 에서 둘을 나란히 두면 「prod — Production」이 잘린다 — 넓은 한 열(sm~lg)에서만 나란히 */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
         <div>
           <label htmlFor="field-env" className={LABEL}>Environment</label>

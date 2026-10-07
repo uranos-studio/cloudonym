@@ -24,7 +24,7 @@ describe('normalizeToken', () => {
 });
 
 describe('canonicalEnv (TC-COM-02)', () => {
-  it.each([['production', 'prd'], ['prod', 'prd'], ['real', 'prd'], ['PRD', 'prd'], ['staging', 'stg'], ['sandbox', 'sbx']])('%s → %s', (i, o) => {
+  it.each([['production', 'prod'], ['prd', 'prod'], ['live', 'prod'], ['real', 'prod'], ['PRD', 'prod'], ['prod', 'prod'], ['staging', 'stg'], ['sandbox', 'sbx']])('%s → %s (D48)', (i, o) => {
     expect(canonicalEnv(i)).toBe(o);
   });
   it('모르는 값 · 상속 프로퍼티는 undefined', () => {

@@ -8,7 +8,7 @@ export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
 /** 켜진 CSP (D45) — 화면 · API · llms.txt · openapi.json 이 이 목록만 연다. 규칙 · 시험 · 기준선은 PROVIDERS 셋을 그대로 돈다.
  *  꺼진 CSP 는 데이터를 남기고 노출만 끈다. 다음 CSP 를 여는 것은 이 배열에 더하는 것이다 */
 export const ENABLED_PROVIDERS: readonly Provider[] = ['gcp'];
-export type Env = 'prd' | 'stg' | 'dev' | 'sbx';
+export type Env = 'prod' | 'stg' | 'dev' | 'sbx';
 export type Region = 'kr' | 'us' | 'jp' | 'eu' | 'global';
 
 export interface NamingContext {

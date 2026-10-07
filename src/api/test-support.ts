@@ -74,7 +74,7 @@ export function fakeLimiter(mode: 'ok' | 'deny' | 'throw' = 'ok'): { limiter: Ra
 /** 대표 응답 한 건 — 계약 시험(openapi.test)과 한글 0 시험(no-hangul.test)이 같은 표본을 쓴다 */
 export interface Sample { id: string; method: 'GET' | 'POST'; path: string; status: number; body: Loose }
 
-const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr' };
 
 /**
  * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 16KB · 403 · 429(v1 · /llms.txt) ·

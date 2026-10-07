@@ -74,14 +74,15 @@ describe('findConflicts — 검사기를 먼저 시험한다', () => {
 });
 
 describe('실제 데이터 — 공허한 통과가 아니라는 대조', () => {
-  const base = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' });
+  // env dev — prod(4자)면 Windows VM(15자)이 축소에 실패해(D48) 「둘 다 유효한데 이름이 다르다」를 볼 수 없다
+  const base = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'dev', region: 'kr' });
   if (!base.ok) throw new Error('base context');
   it('Linux VM + Windows VM 은 같은 entity 지만 이름이 달라 충돌 0', () => {
     const lin = getRule('azure', 'virtual_machine')!;
     const win = getRule('azure', 'virtual_machine_windows')!;
     expect(lin.entity).toBe(win.entity);
     const r = generateMany(base.context, 'azure', [{ rule: lin, count: 1 }, { rule: win, count: 1 }]);
-    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'bi-tr-prd-vm-01']);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-dev-kr-vm-01', 'bi-tr-dev-vm-01']);
     expect(r.conflicts).toEqual([]);
     expect(r.valid).toBe(true);
   });
