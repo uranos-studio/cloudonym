@@ -18,18 +18,23 @@ describe('POST /v1/validate', () => {
     });
   });
   it('유효한 이름 → { valid:true, version, violations:[] } — suggested_name 키가 없다', async () => {
-    const body = await json((await post({ provider: 'aws', resource_type: 's3_bucket', name: 'infra-billing-trade-prd-bucket' })).res);
+    const body = await json((await post({ provider: 'gcp', resource_type: 'storage_bucket', name: 'infra-billing-trade-prd-bucket' })).res);
     expect(body).toEqual({ valid: true, version: VERSION, violations: [] });
     expect('suggested_name' in body).toBe(false);
   });
-  it('정제만으로 되는 이름은 그 값을 제안한다 (TC-AZ-01)', async () => {
-    const body = await json((await post({ provider: 'azure', resource_type: 'storage_account', name: 'st-web-prod' })).res);
-    expect(body).toMatchObject({ valid: false, suggested_name: 'stwebprod' });
+  it('정제만으로 되는 이름은 그 값을 제안한다', async () => {
+    const body = await json((await post({ provider: 'gcp', resource_type: 'storage_bucket', name: 'Infra_Billing' })).res);
+    expect(body).toMatchObject({ valid: false, suggested_name: 'infrabilling' });
   });
-  it('모르는 provider → 400 + supported 셋', async () => {
+  it('아는데 꺼진 provider → 400 request.provider_not_enabled + supported 는 켜진 것 (D45)', async () => {
+    const { res } = await post({ provider: 'azure', resource_type: 'storage_account', name: 'st-web-prod' });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' }, message: "Provider 'azure' is not available yet; 'supported' lists the providers you can use" }], supported: ['gcp'] });
+  });
+  it('모르는 provider → 400 + supported 는 켜진 것', async () => {
     const { res } = await post({ provider: 'oci', resource_type: 'bucket', name: 'x' });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' }, message: "Unsupported provider 'oci'" }], supported: ['aws', 'gcp', 'azure'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' }, message: "Unsupported provider 'oci'" }], supported: ['gcp'] });
   });
   it('모르는 resource_type → 400 + 그 provider 의 유형 목록', async () => {
     const { res } = await post({ provider: 'gcp', resource_type: 'nope', name: 'x' });

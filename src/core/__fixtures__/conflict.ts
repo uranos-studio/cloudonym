@@ -16,3 +16,15 @@ export const CONFLICT_SELECTION = [
   { rule: CONFLICT_RULE_A, count: 1 },
   { rule: CONFLICT_RULE_B, count: 1 },
 ];
+
+// GCP 짝 — API · 화면은 켜진 CSP 만 연다(D45). HTTP · 화면 시험은 이쪽을 쓴다. 위 Azure 짝은 core 기준선 · 회계가 그대로 쓴다
+const gcpVm = getRule('gcp', 'compute_instance')!;
+
+export const CONFLICT_GCP_RULE_A: ResourceRule = { ...gcpVm, id: 'gcp.test_conflict_a', resourceType: 'test_conflict_a', displayName: 'Test Conflict A' };
+export const CONFLICT_GCP_RULE_B: ResourceRule = { ...gcpVm, id: 'gcp.test_conflict_b', resourceType: 'test_conflict_b', displayName: 'Test Conflict B' };
+
+/** 둘 다 count 1 — 같은 이름 하나씩 */
+export const CONFLICT_GCP_SELECTION = [
+  { rule: CONFLICT_GCP_RULE_A, count: 1 },
+  { rule: CONFLICT_GCP_RULE_B, count: 1 },
+];

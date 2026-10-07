@@ -1,5 +1,5 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
-import type { Provider, ResourceRule, Token } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type Provider, type ResourceRule, type Token } from '../core/types';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { ENV_ALIASES, REGION_ALIASES } from '../core/normalize';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
@@ -8,7 +8,14 @@ import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
 
+/** 절 순서 — 켜진 CSP 만 이 순서로 싣는다 (D45). 꺼진 CSP 는 「planned」 한 줄이다 */
 const ORDER: readonly Provider[] = ['gcp', 'aws', 'azure'];
+const LABEL: Record<Provider, string> = { aws: 'AWS', gcp: 'GCP', azure: 'Azure' };
+
+/** 「A」 · 「A and B」 · 「A, B and C」 */
+function joinNames(names: readonly string[]): string {
+  return names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
 
 /** /v1/names 항목의 scope · uniqueness 뜻 — openapi.json NameItem 의 두 설명이 같은 문장이다(openapi.test 가 대어 본다) */
 export const SCOPE_MEANING = 'scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.';
@@ -62,14 +69,19 @@ function constraintLine(rule: ResourceRule, catalog: Catalog): string {
   return `- \`${rule.id}\` (${rule.displayName}): ${bits.join(' · ')}`;
 }
 
-export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: Catalog = en): string {
+/** providers — 실을 CSP. 기본은 켜진 CSP(D45). 시험은 셋을 넘겨 꺼진 CSP 의 줄 꼴도 본다 */
+export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: Catalog = en, providers: readonly Provider[] = ENABLED_PROVIDERS): string {
   const byProvider = (p: Provider): ResourceRule[] => rules.filter((r) => r.provider === p);
+  const order = ORDER.filter((p) => providers.includes(p));
+  const planned = PROVIDERS.filter((p) => !providers.includes(p)).map((p) => LABEL[p]);
+  const enabledNames = joinNames(order.map((p) => LABEL[p]));
   const lines: string[] = [
     '# Cloudonym',
     '',
     `> Engine ${version.engine} · rules revision ${version.rules}`,
     '',
-    "> Multi-cloud resource naming engine for AWS, GCP and Azure — generates, corrects and validates names against each provider's physical constraints.",
+    `> Cloud resource naming engine for ${enabledNames} — generates, corrects and validates names against each provider's physical constraints.`,
+    ...(planned.length > 0 ? [`> ${joinNames(planned)}: planned — not enabled yet. The API answers 400 \`request.provider_not_enabled\` for them.`] : []),
     '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/validate` · `GET /openapi.json`).',
     "> Cloudonym does not replace the provider's final verdict — it checks only the reserved words and patterns that the official documents state.",
     '',
@@ -77,7 +89,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '',
     'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`).',
   ];
-  for (const p of ORDER) {
+  for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
     for (const r of byProvider(p)) {
       lines.push(`- \`${r.id}\`: \`${formulaOf(r)}\`${r.optional.length > 0 ? ` · optional: ${r.optional.join(', ')}` : ''}`);
@@ -85,7 +97,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
   }
   lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region', ...allowedValues(REGION_ALIASES));
   lines.push('', '## Provider Constraints');
-  for (const p of ORDER) {
+  for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
     for (const r of byProvider(p)) lines.push(constraintLine(r, catalog));
   }
@@ -95,14 +107,14 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     'Where each resource is created, from the widest scope down. Under each scope: its rules (`input` = what `/v1/names` accepts for that rule: `count` 1-99, `role`, or `none`), then its child scopes.',
     '', SCOPE_MEANING, '', UNIQUENESS_MEANING,
   );
-  for (const p of ORDER) lines.push('', `### ${p.toUpperCase()}`, ...treeLines(buildTree(p)));
+  for (const p of order) lines.push('', `### ${p.toUpperCase()}`, ...treeLines(buildTree(p)));
   // PASS 의 뜻 (D28) — 정본은 사전의 ui.pass_meaning. README · openapi.json 은 같은 문장을 옮겨 적고 시험이 대어 본다
   lines.push('', '## What PASS means', '', catalog.ui.pass_meaning);
   lines.push(
     '',
     '## API',
     '',
-    '- `POST /v1/generate` — body `{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: ["aws", "gcp", "azure"], "rules_version"?: string }`',
+    `- \`POST /v1/generate\` — body \`{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: [${order.map((p) => `"${p}"`).join(', ')}], "rules_version"?: string }\``,
     '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
     `- \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\``,
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',

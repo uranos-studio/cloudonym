@@ -1,5 +1,5 @@
 // 요청 본문 검증 — 모양(shape)만 본다. 값의 뜻은 엔진(parseContext · rulesFor)이 판정한다. 의존성 추가 없음(수작업 타입 가드)
-import { PROVIDERS, type NamingContext, type Provider, type RawContext } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext } from '../core/types';
 import { rulesFor } from '../core/constraints';
 import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { RULES_REVISION } from '../core/revision';
@@ -27,6 +27,19 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 }
 function isProvider(v: unknown): v is Provider {
   return typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
+}
+/** 켜진 CSP 인가 (D45) — 아는 provider 라도 꺼져 있으면 API 가 받지 않는다 */
+function isEnabled(v: Provider): boolean {
+  return ENABLED_PROVIDERS.includes(v);
+}
+/** supported 에 싣는 목록 — 켜진 CSP 만 */
+const enabledList = (): string[] => [...ENABLED_PROVIDERS];
+
+/** provider 하나의 판정 — 모르는 값은 value_unsupported, 아는데 꺼졌으면 provider_not_enabled. 통과면 undefined */
+function providerError(v: unknown, field: string): ApiMessage | undefined {
+  if (!isProvider(v)) return { code: 'request.value_unsupported', field, params: { value: describe(v) } };
+  if (!isEnabled(v)) return { code: 'request.provider_not_enabled', field, params: { provider: v } };
+  return undefined;
 }
 
 /** 문자열 필드 길이 상한 — 이름 규칙이 아니라 전송 위생이다. 규칙 표의 최대 max_length 는 256 이라
@@ -81,14 +94,17 @@ export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
   const long = contextTooLong(body.context);
   if (long.length > 0) return reject(long);
-  let providers: Provider[] = [...PROVIDERS];
+  // 생략하면 켜진 CSP 전부 (D45)
+  let providers: Provider[] = [...ENABLED_PROVIDERS];
   if (body.providers !== undefined) {
-    if (!Array.isArray(body.providers)) return reject([{ code: 'request.providers_not_array' }], [...PROVIDERS]);
-    if (body.providers.length === 0) return reject([{ code: 'request.providers_empty' }], [...PROVIDERS]);
-    // 틀린 값마다 메시지 하나 — field 는 원래 배열의 자리 (D23)
-    const unknown = body.providers.flatMap((p, i): ApiMessage[] =>
-      isProvider(p) ? [] : [{ code: 'request.value_unsupported', field: `providers[${i}]`, params: { value: describe(p) } }]);
-    if (unknown.length > 0) return reject(unknown, [...PROVIDERS]);
+    if (!Array.isArray(body.providers)) return reject([{ code: 'request.providers_not_array' }], enabledList());
+    if (body.providers.length === 0) return reject([{ code: 'request.providers_empty' }], enabledList());
+    // 틀린 값마다 메시지 하나 — field 는 원래 배열의 자리 (D23). 모르는 값과 꺼진 값을 자리 순서대로 함께 낸다
+    const wrong = body.providers.flatMap((p, i): ApiMessage[] => {
+      const e = providerError(p, `providers[${i}]`);
+      return e ? [e] : [];
+    });
+    if (wrong.length > 0) return reject(wrong, enabledList());
     providers = [...new Set(body.providers.filter(isProvider))];
   }
   const parsed = parseContext(body.context as RawContext);
@@ -103,7 +119,8 @@ export function parseValidateBody(body: unknown): Parsed<ValidateInput> {
   const { provider, resource_type: resourceType, name } = body;
   const long = tooLong({ provider, resource_type: resourceType, name });
   if (long.length > 0) return reject(long);
-  if (!isProvider(provider)) return reject([{ code: 'request.value_unsupported', field: 'provider', params: { value: describe(provider) } }], [...PROVIDERS]);
+  const bad = providerError(provider, 'provider');
+  if (bad || !isProvider(provider)) return reject(bad ? [bad] : [], enabledList());
   const types = rulesFor(provider).map((r) => r.resourceType);
   if (typeof resourceType !== 'string' || !types.includes(resourceType)) {
     return reject([{ code: 'request.value_unsupported', field: 'resource_type', params: { value: describe(resourceType) } }], types);
@@ -139,7 +156,8 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
   const { provider } = body;
   const longProvider = tooLong({ provider });
   if (longProvider.length > 0) return reject(longProvider);
-  if (!isProvider(provider)) return reject([{ code: 'request.value_unsupported', field: 'provider', params: { value: describe(provider) } }], [...PROVIDERS]);
+  const badProvider = providerError(provider, 'provider');
+  if (badProvider || !isProvider(provider)) return reject(badProvider ? [badProvider] : [], enabledList());
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
   const resources = Array.isArray(body.resources) ? (body.resources as unknown[]) : [];
   // 항목 안 문자열도 전송 위생 상한을 건다 — 1024 를 넘는 type · role 을 엔진까지 보내지 않는다

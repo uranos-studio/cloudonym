@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { decodeState, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } from './urlState';
+import { decodeState as decodeEnabled, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } from './urlState';
 import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
-import type { NamingContext } from '../core/types';
+import { PROVIDERS, type NamingContext, type ResourceRule } from '../core/types';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 
 const ctx: NamingContext = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
 const b64 = (v: unknown) => btoa(JSON.stringify(v));
+/** 디코더 자체의 시험 — 세 CSP 가 모두 켜진 것으로 푼다. 켜진 CSP 에 따른 동작(D45 · D55)은 맨 아래 절이 기본값(decodeEnabled)으로 본다 */
+const decodeState = (hash: string, rules?: readonly ResourceRule[]) => decodeEnabled(hash, rules, PROVIDERS);
 /** 문맥만 — v 를 보지 않는 시험용 */
 const ctxOf = (hash: string) => decodeState(hash)?.context;
 
@@ -135,7 +137,6 @@ describe('규칙 버전 v (D26 · D27 ⑵)', () => {
 // ─── hash v2 — p · r (D42) ───────────────────────────
 import { validateSelection, MAX_ITEMS, MAX_NAMES } from '../core/selection';
 import { rulesFor } from '../core/constraints';
-import type { ResourceRule } from '../core/types';
 import { MAX_RESOURCE_TYPE_CHARS, MAX_ROLE_CHARS } from './urlState';
 
 const V2 = '2026-10-06.4';
@@ -256,5 +257,41 @@ describe('hash v2 — 최대 상태 왕복과 상한', () => {
     expect(flat(back?.selection)).toEqual(flat(items));
     expect(back?.dropped).toBeUndefined();
     expect(decodeState(padded, rules)?.selection).toHaveLength(MAX_ITEMS);
+  });
+});
+
+describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다', () => {
+  const vm = (n: number) => ({ virtual_machine: n, resource_group: 1, managed_identity: 'db' });
+  it('p 가 꺼진 CSP(azure)면 선택을 전부 버리고 켜진 GCP 로 푼다 · 버린 수 · 원래 CSP 를 돌려준다(안내용) · 문맥은 그대로', () => {
+    const d = decodeEnabled(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: vm(2) })}`);
+    expect(d).toEqual({ context: ctx, rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure' });
+  });
+  it('p 가 꺼진 CSP 이고 r 이 없으면 버린 것 없이 GCP · 안내는 낸다', () => {
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws' })}`)).toEqual({ context: ctx, provider: 'gcp', unavailable: 'aws' });
+  });
+  it('p 가 꺼진 CSP 이고 r 이 객체가 아니면 한 건을 버린다', () => {
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: ctx, provider: 'gcp', dropped: 1, unavailable: 'aws' });
+  });
+  it('지역 칸은 건드리지 않는다 — 지역 변환은 지역 체계 작업의 몫', () => {
+    const d = decodeEnabled(`#state=${b64({ ...ctx, region: 'jp', p: 'azure', r: vm(1) })}`);
+    expect(d?.context.region).toBe('jp');
+  });
+  it('p 가 켜진 CSP(gcp)면 그대로 연다 — 안내 없음', () => {
+    const d = decodeEnabled(`#state=${b64({ ...ctx, p: 'gcp', r: { compute_instance: 2, project_id: 1 } })}`);
+    expect(d?.provider).toBe('gcp');
+    expect(flat(d?.selection)).toEqual([['compute_instance', 2, null], ['project_id', 1, null]]);
+    expect(d?.unavailable).toBeUndefined();
+    expect(d?.dropped).toBeUndefined();
+  });
+  it('p 가 없으면(옛 다섯 키 링크) 켜진 CSP 하나로 푼다 — 안내 없음', () => {
+    expect(decodeEnabled(`#state=${b64(ctx)}`)).toEqual({ context: ctx, provider: 'gcp' });
+  });
+  it.each([['AWS'], ['oci'], [1], [null]])('p 가 셋 밖(%j)이면 없는 것으로 — 켜진 CSP 하나로 풀고 r 은 버린다 · 안내 없음', (p) => {
+    const d = decodeEnabled(`#state=${b64({ ...ctx, p, r: { vpc: 1 } })}`);
+    expect(d).toEqual({ context: ctx, provider: 'gcp', dropped: 1 });
+  });
+  it('켜진 목록을 넘기면 그것을 따른다 — 둘 이상 켜졌으면 p 없는 링크는 CSP 를 고르지 않는다', () => {
+    expect(decodeEnabled(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
+    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx, dropped: 3, unavailable: 'azure' });
   });
 });

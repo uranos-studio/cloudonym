@@ -33,8 +33,8 @@ describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
 });
 
 describe('POST /v1/generate (D15 wire)', () => {
-  it('① 예시 입력 → GCP SA 축약 · Azure Storage 변환', async () => {
-    const { res } = await post({ context: ctx, providers: ['gcp', 'azure'] });
+  it('① 예시 입력 → GCP SA 축약', async () => {
+    const { res } = await post({ context: ctx, providers: ['gcp'] });
     expect(res.status).toBe(200);
     const body = await json(res);
     expect(body.success).toBe(true);
@@ -48,10 +48,8 @@ describe('POST /v1/generate (D15 wire)', () => {
       ],
       rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
-    expect(body.data.azure.storage_account).toMatchObject({ name: 'stbillingtradeprd', valid: true, is_transformed: true, steps: [{ code: 'step.separator_removed', message: 'Removed hyphens (this rule allows no separator)' }] });
-    expect(body.data.azure.storage_account.rule.notes).toEqual([expect.objectContaining({ code: 'note.azure_reserved', params: { doc_url: expect.stringContaining('learn.microsoft.com') } })]);
     expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
-    expect(body.metadata).toMatchObject({ label_violations: { gcp: [], azure: [] }, label_transformed: { gcp: [], azure: [] }, transformed: [] });
+    expect(body.metadata).toMatchObject({ label_violations: { gcp: [] }, label_transformed: { gcp: [] }, transformed: [] });
   });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {
     const body = await json((await post({ context: ctx, providers: ['gcp'] })).res);
@@ -60,10 +58,10 @@ describe('POST /v1/generate (D15 wire)', () => {
     }
     expect(Object.keys(body.data.gcp)).toHaveLength(rulesFor('gcp').length);
   });
-  it('providers 생략 → 셋 다 · 넷의 provider 집합이 같다', async () => {
+  it('providers 생략 → 켜진 것만(gcp) · 넷의 provider 집합이 같다 (D45)', async () => {
     const body = await json((await post({ context: ctx })).res);
     const keys = (o: object) => Object.keys(o).sort();
-    expect(keys(body.data)).toEqual(['aws', 'azure', 'gcp']);
+    expect(keys(body.data)).toEqual(['gcp']);
     expect(keys(body.metadata.generated_labels)).toEqual(keys(body.data));
     expect(keys(body.metadata.label_violations)).toEqual(keys(body.data));
     expect(keys(body.metadata.label_transformed)).toEqual(keys(body.data));
@@ -86,15 +84,20 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.body_not_json', message: 'Request body is not JSON' }] });
   });
+  it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', async () => {
+    const { res } = await post({ context: ctx, providers: ['aws'] });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'providers[0]', params: { provider: 'aws' }, message: "Provider 'aws' is not available yet; 'supported' lists the providers you can use" }], supported: ['gcp'] });
+  });
   it('providers 가 빈 배열 · 배열 아님 · 모르는 값이면 400 + supported', async () => {
     const empty = await post({ context: ctx, providers: [] });
     expect(empty.res.status).toBe(400);
-    expect(await empty.res.json()).toEqual({ success: false, errors: [{ code: 'request.providers_empty', message: "'providers' is empty" }], supported: ['aws', 'gcp', 'azure'] });
+    expect(await empty.res.json()).toEqual({ success: false, errors: [{ code: 'request.providers_empty', message: "'providers' is empty" }], supported: ['gcp'] });
     const notArray = await post({ context: ctx, providers: 'gcp' });
     expect(notArray.res.status).toBe(400);
     const unknown = await post({ context: ctx, providers: ['gcp', 'oci'] });
     expect(unknown.res.status).toBe(400);
-    expect(await unknown.res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'oci' }, message: "Unsupported providers[1] 'oci'" }], supported: ['aws', 'gcp', 'azure'] });
+    expect(await unknown.res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'oci' }, message: "Unsupported providers[1] 'oci'" }], supported: ['gcp'] });
   });
   it('context 가 없거나 null 이면 400 (500 이 아니다)', async () => {
     expect((await post({})).res.status).toBe(400);
@@ -147,56 +150,62 @@ describe('POST /v1/names (D39)', () => {
   afterEach(() => { vi.unstubAllGlobals(); });
 
   it('200 — 키 전부 · 선택 순서 → 순번 순서 · scope · uniqueness · data · metadata 는 provider 하나', async () => {
-    const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'storage_account' }, { type: 'managed_identity', role: 'db' }, { type: 'resource_group' }] });
+    const { res } = await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance', count: 2 }, { type: 'storage_bucket' }, { type: 'service_account', role: 'db' }, { type: 'project_id' }] });
     expect(res.status).toBe(200);
     const body = await json(res);
     expect(Object.keys(body)).toEqual(['success', 'version', 'data', 'metadata']);
     expect(body.version).toEqual(VERSION);
-    for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) expect(Object.keys(part)).toEqual(['azure']);
-    const az = body.data.azure;
+    for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) expect(Object.keys(part)).toEqual(['gcp']);
+    const az = body.data.gcp;
     expect(Object.keys(az)).toEqual(['valid', 'items', 'conflicts']);
     expect(az.valid).toBe(true);
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
-      'virtual_machine_01=billing-trade-prd-kr-vm-01', 'virtual_machine_02=billing-trade-prd-kr-vm-02',
-      'storage_account=stbillingtradeprd', 'managed_identity_db=billing-trade-prd-id-db', 'resource_group=rg-billing-trade-prd',
+      'compute_instance_01=billing-trade-prd-kr-vm-01', 'compute_instance_02=billing-trade-prd-kr-vm-02',
+      'storage_bucket=platform-billing-trade-prd-bucket', 'service_account_db=billing-trade-prd-sa-db', 'project_id=platform-billing-trade-prd',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
-    expect(az.items[0]).toMatchObject({ resource_type: 'virtual_machine', seq: '01', scope: 'azure:resource_group', uniqueness: 'csp' });
-    expect(az.items[2]).toMatchObject({ scope: 'azure:global' });
+    expect(az.items[0]).toMatchObject({ resource_type: 'compute_instance', seq: '01', scope: 'gcp:project', uniqueness: 'csp' });
+    expect(az.items[2]).toMatchObject({ scope: 'gcp:namespace' });
     expect(az.items[2].seq).toBeUndefined();
-    expect(az.items[3]).toMatchObject({ role: 'db', scope: 'azure:resource_group' });
-    expect(az.items[4]).toMatchObject({ scope: 'azure:subscription' });
-    expect(body.metadata.generated_labels.azure).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
+    expect(az.items[3]).toMatchObject({ role: 'db', scope: 'gcp:project' });
+    expect(az.items[4]).toMatchObject({ scope: 'gcp:namespace' });
+    expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', environment: 'prd', managed_by: 'cloudonym' });
   });
   it('항목 하나가 FAIL 이면 200 · valid:false · 항목 전부와 이유', async () => {
-    const { res } = await names({ provider: 'azure', context: { ...base, system: 'a-long', purpose: 'longpurpose' }, resources: [{ type: 'virtual_machine_windows', count: 2 }, { type: 'resource_group' }] });
+    const { res } = await names({ provider: 'gcp', context: { ...base, owner: 'goog' }, resources: [{ type: 'storage_bucket' }, { type: 'compute_instance', count: 2 }] });
     expect(res.status).toBe(200);
-    const az = (await json(res)).data.azure;
+    const az = (await json(res)).data.gcp;
     expect(az.valid).toBe(false);
     expect(az.items).toHaveLength(3);
-    expect(az.items.filter((i: { valid: boolean }) => !i.valid).length).toBeGreaterThan(0);
+    expect(az.items[0]).toMatchObject({ valid: false, violations: [expect.objectContaining({ code: 'name.forbidden_prefix' })] });
     expect(az.items[2].valid).toBe(true);
   });
-  it('AWS Name 태그 항목은 uniqueness "none" · scope 는 배치 범위 aws:vpc', async () => {
-    const body = await json((await names({ provider: 'aws', context: base, resources: [{ type: 'ec2_instance' }, { type: 's3_bucket' }] })).res);
-    expect(body.data.aws.items[0]).toMatchObject({ key: 'ec2_instance_01', scope: 'aws:vpc', uniqueness: 'none' });
-    expect(body.data.aws.items[1]).toMatchObject({ key: 's3_bucket', scope: 'aws:partition', uniqueness: 'csp' });
+  it('GCP 규칙은 전부 uniqueness "csp" — "none"(AWS Name 태그)은 꺼진 CSP 에만 있다 (D45)', async () => {
+    const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'storage_bucket' }] })).res);
+    expect(body.data.gcp.items[0]).toMatchObject({ key: 'compute_instance_01', scope: 'gcp:project', uniqueness: 'csp' });
+    expect(body.data.gcp.items[1]).toMatchObject({ key: 'storage_bucket', scope: 'gcp:namespace', uniqueness: 'csp' });
+    expect(rulesFor('gcp').filter((r) => r.uniqueness === 'none')).toEqual([]);
   });
-  it('실제 규칙 표의 Linux VM + Windows VM 은 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
-    const az = (await json((await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine' }, { type: 'virtual_machine_windows' }] })).res)).data.azure;
-    expect(az.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'bi-tr-prd-vm-01']);
-    expect(az.conflicts).toEqual([]);
+  it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
+    const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
+    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prd-kr-vm-01', 'billing-trade-prd-kr-disk-01']);
+    expect(g.conflicts).toEqual([]);
   });
-  it('storage_account 에 count 2 → 400 selection.count_not_supported', async () => {
-    const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 2 }, { type: 'storage_account', count: 2 }] });
+  it('storage_bucket 에 count 2 → 400 selection.count_not_supported', async () => {
+    const { res } = await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance', count: 2 }, { type: 'storage_bucket', count: 2 }] });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'selection.count_not_supported', params: { index: 1, type: 'storage_account' }, message: "resources[1]: 'storage_account' has no sequence number, so count must be 1" }] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'selection.count_not_supported', params: { index: 1, type: 'storage_bucket' }, message: "resources[1]: 'storage_bucket' has no sequence number, so count must be 1" }] });
+  });
+  it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', async () => {
+    const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine' }] });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ['gcp'] });
   });
   it('모르는 provider → 400 + supported · rules_version 다르면 409', async () => {
     const bad = await names({ provider: 'oci', context: base, resources: [{ type: 'x' }] });
     expect(bad.res.status).toBe(400);
-    expect(await bad.res.json()).toMatchObject({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider' }], supported: ['aws', 'gcp', 'azure'] });
+    expect(await bad.res.json()).toMatchObject({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider' }], supported: ['gcp'] });
     const pin = await names({ provider: 'gcp', context: base, resources: [{ type: 'project_id' }], rules_version: '2026-01-01.1' });
     expect(pin.res.status).toBe(409);
   });
@@ -210,11 +219,11 @@ describe('POST /v1/names (D39)', () => {
   it('텔레메트리 api_names — { provider, resource_count, name_count, valid } · 문맥값은 싣지 않는다', async () => {
     const sent: string[] = [];
     vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { sent.push(init.body); return Promise.resolve(new Response('{"ingested":1,"failed":0}')); });
-    const { promises } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine', count: 3 }, { type: 'resource_group' }] }, { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' });
+    const { promises } = await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance', count: 3 }, { type: 'project_id' }] }, { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' });
     await Promise.all(promises);
     expect(sent).toHaveLength(1);
     const [row] = JSON.parse(sent[0]!) as Record<string, unknown>[];
-    expect(row).toMatchObject({ event: 'api_names', provider: 'azure', resource_count: 2, name_count: 4, valid: true });
+    expect(row).toMatchObject({ event: 'api_names', provider: 'gcp', resource_count: 2, name_count: 4, valid: true });
     expect(sent[0]).not.toContain('billing');
   });
 });

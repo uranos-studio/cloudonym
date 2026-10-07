@@ -79,6 +79,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'request.providers_empty': { code: 'request.providers_empty' },
   'request.value_unsupported': { code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'BBB' } },
   'request.field_not_string': { code: 'request.field_not_string', field: 'name' },
+  'request.provider_not_enabled': { code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'AAA' } },
   'request.same_origin_only': { code: 'request.same_origin_only' },
   'request.rate_limited': { code: 'request.rate_limited', params: { retry_after: 42 } },
   'request.rules_version_mismatch': { code: 'request.rules_version_mismatch', params: { requested: 'AAA', current: 'BBB' } },
@@ -94,7 +95,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(74);
+    expect(codes).toHaveLength(75);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });
@@ -129,6 +130,7 @@ describe('영어 사전 (D24)', () => {
     expect(format(SAMPLES['step.abbreviated'], en)).toContain("'AAA' to 'BBB'");
     expect(format(SAMPLES['rule.unknown_resource_type'], en)).toContain('CCC, DDD');
     expect(format(SAMPLES['request.value_unsupported'], en)).toBe("Unsupported providers[1] 'BBB'");
+    expect(format(SAMPLES['request.provider_not_enabled'], en)).toBe("Provider 'AAA' is not available yet; 'supported' lists the providers you can use");
     // requested 는 params 에만 있고 문장에는 넣지 않는다
     expect(format(SAMPLES['request.rules_version_mismatch'], en)).toContain("does not match the current rules revision 'BBB'");
     expect(format(SAMPLES['request.rules_version_mismatch'], en)).not.toContain('AAA');

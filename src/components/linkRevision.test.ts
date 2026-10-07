@@ -59,22 +59,29 @@ describe('링크 키에 p · r 이 들어간다 (D42)', () => {
     return linkStateOf(d, hash, encodeState(d.context, CURRENT, { provider: d.provider, selection: d.selection }));
   };
   const pick = (r: unknown[]) => {
-    const res = validateSelection('azure', r);
+    const res = validateSelection('gcp', r);
     if (!res.ok) throw new Error('선택이 틀렸다');
     return res.items;
   };
-  it('옛 다섯 키 링크를 연 직후 — CSP · 선택 없는 폼 키와 같아 hash 를 다시 쓰지 않는다', () => {
+  it('옛 다섯 키 링크를 연 직후 — 켜진 CSP 하나(gcp)를 자동으로 고른 폼 키와 같아 hash 를 다시 쓰지 않는다 (D45)', () => {
     const link = openV2(`#state=${encodeState(ctx, OLD)}`);
-    expect(shouldRewriteHash(encodeState(ctx, CURRENT, {}), link)).toBe(false);
-    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, {}), link, CURRENT)).toBe(OLD);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(false);
+    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBe(OLD);
   });
-  it('p · r 링크를 연 직후는 같은 키 · 선택을 바꾸거나 CSP 를 바꾸면 링크의 옛 v 를 버린다', () => {
-    const items = pick([{ type: 'virtual_machine', count: 2 }]);
-    const link = openV2(`#state=${encodeState(ctx, OLD, { provider: 'azure', selection: items })}`);
-    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'azure', selection: items }), link)).toBe(false);
-    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'azure', selection: pick([{ type: 'virtual_machine', count: 3 }]) }), link)).toBe(true);
+  it('p · r 링크를 연 직후는 같은 키 · 선택을 바꾸면 링크의 옛 v 를 버린다', () => {
+    const items = pick([{ type: 'compute_instance', count: 2 }]);
+    const link = openV2(`#state=${encodeState(ctx, OLD, { provider: 'gcp', selection: items })}`);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp', selection: items }), link)).toBe(false);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp', selection: pick([{ type: 'compute_instance', count: 3 }]) }), link)).toBe(true);
     expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(true);
     expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBeUndefined();
+  });
+  it('꺼진 CSP(azure) 링크를 연 직후 — 선택을 버린 GCP 폼 키와 같아 hash 를 다시 쓰지 않는다 · 옛 v 안내는 남는다 (D55)', () => {
+    const azure = validateSelection('azure', [{ type: 'virtual_machine', count: 2 }]);
+    if (!azure.ok) throw new Error('선택이 틀렸다');
+    const link = openV2(`#state=${encodeState(ctx, OLD, { provider: 'azure', selection: azure.items })}`);
+    expect(shouldRewriteHash(encodeState(ctx, CURRENT, { provider: 'gcp' }), link)).toBe(false);
+    expect(mismatchedLinkVersion(encodeState(ctx, CURRENT, { provider: 'gcp' }), link, CURRENT)).toBe(OLD);
   });
 });
 

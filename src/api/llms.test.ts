@@ -10,6 +10,8 @@ import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { inputKind } from '../core/tree';
+import { ENABLED_PROVIDERS, PROVIDERS } from '../core/types';
+import { rulesFor } from '../core/constraints';
 import { AZURE_INTAKE_ROWS } from '../core/rules/azure-intake';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
 import { AWS_INTAKE_ROWS } from '../core/rules/aws-intake';
@@ -18,24 +20,40 @@ import { AWS_MANUAL_RULES } from '../core/rules/aws-manual';
 import { AZURE_MANUAL_ROWS } from '../core/rules/azure-manual';
 
 const rules = Object.values(RULES);
+// 공개 본문 — 켜진 CSP 만 (D45)
 const text = buildLlmsText(rules, VERSION);
 const lines = text.split('\n');
+const enabledRules = rules.filter((r) => ENABLED_PROVIDERS.includes(r.provider));
+// 형식 시험용 — 세 CSP 를 모두 펼친 본문. 꺼진 CSP 의 규칙 줄 꼴(플래그 · 금지형 · note)이 켜질 때 그대로 나오는지 본다
+const allText = buildLlmsText(rules, VERSION, en, PROVIDERS);
+const allLines = allText.split('\n');
 
 describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('첫 줄은 # Cloudonym', () => expect(lines[0]).toBe('# Cloudonym'));
-  it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다', () => {
-    expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
+  it('켜진 CSP 만 — GCP 절만 있고 공식 줄 수는 GCP 규칙 수 · AWS · Azure 는 「planned」 한 줄 (D45)', () => {
+    expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
+    expect(enabledRules).toHaveLength(rulesFor('gcp').length);
+    expect(rulesFor('gcp')).toHaveLength(121);
+    expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
+    expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
+    expect(lines.filter((l) => l.includes('planned'))).toEqual(['> AWS and Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
+    expect(text).toContain('"providers"?: ["gcp"]');
+  });
+  it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다 (세 CSP 를 펼친 본문)', () => {
+    expect(allLines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
     expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length + Object.keys(AWS_MANUAL_RULES).length + AZURE_MANUAL_ROWS.length);
     expect(formulaOf(RULES['gcp.service_account']!)).toBe('<owner>-<system>-<purpose>-<env>-<region>-sa-<role>');
     expect(formulaOf(RULES['azure.storage_account']!)).toBe('st<system><purpose><env>');
     expect(text).toContain('- `gcp.service_account`: `<owner>-<system>-<purpose>-<env>-<region>-sa-<role>` · optional: region, owner');
   });
   it('제약 줄이 규칙 수만큼 있고 docUrl 이 전부 들어 있다', () => {
-    expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+` \(/.test(l))).toHaveLength(rules.length);
-    for (const r of rules) expect(text, r.id).toContain(`docs: ${r.docUrl}`);
-    expect(text).toContain('- `aws.s3_bucket` (S3 Bucket): 3-63 chars');
-    expect(text).toContain('forbidden: prefixes xn-- sthree- amzn-s3-demo-');
-    const st = lines.find((l) => l.startsWith('- `azure.storage_account` ('))!;
+    expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+` \(/.test(l))).toHaveLength(enabledRules.length);
+    for (const r of enabledRules) expect(text, r.id).toContain(`docs: ${r.docUrl}`);
+    expect(allLines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+` \(/.test(l))).toHaveLength(rules.length);
+    for (const r of rules) expect(allText, r.id).toContain(`docs: ${r.docUrl}`);
+    expect(allText).toContain('- `aws.s3_bucket` (S3 Bucket): 3-63 chars');
+    expect(allText).toContain('forbidden: prefixes xn-- sthree- amzn-s3-demo-');
+    const st = allLines.find((l) => l.startsWith('- `azure.storage_account` ('))!;
     expect(st).toMatch(/forbidden: prefixes login; contains microsoft windows; words access [^;]* azure /);
     expect(st).toContain('case-insensitive');
   });
@@ -45,7 +63,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(text).toContain('- `global`');
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
-    const rg = lines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
+    const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
     expect(rg).toContain('(flags: u)');
     const flagged = rules.filter((r) => r.pattern.flags !== '');
     // 들인 Azure 행의 금지형 · 들인 AWS 행 중 EC2 밖 Name 태그와 「[^…]」 꼴 — 보이지 않는 글자 정의(invisible.mjs 의 \p{…})를 쓰는 u.
@@ -56,7 +74,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
       'azure.authorization_policy_assignments', 'azure.authorization_policy_definitions', 'azure.authorization_policy_exemptions', 'azure.authorization_policy_set_definitions',
       'azure.resource_group', 'azure.resources_tag_names', 'azure.synapse_workspaces_sql_pools',
     ]);
-    const s3 = lines.find((l) => l.startsWith('- `aws.s3_bucket` ('))!;
+    const s3 = allLines.find((l) => l.startsWith('- `aws.s3_bucket` ('))!;
     expect(s3).not.toContain('(flags:');
   });
   it('제목 아래 엔진 · 규칙 버전 한 줄 (D26)', () => {
@@ -68,18 +86,24 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(lines[at + 2]).toBe(en.ui.pass_meaning);
   });
   it('규칙 설명(note)은 사전이 만든 영어 · 여러 개면 「; 」로 잇는다 · 한글 0', () => {
-    const win = lines.find((l) => l.startsWith('- `azure.virtual_machine_windows` ('))!;
+    const win = allLines.find((l) => l.startsWith('- `azure.virtual_machine_windows` ('))!;
     expect(win).toContain('note: Follows the host-name rule');
     expect(win).toContain('; A name made only of digits is not allowed (https://learn.microsoft.com/');
-    const vpc = lines.find((l) => l.startsWith('- `aws.vpc` ('))!;
+    const vpc = allLines.find((l) => l.startsWith('- `aws.vpc` ('))!;
     expect(vpc).toContain('(VPC (Name tag))');
     expect(/\p{Script=Hangul}/u.test(text)).toBe(false);
+    expect(/\p{Script=Hangul}/u.test(allText)).toBe(false);
   });
   it('「## Resource tree」 절 — provider 마다 범위 노드(id · docUrl) 아래 규칙마다 들여쓴 한 줄(id · input) · scope/uniqueness 문장은 openapi 와 같다', () => {
-    const at = lines.indexOf('## Resource tree');
-    const end = lines.findIndex((l, i) => i > at && l.startsWith('## '));
+    // 공개 본문은 켜진 CSP 의 범위 · 규칙만
+    const pubAt = lines.indexOf('## Resource tree');
+    const pub = lines.slice(pubAt, lines.findIndex((l, i) => i > pubAt && l.startsWith('## ')));
+    expect(pub.filter((l) => /^ +- `[a-z]+\.[a-z0-9_]+` · input: /.test(l))).toHaveLength(enabledRules.length);
+    expect(pub.some((l) => /\(`(aws|azure):/.test(l))).toBe(false);
+    const at = allLines.indexOf('## Resource tree');
+    const end = allLines.findIndex((l, i) => i > at && l.startsWith('## '));
     expect(at).toBeGreaterThan(0);
-    const section = lines.slice(at, end);
+    const section = allLines.slice(at, end);
     expect(section).toContain(SCOPE_MEANING);
     expect(section).toContain(UNIQUENESS_MEANING);
     for (const s of Object.values(SCOPES)) expect(section.some((l) => l.includes(`(\`${s.id}\`)`) && l.includes(s.docUrl)), s.id).toBe(true);

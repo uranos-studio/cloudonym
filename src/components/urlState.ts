@@ -3,7 +3,7 @@
 import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind } from '../core/tree';
-import { PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 
 export const HASH_KEY = 'state';
 /** env · region 등 자유 입력이 아닌 필드의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다.
@@ -72,13 +72,15 @@ export function encodeState(ctx: NamingContext, rulesVersion?: string, pick: Pic
   return toBase64Url(new TextEncoder().encode(JSON.stringify(body)));
 }
 
-/** hash 를 푼 결과 — 문맥과, 링크를 만든 규칙 버전(꼴이 맞을 때만) · CSP · 선택 · 버린 선택 수(있을 때만) */
+/** hash 를 푼 결과 — 문맥과, 링크를 만든 규칙 버전(꼴이 맞을 때만) · CSP · 선택 · 버린 선택 수(있을 때만) ·
+ *  링크의 CSP 가 아직 꺼져 있었으면 그 CSP(unavailable — 화면이 안내 한 줄을 띄운다 · D55) */
 export interface DecodedState {
   context: NamingContext;
   rulesVersion?: string;
   provider?: Provider;
   selection?: SelectionItem[];
   dropped?: number;
+  unavailable?: Provider;
 }
 
 const isProvider = (v: unknown): v is Provider => typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
@@ -122,10 +124,15 @@ function decodeSelection(provider: Provider, r: unknown, rules?: readonly Resour
   return { items: [], dropped };
 }
 
+/** r 의 항목 수 — 통째로 버릴 때 센다. 객체가 아니면 한 건 */
+const entryCount = (r: unknown): number => (r !== null && typeof r === 'object' && !Array.isArray(r) ? Object.keys(r).length : 1);
+
 /** `#state=…` · `state=…` 를 받는다. 길이 상한 · 디코딩 · JSON · 모양 · parseContext 중 하나라도 실패하면 undefined.
  *  `v` 는 parseContext 가 읽지 않는다 — 꼴이 `YYYY-MM-DD.N` 일 때만 rulesVersion 으로 돌려주고, 아니면 없는 것으로 본다.
- *  `p` 가 셋 밖이면 없는 것으로 보고 `r` 은 판정할 수 없어 버린다. rules 는 기본이 규칙 표(시험 전용 fixture 가 다른 표를 넘긴다) */
-export function decodeState(hash: string, rules?: readonly ResourceRule[]): DecodedState | undefined {
+ *  `p` 가 셋 밖이면 없는 것으로 보고 `r` 은 판정할 수 없어 버린다. rules 는 기본이 규칙 표(시험 전용 fixture 가 다른 표를 넘긴다).
+ *  enabled — 켜진 CSP (D45). `p` 가 꺼진 CSP 면(D55) 선택을 전부 버리고 unavailable 에 그 CSP 를 싣는다. 지역 칸은 건드리지 않는다.
+ *  `p` 가 없거나 꺼진 CSP 이고 켜진 CSP 가 하나면 그것으로 푼다 — 화면이 그것을 자동으로 고르는 것과 같다 */
+export function decodeState(hash: string, rules?: readonly ResourceRule[], enabled: readonly Provider[] = ENABLED_PROVIDERS): DecodedState | undefined {
   if (hash.length > MAX_HASH_CHARS) return undefined;
   const m = new RegExp(`^#?${HASH_KEY}=(.*)$`).exec(hash);
   if (!m) return undefined;
@@ -144,16 +151,23 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[]): Deco
   if (!parsed.ok) return undefined;
   const { v, p, r } = raw as Record<string, unknown>;
   const out: DecodedState = typeof v === 'string' && RULES_VERSION_RE.test(v) ? { context: parsed.context, rulesVersion: v } : { context: parsed.context };
-  if (isProvider(p)) {
+  if (isProvider(p) && enabled.includes(p)) {
     out.provider = p;
     if (r !== undefined) {
       const { items, dropped } = decodeSelection(p, r, rules);
       if (items.length > 0) out.selection = items;
       if (dropped > 0) out.dropped = dropped;
     }
-  } else if (r !== undefined) {
-    out.dropped = r !== null && typeof r === 'object' && !Array.isArray(r) ? Object.keys(r).length : 1;
+    return out;
   }
+  // 고를 CSP 가 정해지지 않은 링크 — 켜진 것이 하나면 그것. 선택은 규칙 id 가 CSP 에 묶여 있어 옮기지 않는다
+  const only = enabled.length === 1 ? enabled[0] : undefined;
+  if (only !== undefined) out.provider = only;
+  if (r !== undefined) {
+    const n = entryCount(r);
+    if (n > 0) out.dropped = n;
+  }
+  if (isProvider(p)) out.unavailable = p;
   return out;
 }
 

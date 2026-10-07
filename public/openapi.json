@@ -33,8 +33,7 @@
                   "region": "kr"
                 },
                 "providers": [
-                  "gcp",
-                  "azure"
+                  "gcp"
                 ]
               }
             }
@@ -52,7 +51,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), providers is not a non-empty array of supported providers, or rules_version is not a string",
+            "description": "Body is not JSON or not an object, context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), providers is not a non-empty array of supported providers or names a provider that is not enabled yet (request.provider_not_enabled), or rules_version is not a string",
             "content": {
               "application/json": {
                 "schema": {
@@ -126,7 +125,7 @@
                 "$ref": "#/components/schemas/NamesRequest"
               },
               "example": {
-                "provider": "azure",
+                "provider": "gcp",
                 "context": {
                   "owner": "platform",
                   "system": "billing",
@@ -136,7 +135,7 @@
                 },
                 "resources": [
                   {
-                    "type": "virtual_machine",
+                    "type": "compute_instance",
                     "count": 2
                   },
                   {
@@ -144,11 +143,11 @@
                     "count": 2
                   },
                   {
-                    "type": "managed_identity",
+                    "type": "service_account",
                     "role": "db"
                   },
                   {
-                    "type": "resource_group"
+                    "type": "project_id"
                   }
                 ]
               }
@@ -167,7 +166,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, provider is unknown (supported lists the providers), context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
+            "description": "Body is not JSON or not an object, provider is unknown or not enabled yet (request.provider_not_enabled; supported lists the enabled providers), context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), rules_version is not a string, or resources is invalid: not an array, empty, more than 200 items, an item that is not an object, an unknown type (supported lists the resource types), a duplicate type, count not an integer from 1 to 99, count above 1 or a role on a rule that takes none, a role not matching ^[a-z0-9]{2,16}$, or more than 200 names in total (selection.* codes)",
             "content": {
               "application/json": {
                 "schema": {
@@ -260,7 +259,7 @@
             }
           },
           "400": {
-            "description": "Unknown provider or resource_type (supported lists the accepted values), name or rules_version is not a string, or a field is longer than 1024 characters",
+            "description": "Unknown provider or resource_type, or a provider that is not enabled yet (request.provider_not_enabled; supported lists the accepted values), name or rules_version is not a string, or a field is longer than 1024 characters",
             "content": {
               "application/json": {
                 "schema": {
@@ -491,19 +490,15 @@
           },
           "providers": {
             "type": "array",
-            "description": "Omit for all three. Must be non-empty when present.",
+            "description": "Omit for every enabled provider (only gcp for now; aws and azure are planned). Must be non-empty when present. A known provider that is not enabled yet is 400 request.provider_not_enabled.",
             "items": {
               "type": "string",
               "enum": [
-                "aws",
-                "gcp",
-                "azure"
+                "gcp"
               ]
             },
             "example": [
-              "gcp",
-              "aws",
-              "azure"
+              "gcp"
             ]
           },
           "rules_version": {
@@ -666,12 +661,10 @@
           "provider": {
             "type": "string",
             "enum": [
-              "aws",
-              "gcp",
-              "azure"
+              "gcp"
             ],
             "maxLength": 1024,
-            "example": "azure"
+            "example": "gcp"
           },
           "context": {
             "type": "object",
@@ -1144,9 +1137,7 @@
             "type": "string",
             "maxLength": 1024,
             "enum": [
-              "aws",
-              "gcp",
-              "azure"
+              "gcp"
             ],
             "example": "gcp"
           },

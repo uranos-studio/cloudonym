@@ -11,6 +11,7 @@ import { rulesFor } from '../core/constraints';
 import { MESSAGE_CODES } from '../core/messages';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
+import { ENABLED_PROVIDERS } from '../core/types';
 
 const SELECTION_CODES_IN_SAMPLES = MESSAGE_CODES.filter((c) => c.startsWith('selection.'));
 
@@ -24,11 +25,13 @@ const schemas = spec.components.schemas;
 const exampleOf = (path: string): unknown => spec.paths[path]!.post!.requestBody.content['application/json']!.example;
 const keys = (o: object): string[] => Object.keys(o).sort();
 describe('public/openapi.json — 형식', () => {
-  it('3.0.3 · servers 는 상대 /v1 · providers enum 셋(oci 없음 · D8) · env/region 은 enum 이 아닌 string', () => {
+  it('3.0.3 · servers 는 상대 /v1 · provider enum 셋 자리 모두 켜진 CSP 그대로(D45 · oci 없음) · env/region 은 enum 이 아닌 string', () => {
     expect(spec.openapi).toBe('3.0.3');
     expect(spec.servers).toEqual([expect.objectContaining({ url: '/v1' })]);
     const ctx = schemas['GenerateRequest']!.properties!['context']!.properties!;
-    expect(schemas['GenerateRequest']!.properties!['providers']!.items!.enum!.sort()).toEqual(['aws', 'azure', 'gcp']);
+    expect(schemas['GenerateRequest']!.properties!['providers']!.items!.enum).toEqual([...ENABLED_PROVIDERS]);
+    expect(schemas['NamesRequest']!.properties!['provider']!.enum).toEqual([...ENABLED_PROVIDERS]);
+    expect(schemas['ValidateRequest']!.properties!['provider']!.enum).toEqual([...ENABLED_PROVIDERS]);
     expect(ctx['env']).toMatchObject({ type: 'string' });
     expect(ctx['env']!.enum).toBeUndefined();
     expect(ctx['region']!.enum).toBeUndefined();
@@ -79,7 +82,7 @@ describe('public/openapi.json — /names (D39)', () => {
   it('NamesRequest — resources 1~200 · count 1~99 · role pattern · provider enum · context 는 generate 와 같다', () => {
     const r = schemas['NamesRequest']! as Schema & { properties: Record<string, Schema & { minItems?: number; maxItems?: number }> };
     expect(r.required!.sort()).toEqual(['context', 'provider', 'resources']);
-    expect(r.properties['provider']!.enum!.sort()).toEqual(['aws', 'azure', 'gcp']);
+    expect(r.properties['provider']!.enum).toEqual([...ENABLED_PROVIDERS]);
     expect(r.properties['resources']).toMatchObject({ minItems: 1, maxItems: 200 });
     const it0 = r.properties['resources']!.items! as Schema & { properties: Record<string, Schema & { minimum?: number; maximum?: number; pattern?: string }> };
     expect(it0.properties['count']).toMatchObject({ type: 'integer', minimum: 1, maximum: 99 });
@@ -145,15 +148,18 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     expect(failures).toEqual([]);
   });
 
-  it('names 표본 — 정상 · 항목 FAIL · Name 태그 · 충돌 · 400 selection.* 11개 전부 · 409', () => {
+  it('names 표본 — 정상 · 항목 FAIL · 꺼진 CSP · 충돌 · 400 selection.* 11개 전부 · 409', () => {
     const ids = samples.map((x) => x.id);
-    for (const id of ['names-ok', 'names-item-fail', 'names-name-tag', 'names-conflict', '400-names-provider', '409-names-rules-version']) expect(ids, id).toContain(id);
+    for (const id of ['names-ok', 'names-item-fail', '400-names-provider-not-enabled', 'names-conflict', '400-names-provider', '409-names-rules-version']) expect(ids, id).toContain(id);
     const codesSeen = new Set(samples.filter((x) => x.path === '/v1/names' && x.status === 400).flatMap((x) => (x.body.errors as { code: string }[]).map((e) => e.code)));
     expect(SELECTION_CODES_IN_SAMPLES).toHaveLength(11);
     for (const c of SELECTION_CODES_IN_SAMPLES) expect([...codesSeen], c).toContain(c);
-    const tag = samples.find((x) => x.id === 'names-name-tag')!.body.data.aws.items[0];
-    expect(tag).toMatchObject({ scope: 'aws:vpc', uniqueness: 'none' });
-    const conflict = samples.find((x) => x.id === 'names-conflict')!.body.data.azure;
+    // uniqueness "none"(AWS Name 태그)은 꺼진 CSP 에만 있다 — 켜진 GCP 의 항목은 전부 csp (D45)
+    const ok = samples.find((x) => x.id === 'names-ok')!.body.data.gcp.items as { uniqueness: string }[];
+    expect(ok.length).toBeGreaterThan(0);
+    for (const i of ok) expect(i.uniqueness).toBe('csp');
+    expect(samples.find((x) => x.id === '400-names-provider-not-enabled')!.body.errors[0].code).toBe('request.provider_not_enabled');
+    const conflict = samples.find((x) => x.id === 'names-conflict')!.body.data.gcp;
     expect(conflict.valid).toBe(false);
     expect(conflict.conflicts).toHaveLength(1);
   });
@@ -165,13 +171,13 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     for (const p of ['/generate', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(expect.arrayContaining(['400', '409']));
   });
 
-  it('example 요청은 200 이고 /generate example 은 gcp · azure 규칙 수만큼', async () => {
+  it('example 요청은 200 이고 /generate example 은 켜진 CSP 규칙 수만큼', async () => {
     const body = await json((await req(app, '/v1/generate', jsonPost(exampleOf('/generate')))).res);
     expect(validatorFor('GenerateResponse')(body)).toBe(true);
-    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(rulesFor('gcp').length + rulesFor('azure').length);
+    expect(Object.values(body.data as Record<string, object>).reduce((n, o) => n + Object.keys(o).length, 0)).toBe(ENABLED_PROVIDERS.reduce((n, p) => n + rulesFor(p).length, 0));
     const n = await json((await req(app, '/v1/names', jsonPost(exampleOf('/names')))).res);
     expect(validatorFor('NamesResponse')(n)).toBe(true);
-    expect(n.data.azure.valid).toBe(true);
+    expect(n.data.gcp.valid).toBe(true);
     const v = await json((await req(app, '/v1/validate', jsonPost(exampleOf('/validate')))).res);
     expect(validatorFor('ValidateResponse')(v)).toBe(true);
     expect(v.suggested_name).toBeDefined();

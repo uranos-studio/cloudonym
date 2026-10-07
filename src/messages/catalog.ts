@@ -17,8 +17,8 @@ export const UI_KEYS = [
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
   'step_cloud', 'step_context', 'step_resources', 'step_names', 'selection_dropped', 'switch_cloud_confirm',
   'sticky_summary', 'sticky_jump',
-  // CloudPicker
-  'cloud_group_label', 'pick_cloud_prompt',
+  // CloudPicker — 꺼진 CSP 의 표지 · 툴팁 · 꺼진 CSP 링크 안내 (D45 · D55)
+  'cloud_group_label', 'pick_cloud_prompt', 'cloud_coming_soon', 'cloud_planned_aws', 'cloud_planned_azure', 'provider_unavailable',
   // ResourceTree
   'resources_title', 'search_label', 'search_placeholder', 'search_empty', 'selected_only', 'selected_count',
   'expand_all', 'collapse_all', 'category_filter_label', 'category_all',

@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 import { BASELINE_CONTEXTS } from '../core/baseline-inputs';
+import { ENABLED_PROVIDERS, type Provider } from '../core/types';
 
 const HANGUL = /\p{Script=Hangul}/u;
 interface FixtureName { name: string; valid: boolean; isTruncated: boolean; isTransformed: boolean; original: string; violations: number; steps: number }
@@ -22,7 +23,11 @@ describe('사용자 값 — API 출력이 기준선 fixture 와 같다', () => {
       expect(res.status).toBe(200);
       const body = await json(res);
       const want = fixture.core.contexts.find((c) => c.id === id)!;
-      for (const [p, byType] of Object.entries(want.names!)) {
+      // API 는 켜진 CSP 만 낸다 (D45) — 꺼진 CSP 의 기준선은 core 시험이 본다
+      expect(Object.keys(body.data)).toEqual([...ENABLED_PROVIDERS]);
+      const enabled = Object.entries(want.names!).filter(([p]) => ENABLED_PROVIDERS.includes(p as Provider));
+      expect(enabled.length).toBe(ENABLED_PROVIDERS.length);
+      for (const [p, byType] of enabled) {
         for (const [type, w] of Object.entries(byType)) {
           const got = body.data[p][type];
           expect({

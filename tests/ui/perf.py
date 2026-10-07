@@ -1,7 +1,8 @@
 """트리 성능 측정 — 두 패스로 넷을 재고, 허용치를 넘으면 non-zero 로 끝난다.
 
-패스 ① fixture — 시험 전용 규칙 500개(`?fixture=rules500`, DEV 빌드에서만) · Azure.
-패스 ② 실제 규칙 — fixture 없이 세 CSP 중 트리 행이 가장 많은 CSP. 행 수는 적어 두지 않고 그 자리에서 잰다(규칙은 늘어난다).
+패스 ① fixture — 시험 전용 규칙 500개(`?fixture=rules500`, DEV 빌드에서만) · GCP.
+패스 ② 실제 규칙 — fixture 없이 켜진 CSP(화면 ① 에서 고를 수 있는 것) 중 트리 행이 가장 많은 CSP. 행 수는 적어 두지 않고 그 자리에서 잰다(규칙은 늘어난다).
+켜진 CSP 는 화면의 버튼(꺼진 것은 disabled)에서 읽는다 — 꺼진 CSP 링크는 화면이 켜진 CSP 로 바꿔 열기 때문이다(D45 · D55).
 조건: 헤드리스 Chromium · 이 기계 · Vite dev 서버(React 개발 빌드) · 항목마다 새로 불러온 페이지에서 5회 · 중앙값.
 먼저 `[data-tree] [data-rule]` 이 기대한 행 수인지 단언한 뒤 잰다(공허한 측정을 막는다).
   ⑴ 첫 그리기 — 탐색 시작 → 트리 행 N 개가 DOM 에 생긴 시각 (performance.now 원점 = 탐색 시작)
@@ -38,7 +39,7 @@ def state_hash(provider, r=None):
     return '#state=' + base64.urlsafe_b64encode(raw.encode()).rstrip(b'=').decode()
 
 
-# src/dev/fixtureRules.ts 의 입력 종류 순환 — i % 4: 0 · 1 count(VM) · 2 role(관리 ID) · 3 none(Key Vault)
+# src/dev/fixtureRules.ts 의 입력 종류 순환 — i % 4: 0 · 1 count(VM) · 2 role(서비스 계정) · 3 none(버킷)
 SELECT_200 = {f'fx500_{i:03d}': ('sync' if i % 4 == 2 else 1) for i in range(200)}
 
 # 행 수 N 은 탐색마다 window.__rowsWant 로 넘긴다(init script 는 페이지마다 다시 돈다)
@@ -137,15 +138,17 @@ with sync_playwright() as p:
     page = ctx.new_page()
     errors = []
     page.on('pageerror', lambda e: errors.append(str(e)))
-    page.goto(BASE + '/?fixture=rules500' + state_hash('azure'), wait_until='networkidle')  # dev 서버의 변환 · 캐시 데우기 — 재지 않는다
+    page.goto(BASE + '/?fixture=rules500' + state_hash('gcp'), wait_until='networkidle')  # dev 서버의 변환 · 캐시 데우기 — 재지 않는다
 
-    res, cards = measure(page, 'fixture=rules500', 'azure', 500, state_hash('azure', SELECT_200))
+    res, cards = measure(page, 'fixture=rules500', 'gcp', 500, state_hash('gcp', SELECT_200))
     assert cards == 200, cards
-    report['fixture_rules500'] = {'provider': 'azure', 'rows': 500, 'cards': cards, **summarize(res)}
+    report['fixture_rules500'] = {'provider': 'gcp', 'rows': 500, 'cards': cards, **summarize(res)}
 
-    # 실제 규칙 — CSP 마다 행 수를 재고 가장 큰 트리를 쓴다
+    # 실제 규칙 — 켜진 CSP 마다 행 수를 재고 가장 큰 트리를 쓴다
     sizes = {}
-    for prov in ('aws', 'gcp', 'azure'):
+    enabled = page.eval_on_selector_all('[role="radio"]:not([disabled])', 'els => els.map(e => e.dataset.cloud)')
+    assert enabled, '켜진 CSP 가 없다'
+    for prov in enabled:
         page.goto(BASE + f'/?size={prov}' + state_hash(prov), wait_until='networkidle')
         sizes[prov] = page.locator('[data-tree] [data-rule]').count()
     prov = max(sizes, key=sizes.get)

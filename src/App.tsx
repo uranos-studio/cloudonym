@@ -5,8 +5,9 @@ import { ArrowDown, Cloud, FileText } from 'lucide-react';
 import { generateMany, parseContext } from './core/engine';
 import { labelsFor } from './core/labels';
 import { buildTree } from './core/tree';
-import type { NamingContext, Provider, ResourceRule } from './core/types';
+import { ENABLED_PROVIDERS, type NamingContext, type Provider, type ResourceRule } from './core/types';
 import { CloudPicker } from './components/CloudPicker';
+import { providerShort } from './components/providerName';
 import { ContextForm } from './components/ContextForm';
 import { ResourceTree } from './components/ResourceTree';
 import { NamesPanel } from './components/NamesPanel';
@@ -20,8 +21,10 @@ import { en } from './messages/en';
 import { fillUi } from './messages/catalog';
 import { VERSION } from './version';
 
-/** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다. CSP 는 기본값이 없다 — 숨은 기본값을 두지 않는다 */
+/** 첫 화면의 예시 — ① 원문의 예시 그대로. 공유 URL 이 있으면 그것이 이긴다 */
 const DEFAULT_CONTEXT: NamingContext = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prd', region: 'kr' };
+/** 켜진 CSP 가 하나면 첫 그리기 때 그것을 고른다 (D45 · 오너 결정 C1). 둘 이상이면 고르지 않는다 — 숨은 기본값을 두지 않는다 */
+const AUTO_PROVIDER: Provider | undefined = ENABLED_PROVIDERS.length === 1 ? ENABLED_PROVIDERS[0] : undefined;
 const NO_PICK: Picked = new Map();
 
 const PANEL = 'rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900';
@@ -30,7 +33,7 @@ const LINK =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800';
 const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-interface Opened { form: NamingContext; provider?: Provider; picked: Picked; dropped: number; link: LinkState }
+interface Opened { form: NamingContext; provider?: Provider; picked: Picked; dropped: number; unavailable?: Provider; link: LinkState }
 
 /** 주소창의 hash 가 온전하면 그 상태 — 폼과 대어 볼 key 는 지금 규칙 버전 · 트리 순서로 만든다 (D27 ⑵ · D42).
  *  hash 의 r 순서가 트리 순서와 달라도 같은 선택이면 같은 key 다 — 링크를 연 직후 hash 를 덮어쓰지 않는다 */
@@ -40,7 +43,7 @@ function openHash(hash: string, rules: readonly ResourceRule[] | undefined): Ope
   const picked = d.selection ? fromItems(d.selection) : NO_PICK;
   const selection = d.provider ? toItems(buildTree(d.provider, rules?.filter((r) => r.provider === d.provider)), picked) : [];
   const key = encodeState(d.context, VERSION.rules, { provider: d.provider, selection });
-  return { form: d.context, provider: d.provider, picked, dropped: d.dropped ?? 0, link: linkStateOf(d, hash, key) };
+  return { form: d.context, provider: d.provider, picked, dropped: d.dropped ?? 0, unavailable: d.unavailable, link: linkStateOf(d, hash, key) };
 }
 
 /** rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
@@ -48,10 +51,12 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (깨진 hash 는 decodeState 가 undefined 로 돌려준다)
   const [initial] = useState(() => openHash(window.location.hash, rules));
   const [form, setForm] = useState<NamingContext>(() => initial?.form ?? DEFAULT_CONTEXT);
-  const [provider, setProvider] = useState<Provider | undefined>(() => initial?.provider);
+  const [provider, setProvider] = useState<Provider | undefined>(() => (initial ? initial.provider : AUTO_PROVIDER));
   const [picked, setPicked] = useState<Picked>(() => initial?.picked ?? NO_PICK);
   // 링크에서 버린 선택 수 — 사용자가 선택 · CSP 를 바꾸면 지운다
   const [dropped, setDropped] = useState(() => initial?.dropped ?? 0);
+  // 링크가 아직 꺼진 CSP 로 만들어졌으면 그 CSP — 안내 한 줄 (D55). 사용자가 선택 · CSP 를 바꾸면 지운다
+  const [unavailable, setUnavailable] = useState<Provider | undefined>(() => initial?.unavailable);
   // 링크에서 읽은 상태 — 폼과 따로 둔다. 사용자가 폼을 고치면 버린다 (D27 ⑵)
   const [link, setLink] = useState<LinkState | undefined>(() => initial?.link);
   const editForm = (next: NamingContext) => {
@@ -78,17 +83,19 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     // 선택을 바꾸면 링크 상태를 버린다 — 남겨 두면 링크와 같은 선택으로 돌아왔을 때 hash 쓰기가 멈춰 주소창이 낡은 선택에 남는다
     setLink(undefined);
     setDropped(0);
+    setUnavailable(undefined);
     setPicked(ok);
   }, [provider, tree, rules]);
 
   const onCloud = (p: Provider) => {
-    if (p === provider) return;
+    if (p === provider || !ENABLED_PROVIDERS.includes(p)) return;
     // 규칙 id 가 provider 에 묶여 있어 선택을 옮길 수 없다 — 지우기 전에 한 번 묻는다(선택이 있을 때만)
     if (picked.size > 0 && !window.confirm(fillUi(en, 'switch_cloud_confirm', { n: picked.size }))) return;
     setLink(undefined);
     setProvider(p);
     setPicked(clearForCloudSwitch());
     setDropped(0);
+    setUnavailable(undefined);
   };
 
   // 상태 → URL hash (replaceState — 히스토리를 쌓지 않는다). 문맥이 불완전한 동안은 쓰지 않는다 — 마지막 온전한 hash 가 남아 새로고침해도 CSP · 선택이 돌아온다.
@@ -131,6 +138,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
         setProvider(opened.provider);
         setPicked(opened.picked);
         setDropped(opened.dropped);
+        setUnavailable(opened.unavailable);
         return;
       }
       const hash = currentHash.current;
@@ -170,7 +178,10 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
         {linkedVersion && (
           <p data-rules-mismatch role="status" className={NOTICE}>{fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}</p>
         )}
-        {dropped > 0 && <p data-selection-dropped role="status" className={NOTICE}>{fillUi(en, 'selection_dropped', { n: dropped })}</p>}
+        {/* 꺼진 CSP 링크면 그 안내 하나 — 버린 선택은 그 문장이 말한다. 아니면 버린 선택 수 */}
+        {unavailable
+          ? <p data-provider-unavailable role="status" className={NOTICE}>{fillUi(en, 'provider_unavailable', { name: providerShort(unavailable) })}</p>
+          : dropped > 0 && <p data-selection-dropped role="status" className={NOTICE}>{fillUi(en, 'selection_dropped', { n: dropped })}</p>}
 
         {/* 좁은 화면은 ② → ③ → ④ → 태그 순서, 넓은 화면은 왼쪽 열(② · 태그) · 오른쪽 열(③ · ④) */}
         <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">

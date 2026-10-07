@@ -24,7 +24,7 @@ describe('본문 16KB 상한 — 413 · ErrorResponse 꼴', () => {
   });
   it('validate name 100KB → 413 이 빨리 나온다 (500 ms 안 · 전에는 제곱 루프로 9 초)', async () => {
     const t0 = performance.now();
-    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: 'vpc', name: 'a-'.repeat(50_000) }));
+    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: 'artifact_registry_rule', name: 'a-'.repeat(50_000) }));
     const ms = performance.now() - t0;
     expect(res.status).toBe(413);
     expect(ms).toBeLessThan(500);
@@ -38,18 +38,18 @@ describe('본문 16KB 상한 — 413 · ErrorResponse 꼴', () => {
 
 describe('필드 길이 상한(자유 입력 64 · 나머지 1024) — 본문 상한과 별개로 400', () => {
   it('validate name 1025자(본문 약 1.1KB) → 400 name: 1024자를 넘는다', async () => {
-    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: 'vpc', name: 'a'.repeat(1025) }));
+    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: 'artifact_registry_rule', name: 'a'.repeat(1025) }));
     expect(res.status).toBe(400);
     expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'name', params: { max: 1024 }, message: "'name' is longer than 1024 characters" }] });
   });
   it('name 1024자 · 가운데 하이픈 → 400 아님 (200) 이고 빨리 끝난다', async () => {
     const t0 = performance.now();
-    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: 'vpc', name: 'a-'.repeat(512) }));
+    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: 'artifact_registry_rule', name: 'a-'.repeat(512) }));
     expect(res.status).toBe(200);
     expect(performance.now() - t0).toBeLessThan(500);
   });
-  it('aws.vpc(최대 256자) 에 257자 → 200 + 길이 위반 (상한이 엔진의 판정을 가리지 않는다)', async () => {
-    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: 'vpc', name: 'a'.repeat(257) }));
+  it('gcp.artifact_registry_rule(최대 256자) 에 257자 → 200 + 길이 위반 (상한이 엔진의 판정을 가리지 않는다)', async () => {
+    const { res } = await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: 'artifact_registry_rule', name: 'a'.repeat(257) }));
     expect(res.status).toBe(200);
     const body = await json(res);
     expect(body.valid).toBe(false);
@@ -68,9 +68,9 @@ describe('필드 길이 상한(자유 입력 64 · 나머지 1024) — 본문 �
   });
   it('긴 provider · resource_type · event 는 오류 문구에 값을 되돌려 주지 않는다', async () => {
     const long = 'z'.repeat(2000);
-    const p = await json((await req(app, '/v1/validate', jsonPost({ provider: long, resource_type: 'vpc', name: 'x' }))).res);
+    const p = await json((await req(app, '/v1/validate', jsonPost({ provider: long, resource_type: 'project_id', name: 'x' }))).res);
     expect(p).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'provider', params: { max: 1024 }, message: "'provider' is longer than 1024 characters" }] });
-    const r = await json((await req(app, '/v1/validate', jsonPost({ provider: 'aws', resource_type: long, name: 'x' }))).res);
+    const r = await json((await req(app, '/v1/validate', jsonPost({ provider: 'gcp', resource_type: long, name: 'x' }))).res);
     expect(r).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'resource_type', params: { max: 1024 }, message: "'resource_type' is longer than 1024 characters" }] });
     const e = await json((await req(app, '/v1/events', beaconPost({ event: long }))).res);
     expect(e).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'event', params: { max: 1024 }, message: "'event' is longer than 1024 characters" }] });

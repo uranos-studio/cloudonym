@@ -73,10 +73,10 @@ describe('API 응답 — 한글 0 · 모든 실패에 code 와 message', () => {
     }
   });
 
-  it('microsoft123 은 여전히 무효 · 모든 200 응답에 version', () => {
-    const ms = samples.find((x) => x.id === 'validate-invalid-microsoft123')!;
+  it('goog-billing 은 무효 · 모든 200 응답에 version', () => {
+    const ms = samples.find((x) => x.id === 'validate-invalid-goog')!;
     expect(ms.body.valid).toBe(false);
-    expect(ms.body.violations[0]).toMatchObject({ code: 'name.forbidden_substring', params: { value: 'microsoft' }, message: "Contains the forbidden string 'microsoft'" });
+    expect(ms.body.violations[0]).toMatchObject({ code: 'name.forbidden_prefix', params: { value: 'goog' } });
     for (const x of samples.filter((s) => s.status === 200 && s.path !== '/v1/events')) expect(x.body.version, x.id).toEqual(VERSION);
   });
 });
