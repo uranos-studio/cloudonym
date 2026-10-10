@@ -518,13 +518,21 @@ function hashJson(hash: string, max: number): Record<string, unknown> | undefine
   }
 }
 
-/** 뿌리 경로의 화면 고르기 (D68) — `w` 가 있으면 wizard · `w` 없는 온전한 JSON 이면 tree(옛 v3 · 다섯 키 링크) · hash 가 없으면 none · 그 밖은 broken */
+/** 뿌리 경로의 화면 고르기 (D68) — 디코더가 받는 꼴만 그 화면이다: decodeWizardState 가 받으면 wizard · `w` 가 없고 decodeState 가 받으면 tree
+ *  (옛 v3 · 다섯 키 링크 — 걸린 항목은 그 디코더가 버리고 연다) · hash 가 없으면 none · 그 밖(풀리지 않는 꼴 · 문맥이 틀린 링크)은 broken */
 export type HashKind = 'wizard' | 'tree' | 'none' | 'broken';
 export function hashKind(hash: string): HashKind {
   if (hash === '' || hash === '#') return 'none';
   const raw = hashJson(hash, MAX_ANY_HASH_CHARS);
   if (!raw) return 'broken';
-  return 'w' in raw ? 'wizard' : 'tree';
+  if ('w' in raw) return decodeWizardState(hash) !== undefined ? 'wizard' : 'broken';
+  return decodeState(hash) !== undefined ? 'tree' : 'broken';
+}
+
+/** 뿌리에서 같은 탭 hash 이동 — 다른 화면의 디코더가 받는 hash 일 때만 화면을 바꾼다. 아니면 지금 화면이 그 hash 를 다룬다(깨진 hash 는 되돌린다) */
+export function nextRootScreen(current: 'wizard' | 'tree', hash: string): 'wizard' | 'tree' {
+  const k = hashKind(hash);
+  return k === 'wizard' || k === 'tree' ? k : current;
 }
 
 /** 마법사 hash 를 푼다 — 문맥 넷이 안 풀리면(깨진 링크) undefined. w 와 r 이 같이 있으면 깨진 링크다.

@@ -698,3 +698,37 @@ describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
     expect(decodeWizardState(big)).toBeUndefined();
   });
 });
+
+// ─── 뿌리 화면 고르기 — 풀리는 꼴만 그 화면이다 (D68 · 검토 M-2 · M-3) ───
+import { nextRootScreen } from './urlState';
+describe('hashKind — 디코더가 받는 hash 만 tree · wizard', () => {
+  const five = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' }))}`;
+  const v3Bad = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', v: WV, p: 'gcp', r: { nope_type: 1, compute_instance: 'x' } }))}`;
+  it('옛 링크 — 다섯 키 · 걸린 항목이 든 v3(decodeState 가 받고 그 항목만 버린다)는 tree', () => {
+    expect(decodeEnabled(v3Bad)).toBeDefined();
+    expect(hashKind(five)).toBe('tree');
+    expect(hashKind(v3Bad)).toBe('tree');
+  });
+  it('w 없는 JSON 이라도 decodeState 가 받지 않으면 broken — {"owner":42} · 빈 문맥 · 모르는 env', () => {
+    for (const body of [{ owner: 42 }, {}, { owner: 'a', system: 'b', purpose: 'c', env: 'nope', region: 'ane3' }]) {
+      const h = `#state=${btoa(JSON.stringify(body))}`;
+      expect(decodeEnabled(h)).toBeUndefined();
+      expect(hashKind(h)).toBe('broken');
+    }
+  });
+  it('w 가 있어도 decodeWizardState 가 받지 않으면 broken — 문맥 오류 · w + r', () => {
+    expect(hashKind(rawWizardHash(W_SAMPLE, { env: 'nope' }))).toBe('broken');
+    expect(hashKind(rawWizardHash(W_SAMPLE, { r: { disk: 1 } }))).toBe('broken');
+    // w 의 꼴만 틀리면(문맥은 온전) 디코더가 받고 w 를 버린다 — wizard
+    expect(hashKind(`#state=${btoa(JSON.stringify({ ...WP, w: 5 }))}`)).toBe('wizard');
+  });
+  it('nextRootScreen — 같은 탭 이동은 다른 화면으로 풀릴 때만 바꾼다', () => {
+    const w = `#state=${encodeWizardState(W_SAMPLE, WV)}`;
+    expect(nextRootScreen('tree', w)).toBe('wizard');
+    expect(nextRootScreen('wizard', five)).toBe('tree');
+    for (const h of [rawWizardHash(W_SAMPLE, { env: 'nope' }), '#state=!!!', `#state=${btoa('{"owner":42}')}`, '']) {
+      expect(nextRootScreen('tree', h)).toBe('tree');
+      expect(nextRootScreen('wizard', h)).toBe('wizard');
+    }
+  });
+});

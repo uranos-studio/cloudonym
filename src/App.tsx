@@ -14,7 +14,7 @@ import { NamesPanel } from './components/NamesPanel';
 import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
 import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } from './components/selection';
-import { encodeState, hashKind, shareUrl } from './components/urlState';
+import { encodeState, hashKind, nextRootScreen, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './components/route';
@@ -45,8 +45,8 @@ function RootScreen({ rules }: { rules?: readonly ResourceRule[] }) {
   const [mode, setMode] = useState<{ screen: 'wizard' | 'tree'; broken: boolean }>(() => ({ screen: start === 'tree' ? 'tree' : 'wizard', broken: start === 'broken' }));
   useEffect(() => {
     const onHash = () => {
-      const k = hashKind(window.location.hash);
-      if (k === 'tree' || k === 'wizard') setMode((m) => (m.screen === k ? m : { screen: k, broken: false }));
+      // 다른 화면의 디코더가 받는 hash 일 때만 바꾼다 — 아니면 지금 화면이 다룬다(깨진 hash 는 되돌린다)
+      setMode((m) => { const k = nextRootScreen(m.screen, window.location.hash); return m.screen === k ? m : { screen: k, broken: false }; });
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);

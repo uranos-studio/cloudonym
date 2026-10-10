@@ -407,8 +407,16 @@ def wizard_scenarios(browser, rules_version, errors):
                 tree_share = p36.evaluate('navigator.clipboard.readText()')
                 assert tree_share.startswith(BASE + '/pick#state='), tree_share
                 assert 'w' not in hash_state(tree_share), tree_share
-    # 같은 탭 — 뿌리의 트리에서 마법사 링크로 이동하면 마법사로 바뀐다
+    # 같은 탭 — 뿌리의 트리에서 풀리지 않는 마법사 hash(문맥이 틀림)로 이동하면 트리에 남고 주소창이 되돌아간다
     goto_ready(p36, BASE + '/' + v3)
+    bad_w = json.loads(json.dumps(hash_state(shared)))
+    bad_w['env'] = 'nope'
+    bad_w_hash = '#state=' + base64.urlsafe_b64encode(json.dumps(bad_w, separators=(',', ':')).encode()).rstrip(b'=').decode()
+    p36.evaluate('h => { location.hash = h; }', bad_w_hash)
+    p36.wait_for_function('h => location.hash === h', arg=v3)
+    expect(p36.locator('[data-tree]')).to_have_count(1)
+    expect(p36.locator('[data-wizard]')).to_have_count(0)
+    # 같은 탭 — 뿌리의 트리에서 마법사 링크로 이동하면 마법사로 바뀐다
     p36.evaluate('h => { location.hash = h; }', '#' + shared.split('#', 1)[1])
     expect(p36.locator('[data-wizard]')).to_be_visible()
     expect(p36.locator('[data-tree]')).to_have_count(0)
@@ -418,7 +426,8 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(p36.locator('[data-wizard]')).to_have_count(0)
     expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
     # 깨진 뿌리 hash → 마법사 + 안내 한 줄 (조용히 버리지 않는다)
-    for broken in ('#state=!!!', '#state=W10'):
+    # {"owner":42} 는 JSON 이지만 decodeState 가 받지 않는다 → 트리가 아니라 마법사 + 안내 (검토 M-2)
+    for broken in ('#state=!!!', '#state=W10', '#state=eyJvd25lciI6NDJ9'):
         goto_ready(p36, BASE + '/?b' + broken)
         goto_ready(p36, BASE + '/' + broken)
         expect(p36.locator('[data-wizard]')).to_be_visible()
