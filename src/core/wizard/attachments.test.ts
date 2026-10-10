@@ -74,6 +74,11 @@ describe('checkAttachments (D62 · §4-5 ⑷)', () => {
     const out = checkAttachments(item([{ seq: '01', attach: { boot: true } }, { seq: '02', attach: { data: ['01'] } }], sql), 3);
     expect(out).toEqual([{ tail: '', message: { code: 'wizard.children_not_supported', params: { index: 3, type: 'cloud_sql_instance' } } }]);
   });
+  it('호환표에 없는 부모 — 빈 객체 attach 도 children_not_supported (attach 가 오는 것 자체가 잘못)', () => {
+    expect(checkAttachments(item([{ seq: '01', attach: {} }], sql), 1)).toEqual([
+      { tail: '', message: { code: 'wizard.children_not_supported', params: { index: 1, type: 'cloud_sql_instance' } } },
+    ]);
+  });
   it('data 범위 — 비었다 · 10개 · 배열 아님 → attach_out_of_range { max: 9 } · 위치는 attach.data', () => {
     const ten = Array.from({ length: 10 }, (_, i) => String(i + 1).padStart(2, '0'));
     const out = checkAttachments(item([{ seq: '01', attach: { data: [] } }, { seq: '02', attach: { data: ten } }, { seq: '03', attach: { data: '01' } }]));

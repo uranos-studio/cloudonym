@@ -46,6 +46,18 @@ describe('구조 키 — 단사 (D69)', () => {
     expect(keys).toContain('project/-/compute_instance/-/01');
     expect(keys).toContain('service/shop/compute_instance/-/01');
   });
+  it('서비스 이름이 정제 뒤 project 여도 프로젝트 수준 항목과 키가 다르다 — 키의 level 칸은 namespace 가 아니라 level 에서 온다', () => {
+    const vm = rulesFor('gcp').find((r) => r.id === 'gcp.compute_instance')!;
+    const r = generateProject({ project: WIZARD_PROJECT, projectItems: [{ rule: vm, count: 1, level: 'project', instances: [{ seq: '01', attach: { boot: true } }] }],
+      services: [{ purpose: 'Project', items: [{ rule: vm, count: 1, instances: [{ seq: '01', attach: { boot: true } }] }] }] }, 'gcp');
+    const ks = r.items.map((i) => i.key);
+    expect(ks.slice(1)).toEqual(['project/-/compute_instance/-/01', 'project/-/compute_instance/-/01/boot/-',
+                                 'service/project/compute_instance/-/01', 'service/project/compute_instance/-/01/boot/-']);
+    expect(new Set(ks).size).toBe(ks.length);
+    const hcl = wizardTerraform(r, {});
+    const mapKeys = [...hcl.matchAll(/^ {4}"([^"]+)" = "/gm)].map((m) => m[1]!);
+    expect(new Set(mapKeys).size).toBe(mapKeys.length);
+  });
   it('같은 슬롯의 자식 다섯은 다른 키이고 그 집합이 정확히 boot/- · data/01 · data/02 · ip/- · ipi/-', () => {
     const parent = 'service/shop/compute_instance/web/01';
     const tails = keys.filter((k) => k.startsWith(`${parent}/`)).map((k) => k.slice(parent.length + 1));

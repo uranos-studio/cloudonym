@@ -160,9 +160,10 @@ const PROJECT_NAMESPACE = 'project';
 
 /** 구조 키 (D69) — generateProject 만 쓴다. `/` 로 이은 고정 길이 경로: 부모 `<level>/<service>/<type>/<tier|->/<seq|role|->`,
  *  자식은 그 뒤에 `/<attach>/<seq|->`. 어느 칸에도 `/` 가 올 수 없고 칸 수가 모양마다 고정이라 다른 항목이 같은 키가 될 수 없다.
- *  namespace 'project' 면 level 칸이 project · service 칸이 '-' 다. generateMany 의 키(compute_instance_01)와는 다른 함수다 */
-export function projectItemKey(p: { namespace: string; type: string; tier?: string; slot?: string }, child?: { attach: AttachKind; seq?: string }): string {
-  const head = p.namespace === PROJECT_NAMESPACE ? `project/-` : `service/${p.namespace}`;
+ *  level 'project' 면 level 칸이 project · service 칸이 '-' 다. generateMany 의 키(compute_instance_01)와는 다른 함수다 */
+export function projectItemKey(p: { level?: 'project'; namespace: string; type: string; tier?: string; slot?: string }, child?: { attach: AttachKind; seq?: string }): string {
+  // level 칸은 level 에서 온다 — 정제 뒤 project 인 서비스 이름이 프로젝트 수준 키를 흉내 내지 못한다
+  const head = p.level === 'project' ? 'project/-' : `service/${p.namespace}`;
   const parent = `${head}/${p.type}/${p.tier ?? '-'}/${p.slot ?? '-'}`;
   return child ? `${parent}/${child.attach}/${child.seq ?? '-'}` : parent;
 }
@@ -215,7 +216,7 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
     const lv = level === undefined ? {} : { level };
     const one = (extra: ItemExtra, slot: string | undefined, meta: { seq?: string; role?: string }, children: Built['children']) => {
       const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...extra });
-      const key = projectItemKey({ namespace, type: rule.resourceType, ...(tier === undefined ? {} : { tier }), ...(slot === undefined ? {} : { slot }) });
+      const key = projectItemKey({ ...lv, namespace, type: rule.resourceType, ...(tier === undefined ? {} : { tier }), ...(slot === undefined ? {} : { slot }) });
       const item: NameItem = {
         ...res, key, ...meta, ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }),
         ...(tier === undefined ? {} : { tier }), ...lv, namespace,
@@ -244,6 +245,7 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
     }
   };
 
+  // 입력은 중복이 없어야 한다 — 같은 이름공간으로 정제되는 서비스 · 같은 (type, tier, level) 항목은 T5 의 마법사 모델 검사(validatePlan)가 먼저 거부한다
   // ① 부모 전부
   add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1 }, 'project');
   for (const it of sel.projectItems) add(sel.project, PROJECT_NAMESPACE, it, 'project');

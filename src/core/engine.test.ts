@@ -688,7 +688,8 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
 
 describe('projectItemKey · serviceNamespace · attachName (D69)', () => {
   it('키 꼴 — 부모 5칸 · 자식 7칸', () => {
-    expect(projectItemKey({ namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('project/-/vpc_network/-/01');
+    expect(projectItemKey({ level: 'project', namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('project/-/vpc_network/-/01');
+    expect(projectItemKey({ namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('service/project/vpc_network/-/01');
     expect(projectItemKey({ namespace: 'shop', type: 'compute_instance', tier: 'web', slot: '01' }, { attach: 'data', seq: '01' }))
       .toBe('service/shop/compute_instance/web/01/data/01');
     expect(projectItemKey({ namespace: 'shop', type: 'compute_instance', slot: '01' }, { attach: 'boot' })).toBe('service/shop/compute_instance/-/01/boot/-');

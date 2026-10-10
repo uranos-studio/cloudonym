@@ -53,8 +53,10 @@ export function checkAttachments(item: SelectionItem, index = 0): AttachmentIssu
       out.push({ tail: at, message: { code: 'wizard.attach_not_object', params: { index } } });
       return;
     }
+    // 표에 없는 부모에 attach 가 오는 것 자체가 잘못이다(빈 객체여도) · 표에 있는 부모라도 그 종류의 행이 없으면 같다
     const given = ATTACH_KINDS.filter((k) => (attach as Record<string, unknown>)[k] !== undefined);
-    if (given.some((k) => !attachmentRow(item.rule.id, k))) {
+    const parentKnown = ATTACHMENTS.some((r) => r.parent === item.rule.id);
+    if (!parentKnown || given.some((k) => !attachmentRow(item.rule.id, k))) {
       if (!unsupported) out.push({ tail: '', message: { code: 'wizard.children_not_supported', params: { index, type: item.rule.resourceType } } });
       unsupported = true;
       return;
