@@ -233,7 +233,7 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     const global = rulesFor('gcp').filter((r) => r.scope === 'gcp:project_global');
     expect(global).toHaveLength(34);
     for (const r of global) expect(r.template, r.id).not.toContain('region');
-    expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'kind', 'seq']);
+    expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'kind', 'tier', 'seq']);
   });
 
   it('종류 표가 있는 행의 규칙만 kinds 가 있고, 그 규칙만 템플릿의 slug 바로 뒤에 kind 가 있다 · optional 에는 없다 (D52)', () => {
@@ -251,8 +251,8 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
       if (r.kinds) expect(at, r.id).toBe(r.template.indexOf('slug') + 1);
       else expect(at, r.id).toBe(-1);
       expect(r.optional, r.id).not.toContain('kind');
-      // 덮기 전 템플릿에서 region(none 이면) · kind 만 다르다
-      expect(r.template.filter((t) => t !== 'kind'), r.id).toEqual(GCP_BASE_RULES[r.id]!.template.filter((t) => r.regionToken !== 'none' || t !== 'region'));
+      // 덮기 전 템플릿에서 region(none 이면) · kind · tier 만 다르다
+      expect(r.template.filter((t) => t !== 'kind' && t !== 'tier'), r.id).toEqual(GCP_BASE_RULES[r.id]!.template.filter((t) => r.regionToken !== 'none' || t !== 'region'));
     }
   });
 
@@ -265,6 +265,20 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
       const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])].filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]) || String(before[k]) !== String(after[k]));
       expect(changed.filter((k) => !allowed.has(k)), id).toEqual([]);
     }
+  });
+
+  it('용도 토큰 tier — 세 CSP 의 count 규칙 전부 seq 바로 앞 · 종류 토큰이 있으면 그 뒤 · 나머지 규칙에는 없다 (D60)', () => {
+    for (const r of Object.values(RULES)) {
+      const seq = r.template.indexOf('seq');
+      if (seq < 0) { expect(r.template, r.id).not.toContain('tier'); continue; }
+      expect(r.template.indexOf('tier'), r.id).toBe(seq - 1);
+      expect(r.template.filter((t) => t === 'tier').length, r.id).toBe(1);
+      if (r.template.includes('kind')) expect(r.template.indexOf('kind'), r.id).toBe(seq - 2);
+      expect(r.optional, r.id).not.toContain('tier');
+    }
+    expect(RULES['gcp.compute_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
+    expect(RULES['aws.ec2_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
+    expect(RULES['azure.virtual_machine']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
   });
 
   it('AWS · Azure 규칙은 덮지 않는다', () => {

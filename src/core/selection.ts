@@ -5,8 +5,20 @@ import type { CoreMessage } from './messages';
 import { inputKind } from './tree';
 import type { Provider, ResourceRule } from './types';
 
-/** kind 는 종류 값 이름(POSTGRES) — 그 규칙의 kinds.allowed 안이다 (D52) */
-export interface SelectionItem { rule: ResourceRule; count: number; role?: string; kind?: string }
+/** 슬롯 하나에 딸린 것 (D62) — 종류별 한 묶음. boot · ip · ipi 는 켜면 true, data 는 디스크 순번("01"…) 배열 */
+export interface Attachments { boot?: true; data?: readonly string[]; ip?: true; ipi?: true }
+/** 인스턴스 슬롯 (D61) — 순번은 슬롯의 값이다(셈이 아니다). 슬롯을 지워도 남은 순번은 그대로다 */
+export interface InstanceSlot { seq: string; attach?: Attachments }
+
+/** kind 는 종류 값 이름(POSTGRES) — 그 규칙의 kinds.allowed 안이다 (D52).
+ *  tier · level · instances 는 마법사 모델만 채운다 (D60 · D63 · D61) — validateSelection 은 이 셋을 만들지 않고 /v1/names 의 입력도 그대로다.
+ *  검사는 마법사 모델의 검사 함수가 한다 */
+export interface SelectionItem {
+  rule: ResourceRule; count: number; role?: string; kind?: string;
+  tier?: string;
+  level?: 'project';
+  instances?: readonly InstanceSlot[];
+}
 
 /** 한 요청의 항목 수 · 이름 수(Σ count) · 항목 하나의 개수 상한. 200 은 화면 · 링크 길이의 상한이지 응답 크기 보장이 아니다 */
 export const MAX_ITEMS = 200;

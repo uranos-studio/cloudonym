@@ -4,6 +4,7 @@ import type { CoreMessage } from '../messages';
 import { NO_INVISIBLE } from '../invisible.mjs';
 import { AWS_INTAKE_ROWS } from './aws-intake';
 import { AWS_MANUAL_RULES } from './aws-manual';
+import { withTier } from '../compose';
 
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
 /** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
@@ -160,9 +161,10 @@ function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
   };
 }
 
-/** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서(타입 이름 순) */
-export const AWS_RULES: Record<string, ResourceRule> = {
+/** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서(타입 이름 순).
+ *  count 규칙 템플릿에는 seq 바로 앞에 용도 토큰 자리를 둔다 (D60) — 꺼진 CSP 라도 템플릿 꼴을 맞춘다. 빈 토큰이라 이름은 그대로다 */
+export const AWS_RULES: Record<string, ResourceRule> = Object.fromEntries(Object.entries({
   ...AWS_HAND_RULES,
   ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
   ...AWS_MANUAL_RULES,
-};
+}).map(([id, r]) => [id, { ...r, template: withTier(r.template) }]));

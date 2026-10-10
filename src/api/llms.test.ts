@@ -132,6 +132,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(formulaOf(RULES['gcp.cloud_sql_instance']!)).toBe('<system>-<purpose>-<env>-<region>-sql-<kind>-<seq>');
     expect(formulaOf(RULES['gcp.vpc_network']!)).not.toContain('<kind>');
   });
+  it('용도 토큰 tier 는 공식에 펼치지 않는다 — 이 API 가 받지 않는 입력이다 (D60)', () => {
+    expect(RULES['gcp.cloud_sql_instance']!.template).toContain('tier');
+    for (const l of allLines) expect(l).not.toContain('<tier>');
+  });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
     expect(rg).toContain('(flags: u)');

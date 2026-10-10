@@ -52,3 +52,12 @@ describe('labelsFor — 항목 입력(seq · role)이 라벨에 들어가지 않
     }
   });
 });
+
+describe('labelsFor — 프로젝트 문맥 (D63)', () => {
+  it('purpose 가 없는 문맥이면 라벨이 넷이다 — purpose 키가 없다', () => {
+    const project = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' } as const;
+    for (const p of ['aws', 'gcp', 'azure'] as const) {
+      expect(labelsFor(project, p).labels, p).toEqual({ owner: 'platform', system: 'billing', environment: 'prod', managed_by: 'cloudonym' });
+    }
+  });
+});

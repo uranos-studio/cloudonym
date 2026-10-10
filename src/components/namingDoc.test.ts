@@ -50,6 +50,11 @@ describe('namingDocModel', () => {
     expect(section(model, 'pass').paragraphs).toEqual([en.ui.pass_meaning]);
   });
 
+  it('용도 토큰 tier 는 아직 문서에 싣지 않는다 — 공식 · 토큰 표 · 축소 설명 (D60)', () => {
+    const text = JSON.stringify(model);
+    expect(text).not.toContain('<tier>');
+    expect(text).not.toMatch(/\btier\b/);
+  });
   it('실제 데이터 — 약어 100행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 아홉', () => {
     expect(rowsOf(model, 'abbreviations')).toHaveLength(100);
     expect(rowsOf(model, 'regions')).toHaveLength(43);

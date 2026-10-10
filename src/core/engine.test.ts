@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generate, generateMany, validateName, parseContext } from './engine';
+import { generate, generateItem, generateMany, validateName, parseContext, parseProjectContext } from './engine';
+import { findConflicts } from './conflict';
 import { getRule, rulesFor } from './constraints';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
 import { REGIONS } from './regions-data';
@@ -408,5 +409,97 @@ describe('종류 토큰 (D52)', () => {
     const tight = { ...rule('subnet'), maxLength: 26 };
     const r = generateMany({ ...base, system: 'paymentsettlement', purpose: 'reconciliation' }, 'gcp', [{ rule: tight, count: 1, kind: 'REGIONAL_MANAGED_PROXY' }]);
     expect(r.items[0]).toMatchObject({ name: 'pay-rec-prod-snet-proxy-01', valid: true, isTruncated: true });
+  });
+});
+
+describe('parseProjectContext · generateItem — 용도 토큰 · 프로젝트 수준 (D60 · D63)', () => {
+  const raw = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
+  const parsed = () => {
+    const p = parseContext({ ...raw, purpose: 'shop' }, 'gcp');
+    if (!p.ok) throw new Error('context must parse');
+    return p.context;
+  };
+  const vm = () => getRule('gcp', 'compute_instance')!;
+
+  it('parseProjectContext — 넷이면 통과하고 purpose 가 없다', () => {
+    const p = parseProjectContext(raw, 'gcp');
+    expect(p).toEqual({ ok: true, context: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' },
+                        transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'ane3' } }] });
+  });
+  it('parseProjectContext — purpose 가 와도 무시한다(오류도 아니다)', () => {
+    const p = parseProjectContext({ ...raw, purpose: 12 }, 'gcp');
+    expect(p.ok).toBe(true);
+    if (p.ok) expect('purpose' in p.context).toBe(false);
+  });
+  it('parseProjectContext — 넷의 판정 · 순서는 parseContext 와 같다', () => {
+    const p = parseProjectContext({ owner: 1, env: 'qa', region: 'mars' }, 'gcp');
+    expect(p.ok).toBe(false);
+    if (!p.ok) expect(p.errors.map((e) => [e.code, 'field' in e ? e.field : ''])).toEqual([
+      ['context.not_string', 'owner'], ['context.not_string', 'system'], ['context.value_unsupported', 'env'], ['context.value_unsupported', 'region'],
+    ]);
+  });
+  it('parseProjectContext — 존 입력은 리전으로 풀고 zone 을 남긴다', () => {
+    const p = parseProjectContext({ ...raw, region: 'asia-northeast3-a' }, 'gcp');
+    expect(p.ok && p.context).toMatchObject({ region: 'ane3', zone: 'ane3a' });
+  });
+  it('parseContext 는 여전히 purpose 가 없으면 context.not_string', () => {
+    const p = parseContext(raw, 'gcp');
+    expect(p).toEqual({ ok: false, errors: [{ code: 'context.not_string', field: 'purpose' }] });
+  });
+
+  it("generateItem — tier 'web' → billing-shop-prod-ane3-gce-web-01 (PASS)", () => {
+    expect(generateItem(parsed(), vm(), { tier: 'web' })).toMatchObject({ name: 'billing-shop-prod-ane3-gce-web-01', valid: true, violations: [] });
+  });
+  it('generateItem — extra 가 없으면 generate 의 결과와 같다(옛 경로)', () => {
+    const c = parsed();
+    const all = generate(c, ['gcp']).gcp!;
+    // generate 는 요청 안 충돌(같은 entity 의 같은 이름)을 덧단다 — 그 항목은 충돌 표시를 뺀 판정과 대어 본다
+    for (const r of rulesFor('gcp')) {
+      const g = all[r.resourceType]!;
+      const conflictFree = g.violations.filter((v) => v.code !== 'name.conflict');
+      expect(generateItem(c, r), r.id).toEqual({ ...g, violations: conflictFree, valid: conflictFree.length === 0 });
+    }
+  });
+  it("generateItem — level 'project' 의 VPC · 프로젝트 ID 는 purpose 빈 토큰을 문제 삼지 않는다", () => {
+    const p = parseProjectContext(raw, 'gcp');
+    if (!p.ok) throw new Error('project context must parse');
+    expect(generateItem(p.context, getRule('gcp', 'vpc_network')!, { level: 'project' })).toMatchObject({ name: 'billing-prod-vpc-01', valid: true });
+    expect(generateItem(p.context, getRule('gcp', 'project_id')!, { level: 'project' })).toMatchObject({ name: 'platform-billing-prod', valid: true });
+    expect(generateItem(p.context, getRule('gcp', 'firewall_rule')!, { level: 'project', kind: 'EGRESS', tier: 'ssh' })).toMatchObject({ name: 'billing-prod-fw-egr-ssh-01', valid: true });
+  });
+  it('generateItem — 서비스 항목(level 없음)에서 purpose 가 비면 여전히 name.token_empty', () => {
+    const r = generateItem({ ...parsed(), purpose: '' }, vm(), { tier: 'web' });
+    expect(r).toMatchObject({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'purpose' }] });
+  });
+  it('generateItem — tier 가 정제 뒤 비어도 빈 토큰 오류가 아니다(빈 tier = 없음)', () => {
+    expect(generateItem(parsed(), vm(), { tier: '' })).toMatchObject({ name: 'billing-shop-prod-ane3-gce-01', valid: true });
+  });
+
+  it('같은 서비스의 web · was 는 다른 이름이라 충돌하지 않는다 · tier 가 없으면 충돌한다', () => {
+    const c = parsed();
+    const item = (tier: string | undefined, key: string) => ({ key, rule: vm(), result: generateItem(c, vm(), tier === undefined ? {} : { tier }) });
+    expect(findConflicts([item('web', 'a'), item('was', 'b')])).toEqual([]);
+    expect(findConflicts([item(undefined, 'a'), item(undefined, 'b')])).toEqual([
+      { code: 'name.conflict', params: { name: 'billing-shop-prod-ane3-gce-01', keys: ['a', 'b'] } },
+    ]);
+  });
+  it("비겹침 — purpose 'shop' + tier 'web' ≠ purpose 'shop-web'(tier 없음)", () => {
+    const a = generateItem(parsed(), vm(), { tier: 'web' }).name;
+    const b = generateItem({ ...parsed(), purpose: 'shop-web' }, vm()).name;
+    expect(a).toBe('billing-shop-prod-ane3-gce-web-01');
+    expect(b).toBe('billing-shop-web-prod-ane3-gce-01');
+    expect(a).not.toBe(b);
+  });
+  it('generateMany 의 count 2 는 여전히 01 · 02 (옛 경로 — 슬롯은 generateProject 몫)', () => {
+    const r = generateMany(parsed(), 'gcp', [{ rule: vm(), count: 2 }]);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-shop-prod-ane3-gce-01', 'billing-shop-prod-ane3-gce-02']);
+  });
+
+  it('purpose 60자 + tier 16자 → 들어간다 — region 생략 · purpose 단축, tier 는 줄지 않는다', () => {
+    const r = generateItem({ ...parsed(), purpose: 'a'.repeat(60) }, vm(), { tier: 'x'.repeat(16) });
+    expect(r).toMatchObject({ name: 'billing-aaaaaaaaaaaaaaaa-prod-gce-xxxxxxxxxxxxxxxx-01', valid: true, isTruncated: true });
+    expect(r.steps).toContainEqual({ code: 'step.token_dropped', field: 'region' });
+    expect(r.steps.some((s) => s.code === 'step.budget_shortened')).toBe(true);
+    expect(r.steps.filter((s) => 'field' in s && s.field === 'tier')).toEqual([]);
   });
 });

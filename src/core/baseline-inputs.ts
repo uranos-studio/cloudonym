@@ -2,10 +2,11 @@
 // 시험 파일이 아니다 — 기준선 시험(baseline.test.ts)과 규칙 지문(revision.test.ts)이 같이 쓴다.
 // 문구는 기록하지 않는다(문구는 바뀐다) — 위반 · 단계는 개수만 담는다.
 import { RULES, getRule } from './constraints';
-import { generate, generateMany, parseContext, validateName, type ManyResult } from './engine';
+import { generate, generateItem, generateMany, parseContext, parseProjectContext, validateName, type ManyResult } from './engine';
+import type { ItemExtra } from './compose';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
 import { labelsFor } from './labels';
-import { PROVIDERS, type Provider, type RawContext } from './types';
+import { PROVIDERS, type NameResult, type Provider, type RawContext } from './types';
 
 /** 한글 사용자 입력 표본 — 소스의 문자열 리터럴에 한글을 두지 않으려고(시스템 문구 한글 0 검사 대상이다) 코드 포인트로 쓴다 */
 const HANGUL_OWNER = String.fromCodePoint(0xac1c, 0xbc1c);
@@ -120,6 +121,32 @@ export function baselineMany(): { id: string; result: ManyResult }[] {
   ];
 }
 
+/** 항목 하나 표본 (D60 · D63) — 용도 토큰 · 프로젝트 수준. GCP 만(마법사는 GCP 다). 서비스 표본은 base 문맥의 purpose 를 shop 으로 바꾼다.
+ *  인스턴스 슬롯 표본은 슬롯을 쓰는 생성 함수가 생길 때 더한다 */
+export function baselineItems(): { id: string; parse?: { ok: boolean; errors: number }; result?: NameResult }[] {
+  const service = parseContext({ ...BASE, purpose: 'shop', region: BASE_REGION.gcp }, 'gcp');
+  const project = parseProjectContext({ owner: BASE.owner, system: BASE.system, env: BASE.env, region: BASE_REGION.gcp }, 'gcp');
+  if (!service.ok || !project.ok) throw new Error('item contexts must parse');
+  const s = (id: string, type: string, extra: ItemExtra, purpose?: string) =>
+    ({ id, result: generateItem(purpose === undefined ? service.context : { ...service.context, purpose }, getRule('gcp', type)!, extra) });
+  const p = (id: string, type: string, extra: ItemExtra) => ({ id, result: generateItem(project.context, getRule('gcp', type)!, { ...extra, level: 'project' }) });
+  const bad = parseProjectContext({ owner: 1, env: 'qa', region: 'mars' }, 'gcp');
+  return [
+    s('tier-web', 'compute_instance', { tier: 'web' }),
+    s('tier-was-seq2', 'compute_instance', { tier: 'was', seq: '02' }),
+    s('tier-none-shop-web', 'compute_instance', {}, 'shop-web'),
+    s('tier-kind-sql-pg-rpt', 'cloud_sql_instance', { kind: 'POSTGRES', tier: 'rpt' }),
+    s('tier-on-bucket-ignored', 'storage_bucket', { tier: 'web' }),
+    s('tier-16-purpose-60', 'compute_instance', { tier: 'x'.repeat(16) }, 'a'.repeat(60)),
+    s('tier-16-hyphen-purpose-shortened', 'compute_instance', { tier: 'x'.repeat(16) }, 'reconciliation-'.repeat(4) + 'end'),
+    p('project-vpc', 'vpc_network', {}),
+    p('project-id', 'project_id', {}),
+    p('project-fw-egr-ssh', 'firewall_rule', { kind: 'EGRESS', tier: 'ssh' }),
+    p('project-subnet', 'subnet', { tier: 'web' }),
+    { id: 'project-parse-errors', parse: { ok: bad.ok, errors: bad.ok ? 0 : bad.errors.length } },
+  ];
+}
+
 /** 표본 × CSP — 지역을 CSP 마다 풀므로 파싱 · 생성도 CSP 마다 한다 */
 function eachContext() {
   return BASELINE_CONTEXTS.flatMap((c) => baselineProviders(c).map((p) => ({ id: c.id, provider: p, parsed: parseContext(baselineRaw(c, p), p) })));
@@ -154,7 +181,12 @@ export function coreBaseline() {
     id, provider: result.provider, valid: result.valid, conflicts: result.conflicts.length,
     items: result.items.map((i) => ({ key: i.key, name: i.name, valid: i.valid, violations: i.violations.length, ...(i.kind === undefined ? {} : { kind: i.kind }), ...(i.kindToken === undefined ? {} : { kindToken: i.kindToken }) })),
   }));
-  return { contexts, validate, many };
+  const items = baselineItems().map(({ id, parse, result }) => ({
+    id, ...(parse ? { parse } : {}),
+    ...(result ? { name: result.name, valid: result.valid, isTruncated: result.isTruncated, original: result.original,
+                   violations: result.violations.length, steps: result.steps.length } : {}),
+  }));
+  return { contexts, validate, many, items };
 }
 
 /** 규칙 지문(revision.test)용 — 기준선 입력의 위반 · 라벨 위반 · 파싱 오류를 개수가 아니라 코드 목록으로 담는다.
@@ -168,5 +200,6 @@ export function coreBaselineCodes() {
   });
   const validate = baselineValidateCases().map((c) => codes(validateName(c.provider, c.resourceType, c.name).violations));
   const many = baselineMany().map(({ id, result }) => ({ id, items: result.items.map((i) => codes(i.violations)), conflicts: codes(result.conflicts) }));
-  return { contexts, validate, many };
+  const items = baselineItems().map(({ id, result }) => ({ id, violations: result ? codes(result.violations) : [] }));
+  return { contexts, validate, many, items };
 }

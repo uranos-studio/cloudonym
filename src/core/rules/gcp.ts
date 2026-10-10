@@ -3,6 +3,7 @@ import type { ResourceRule, Token } from '../types';
 import { GCP_INTAKE_ROWS } from './gcp-intake';
 import { GCP_MANUAL_RULES } from './gcp-manual';
 import { GCP_CATALOG } from './gcp-catalog';
+import { withTier } from '../compose';
 
 /** Compute 디스커버리 문서 — insert.path 가 범위(global · regions/{region} · zones/{zone})를 준다 */
 const GCP_COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
@@ -145,6 +146,7 @@ function withKind(ts: Token[]): Token[] {
  *  지역 토큰이 none 이면 템플릿과 optional 에서 region 을 함께 뺀다(optional 은 template 에 있는 토큰만).
  *  존 규칙도 region 이라 optional 에 region 이 남는다 — 축소 1단계에서 뗄 수 있다 (D50 revised · D51 철회).
  *  종류 표가 있으면 템플릿의 slug 바로 뒤에 kind 를 끼운다 (D52) — optional 에는 넣지 않는다(보호 토큰).
+ *  그 뒤 count 규칙이면 seq 바로 앞에 tier 를 끼운다 (D60) — 역시 보호 토큰이라 optional 밖이다.
  *  category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
 export function applyCatalog(rule: ResourceRule): ResourceRule {
   const hit = CATALOG_BY_RULE.get(rule.id);
@@ -155,7 +157,7 @@ export function applyCatalog(rule: ResourceRule): ResourceRule {
     ...rule,
     slug: row.slug.value,
     entity: row.entity ?? rule.entity,
-    template: row.kind && spec.kinds ? withKind(dropRegion(rule.template)) : dropRegion(rule.template),
+    template: withTier(row.kind && spec.kinds ? withKind(dropRegion(rule.template)) : dropRegion(rule.template)),
     optional: dropRegion(rule.optional),
     regionToken: spec.regionToken,
     ...(row.kind && spec.kinds ? {

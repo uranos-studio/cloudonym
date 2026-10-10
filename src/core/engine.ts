@@ -1,5 +1,5 @@
 // 엔진 공개 API — API 와 화면은 generate · validateName · parseContext · generateMany 넷을 부른다 (선택 검증은 selection.ts)
-import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
+import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type ProjectContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
 import { canonicalRegion, regionCandidates } from './regions';
@@ -12,7 +12,7 @@ import { checkName } from './validate';
 import type { CoreMessage, ContextField } from './messages';
 import { clipForDisplay } from './display';
 
-function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
   const raw = tokenValues(ctx, rule, extra);
   const steps: CoreMessage[] = [];
   let transformed = false;
@@ -36,8 +36,10 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
   };
 
   // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다.
-  // 종류 자리는 비는 것이 정상이다 — 종류를 주지 않았거나 기본값이면 토큰이 없다 (D52). 필수 종류는 아래 kind_required 가 본다
-  const emptied = rule.template.filter((t) => t !== 'kind' && !rule.optional.includes(t) && !values[t]);
+  // 종류 자리는 비는 것이 정상이다 — 종류를 주지 않았거나 기본값이면 토큰이 없다 (D52). 필수 종류는 아래 kind_required 가 본다.
+  // 용도 자리도 같다 — tier 를 주지 않으면 빈 토큰이다 (D60). 프로젝트 수준 항목에는 purpose 자리가 없다 (D63)
+  const emptied = rule.template.filter((t) => t !== 'kind' && t !== 'tier' && !(t === 'purpose' && extra.level === 'project')
+                                             && !rule.optional.includes(t) && !values[t]);
   if (emptied.length > 0) {
     return { ...base, name: '', valid: false, isTruncated: false, violations: emptied.map((t): CoreMessage => ({ code: 'name.token_empty', field: t })), steps };
   }
@@ -50,6 +52,13 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
   // 이름 · 단계는 종류 없이 만든 그대로 두고 판정만 FAIL 로 한다(쓸 수 있는 이름이 아니다)
   if (rule.kinds?.rule === 'required' && extra.kind === undefined) violations.unshift({ code: 'name.kind_required', params: { supported: [...rule.kinds.allowed] } });
   return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
+}
+
+/** 항목 하나의 이름 — 용도 토큰 · 프로젝트 수준을 받는 진입점 (D60 · D63). 충돌 검사는 하지 않는다(부르는 쪽이 요청 전체로 한다).
+ *  extra 가 없으면 generate 의 그 규칙 결과와 같다(충돌 표시 전). generateMany 는 이 함수를 거치지 않는다 — 옛 경로 그대로다.
+ *  선택은 부르는 쪽이 검사한 것이다 — 허용 밖 종류는 던진다 */
+export function generateItem(ctx: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+  return generateOne(ctx, rule, extra);
 }
 
 /** 같은 부류(entity)의 같은 이름을 찾아 그 항목마다 valid:false + name.conflict 를 단다 (D41 · D47). 요약(충돌마다 메시지 하나)을 돌려준다.
@@ -81,7 +90,7 @@ export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDE
 /** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음).
  *  종류가 달라도 key 는 같은 꼴이다(한 행에 종류 하나 — D52).
  *  kind 는 고른 값 이름(POSTGRES) · kindToken 은 이름에 넣은 토큰(pg) — 기본값 · omitValues 를 고르면 kind 만 있고 kindToken 은 없다 (D52) */
-export interface NameItem extends NameResult { key: string; seq?: string; role?: string; kind?: string; kindToken?: string }
+export interface NameItem extends NameResult { key: string; seq?: string; role?: string; kind?: string; kindToken?: string; tier?: string; level?: 'project' }
 export interface ManyResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
 
 /** 순번은 두 자리 고정 (D40) — 한 항목의 이름이 같은 자리수를 써서 축소 경로가 같다 */
@@ -152,6 +161,8 @@ export function validateName(provider: Provider, resourceType: string, name: str
 /** env 표준값 — 화면의 env 고르기가 쓰는 공개 API (D48). 정본은 normalize.ts 의 별칭 표다 */
 export { ENV_VALUES };
 const FIELDS: readonly ContextField[] = ['owner', 'system', 'purpose', 'env', 'region'];
+/** 프로젝트 문맥의 필드 (D63) — purpose 가 없다 */
+const PROJECT_FIELDS: readonly ContextField[] = FIELDS.filter((f) => f !== 'purpose');
 
 /** 자유 입력(owner · system · purpose) 하나의 길이 상한 — 이름 규칙이 아니라 전송 위생이다. API 와 화면 입력 · 공유 hash 가 이 값을 쓴다.
  *  가장 긴 이름 규칙이 256자라 필드 하나 64자면 모자라지 않고, 이름 200개 응답이 작은 요청으로 커지지 않는다 (docs/decisions.md · 2026-10-06).
@@ -162,11 +173,25 @@ export const MAX_CONTEXT_CHARS = 64;
  *  받지 않는 지역이면 supported 에 후보(옛 나라 값이면 그 나라의 리전 이름, 아니면 그 CSP 리전 이름 전부) */
 export function parseContext(raw: RawContext, provider: Provider):
   { ok: true; context: NamingContext; transformed: CoreMessage[] } | { ok: false; errors: CoreMessage[] } {
+  const r = parseFields(raw, provider, FIELDS);
+  return r.ok ? { ok: true, context: r.vals as unknown as NamingContext, transformed: r.transformed } : r;
+}
+
+/** 프로젝트 문맥 (D63) — owner · system · env · region 넷. purpose 는 보지 않는다(와도 무시한다).
+ *  판정 · 오류 순서는 parseContext 와 같은 함수를 쓴다 */
+export function parseProjectContext(raw: RawContext, provider: Provider):
+  { ok: true; context: ProjectContext; transformed: CoreMessage[] } | { ok: false; errors: CoreMessage[] } {
+  const r = parseFields(raw, provider, PROJECT_FIELDS);
+  return r.ok ? { ok: true, context: r.vals as unknown as ProjectContext, transformed: r.transformed } : r;
+}
+
+function parseFields(raw: RawContext, provider: Provider, fields: readonly ContextField[]):
+  { ok: true; vals: Record<string, string>; transformed: CoreMessage[] } | { ok: false; errors: CoreMessage[] } {
   const errors: CoreMessage[] = [];
   const transformed: CoreMessage[] = [];
   const vals: Record<string, string> = {};
   // 여러 필드가 틀리면 owner → system → purpose → env → region 순서로 알린다
-  for (const f of FIELDS) {
+  for (const f of fields) {
     const v = raw[f];
     if (typeof v !== 'string') { errors.push({ code: 'context.not_string', field: f }); continue; }
     if (v.trim() === '') { errors.push({ code: 'context.empty', field: f }); continue; }
@@ -189,5 +214,5 @@ export function parseContext(raw: RawContext, provider: Provider):
     }
   }
   if (errors.length > 0) return { ok: false, errors };
-  return { ok: true, context: vals as unknown as NamingContext, transformed };
+  return { ok: true, vals, transformed };
 }

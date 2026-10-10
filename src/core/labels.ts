@@ -1,5 +1,5 @@
 // 리소스에 붙일 표준 태그 · 라벨 — 한도는 constraints.ts 의 LABEL_LIMITS 가 정본이다
-import type { LabelSet, NamingContext, Provider } from './types';
+import type { LabelSet, NamingContext, ProjectContext, Provider } from './types';
 import { AWS_TAG_VALUE, LABEL_LIMITS } from './constraints';
 import type { CoreMessage } from './messages';
 import { INVISIBLE_CLASS } from './invisible.mjs';
@@ -7,9 +7,10 @@ import { INVISIBLE_CLASS } from './invisible.mjs';
 /** GCP 라벨 값 규격 (D21) — \p{L} 이라 한글(Lo)도 남는다. 한글 채움(U+3164 등 Lo)처럼 보이지 않는 글자는 지운다(invisible.mjs) */
 const GCP_VALUE_STRIP = new RegExp(`[^\\p{L}\\p{N}_-]|[${INVISIBLE_CLASS}]`, 'gu');
 
-export function labelsFor(ctx: NamingContext, provider: Provider): LabelSet {
+/** 프로젝트 문맥(purpose 없음 · D63)이면 purpose 라벨이 없다 — 키 넷 */
+export function labelsFor(ctx: NamingContext | ProjectContext, provider: Provider): LabelSet {
   const base: Record<string, string> = {
-    owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, environment: ctx.env, managed_by: 'cloudonym',
+    owner: ctx.owner, system: ctx.system, ...('purpose' in ctx ? { purpose: ctx.purpose } : {}), environment: ctx.env, managed_by: 'cloudonym',
   };
   const max = LABEL_LIMITS[provider].value;
   const labels: Record<string, string> = {};

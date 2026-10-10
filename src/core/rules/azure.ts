@@ -4,6 +4,7 @@ import type { CoreMessage } from '../messages';
 import { NO_INVISIBLE } from '../invisible.mjs';
 import { AZURE_INTAKE_CHARS, AZURE_INTAKE_ROWS } from './azure-intake';
 import { AZURE_MANUAL_ROWS, type AzureManualRule } from './azure-manual';
+import { withTier } from '../compose';
 
 const AZURE_RULES = 'https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules';
 const AKS_FAQ = 'https://learn.microsoft.com/en-us/troubleshoot/azure/azure-kubernetes/create-upgrade-delete/aks-common-issues-faq#what-naming-restrictions-are-enforced-for-aks-resources-and-parameters-';
@@ -215,9 +216,10 @@ function fromManualRow({ reserved, ...r }: AzureManualRule): ResourceRule {
   return { ...r, forbidden: merged, notes: [AZURE_RESERVED_NOTE, ...(r.notes ?? [])] };
 }
 
-/** 손으로 쓴 규칙 다음에 들인 행 — 표 순서 */
-export const AZURE_RULES_TABLE: Record<string, ResourceRule> = {
+/** 손으로 쓴 규칙 다음에 들인 행 — 표 순서.
+ *  count 규칙 템플릿에는 seq 바로 앞에 용도 토큰 자리를 둔다 (D60) — 꺼진 CSP 라도 템플릿 꼴을 맞춘다. 빈 토큰이라 이름은 그대로다 */
+export const AZURE_RULES_TABLE: Record<string, ResourceRule> = Object.fromEntries(Object.entries({
   ...AZURE_HAND_RULES,
   ...Object.fromEntries(AZURE_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
   ...Object.fromEntries(AZURE_MANUAL_ROWS.map((r) => [r.id, fromManualRow(r)])),
-};
+}).map(([id, r]) => [id, { ...r, template: withTier(r.template) }]));

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { fit } from './truncate';
-import { getRule, rulesFor } from './constraints';
+import { RULES, getRule, rulesFor } from './constraints';
 import { tokenValues } from './compose';
 import { MAX_CONTEXT_CHARS, generate } from './engine';
 import { PROTECTED, type ResourceRule } from './types';
@@ -136,5 +136,29 @@ describe('지역 토큰과 축소 (D50 revised — D51 철회)', () => {
     const ctx = { owner: 'o', system: 'billing', purpose: 'trade', env: 'prod' as const, region: 'krc', zone: 'zz' };
     expect(tokenValues(ctx, rule).region).toBe('krc');
     expect(tokenValues({ ...ctx, region: 'global' }, rule).region).toBe('');
+  });
+});
+
+describe('용도 토큰 tier 는 보호 토큰이다 (D60)', () => {
+  const ctx = { owner: 'platform', system: 'billing', purpose: 'shop', env: 'prod', region: 'ane3' } as const;
+  const vm = () => getRule('gcp', 'compute_instance')!;
+
+  it('tier 16자 + 긴 입력 → 가변 토큰이 줄고 tier 는 글자 그대로', () => {
+    const tier = 'abcdefghijklmnop';
+    const r = fit(tokenValues({ ...ctx, system: 'paymentsettlementplatform', purpose: 'reconciliationworker' }, vm(), { tier }), vm());
+    expect(r.fits).toBe(true);
+    expect(r.values.tier).toBe(tier);
+    expect(r.name.length).toBeLessThanOrEqual(63);
+    expect(r.name.endsWith(`-gce-${tier}-01`)).toBe(true);
+  });
+  it('가변 토큰을 다 줄여도 안 들어가면 실패한다 — tier 를 자르지 않는다', () => {
+    const tiny = { ...vm(), id: 'test.tier-tiny', maxLength: 30 };
+    const r = fit(tokenValues({ ...ctx, purpose: 'reconciliation' }, tiny, { tier: 'abcdefghijklmnop' }), tiny);
+    expect(r.fits).toBe(false);
+    expect(r.values.tier).toBe('abcdefghijklmnop');
+  });
+  it('tier 는 PROTECTED 에 있고 어느 규칙의 optional 에도 없다', () => {
+    expect(PROTECTED).toContain('tier');
+    for (const r of Object.values(RULES)) expect(r.optional, r.id).not.toContain('tier');
   });
 });

@@ -3,6 +3,9 @@
 import { describe, it, expect } from 'vitest';
 import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
 import { REGIONS } from './regions-data';
+import { RESERVED_TIERS } from './tier';
+import { TIER_PATTERN } from './types';
+import { rulesFor } from './constraints';
 
 /** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대) */
 const SHARED_SLUGS: Record<string, readonly string[]> = {
@@ -85,5 +88,71 @@ describe('catalog 겹침 검사 (D47)', () => {
       const row = GCP_CATALOG.find((r) => r.key === key)!;
       expect(Object.values(row.kind!.tokens).filter((t) => t === token).length, key).toBeGreaterThan(1);
     }
+  });
+});
+
+// ⑹ ⑺ 용도 토큰 tier · 딸린 것 접미 attach (D60 · D62) — tier 는 약어 · 종류 토큰 바로 뒤에 온다(…-{slug}[-{kind}]-{tier}-{seq}).
+// 프리셋 · 접미 데이터는 마법사 데이터(뒤 작업)가 들인다 — 그때까지 이 목록이 기대값이다
+const PRESET_TIERS = ['web', 'was', 'bastion', 'file', 'ssh', 'icmp'];
+const ATTACH_SUFFIXES = ['boot', 'data', 'ip', 'ipi'];
+
+interface TierInput { tiers: readonly string[]; attach: readonly string[]; rows: readonly Pick<CatalogRow, 'key' | 'slug' | 'kind'>[]; regionCodes: readonly string[]; envValues: readonly string[] }
+
+/** ⑹ tier · attach ↔ 지역 · 환경 값 ⑺ tier ↔ 약어 · 종류 토큰. attach 는 부모 이름 뒤라 ⑺ 에서 뺀다(ip 는 주소 약어와 같은 글자 — 자리로 구분) */
+function tierCollisions({ tiers, attach, rows, regionCodes, envValues }: TierInput): string[] {
+  const out: string[] = [];
+  const regionSet = new Set(regionCodes);
+  const envSet = new Set(envValues);
+  for (const [w, what] of [...tiers.map((t) => [t, 'tier']), ...attach.map((a) => [a, 'attach'])] as const) {
+    if (regionSet.has(w)) out.push(`(6) region ${w}: ${what}`);
+    if (envSet.has(w)) out.push(`(6) env ${w}: ${what}`);
+  }
+  const slugs = new Set(rows.map((r) => r.slug.value).filter((s) => s !== ''));
+  const kinds = new Set(rows.flatMap((r) => Object.values(r.kind?.tokens ?? {}).filter((t): t is string => t !== null)));
+  for (const t of tiers) {
+    if (slugs.has(t)) out.push(`(7) slug ${t}: tier`);
+    if (kinds.has(t)) out.push(`(7) kind ${t}: tier`);
+  }
+  return out;
+}
+
+describe('tier · attach 겹침 검사 (D60 · D62)', () => {
+  const input = { tiers: PRESET_TIERS, attach: ATTACH_SUFFIXES, rows: GCP_CATALOG, regionCodes, envValues: ENV_VALUES };
+
+  it('검사기 자체 — ane3 · prod · db · pg 를 tier 로 넣으면 넷 다 잡고, attach 의 prod 도 잡는다', () => {
+    expect(tierCollisions({ ...input, tiers: [...PRESET_TIERS, 'ane3', 'prod', 'db', 'pg'], attach: [...ATTACH_SUFFIXES, 'prod'] })).toEqual([
+      '(6) region ane3: tier', '(6) env prod: tier', '(6) env prod: attach', '(7) slug db: tier', '(7) kind pg: tier',
+    ]);
+  });
+  it('⑹ 프리셋 tier · attach ↔ 지역 173 · 환경 5 = 0 · ⑺ 프리셋 tier ↔ 약어 · 종류 토큰 = 0', () => {
+    expect(tierCollisions(input)).toEqual([]);
+  });
+  it('프리셋 tier 는 TIER_PATTERN 을 지나고 예약 목록에 없다', () => {
+    for (const t of PRESET_TIERS) {
+      expect(TIER_PATTERN.test(t), t).toBe(true);
+      expect(RESERVED_TIERS.has(t), t).toBe(false);
+    }
+  });
+});
+
+describe('RESERVED_TIERS — tier 로 쓸 수 없는 글자 (D60)', () => {
+  it('catalog 의 약어 전부 · 종류 토큰 전부를 담는다(규칙 표에서 센다)', () => {
+    const slugs = [...new Set(GCP_CATALOG.map((r) => r.slug.value).filter((s) => s !== ''))];
+    const kinds = [...new Set(GCP_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {}).filter((t): t is string => t !== null)))];
+    expect(slugs.length).toBeGreaterThan(0);
+    expect(kinds.length).toBeGreaterThan(0);
+    expect(slugs.filter((s) => !RESERVED_TIERS.has(s))).toEqual([]);
+    expect(kinds.filter((k) => !RESERVED_TIERS.has(k))).toEqual([]);
+    for (const r of rulesFor('gcp')) if (r.slug) expect(RESERVED_TIERS.has(r.slug), r.id).toBe(true);
+  });
+  it('환경 값 다섯 · GCP 지역 코드 173 을 담는다', () => {
+    for (const e of ENV_VALUES) expect(RESERVED_TIERS.has(e), e).toBe(true);
+    expect(regionCodes.filter((c) => !RESERVED_TIERS.has(c))).toEqual([]);
+  });
+  it('넷 밖의 글자는 담지 않는다', () => {
+    const slugs = GCP_CATALOG.map((r) => r.slug.value);
+    const kinds = GCP_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {}));
+    const expected = new Set([...slugs, ...kinds, ...ENV_VALUES, ...regionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
+    expect([...RESERVED_TIERS].sort()).toEqual([...expected].sort());
   });
 });

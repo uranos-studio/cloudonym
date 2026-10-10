@@ -36,10 +36,11 @@ function treeLines(node: TreeNode, depth = 0): string[] {
   ];
 }
 
-/** template 을 `<owner>-<system>-…-sa-<role>` 꼴로 펼친다. slug 는 실제 약어를 그대로 쓴다 (구분자 없는 규칙은 붙여 쓴다) */
+/** template 을 `<owner>-<system>-…-sa-<role>` 꼴로 펼친다. slug 는 실제 약어를 그대로 쓴다 (구분자 없는 규칙은 붙여 쓴다).
+ *  용도 토큰 tier(D60)는 이 API 가 받지 않는 입력이라 펼치지 않는다 — 빈 토큰이라 이름에 들지 않는다 */
 export function formulaOf(rule: ResourceRule): string {
   const part = (t: Token): string => (t === 'slug' ? rule.slug : `<${t}>`);
-  return rule.template.map(part).join(rule.separator);
+  return rule.template.filter((t) => t !== 'tier').map(part).join(rule.separator);
 }
 
 /** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES 가 정본) */

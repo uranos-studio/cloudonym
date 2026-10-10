@@ -16,15 +16,19 @@ export type Env = 'prod' | 'stg' | 'dev' | 'sbx';
 export interface NamingContext {
   owner: string; system: string; purpose: string; env: Env; region: string; zone?: string;
 }
+/** 프로젝트 수준 문맥 (D63) — purpose 가 없다. 서비스에 딸리지 않은 항목(네트워크 · 프로젝트 ID)이 쓴다 */
+export type ProjectContext = Omit<NamingContext, 'purpose'>;
 /** 사용자가 보낸 그대로 — env/region 은 별칭일 수 있다 */
 export interface RawContext {
   owner?: unknown; system?: unknown; purpose?: unknown; env?: unknown; region?: unknown;
 }
 
-export type Token = 'owner' | 'system' | 'purpose' | 'env' | 'region' | 'slug' | 'kind' | 'seq' | 'role';
-/** 축소에서 손대지 않는 토큰 (D13 · D51 · D52) — region 은 2단계(단축 · 균등 예산)에서 자르지 않는다. 1단계는 optional 이면 통째로 뗀다.
- *  kind 는 종류 토큰(pg · int …)이다 — 자르면 뜻이 사라진다 */
-export const PROTECTED: readonly Token[] = ['slug', 'kind', 'seq', 'role', 'env', 'region'];
+export type Token = 'owner' | 'system' | 'purpose' | 'tier' | 'env' | 'region' | 'slug' | 'kind' | 'seq' | 'role';
+/** 축소에서 손대지 않는 토큰 (D13 · D51 · D52 · D60) — region 은 2단계(단축 · 균등 예산)에서 자르지 않는다. 1단계는 optional 이면 통째로 뗀다.
+ *  kind 는 종류 토큰(pg · int …)이다 — 자르면 뜻이 사라진다. tier 는 용도 토큰(web · was …)이다 — 줄이거나 떼면 두 항목이 같은 이름이 된다 */
+export const PROTECTED: readonly Token[] = ['slug', 'kind', 'tier', 'seq', 'role', 'env', 'region'];
+/** 용도 토큰의 꼴 (D60) — 가장 좁은 allowed(lower-digit)를 바뀜 없이 지나야 한다. 하이픈이 있으면 종류 · 용도의 경계를 못 읽는다 */
+export const TIER_PATTERN = /^[a-z0-9]{2,16}$/;
 /** 축소 뒤 가변 토큰의 최소 길이 (D13) */
 export const MIN_TOKEN = 2;
 

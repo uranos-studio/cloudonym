@@ -86,3 +86,36 @@ describe('tokenValues — 종류 토큰 (D52)', () => {
     expect(() => tokenValues(ctx, getRule('gcp', 'vpc_network')!, { kind: 'POSTGRES' })).toThrow(/vpc_network/);
   });
 });
+
+describe('tokenValues — 용도 토큰 tier · 프로젝트 수준 (D60 · D63)', () => {
+  const seoul = { owner: 'platform', system: 'billing', purpose: 'shop', env: 'prod', region: 'ane3' } as const;
+  const project = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' } as const;
+  const named = (c: Parameters<typeof tokenValues>[0], type: string, extra: Parameters<typeof tokenValues>[2] = {}) => {
+    const r = getRule('gcp', type)!;
+    return compose(tokenValues(c, r, extra), r.template, r.separator);
+  };
+
+  it("tier 'web' → 약어 뒤 · 순번 앞 — billing-shop-prod-ane3-gce-web-01", () => {
+    expect(named(seoul, 'compute_instance', { tier: 'web' })).toBe('billing-shop-prod-ane3-gce-web-01');
+  });
+  it('tier 가 없으면 지금 이름 그대로 — …-gce-01', () => {
+    expect(named(seoul, 'compute_instance')).toBe('billing-shop-prod-ane3-gce-01');
+    expect(tokenValues(seoul, getRule('gcp', 'compute_instance')!).tier).toBe('');
+  });
+  it('tier 는 글자 그대로 들어간다(자리만 정한다)', () => {
+    expect(named(seoul, 'compute_instance', { tier: 'bastion', seq: '03' })).toBe('billing-shop-prod-ane3-gce-bastion-03');
+  });
+  it("종류 + 용도 — 방화벽 kind 'EGRESS'(토큰 egr) + tier 'ssh' → 종류가 먼저", () => {
+    expect(named(project, 'firewall_rule', { kind: 'EGRESS', tier: 'ssh', level: 'project' })).toBe('billing-prod-fw-egr-ssh-01');
+    expect(named(seoul, 'cloud_sql_instance', { kind: 'POSTGRES', tier: 'rpt' })).toBe('billing-shop-prod-ane3-sql-pg-rpt-01');
+  });
+  it("level 'project' + 프로젝트 문맥 → purpose 자리가 없다 — billing-prod-vpc-01 · 프로젝트 ID platform-billing-prod", () => {
+    expect(named(project, 'vpc_network', { level: 'project' })).toBe('billing-prod-vpc-01');
+    expect(named(project, 'project_id', { level: 'project' })).toBe('platform-billing-prod');
+    expect('purpose' in tokenValues(project, getRule('gcp', 'vpc_network')!, { level: 'project' })).toBe(false);
+  });
+  it('순번 없는 규칙 · 역할 규칙에는 tier 가 들어가지 않는다', () => {
+    expect(named(seoul, 'storage_bucket', { tier: 'web' })).toBe('platform-billing-shop-prod-gcs');
+    expect('tier' in tokenValues(seoul, getRule('gcp', 'service_account')!, { tier: 'web' })).toBe(false);
+  });
+});

@@ -215732,6 +215732,114 @@
           }
         ]
       }
+    ],
+    "items": [
+      {
+        "id": "tier-web",
+        "name": "billing-shop-prod-ane3-gce-web-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-shop-prod-ane3-gce-web-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "tier-was-seq2",
+        "name": "billing-shop-prod-ane3-gce-was-02",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-shop-prod-ane3-gce-was-02",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "tier-none-shop-web",
+        "name": "billing-shop-web-prod-ane3-gce-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-shop-web-prod-ane3-gce-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "tier-kind-sql-pg-rpt",
+        "name": "billing-shop-prod-ane3-sql-pg-rpt-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-shop-prod-ane3-sql-pg-rpt-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "tier-on-bucket-ignored",
+        "name": "platform-billing-shop-prod-gcs",
+        "valid": true,
+        "isTruncated": false,
+        "original": "platform-billing-shop-prod-gcs",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "tier-16-purpose-60",
+        "name": "billing-aaaaaaaaaaaaaaaa-prod-gce-xxxxxxxxxxxxxxxx-01",
+        "valid": true,
+        "isTruncated": true,
+        "original": "billing-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-prod-ane3-gce-xxxxxxxxxxxxxxxx-01",
+        "violations": 0,
+        "steps": 2
+      },
+      {
+        "id": "tier-16-hyphen-purpose-shortened",
+        "name": "billing-reconciliation-r-prod-gce-xxxxxxxxxxxxxxxx-01",
+        "valid": true,
+        "isTruncated": true,
+        "original": "billing-reconciliation-reconciliation-reconciliation-reconciliation-end-prod-ane3-gce-xxxxxxxxxxxxxxxx-01",
+        "violations": 0,
+        "steps": 2
+      },
+      {
+        "id": "project-vpc",
+        "name": "billing-prod-vpc-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-prod-vpc-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "project-id",
+        "name": "platform-billing-prod",
+        "valid": true,
+        "isTruncated": false,
+        "original": "platform-billing-prod",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "project-fw-egr-ssh",
+        "name": "billing-prod-fw-egr-ssh-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-prod-fw-egr-ssh-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "project-subnet",
+        "name": "billing-prod-ane3-snet-web-01",
+        "valid": true,
+        "isTruncated": false,
+        "original": "billing-prod-ane3-snet-web-01",
+        "violations": 0,
+        "steps": 0
+      },
+      {
+        "id": "project-parse-errors",
+        "parse": {
+          "ok": false,
+          "errors": 4
+        }
+      }
     ]
   },
   "ui": [

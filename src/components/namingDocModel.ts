@@ -44,8 +44,9 @@ export interface NamingDocInput {
 }
 
 const PROVIDER_LABEL: Record<Provider, string> = { aws: 'AWS', gcp: 'GCP', azure: 'Azure' };
-/** 토큰 표의 순서 · 뜻 — Record 라 Token 이 늘면 typecheck 가 잡는다 */
-const TOKEN_MEANING: Record<Token, UiKey> = {
+/** 토큰 표의 순서 · 뜻 — Record 라 Token 이 늘면 typecheck 가 잡는다.
+ *  용도 토큰 tier(D60)는 받는 공개 입력이 아직 없어 문서에 싣지 않는다 — 공식(formulaText)에서도 뺀다 */
+const TOKEN_MEANING: Record<Exclude<Token, 'tier'>, UiKey> = {
   owner: 'doc_token_owner', system: 'doc_token_system', purpose: 'doc_token_purpose', env: 'doc_token_env', region: 'doc_token_region',
   slug: 'doc_token_slug', kind: 'doc_token_kind', seq: 'doc_token_seq', role: 'doc_token_role',
 };
@@ -58,7 +59,7 @@ const KIND_RULE: Record<NonNullable<CatalogRow['kind']>['rule'], UiKey> = {
 
 /** 규칙의 조립 순서를 `<system>-<purpose>-…` 꼴로 — 표시일 뿐 이름을 만들지 않는다 */
 export function formulaText(rule: Pick<ResourceRule, 'template' | 'separator'>): string {
-  return rule.template.map((t) => `<${t}>`).join(rule.separator);
+  return rule.template.filter((t) => t !== 'tier').map((t) => `<${t}>`).join(rule.separator);
 }
 
 /** 존 코드가 「리전 코드 + 존 글자」가 아닌 것 — 존 절의 문장이 데이터와 맞는지 시험이 본다 */
@@ -93,7 +94,7 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
   const formulaRows = [...formulas.entries()].sort((a, b) => b[1].count - a[1].count || a[1].formula.localeCompare(b[1].formula))
     .map(([key, f]) => ({ key, cells: [f.formula, f.optional, String(f.count)] }));
 
-  const tokens = Object.keys(TOKEN_MEANING) as Token[];
+  const tokens = Object.keys(TOKEN_MEANING) as (keyof typeof TOKEN_MEANING)[];
   // 순번 자릿수 — 상한의 자릿수(엔진은 이 폭으로 0 을 채운다 · 시험이 generateMany 에 대어 본다)
   const seqWidth = String(MAX_COUNT).length;
   const tokenVars = { max: MAX_CONTEXT_CHARS, maxCount: MAX_COUNT, width: seqWidth, first: '1'.padStart(seqWidth, '0'), role: DEFAULT_ROLE, hint: ui.role_hint };
@@ -141,7 +142,7 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
       id: 'shrink', title: ui.doc_shrink_title, paragraphs: [ui.doc_shrink_body], ordered: true,
       items: [
         fill('doc_shrink_step1', { optional: ui.doc_col_optional }),
-        fill('doc_shrink_step2', { protected: PROTECTED.join(', '), min: MIN_TOKEN }),
+        fill('doc_shrink_step2', { protected: PROTECTED.filter((t) => t !== 'tier').join(', '), min: MIN_TOKEN }),
         ui.doc_shrink_step3,
       ],
     },
