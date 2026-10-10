@@ -7,6 +7,7 @@ import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
+import type { WireMessage } from './serialize';
 import type { Message } from '../messages/catalog';
 import { clipForDisplay } from '../core/display';
 
@@ -251,15 +252,66 @@ function listOf(v: unknown, map: (x: unknown) => unknown): unknown {
   return Array.isArray(v) ? v.map(map) : v;
 }
 
+/** 모델 경로(services[1].picks[0].instances[1].attach.data[0])가 가리키는 값 — 없으면 undefined */
+function atPath(root: unknown, path: string): unknown {
+  let node: unknown = root;
+  for (const [, key, index] of path.matchAll(/([A-Za-z_]+)|\[(\d+)\]/g)) {
+    if (key !== undefined) node = isRecord(node) && Object.hasOwn(node, key) ? node[key] : undefined;
+    else node = Array.isArray(node) ? node[Number(index)] : undefined;
+  }
+  return node;
+}
+
+/** 코드마다 사용자 값(value)이 온 칸 — path 가 가리키는 요소(pick · 슬롯 · 디스크 순번)에서 읽는다. null 이면 요소 자체다 */
+const VALUE_FIELD: Readonly<Record<string, string | null>> = {
+  'wizard.unknown_preset': 'preset', 'selection.unknown_type': 'ruleId', 'selection.unknown_kind': 'kind', 'selection.invalid_role': 'role',
+  'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null,
+};
+
 /** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,
- *  모델 전체 오류는 field 없음. 되돌리는 사용자 값(value)은 다른 요청 오류처럼 80자 · 보이지 않는 문자 표시 */
-function toApiError(e: PlanError): Message {
+ *  모델 전체 오류는 field 없음. 되돌리는 사용자 값(value)은 /v1/names 의 echoSafe 처럼 원래 입력에서 다시 만든다(80자 · JSON · 보이지 않는 문자 표시) —
+ *  core 의 문자열화는 객체를 [object Object] 로 낸다 */
+function toApiError(e: PlanError, plan: unknown): Message {
   const { path, ...m } = e;
   const p: unknown = 'params' in m ? m.params : undefined;
-  const params = isRecord(p) && typeof p.value === 'string' ? { params: { ...p, value: describe(p.value) } } : {};
+  let params = {};
+  if (isRecord(p) && 'value' in p) {
+    const at = path === undefined ? undefined : atPath(plan, path);
+    const source = Object.hasOwn(VALUE_FIELD, m.code) ? VALUE_FIELD[m.code] : undefined;
+    const raw = source === undefined ? p.value : source === null ? at : isRecord(at) ? at[source] : p.value;
+    params = { params: { ...p, value: describe(raw) } };
+  }
   if (path !== undefined) return { ...m, ...params, field: toWirePath(path) } as Message;
   if (m.code.startsWith('context.') && 'field' in m) return { ...m, ...params, field: `project.${m.field}` } as Message;
   return { ...m, ...params } as Message;
+}
+
+/** 객체가 아닌 서비스는 오류 하나 — core 는 같은 자리에 empty_service 와 not_array 를 함께 낸다 */
+function mergeServiceShape(errors: Message[], services: unknown): Message[] {
+  if (!Array.isArray(services)) return errors;
+  const bad = new Set(services.flatMap((s, i) => (isRecord(s) ? [] : [`services[${i}]`])));
+  if (bad.size === 0) return errors;
+  const out: Message[] = [];
+  for (const m of errors) {
+    const field = 'field' in m ? m.field : undefined;
+    if (field !== undefined && bad.has(field)) {
+      if (!out.some((x) => 'field' in x && x.field === field)) out.push({ code: 'selection.item_not_object', params: { index: Number(/\d+/.exec(field)![0]) }, field } as Message);
+      continue;
+    }
+    out.push(m);
+  }
+  return out;
+}
+
+/** /v1/wizard 오류 문장의 위치를 요청 본문의 이름으로 — core 문장은 resources[i] · picks[i] 로 시작한다(한 항목 목록 · 한 pick 목록의 자리).
+ *  field 가 있으면 그 자리를 field 로 바꾸고, 목록 모양 오류는 목록 이름을 요청 이름으로 쓴다 */
+export function wizardSentence(w: WireMessage): WireMessage {
+  if (w.code === 'selection.not_array') {
+    const message = w.field === undefined ? "'services' and 'project_picks' must be arrays" : `'${w.field}.picks' must be an array`;
+    return { ...w, message };
+  }
+  if (w.field === undefined) return w;
+  return { ...w, message: w.message.replace(/^(resources|picks)\[\d+\]/, w.field) };
 }
 
 /** POST /v1/wizard (D66) — 모양 · 길이는 여기, 마법사 검사는 core validatePlan 하나, 서비스마다 문맥(purpose 포함)은 parseContext */
@@ -298,12 +350,12 @@ export function parseWizardBody(body: unknown): Parsed<WizardInput> {
   const checked = validatePlan(plan);
   if (!checked.ok) {
     const unknownType = checked.errors.some((m) => m.code === 'selection.unknown_type');
-    return reject(checked.errors.map(toApiError), unknownType ? rulesFor('gcp').map((r) => r.id) : undefined);
+    return reject(mergeServiceShape(checked.errors.map((e) => toApiError(e, plan)), plan.services), unknownType ? rulesFor('gcp').map((r) => r.id) : undefined);
   }
 
   // 서비스마다 다섯 값 문맥 — 프로젝트 넷은 이미 지났으므로 오류는 purpose 의 것이다(field services[i].purpose)
   const proj = parseProjectContext(raw, provider);
-  if (!proj.ok) return reject(proj.errors.map((e) => toApiError(e)));
+  if (!proj.ok) return reject(proj.errors.map((e) => toApiError(e, plan)));
   const transformed: CoreMessage[] = [];
   const addOnce = (ms: readonly CoreMessage[]) => {
     for (const m of ms) if (!transformed.some((x) => JSON.stringify(x) === JSON.stringify(m))) transformed.push(m);

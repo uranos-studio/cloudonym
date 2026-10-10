@@ -6,7 +6,7 @@ import { every, except } from 'hono/combine';
 import type { App } from './env';
 import { generate, generateMany, generateProject, validateName } from '../core/engine';
 import { labelsFor } from '../core/labels';
-import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody } from './schemas';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, wizardSentence } from './schemas';
 import { toWireGenerate, toWireNames, toWireValidate, toWireWizard, type ProviderResult } from './serialize';
 import { logTelemetry } from './telemetry';
 import { fail, internalError } from './errors';
@@ -79,7 +79,7 @@ v1.post('/wizard', async (c) => {
   const read = await readJson(c);
   if (!read.ok) return notJson(c);
   const parsed = parseWizardBody(read.body);
-  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
+  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported, rewrite: wizardSentence });
   const { provider, selection, transformed, labelContexts, pickCount } = parsed.value;
   const out = generateProject(selection, provider);
   const labels = labelContexts.map(({ namespace, context }) => ({ namespace, labels: labelsFor(context, provider) }));

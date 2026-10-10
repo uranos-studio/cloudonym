@@ -4,14 +4,15 @@
 import type { Context } from 'hono';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { Message } from '../messages/catalog';
-import { toWireMessage } from './serialize';
+import { toWireMessage, type WireMessage } from './serialize';
 
 export type FailStatus = 400 | 403 | 404 | 409 | 413 | 429 | 500;
 
-export function fail(c: Context, status: FailStatus, messages: Message[], extra: { supported?: string[] } = {}, headers: Record<string, string> = {}): Response {
+/** rewrite — 라우트가 문장을 요청 본문의 이름으로 고칠 때(/v1/wizard). 꼴은 그대로다 */
+export function fail(c: Context, status: FailStatus, messages: Message[], extra: { supported?: string[]; rewrite?: (w: WireMessage) => WireMessage } = {}, headers: Record<string, string> = {}): Response {
   const body = {
     success: false as const,
-    errors: messages.map((m) => toWireMessage(m)),
+    errors: messages.map((m) => (extra.rewrite ? extra.rewrite(toWireMessage(m)) : toWireMessage(m))),
     ...(extra.supported ? { supported: extra.supported } : {}),
   };
   return c.json(body, status as ContentfulStatusCode, headers);

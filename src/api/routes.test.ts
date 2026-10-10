@@ -525,3 +525,46 @@ describe('/v1/names 는 그대로 — 마법사 필드를 보내도 옛 응답�
     expect(a.data.gcp.items.map((i: Loose) => i.key)).toEqual(['compute_instance_01', 'compute_instance_02']);
   });
 });
+
+describe('POST /v1/wizard — 되돌려 싣는 값 · 문장 (고침 1)', () => {
+  const W = WIZARD_WIRE_SAMPLE;
+  const errs = async (body: unknown) => {
+    const { res } = await req(app, '/v1/wizard', jsonPost(body));
+    expect(res.status).toBe(400);
+    return (await json(res)).errors as Loose[];
+  };
+  const one = (pick: unknown) => ({ ...W, project_picks: [], services: [{ purpose: 'shop', picks: [pick] }] });
+
+  it('객체 · 배열 값은 /v1/names 처럼 JSON 으로 — rule · preset · slot id · kind (문장도 같은 값)', async () => {
+    const [rule] = await errs(one({ preset: null, rule: { a: 1 } }));
+    expect(rule).toMatchObject({ code: 'selection.unknown_type', field: 'services[0].picks[0]', params: { value: '{"a":1}' } });
+    expect(rule.message).toContain(`'{"a":1}'`);
+    expect(rule.message).not.toContain('[object Object]');
+    const [preset] = await errs(one({ preset: { a: 1 } }));
+    expect(preset).toMatchObject({ code: 'wizard.unknown_preset', params: { value: '{"a":1}' } });
+    const ids = await errs(one({ preset: 'web', instances: [{ id: { x: 1 }, seq: '01' }] }));
+    expect(ids.find((e) => e.code === 'wizard.invalid_slot_id')).toMatchObject({ field: 'services[0].picks[0].instances[0]', params: { value: '{"x":1}' } });
+    const kinds = await errs(one({ preset: 'db', kind: [1], instances: [{ id: 'a', seq: '01' }] }));
+    expect(kinds.find((e) => e.code === 'selection.unknown_kind')).toMatchObject({ params: { value: '[1]' } });
+    const seq = await errs(one({ preset: 'web', instances: [{ id: 'a', seq: 7, attach: { data: [{ d: 1 }] } }] }));
+    expect(seq.find((e) => e.code === 'wizard.invalid_seq')!.params.value).toBe('7');
+    expect(seq.find((e) => e.code === 'wizard.invalid_data_seq')!.params.value).toBe('{"d":1}');
+    const long = await errs(one({ preset: 'x'.repeat(500) }));
+    expect(long[0].params.value).toBe(`${'x'.repeat(80)}…`);
+  });
+
+  it('문장의 위치는 요청 본문의 이름 — field 와 같다 (resources[0] · picks[0] 아님)', async () => {
+    const [a] = await errs(one({ preset: null, rule: 'gcp.nope' }));
+    expect(a.message.startsWith('services[0].picks[0]: ')).toBe(true);
+    const [b] = await errs({ ...W, services: [], project_picks: [{ preset: 'web', instances: [{ id: 'a', seq: '7' }] }] });
+    expect(b.message.startsWith('project_picks[0].instances[0]: ')).toBe(true);
+    for (const e of await errs({ ...W, services: [{ purpose: 'shop', picks: 'x' }] })) expect(e.message, e.code).not.toMatch(/resources/);
+    for (const e of await errs({ ...W, services: 'x' })) expect(e.message, e.code).not.toMatch(/resources/);
+  });
+
+  it('services:[null] 은 오류 하나 — services[0] must be an object', async () => {
+    const e = await errs({ ...W, services: [null] });
+    expect(e.map((x) => [x.code, x.field])).toEqual([['selection.item_not_object', 'services[0]']]);
+    expect(e[0].message).toBe('services[0] must be an object');
+  });
+});
