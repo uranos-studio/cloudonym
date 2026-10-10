@@ -28,16 +28,15 @@ BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
 OUT.mkdir(parents=True, exist_ok=True)
 
-# ⑴ 의 입력 — 기본값(platform · billing · trade · asia-northeast3-a)과 달라야 시험이 공허하지 않다. SA 원본 40자 → region 생략 → owner 생략 (엔진 실측)
-# region 은 hash 에 싣는 꼴(존 코드 — urlState.encodeState)이다. 폼에서는 리전 콤보박스와 존 select 둘로 나뉜다(REGION_FORM)
-INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prod', 'region': 'euw1b'}
+# ⑴ 의 입력 — 기본값(platform · billing · trade · asia-northeast3)과 달라야 시험이 공허하지 않다. SA 원본 40자 → region 생략 → owner 생략 (엔진 실측)
+# region 은 hash 에 싣는 꼴(리전 코드 — urlState.encodeState)이다. 폼의 리전 콤보박스에는 리전 이름이 보인다(REGION_FORM) — 존은 이름에 들지 않는다(D50 revised)
+INPUT = {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'env': 'prod', 'region': 'euw1'}
 # 같은 탭 공유 URL 이동의 입력 — INPUT 과 다섯 값이 모두 다르다
-OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'ane1c'}
-# hash 의 지역 코드 → 폼의 (리전 · 존) — 존이 없으면 ''(존 select 의 none)
-REGION_FORM = {'euw1b': ('europe-west1', 'europe-west1-b'), 'euw1': ('europe-west1', ''), 'ane1c': ('asia-northeast1', 'asia-northeast1-c'),
-               'ane3a': ('asia-northeast3', 'asia-northeast3-a')}
+OTHER = {'owner': 'infra', 'system': 'billing', 'purpose': 'batch', 'env': 'stg', 'region': 'ane1'}
+# hash 의 지역 코드 → 폼의 리전 이름
+REGION_FORM = {'euw1': 'europe-west1', 'ane1': 'asia-northeast1', 'ane3': 'asia-northeast3'}
 # 첫 화면 · 깨진 hash · 꺼진 CSP 링크의 문맥 (R0 · D55)
-DEFAULT = {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prod', 'region': 'ane3a'}
+DEFAULT = {'owner': 'platform', 'system': 'billing', 'purpose': 'trade', 'env': 'prod', 'region': 'ane3'}
 # ⑾ 에서 고르는 GCP 선택 — 트리 순서(Global namespace → Project)
 PICK = {'project_id': 1, 'storage_bucket': 1, 'service_account': 'db', 'compute_instance': 2}
 
@@ -72,7 +71,7 @@ def hash_state(hash_or_url):
 SELECT_FIT_JS = '''() => {
   const ctx = document.createElement('canvas').getContext('2d');
   const out = [];
-  for (const sel of document.querySelectorAll('#field-env, #field-zone')) {
+  for (const sel of document.querySelectorAll('#field-env')) {
     const cs = getComputedStyle(sel);
     ctx.font = cs.font;
     const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24;
@@ -85,27 +84,8 @@ SELECT_FIT_JS = '''() => {
 }'''
 
 
-# 존 select 는 지금 리전의 존만 든다 — 표의 모든 존 글자(RegionPicker 의 「a — ane3a」 꼴)를 같은 상자 · 같은 글꼴로 잰다
-ZONE_FIT_JS = '''(labels) => {
-  const sel = document.getElementById('field-zone');
-  const cs = getComputedStyle(sel);
-  const ctx = document.createElement('canvas').getContext('2d');
-  ctx.font = cs.font;
-  const avail = sel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 24;
-  return labels.map((t) => [t, ctx.measureText(t).width]).filter(([, w]) => w > avail).map(([t, w]) => `field-zone 「${t}」 ${w.toFixed(1)}px > ${avail.toFixed(1)}px`);
-}'''
-
-
-def zone_labels(page):
-    """/llms.txt 지역 표(GCP)의 모든 존 → 존 select 의 글자"""
-    text = page.request.get(BASE + '/llms.txt').text()
-    zones = re.findall(r'`((?:[a-z]+-)+[a-z]+[0-9]+-([a-z]))` `([a-z0-9]+)`', text)
-    assert len(zones) > 100, len(zones)  # 공허하지 않다
-    return sorted({f'{letter} — {code}' for _, letter, code in zones})
-
-
 def assert_selects_fit(page, width):
-    clipped = page.evaluate(SELECT_FIT_JS) + page.evaluate(ZONE_FIT_JS, ZONE_LABELS)
+    clipped = page.evaluate(SELECT_FIT_JS)
     assert clipped == [], f'폭 {width}px 에서 select 글자가 잘린다: {clipped}'
 
 
@@ -129,27 +109,24 @@ def events_of(page):
     return sent
 
 
-def pick_region(page, region, zone):
-    """② 지역 — 콤보박스에 리전 이름을 쳐서 그 항목을 누르고, 존은 늘 명시한다(리전을 바꾸면 같은 글자의 존을 이어 받으므로)"""
+def pick_region(page, region):
+    """② 지역 — 콤보박스에 리전 이름을 쳐서 그 항목을 누른다"""
     page.fill('#field-region', region)
     page.click(f'[data-region-option="{region}"]')
-    page.select_option('#field-zone', zone)
 
 
 def fill_five(page, ctx):
     for key in ('owner', 'system', 'purpose'):
         page.fill(f'#field-{key}', ctx[key])
     page.select_option('#field-env', ctx['env'])
-    pick_region(page, *REGION_FORM[ctx['region']])
+    pick_region(page, REGION_FORM[ctx['region']])
 
 
 def expect_ctx(page, ctx):
-    """폼이 문맥(hash 꼴)을 보이는가 — 지역은 리전 칸 · 존 칸 둘로 본다"""
+    """폼이 문맥(hash 꼴)을 보이는가 — 지역은 리전 칸의 리전 이름"""
     for key in ('owner', 'system', 'purpose', 'env'):
         expect(page.locator(f'#field-{key}')).to_have_value(ctx[key])
-    region, zone = REGION_FORM[ctx['region']]
-    expect(page.locator('#field-region')).to_have_value(region)
-    expect(page.locator('#field-zone')).to_have_value(zone)
+    expect(page.locator('#field-region')).to_have_value(REGION_FORM[ctx['region']])
 
 
 def row(page, rtype):
@@ -230,7 +207,6 @@ with sync_playwright() as p:
     sent = events_of(page)
     goto_ready(page, BASE + '/')
     VERSION = page.request.get(BASE + '/v1/health').json()['version']
-    ZONE_LABELS = zone_labels(page)
     RULES = VERSION['rules']
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
@@ -332,7 +308,7 @@ with sync_playwright() as p:
     for _ in range(2):
         vm_row.locator('[data-inc]').click()
     expect(vm_row.locator('[data-count]')).to_have_text('3')
-    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-03')
+    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-03')
     expect(page.locator('article[data-key="compute_instance_03"] h4')).to_have_text('VM Instance · 03')  # 카드 제목 = catalog 행 이름
     vm_row.locator('input[data-row-check]').focus()
     page.keyboard.press('-')
@@ -390,22 +366,22 @@ with sync_playwright() as p:
     head = hcl.split('\n')
     assert head[0] == f"# Generated by Cloudonym — engine {VERSION['engine']} · rules {RULES}", head[:3]
     assert head[1].startswith('# PASS means') and head[2] == 'locals {', head[:3]
-    assert '  # gcp\n  gcp_project_id = "devops-payments-ledger-prod"\n  gcp_storage_bucket = "devops-payments-ledger-prod-gcs"\n  gcp_service_account_db = "payments-ledger-prod-sa-db"\n  gcp_compute_instance_01 = "payments-ledger-prod-euw1b-gce-01"\n  gcp_compute_instance_02 = "payments-ledger-prod-euw1b-gce-02"\n' in hcl, hcl
+    assert '  # gcp\n  gcp_project_id = "devops-payments-ledger-prod"\n  gcp_storage_bucket = "devops-payments-ledger-prod-gcs"\n  gcp_service_account_db = "payments-ledger-prod-sa-db"\n  gcp_compute_instance_01 = "payments-ledger-prod-euw1-gce-01"\n  gcp_compute_instance_02 = "payments-ledger-prod-euw1-gce-02"\n' in hcl, hcl
     assert '  gcp_labels = {\n' in hcl and 'INVALID' not in hcl and 'azure' not in hcl and 'aws' not in hcl, hcl
     page.click('[data-copy="names-json"]')
     names = json.loads(page.evaluate('navigator.clipboard.readText()'))
-    assert names['version'] == VERSION and names['provider'] == 'gcp' and names['context'] == {**{k: INPUT[k] for k in ('owner', 'system', 'purpose', 'env')}, 'region': 'euw1', 'zone': 'euw1b'}, names
+    assert names['version'] == VERSION and names['provider'] == 'gcp' and names['context'] == {**{k: INPUT[k] for k in ('owner', 'system', 'purpose', 'env')}, 'region': 'euw1'}, names
     assert [n['key'] for n in names['names']] == ['project_id', 'storage_bucket', 'service_account_db', 'compute_instance_01', 'compute_instance_02'], names['names']
-    assert names['names'][3] == {'key': 'compute_instance_01', 'resource_type': 'compute_instance', 'seq': '01', 'scope': 'gcp:project', 'name': 'payments-ledger-prod-euw1b-gce-01'}, names['names'][3]
+    assert names['names'][3] == {'key': 'compute_instance_01', 'resource_type': 'compute_instance', 'seq': '01', 'scope': 'gcp:project', 'name': 'payments-ledger-prod-euw1-gce-01'}, names['names'][3]
     assert names['invalid'] == [], names['invalid']
     expect(page.locator('[data-copy="all-names"]')).to_have_text('Copy all names')
     page.click('[data-copy="all-names"]')
-    assert page.evaluate('navigator.clipboard.readText()') == 'devops-payments-ledger-prod\ndevops-payments-ledger-prod-gcs\npayments-ledger-prod-sa-db\npayments-ledger-prod-euw1b-gce-01\npayments-ledger-prod-euw1b-gce-02'
+    assert page.evaluate('navigator.clipboard.readText()') == 'devops-payments-ledger-prod\ndevops-payments-ledger-prod-gcs\npayments-ledger-prod-sa-db\npayments-ledger-prod-euw1-gce-01\npayments-ledger-prod-euw1-gce-02'
     page.click('[data-copy="tags-json"]')
     copied_tags = json.loads(page.evaluate('navigator.clipboard.readText()'))
     assert copied_tags == {'version': VERSION, 'labels': {'gcp': {'owner': 'devops', 'system': 'payments', 'purpose': 'ledger', 'environment': 'prod', 'managed_by': 'cloudonym'}}}, copied_tags
     page.click(f'{VM1} [data-copy="name:compute_instance_01"]')
-    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prod-euw1b-gce-01'
+    assert page.evaluate('navigator.clipboard.readText()') == 'payments-ledger-prod-euw1-gce-01'
     page.click('[data-copy="share-url"]')
     copied_url = page.evaluate('navigator.clipboard.readText()')
     assert copied_url == share_url, (copied_url, share_url)
@@ -537,7 +513,7 @@ with sync_playwright() as p:
     goto_ready(page2, copied_url)
     expect_ctx(page2, INPUT)
     expect(page2.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page2.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
+    expect(page2.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
     expect(page2.locator('article[data-key]')).to_have_count(5)
     page2.wait_for_timeout(1300)
     assert sent2 == ['ui_visit'], f'복원 로드는 ui_visit 1회뿐이어야 한다(첫 화면은 ui_generate 를 세지 않는다): {sent2}'
@@ -550,7 +526,7 @@ with sync_playwright() as p:
     page.evaluate('h => { location.hash = h; }', other_hash)
     expect_ctx(page, OTHER)
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('billing-batch-stg-ane1c-gce-03')
+    expect(page.locator('article[data-key="compute_instance_03"] [data-name]')).to_have_text('billing-batch-stg-ane1-gce-03')
     page.wait_for_timeout(1300)
     assert sent.count('ui_generate') == generated_before, f'hash 이동 복원이 ui_generate 를 셌다: {sent}'
     assert page.evaluate('location.hash') == other_hash, (page.evaluate('location.hash'), other_hash)
@@ -558,7 +534,7 @@ with sync_playwright() as p:
     page.wait_for_function('h => location.hash === h', arg=other_hash)
     expect(page.locator('#field-owner')).to_have_value(OTHER['owner'])
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
-    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
 
     # ── ⑺ 자유 입력은 64자에서 멈춘다 · 라벨 한도 위반(GCP 라벨 값 63자) → 태그 JSON 복사 비활성 + 이유 문구 · Terraform 은 INVALID 주석으로 복사된다 ──
     page.evaluate('h => { location.hash = h; }', other_hash)
@@ -574,7 +550,7 @@ with sync_playwright() as p:
     expect(page.locator('[data-copy="tags-json"]')).to_be_enabled()
     expect(page.locator('[data-json-blocked]')).to_have_count(0)
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
-    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
+    expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
 
     # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — 켜진 CSP(GCP)가 자동 선택 ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
@@ -642,7 +618,7 @@ with sync_playwright() as p:
     page4 = dark.new_page()
     page4.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(page4, share_url)
-    expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1b-gce-01')
+    expect(page4.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
     bg = page4.evaluate('getComputedStyle(document.body).backgroundColor')
     assert bg not in ('rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)'), f'다크 모드 배경이 아니다: {bg}'
     expect(page4.locator('[data-share-warning]')).to_be_visible()
@@ -921,62 +897,28 @@ with sync_playwright() as p:
     expect(chip).to_have_attribute('aria-pressed', 'false')
     assert len(visible_rows(pr)) == n_rows, (len(visible_rows(pr)), n_rows)
 
-    # ㉕ 존 가드 — 존이 없으면 고르지 않은 존 행은 체크 불가 + 안내 · 존을 고르면 체크할 수 있다
-    disk = row_key(pr, 'gcp.disk')
-    disk_box = disk.locator('input[data-row-check]')
-    disk.locator('[data-scope-select]').select_option('gcp:project_zone')
-    expect(disk_box).to_be_enabled()
-    pr.select_option('#field-zone', '')
-    wait_for(lambda: hash_state(pr.url)['region'], 'euw1', '존 none → 리전 코드')
-    expect(pr.locator('[data-zone-hint]')).to_have_text('Zonal resources (VMs, disks) need a zone')
-    expect(disk_box).to_be_disabled()
-    expect(disk.locator('[data-zone-required]')).to_have_text('Pick a zone in ② to name zonal resources')
-    expect(disk_box).to_have_attribute('aria-describedby', disk.locator('[data-zone-required]').get_attribute('id'))
-    expect(row_key(pr, 'gcp.compute_instance').locator('input[data-row-check]')).to_be_disabled()  # 단일 존 행도 같다
-    pr.select_option('#field-zone', 'europe-west1-c')
-    expect(disk_box).to_be_enabled()
-    expect(disk.locator('[data-zone-required]')).to_have_count(0)
+    # ㉕ 존은 이름에 들지 않는다 (D50 revised) — 존 select · 존 안내가 없다 · 리전만으로 VM · 디스크 행을 체크할 수 있고 카드는 PASS(리전 코드)
+    expect(pr.locator('#field-zone')).to_have_count(0)
     expect(pr.locator('[data-zone-hint]')).to_have_count(0)
-    pr.select_option('#field-zone', 'europe-west1-b')
-
-    # ㉕-2 VM 2 를 고른 뒤 존을 none 으로 → 선택 유지 · 카드 둘 FAIL(name.zone_required) · 존을 다시 고르면 PASS · 체크 해제는 된다
+    expect(pr.locator('[data-zone-required]')).to_have_count(0)
+    disk = row_key(pr, 'gcp.disk')
+    disk.locator('[data-scope-select]').select_option('gcp:project_zone')
+    expect(disk.locator('input[data-row-check]')).to_be_enabled()
     vm_box = vmr.locator('input[data-row-check]')
+    expect(vm_box).to_be_enabled()
     vm_box.check()
     vmr.locator('[data-inc]').click()
     expect(vmr.locator('[data-count]')).to_have_text('2')
     want = api([{'type': 'compute_instance', 'count': 2}])
     for k in ('compute_instance_01', 'compute_instance_02'):
+        assert want[k]['valid'] and '-euw1-gce-' in want[k]['name'], want[k]
         expect(card(k)).to_have_attribute('data-valid', 'true')
         expect(card(k).locator('[data-name]')).to_have_text(want[k]['name'])
-    pr.select_option('#field-zone', '')
-    no_zone = api([{'type': 'compute_instance', 'count': 2}], region='euw1')
-    assert all(no_zone[k]['violations'][0]['code'] == 'name.zone_required' for k in ('compute_instance_01', 'compute_instance_02')), no_zone
-    expect(vm_box).to_be_checked()
-    expect(vm_box).to_be_enabled()  # 고른 행은 체크 해제만 된다
-    expect(vmr.locator('[data-zone-required]')).to_have_text('Pick a zone in ② to name zonal resources')
-    expect(vmr.locator('[data-count]')).to_have_text('2')
-    for k in ('compute_instance_01', 'compute_instance_02'):
-        expect(card(k)).to_have_attribute('data-valid', 'false')
-        expect(card(k).locator('[data-violations]')).to_contain_text("This resource is zonal: put a zone (zone name or zone code), not a region, in region (got 'euw1')")
-        expect(card(k).locator('button[data-copy]')).to_be_disabled()
-    pr.click('[data-copy="names-json"]')
-    inv = json.loads(pr.evaluate('navigator.clipboard.readText()'))['invalid']
-    assert {'key': 'compute_instance_01', 'codes': ['name.zone_required']} in inv and {'key': 'compute_instance_02', 'codes': ['name.zone_required']} in inv, inv
-    pr.select_option('#field-zone', 'europe-west1-b')
-    for k in ('compute_instance_01', 'compute_instance_02'):
-        expect(card(k)).to_have_attribute('data-valid', 'true')
-        expect(card(k).locator('[data-name]')).to_have_text(want[k]['name'])
-    expect(vmr.locator('[data-zone-required]')).to_have_count(0)
-    pr.select_option('#field-zone', '')
-    expect(card('compute_instance_01')).to_have_attribute('data-valid', 'false')
     vm_box.uncheck()
-    expect(vm_box).not_to_be_checked()
     expect(card('compute_instance_01')).to_have_count(0)
-    expect(vm_box).to_be_disabled()  # 끈 뒤에는 존이 없어 다시 고를 수 없다
-    pr.select_option('#field-zone', 'europe-west1-b')
     expect(vm_box).to_be_enabled()
 
-    # ㉖ 지역 콤보박스 — 열기 · 리전 이름 · 위치 · 코드로 거르기 · 없음 안내 · Escape 는 검색어를 버린다 · 방향키 + Enter 로 고르면 같은 글자의 존을 잇는다
+    # ㉖ 지역 콤보박스 — 열기 · 리전 이름 · 위치 · 코드 · 존 이름으로 거르기 · 없음 안내 · Escape 는 검색어를 버린다 · 방향키 + Enter 로 리전을 고른다
     region_box = pr.locator('#field-region')
     listbox = pr.locator('[role="listbox"]')
     expect(region_box).to_have_attribute('aria-expanded', 'false')
@@ -991,12 +933,13 @@ with sync_playwright() as p:
     assert opt_text() == ['asia-northeast1 — Tokyo, Japan · ane1'], opt_text()
     region_box.fill('ane3')  # 코드
     assert opt_text() == ['asia-northeast3 — Seoul, South Korea · ane3'], opt_text()  # 대륙 꼬리 없이
+    region_box.fill('asia-northeast3-b')  # 존 이름 — 그 리전 항목이 걸린다
+    assert opt_text() == ['asia-northeast3 — Seoul, South Korea · ane3'], opt_text()
     region_box.fill('zzz-none')
     expect(pr.locator('[data-region-empty]')).to_have_text('No region matches — type a region name, a city or a code')
     pr.keyboard.press('Escape')
     expect(region_box).to_have_attribute('aria-expanded', 'false')
     expect(region_box).to_have_value('europe-west1')
-    expect(pr.locator('#field-zone')).to_have_value('europe-west1-b')
     region_box.fill('asia-northeast')  # 리전 이름
     names_shown = pr.eval_on_selector_all('[data-region-option]', 'els => els.map(e => e.dataset.regionOption)')
     assert len(names_shown) >= 2 and all(v.startswith('asia-northeast') for v in names_shown), names_shown
@@ -1005,12 +948,11 @@ with sync_playwright() as p:
     pr.keyboard.press('Enter')
     expect(region_box).to_have_attribute('aria-expanded', 'false')
     expect(region_box).to_have_value(names_shown[1])
-    expect(pr.locator('#field-zone')).to_have_value(names_shown[1] + '-b')  # europe-west1-b 의 b 를 잇는다
-    wait_for(lambda: hash_state(pr.url)['region'], {'asia-northeast2': 'ane2b', 'asia-northeast3': 'ane3b'}.get(names_shown[1]), '콤보박스로 고른 지역')
+    wait_for(lambda: hash_state(pr.url)['region'], {'asia-northeast2': 'ane2', 'asia-northeast3': 'ane3'}.get(names_shown[1]), '콤보박스로 고른 지역')
     region_box.fill('seoul')
     pr.keyboard.press('Enter')
     expect(region_box).to_have_value('asia-northeast3')
-    expect(pr.locator('[data-region-summary]')).to_have_text('Seoul, South Korea · ane3b')
+    expect(pr.locator('[data-region-summary]')).to_have_text('Seoul, South Korea · ane3')
     no_hangul(pr)
     ctxR.close()
 
@@ -1077,7 +1019,7 @@ with sync_playwright() as p:
     expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the region was reset to the example and the selection was cleared.')
     expect(page20.locator('[data-selection-dropped]')).to_have_count(0)  # 안내는 한 줄 — 버린 선택은 위 문장이 말한다
     reset = {**INPUT, 'region': DEFAULT['region']}
-    expect_ctx(page20, reset)  # 자유 입력 셋 · 환경은 링크 그대로, 지역은 예시 asia-northeast3-a
+    expect_ctx(page20, reset)  # 자유 입력 셋 · 환경은 링크 그대로, 지역은 예시 asia-northeast3
     expect(page20.locator('[data-selected-count]')).to_have_text('0 selected')
     expect(page20.locator('article[data-key]')).to_have_count(0)
     no_hangul(page20)
@@ -1089,4 +1031,4 @@ with sync_playwright() as p:
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ · ㉕-2 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
