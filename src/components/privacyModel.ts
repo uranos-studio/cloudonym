@@ -18,6 +18,7 @@ export const PRIVACY_EVENTS: readonly { event: string; when: UiKey; fields: read
   { event: 'api_generate', when: 'privacy_when_api_generate', fields: ['providers'] },
   { event: 'api_names', when: 'privacy_when_api_names', fields: ['provider', 'resource_count', 'name_count', 'valid'] },
   { event: 'api_validate', when: 'privacy_when_api_validate', fields: ['provider', 'resource_type', 'valid'] },
+  { event: 'api_wizard', when: 'privacy_when_api_wizard', fields: ['provider', 'service_count', 'resource_count', 'name_count', 'valid'] },
   { event: 'llms_txt_accessed', when: 'privacy_when_llms_txt_accessed', fields: [] },
   { event: 'catalog_json_accessed', when: 'privacy_when_catalog_json_accessed', fields: [] },
 ];

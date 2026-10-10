@@ -20,11 +20,22 @@ import { GCP_MANUAL_RULES } from '../core/rules/gcp-manual';
 import { AWS_MANUAL_RULES } from '../core/rules/aws-manual';
 import { GCP_CATALOG, GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
 import { AZURE_MANUAL_ROWS } from '../core/rules/azure-manual';
+import { TIER_PATTERN } from '../core/types';
+import { RESERVED_TIERS } from '../core/tier';
+import { PRESETS, PRESET_TIERS } from '../core/wizard/presets';
+import { ATTACHMENTS } from '../core/wizard/attachments';
 
 const rules = Object.values(RULES);
 // 공개 본문 — 켜진 CSP 만 (D45)
 const text = buildLlmsText(rules, VERSION);
 const lines = text.split('\n');
+/** 절 하나 — 제목 줄부터 다음 「## 」 앞까지 */
+const section = (title: string): string[] => {
+  const at = lines.indexOf(title);
+  expect(at, title).toBeGreaterThan(0);
+  const end = lines.findIndex((l, i) => i > at && l.startsWith('## '));
+  return lines.slice(at, end < 0 ? undefined : end);
+};
 const enabledRules = rules.filter((r) => ENABLED_PROVIDERS.includes(r.provider));
 // 형식 시험용 — 세 CSP 를 모두 펼친 본문. 꺼진 CSP 의 규칙 줄 꼴(플래그 · 금지형 · note)이 켜질 때 그대로 나오는지 본다
 const allText = buildLlmsText(rules, VERSION, en, PROVIDERS);
@@ -129,12 +140,62 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   });
   it('공식에 종류 자리가 있다 — 종류 표가 있는 규칙만 <kind> 가 약어 바로 뒤', () => {
     expect(lines.some((l) => l.startsWith(`- \`gcp.cloud_sql_instance\`: \`${formulaOf(RULES['gcp.cloud_sql_instance']!)}\``))).toBe(true);
-    expect(formulaOf(RULES['gcp.cloud_sql_instance']!)).toBe('<system>-<purpose>-<env>-<region>-sql-<kind>-<seq>');
+    expect(formulaOf(RULES['gcp.cloud_sql_instance']!)).toBe('<system>-<purpose>-<env>-<region>-sql-<kind>[-<tier>]-<seq>');
     expect(formulaOf(RULES['gcp.vpc_network']!)).not.toContain('<kind>');
   });
-  it('용도 토큰 tier 는 공식에 펼치지 않는다 — 이 API 가 받지 않는 입력이다 (D60)', () => {
+  it('용도 토큰 tier 는 공식에 [-<tier>] 로 — 약어 · 종류 뒤 · 순번 앞 · 순번 규칙에만 (D60)', () => {
     expect(RULES['gcp.cloud_sql_instance']!.template).toContain('tier');
-    for (const l of allLines) expect(l).not.toContain('<tier>');
+    const formulas = lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l));
+    for (const r of enabledRules) {
+      const f = formulaOf(r);
+      expect(f.includes('[-<tier>]'), r.id).toBe(r.template.includes('tier'));
+      if (r.template.includes('tier')) expect(f, r.id).toMatch(/\[-<tier>\]-<seq>$/);
+    }
+    expect(formulaOf(RULES['gcp.compute_instance']!)).toBe(`<system>-<purpose>-<env>-<region>-${RULES['gcp.compute_instance']!.slug}[-<tier>]-<seq>`);
+    expect(formulas.filter((l) => l.includes('<tier>')).length).toBeGreaterThan(0);
+    // 구분자 없는 규칙은 괄호 안에 구분자도 없다
+    const noSep = rules.find((r) => r.separator === '' && r.template.includes('tier'));
+    if (noSep) expect(formulaOf(noSep)).toContain('[<tier>]');
+  });
+  it('절 목록 — 마법사 절 셋(Tiers · Attached resources · Wizard presets)이 Kind tokens 뒤에 있다', () => {
+    expect(lines.filter((l) => l.startsWith('## '))).toEqual([
+      '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets',
+      '## Provider Constraints', '## Resource tree', '## What PASS means', '## API',
+    ]);
+  });
+  it('「## Tiers」 — 꼴 문법 한 줄 · 예약어 전부 · 프리셋 토큰 · 예시 이름', () => {
+    const sec = section('## Tiers');
+    expect(sec).toContain(`- \`<tier>\` = \`${TIER_PATTERN.source}\``);
+    const reserved = sec.find((l) => l.startsWith('- reserved: '))!;
+    expect(reserved.slice('- reserved: '.length).split(' ').map((w) => w.replace(/`/g, ''))).toEqual([...RESERVED_TIERS].sort());
+    expect(sec.find((l) => l.startsWith('- preset tokens: '))).toBe(`- preset tokens: ${PRESET_TIERS.map((t) => `\`${t}\``).join(' ')}`);
+    expect(sec.join('\n')).toContain('`billing-shop-prod-ane3-gce-web-01`');
+    expect(sec.join('\n')).toContain('`wizard.tier_reserved`');
+  });
+  it('「## Attached resources」 — 접미 넷 · 호환표 행마다 한 줄 · 상속 · 줄이지 않는다', () => {
+    const sec = section('## Attached resources');
+    const rows = sec.filter((l) => /^- `-(boot|data|ip|ipi)/.test(l));
+    expect(rows).toHaveLength(ATTACHMENTS.length);
+    for (const a of ATTACHMENTS) expect(rows.some((l) => l.includes(`\`${a.parent}\``) && l.includes(`\`${a.child}\``) && l.includes(`\`${a.attach}\``)), a.attach).toBe(true);
+    const body = sec.join('\n');
+    expect(body).toContain('`name.parent_invalid`');
+    expect(body).toContain('`name.cannot_fit`');
+    expect(body).toMatch(/never shortened/);
+  });
+  it('「## Wizard presets」 — 다섯 줄 · 프리셋 id 아홉이 전부 · HA 규칙', () => {
+    const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
+    expect(rows).toHaveLength(5);
+    for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
+    expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
+    expect(rows.join('\n')).toContain('`gcp.run_service`');
+  });
+  it('API 절 — POST /v1/wizard 한 줄 · 재현 문장 · 머리말에도', () => {
+    const api = section('## API').join('\n');
+    expect(api).toContain('- `POST /v1/wizard` — body');
+    expect(api).toContain('"project_picks"');
+    expect(api).toContain('project_picks[0].instances[0].attach.data[1]');
+    expect(text).toContain('the wizard response is reproduced by repeating the same wizard request with its `rules_version`; `/v1/names` is a separate, flat endpoint');
+    expect(lines.find((l) => l.startsWith('> For humans'))).toContain('`POST /v1/wizard`');
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
@@ -248,9 +309,9 @@ describe('GET /llms.txt — Worker 라우트 (D17)', () => {
     const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
     expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/llms\.txt"/);
   });
-  it('app.routes 는 정확히 일곱 경로 + secureHeaders 의 ALL /* · cors 의 ALL /v1/* 하나씩 · /v1/v1 없음', () => {
+  it('app.routes 는 정확히 여덟 경로 + secureHeaders 의 ALL /* · cors 의 ALL /v1/* 하나씩 · /v1/v1 없음', () => {
     const routes = app.routes.map((r) => `${r.method} ${r.path}`);
-    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /catalog.json', 'GET /llms.txt', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/names', 'POST /v1/validate']);
+    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /catalog.json', 'GET /llms.txt', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/names', 'POST /v1/validate', 'POST /v1/wizard']);
     expect(routes.filter((r) => r.startsWith('ALL ')).sort()).toEqual(['ALL /*', 'ALL /v1/*']);
     expect(routes.some((r) => r.includes('/v1/v1'))).toBe(false);
   });

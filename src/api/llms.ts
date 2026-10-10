@@ -1,5 +1,9 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
-import { ENABLED_PROVIDERS, PROVIDERS, type Provider, type ResourceRule, type Token } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, TIER_PATTERN, type Provider, type ResourceRule, type Token } from '../core/types';
+import { RESERVED_TIERS } from '../core/tier';
+import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
+import { PRESETS, PRESET_TIERS, type Preset } from '../core/wizard/presets';
+import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
 import { ENV_ALIASES } from '../core/normalize';
@@ -37,10 +41,60 @@ function treeLines(node: TreeNode, depth = 0): string[] {
 }
 
 /** template 을 `<owner>-<system>-…-sa-<role>` 꼴로 펼친다. slug 는 실제 약어를 그대로 쓴다 (구분자 없는 규칙은 붙여 쓴다).
- *  용도 토큰 tier(D60)는 이 API 가 받지 않는 입력이라 펼치지 않는다 — 빈 토큰이라 이름에 들지 않는다 */
+ *  용도 토큰 tier(D60)는 마법사(/v1/wizard)만 채우는 자리라 `[-<tier>]` 로 적는다 — 괄호가 앞 구분자까지 감싼다(없으면 이름에 들지 않는다) */
 export function formulaOf(rule: ResourceRule): string {
   const part = (t: Token): string => (t === 'slug' ? rule.slug : `<${t}>`);
-  return rule.template.filter((t) => t !== 'tier').map(part).join(rule.separator);
+  return rule.template.reduce((out, t, i) => (t === 'tier' ? `${out}[${rule.separator}<tier>]` : `${out}${i === 0 ? '' : rule.separator}${part(t)}`), '');
+}
+
+/** 「## Tiers」 절 (D60) — 꼴 · 예약어 · 프리셋 토큰. 예약어는 tier.ts 의 목록 그대로(규칙 · 별칭 · 지역 표에서 만든다) */
+function tierLines(): string[] {
+  return [
+    '', '## Tiers', '',
+    'A tier is a short purpose token (`web`, `was`) that only `/v1/wizard` fills. It goes after the abbreviation and kind token and before the sequence number: `[-<tier>]` in the formulas, for example `billing-shop-prod-ane3-gce-web-01`. Only rules with a sequence number (`input: count`) take one; it is never shortened or dropped. A preset brings its own tier; `tier` on a pick overrides it. `/v1/generate` and `/v1/names` never put a tier in a name.',
+    `- \`<tier>\` = \`${TIER_PATTERN.source}\``,
+    '- rejected with 400 `wizard.invalid_tier` when it does not match, and `wizard.tier_reserved` when it is one of the reserved words below: abbreviations, kind tokens, environment values and their aliases, and region and zone codes — they would read as that token',
+    `- reserved: ${[...RESERVED_TIERS].sort().map((w) => `\`${w}\``).join(' ')}`,
+    `- preset tokens: ${PRESET_TIERS.map((t) => `\`${t}\``).join(' ')}`,
+  ];
+}
+
+/** 「## Attached resources」 절 (D62) — 호환표(attachments.ts) 행마다 한 줄 · 상속 · 줄이지 않는다 */
+function attachLines(): string[] {
+  return [
+    '', '## Attached resources', '',
+    `A server slot on \`/v1/wizard\` can carry attached resources. Their name is the final name of the parent plus a suffix, so they inherit its region, tier and sequence; they are never shortened. If the result is too long the attached item is \`valid: false\` with \`name.cannot_fit\` and \`name.parent_name\`; if the parent is not valid the attached item comes back with an empty name and \`name.parent_invalid\`. Data disks take their own numbers (\`data: ["01", "02"]\`, 1 to ${MAX_DATA_DISKS}).`,
+    ...ATTACHMENTS.map((a) => `- \`-${a.attach}${a.seq ? '-<seq>' : ''}\` · attach \`${a.attach}\` on \`${a.parent}\` → \`${a.child}\``),
+  ];
+}
+
+/** 프리셋 묶음 (D59) — 네트워크는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩. 무료 프리셋은 다섯 묶음이다 */
+function presetGroups(): Preset[][] {
+  const groups = new Map<string, Preset[]>();
+  for (const p of PRESETS) {
+    const key = p.group ?? (p.ruleId === 'gcp.compute_instance' && !p.defaultAttach ? 'server' : p.id);
+    groups.set(key, [...(groups.get(key) ?? []), p]);
+  }
+  return [...groups.values()];
+}
+
+/** 「## Wizard presets」 절 (D59 · D61 · D65) — 묶음마다 한 줄: 프리셋 id · 규칙 · tier · HA · 서버리스 · 초기 딸린 것 */
+function presetLines(): string[] {
+  const one = (p: Preset): string => {
+    const bits = [`\`${p.id}\` (${p.label}) → \`${p.ruleId}\``];
+    if (p.tier !== null) bits.push(`tier \`${p.tier}\`${p.tierChoices ? ` (or ${p.tierChoices.filter((t) => t !== p.tier).map((t) => `\`${t}\``).join(', ')})` : ''}`);
+    if (p.serverless) bits.push(`serverless: ${p.serverless.ruleIds.map((r) => `\`${r}\``).join(' or ')}`);
+    if (p.defaultAttach?.data) bits.push(`the screen starts it with data disk ${p.defaultAttach.data.map((d) => `\`${d}\``).join(', ')}`);
+    return bits.join(', ');
+  };
+  return [
+    '', '## Wizard presets', '',
+    `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets are usually project-level (\`project_picks\`). At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
+    ...presetGroups().map((g) => {
+      const ha = g.find((p) => p.ha);
+      return `- ${g.map(one).join('; ')}${ha?.ha ? ` · HA (\`ha: true\`) on ${g.filter((p) => p.ha).map((p) => `\`${p.id}\``).join(' and ')} as virtual machines only: at least ${ha.ha.minInstances} servers` : ''}`;
+    }),
+  ];
 }
 
 /** 표준값 한 줄씩 — 별칭이 있으면 같이 (ENV_ALIASES 가 정본) */
@@ -135,12 +189,12 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '',
     `> Cloud resource naming engine for ${enabledNames} — generates, corrects and validates names against each provider's physical constraints.`,
     ...(planned.length > 0 ? [`> ${joinNames(planned)}: planned — not enabled yet. The API answers 400 \`request.provider_not_enabled\` for them.`] : []),
-    '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/validate` · `GET /openapi.json`).',
+    '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/wizard` · `POST /v1/validate` · `GET /openapi.json`).',
     "> Cloudonym does not replace the provider's final verdict — it checks only the reserved words and patterns that the official documents state.",
     '',
     '## Naming Formulas',
     '',
-    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`), `<kind>` is empty unless `kind` on `/v1/names` picks a value with a token (see `## Kind tokens`).',
+    'One line per rule: `<rule id>`: formula · `optional` = tokens dropped first (in this order) when the name is too long. `<seq>` defaults to `01` (`count` on `/v1/names` gives `01`…`99`), `<role>` defaults to `sync` (`role` on `/v1/names`), `<kind>` is empty unless `kind` on `/v1/names` picks a value with a token (see `## Kind tokens`). `[-<tier>]` is filled only by `/v1/wizard` (see `## Tiers`).',
   ];
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -152,6 +206,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`');
   lines.push(...regionLines(order));
   lines.push(...kindLines(order));
+  lines.push(...tierLines(), ...attachLines(), ...presetLines());
   lines.push('', '## Provider Constraints');
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -173,13 +228,15 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     `- \`POST /v1/generate\` — body \`{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: [${order.map((p) => `"${p}"`).join(', ')}], "rules_version"?: string }\``,
     '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string, "kind"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `kind` and `kind_token` when a kind was picked (`kind_token` only when the name carries one), `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
     `- \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\``,
+    '- `POST /v1/wizard` — body `{ "provider", "project": { "owner", "system", "env", "region" }, "project_picks"?: [pick], "services"?: [{ "purpose", "picks": [pick] }], "rules_version"?: string }` with pick `{ "preset": id | null, "rule"?: rule id, "tier"?, "role"?, "kind"?, "ha"?: boolean, "serverless"?: rule id, "instances"?: [{ "id", "seq", "attach"?: { "boot"?: true, "data"?: [seq], "ip"?: true, "ipi"?: true } }] }` — one project: the project ID first, then project-level items, then each service; each parent is followed by its attached resources. `data.<provider>` is `{ valid, items[], conflicts[] }`; items carry a structured `key` (`service/shop/compute_instance/web/01/data/01`), `namespace` (`project` or the service), `level`, `tier`, `parent` and `attach` when they apply, and the `/v1/names` item fields. `metadata.generated_labels.<provider>` maps each namespace to its labels (the `project` labels have no `purpose`). A 400 names the offending element in `field` with the request names (`project_picks[0].instances[0].attach.data[1]`); errors about the whole plan have no `field`. At most 200 names including the project ID',
+    'The wizard response is not reproduced through `/v1/names`: the wizard response is reproduced by repeating the same wizard request with its `rules_version`; `/v1/names` is a separate, flat endpoint.',
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
     '- `GET /catalog.json` — the resource catalog of the enabled providers as JSON: one row per resource with its rule ids, abbreviation, kinds and kind tokens, region-token kind (`none` or `region`), description and search aliases, the region and zone codes, and `version: { engine, rules }`',
     '',
     '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`, no kind); `/v1/names` is the selection. Rules that need a kind come back `valid: false` there (`name.kind_required`) — use `/v1/names` with `kind` for them. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
-    'Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
+    'Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
     'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',
     '',

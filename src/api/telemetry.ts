@@ -34,6 +34,7 @@ export function classifyClient(userAgent: string | undefined): ClientClass {
 export const META_KEYS: Readonly<Record<string, readonly string[]>> = {
   ui_visit: [], ui_generate: [], ui_copy: ['target'],
   api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
+  api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid'],
   llms_txt_accessed: [], catalog_json_accessed: [],
 };
 function allowedMeta(event: string, meta: Record<string, unknown>): Record<string, unknown> {

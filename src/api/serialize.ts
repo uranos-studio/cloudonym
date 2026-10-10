@@ -1,6 +1,8 @@
 // 코어(camelCase) → wire(snake_case) (D15 · D25). 이름 규칙 · 판정 로직은 여기 없다 — 필드 이름을 바꾸고 메시지 코드에 문장을 붙인다
 import type { LabelSet, NameResult, Provider, ResourceRule, ScopeId } from '../core/types';
-import type { ManyResult } from '../core/engine';
+import type { ManyResult, ProjectResult } from '../core/engine';
+import { RULES } from '../core/constraints';
+import type { AttachKind } from '../core/wizard/attachments';
 import { displayMessage, format, type Catalog, type Message, type MessageCode } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -104,6 +106,63 @@ export function toWireNames(result: ManyResult, rules: readonly ResourceRule[], 
       generated_labels: { [p]: labels.labels },
       label_violations: { [p]: wire(labels.violations, catalog) },
       label_transformed: { [p]: wire(labels.transformed, catalog) },
+      transformed: wire(transformed, catalog),
+    },
+  };
+}
+
+/** /v1/wizard 항목 (D66 · D69) — WireNameItem 에 이름공간 · 프로젝트 수준 · 용도 토큰 · 부모 키 · 접미 종류. key 는 구조 키다 */
+export interface WireWizardItem extends WireNameItem { namespace: string; level?: 'project'; tier?: string; parent?: string; attach?: AttachKind }
+export interface WireWizardProvider { valid: boolean; items: WireWizardItem[]; conflicts: WireMessage[] }
+/** 라벨은 이름공간 → 라벨 맵. 라벨 위반 · 변환은 한 목록이고 field 는 `<이름공간>.<라벨 키>` 다 */
+export interface WireWizard {
+  success: true;
+  version: Version;
+  data: Partial<Record<Provider, WireWizardProvider>>;
+  metadata: {
+    generated_labels: Partial<Record<Provider, Record<string, Record<string, string>>>>;
+    label_violations: Partial<Record<Provider, WireMessage[]>>;
+    label_transformed: Partial<Record<Provider, WireMessage[]>>;
+    transformed: WireMessage[];
+  };
+}
+
+/** 라벨 기록의 field 를 `<이름공간>.<키>` 로. 서비스 이름공간은 purpose 만 싣는다 — 나머지 키는 프로젝트의 값과 같아 project 에 한 번 실린다 */
+function labelMessages(sets: readonly { namespace: string; labels: LabelSet }[], pick: (l: LabelSet) => readonly Message[]): Message[] {
+  return sets.flatMap(({ namespace, labels }) => pick(labels)
+    .filter((m) => namespace === 'project' || ('field' in m && m.field === 'purpose'))
+    .map((m) => ('field' in m ? { ...m, field: `${namespace}.${m.field}` } : m) as Message));
+}
+
+/** POST /v1/wizard — 항목의 scope · uniqueness 는 그 항목의 규칙(자식은 디스크 · 주소 규칙)에서 */
+export function toWireWizard(result: ProjectResult, labels: readonly { namespace: string; labels: LabelSet }[], transformed: readonly Message[], version: Version, catalog: Catalog = en): WireWizard {
+  const items = result.items.map((it): WireWizardItem => {
+    const rule = RULES[it.ruleId];
+    if (!rule) throw new Error(`no rule for item ${it.key}`);
+    if (it.namespace === undefined) throw new Error(`no namespace for item ${it.key}`);
+    return {
+      key: it.key, namespace: it.namespace,
+      ...(it.level !== undefined ? { level: it.level } : {}),
+      ...(it.parent !== undefined ? { parent: it.parent } : {}),
+      ...(it.attach !== undefined ? { attach: it.attach } : {}),
+      resource_type: it.resourceType,
+      ...(it.tier !== undefined ? { tier: it.tier } : {}),
+      ...(it.seq !== undefined ? { seq: it.seq } : {}),
+      ...(it.role !== undefined ? { role: it.role } : {}),
+      ...(it.kind !== undefined ? { kind: it.kind } : {}),
+      ...(it.kindToken !== undefined ? { kind_token: it.kindToken } : {}),
+      scope: rule.scope, uniqueness: rule.uniqueness,
+      ...toWireName(it, catalog),
+    };
+  });
+  const p = result.provider;
+  return {
+    success: true, version: { ...version },
+    data: { [p]: { valid: result.valid, items, conflicts: wire(result.conflicts, catalog) } },
+    metadata: {
+      generated_labels: { [p]: Object.fromEntries(labels.map((l) => [l.namespace, l.labels.labels])) },
+      label_violations: { [p]: wire(labelMessages(labels, (l) => l.violations), catalog) },
+      label_transformed: { [p]: wire(labelMessages(labels, (l) => l.transformed), catalog) },
       transformed: wire(transformed, catalog),
     },
   };

@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, UI_COPY_TARGETS } from './schemas';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, toWirePath, UI_COPY_TARGETS } from './schemas';
+import { WIZARD_WIRE_SAMPLE } from './test-support';
+import { validatePlan } from '../core/wizard/plan';
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -217,5 +219,139 @@ describe('parseNamesBody (D39)', () => {
   it('rules_version 이 다르면 409', () => {
     expect(parseNamesBody({ ...ok, rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch' }] } });
     expect(parseNamesBody({ ...ok, rules_version: RULES_REVISION }).ok).toBe(true);
+  });
+});
+
+describe('parseWizardBody (D66) — 모양은 API 가, 마법사 검사는 core validatePlan 이 본다', () => {
+  const W = WIZARD_WIRE_SAMPLE;
+  const errorsOf = (body: unknown) => {
+    const r = parseWizardBody(body);
+    return r.ok ? [] : r.rejection.errors;
+  };
+  const statusOf = (body: unknown) => {
+    const r = parseWizardBody(body);
+    return r.ok ? 200 : r.rejection.status;
+  };
+  const one = (pick: unknown) => ({ ...W, project_picks: [], services: [{ purpose: 'shop', picks: [pick] }] });
+
+  it('표본 — 통과 · 프로젝트 문맥(purpose 없음) · 서비스 둘 · wire 이름(project_picks · rule)이 모델 이름으로 바뀐다', () => {
+    const r = parseWizardBody(W);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.provider).toBe('gcp');
+    expect(r.value.selection.project).toMatchObject({ owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' });
+    expect('purpose' in r.value.selection.project).toBe(false);
+    expect(r.value.selection.projectItems).toHaveLength(4);
+    expect(r.value.selection.services.map((s) => s.purpose)).toEqual(['shop', 'pay']);
+    expect(r.value.pickCount).toBe(7);
+    expect(r.value.transformed).toEqual([{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3' } }]);
+    expect(r.value.labelContexts.map((l) => l.namespace)).toEqual(['project', 'shop', 'pay']);
+    const custom = parseWizardBody(one({ preset: null, rule: 'gcp.run_service', instances: [{ id: 'a', seq: '01' }] }));
+    expect(custom.ok && custom.value.selection.services[0]!.items[0]!.rule.id).toBe('gcp.run_service');
+  });
+
+  it('본문 · provider · project 모양 — 400 · 꺼진 provider 는 provider_not_enabled · supported 는 켜진 것', () => {
+    expect(errorsOf('x')).toEqual([{ code: 'request.body_not_object' }]);
+    expect(parseWizardBody({ ...W, provider: 'aws' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'aws' } }], supported: ['gcp'] } });
+    expect(errorsOf({ ...W, provider: undefined })).toEqual([{ code: 'request.field_missing', field: 'provider' }]);
+    expect(errorsOf({ ...W, provider: 'oci' })).toEqual([{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }]);
+    expect(errorsOf({ ...W, project: null })).toEqual([{ code: 'request.context_not_object' }]);
+    expect(errorsOf({ ...W, project: 'x' })).toEqual([{ code: 'request.context_not_object' }]);
+  });
+
+  it('rules_version — 다르면 409 · 지금 값이면 통과 · 문자열 아님 400', () => {
+    expect(parseWizardBody({ ...W, rules_version: 'old' })).toMatchObject({ ok: false, rejection: { status: 409, errors: [{ code: 'request.rules_version_mismatch' }] } });
+    expect(parseWizardBody({ ...W, rules_version: RULES_REVISION }).ok).toBe(true);
+    expect(statusOf({ ...W, rules_version: 1 })).toBe(400);
+  });
+
+  it('길이 상한 — owner · system · purpose 64 · env · region · pick 문자열 1024 → request.field_too_long (field 는 wire 경로)', () => {
+    expect(errorsOf({ ...W, services: [{ purpose: 'p'.repeat(65), picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01' }] }] }] }))
+      .toEqual([{ code: 'request.field_too_long', field: 'services[0].purpose', params: { max: 64 } }]);
+    expect(errorsOf({ ...W, project: { ...W.project, owner: 'o'.repeat(65), region: 'r'.repeat(1025) } })).toEqual([
+      { code: 'request.field_too_long', field: 'project.owner', params: { max: 64 } },
+      { code: 'request.field_too_long', field: 'project.region', params: { max: 1024 } },
+    ]);
+    expect(errorsOf({ ...W, project_picks: [{ preset: null, rule: 'x'.repeat(1025) }] })).toEqual([{ code: 'request.field_too_long', field: 'project_picks[0].rule', params: { max: 1024 } }]);
+    expect(errorsOf(one({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { data: ['0'.repeat(1025)] } }] })))
+      .toEqual([{ code: 'request.field_too_long', field: 'services[0].picks[0].instances[0].attach.data[0]', params: { max: 1024 } }]);
+  });
+
+  it('프로젝트 문맥 오류 — context.* 의 field 에 project. 접두', () => {
+    expect(errorsOf({ ...W, project: { ...W.project, env: 'qa' } })).toEqual([
+      { code: 'context.value_unsupported', field: 'project.env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] } },
+    ]);
+    expect(errorsOf({ ...W, project: { system: 'billing', env: 'prod', region: 'global' } })).toEqual([{ code: 'context.not_string', field: 'project.owner' }]);
+  });
+
+  it('모델 전체 오류는 field 가 없다 — wizard.empty · too_many_services · too_many_names · selection.not_array', () => {
+    expect(errorsOf({ ...W, project_picks: [], services: [] })).toEqual([{ code: 'wizard.empty' }]);
+    expect(errorsOf({ ...W, project_picks: undefined, services: undefined })).toEqual([{ code: 'wizard.empty' }]);
+    const many = Array.from({ length: 21 }, (_, i) => ({ purpose: `s${i}`, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01' }] }] }));
+    expect(errorsOf({ ...W, services: many })).toEqual([{ code: 'wizard.too_many_services', params: { max: 20, actual: 21 } }]);
+    expect(errorsOf({ ...W, services: 'x' })).toEqual([{ code: 'selection.not_array' }]);
+    expect(errorsOf({ ...W, project_picks: {} })).toEqual([{ code: 'selection.not_array' }]);
+  });
+
+  it('pick 상한 — 서비스는 field services[0] · 프로젝트 공용은 project_picks', () => {
+    const picks = Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
+    expect(errorsOf({ ...W, project_picks: [], services: [{ purpose: 'shop', picks }] }))
+      .toContainEqual({ code: 'wizard.too_many_picks', field: 'services[0]', params: { index: 0, max: 20, actual: 21 } });
+    expect(errorsOf({ ...W, project_picks: picks, services: [] }))
+      .toContainEqual({ code: 'wizard.too_many_picks', field: 'project_picks', params: { index: -1, max: 20, actual: 21 } });
+  });
+
+  it('위치 오류 — field 는 toWirePath(모델 경로) · 프로젝트 공용 딸린 것의 두 표기', () => {
+    const body = { ...W, services: [], project_picks: [{ preset: null, rule: 'gcp.compute_instance', instances: [{ id: 'a', seq: '01', attach: { data: ['01', '00'] } }] }] };
+    // 모델 표기는 validatePlan 이 낸다 — 같은 입력을 모델로 넣어 path 를 본다
+    const model = validatePlan({ provider: 'gcp', project: W.project, projectPicks: [{ preset: null, ruleId: 'gcp.compute_instance', instances: [{ id: 'a', seq: '01', attach: { data: ['01', '00'] } }] }], services: [] });
+    expect(model.ok ? [] : model.errors.map((e) => e.path)).toEqual(['projectPicks[0].instances[0].attach.data[1]']);
+    expect(errorsOf(body)).toEqual([{ code: 'wizard.invalid_data_seq', field: 'project_picks[0].instances[0].attach.data[1]', params: { index: 0, value: '00', pattern: '^(0[1-9]|[1-9][0-9])$' } }]);
+    expect(toWirePath('projectPicks[0].instances[0].attach.data[1]')).toBe('project_picks[0].instances[0].attach.data[1]');
+  });
+
+  it('toWirePath — 표의 모든 줄 (바뀌는 둘 · 같은 글자 열여덟) · 모르는 글자 · 원형 속성은 그대로', () => {
+    expect(toWirePath('projectPicks')).toBe('project_picks');
+    expect(toWirePath('ruleId')).toBe('rule');
+    for (const same of ['services', 'purpose', 'picks', 'preset', 'tier', 'role', 'kind', 'ha', 'serverless', 'instances', 'id', 'seq', 'attach', 'boot', 'data', 'ip', 'ipi']) {
+      expect(toWirePath(same), same).toBe(same);
+    }
+    expect(toWirePath('services[1].picks[0].instances[1].attach.ipi')).toBe('services[1].picks[0].instances[1].attach.ipi');
+    expect(toWirePath('constructor.toString')).toBe('constructor.toString');
+  });
+
+  it('selection.unknown_type — 되돌리는 값은 80자 · supported 는 gcp 규칙 id', () => {
+    const r = parseWizardBody(one({ preset: null, rule: 'y'.repeat(500) }));
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.rejection.errors[0]).toMatchObject({ code: 'selection.unknown_type', field: 'services[0].picks[0]', params: { value: `${'y'.repeat(80)}…` } });
+    expect(r.rejection.supported).toContain('gcp.compute_instance');
+  });
+
+  it('HA · seq · data 순번 — 400 과 그 code', () => {
+    const codes = (pick: unknown) => errorsOf(one(pick)).map((e) => e.code);
+    const two = [{ id: 'a', seq: '01' }, { id: 'b', seq: '02' }];
+    expect(codes({ preset: 'web', serverless: 'gcp.cloud_function', ha: true, instances: two })).toEqual(['wizard.ha_not_supported']);
+    expect(codes({ preset: 'bastion', ha: true, instances: two })).toEqual(['wizard.ha_not_supported']);
+    expect(codes({ preset: null, rule: 'gcp.compute_instance', ha: true, instances: two })).toEqual(['wizard.ha_not_supported']);
+    for (const seq of ['00', '7', '100', 'ab']) expect(codes({ preset: 'web', instances: [{ id: 'a', seq }] }), seq).toEqual(['wizard.invalid_seq']);
+    expect(codes({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { data: ['00'] } }] })).toEqual(['wizard.invalid_data_seq']);
+  });
+
+  it('틀린 모양은 던지지 않고 400 — services:[null] · picks:x · attach:x · instances:x · pick null · slot null', () => {
+    for (const body of [
+      { ...W, services: [null] }, { ...W, services: [{ purpose: 'shop', picks: 'x' }] },
+      one({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: 'x' }] }), one({ preset: 'web', instances: 'x' }),
+      one(null), one({ preset: 'web', instances: [null] }), { ...W, project_picks: [1] }, { ...W, services: [{ purpose: 3, picks: [] }] },
+    ]) {
+      expect(() => parseWizardBody(body)).not.toThrow();
+      expect(statusOf(body), JSON.stringify(body).slice(0, 120)).toBe(400);
+    }
+  });
+
+  it('/v1/names 는 마법사 필드(tier · instances · level · attach)를 모르는 필드로 무시한다 — 결과가 없을 때와 같다', () => {
+    const base = { provider: 'gcp', context: ctx, resources: [{ type: 'compute_instance', count: 2 }] };
+    const extra = { ...base, resources: [{ type: 'compute_instance', count: 2, tier: 'web', level: 'project', instances: [{ seq: '05' }], attach: { boot: true } }] };
+    expect(parseNamesBody(extra)).toEqual(parseNamesBody(base));
   });
 });

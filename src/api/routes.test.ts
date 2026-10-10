@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, json, fakeKv, fakeLimiter } from './test-support';
+import { req, jsonPost, json, fakeKv, fakeLimiter, WIZARD_WIRE_SAMPLE, type Loose } from './test-support';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -327,5 +327,201 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
   it('wrangler.jsonc run_worker_first 에 /catalog.json 이 있다', () => {
     const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
     expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/catalog\.json"/);
+  });
+});
+
+describe('POST /v1/wizard (D66)', () => {
+  const W = WIZARD_WIRE_SAMPLE;
+  const wizard = (body: unknown, env = {}) => req(app, '/v1/wizard', jsonPost(body), env);
+  const itemsOf = async (body: unknown) => {
+    const { res } = await wizard(body);
+    expect(res.status).toBe(200);
+    return (await json(res)).data.gcp as { valid: boolean; items: Loose[]; conflicts: Loose[] };
+  };
+  const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
+
+  it('라우트 · CORS — POST /v1/wizard 가 있고 OPTIONS 는 204 + *', async () => {
+    expect(app.routes.map((r) => `${r.method} ${r.path}`)).toContain('POST /v1/wizard');
+    const { res } = await req(app, '/v1/wizard', { method: 'OPTIONS' });
+    expect(res.status).toBe(204);
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect((await req(app, '/v1/wizard')).res.status).toBe(404);
+  });
+
+  it('표본 — 200 · 항목 14 · 순서 · 구조 키 · 이름 글자 그대로 · version · 라벨은 이름공간 맵 · project 라벨에 purpose 없음', async () => {
+    const { res } = await wizard(W);
+    expect(res.status).toBe(200);
+    const body = await json(res);
+    expect(body.success).toBe(true);
+    expect(body.version).toEqual(VERSION);
+    const g = body.data.gcp;
+    expect(g.valid).toBe(true);
+    expect(g.conflicts).toEqual([]);
+    expect(g.items).toHaveLength(14);
+    expect(g.items.map((i: Loose) => [i.key, i.name])).toEqual([
+      ['project/-/project_id/-/-', expect.any(String)],
+      ['project/-/vpc_network/-/01', expect.any(String)],
+      ['project/-/subnet/-/01', expect.any(String)],
+      ['project/-/firewall_rule/ssh/01', expect.any(String)],
+      ['project/-/firewall_rule/web/01', expect.any(String)],
+      ['service/shop/compute_instance/web/01', 'billing-shop-prod-ane3-gce-web-01'],
+      ['service/shop/compute_instance/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot'],
+      ['service/shop/compute_instance/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01'],
+      ['service/shop/compute_instance/web/01/ip/-', 'billing-shop-prod-ane3-gce-web-01-ip'],
+      ['service/shop/cloud_sql_instance/-/01', expect.any(String)],
+      ['service/pay/compute_instance/web/01', 'billing-pay-prod-ane3-gce-web-01'],
+      ['service/pay/compute_instance/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot'],
+      ['service/pay/compute_instance/web/02', 'billing-pay-prod-ane3-gce-web-02'],
+      ['service/pay/compute_instance/web/02/boot/-', 'billing-pay-prod-ane3-gce-web-02-boot'],
+    ]);
+    const first = g.items[0];
+    expect(first).toMatchObject({ namespace: 'project', level: 'project', resource_type: 'project_id', valid: true, scope: expect.any(String), uniqueness: 'csp' });
+    const boot = g.items[6];
+    expect(boot).toMatchObject({ namespace: 'shop', parent: 'service/shop/compute_instance/web/01', attach: 'boot', resource_type: 'disk' });
+    expect(boot.level).toBeUndefined();
+    expect(g.items[7]).toMatchObject({ attach: 'data', seq: '01' });
+    expect(g.items[5]).toMatchObject({ namespace: 'shop', tier: 'web', seq: '01' });
+    expect(g.items[5].parent).toBeUndefined();
+    expect(g.items[9]).toMatchObject({ kind: 'POSTGRES' });
+    expect(Object.keys(body.metadata.generated_labels.gcp)).toEqual(['project', 'shop', 'pay']);
+    expect(body.metadata.generated_labels.gcp.project).toEqual({ owner: 'platform', system: 'billing', environment: 'prod', managed_by: 'cloudonym' });
+    expect(body.metadata.generated_labels.gcp.shop).toEqual({ owner: 'platform', system: 'billing', purpose: 'shop', environment: 'prod', managed_by: 'cloudonym' });
+    expect(body.metadata.label_violations).toEqual({ gcp: [] });
+    expect(body.metadata.label_transformed).toEqual({ gcp: [] });
+    expect(body.metadata.transformed).toEqual([{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3' }, message: expect.any(String) }]);
+  });
+
+  it('같은 요청에 응답의 version.rules 를 rules_version 으로 넣으면 같은 응답 (D27) · 다르면 409', async () => {
+    const a = await json((await wizard(W)).res);
+    const b = await json((await wizard({ ...W, rules_version: a.version.rules })).res);
+    expect(b).toEqual(a);
+    const { res } = await wizard({ ...W, rules_version: '2026-01-01.1' });
+    expect(res.status).toBe(409);
+    expect((await json(res)).errors[0].code).toBe('request.rules_version_mismatch');
+  });
+
+  it('자식 넘침은 200 · 그 자식만 valid:false (name.cannot_fit · name.parent_name)', async () => {
+    const g = await itemsOf({ ...W, project_picks: [], services: [vm('p'.repeat(30), { boot: true })] });
+    expect(g.items).toHaveLength(3);
+    expect(g.items[1].valid).toBe(true);
+    expect(g.items[2].valid).toBe(false);
+    expect(g.items[2].violations.map((v: Loose) => v.code)).toEqual(['name.cannot_fit', 'name.parent_name']);
+    expect(g.valid).toBe(false);
+  });
+
+  it('충돌 fixture — cloud_function + cloud_function_gen1 → 200 · 항목 셋 · 둘 다 name.conflict', async () => {
+    const g = await itemsOf({ ...W, project_picks: [], services: [{ purpose: 'shop', picks: [
+      { preset: null, rule: 'gcp.cloud_function', instances: [{ id: 'a', seq: '01' }] },
+      { preset: null, rule: 'gcp.cloud_function_gen1', instances: [{ id: 'a', seq: '01' }] }] }] });
+    expect(g.items).toHaveLength(3);
+    expect(g.items[1].name).toBe(g.items[2].name);
+    for (const i of [1, 2]) expect(g.items[i].violations.map((v: Loose) => v.code)).toContain('name.conflict');
+    expect(g.conflicts).toHaveLength(1);
+    expect(g.valid).toBe(false);
+  });
+
+  it('부모 FAIL fixture — 축소 뒤 같아지는 60자 purpose 둘 · boot 는 첫 서버에만 → 항목 넷 · 부모 둘 name.conflict · boot 는 name.parent_invalid 이름 빈 값', async () => {
+    const g = await itemsOf({ ...W, project_picks: [], services: [vm(`${'a'.repeat(59)}b`, { boot: true }), vm(`${'a'.repeat(59)}c`)] });
+    expect(g.items).toHaveLength(4);
+    const [, p1, boot, p2] = g.items;
+    expect(p1.name).toBe(p2.name);
+    expect(p1.violations.map((v: Loose) => v.code)).toContain('name.conflict');
+    expect(p2.violations.map((v: Loose) => v.code)).toContain('name.conflict');
+    expect(boot).toMatchObject({ attach: 'boot', name: '', valid: false });
+    expect(boot.violations.map((v: Loose) => v.code)).toEqual(['name.parent_invalid']);
+  });
+
+  it('프로젝트 ↔ 서비스 방화벽 — 둘 다 PASS · 충돌 0', async () => {
+    const fw = { preset: 'firewall', tier: 'ssh', instances: [{ id: 'a', seq: '01' }] };
+    const g = await itemsOf({ ...W, project_picks: [fw], services: [{ purpose: 'shop', picks: [fw] }] });
+    expect(g.items).toHaveLength(3);
+    expect(g.items.every((i: Loose) => i.valid)).toBe(true);
+    expect(g.items[1].name).not.toBe(g.items[2].name);
+    expect(g.conflicts).toEqual([]);
+  });
+
+  it('같은 슬롯에 boot · data 01 02 · ip · ipi → 자식 다섯 · 키가 모두 다르다', async () => {
+    const g = await itemsOf({ ...W, project_picks: [], services: [vm('shop', { boot: true, data: ['01', '02'], ip: true, ipi: true })] });
+    expect(g.items).toHaveLength(7);
+    const children = g.items.filter((i: Loose) => i.parent !== undefined);
+    expect(children.map((i: Loose) => i.attach)).toEqual(['boot', 'data', 'data', 'ip', 'ipi']);
+    expect(new Set(children.map((i: Loose) => i.key)).size).toBe(5);
+  });
+
+  it('400 — HA 셋 · seq 넷 · data 순번 · field 는 wire 경로 · 문장에 -1 이 없다', async () => {
+    const two = [{ id: 'a', seq: '01' }, { id: 'b', seq: '02' }];
+    const bad = async (pick: unknown) => {
+      const { res } = await wizard({ ...W, project_picks: [], services: [{ purpose: 'shop', picks: [pick] }] });
+      expect(res.status).toBe(400);
+      return (await json(res)).errors as Loose[];
+    };
+    for (const pick of [{ preset: 'web', serverless: 'gcp.cloud_function', ha: true, instances: two }, { preset: 'bastion', ha: true, instances: two }, { preset: null, rule: 'gcp.compute_instance', ha: true, instances: two }]) {
+      expect((await bad(pick)).map((e) => [e.code, e.field])).toEqual([['wizard.ha_not_supported', 'services[0].picks[0]']]);
+    }
+    for (const seq of ['00', '7', '100', 'ab']) {
+      expect((await bad({ preset: 'web', instances: [{ id: 'a', seq }] })).map((e) => [e.code, e.field]), seq).toEqual([['wizard.invalid_seq', 'services[0].picks[0].instances[0]']]);
+    }
+    expect((await bad({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { data: ['00'] } }] })).map((e) => [e.code, e.field]))
+      .toEqual([['wizard.invalid_data_seq', 'services[0].picks[0].instances[0].attach.data[0]']]);
+    const picks = Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
+    const { res } = await wizard({ ...W, project_picks: picks, services: [] });
+    const tooMany = ((await json(res)).errors as Loose[]).find((e) => e.code === 'wizard.too_many_picks');
+    expect(tooMany.field).toBe('project_picks');
+    expect(tooMany.message).not.toContain('-1');
+  });
+
+  it('이름 총합 — 프로젝트 ID + VM 199 → 200 · + VM 200 → 400 wizard.too_many_names (field 없음)', async () => {
+    const slots = (n: number) => Array.from({ length: n }, (_, i) => ({ id: `s${i}`, seq: String(i + 1).padStart(2, '0') }));
+    const plan = (last: number) => ({ ...W, project_picks: [], services: [{ purpose: 'shop', picks: [
+      { preset: 'web', instances: slots(99) }, { preset: 'was', instances: slots(99) }, { preset: 'bastion', instances: slots(last) }] }] });
+    const ok = await wizard(plan(1));
+    expect(ok.res.status).toBe(200);
+    expect((await json(ok.res)).data.gcp.items).toHaveLength(200);
+    const over = await wizard(plan(2));
+    expect(over.res.status).toBe(400);
+    expect((await json(over.res)).errors).toEqual([{ code: 'wizard.too_many_names', params: { max: 200, actual: 201 }, message: expect.any(String) }]);
+  });
+
+  it('틀린 모양은 500 이 아니라 400 — services:x · picks:x · services:[null] · attach:x · instances:x', async () => {
+    for (const body of [
+      { ...W, services: 'x' }, { ...W, services: [{ purpose: 'shop', picks: 'x' }] }, { ...W, services: [null] },
+      { ...W, services: [vm('shop', 'x' as unknown as object)] }, { ...W, services: [{ purpose: 'shop', picks: [{ preset: 'web', instances: 'x' }] }] },
+      { ...W, project: [] }, [W], { ...W, project_picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { data: 'x' } }] }] },
+    ]) {
+      const { res } = await wizard(body);
+      expect(res.status, JSON.stringify(body).slice(0, 100)).toBe(400);
+    }
+    const { res } = await req(app, '/v1/wizard', { method: 'POST', body: 'not json' });
+    expect(res.status).toBe(400);
+  });
+
+  it('텔레메트리 api_wizard — provider · 서비스 수 · pick 수 · 이름 수 · valid 만 · 문맥값 · 서비스 이름 없음 · 응답을 기다리지 않는다', async () => {
+    const { kv, store } = fakeKv();
+    const axiom = vi.fn((_url: string, _init: { body: string }) => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve('{}') }));
+    vi.stubGlobal('fetch', axiom);
+    try {
+      const { res, promises } = await wizard(W, { CLOUDONYM_KV: kv, AXIOM_API_KEY: 'k', AXIOM_DATASET: 'd' });
+      expect(res.status).toBe(200);
+      expect(promises).toHaveLength(1);
+      await promises[0];
+      expect([...store.keys()][0]).toMatch(/^stats:api_wizard:/);
+      const sent = JSON.parse(axiom.mock.calls[0]![1].body)[0];
+      expect(sent).toMatchObject({ event: 'api_wizard', provider: 'gcp', service_count: 2, resource_count: 7, name_count: 14, valid: true });
+      const raw = JSON.stringify(sent);
+      for (const v of ['platform', 'billing', 'shop', 'pay', 'asia-northeast3']) expect(raw, v).not.toContain(v);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe('/v1/names 는 그대로 — 마법사 필드를 보내도 옛 응답과 같다', () => {
+  it('tier · instances · level · attach 를 실어도 같은 응답', async () => {
+    const base = { provider: 'gcp', context: ctx, resources: [{ type: 'compute_instance', count: 2 }] };
+    const extra = { ...base, resources: [{ type: 'compute_instance', count: 2, tier: 'web', level: 'project', instances: [{ seq: '05' }], attach: { boot: true } }] };
+    const a = await json((await req(app, '/v1/names', jsonPost(base))).res);
+    const b = await json((await req(app, '/v1/names', jsonPost(extra))).res);
+    expect(b).toEqual(a);
+    expect(a.data.gcp.items.map((i: Loose) => i.key)).toEqual(['compute_instance_01', 'compute_instance_02']);
   });
 });

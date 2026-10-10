@@ -4,10 +4,10 @@ import { cors } from 'hono/cors';
 import { bodyLimit } from 'hono/body-limit';
 import { every, except } from 'hono/combine';
 import type { App } from './env';
-import { generate, generateMany, validateName } from '../core/engine';
+import { generate, generateMany, generateProject, validateName } from '../core/engine';
 import { labelsFor } from '../core/labels';
-import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody } from './schemas';
-import { toWireGenerate, toWireNames, toWireValidate, type ProviderResult } from './serialize';
+import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody } from './schemas';
+import { toWireGenerate, toWireNames, toWireValidate, toWireWizard, type ProviderResult } from './serialize';
 import { logTelemetry } from './telemetry';
 import { fail, internalError } from './errors';
 import { VERSION } from '../version';
@@ -71,6 +71,21 @@ v1.post('/names', async (c) => {
   // 문맥값은 싣지 않는다 (D17)
   c.executionCtx.waitUntil(logTelemetry(c, 'api_names', { provider, resource_count: items.length, name_count: out.items.length, valid: out.valid }));
   return c.json(toWireNames(out, items.map((i) => i.rule), labelsFor(context, provider), transformed, VERSION));
+});
+
+// 마법사 (D66) — 프로젝트 한 번의 구성(프로젝트 공용 + 서비스마다)을 구조 키로. 항목 FAIL · 충돌도 200 이고 valid:false 와 이유를 싣는다.
+// 다시 받는 길은 같은 요청에 응답의 version.rules 를 rules_version 으로 넣는 것이다(D27) — /v1/names 로 재현하지 않는다
+v1.post('/wizard', async (c) => {
+  const read = await readJson(c);
+  if (!read.ok) return notJson(c);
+  const parsed = parseWizardBody(read.body);
+  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
+  const { provider, selection, transformed, labelContexts, pickCount } = parsed.value;
+  const out = generateProject(selection, provider);
+  const labels = labelContexts.map(({ namespace, context }) => ({ namespace, labels: labelsFor(context, provider) }));
+  // 문맥값 · 서비스 이름은 싣지 않는다 (D17 · D56)
+  c.executionCtx.waitUntil(logTelemetry(c, 'api_wizard', { provider, service_count: selection.services.length, resource_count: pickCount, name_count: out.items.length, valid: out.valid }));
+  return c.json(toWireWizard(out, labels, transformed, VERSION));
 });
 
 v1.post('/validate', async (c) => {

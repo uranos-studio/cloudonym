@@ -3,7 +3,9 @@ import Ajv from 'ajv';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
-import { req, jsonPost, json, collectSamples, type Sample } from './test-support';
+import { req, jsonPost, json, collectSamples, WIZARD_WIRE_SAMPLE, type Sample } from './test-support';
+import { MAX_SERVICES } from '../core/wizard/plan';
+import { PRESETS } from '../core/wizard/presets';
 import { VERSION } from '../version';
 import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
@@ -85,16 +87,16 @@ describe('public/openapi.json — 형식', () => {
     const ruleSpec = providerSchema.properties!['rows']!.items!.properties!['rules']!.additionalProperties as Schema;
     expect(ruleSpec.properties!['regionToken']!.enum).toEqual(['none', 'region']);
   });
-  it('여섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
-    expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/validate']);
+  it('일곱 경로 — generate · names · validate · wizard 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
+    expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/validate', '/wizard']);
     // servers 가 /v1 이라 /catalog.json 은 경로 단위로 뿌리 서버를 덮어써야 /v1/catalog.json 으로 읽히지 않는다
     expect(spec.paths['/catalog.json']!.servers).toEqual([expect.objectContaining({ url: '/' })]);
     expect(keys(spec.paths['/catalog.json']!.get!.responses)).toEqual(['200', '429', '500']);
-    for (const p of ['/events', '/generate', '/health', '/names', '/validate']) expect(spec.paths[p]!.servers, p).toBeUndefined();
-    for (const p of ['/generate', '/names', '/validate']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
+    for (const p of ['/events', '/generate', '/health', '/names', '/validate', '/wizard']) expect(spec.paths[p]!.servers, p).toBeUndefined();
+    for (const p of ['/generate', '/names', '/validate', '/wizard']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
     expect(keys(spec.paths['/events']!.post!.responses)).toEqual(['200', '400', '403', '413', '429', '500']);
     expect(keys(spec.paths['/health']!.get!.responses)).toEqual(['200', '500']);
-    for (const p of ['/events', '/generate', '/names', '/validate']) {
+    for (const p of ['/events', '/generate', '/names', '/validate', '/wizard']) {
       const r429 = spec.paths[p]!.post!.responses['429'] as { headers?: Record<string, { schema: Schema }> };
       expect(r429.headers?.['Retry-After']?.schema.type, p).toBe('integer');
     }
@@ -174,6 +176,40 @@ describe('public/openapi.json — /names (D39)', () => {
   });
 });
 
+describe('public/openapi.json — /wizard (D66)', () => {
+  const req0 = () => schemas['WizardRequest']! as Schema & { properties: Record<string, Schema & { maxItems?: number }> };
+  it('WizardRequest — provider enum · project 넷(purpose 없음) · 길이 상한 · services 최대 20 · wire 이름(project_picks · rule)', () => {
+    const r = req0();
+    expect(r.required!.sort()).toEqual(['project', 'provider']);
+    expect(r.properties['provider']!.enum).toEqual([...ENABLED_PROVIDERS]);
+    const project = r.properties['project']!;
+    expect(keys(project.properties!)).toEqual(['env', 'owner', 'region', 'system']);
+    for (const f of ['owner', 'system']) expect(project.properties![f]!.maxLength, f).toBe(MAX_CONTEXT_CHARS);
+    for (const f of ['env', 'region']) expect(project.properties![f]!.maxLength, f).toBe(1024);
+    expect(r.properties['services']!.maxItems).toBe(MAX_SERVICES);
+    expect(r.properties['services']!.items!.properties!['purpose']!.maxLength).toBe(MAX_CONTEXT_CHARS);
+    expect(r.properties['project_picks']!.items!.$ref).toBe('#/components/schemas/WizardPick');
+    const pick = schemas['WizardPick']!.properties!;
+    expect(keys(pick)).toEqual(['ha', 'instances', 'kind', 'preset', 'role', 'rule', 'serverless', 'tier']);
+    expect(pick['preset']!.description).toContain(PRESETS.map((x) => x.id).join(', '));
+    expect(r.properties['rules_version']!.maxLength).toBe(1024);
+  });
+  it('WizardItem — NameItem 의 키 전부(key 설명만 구조 키) + namespace · level · tier · parent · attach · NameItem 은 그대로', () => {
+    // 다른 시험이 scope enum 을 제자리 정렬하므로 파일을 새로 읽어 비교한다
+    const fresh = (JSON.parse(readFileSync(join(import.meta.dirname, '../../public/openapi.json'), 'utf-8')) as Spec).components.schemas;
+    const w = fresh['WizardItem']!.properties!;
+    for (const k of Object.keys(fresh['NameItem']!.properties!)) if (k !== 'key') expect(w[k], k).toEqual(fresh['NameItem']!.properties![k]);
+    expect(w['key']!.description).toMatch(/structured key/i);
+    expect(w['attach']!.enum).toEqual(['boot', 'data', 'ip', 'ipi']);
+    expect(w['level']!.enum).toEqual(['project']);
+    expect(schemas['NameItem']!.properties!['namespace']).toBeUndefined();
+  });
+  it('example 요청 = 대표 표본 · info 설명이 /wizard 를 말한다', () => {
+    expect(exampleOf('/wizard')).toEqual(WIZARD_WIRE_SAMPLE);
+    expect(spec.info.description).toContain('/wizard');
+  });
+});
+
 describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다 (ajv · D25)', () => {
   // OpenAPI 3.0 의 example 키워드 때문에 strict:false. 명세 전체를 한 스키마로 넣고 #/components/schemas/X 를 그 안에서 찾는다
   const ajv = new Ajv({ strict: false, allErrors: true });
@@ -239,6 +275,16 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     expect(conflict.conflicts).toHaveLength(1);
   });
 
+  it('wizard 표본 — 정상 · 고정 · 충돌 · 400 넷 이상 · 409 · 요청 본문도 WizardRequest 에 맞는다', () => {
+    const ids = samples.filter((x) => x.path === '/v1/wizard').map((x) => `${x.id} ${x.status}`);
+    expect(ids).toEqual(expect.arrayContaining(['wizard-ok 200', 'wizard-pinned-current 200', 'wizard-conflict 200', '400-wizard-attach-data 400', '400-wizard-empty 400', '409-wizard-rules-version 409']));
+    expect(samples.find((x) => x.id === 'wizard-ok')!.body.data.gcp.items).toHaveLength(14);
+    expect(samples.find((x) => x.id === 'wizard-conflict')!.body.data.gcp.valid).toBe(false);
+    expect(validatorFor('WizardRequest')(WIZARD_WIRE_SAMPLE)).toBe(true);
+    expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, extra: 1 })).toBe(false);
+    expect(validatorFor('WizardResponse')({ ...samples.find((x) => x.id === 'wizard-ok')!.body, extra: 1 })).toBe(false);
+  });
+
   it('events 표본 — ui_copy 여섯 target 은 200 · target 이 없거나 모르는 값이면 400 · 요청 본문은 EventRequest 에 맞는다 (D56)', () => {
     for (const t of UI_COPY_TARGETS) {
       const x = samples.find((s) => s.id === `events-ui-copy-${t}`);
@@ -295,6 +341,9 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     const n = await json((await req(app, '/v1/names', jsonPost(exampleOf('/names')))).res);
     expect(validatorFor('NamesResponse')(n)).toBe(true);
     expect(n.data.gcp.valid).toBe(true);
+    const w = await json((await req(app, '/v1/wizard', jsonPost(exampleOf('/wizard')))).res);
+    expect(validatorFor('WizardResponse')(w)).toBe(true);
+    expect(w.data.gcp.items).toHaveLength(14);
     const v = await json((await req(app, '/v1/validate', jsonPost(exampleOf('/validate')))).res);
     expect(validatorFor('ValidateResponse')(v)).toBe(true);
     expect(v.suggested_name).toBeDefined();

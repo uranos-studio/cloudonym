@@ -79,6 +79,27 @@ export interface Sample { id: string; method: 'GET' | 'POST'; path: string; stat
 
 const SAMPLE_CTX = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
 
+/** POST /v1/wizard 의 대표 요청 (D66) — 프로젝트 네트워크 넷 · shop(web VM + boot · data 01 · ip, Cloud SQL) · pay(web HA 서버 둘 · boot 둘). 응답 항목 14 */
+export const WIZARD_WIRE_SAMPLE = {
+  provider: 'gcp',
+  project: { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3-a' },
+  project_picks: [
+    { preset: 'vpc', instances: [{ id: 'a', seq: '01' }] },
+    { preset: 'subnet', instances: [{ id: 'b', seq: '01' }] },
+    { preset: 'firewall', tier: 'ssh', instances: [{ id: 'c', seq: '01' }] },
+    { preset: 'firewall', tier: 'web', instances: [{ id: 'd', seq: '01' }] },
+  ],
+  services: [
+    { purpose: 'shop', picks: [
+      { preset: 'web', instances: [{ id: 'e', seq: '01', attach: { boot: true, data: ['01'], ip: true } }] },
+      { preset: 'db', kind: 'POSTGRES', instances: [{ id: 'f', seq: '01' }] },
+    ] },
+    { purpose: 'pay', picks: [
+      { preset: 'web', ha: true, instances: [{ id: 'g', seq: '01', attach: { boot: true } }, { id: 'h', seq: '02', attach: { boot: true } }] },
+    ] },
+  ],
+} as const;
+
 /**
  * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 16KB · 403 · 429(v1 · /llms.txt) ·
  * rules_version 409 · 400 · 500 · validate 무효/유효 · names(정상 · 항목 FAIL · Name 태그 · 충돌 · 종류 · selection.* 400 · 409) · health. 입력이 ASCII 라 응답의 한글은 전부 시스템 문구다(면제가 필요 없다)
@@ -139,6 +160,20 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await names('400-names-kind-required', pick([{ type: 'cloud_sql_instance', kind: 'POSTGRES' }, { type: 'resource_policy' }]));
   await names('400-names-kind-not-supported', pick([{ type: 'vpc_network', kind: 'PRIVATE' }]));
   await names('409-names-rules-version', { ...pick([{ type: 'project_id' }]), rules_version: '2026-01-01.1' });
+  // 마법사 (D66) — 정상 14 · 고정 규칙 버전 · 항목 FAIL(충돌) · 400(경로 field · 모델 전체 · 문맥 접두) · 409
+  const wiz = (id: string, body: unknown) => add(id, 'POST', '/v1/wizard', jsonPost(body));
+  const W = WIZARD_WIRE_SAMPLE;
+  await wiz('wizard-ok', W);
+  await wiz('wizard-pinned-current', { ...W, rules_version: rulesVersion });
+  await wiz('wizard-conflict', { ...W, project_picks: [], services: [{ purpose: 'shop', picks: [
+    { preset: null, rule: 'gcp.cloud_function', instances: [{ id: 'a', seq: '01' }] }, { preset: null, rule: 'gcp.cloud_function_gen1', instances: [{ id: 'a', seq: '01' }] }] }] });
+  await wiz('400-wizard-attach-data', { ...W, services: [], project_picks: [{ preset: null, rule: 'gcp.compute_instance', instances: [{ id: 'a', seq: '01', attach: { data: ['01', '00'] } }] }] });
+  await wiz('400-wizard-empty', { ...W, project_picks: [], services: [] });
+  await wiz('400-wizard-too-many-picks', { ...W, project_picks: Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] })), services: [] });
+  await wiz('400-wizard-project-context', { ...W, project: { ...W.project, env: 'qa' } });
+  await wiz('400-wizard-unknown-rule', { ...W, services: [{ purpose: 'shop', picks: [{ preset: null, rule: 'gcp.nope' }] }] });
+  await wiz('400-wizard-provider-not-enabled', { ...W, provider: 'aws' });
+  await wiz('409-wizard-rules-version', { ...W, rules_version: '2026-01-01.1' });
   await val('validate-invalid-too-long', { provider: 'gcp', resource_type: 'service_account', name: 'platform-billing-trade-prod-kr-sa-sync' });
   await val('validate-invalid-goog', { provider: 'gcp', resource_type: 'storage_bucket', name: 'goog-billing' });
   await val('validate-invalid-many', { provider: 'gcp', resource_type: 'storage_bucket', name: 'google-192.168.0.1' });

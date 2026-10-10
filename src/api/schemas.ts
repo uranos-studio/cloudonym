@@ -1,7 +1,8 @@
 // 요청 본문 검증 — 모양(shape)만 본다. 값의 뜻은 엔진(parseContext · rulesFor)이 판정한다. 의존성 추가 없음(수작업 타입 가드)
-import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type ProjectContext, type Provider, type RawContext } from '../core/types';
 import { rulesFor } from '../core/constraints';
-import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
+import { MAX_CONTEXT_CHARS, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection } from '../core/engine';
+import { expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
 import type { CoreMessage } from '../core/messages';
@@ -16,6 +17,11 @@ export type Parsed<T> = { ok: true; value: T } | { ok: false; rejection: Rejecti
 /** contexts — 지역을 CSP 마다 풀어(D49) provider 마다 문맥 하나. transformed 는 provider 순서로 모은 것(같은 기록은 한 번) */
 export interface GenerateInput { contexts: Partial<Record<Provider, NamingContext>>; transformed: CoreMessage[]; providers: Provider[] }
 export interface NamesInput { provider: Provider; context: NamingContext; transformed: CoreMessage[]; items: SelectionItem[] }
+/** POST /v1/wizard (D66) — 펼친 선택 · 문맥 정규화 기록 · 라벨을 만들 문맥(이름공간마다) · 텔레메트리용 pick 수 */
+export interface WizardInput {
+  provider: Provider; selection: ProjectSelection; transformed: CoreMessage[];
+  labelContexts: { namespace: string; context: NamingContext | ProjectContext }[]; pickCount: number;
+}
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
 export type UiEvent = (typeof UI_EVENTS)[number];
@@ -207,4 +213,116 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
     return reject(errors, unknownType ? rulesFor(provider).map((r) => r.resourceType) : undefined);
   }
   return { ok: true, value: { provider, context: parsed.context, transformed: parsed.transformed, items: selection.items } };
+}
+
+/** 모델 경로의 이름 → 요청 본문의 이름 (§5-5 표) — 표에 없는 글자는 같다 */
+export const WIRE_PATH_NAMES: Readonly<Record<string, string>> = { projectPicks: 'project_picks', ruleId: 'rule' };
+
+/** validatePlan 의 path(모델 표기)를 응답 field(요청 본문 표기)로 — `projectPicks[0].instances[0]` → `project_picks[0].instances[0]` */
+export function toWirePath(path: string): string {
+  return path.replace(/[A-Za-z_]+/g, (seg) => (Object.hasOwn(WIRE_PATH_NAMES, seg) ? WIRE_PATH_NAMES[seg]! : seg));
+}
+
+/** pick 하나의 문자열 칸 상한 — field 는 wire 경로. 객체가 아니면 여기서 보지 않는다(validatePlan 이 본다) */
+function pickTooLong(p: unknown, base: string): ApiMessage[] {
+  if (!isRecord(p)) return [];
+  const own = tooLong(Object.fromEntries(['preset', 'rule', 'tier', 'role', 'kind', 'serverless'].map((k) => [`${base}.${k}`, p[k]])));
+  const slots = Array.isArray(p.instances) ? (p.instances as unknown[]) : [];
+  return [...own, ...slots.flatMap((s, k) => {
+    if (!isRecord(s)) return [];
+    const at = `${base}.instances[${k}]`;
+    const data = isRecord(s.attach) && Array.isArray(s.attach.data) ? (s.attach.data as unknown[]) : [];
+    return [...tooLong({ [`${at}.id`]: s.id, [`${at}.seq`]: s.seq }), ...data.flatMap((d, i) => tooLong({ [`${at}.attach.data[${i}]`]: d }))];
+  })];
+}
+
+/** 요청 본문 pick → 모델 Pick — 아는 칸만 옮긴다(rule → ruleId). preset 이 없으면 custom(null). 객체가 아니면 그대로 넘겨 validatePlan 이 거부한다 */
+function toModelPick(p: unknown): unknown {
+  if (!isRecord(p)) return p;
+  const out: Record<string, unknown> = { preset: p.preset === undefined ? null : p.preset };
+  if (p.rule !== undefined) out.ruleId = p.rule;
+  for (const k of ['tier', 'role', 'kind', 'ha', 'serverless', 'instances']) if (p[k] !== undefined) out[k] = p[k];
+  return out;
+}
+
+/** 목록 칸 — 없으면 빈 목록, 배열이면 칸마다 바꾸고, 배열이 아니면 그대로(validatePlan 의 selection.not_array) */
+function listOf(v: unknown, map: (x: unknown) => unknown): unknown {
+  if (v === undefined) return [];
+  return Array.isArray(v) ? v.map(map) : v;
+}
+
+/** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,
+ *  모델 전체 오류는 field 없음. 되돌리는 사용자 값(value)은 다른 요청 오류처럼 80자 · 보이지 않는 문자 표시 */
+function toApiError(e: PlanError): Message {
+  const { path, ...m } = e;
+  const p: unknown = 'params' in m ? m.params : undefined;
+  const params = isRecord(p) && typeof p.value === 'string' ? { params: { ...p, value: describe(p.value) } } : {};
+  if (path !== undefined) return { ...m, ...params, field: toWirePath(path) } as Message;
+  if (m.code.startsWith('context.') && 'field' in m) return { ...m, ...params, field: `project.${m.field}` } as Message;
+  return { ...m, ...params } as Message;
+}
+
+/** POST /v1/wizard (D66) — 모양 · 길이는 여기, 마법사 검사는 core validatePlan 하나, 서비스마다 문맥(purpose 포함)은 parseContext */
+export function parseWizardBody(body: unknown): Parsed<WizardInput> {
+  if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
+  const pin = checkRulesVersion(body);
+  if (pin) return pin;
+  const { provider } = body;
+  const longProvider = tooLong({ provider });
+  if (longProvider.length > 0) return reject(longProvider);
+  const badProvider = providerError(provider, 'provider');
+  if (badProvider || !isProvider(provider)) return reject(badProvider ? [badProvider] : [], enabledList());
+  const project = body.project;
+  if (!isRecord(project)) return reject([{ code: 'request.context_not_object' }]);
+
+  // 전송 위생 — 문맥 넷 · purpose · pick 의 문자열. 엔진까지 보내지 않는다
+  const services = Array.isArray(body.services) ? (body.services as unknown[]) : [];
+  const projectPicks = Array.isArray(body.project_picks) ? (body.project_picks as unknown[]) : [];
+  const long = [
+    ...tooLong({ 'project.owner': project.owner, 'project.system': project.system }, MAX_CONTEXT_CHARS),
+    ...tooLong({ 'project.env': project.env, 'project.region': project.region }),
+    ...projectPicks.flatMap((p, j) => pickTooLong(p, `project_picks[${j}]`)),
+    ...services.flatMap((s, i) => (isRecord(s) ? [
+      ...tooLong({ [`services[${i}].purpose`]: s.purpose }, MAX_CONTEXT_CHARS),
+      ...(Array.isArray(s.picks) ? (s.picks as unknown[]).flatMap((p, j) => pickTooLong(p, `services[${i}].picks[${j}]`)) : []),
+    ] : [])),
+  ];
+  if (long.length > 0) return reject(long);
+
+  const raw = { owner: project.owner, system: project.system, env: project.env, region: project.region };
+  const plan = {
+    provider, project: raw,
+    projectPicks: listOf(body.project_picks, toModelPick),
+    services: listOf(body.services, (s) => (isRecord(s) ? { purpose: s.purpose, picks: listOf(s.picks, toModelPick) } : s)),
+  } as unknown as WizardPlan;
+  const checked = validatePlan(plan);
+  if (!checked.ok) {
+    const unknownType = checked.errors.some((m) => m.code === 'selection.unknown_type');
+    return reject(checked.errors.map(toApiError), unknownType ? rulesFor('gcp').map((r) => r.id) : undefined);
+  }
+
+  // 서비스마다 다섯 값 문맥 — 프로젝트 넷은 이미 지났으므로 오류는 purpose 의 것이다(field services[i].purpose)
+  const proj = parseProjectContext(raw, provider);
+  if (!proj.ok) return reject(proj.errors.map((e) => toApiError(e)));
+  const transformed: CoreMessage[] = [];
+  const addOnce = (ms: readonly CoreMessage[]) => {
+    for (const m of ms) if (!transformed.some((x) => JSON.stringify(x) === JSON.stringify(m))) transformed.push(m);
+  };
+  addOnce(proj.transformed);
+  const labelContexts: WizardInput['labelContexts'] = [{ namespace: 'project', context: proj.context }];
+  const errors: Message[] = [];
+  plan.services.forEach((s, i) => {
+    const r = parseContext({ ...raw, purpose: s.purpose }, provider);
+    if (!r.ok) {
+      errors.push(...r.errors.map((e) => ('field' in e ? { ...e, field: e.field === 'purpose' ? `services[${i}].purpose` : `project.${e.field}` } : e) as Message));
+      return;
+    }
+    addOnce(r.transformed);
+    labelContexts.push({ namespace: serviceNamespace(s.purpose), context: r.context });
+  });
+  if (errors.length > 0) return reject(errors);
+
+  const selection = expandPlan(plan);
+  const pickCount = plan.projectPicks.length + plan.services.reduce((n, s) => n + s.picks.length, 0);
+  return { ok: true, value: { provider, selection, transformed, labelContexts, pickCount } };
 }

@@ -193,6 +193,7 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
       api_generate: { providers: ['gcp'] },
       api_names: { provider: 'gcp', resource_count: 2, name_count: 3, valid: true },
       api_validate: { provider: 'gcp', resource_type: 'project_id', valid: false },
+      api_wizard: { provider: 'gcp', service_count: 2, resource_count: 7, name_count: 14, valid: true },
     };
     for (const event of [...Object.keys(META_KEYS), 'unknown_event']) {
       const { fetchFn, calls } = fakeFetch();
@@ -201,10 +202,18 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
       expect(Object.keys(row!).sort(), event).toEqual([...COMMON, ...(META_KEYS[event] ?? [])].sort());
     }
   });
+  it('api_wizard — 서비스 이름 · 문맥값을 meta 로 넘겨도 싣지 않는다 (D17 · D56)', async () => {
+    const { fetchFn, calls } = fakeFetch();
+    await logTelemetry(source(env), 'api_wizard', { provider: 'gcp', service_count: 1, resource_count: 1, name_count: 2, valid: true, services: ['shop'], purpose: 'shop', project: { owner: 'example-team' } }, { now: NOW, fetchFn });
+    const body = calls[0]!.init.body;
+    expect(body).not.toContain('shop');
+    expect(body).not.toContain('example-team');
+  });
   it('허용 표는 D56 의 필드 표와 같다', () => {
     expect(META_KEYS).toEqual({
       ui_visit: [], ui_generate: [], ui_copy: ['target'],
       api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
+      api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid'],
       llms_txt_accessed: [], catalog_json_accessed: [],
     });
   });

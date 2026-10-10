@@ -293,6 +293,7 @@ export const en: Catalog = {
     privacy_when_api_generate: 'A call to POST /v1/generate',
     privacy_when_api_names: 'A call to POST /v1/names',
     privacy_when_api_validate: 'A call to POST /v1/validate',
+    privacy_when_api_wizard: 'A call to POST /v1/wizard',
     privacy_when_llms_txt_accessed: 'A request for /llms.txt',
     privacy_when_catalog_json_accessed: 'A request for /catalog.json',
     privacy_target_note: 'target says which button was used ({targets}), never what was copied.',
