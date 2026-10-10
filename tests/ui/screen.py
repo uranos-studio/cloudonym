@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68)의 ㉚~㊲ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -8,6 +8,8 @@
 실행(저장소 루트) — 터미널 둘:
   ① npm run dev -- --host 127.0.0.1 --port 5199 --strictPort
   ② uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://127.0.0.1:5199 docs/screenshots
+  ③ 같은 트리 시나리오를 /pick 경로의 hash 로 — 스크린샷은 버릴 폴더에:
+     uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://127.0.0.1:5199 <임시 폴더> /pick
 
 ①이 뜬 뒤(`curl -s http://127.0.0.1:5199/v1/health` → {"ok":true}) ②를 돌리고, 끝나면 ①을 멈춘다.
 500행 성능 측정은 tests/ui/perf.py 다(같은 서버).
@@ -26,6 +28,11 @@ from playwright.sync_api import Error, expect, sync_playwright
 
 BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
+# 옛 hash 링크를 여는 경로 (D68) — 기본은 뿌리 `/`(이미 나간 링크 그대로), 셋째 인자로 `/pick` 을 주면 같은 시나리오를 트리 경로에서 돈다.
+# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊲ 는 뿌리 패스에서만 돈다
+HB = sys.argv[3] if len(sys.argv) > 3 else '/'
+assert HB in ('/', '/pick'), HB
+TREE = '/pick'
 OUT.mkdir(parents=True, exist_ok=True)
 
 # ⑴ 의 입력 — 기본값(platform · billing · trade · asia-northeast3)과 달라야 시험이 공허하지 않다. SA 원본 40자 → region 생략 → owner 생략 (엔진 실측)
@@ -195,6 +202,230 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
+# ── 마법사 (D59 · D64 · D67 · D68) — ㉚~㊲ ──
+# 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
+W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
+
+
+def wizard_names(page, body):
+    res = page.request.post(BASE + '/v1/wizard', data={'provider': 'gcp', 'project': W_PROJECT, **body})
+    assert res.status == 200, res.text()
+    return [(i['key'], i['name'], i['valid']) for i in res.json()['data']['gcp']['items']]
+
+
+def screen_names(page):
+    """⑥ 의 카드 — (key, 이름, PASS 여부)"""
+    out = []
+    for card in page.locator('#names article[data-key]').all():
+        out.append((card.get_attribute('data-key'), card.locator('[data-name]').inner_text(), card.get_attribute('data-valid') == 'true'))
+    return [(k, '' if n == '—' else n, v) for k, n, v in out]
+
+
+def svc(page, i):
+    return page.locator(f'[data-service="{i}"]')
+
+
+def slot(page, service, k):
+    return svc(page, service).locator('li[data-slot]').nth(k)
+
+
+def open_attached(row_):
+    d = row_.locator('details[data-attached]')
+    if d.get_attribute('open') is None:
+        d.locator('summary').click()
+
+
+def fill_project(page):
+    page.fill('#wizard-owner', W_PROJECT['owner'])
+    page.fill('#wizard-system', W_PROJECT['system'])
+
+
+def wizard_scenarios(browser, rules_version, errors):
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    ctx.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
+    page = ctx.new_page()
+    page.on('pageerror', lambda e: errors.append(str(e)))
+
+    # ── ㉚ 뿌리 · hash 없음 → 마법사. 칩을 켜기 전에는 이름이 없다. 서비스 둘 · 서버 1 은 boot + data 1 · 서버 2 는 boot 만 → 여섯 이름 ──
+    goto_ready(page, BASE + '/')
+    expect(page.locator('[data-wizard]')).to_be_visible()
+    expect(page.locator('[data-tree]')).to_have_count(0)
+    expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
+    expect(page.locator('[data-names-empty]')).to_have_text('Pick what runs in a service (or a project resource) to see names here.')
+    expect(page.locator('[data-wizard-notice]')).to_have_count(0)
+    fill_project(page)
+    expect(page.locator('[data-project-id]')).to_have_text('devops-payments-prod')
+    expect(page.locator('[data-common-parts] code')).to_have_text(['payments', 'prod', 'ane3'])
+    svc(page, 0).locator('[data-service-name]').fill('shop')
+    svc(page, 0).locator('[data-purpose-chip="web"]').click()
+    expect(svc(page, 0).locator('[data-purpose-chip="web"]')).to_have_attribute('aria-pressed', 'true')
+    page.click('[data-add-service]')
+    svc(page, 1).locator('[data-service-name]').fill('pay')
+    svc(page, 1).locator('[data-purpose-chip="web"]').click()
+    s1 = slot(page, 0, 0)
+    open_attached(s1)
+    s1.locator('[data-attach="boot"]').check()
+    s1.locator('[data-add-disk]').click()
+    s2 = slot(page, 1, 0)
+    open_attached(s2)
+    s2.locator('[data-attach="boot"]').check()
+    expected = wizard_names(page, {'services': [
+        {'purpose': 'shop', 'picks': [{'preset': 'web', 'instances': [{'id': '1', 'seq': '01', 'attach': {'boot': True, 'data': ['01']}}]}]},
+        {'purpose': 'pay', 'picks': [{'preset': 'web', 'instances': [{'id': '1', 'seq': '01', 'attach': {'boot': True}}]}]},
+    ]})
+    assert len(expected) == 6, expected
+    expect(page.locator('#names article[data-key]')).to_have_count(6)
+    assert screen_names(page) == expected, (screen_names(page), expected)
+    expect(page.locator('[data-names-summary]')).to_have_text('6 names · 6/6 PASS')
+    # 자식은 부모 아래 들여쓰기 · 「attached to」 줄 · 제목 VM Instance · web · 01
+    expect(page.locator('#names [data-child]')).to_have_count(3)
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/01"] h4')).to_have_text('VM Instance · web · 01')
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/01/data/01"] [data-parent]')).to_contain_text('attached to')
+    expect(page.locator('[data-names-group]')).to_have_count(3)
+    no_hangul(page)
+    page.evaluate('window.scrollTo(0, 0)')
+    page.screenshot(path=str(OUT / '06-wizard.png'), full_page=True)
+
+    # 내보내기 — JSON 은 구조 키 · Terraform 은 맵 하나
+    page.click('[data-copy="names-json"]')
+    exported = json.loads(page.evaluate('navigator.clipboard.readText()'))
+    assert [n['key'] for n in exported['names']] == [k for k, _, _ in expected], exported['names']
+    assert exported['project'] == {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'ane3'}, exported['project']
+    page.click('[data-copy="terraform"]')
+    hcl = page.evaluate('navigator.clipboard.readText()')
+    assert '  gcp_names = {\n' in hcl and '"service/shop/compute_instance/web/01/data/01" = "' in hcl and 'gcp_labels_by_namespace' in hcl, hcl
+
+    # ── ㉟ Share URL 왕복 — shop 에 서버 02 를 더하고(ip) 01 을 지운 뒤에도 02 의 이름 · 딸린 것이 그대로 ──
+    svc(page, 0).locator('[data-add-slot]').click()
+    s02 = slot(page, 0, 1)
+    open_attached(s02)
+    s02.locator('[data-attach="ip"]').check()
+    name02 = page.locator('#names article[data-key="service/shop/compute_instance/web/02"] [data-name]').inner_text()
+    slot(page, 0, 0).locator('[data-remove-slot]').click()
+    expect(svc(page, 0).locator('li[data-slot]')).to_have_count(1)
+    expect(slot(page, 0, 0)).to_have_attribute('data-seq', '02')
+    expect(svc(page, 0).locator('[data-renumber]')).to_be_visible()
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/02"] [data-name]')).to_have_text(name02)
+    page.click('[data-copy="share-url"]')
+    shared = page.evaluate('navigator.clipboard.readText()')
+    assert shared.startswith(BASE + '/#state='), shared
+    body = hash_state(shared)
+    assert 'w' in body and 'purpose' not in body and body['v'] == rules_version, body
+    before = screen_names(page)
+    ctx35 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p35 = ctx35.new_page()
+    p35.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p35, shared)
+    expect(p35.locator('[data-wizard]')).to_be_visible()
+    expect(p35.locator('#names article[data-key]')).to_have_count(len(before))
+    assert screen_names(p35) == before, (screen_names(p35), before)
+    expect(slot(p35, 0, 0)).to_have_attribute('data-seq', '02')
+    expect(slot(p35, 0, 0).locator('[data-attached-summary]')).to_have_text('ip')
+    assert p35.url == shared, (p35.url, shared)  # 링크로 연 그대로면 hash 를 다시 쓰지 않는다
+    ctx35.close()
+
+    # ── ㉛ HA 토글 → 서버 줄 둘 · 존 분산 안내 한 줄 · 줄 하나 지우면 HA 꺼짐 ──
+    pay = svc(page, 1)
+    pay.locator('[data-ha]').check()
+    expect(pay.locator('li[data-slot]')).to_have_count(2)
+    expect(pay.locator('[data-ha-hint]')).to_have_text('Two servers or more. Place the servers in different zones when you create them.')
+    expect(page.locator('#names article[data-key="service/pay/compute_instance/web/02"]')).to_have_count(1)
+    pay.locator('li[data-slot]').nth(1).locator('[data-remove-slot]').click()
+    expect(pay.locator('[data-ha]')).not_to_be_checked()
+    expect(pay.locator('[data-ha-hint]')).to_have_count(0)
+    # Serverless 를 고르면 HA 토글이 숨고 이름이 Cloud Run 이 된다 · 끄면 돌아온다
+    pay.locator('[data-serverless]').select_option('run')
+    expect(pay.locator('[data-ha]')).to_have_count(0)
+    expect(page.locator('#names article[data-key="service/pay/run_service/web/01"] [data-name]')).to_have_text('payments-pay-prod-ane3-run-web-01')
+    pay.locator('[data-serverless]').select_option('')
+    expect(pay.locator('[data-ha]')).to_have_count(1)
+
+    # ── ㉜ db 칩에는 HA 토글이 없다 · 엔진 select 가 있다 ──
+    pay.locator('[data-purpose-chip="db"]').click()
+    db = pay.locator('[data-pick="db"]')
+    expect(db).to_have_count(1)
+    expect(db.locator('[data-ha]')).to_have_count(0)
+    expect(db.locator('[data-serverless]')).to_have_count(0)
+    expect(db.locator('[data-kind]')).to_have_count(1)
+    for chip in ('bastion', 'file', 'object'):
+        pay.locator(f'[data-purpose-chip="{chip}"]').click()
+        expect(pay.locator(f'[data-pick="{chip}"] [data-ha]')).to_have_count(0)
+    expect(pay.locator('[data-pick="file"] [data-attached-summary]')).to_have_text('data-01')
+
+    # ── ㉝ custom 용도 — 트리를 모달로 열어 한 행을 고르고 tier 를 db 로 → 거부 안내 · 이름 대신 「고칠 칸」 ──
+    svc(page, 0).locator('[data-purpose-chip="custom"]').click()
+    dialog = page.locator('[data-custom-dialog]')
+    expect(dialog).to_be_visible()
+    # 행을 고르면 모달이 닫힌다 — check() 는 체크 상태를 기다리므로 click 으로 고른다
+    row(page, 'compute_instance').locator('input[data-row-check]').click()
+    expect(dialog).to_have_count(0)
+    custom = svc(page, 0).locator('[data-pick="custom"]')
+    expect(custom).to_have_count(1)
+    custom.locator('[data-tier]').fill('db')
+    expect(custom.locator('[data-wizard-error]')).to_contain_text("tier 'db' is reserved")
+    expect(page.locator('[data-names-empty]')).to_have_text('Fix the marked fields to see names.')
+    expect(page.locator('[data-copy="share-url"]')).to_have_count(0)  # 온전하지 않은 모델은 공유하지 않는다
+    # ── ㉞ 자식 넘침 — 부모는 63자에 맞췄지만 -data-01 이 붙으면 넘친다 → 그 자식 카드만 FAIL ──
+    custom.locator('[data-tier]').fill('abcdefghijklmnop')
+    svc(page, 0).locator('[data-service-name]').fill('b' * 20)
+    crow = custom.locator('li[data-slot]').nth(0)
+    open_attached(crow)
+    crow.locator('[data-add-disk]').click()
+    child = page.locator('#names article[data-key$="/compute_instance/abcdefghijklmnop/01/data/01"]')
+    expect(child).to_have_attribute('data-valid', 'false')
+    expect(child.locator('[data-violations]')).to_contain_text('exceeds the limit')
+    expect(page.locator('#names article[data-key$="/compute_instance/abcdefghijklmnop/01"]')).to_have_attribute('data-valid', 'true')
+    no_hangul(page)
+
+    # 폭 360px — 가로 스크롤 없음
+    page.set_viewport_size({'width': 360, 'height': 800})
+    page.wait_for_timeout(200)
+    assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '마법사가 360px 에서 가로 스크롤이 생긴다'
+    ctx.close()
+
+    # ── ㊱ 지금 나간 꼴 그대로의 뿌리 링크(v3 r · 다섯 키)는 트리 화면으로 열린다 · 깨진 뿌리 hash 는 마법사 + 한 줄 안내 ──
+    # ── ㊲ /pick#state=… 도 같다 ──
+    v3 = state_hash(INPUT, rules_version, 'gcp', {'compute_instance': 2})
+    five = state_hash(INPUT)
+    ctx36 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p36 = ctx36.new_page()
+    p36.on('pageerror', lambda e: errors.append(str(e)))
+    for path in ('/', '/pick'):
+        for h in (v3, five):
+            goto_ready(p36, BASE + path + '?r' + h)
+            goto_ready(p36, BASE + path + h)
+            expect(p36.locator('[data-tree]')).to_have_count(1)
+            expect(p36.locator('[data-wizard]')).to_have_count(0)
+            expect_ctx(p36, INPUT)
+            expect(p36.locator('[data-nav-wizard]')).to_have_attribute('href', '/')
+            if h == v3:
+                expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
+                # 뿌리에서 연 옛 링크라도 새 Share URL 은 /pick 이다
+                assert p36.url.startswith(BASE + path + '#state='), p36.url
+    # 같은 탭 — 뿌리의 트리에서 마법사 링크로 이동하면 마법사로 바뀐다
+    goto_ready(p36, BASE + '/' + v3)
+    p36.evaluate('h => { location.hash = h; }', '#' + shared.split('#', 1)[1])
+    expect(p36.locator('[data-wizard]')).to_be_visible()
+    expect(p36.locator('[data-tree]')).to_have_count(0)
+    # 깨진 뿌리 hash → 마법사 + 안내 한 줄 (조용히 버리지 않는다)
+    for broken in ('#state=!!!', '#state=W10'):
+        goto_ready(p36, BASE + '/?b' + broken)
+        goto_ready(p36, BASE + '/' + broken)
+        expect(p36.locator('[data-wizard]')).to_be_visible()
+        expect(p36.locator('[data-wizard-notice]')).to_have_text(['This link could not be opened — the wizard starts with example values.'])
+    # 마법사 링크의 걸린 자리 — 디스크 순번 00 만 버리고 안내 한 줄
+    bad = json.loads(json.dumps(body))
+    bad['w']['s'][0]['p'][0]['i'][0]['a'] = {'b': 1, 'd': ['00']}
+    raw = json.dumps(bad, separators=(',', ':'), ensure_ascii=False)
+    bad_hash = '#state=' + base64.urlsafe_b64encode(raw.encode()).rstrip(b'=').decode()
+    goto_ready(p36, BASE + '/?c' + bad_hash)
+    goto_ready(p36, BASE + '/' + bad_hash)
+    expect(p36.locator('[data-wizard-notice]')).to_have_text(['1 invalid item(s) in this link were left out.'])
+    expect(slot(p36, 0, 0).locator('[data-attached-summary]')).to_have_text('boot')
+    ctx36.close()
+    print('OK — 마법사 시나리오 ㉚~㊲ 통과')
+
+
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     errors = []
@@ -205,7 +436,7 @@ with sync_playwright() as p:
     page = ctx1.new_page()
     page.on('pageerror', lambda e: errors.append(str(e)))
     sent = events_of(page)
-    goto_ready(page, BASE + '/')
+    goto_ready(page, BASE + TREE)
     VERSION = page.request.get(BASE + '/v1/health').json()['version']
     RULES = VERSION['rules']
     assert RULES != OLD_RULES, RULES
@@ -359,6 +590,8 @@ with sync_playwright() as p:
     page.evaluate('window.scrollTo(0, 0)')
     shot(page, '01-desktop-light.png')
     share_url = page.url
+    # 트리의 주소창 · Share URL 은 /pick 이다 (D68)
+    assert share_url.startswith(BASE + TREE + '#state='), share_url
 
     # ── ⑸ 내보내기 셋 + 태그 JSON · 이름 복사 · 공유 URL ──
     page.click('[data-copy="terraform"]')
@@ -557,7 +790,7 @@ with sync_playwright() as p:
         ctx3 = browser.new_context(viewport={'width': 1280, 'height': 900})
         page3 = ctx3.new_page()
         page3.on('pageerror', lambda e: errors.append(str(e)))
-        goto_ready(page3, BASE + '/' + broken)
+        goto_ready(page3, BASE + TREE + broken)
         expect(page3.locator('h1')).to_have_text('Cloudonym')
         expect(page3.locator('#field-owner')).to_have_value('platform')
         expect(page3.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
@@ -632,7 +865,7 @@ with sync_playwright() as p:
     page8.on('pageerror', lambda e: errors.append(str(e)))
     # r 순서를 트리 순서와 다르게 — 같은 선택이면 링크를 연 직후 hash 를 덮어쓰지 않는다
     old_hash = state_hash(INPUT, OLD_RULES, 'gcp', {'compute_instance': 2, 'project_id': 1})
-    goto_ready(page8, BASE + '/' + old_hash)
+    goto_ready(page8, BASE + HB + old_hash)
     notice = page8.locator('[data-rules-mismatch]')
     expect(notice).to_have_text(f'This link was made with rules {OLD_RULES}; the current rules are {RULES}. Names may differ.')
     expect_ctx(page8, INPUT)
@@ -663,8 +896,8 @@ with sync_playwright() as p:
 
     # ── ⒁ 옛 링크(다섯 키만) → 문맥이 열리고 켜진 CSP(GCP)가 자동 선택 · hash 를 덮어쓰지 않는다 ──
     v1_hash = state_hash(INPUT)
-    goto_ready(page8, BASE + '/?' + v1_hash)  # 경로를 바꿔 새로 불러온다
-    goto_ready(page8, BASE + '/' + v1_hash)
+    goto_ready(page8, BASE + HB + '?' + v1_hash)  # 경로를 바꿔 새로 불러온다
+    goto_ready(page8, BASE + HB + v1_hash)
     expect_ctx(page8, INPUT)
     expect(page8.locator('[role="radio"][aria-checked="true"]')).to_have_count(1)
     expect(page8.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
@@ -674,8 +907,8 @@ with sync_playwright() as p:
 
     # ── ⒂ 모르는 type · 종류가 안 맞는 값이 든 링크 → 그 항목만 버리고 한 줄 안내 ──
     odd = state_hash(INPUT, RULES, 'gcp', {'no_such_type': 1, 'compute_instance': 2, 'service_account': 1})
-    goto_ready(page8, BASE + '/?x' + odd)
-    goto_ready(page8, BASE + '/' + odd)
+    goto_ready(page8, BASE + HB + '?x' + odd)
+    goto_ready(page8, BASE + HB + odd)
     expect(page8.locator('[data-selection-dropped]')).to_have_text('This link had 2 resource selections that do not fit the current rules or limits; they were left out.')
     expect(page8.locator('article[data-key]')).to_have_count(2)
     expect(page8.locator('[data-selected-count]')).to_have_text('1 selected')
@@ -684,8 +917,8 @@ with sync_playwright() as p:
 
     # ── ⒄ 지금 버전 링크로 연 뒤 개수 +1 → −1 — 주소창 hash 가 화면의 선택을 따라간다(링크 상태가 남아 hash 쓰기를 막으면 안 된다) ──
     linked = state_hash(INPUT, RULES, 'gcp', {'compute_instance': 2})
-    goto_ready(page8, BASE + '/?y' + linked)
-    goto_ready(page8, BASE + '/' + linked)
+    goto_ready(page8, BASE + HB + '?y' + linked)
+    goto_ready(page8, BASE + HB + linked)
     vm8 = row(page8, 'compute_instance')
     expect(vm8.locator('[data-count]')).to_have_text('2')
     vm8.locator('[data-inc]').click()
@@ -703,7 +936,7 @@ with sync_playwright() as p:
     page18 = ctx18.new_page()
     page18.on('pageerror', lambda e: errors.append(str(e)))
     full = state_hash(INPUT, RULES, 'gcp', {'compute_instance': 2})
-    goto_ready(page18, BASE + '/' + full)
+    goto_ready(page18, BASE + HB + full)
     expect(page18.locator('[data-copy="share-url"]')).to_have_count(1)
     page18.fill('#field-owner', '')
     expect(page18.locator('[data-names-empty]')).to_have_text('Fill in Owner · System · Purpose to generate names.')
@@ -724,7 +957,7 @@ with sync_playwright() as p:
     page19 = ctx19.new_page()
     page19.on('pageerror', lambda e: errors.append(str(e)))
     sel200 = {f'fx500_{i:03d}': ('sync' if i % 4 == 2 else 1) for i in range(200)}  # src/dev/fixtureRules.ts 의 입력 종류 순환
-    goto_ready(page19, BASE + '/?fixture=rules500' + state_hash(INPUT, RULES, 'gcp', sel200))
+    goto_ready(page19, BASE + HB + '?fixture=rules500' + state_hash(INPUT, RULES, 'gcp', sel200))
     expect(page19.locator('[data-selected-count]')).to_have_text('200 selected')
     # 바로 다음 보이는 상자가 비활성이고 그 뒤에 활성 상자가 있는 체크된 행 — 기대값은 그 뒤 첫 활성 상자
     plan = page19.evaluate('''() => {
@@ -748,7 +981,7 @@ with sync_playwright() as p:
     ctx16 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page16 = ctx16.new_page()
     page16.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(page16, BASE + '/?fixture=conflict' + state_hash(INPUT, RULES, 'gcp', {'test_conflict_a': 1, 'test_conflict_b': 1, 'project_id': 1}))
+    goto_ready(page16, BASE + HB + '?fixture=conflict' + state_hash(INPUT, RULES, 'gcp', {'test_conflict_a': 1, 'test_conflict_b': 1, 'project_id': 1}))
     for k in ('test_conflict_a_01', 'test_conflict_b_01'):
         card = page16.locator(f'article[data-key="{k}"]')
         expect(card).to_have_attribute('data-valid', 'false')
@@ -766,7 +999,7 @@ with sync_playwright() as p:
     ctxR.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     pr = ctxR.new_page()
     pr.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pr, BASE + '/' + state_hash(INPUT, RULES, 'gcp'))
+    goto_ready(pr, BASE + HB + state_hash(INPUT, RULES, 'gcp'))
     expect_ctx(pr, INPUT)
     pr.click('[data-expand-all]')
 
@@ -956,7 +1189,7 @@ with sync_playwright() as p:
     no_hangul(pr)
     ctxR.close()
 
-    # ── ㉗ /privacy — 200 · IP 문장(읽어서 제한 키로 넘기고 저장하지 않는다) · KV 366 · Axiom 은 데이터셋에 설정한 보존 · 계측 표 여덟 줄 · 휴대폰 폭 (D56) ──
+    # ── ㉗ /privacy — 200 · IP 문장(읽어서 제한 키로 넘기고 저장하지 않는다) · KV 366 · Axiom 은 데이터셋에 설정한 보존 · 계측 표 아홉 줄(api_wizard 포함) · 휴대폰 폭 (D56) ──
     ctx27 = browser.new_context(viewport={'width': 360, 'height': 800})
     page27 = ctx27.new_page()
     page27.on('pageerror', lambda e: errors.append(str(e)))
@@ -968,7 +1201,7 @@ with sync_playwright() as p:
     expect(page27.locator('[data-privacy-kv]')).to_have_text('KV daily counters expire 366 days after their last update.')
     expect(page27.locator('[data-privacy-axiom]')).to_contain_text('the retention configured on the Axiom dataset')
     expect(page27.locator('[data-privacy-never]')).to_contain_text('never collected')
-    expect(page27.locator('[data-privacy-events] tr[data-event]')).to_have_count(8)
+    expect(page27.locator('[data-privacy-events] tr[data-event]')).to_have_count(9)
     expect(page27.locator('[data-privacy-events] tr[data-event="ui_copy"]')).to_contain_text('target')
     privacy_text = page27.inner_text('main')
     for sentence in re.split(r'(?<=\.)\s+', privacy_text):
@@ -977,7 +1210,7 @@ with sync_playwright() as p:
     no_hangul(page27)
     ctx27.close()
 
-    # ── ㉘ /docs/naming — 200 · 절 아홉 · 표 행 수(약어 100 · 리전 43 · 종류 토큰 19 · 환경 4 · 토큰 9) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
+    # ── ㉘ /docs/naming — 200 · 절 아홉 · 표 행 수(약어 101(Cloud Run 포함) · 리전 43 · 종류 토큰 19 · 환경 4 · 토큰 9) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
     ctx28 = browser.new_context(viewport={'width': 360, 'height': 800})
     page28 = ctx28.new_page()
     page28.on('pageerror', lambda e: errors.append(str(e)))
@@ -985,7 +1218,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(9)
-    for table_id, rows in {'abbreviations': 100, 'regions': 43, 'kinds': 19, 'env': 4, 'tokens': 9}.items():
+    for table_id, rows in {'abbreviations': 101, 'regions': 43, 'kinds': 19, 'env': 4, 'tokens': 9}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
@@ -1013,7 +1246,7 @@ with sync_playwright() as p:
     page20 = ctx20.new_page()
     page20.on('pageerror', lambda e: errors.append(str(e)))
     az_link = state_hash({**INPUT, 'region': 'koreacentral'}, RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})  # Azure 가 풀 수 있는 지역이라야 이 분기다
-    goto_ready(page20, BASE + '/' + az_link)
+    goto_ready(page20, BASE + HB + az_link)
     expect(page20.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(page20.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'false')
     expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the region was reset to the example and the selection was cleared.')
@@ -1028,7 +1261,10 @@ with sync_playwright() as p:
     page20.wait_for_function('h => location.hash !== h', arg=az_link)
     assert hash_state(page20.url) == {**reset, 'v': RULES, 'p': 'gcp', 'r': {'project_id': 1}}, hash_state(page20.url)
     ctx20.close()
+
+    if HB == '/':
+        wizard_scenarios(browser, RULES, errors)
     browser.close()
 
     assert errors == [], errors
-    print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print(f'OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과(옛 hash 경로 {HB}) · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
