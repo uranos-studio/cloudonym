@@ -105,6 +105,11 @@ describe('HA · serverless (§4-2 · D61 · Q5 ⑵)', () => {
     expectError(svc({ preset: 'web', serverless: 'gcp.cloud_sql_instance', instances: slots(1) }), 'wizard.serverless_not_supported', 'services[0].picks[0]');
     expectError(svc({ preset: 'bastion', serverless: 'gcp.run_service', instances: slots(1) }), 'wizard.serverless_not_supported', 'services[0].picks[0]');
   });
+  it('ha: null · serverless: null 은 꺼짐 (JSON 클라이언트가 null 을 보낸다)', () => {
+    const plan = svc({ preset: 'web', ha: null, serverless: null, instances: slots(1) }, { preset: 'db', ha: null, serverless: null, instances: slots(1) });
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    expect(names(plan)).toEqual(['platform-billing-prod', 'billing-shop-prod-ane3-gce-web-01', 'billing-shop-prod-ane3-sql-01']);
+  });
   it('serverless run_service → …-run-web-01 · 같은 서비스의 was → …-run-was-01', () => {
     const plan = svc({ preset: 'web', serverless: 'gcp.run_service', instances: slots(1) }, { preset: 'was', serverless: 'gcp.run_service', instances: slots(1) });
     expect(validatePlan(plan)).toEqual({ ok: true });
@@ -179,6 +184,11 @@ describe('tier · level · 중복 (D60 · D63)', () => {
     expectError(svc({ preset: 'web', instances: slots(1) }, { preset: 'web', instances: slots(1, 2) }), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'compute_instance/web' });
     expect(validatePlan(svc({ preset: 'web', instances: slots(1) }, { preset: 'was', instances: slots(1) }))).toEqual({ ok: true });
   });
+  it('같은 서비스의 서비스 계정 둘 — role 이 다르면 통과 · 같으면 duplicate_pick', () => {
+    const sa = (role: string): Pick => ({ preset: null, ruleId: 'gcp.service_account', role });
+    expect(validatePlan(svc(sa('worker'), sa('deploy')))).toEqual({ ok: true });
+    expectError(svc(sa('worker'), sa('worker')), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'service_account/worker' });
+  });
   it('custom 버킷 tier 없음 · custom 서비스 계정 role worker → 통과', () => {
     expect(validatePlan(svc({ preset: null, ruleId: 'gcp.storage_bucket' }))).toEqual({ ok: true });
     expect(validatePlan(svc({ preset: null, ruleId: 'gcp.service_account', role: 'worker' }))).toEqual({ ok: true });
@@ -248,6 +258,22 @@ describe('서비스 · 모델 전체', () => {
     expectError(plan, 'wizard.too_many_picks', 'services[1]', { index: 1, max: MAX_PICKS_PER_SERVICE, actual: MAX_PICKS_PER_SERVICE + 1 });
     const proj = Array.from({ length: MAX_PICKS_PER_SERVICE + 1 }, (): Pick => ({ preset: 'vpc', instances: slots(1) }));
     expectError({ provider: 'gcp', project: PROJECT, projectPicks: proj, services: [] }, 'wizard.too_many_picks', 'projectPicks', { max: MAX_PICKS_PER_SERVICE });
+  });
+  it('services · projectPicks 가 배열이 아니면 selection.not_array (path 없음) · expandPlan 은 분명히 던진다', () => {
+    for (const bad of [{ ...SAMPLE, services: raw({}) as unknown as WizardPlan['services'] }, { ...SAMPLE, projectPicks: raw(null) as unknown as Pick[] }]) {
+      expect(errorsOf(bad)).toEqual([{ code: 'selection.not_array' }]);
+      expect(() => expandPlan(bad)).toThrow(/validatePlan/);
+    }
+  });
+  it('서비스의 picks 가 배열이 아니면 selection.not_array @ services[i] · expandPlan 은 분명히 던진다', () => {
+    const bad: WizardPlan = { ...SAMPLE, services: [SAMPLE.services[0]!, { purpose: 'pay', picks: raw('x') as unknown as Pick[] }] };
+    expectError(bad, 'selection.not_array', 'services[1]');
+    expect(() => expandPlan(bad)).toThrow(/validatePlan/);
+  });
+  it('서비스 항목이 객체가 아니면 empty_service · not_array @ services[i]', () => {
+    const bad: WizardPlan = { ...SAMPLE, services: [SAMPLE.services[0]!, raw(null) as unknown as WizardPlan['services'][number]] };
+    expectError(bad, 'wizard.empty_service', 'services[1]');
+    expectError(bad, 'selection.not_array', 'services[1]');
   });
   it('프로젝트 문맥 오류는 context.* (field) 로 낸다', () => {
     const errs = errorsOf({ ...SAMPLE, project: { ...PROJECT, env: 'xx' } });

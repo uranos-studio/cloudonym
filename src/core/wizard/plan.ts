@@ -33,10 +33,10 @@ export interface Pick {
   preset: string | null;
   ruleId?: string;
   tier?: string; role?: string; kind?: string;
-  /** HA (D61) — 프리셋에 ha 가 있고 유효 규칙이 VM 일 때만. 없으면 꺼짐 */
-  ha?: boolean;
-  /** 서버리스 규칙 id — 프리셋 데이터의 serverless.ruleIds 안 */
-  serverless?: string;
+  /** HA (D61) — 프리셋에 ha 가 있고 유효 규칙이 VM 일 때만. 없거나 null 이면 꺼짐(JSON 이 null 을 보낸다) */
+  ha?: boolean | null;
+  /** 서버리스 규칙 id — 프리셋 데이터의 serverless.ruleIds 안. 없거나 null 이면 꺼짐 */
+  serverless?: string | null;
   /** count 규칙에만(1~99) */
   instances?: WizardSlot[];
 }
@@ -112,7 +112,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
     // serverless — 프리셋 데이터의 규칙 id 하나여야 한다(불리언 · 다른 규칙 id 는 거부)
     let rule = baseRule;
-    if (pick.serverless !== undefined) {
+    if (pick.serverless !== undefined && pick.serverless !== null) {
       const allowed = preset?.serverless?.ruleIds ?? [];
       if (typeof pick.serverless !== 'string' || !allowed.includes(pick.serverless)) {
         push({ code: 'wizard.serverless_not_supported', params: { index, type: baseRule.resourceType } });
@@ -125,7 +125,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     const slots: unknown = pick.instances;
 
     // HA — 프리셋에 ha 메타데이터가 있고 유효 규칙이 VM 일 때만 · 켜면 슬롯 ≥ minInstances
-    if (pick.ha !== undefined && pick.ha !== false) {
+    if (pick.ha !== undefined && pick.ha !== null && pick.ha !== false) {
       if (pick.ha !== true || !preset?.ha || rule.id !== HA_RULE) push({ code: 'wizard.ha_not_supported', params: { index, type } });
       else if (!Array.isArray(slots) || slots.length < preset.ha.minInstances) push({ code: 'wizard.count_below_min', params: { index, min: preset.ha.minInstances } });
     }
@@ -142,8 +142,9 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     }
 
     // 같은 (type, tier, level) 둘
-    const dup = `${type}|${typeof tier === 'string' ? tier : ''}|${level ?? ''}`;
-    if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: typeof tier === 'string' ? `${type}/${tier}` : type } });
+    const role = typeof pick.role === 'string' ? pick.role : '';
+    const dup = `${type}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
+    if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: [type, ...(typeof tier === 'string' ? [tier] : []), ...(role === '' ? [] : [role])].join('/') } });
     seen.add(dup);
 
     // 슬롯 — count 규칙에만 · id 꼴 · 고유 · seq 꼴 · 고유 · attach 의 값
@@ -181,8 +182,10 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
 /** 마법사 모델 검사 — 오류를 모두 낸다. 검사 순서: 모델 전체(서비스 수 · 빈 모델) → 프로젝트 문맥 → 서비스(이름 · 예약 · 중복) → pick → 이름 총합 */
 export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; errors: PlanError[] } {
-  const services: readonly unknown[] = Array.isArray(plan.services) ? plan.services : [];
-  const projectPicks: readonly unknown[] = Array.isArray(plan.projectPicks) ? plan.projectPicks : [];
+  // 모양 — services · projectPicks 는 배열(모델 전체 오류 · path 없음). 서비스의 picks 가 배열이 아니면 아래에서 services[i] 에 낸다
+  if (!Array.isArray(plan.services) || !Array.isArray(plan.projectPicks)) return { ok: false, errors: [{ code: 'selection.not_array' }] };
+  const services: readonly unknown[] = plan.services;
+  const projectPicks: readonly unknown[] = plan.projectPicks;
   if (services.length > MAX_SERVICES) return { ok: false, errors: [{ code: 'wizard.too_many_services', params: { max: MAX_SERVICES, actual: services.length } }] };
   const picksOf = (s: unknown): readonly unknown[] => (isObject(s) && Array.isArray(s.picks) ? s.picks : []);
   if (projectPicks.length === 0 && services.every((s) => picksOf(s).length === 0)) return { ok: false, errors: [{ code: 'wizard.empty' }] };
@@ -205,6 +208,7 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
     else if (ns === RESERVED_SERVICE) errors.push({ code: 'wizard.reserved_service', params: { index, value: ns }, path });
     else if (namespaces.has(ns)) errors.push({ code: 'wizard.duplicate_service', params: { index, value: ns }, path });
     namespaces.add(ns);
+    if (!isObject(svc) || !Array.isArray(svc.picks)) errors.push({ code: 'selection.not_array', path });
     const picks = picksOf(svc);
     if (picks.length > MAX_PICKS_PER_SERVICE) errors.push({ code: 'wizard.too_many_picks', params: { index, max: MAX_PICKS_PER_SERVICE, actual: picks.length }, path });
     checkPicks(picks, path, undefined, errors);
@@ -218,6 +222,8 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
 /** 검사를 지난 모델 → generateProject 의 입력. 슬롯 id 는 싣지 않는다(hash 의 일) · 프리셋의 defaultAttach 는 넣지 않는다(화면 초기값일 뿐).
  *  검사를 지나지 않은 모델이면 던진다 */
 export function expandPlan(plan: WizardPlan): ProjectSelection {
+  // 같은 검사를 다시 지난다 — 검사를 지난 모델은 아래에서 던지지 않는다(모양이 틀린 모델은 여기서 분명히 던진다)
+  if (!validatePlan(plan).ok) throw new Error('expandPlan: the plan did not pass validatePlan');
   const ctx = parseProjectContext(plan.project, 'gcp');
   if (!ctx.ok) throw new Error('expandPlan: invalid project context');
   const item = (pick: Pick, level: 'project' | undefined): SelectionItem => {
