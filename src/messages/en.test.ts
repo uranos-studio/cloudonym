@@ -28,6 +28,13 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'name.token_empty': { code: 'name.token_empty', field: 'system' },
   'name.cannot_fit': { code: 'name.cannot_fit', params: { max: 15 } },
   'name.kind_required': { code: 'name.kind_required', params: { supported: ['CCC', 'DDD'] } },
+  'name.parent_invalid': { code: 'name.parent_invalid', params: { parent: 'AAA' } },
+  'name.parent_name': { code: 'name.parent_name', params: { parent: 'AAA', suffix: '-BBB' } },
+  'wizard.children_not_supported': { code: 'wizard.children_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.attach_not_object': { code: 'wizard.attach_not_object', params: { index: 2 } },
+  'wizard.attach_out_of_range': { code: 'wizard.attach_out_of_range', params: { index: 2, max: 9 } },
+  'wizard.invalid_data_seq': { code: 'wizard.invalid_data_seq', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
+  'wizard.duplicate_seq': { code: 'wizard.duplicate_seq', params: { index: 2, value: 'BBB' } },
   'rule.unknown_resource_type': { code: 'rule.unknown_resource_type', params: { provider: 'AAA', supported: ['CCC', 'DDD'] } },
   'context.not_string': { code: 'context.not_string', field: 'owner' },
   'context.empty': { code: 'context.empty', field: 'owner' },
@@ -100,7 +107,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(80);
+    expect(codes).toHaveLength(87);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

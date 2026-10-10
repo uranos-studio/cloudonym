@@ -30,6 +30,10 @@ export const MESSAGE_CODES = [
   'selection.not_array', 'selection.empty', 'selection.too_many_items', 'selection.item_not_object', 'selection.unknown_type',
   'selection.duplicate_type', 'selection.count_out_of_range', 'selection.count_not_supported', 'selection.role_not_supported',
   'selection.invalid_role', 'selection.too_many_names', 'selection.kind_not_supported', 'selection.unknown_kind', 'selection.kind_required',
+  // engine.ts attachName (2)
+  'name.parent_invalid', 'name.parent_name',
+  // wizard/attachments.ts checkAttachments (5)
+  'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range', 'wizard.invalid_data_seq', 'wizard.duplicate_seq',
 ] as const;
 
 export type CoreMessage =
@@ -100,7 +104,18 @@ export type CoreMessage =
   /** 종류 (D52) — supported 는 그 규칙(= 범위)의 허용 값 이름. 규칙마다 다르므로 항목에 싣는다(많아야 아홉 값) */
   | { code: 'selection.kind_not_supported'; params: { index: number; type: string } }
   | { code: 'selection.unknown_kind'; params: { index: number; type: string; value: string; supported: string[] } }
-  | { code: 'selection.kind_required'; params: { index: number; type: string; supported: string[] } };
+  | { code: 'selection.kind_required'; params: { index: number; type: string; supported: string[] } }
+  /** 부모가 최종 FAIL(축소 · 충돌 어느 것이든)이라 딸린 이름을 만들지 않았다 — parent 는 부모의 항목 key (D62 · D69) */
+  | { code: 'name.parent_invalid'; params: { parent: string } }
+  /** 딸린 이름이 넘칠 때 name.cannot_fit 에 같이 싣는다 — parent 는 부모의 최종 이름, suffix 는 더한 접미(-data-01) (D62) */
+  | { code: 'name.parent_name'; params: { parent: string; suffix: string } }
+  /** 마법사 딸린 것 검사 (D62) — index 는 pick 의 자리. 위치(path)는 부르는 쪽이 꼬리를 붙여 싣는다 */
+  | { code: 'wizard.children_not_supported'; params: { index: number; type: string } }
+  | { code: 'wizard.attach_not_object'; params: { index: number } }
+  | { code: 'wizard.attach_out_of_range'; params: { index: number; max: number } }
+  | { code: 'wizard.invalid_data_seq'; params: { index: number; value: string; pattern: string } }
+  /** value 는 겹친 순번 — 디스크면 data/03 꼴 */
+  | { code: 'wizard.duplicate_seq'; params: { index: number; value: string } };
 
 export type CoreCode = CoreMessage['code'];
 

@@ -76,6 +76,15 @@ export const en: Catalog = {
     'selection.kind_not_supported': (m) => `resources[${m.params.index}]: '${m.params.type}' takes no kind`,
     'selection.unknown_kind': (m) => `resources[${m.params.index}]: '${m.params.value}' is not a kind of '${m.params.type}'; use one of ${list(m.params.supported)}`,
     'selection.kind_required': (m) => `resources[${m.params.index}]: '${m.params.type}' needs a kind; use one of ${list(m.params.supported)}`,
+    // 딸린 이름 (attachName)
+    'name.parent_invalid': (m) => `The parent '${m.params.parent}' is not valid, so this attached name was not built`,
+    'name.parent_name': (m) => `'${m.params.parent}' plus '${m.params.suffix}' exceeds the limit`,
+    // 마법사 딸린 것 (checkAttachments)
+    'wizard.children_not_supported': (m) => `picks[${m.params.index}]: '${m.params.type}' takes no attachments`,
+    'wizard.attach_not_object': (m) => `picks[${m.params.index}]: attach must be an object`,
+    'wizard.attach_out_of_range': (m) => `picks[${m.params.index}]: data must list from 1 to ${m.params.max} disk numbers`,
+    'wizard.invalid_data_seq': (m) => `picks[${m.params.index}]: disk number '${m.params.value}' must match ${m.params.pattern}`,
+    'wizard.duplicate_seq': (m) => `picks[${m.params.index}]: '${m.params.value}' is used twice`,
     // API
     'request.body_not_json': () => 'Request body is not JSON',
     'request.body_not_object': () => 'Request body must be a JSON object',

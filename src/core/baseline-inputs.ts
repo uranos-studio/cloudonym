@@ -2,9 +2,10 @@
 // 시험 파일이 아니다 — 기준선 시험(baseline.test.ts)과 규칙 지문(revision.test.ts)이 같이 쓴다.
 // 문구는 기록하지 않는다(문구는 바뀐다) — 위반 · 단계는 개수만 담는다.
 import { RULES, getRule } from './constraints';
-import { generate, generateItem, generateMany, parseContext, parseProjectContext, validateName, type ManyResult } from './engine';
+import { generate, generateItem, generateMany, generateProject, parseContext, parseProjectContext, validateName, type ManyResult, type ProjectResult, type ProjectSelection } from './engine';
 import type { ItemExtra } from './compose';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
+import { WIZARD_CONFLICT, WIZARD_PARENT_FAIL, WIZARD_PROJECT, WIZARD_SAMPLE } from './__fixtures__/project';
 import { labelsFor } from './labels';
 import { PROVIDERS, type NameResult, type Provider, type RawContext } from './types';
 
@@ -122,7 +123,7 @@ export function baselineMany(): { id: string; result: ManyResult }[] {
 }
 
 /** 항목 하나 표본 (D60 · D63) — 용도 토큰 · 프로젝트 수준. GCP 만(마법사는 GCP 다). 서비스 표본은 base 문맥의 purpose 를 shop 으로 바꾼다.
- *  인스턴스 슬롯 표본은 슬롯을 쓰는 생성 함수가 생길 때 더한다 */
+ *  인스턴스 슬롯 · 딸린 것 표본은 baselineProjects 다 */
 export function baselineItems(): { id: string; parse?: { ok: boolean; errors: number }; result?: NameResult }[] {
   const service = parseContext({ ...BASE, purpose: 'shop', region: BASE_REGION.gcp }, 'gcp');
   const project = parseProjectContext({ owner: BASE.owner, system: BASE.system, env: BASE.env, region: BASE_REGION.gcp }, 'gcp');
@@ -144,6 +145,20 @@ export function baselineItems(): { id: string; parse?: { ok: boolean; errors: nu
     p('project-fw-egr-ssh', 'firewall_rule', { kind: 'EGRESS', tier: 'ssh' }),
     p('project-subnet', 'subnet', { tier: 'web' }),
     { id: 'project-parse-errors', parse: { ok: bad.ok, errors: bad.ok ? 0 : bad.errors.length } },
+  ];
+}
+
+/** 프로젝트 한 번 표본 (D62 · D69) — 슬롯 · 딸린 것 · 부모 FAIL · 충돌. GCP 만 */
+export function baselineProjects(): { id: string; result: ProjectResult }[] {
+  const vm = getRule('gcp', 'compute_instance')!;
+  const one = (purpose: string, items: ProjectSelection['services'][number]['items']): ProjectSelection => ({ project: WIZARD_PROJECT, projectItems: [], services: [{ purpose, items }] });
+  return [
+    { id: 'wizard-sample', result: generateProject(WIZARD_SAMPLE, 'gcp') },
+    { id: 'wizard-parent-fail', result: generateProject(WIZARD_PARENT_FAIL, 'gcp') },
+    { id: 'wizard-conflict', result: generateProject(WIZARD_CONFLICT, 'gcp') },
+    { id: 'wizard-child-overflow', result: generateProject(one('a'.repeat(30), [{ rule: vm, count: 1, tier: 'web', instances: [{ seq: '01', attach: { boot: true, data: ['01'] } }] }]), 'gcp') },
+    { id: 'wizard-slots-01-03-data-02-ip-ipi', result: generateProject(one('shop', [{ rule: vm, count: 2, instances: [
+      { seq: '01', attach: { data: ['02'], ip: true, ipi: true } }, { seq: '03' }] }]), 'gcp') },
   ];
 }
 
@@ -186,7 +201,11 @@ export function coreBaseline() {
     ...(result ? { name: result.name, valid: result.valid, isTruncated: result.isTruncated, original: result.original,
                    violations: result.violations.length, steps: result.steps.length } : {}),
   }));
-  return { contexts, validate, many, items };
+  const projects = baselineProjects().map(({ id, result }) => ({
+    id, valid: result.valid, conflicts: result.conflicts.length,
+    items: result.items.map((i) => ({ key: i.key, name: i.name, valid: i.valid, violations: i.violations.length })),
+  }));
+  return { contexts, validate, many, items, projects };
 }
 
 /** 규칙 지문(revision.test)용 — 기준선 입력의 위반 · 라벨 위반 · 파싱 오류를 개수가 아니라 코드 목록으로 담는다.
@@ -201,5 +220,6 @@ export function coreBaselineCodes() {
   const validate = baselineValidateCases().map((c) => codes(validateName(c.provider, c.resourceType, c.name).violations));
   const many = baselineMany().map(({ id, result }) => ({ id, items: result.items.map((i) => codes(i.violations)), conflicts: codes(result.conflicts) }));
   const items = baselineItems().map(({ id, result }) => ({ id, violations: result ? codes(result.violations) : [] }));
-  return { contexts, validate, many, items };
+  const projects = baselineProjects().map(({ id, result }) => ({ id, items: result.items.map((i) => codes(i.violations)), conflicts: codes(result.conflicts) }));
+  return { contexts, validate, many, items, projects };
 }

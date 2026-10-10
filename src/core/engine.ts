@@ -1,16 +1,23 @@
 // 엔진 공개 API — API 와 화면은 generate · validateName · parseContext · generateMany 넷을 부른다 (선택 검증은 selection.ts)
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type ProjectContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
-import { getRule, rulesFor } from './constraints';
+import { RULES, getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
 import { canonicalRegion, regionCandidates } from './regions';
 import { compose, kindTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
-import type { SelectionItem } from './selection';
+import type { InstanceSlot, SelectionItem } from './selection';
 import { inputKind } from './tree';
 import { fit } from './truncate';
 import { checkName } from './validate';
 import type { CoreMessage, ContextField } from './messages';
 import { clipForDisplay } from './display';
+import { attachmentRow, type AttachKind } from './wizard/attachments';
+
+/** 결과에 싣는 규칙 요약 — 규칙 표의 notes 를 참조로 넘기지 않는다(호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게) */
+function ruleInfo(rule: ResourceRule): NameResult['rule'] {
+  return { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
+           notes: (rule.notes ?? []).map((m) => structuredClone(m)) };
+}
 
 function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
   const raw = tokenValues(ctx, rule, extra);
@@ -30,9 +37,7 @@ function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, ex
     ruleId: rule.id, resourceType: rule.resourceType, displayName: rule.displayName,
     original: compose(raw, rule.template, rule.separator),
     isTransformed: transformed,
-    rule: { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
-            // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게
-            notes: (rule.notes ?? []).map((m) => structuredClone(m)) },
+    rule: ruleInfo(rule),
   };
 
   // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다.
@@ -94,7 +99,11 @@ export function generate(ctx: NamingContext, providers: Provider[] = [...PROVIDE
 /** 항목 하나의 이름 — key 는 `${resourceType}_${seq}`(count 규칙) · `${resourceType}_${role}`(role 규칙, 생략이면 기본 역할) · resourceType(입력 없음).
  *  종류가 달라도 key 는 같은 꼴이다(한 행에 종류 하나 — D52).
  *  kind 는 고른 값 이름(POSTGRES) · kindToken 은 이름에 넣은 토큰(pg) — 기본값 · omitValues 를 고르면 kind 만 있고 kindToken 은 없다 (D52) */
-export interface NameItem extends NameResult { key: string; seq?: string; role?: string; kind?: string; kindToken?: string; tier?: string; level?: 'project' }
+export interface NameItem extends NameResult {
+  key: string; seq?: string; role?: string; kind?: string; kindToken?: string; tier?: string; level?: 'project';
+  /** generateProject 만 — 이름공간('project' 또는 정제된 purpose) · 딸린 것이면 부모 key 와 접미 종류 (D62 · D69) */
+  namespace?: string; parent?: string; attach?: AttachKind;
+}
 export interface ManyResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
 
 /** 순번은 두 자리 고정 (D40) — 한 항목의 이름이 같은 자리수를 써서 축소 경로가 같다 */
@@ -135,6 +144,130 @@ export function generateMany(ctx: NamingContext, provider: Provider, selection: 
   const conflicts = markConflicts(items.map(({ item, rule }) => ({ key: item.key, rule, result: item })));
   const out = items.map(({ item }) => item);
   return { provider, valid: out.every((i) => i.valid), items: out, conflicts };
+}
+
+/** 프로젝트 한 번의 선택 (D69) — 프로젝트 수준 항목과 서비스(purpose)마다의 항목. 마법사 모델이 펼친 것이다(검사는 부르는 쪽) */
+export interface ServiceSelection { purpose: string; items: readonly SelectionItem[] }
+export interface ProjectSelection { project: ProjectContext; projectItems: readonly SelectionItem[]; services: readonly ServiceSelection[] }
+export interface ProjectResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
+
+/** 서비스의 이름공간 — 정제 뒤 purpose (키의 service 칸 · 라벨 맵 키) */
+export function serviceNamespace(purpose: string): string {
+  return normalizeToken(purpose, 'lower-digit-hyphen').value;
+}
+
+const PROJECT_NAMESPACE = 'project';
+
+/** 구조 키 (D69) — generateProject 만 쓴다. `/` 로 이은 고정 길이 경로: 부모 `<level>/<service>/<type>/<tier|->/<seq|role|->`,
+ *  자식은 그 뒤에 `/<attach>/<seq|->`. 어느 칸에도 `/` 가 올 수 없고 칸 수가 모양마다 고정이라 다른 항목이 같은 키가 될 수 없다.
+ *  namespace 'project' 면 level 칸이 project · service 칸이 '-' 다. generateMany 의 키(compute_instance_01)와는 다른 함수다 */
+export function projectItemKey(p: { namespace: string; type: string; tier?: string; slot?: string }, child?: { attach: AttachKind; seq?: string }): string {
+  const head = p.namespace === PROJECT_NAMESPACE ? `project/-` : `service/${p.namespace}`;
+  const parent = `${head}/${p.type}/${p.tier ?? '-'}/${p.slot ?? '-'}`;
+  return child ? `${parent}/${child.attach}/${child.seq ?? '-'}` : parent;
+}
+
+/** 딸린 이름 (D62) — 부모의 최종 이름에 `-{attach}[-{seq}]` 를 더하고 checkName 만 돌린다(fit 을 부르지 않는다 — 자식을 줄이면 부모와 글자가 달라진다).
+ *  부모가 valid:false 면 이름 '' + name.parent_invalid. 넘치면 checkName 의 name.too_long 을 name.cannot_fit 으로 바꾸고 name.parent_name 을 더한다.
+ *  자식 규칙은 호환표에서 온다 — 표에 없는 짝은 던진다(마법사 모델 검사가 먼저 거른다) */
+export function attachName(parent: NameItem, child: { attach: AttachKind; seq?: string }): NameItem {
+  const row = attachmentRow(parent.ruleId, child.attach);
+  if (!row) throw new Error(`attachment not supported: ${parent.ruleId} ${child.attach}`);
+  if (row.seq !== (child.seq !== undefined)) throw new Error(`attachment sequence mismatch: ${child.attach}`);
+  const rule = RULES[row.child];
+  if (!rule) throw new Error(`attachment rule missing: ${row.child}`);
+  const suffix = `-${child.attach}${child.seq === undefined ? '' : `-${child.seq}`}`;
+  const meta = {
+    key: `${parent.key}/${child.attach}/${child.seq ?? '-'}`, parent: parent.key, attach: child.attach,
+    ...(child.seq === undefined ? {} : { seq: child.seq }), ...(parent.namespace === undefined ? {} : { namespace: parent.namespace }),
+    ...(parent.level === undefined ? {} : { level: parent.level }),
+  };
+  const base = { ruleId: rule.id, resourceType: rule.resourceType, displayName: rule.displayName, isTruncated: false, isTransformed: false, steps: [], rule: ruleInfo(rule) };
+  if (!parent.valid) {
+    return { ...base, ...meta, name: '', original: '', valid: false, violations: [{ code: 'name.parent_invalid', params: { parent: parent.key } }] };
+  }
+  const name = `${parent.name}${suffix}`;
+  const violations: CoreMessage[] = [];
+  let tooLong = false;
+  for (const v of checkName(name, rule)) {
+    if (v.code === 'name.too_long') { tooLong = true; violations.push({ code: 'name.cannot_fit', params: { max: v.params.max } }); }
+    else violations.push(v);
+  }
+  if (tooLong) violations.push({ code: 'name.parent_name', params: { parent: parent.name, suffix } });
+  return { ...base, ...meta, name, original: name, valid: violations.length === 0, violations };
+}
+
+/** 프로젝트 한 번에 (D69) — 마감 순서가 계약이다:
+ *  ① 부모 전부(프로젝트 ID · 프로젝트 수준 · 모든 서비스)를 만든다 ② 충돌 표시 한 번(전체) ③ 요청된 자식 전부 — 부모가 최종 valid 면 attachName,
+ *  아니면 이름 '' + name.parent_invalid(항목은 반드시 나온다) ④ 충돌 표시 한 번 더 — 아직 valid 인 항목 전체(자식끼리 · 자식과 같은 부류의 부모)
+ *  ⑤ valid = 항목 전부. 프로젝트 ID(project/-/project_id/-/-)는 늘 첫 항목이다. 순번은 슬롯의 값(instances[].seq)이고, 슬롯이 없으면 01…count.
+ *  항목 순서 = 선택 순서 · 자식은 부모 바로 뒤(boot · data(준 순서) · ip · ipi). 입력은 마법사 모델 검사를 거친 것이다 */
+export function generateProject(sel: ProjectSelection, provider: Provider): ProjectResult {
+  const projectRule = getRule(provider, 'project_id');
+  if (!projectRule) throw new Error(`no project_id rule for ${provider}`);
+  type Built = { item: NameItem; rule: ResourceRule; children: { attach: AttachKind; seq?: string }[] };
+  const parents: Built[] = [];
+
+  const add = (ctx: NamingContext | ProjectContext, namespace: string, it: SelectionItem, level: 'project' | undefined) => {
+    const { rule, count, role, kind, tier, instances } = it;
+    if (rule.provider !== provider) throw new Error(`rule ${rule.id} is not a ${provider} rule`);
+    const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
+    const lv = level === undefined ? {} : { level };
+    const one = (extra: ItemExtra, slot: string | undefined, meta: { seq?: string; role?: string }, children: Built['children']) => {
+      const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...extra });
+      const key = projectItemKey({ namespace, type: rule.resourceType, ...(tier === undefined ? {} : { tier }), ...(slot === undefined ? {} : { slot }) });
+      const item: NameItem = {
+        ...res, key, ...meta, ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }),
+        ...(tier === undefined ? {} : { tier }), ...lv, namespace,
+      };
+      parents.push({ item, rule, children });
+    };
+    const input = inputKind(rule);
+    if (input !== 'count' && instances !== undefined) throw new Error(`instances not supported: ${rule.id}`);
+    if (input === 'count') {
+      const slots: readonly InstanceSlot[] = instances ?? Array.from({ length: count }, (_, i) => ({ seq: seqOf(i + 1) }));
+      for (const s of slots) {
+        const a = s.attach;
+        const children: Built['children'] = a === undefined ? [] : [
+          ...(a.boot === true ? [{ attach: 'boot' as const }] : []),
+          ...(a.data ?? []).map((seq) => ({ attach: 'data' as const, seq })),
+          ...(a.ip === true ? [{ attach: 'ip' as const }] : []),
+          ...(a.ipi === true ? [{ attach: 'ipi' as const }] : []),
+        ];
+        one({ seq: s.seq }, s.seq, { seq: s.seq }, children);
+      }
+    } else if (input === 'role') {
+      const r = role ?? DEFAULT_ROLE;
+      one({ role: r }, r, { role: r }, []);
+    } else {
+      one({}, undefined, {}, []);
+    }
+  };
+
+  // ① 부모 전부
+  add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1 }, 'project');
+  for (const it of sel.projectItems) add(sel.project, PROJECT_NAMESPACE, it, 'project');
+  for (const svc of sel.services) {
+    for (const it of svc.items) {
+      if (it.level !== undefined) throw new Error(`project level item inside service: ${it.rule.id}`);
+      add({ ...sel.project, purpose: svc.purpose }, serviceNamespace(svc.purpose), it, undefined);
+    }
+  }
+  // ② 부모 충돌 — 전체 한 번
+  const conflicts = markConflicts(parents.map(({ item, rule }) => ({ key: item.key, rule, result: item })));
+  // ③ 자식 — 부모가 최종 판정을 받은 뒤
+  const ordered: { item: NameItem; rule: ResourceRule }[] = [];
+  for (const p of parents) {
+    ordered.push({ item: p.item, rule: p.rule });
+    for (const c of p.children) {
+      const child = attachName(p.item, c);
+      ordered.push({ item: child, rule: RULES[child.ruleId]! });
+    }
+  }
+  // ④ 아직 valid 인 항목 전체 — 이미 표시된 부모 충돌은 valid:false 라 다시 잡히지 않는다
+  conflicts.push(...markConflicts(ordered.map(({ item, rule }) => ({ key: item.key, rule, result: item }))));
+  const items = ordered.map(({ item }) => item);
+  return { provider, valid: items.every((i) => i.valid), items, conflicts };
 }
 
 export function validateName(provider: Provider, resourceType: string, name: string):

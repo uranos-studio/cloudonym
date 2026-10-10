@@ -25,6 +25,8 @@ export const MAX_ITEMS = 200;
 export const MAX_NAMES = 200;
 export const MAX_COUNT = 99;
 export const ROLE_PATTERN = /^[a-z0-9]{2,16}$/;
+/** 슬롯 순번 · 디스크 순번의 꼴 (D61 · D62) — 두 자리 01~99. 00 · 7 · 100 은 거부한다. 마법사 모델 검사 · hash 디코더 · 화면이 같은 상수를 쓴다 */
+export const SEQ_PATTERN = /^(0[1-9]|[1-9][0-9])$/;
 
 /** 사용자 값을 표시용 문자열로 — 문자열은 그대로, 나머지는 String(). String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던지므로 그때는 typeof */
 const shown = (v: unknown): string => {

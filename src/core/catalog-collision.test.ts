@@ -6,6 +6,7 @@ import { REGIONS } from './regions-data';
 import { RESERVED_TIERS } from './tier';
 import { TIER_PATTERN } from './types';
 import { rulesFor } from './constraints';
+import { ATTACH_KINDS } from './wizard/attachments';
 
 /** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대) */
 const SHARED_SLUGS: Record<string, readonly string[]> = {
@@ -92,9 +93,9 @@ describe('catalog 겹침 검사 (D47)', () => {
 });
 
 // ⑹ ⑺ 용도 토큰 tier · 딸린 것 접미 attach (D60 · D62) — tier 는 약어 · 종류 토큰 바로 뒤에 온다(…-{slug}[-{kind}]-{tier}-{seq}).
-// 프리셋 · 접미 데이터는 마법사 데이터(뒤 작업)가 들인다 — 그때까지 이 목록이 기대값이다
+// 접미는 호환표 데이터(wizard/attachments.ts)에서 읽는다. 프리셋 데이터는 뒤 작업이 들인다 — 그때까지 tier 목록이 기대값이다
 const PRESET_TIERS = ['web', 'was', 'bastion', 'file', 'ssh', 'icmp'];
-const ATTACH_SUFFIXES = ['boot', 'data', 'ip', 'ipi'];
+const ATTACH_SUFFIXES = [...ATTACH_KINDS];
 
 interface TierInput { tiers: readonly string[]; attach: readonly string[]; rows: readonly Pick<CatalogRow, 'key' | 'slug' | 'kind'>[]; regionCodes: readonly string[]; envValues: readonly string[] }
 

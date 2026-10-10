@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { conflictKey, findConflicts, NAME_COMPARISON } from './conflict';
-import { generateMany, parseContext } from './engine';
+import { attachName, generateMany, generateProject, parseContext } from './engine';
+import { WIZARD_PROJECT } from './__fixtures__/project';
 import { getRule, rulesFor } from './constraints';
 import { inputKind } from './tree';
 import { PROVIDERS, type NameResult, type ResourceRule } from './types';
@@ -102,5 +103,27 @@ describe('실제 데이터 — 공허한 통과가 아니라는 대조', () => {
       }
     }
     expect(checked).toBeGreaterThan(0);   // 전부 FAIL 이라 공허하게 통과하지 않는다
+  });
+});
+
+describe('딸린 것의 충돌 (D62 · D69)', () => {
+  const vm = getRule('gcp', 'compute_instance')!;
+  const sel = (instances: { seq: string; attach?: { data?: string[] } }[]) =>
+    ({ project: WIZARD_PROJECT, projectItems: [], services: [{ purpose: 'shop', items: [{ rule: vm, count: instances.length, instances }] }] });
+
+  it('…-gce-01-data-01 과 …-gce-02-data-01 — 같은 entity 이지만 글자가 달라 충돌 0', () => {
+    const out = generateProject(sel([{ seq: '01', attach: { data: ['01'] } }, { seq: '02', attach: { data: ['01'] } }]), 'gcp');
+    const disks = out.items.filter((i) => i.attach === 'data');
+    expect(disks.map((d) => d.name)).toEqual(['billing-shop-prod-ane3-gce-01-data-01', 'billing-shop-prod-ane3-gce-02-data-01']);
+    expect(out.conflicts).toEqual([]);
+    expect(out.valid).toBe(true);
+  });
+  it('시험 전용 — 같은 부모에 같은 접미 둘을 넣으면 name.conflict (검사기 자체)', () => {
+    const parent = generateProject(sel([{ seq: '01' }]), 'gcp').items[1]!;
+    const disk = getRule('gcp', 'disk')!;
+    const a = attachName(parent, { attach: 'data', seq: '01' });
+    const b = { ...attachName(parent, { attach: 'data', seq: '01' }), key: `${a.key}#copy` };
+    expect(findConflicts([{ key: a.key, rule: disk, result: a }, { key: b.key, rule: disk, result: b }]))
+      .toEqual([{ code: 'name.conflict', params: { name: a.name, keys: [a.key, b.key] } }]);
   });
 });
