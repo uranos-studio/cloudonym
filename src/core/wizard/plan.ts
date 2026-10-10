@@ -2,7 +2,7 @@
 // 마법사 입력의 검사는 전부 validatePlan 하나다 — pick 마다 checkAttachments(호환표) 와 validateSelection(한 항목짜리 목록)을 부르고,
 // 입력 요소에 걸린 오류에는 위치 path 를 붙인다. 모델 전체 오류(wizard.empty · too_many_names · too_many_services)에는 path 가 없다
 import { RULES, rulesFor } from '../constraints';
-import { parseContext, parseProjectContext, serviceNamespace, type ProjectSelection, type ServiceSelection } from '../engine';
+import { DEFAULT_ROLE, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection, type ServiceSelection } from '../engine';
 import type { CoreMessage } from '../messages';
 import { MAX_NAMES, SEQ_PATTERN, validateSelection, type Attachments, type InstanceSlot, type SelectionItem } from '../selection';
 import { RESERVED_TIERS } from '../tier';
@@ -20,7 +20,7 @@ export const SLOT_ID_PATTERN = /^[a-z0-9]{1,8}$/;
 /** 서비스 이름공간으로 쓸 수 없는 값 — 프로젝트 수준 항목의 이름공간이다 */
 const RESERVED_SERVICE = 'project';
 /** 프로젝트 ID 는 늘 암묵 항목 하나라 pick 으로 고를 수 없다 */
-const PROJECT_ID_RULE = 'gcp.project_id';
+export const PROJECT_ID_RULE = 'gcp.project_id';
 /** 프로젝트 수준(level 'project')을 받는 범위 (D63) */
 const PROJECT_SCOPES: readonly ScopeId[] = ['gcp:namespace', 'gcp:project', 'gcp:project_global', 'gcp:project_region'];
 /** HA 를 받는 유효 규칙 — serverless 를 푼 뒤의 규칙이 이것이어야 한다 */
@@ -141,8 +141,8 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
       else if (RESERVED_TIERS.has(pick.tier)) push({ code: 'wizard.tier_reserved', params: { index, value: pick.tier } });
     }
 
-    // 같은 (type, tier, level) 둘
-    const role = typeof pick.role === 'string' ? pick.role : '';
+    // 같은 (type, tier, role, level) 둘 — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다
+    const role = typeof pick.role === 'string' ? pick.role : input === 'role' ? DEFAULT_ROLE : '';
     const dup = `${type}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
     if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: [type, ...(typeof tier === 'string' ? [tier] : []), ...(role === '' ? [] : [role])].join('/') } });
     seen.add(dup);

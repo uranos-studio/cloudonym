@@ -189,6 +189,13 @@ describe('tier · level · 중복 (D60 · D63)', () => {
     expect(validatePlan(svc(sa('worker'), sa('deploy')))).toEqual({ ok: true });
     expectError(svc(sa('worker'), sa('worker')), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'service_account/worker' });
   });
+  it('role 을 뺀 서비스 계정은 엔진처럼 기본 role(sync)로 친다 — 빠진 것 + sync → duplicate_pick', () => {
+    const bare: Pick = { preset: null, ruleId: 'gcp.service_account' };
+    const sync: Pick = { preset: null, ruleId: 'gcp.service_account', role: 'sync' };
+    expectError(svc(bare, sync), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'service_account/sync' });
+    expectError(svc(sync, bare), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'service_account/sync' });
+    expect(validatePlan(svc(bare, { preset: null, ruleId: 'gcp.service_account', role: 'worker' }))).toEqual({ ok: true });
+  });
   it('custom 버킷 tier 없음 · custom 서비스 계정 role worker → 통과', () => {
     expect(validatePlan(svc({ preset: null, ruleId: 'gcp.storage_bucket' }))).toEqual({ ok: true });
     expect(validatePlan(svc({ preset: null, ruleId: 'gcp.service_account', role: 'worker' }))).toEqual({ ok: true });

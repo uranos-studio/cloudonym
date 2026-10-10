@@ -25,11 +25,11 @@ for bin in curl jq perl; do
   command -v "${bin}" >/dev/null || { echo "missing dependency: ${bin}" >&2; exit 2; }
 done
 
-# /v1/names 의 기대 이름 — 규칙 버전 2026-10-10.1 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
+# /v1/names 의 기대 이름 — 규칙 버전 2026-10-10.8 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
 # 새 빌드에 보내 값을 다시 적는다(조용히 통과하지 않는다)
 NAMES_REQUEST='{"provider":"gcp","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"},"resources":[{"type":"vpc_network"},{"type":"storage_bucket"},{"type":"service_account","role":"db"}]}'
 NAMES_EXPECTED='{"service_account_db":"payments-batch-prod-sa-db","storage_bucket":"platform-payments-batch-prod-gcs","vpc_network_01":"payments-batch-prod-vpc-01"}'
-# /v1/wizard 의 기대 항목(순서 그대로 key=name) — 규칙 버전 2026-10-10.7 의 엔진 출력이다. 프로젝트 ID 가 먼저, 서비스마다 부모 뒤에 딸린 것.
+# /v1/wizard 의 기대 항목(순서 그대로 key=name) — 규칙 버전 2026-10-10.8 의 엔진 출력이다. 프로젝트 ID 가 먼저, 서비스마다 부모 뒤에 딸린 것.
 # 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을 새 빌드에 보내 값을 다시 적는다
 WIZARD_REQUEST='{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]}]},{"purpose":"pay","picks":[{"preset":"web","instances":[{"id":"b","seq":"01","attach":{"boot":true}}]}]}]}'
 WIZARD_EXPECTED='["project/-/project_id/-/-=platform-billing-prod","service/shop/compute_instance/web/01=billing-shop-prod-ane3-gce-web-01","service/shop/compute_instance/web/01/boot/-=billing-shop-prod-ane3-gce-web-01-boot","service/shop/compute_instance/web/01/data/01=billing-shop-prod-ane3-gce-web-01-data-01","service/pay/compute_instance/web/01=billing-pay-prod-ane3-gce-web-01","service/pay/compute_instance/web/01/boot/-=billing-pay-prod-ane3-gce-web-01-boot"]'

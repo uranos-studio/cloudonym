@@ -6,7 +6,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".
 
-Rules revision for this release: 2026-10-10.7.
+Rules revision for this release: 2026-10-10.8.
 
 ### Added
 
