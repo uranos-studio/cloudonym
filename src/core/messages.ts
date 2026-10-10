@@ -10,9 +10,9 @@ export const MESSAGE_CODES = [
   'name.empty', 'name.too_long', 'name.too_short', 'name.first_not_letter', 'name.last_not_alnum', 'name.pattern_mismatch',
   'name.consecutive_separator', 'name.forbidden_prefix', 'name.forbidden_suffix', 'name.forbidden_substring',
   'name.forbidden_exact', 'name.forbidden_word', 'name.ipv4_form',
-  // engine.ts (11)
+  // engine.ts (10)
   'step.normalized', 'step.separator_removed', 'name.token_empty', 'name.cannot_fit', 'rule.unknown_resource_type',
-  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.zone_required', 'name.kind_required',
+  'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.kind_required',
   // truncate.ts (3)
   'step.token_dropped', 'step.abbreviated', 'step.budget_shortened',
   // labels.ts (3)
@@ -50,8 +50,6 @@ export type CoreMessage =
   | { code: 'step.separator_removed' }
   | { code: 'name.token_empty'; field: Token }
   | { code: 'name.cannot_fit'; params: { max: number } }
-  /** 존 규칙(regionToken zone)에 존이 없다 — region 은 문맥의 리전 코드 또는 global (D50) */
-  | { code: 'name.zone_required'; params: { region: string } }
   /** 종류가 필수인 규칙(리소스 정책)에 종류가 없다 — supported 는 그 규칙의 허용 값 (D52). 이름은 종류 없이 만든 것을 싣는다 */
   | { code: 'name.kind_required'; params: { supported: string[] } }
   | { code: 'rule.unknown_resource_type'; params: { provider: string; supported: string[] } }

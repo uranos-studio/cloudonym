@@ -60,8 +60,6 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   const ctx = parsed.ok ? parsed.context : undefined;
   const many = useMemo(() => (ctx && provider && items.length > 0 ? generateMany(ctx, provider, items) : undefined), [ctx, provider, items]);
   const labels = useMemo(() => (ctx && provider ? labelsFor(ctx, provider) : undefined), [ctx, provider]);
-  // 문맥에 존이 없다(리전만 · global) — 존 규칙 행을 새로 체크할 수 없다. 문맥이 불완전한 동안은 막지 않는다(존 칸이 아니라 다른 칸의 문제다) (D50)
-  const zoneMissing = ctx !== undefined && ctx.zone === undefined;
 
   // 상태 key — 다섯 값 + v + p + r. 링크 비교 · hash 쓰기에 쓴다. 비콘은 문맥 key 만 본다(선택 이벤트는 더하지 않는다)
   const stateKey = ctx ? encodeState(ctx, VERSION.rules, { provider, selection: items }) : '';
@@ -189,7 +187,7 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
           <div className="min-w-0 space-y-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <div className={PANEL}>
               {provider && tree
-                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} zoneMissing={zoneMissing} regionGlobal={ctx?.region === 'global'} />
+                ? <ResourceTree provider={provider} tree={tree} picked={picked} onChange={onPick} />
                 : (
                   <section aria-labelledby="step-resources" className="space-y-2">
                     <h2 id="step-resources" className="text-base font-semibold"><span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">3</span>{en.ui.step_resources}</h2>

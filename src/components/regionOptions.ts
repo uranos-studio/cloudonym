@@ -1,5 +1,5 @@
-// 지역 고르기의 판정 (D49 · D50) — 콤보박스(RegionPicker.tsx)가 그리는 항목 · 거르기 · 폼의 지역 문자열 하나 ↔ 리전 + 존.
-// 표는 core 의 지역 표가 정본이다. 존은 따로 칸을 두지 않고 region 문자열 하나에 든다(D50)
+// 지역 고르기의 판정 (D49 · D50 revised) — 콤보박스(RegionPicker.tsx)가 그리는 항목 · 거르기 · 폼의 지역 문자열 → 리전.
+// 표는 core 의 지역 표가 정본이다. 존 이름 · 존 코드로도 찾고, 그 리전으로 풀린다 — 존은 이름에 들지 않는다
 import { REGIONS, type ZoneEntry } from '../core/regions-data';
 import type { Provider } from '../core/types';
 
@@ -48,16 +48,3 @@ export function splitRegion(input: string, options: readonly RegionOption[]): { 
   }
   return {};
 }
-
-/** 리전 + 존 → 폼의 지역 문자열 — 존이 있으면 존 이름, 없으면 리전 이름 */
-export function composeRegion(region: RegionOption, zone?: ZoneEntry): string {
-  return zone ? zone.zone : region.value;
-}
-
-/** 리전을 바꿀 때의 존 — 같은 글자의 존이 새 리전에 있으면 그것, 없으면 none(undefined) */
-export function zoneAfter(previous: ZoneEntry | undefined, next: RegionOption): ZoneEntry | undefined {
-  if (!previous) return undefined;
-  const letter = previous.zone.slice(previous.zone.lastIndexOf('-') + 1);
-  return next.zones.find((z) => z.zone.endsWith(`-${letter}`));
-}
-

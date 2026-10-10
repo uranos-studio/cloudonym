@@ -12,7 +12,8 @@ const parsedCtx = { ...ctx, region: 'ane3', zone: 'ane3a' };
 describe('parseGenerateBody', () => {
   it('정상 — providers 는 중복을 없앤다', () => {
     const r = parseGenerateBody({ context: ctx, providers: ['gcp', 'gcp'] });
-    expect(r).toEqual({ ok: true, value: { contexts: { gcp: parsedCtx }, transformed: [], providers: ['gcp'] } });
+    // 존 코드는 리전 코드로 풀리고 그 기록이 남는다 — 존은 이름에 들지 않는다 (D50 revised)
+    expect(r).toEqual({ ok: true, value: { contexts: { gcp: parsedCtx }, transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'ane3a', to: 'ane3' } }], providers: ['gcp'] } });
   });
   it('providers 생략 → 켜진 것만 (D45)', () => {
     const r = parseGenerateBody({ context: ctx });

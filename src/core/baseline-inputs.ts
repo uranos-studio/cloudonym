@@ -43,7 +43,7 @@ export const BASELINE_CONTEXTS: readonly BaselineContext[] = [
   { id: 'parse-region-mars', raw: { ...BASE, region: 'mars' } },
   // 옛 나라 값은 받지 않는다 — supported 는 그 CSP 의 한국 리전 이름 (D49)
   { id: 'region-country-kr', raw: { ...BASE, region: 'kr' } },
-  // 존 이름 — 존 규칙은 존 코드, 리전 규칙은 리전 코드 (D50)
+  // 존 이름 — 리전 코드로 풀린다. 존 규칙도 리전 코드다 (D50 revised)
   { id: 'region-zone', raw: { ...BASE, region: 'asia-northeast3-a' }, providers: ['gcp'] },
   { id: 'parse-owner-empty', raw: { ...BASE, owner: '   ' } },
   { id: 'parse-owner-number', raw: { ...BASE, owner: 123 } },

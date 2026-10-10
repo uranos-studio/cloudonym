@@ -13,7 +13,7 @@
   This check runs in API mode only — see *Pinned mode* below.
   If the API answers 400 or 409, the `postcondition` on `data "http"` surfaces the API's error body
   (`{ "success": false, "errors": [{ "code", "message", … }] }`).
-- `region` is the region input for the name. A VM is a zonal resource, so give a **zone** — its name (`asia-northeast3-a`) or code (`ane3a`); a region alone returns `valid: false` with `name.zone_required` and blocks apply. The value only shapes the name; the VM is placed by `gcp_zone`, so keep the two the same. Region and zone codes are listed in `/llms.txt`.
+- `region` is the region input for the name — a region or a zone, by name or by code. A zone resolves to its region, so the name carries the region code (`ane3`), never a zone. The value only shapes the name; the VM is placed by `gcp_zone`. Region codes are listed in `/llms.txt`.
 - `cloudonym_api_url` has no default. Set it to your deployed Worker URL (or the URL `npm run dev` prints), without a trailing `/` or `/v1`.
 
 ### Outputs
@@ -46,7 +46,7 @@ context, and renaming a VM means destroy + create. Three things keep the name st
 
 ```hcl
 pinned = {
-  name   = "payments-batch-prod-ane3a-gce-01"
+  name   = "payments-batch-prod-ane3-gce-01"
   labels = { owner = "platform", system = "payments", purpose = "batch", environment = "prod", managed_by = "cloudonym" }
 }
 ```
@@ -59,7 +59,7 @@ owner             = "platform"
 system            = "payments"
 purpose           = "batch"
 env               = "prod"
-region            = "asia-northeast3-a"
+region            = "asia-northeast3"
 gcp_zone          = "asia-northeast3-a"
 TFVARS
 
@@ -82,7 +82,7 @@ uniqueness, permissions, quotas and organisation policy are not checked.
   라벨 `metadata.generated_labels.gcp` · 라벨 위반 `metadata.label_violations.gcp`
 - **apply 차단** — `valid` 가 `true` 이고 라벨 위반이 없을 때만 VM 을 만든다(`lifecycle { precondition }`). API 모드에서만 본다 — 아래 핀 모드 참고
   API 가 400 · 409 를 돌려주면 `data "http"` 의 `postcondition` 이 API 의 오류 본문을 그대로 보여 준다
-- `region` 은 이름에 넣을 지역 입력이다. VM 은 존 리소스라 **존**을 준다 — 이름(`asia-northeast3-a`)이나 코드(`ane3a`). 리전만 주면 `valid: false` · `name.zone_required` 로 apply 가 막힌다. 이 값은 이름만 정하고 VM 이 놓일 자리는 `gcp_zone` 이 정하므로 둘을 같게 둔다. 리전 · 존 코드는 `/llms.txt` 에 있다
+- `region` 은 이름에 넣을 지역 입력이다 — 리전이나 존을 이름이나 코드로. 존은 그 리전으로 풀려 이름에는 리전 코드(`ane3`)만 들고 존은 들지 않는다. 이 값은 이름만 정하고 VM 이 놓일 자리는 `gcp_zone` 이 정한다. 리전 코드는 `/llms.txt` 에 있다
 - `cloudonym_api_url` 에는 기본값이 없다 — 배포한 Worker 의 URL(또는 로컬 `npm run dev` 가 찍는 URL)을 넣는다. 끝에 `/` 와 `/v1` 을 붙이지 않는다
 
 ### 이름 안정성

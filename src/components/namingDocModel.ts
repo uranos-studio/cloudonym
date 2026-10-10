@@ -101,7 +101,6 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
   const zoneCount = regions.reduce((n, r) => n + r.zones.length, 0);
   const sample = regions.find((r) => r.zones.length > 0);
   const example = sample ? `${sample.zones[0]!.zone} → ${sample.zones[0]!.code}` : none;
-  const zonalRows = catalog.filter((row) => Object.values(row.rules).some((s) => s.regionToken === 'zone'));
 
   const kindRows = catalog.filter((row) => row.kind !== null);
 
@@ -130,7 +129,6 @@ export function namingDocModel({ provider, catalog, regions, rules, messages, ve
     },
     {
       id: 'zones', title: ui.doc_zones_title, paragraphs: [fill('doc_zones_body', { example, n: zoneCount })],
-      ...(zonalRows.length > 0 ? { listLead: fill('doc_zones_list', { n: zonalRows.length }), items: zonalRows.map((row) => row.displayName) } : {}),
     },
     {
       id: 'env', title: ui.doc_env_title, paragraphs: [ui.doc_env_body],

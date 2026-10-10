@@ -10,7 +10,8 @@ export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
 export const ENABLED_PROVIDERS: readonly Provider[] = ['gcp'];
 export type Env = 'prod' | 'stg' | 'dev' | 'sbx';
 
-/** region 은 그 CSP 의 리전 코드(ane3 · apne2 · krc) 또는 'global' · zone 은 존 코드(ane3a) — 존 이름 · 존 코드를 넣었을 때만 (D49 · D50).
+/** region 은 그 CSP 의 리전 코드(ane3 · apne2 · krc) 또는 'global' · zone 은 존 코드(ane3a) — 존 이름 · 존 코드를 넣었을 때만 (D49).
+ *  zone 은 입력 왕복 · 표시용이고 이름에는 들지 않는다 (D50 revised).
  *  코드 표는 regions-data.ts 이고 parseContext 가 provider 마다 푼다 */
 export interface NamingContext {
   owner: string; system: string; purpose: string; env: Env; region: string; zone?: string;
@@ -43,8 +44,8 @@ export interface Forbidden {
 /** 트리의 표시 분류 (D37) */
 export type Category = 'compute' | 'networking' | 'storage' | 'database' | 'identity' | 'security' | 'management' | 'containers';
 
-/** 지역 자리에 무엇이 오나 (D47 · D51) — none 은 지역 토큰이 없는 규칙(전역 리소스 등) */
-export type RegionToken = 'none' | 'region' | 'zone';
+/** 지역 자리에 무엇이 오나 (D47 · D50 revised) — none 은 지역 토큰이 없는 규칙(전역 리소스 등). 존 규칙도 리전 코드다 */
+export type RegionToken = 'none' | 'region';
 
 /** 규칙(= 범위) 하나의 종류 표 (D52) — catalog 가 덮는다. 종류 토큰은 약어 바로 뒤에 온다(…-{slug}-{kind}-{seq}) */
 export interface RuleKinds {

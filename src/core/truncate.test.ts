@@ -21,7 +21,7 @@ describe('fit — 3단계 축소', () => {
   it('들어가면 손대지 않는다', () => {
     const rule = getRule('gcp', 'compute_instance')!;
     const ctx = { owner: 'sj', system: 'antigravity', purpose: 'sync', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prod-ane3a-gce-01' });
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ truncated: false, fits: true, name: 'antigravity-sync-prod-ane3-gce-01' });
   });
   it('TC-AZ-02 Windows 노드풀 6자: tokenValues 경로로 npprod', () => {
     const rule = getRule('azure', 'aks_nodepool_windows')!;   // template [slug, purpose] · max 6 · separator ''
@@ -77,7 +77,7 @@ describe('fit — 3단계 축소', () => {
   it('축소하지 않은 1글자 입력(system a)은 MIN_TOKEN 으로 막지 않는다 (GCP VM)', () => {
     const rule = getRule('gcp', 'compute_instance')!;
     const ctx = { owner: 'sj', system: 'a', purpose: 'sync', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
-    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prod-ane3a-gce-01' });
+    expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, truncated: false, name: 'a-sync-prod-ane3-gce-01' });
   });
 });
 
@@ -98,35 +98,26 @@ describe('fit — 순번 자리수와 Windows VM 15자 (실측 고정)', () => {
   });
 });
 
-describe('지역 토큰과 축소 (D51)', () => {
+describe('지역 토큰과 축소 (D50 revised — D51 철회)', () => {
   const gcpRules = rulesFor('gcp');
-  it('템플릿에 region 이 있는 GCP 규칙 — region 규칙은 optional 에 region 이 있고, 존 규칙 14 는 없다', () => {
+  const ZONAL = ['compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
+    'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group'];
+  it('템플릿에 region 이 있는 GCP 규칙은 전부 region 규칙이고 optional 에 region 이 있다 — 옛 존 규칙 14 도 같다', () => {
     const placed = gcpRules.filter((r) => r.template.includes('region'));
-    const zonal = placed.filter((r) => r.regionToken === 'zone');
-    expect(zonal).toHaveLength(14);
-    for (const r of zonal) expect(r.optional, r.id).not.toContain('region');
-    for (const r of placed.filter((x) => x.regionToken === 'region')) expect(r.optional, r.id).toContain('region');
+    expect(placed.filter((r) => r.regionToken !== 'region').map((r) => r.id)).toEqual([]);
+    for (const r of placed) expect(r.optional, r.id).toContain('region');
     // 템플릿에 region 이 없으면 none 이고, 있으면 none 이 아니다
     for (const r of gcpRules) expect(r.regionToken === 'none', r.id).toBe(!r.template.includes('region'));
   });
 
-  it('긴 입력에서 존 ane3a · ane3b 의 VM 은 다른 이름이다 — 존 코드는 떼지도 자르지도 않는다', () => {
-    const rule = getRule('gcp', 'compute_instance')!;
-    const long = { owner: 'o', system: 's'.repeat(MAX_CONTEXT_CHARS), purpose: 'p'.repeat(MAX_CONTEXT_CHARS), env: 'prod' as const, region: 'ane3' };
-    const a = fit(tokenValues({ ...long, zone: 'ane3a' }, rule), rule);
-    const b = fit(tokenValues({ ...long, zone: 'ane3b' }, rule), rule);
-    expect(a.fits && b.fits).toBe(true);
-    expect(a.name).not.toBe(b.name);
-    expect(a.name).toContain('-ane3a-');
-    expect(b.name).toContain('-ane3b-');
-  });
-
-  it('MAX_CONTEXT_CHARS 64 둘을 넣어도 존 규칙 14 는 name.cannot_fit 없이 들어간다', () => {
-    const ctx = { owner: 'o'.repeat(MAX_CONTEXT_CHARS), system: 's'.repeat(MAX_CONTEXT_CHARS), purpose: 'p'.repeat(MAX_CONTEXT_CHARS), env: 'prod' as const, region: 'ause1', zone: 'ause1a' };
+  it('긴 입력이면 옛 존 규칙 14 도 축소 1단계가 region 을 뗀다 — 다른 지역 규칙과 같다', () => {
+    const ctx = { owner: 'o', system: 's'.repeat(MAX_CONTEXT_CHARS), purpose: 'p'.repeat(MAX_CONTEXT_CHARS), env: 'prod' as const, region: 'ause1', zone: 'ause1a' };
     const out = generate(ctx, ['gcp']).gcp!;
-    for (const r of gcpRules.filter((x) => x.regionToken === 'zone')) {
-      expect(out[r.resourceType]!.violations.map((v) => v.code), r.id).toEqual([]);
-      expect(out[r.resourceType]!.name, r.id).toContain('-ause1a-');
+    for (const t of ZONAL) {
+      const r = out[t]!;
+      expect(r.violations.map((v) => v.code), t).toEqual([]);
+      expect(r.steps[0], t).toEqual({ code: 'step.token_dropped', field: 'region' });
+      expect(r.name, t).not.toContain('ause1');
     }
   });
 

@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine. This release enables Google Cloud (gcp) only; AWS and Azure are in the rule table but not enabled, and a request for them is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names against each provider's physical constraints. Formulas, region and zone codes, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "description": "Multi-cloud resource naming engine. This release enables Google Cloud (gcp) only; AWS and Azure are in the rule table but not enabled, and a request for them is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names against each provider's physical constraints. Formulas, region codes, the zones they accept, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
     "version": "0.1.0"
   },
   "servers": [
@@ -69,7 +69,7 @@
     "/generate": {
       "post": {
         "summary": "Generate cloud resource names",
-        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated. Every violation, step and note is a Message: branch on code, show message to people. This is the catalogue: rules that need a kind (resource policies) or a zone come back valid=false here (name.kind_required, name.zone_required); use /names with kind and a zone for them.",
+        "description": "Generates names and standard labels for every resource type of the requested providers from five context values. Names that cannot fit even after shortening are returned with valid=false and the reasons; nothing is silently truncated. Every violation, step and note is a Message: branch on code, show message to people. This is the catalogue: rules that need a kind (resource policies) come back valid=false here (name.kind_required); use /names with kind for them.",
         "operationId": "generateNames",
         "requestBody": {
           "required": true,
@@ -542,7 +542,7 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the code: ane3 for the region, ane3a for the zone. Zonal resources need a zone; given only a region they come back valid: false with name.zone_required. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
+                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
                 "example": "asia-northeast3-a"
               }
             }
@@ -759,7 +759,7 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the code: ane3 for the region, ane3a for the zone. Zonal resources need a zone; given only a region they come back valid: false with name.zone_required. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
+                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt.",
                 "example": "asia-northeast3-a"
               }
             }
@@ -1450,7 +1450,7 @@
                       },
                       "rules": {
                         "type": "object",
-                        "description": "Rule id -> { scope, regionToken (none, region or zone), kinds? { default, allowed } }. A row with several rules asks for the scope; each rule is one resource_type of /v1/names",
+                        "description": "Rule id -> { scope, regionToken (none or region), kinds? { default, allowed } }. A row with several rules asks for the scope; each rule is one resource_type of /v1/names",
                         "additionalProperties": {
                           "type": "object",
                           "required": [
@@ -1465,8 +1465,7 @@
                               "type": "string",
                               "enum": [
                                 "none",
-                                "region",
-                                "zone"
+                                "region"
                               ]
                             },
                             "kinds": {

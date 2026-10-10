@@ -7,7 +7,7 @@ import { getRule } from './constraints';
 import { PROVIDERS, type GenerateOutput } from './types';
 
 const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
-/** 서울 — GCP 는 존 이름이라 존 규칙(compute_instance · disk)도 이름이 나온다 (D49 · D50) */
+/** 서울 — GCP 는 존 이름을 넣어도 리전 코드로 풀린다. compute_instance · disk 두 리터럴만 D50 revised 로 ane3a → ane3 (D70 의 유일한 예외) */
 const REGION = { gcp: 'asia-northeast3-a', aws: 'ap-northeast-2', azure: 'koreacentral' } as const;
 
 /** 리터럴 가운데 유효하지 않은 것 — env prod(4자)로 Windows VM(15자)의 축소 예산이 MIN_TOKEN 아래가 되어 name.cannot_fit (D48).
@@ -31,13 +31,13 @@ const EXPECTED: Record<string, Record<string, string>> = {
   gcp: {
     project_id: 'platform-billing-trade-prod',
     service_account: 'billing-trade-prod-sa-sync',
-    compute_instance: 'billing-trade-prod-ane3a-gce-01',
+    compute_instance: 'billing-trade-prod-ane3-gce-01',
     vpc_network: 'billing-trade-prod-vpc-01',
     subnet: 'billing-trade-prod-ane3-snet-01',
     cloud_sql_instance: 'billing-trade-prod-ane3-sql-01',
     storage_bucket: 'platform-billing-trade-prod-gcs',
     firewall_rule: 'billing-trade-prod-fw-01',
-    disk: 'billing-trade-prod-ane3a-disk-01',
+    disk: 'billing-trade-prod-ane3-disk-01',
   },
   azure: {
     resource_group: 'rg-billing-trade-prod',

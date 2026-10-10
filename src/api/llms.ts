@@ -5,7 +5,6 @@ import { rulesFor } from '../core/constraints';
 import { ENV_ALIASES } from '../core/normalize';
 import { REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
-import { regionTokenOfRule } from '../core/compose';
 import { catalogFor } from '../core/catalog';
 import { GCP_KIND_CHECKED, type CatalogRow } from '../core/rules/gcp-catalog';
 import { MAX_FIELD_CHARS } from './schemas';
@@ -51,14 +50,13 @@ function allowedValues(dict: Record<string, string>): string[] {
   });
 }
 
-/** 「## Regions」 절 (D49 · D50) — 받는 꼴 · 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존) · 존 규칙 문장. 표는 지역 표(regions-data)가 정본이다 */
-function regionLines(rules: readonly ResourceRule[], order: readonly Provider[]): string[] {
-  const zonal = rules.filter((r) => order.includes(r.provider) && regionTokenOfRule(r) === 'zone').map((r) => `\`${r.id}\``);
+/** 「## Regions」 절 (D49 · D50 revised) — 받는 꼴 · 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존). 존 입력은 리전으로 풀린다. 표는 지역 표(regions-data)가 정본이다 */
+function regionLines(order: readonly Provider[]): string[] {
   const lines = [
     '', '## Regions', '',
     '`region` takes a region or a zone of the provider you name, by name or by code, in any case: `asia-northeast3`, `asia-northeast3-a`, `ane3` or `ane3a`, or `global`. Country values such as `kr`, `us`, `jp` and `eu` are rejected (400 `context.value_unsupported`, with the matching region names in `supported`), and so are region names of another provider.',
-    'Names carry a short code, not the region name: each region has the code listed below, and a zone code is the region code followed by the zone letter (`asia-northeast3-a` -> `ane3a`). A region or zone name you send is reported once as `context.normalized`. `global` puts no region token in any name.',
-    `Zonal resources carry the zone code and need a zone: given only a region, they come back \`valid: false\` with \`name.zone_required\` — ${zonal.join(', ')}. Regional resources carry the region code (or drop it first when the name is too long); global resources carry none.`,
+    'Names carry a short region code, not the region name: each region has the code listed below, and a zone name is accepted and resolved to its region (`asia-northeast3-a` and `ane3a` -> `ane3`); names never carry a zone. A region name, zone name or zone code you send is reported once as `context.normalized`. `global` puts no region token in any name.',
+    'Zonal and regional resources alike carry the region code (or drop it first when the name is too long); global resources carry none.',
   ];
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
@@ -151,7 +149,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
   }
   lines.push('', '## Canonical Allowed Values', '', '### env', ...allowedValues(ENV_ALIASES), '', '### region',
     '- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`');
-  lines.push(...regionLines(rules, order));
+  lines.push(...regionLines(order));
   lines.push(...kindLines(order));
   lines.push('', '## Provider Constraints');
   for (const p of order) {
@@ -177,9 +175,9 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
-    '- `GET /catalog.json` — the resource catalog of the enabled providers as JSON: one row per resource with its rule ids, abbreviation, kinds and kind tokens, region-token kind (`none`, `region` or `zone`), description and search aliases, the region and zone codes, and `version: { engine, rules }`',
+    '- `GET /catalog.json` — the resource catalog of the enabled providers as JSON: one row per resource with its rule ids, abbreviation, kinds and kind tokens, region-token kind (`none` or `region`), description and search aliases, the region and zone codes, and `version: { engine, rules }`',
     '',
-    '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`, no kind); `/v1/names` is the selection. Rules that need a kind or a zone come back `valid: false` there (`name.kind_required`, `name.zone_required`) — use `/v1/names` with `kind` and a zone for them. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
+    '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`, no kind); `/v1/names` is the selection. Rules that need a kind come back `valid: false` there (`name.kind_required`) — use `/v1/names` with `kind` for them. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
     'Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
     'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',

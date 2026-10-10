@@ -93,9 +93,9 @@ describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
 describe('regionToken 불변식 (§4-1)', () => {
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 34 + 4 · zone 14 · region 69', () => {
+  it('none 34 + 4 · region 83 — zone 은 없다 (D50 revised)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([38, 14, 69]);
+    expect([count('none'), count('zone'), count('region')]).toEqual([38, 0, 83]);
     // none 의 내역 — gcp:project_global 34 · 그 밖 4(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
     expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(34);
@@ -109,10 +109,14 @@ describe('regionToken 불변식 (§4-1)', () => {
     expect(removed).toEqual(['gcp.global_network_endpoint_group']);
   });
 
-  it('zone 인 규칙은 gcp:project_zone 범위이거나 compute_instance 다', () => {
-    const bad = specs.filter(([id, s]) => s.regionToken === 'zone' && GCP_RULES[id]!.scope !== 'gcp:project_zone' && id !== 'gcp.compute_instance');
-    expect(bad).toEqual([]);
-    expect(specs.filter(([id]) => GCP_RULES[id]!.scope === 'gcp:project_zone').every(([, s]) => s.regionToken === 'zone')).toBe(true);
+  it('옛 존 규칙 14종은 region 이고 optional 에 region 이 있다 — 축소 1단계가 뗄 수 있다 (D50 revised · D51 철회)', () => {
+    const ids = ['compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
+      'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group'].map((t) => `gcp.${t}`);
+    for (const id of ids) {
+      expect(specs.find(([x]) => x === id)?.[1].regionToken, id).toBe('region');
+      expect(GCP_RULES[id]!.optional, id).toContain('region');
+    }
+    expect(specs.filter(([id]) => GCP_RULES[id]!.scope === 'gcp:project_zone').every(([, s]) => s.regionToken === 'region')).toBe(true);
   });
 
   it('region 인 규칙은 템플릿에 region 이 있다 · gcp:project_global 은 모두 none', () => {
@@ -236,7 +240,7 @@ describe('catalog.ts 순수 함수', () => {
   });
 
   it('regionTokenOf — catalog 값 · catalog 밖 규칙은 템플릿으로', () => {
-    expect(regionTokenOf(rule('gcp.compute_instance'))).toBe('zone');
+    expect(regionTokenOf(rule('gcp.compute_instance'))).toBe('region');
     expect(regionTokenOf(rule('gcp.vpc_network'))).toBe('none');
     expect(regionTokenOf(rule('gcp.global_network_endpoint_group'))).toBe('none');
     expect(regionTokenOf(rule('gcp.subnet'))).toBe('region');

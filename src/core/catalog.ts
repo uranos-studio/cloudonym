@@ -1,6 +1,6 @@
 // catalog 조회 (D46 · D52) — 생성 파일 rules/gcp-catalog.ts 를 읽는 순수 함수. 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
-import type { Provider, ResourceRule } from './types';
-import { GCP_CATALOG, type CatalogRow, type RegionToken } from './rules/gcp-catalog';
+import type { Provider, RegionToken, ResourceRule } from './types';
+import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
 import { kindTokenFor, regionTokenOfRule } from './compose';
 
 /** 종류 토큰 길이 상한 — proxy · grpcs · https 가 5자다 */

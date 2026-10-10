@@ -6,7 +6,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".
 
-Rules revision for this release: 2026-10-07.11.
+Rules revision for this release: 2026-10-10.1.
 
 ### Added
 
@@ -14,7 +14,7 @@ Rules revision for this release: 2026-10-07.11.
 - **Web UI in four steps** — ① Cloud ② Context ③ Resources (a tree grouped by the scope in which Google Cloud requires a name to be unique, with search, categories, a count per resource, a scope choice for merged rows, a one-line description and where the name is entered) ④ Names (PASS / FAIL per name with the reasons, copy one name, all valid names, names JSON, Terraform locals or the standard labels). The state lives in the URL hash, so a link restores the same screen.
 - **API** — `POST /v1/generate` (every resource type), `POST /v1/names` (the picked resources, with count, role and kind), `POST /v1/validate`, `GET /v1/health`, `POST /v1/events`. Successful responses carry `version: { engine, rules }`; `rules_version` in a request turns a rules change into a 409.
 - **For AI coding agents** — `GET /llms.txt` (formulas, canonical values, regions, kind tokens, abbreviations with their sources, every rule), `GET /openapi.json` and `GET /catalog.json` (the resource catalog and region table of the enabled providers), all generated from the same data as the engine.
-- **Region and zone codes per provider** (D49, D50) — `asia-northeast3` → `ane3`, `asia-northeast3-a` → `ane3a`. The `region` field takes a region or a zone, by name or by code, or `global`. Zonal resources need a zone (`name.zone_required` without one); global resources carry no region token.
+- **Region codes per provider** (D49) — `asia-northeast3` → `ane3`. The `region` field takes a region or a zone, by name or by code, or `global`; global resources carry no region token.
 - **Kind token** (D52) — an optional value such as `POSTGRES` adds a short token after the abbreviation (`…-sql-pg-01`) when it differs from the provider default. Resource policies require one (`name.kind_required`).
 - **Resource catalog** (D46, D47, D54) — `catalog/gcp.json` and `catalog/regions.json` are the source for abbreviations, uniqueness classes, region-token kind, allowed kinds, descriptions and search aliases; `npm run catalog` writes the typed constants the engine uses. A collision test keeps abbreviations, kind tokens, region codes and environment values apart.
 - **Same-name conflicts** (D41, D47) — two items of the same uniqueness class with the same name are both `valid: false` with `name.conflict`, on `/v1/names` and on `/v1/generate`.
@@ -28,6 +28,7 @@ These changes were made before any public deployment, so no released name depend
 
 - The canonical environment is **`prod`** (D48); `prd`, `production`, `real` and `live` are accepted as aliases.
 - The country values `kr`, `us`, `jp` and `eu` are no longer accepted for `region`; the error lists the matching region names. `global` now leaves the region slot empty instead of writing the word `global` into the name.
+- **Names carry no zone** (D50 revised): a zone (`asia-northeast3-a` or `ane3a`) is accepted and resolved to its region, and zonal resources such as VMs and disks carry the region code like regional ones (`…-ane3-gce-01`, was `…-ane3a-gce-01`). The `name.zone_required` code is gone, the UI has no zone picker, and a share link stores the region code.
 - Abbreviations come from the catalog, for example a Compute Engine VM is `gce` (was `vm`).
 - `providers` defaults to the enabled providers; a request for a provider that is not enabled is 400 `request.provider_not_enabled` with the supported list.
 - Share links use hash v3 (D55): old links with a country region do not open, and a link made for a provider that is not enabled keeps the free fields and `env` and resets the region and the selection.

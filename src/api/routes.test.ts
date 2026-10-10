@@ -55,9 +55,9 @@ describe('POST /v1/generate (D15 wire)', () => {
       rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
     expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });
-    // 존 이름은 이름에 들어가는 존 코드로 바뀌고 그 기록이 남는다 (D49)
+    // 존 이름은 이름에 들어가는 리전 코드로 바뀌고 그 기록이 남는다 (D49 · D50 revised)
     expect(body.metadata).toMatchObject({ label_violations: { gcp: [] }, label_transformed: { gcp: [] }, transformed: [
-      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3a' } },
+      { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3' } },
     ] });
   });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {
@@ -170,7 +170,7 @@ describe('POST /v1/names (D39)', () => {
     expect(az.valid).toBe(true);
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
-      'compute_instance_01=billing-trade-prod-ane3a-gce-01', 'compute_instance_02=billing-trade-prod-ane3a-gce-02',
+      'compute_instance_01=billing-trade-prod-ane3-gce-01', 'compute_instance_02=billing-trade-prod-ane3-gce-02',
       'storage_bucket=platform-billing-trade-prod-gcs', 'service_account_db=billing-trade-prod-sa-db', 'project_id=platform-billing-trade-prod',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
@@ -198,7 +198,7 @@ describe('POST /v1/names (D39)', () => {
   });
   it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
     const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
-    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prod-ane3a-gce-01', 'billing-trade-prod-ane3a-disk-01']);
+    expect(g.items.map((i: { name: string }) => i.name)).toEqual(['billing-trade-prod-ane3-gce-01', 'billing-trade-prod-ane3-disk-01']);
     expect(g.conflicts).toEqual([]);
   });
   it('storage_bucket 에 count 2 → 400 selection.count_not_supported', async () => {

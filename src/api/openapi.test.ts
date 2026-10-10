@@ -54,6 +54,37 @@ describe('public/openapi.json — 형식', () => {
     // 이름 예시에 옛 지역 토큰이 남지 않는다
     expect(JSON.stringify(spec)).not.toMatch(/-kr-/);
   });
+  it('존은 이름에 들지 않는다 (D50 revised) — 칸을 집어 단언: name.zone_required 없음 · region 설명 · 예시 · 이름 예시에 존 코드 토큰 없음 · 입력 표의 존은 남는다', () => {
+    const strings: { path: string; value: string }[] = [];
+    const walk = (o: unknown, path: string) => {
+      if (typeof o === 'string') strings.push({ path, value: o });
+      else if (Array.isArray(o)) o.forEach((v, i) => walk(v, `${path}/${i}`));
+      else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${path}/${k}`);
+    };
+    walk(spec, '');
+    // 메시지 코드 name.zone_required 는 어느 칸에도 없다(설명 · 예시 · enum)
+    expect(strings.filter((s) => s.value.includes('name.zone_required')).map((s) => s.path)).toEqual([]);
+    for (const r of ['GenerateRequest', 'NamesRequest']) {
+      const region = schemas[r]!.properties!['context']!.properties!['region']! as Schema & { example?: string };
+      expect(region.description, r).toMatch(/zone name is accepted and resolved to its region/);
+      expect(region.description, r).not.toMatch(/ane3a for the zone|need a zone/);
+      expect(region.example, r).not.toMatch(/^[a-z]+\d+[a-z]$/);
+    }
+    // 이름 예시(name 칸 · 이름 꼴 문자열)에 존 코드 토큰(-ane3a-)이 없다
+    const zoneToken = /(^|-)[a-z]{2,4}\d[a-z](-|$)/;
+    const nameish = strings.filter((s) => /\/name$|\/suggested_name$|\/original$/.test(s.path) || /^[a-z0-9]+(-[a-z0-9]+){3,}$/.test(s.value));
+    expect(nameish.length).toBeGreaterThan(0);
+    expect(nameish.filter((s) => zoneToken.test(s.value)).map((s) => `${s.path} ${s.value}`)).toEqual([]);
+    // 남는 것 — 범위 enum 의 gcp:project_zone(리소스의 유일 범위) · /catalog.json 지역 표의 zones 와 그 예시 ane3a(입력 표)
+    expect(schemas['NameItem']!.properties!['scope']!.enum).toContain('gcp:project_zone');
+    const providerSchema = schemas['CatalogResponse']!.properties!['providers']!.additionalProperties as Schema;
+    const regionsItem = providerSchema.properties!['regions']!.items as Schema & { properties: Record<string, Schema & { items: Schema & { properties: Record<string, Schema & { example?: string }> } }> };
+    expect(regionsItem.required).toContain('zones');
+    expect(regionsItem.properties['zones']!.items.properties['code']!.example).toBe('ane3a');
+    // catalog 의 regionToken 은 none · region 둘
+    const ruleSpec = providerSchema.properties!['rows']!.items!.properties!['rules']!.additionalProperties as Schema;
+    expect(ruleSpec.properties!['regionToken']!.enum).toEqual(['none', 'region']);
+  });
   it('여섯 경로 — generate · names · validate 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
     expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/validate']);
     // servers 가 /v1 이라 /catalog.json 은 경로 단위로 뿌리 서버를 덮어써야 /v1/catalog.json 으로 읽히지 않는다

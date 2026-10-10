@@ -72,10 +72,10 @@ function itemValue(item: SelectionItem): number | string {
 /** `"n:값이름"` — n 은 1~99, 값 이름은 영숫자 · 밑줄 · 붙임표(`POSTGRES` · `snapshot-schedule`) MAX_KIND_VALUE_CHARS 자까지. 값이 그 규칙에 맞는지는 validateSelection 이 본다 */
 const KIND_VALUE_RE = new RegExp(`^([1-9]\\d?):([A-Za-z0-9_-]{1,${MAX_KIND_VALUE_CHARS}})$`);
 
-/** 다섯 필드를 고정 순서로 담고(region 은 존 코드가 있으면 그것 — D50 · D55), 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
+/** 다섯 필드를 고정 순서로 담고(region 은 리전 코드 — 존은 싣지 않는다 · D50 revised · D55), 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
  *  p 가 없으면 p · r 을 모두 빼고, 선택이 비면 r 을 뺀다 — 옛 링크(다섯 키 · v)와 같은 문자열이 나와 링크 상태가 유지된다 */
 export function encodeState(ctx: NamingContext, rulesVersion?: string, pick: PickState = {}): string {
-  const body: Record<string, unknown> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.zone ?? ctx.region };
+  const body: Record<string, unknown> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.region };
   if (rulesVersion !== undefined) body.v = rulesVersion;
   if (pick.provider !== undefined) {
     body.p = pick.provider;

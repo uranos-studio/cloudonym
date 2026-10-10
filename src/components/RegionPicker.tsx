@@ -1,9 +1,9 @@
-// ② 의 지역 고르기 (D49 · D50) — 리전 콤보박스(입력 상자 + 걸러진 목록) + 존 select. 둘이 합쳐 폼의 region 문자열 하나를 만든다(D50).
+// ② 의 지역 고르기 (D49 · D50 revised) — 리전 콤보박스(입력 상자 + 걸러진 목록). 존 이름 · 존 코드로도 찾고, 고르면 그 리전이 된다 — 존은 이름에 들지 않는다.
 // 입력 상자는 검색어다 — 목록에서 고를 때(클릭 · Enter)만 값을 바꾸고, Escape · 포커스 이탈은 검색어를 버린다. 그래서 폼의 지역은 늘 core 가 받는 값이다.
 // 키보드 — ↓ ↑ 로 목록을 열고 옮긴다 · Enter 로 고른다 · Escape 로 닫는다
 import { useEffect, useId, useMemo, useState, type KeyboardEvent } from 'react';
 import type { Provider } from '../core/types';
-import { composeRegion, displayLabel, filterRegions, regionOptions, splitRegion, zoneAfter, type RegionOption } from './regionOptions';
+import { displayLabel, filterRegions, regionOptions, splitRegion, type RegionOption } from './regionOptions';
 import { en } from '../messages/en';
 
 interface Props {
@@ -21,7 +21,7 @@ const OPTION = 'flex cursor-pointer flex-wrap items-baseline gap-x-1.5 px-3 py-1
 
 export function RegionPicker({ provider, value, onChange, error, labelClass, controlClass }: Props) {
   const options = useMemo(() => regionOptions(provider), [provider]);
-  const { region, zone } = splitRegion(value, options);
+  const { region } = splitRegion(value, options);
   // 검색어 — undefined 면 검색 중이 아니고 상자는 고른 리전 이름을 보인다
   const [query, setQuery] = useState<string | undefined>(undefined);
   const [open, setOpen] = useState(false);
@@ -42,8 +42,7 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
     setOpen(false);
   };
   const pick = (o: RegionOption) => {
-    // 리전을 바꾸면 같은 글자의 존을 잇고, 없으면 none — 고른 리소스는 그대로 두고 존 리소스만 FAIL 로 보인다 (D50)
-    onChange(composeRegion(o, o === region ? zone : zoneAfter(zone, o)));
+    onChange(o.value);
     close();
   };
   const openAt = () => {
@@ -64,9 +63,8 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
     }
   };
 
-  const zones = region?.zones ?? [];
   const errorId = `${base}-error`;
-  // 목록은 입력 줄 바로 아래 · 리전 칸과 존 칸을 합친 폭 — 리전 칸만으로는 위치 이름이 잘린다
+  // 목록은 입력 줄 바로 아래 · 입력 칸과 같은 폭
   return (
     <div>
       <div className="relative flex items-end gap-2">
@@ -88,15 +86,6 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
             className={`${controlClass} font-mono`}
           />
         </div>
-        <div className="w-36 shrink-0">
-          <label htmlFor="field-zone" className={labelClass}>Zone</label>
-          <select id="field-zone" name="zone" data-zone-select value={zone?.zone ?? ''} disabled={zones.length === 0}
-            onChange={(e) => region && onChange(composeRegion(region, zones.find((z) => z.zone === e.target.value)))}
-            className={`${controlClass} px-2 disabled:opacity-50`}>
-            <option value="">{en.ui.zone_none}</option>
-            {zones.map((z) => <option key={z.zone} value={z.zone}>{z.zone.slice(z.zone.lastIndexOf('-') + 1)} — {z.code}</option>)}
-          </select>
-        </div>
         <ul id={listId} role="listbox" aria-label={en.ui.region_options_label} hidden={!open}
           className="absolute inset-x-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-md border border-zinc-300 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-950">
           {shown.length === 0
@@ -113,10 +102,9 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
       </div>
       {region && region.value !== 'global' && (
         <p data-region-summary className="mt-1 truncate text-xs text-zinc-600 dark:text-zinc-400">
-          {displayLabel(region.label)} · <code className="font-mono">{zone?.code ?? region.code}</code>
+          {displayLabel(region.label)} · <code className="font-mono">{region.code}</code>
         </p>
       )}
-      {zones.length > 0 && !zone && <p data-zone-hint className="mt-1 text-xs text-amber-800 dark:text-amber-300">{en.ui.zone_hint}</p>}
       {error && <p id={errorId} className="mt-1 text-xs text-rose-700 dark:text-rose-300">{error}</p>}
     </div>
   );

@@ -27,7 +27,6 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'step.separator_removed': { code: 'step.separator_removed' },
   'name.token_empty': { code: 'name.token_empty', field: 'system' },
   'name.cannot_fit': { code: 'name.cannot_fit', params: { max: 15 } },
-  'name.zone_required': { code: 'name.zone_required', params: { region: 'ane3' } },
   'name.kind_required': { code: 'name.kind_required', params: { supported: ['CCC', 'DDD'] } },
   'rule.unknown_resource_type': { code: 'rule.unknown_resource_type', params: { provider: 'AAA', supported: ['CCC', 'DDD'] } },
   'context.not_string': { code: 'context.not_string', field: 'owner' },
@@ -101,7 +100,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(81);
+    expect(codes).toHaveLength(80);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });
@@ -172,12 +171,10 @@ describe('영어 사전 (D24)', () => {
     expect(fillUi(en, 'kind_required_hint', { displayName: 'Resource Policy' })).toBe('Choose a kind to select Resource Policy');
     expect(fillUi(en, 'kind_label', { displayName: 'Cloud SQL Instance' })).toBe('Kind of Cloud SQL Instance');
   });
-  it('행 · 범위 · (i) · 표지 · 존 문구 (D50 · D53 · D54)', () => {
+  it('행 · 범위 · (i) · 표지 문구 (D53 · D54)', () => {
     expect(fillUi(en, 'scope_choice_label', { displayName: 'IP Address' })).toBe('Scope of IP Address');
     expect(en.ui.scope_choose).toBe('scope…');
     expect(fillUi(en, 'scope_required_hint', { displayName: 'IP Address' })).toBe('Choose a scope to select IP Address');
-    expect(en.ui.zone_row_hint).toBe('Pick a zone in ② to name zonal resources');
-    expect(en.ui.zone_row_hint_global).toBe('Pick a region with zones in ② to name zonal resources');
     expect(fillUi(en, 'kind_dropped_on_scope', { kind: 'GCE_VM_IP', scope: 'Global' })).toBe('Kind GCE_VM_IP does not exist at Global scope; it was cleared.');
     expect(fillUi(en, 'info_toggle', { displayName: 'IP Address' })).toBe('About IP Address');
     expect(en.ui.enter_name_at).toBe('Enter the name at');

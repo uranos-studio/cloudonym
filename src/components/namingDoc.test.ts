@@ -104,14 +104,14 @@ describe('namingDocModel', () => {
     expect(cited('principle 5').filter((n) => !defined.has(n))).toEqual([5]);
   });
 
-  it('존 — 존 코드는 리전 코드 + 존 글자다(데이터로 확인) · 존 리소스 목록은 catalog 에서', () => {
+  it('존 — 존 코드는 리전 코드 + 존 글자다(데이터로 확인) · 존 입력은 리전으로 풀린다고 말한다 · 존 리소스 목록은 없다 (D50 revised)', () => {
     expect(zoneCodeMismatches(REGIONS.gcp)).toEqual([]);
     // 검사기 자체 — 틀린 코드를 넣으면 잡는다
     const broken = [{ ...REGIONS.gcp[0]!, zones: [{ zone: `${REGIONS.gcp[0]!.region}-a`, code: 'zzz9a' }] }];
     expect(zoneCodeMismatches(broken)).toEqual(['zzz9a']);
     const zones = section(model, 'zones');
-    expect(zones.items).toContain('VM Instance');
-    expect(section(namingDocModel(fixture), 'zones').items ?? []).toEqual([]);
+    expect(zones.items).toBeUndefined();
+    expect(zones.paragraphs[0]).toMatch(/resolves to its region: names carry the region code, never a zone/);
   });
 
   it('축소 세 단계 — 순서 있는 세 항목', () => {
@@ -161,15 +161,10 @@ describe('페이지 문장이 엔진이 하는 일과 같다', () => {
     expect(body).not.toMatch(/A token with no value is skipped/);
   });
 
-  it('global — 지역 토큰 없이 PASS, 존 리소스만 name.zone_required · 문장도 그렇게 말한다', () => {
-    const codes = new Set<string>();
-    for (const r of real.rules) {
-      const it0 = one(r, { region: 'global' })[0]!;
-      if (r.regionToken === 'zone') expect(it0.violations.map((v) => v.code), r.id).toEqual(['name.zone_required']);
-      else { expect(it0.valid, r.id).toBe(true); codes.add('pass'); }
-    }
-    expect(codes.has('pass')).toBe(true);
-    expect(section(model, 'regions').paragraphs[0]).toMatch(/zonal resources need a zone, so with global their names fail/);
+  it('global — 지역 토큰 없이 모든 규칙이 PASS (존 리소스도 · D50 revised) · 문장도 그렇게 말한다', () => {
+    for (const r of real.rules) expect(one(r, { region: 'global' })[0]!.valid, r.id).toBe(true);
+    expect(section(model, 'regions').paragraphs[0]).toMatch(/global puts no region token in any name\.$/);
+    expect(section(model, 'regions').paragraphs[0]).not.toMatch(/zone-required/);
   });
 
   it('축소 2단계 — 보호 토큰은 줄이지 않되 1단계가 그 가운데 optional 은 뗄 수 있다고 말한다', () => {

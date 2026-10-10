@@ -13,7 +13,7 @@ export const UI_KEYS = [
   'form_title', 'form_hint', 'field_owner_hint', 'field_system_hint', 'field_purpose_hint',
   'field_owner_placeholder', 'field_system_placeholder', 'field_purpose_placeholder', 'region_global_label',
   // RegionPicker (D49 · D50)
-  'region_search_placeholder', 'region_no_match', 'region_options_label', 'zone_none', 'zone_hint',
+  'region_search_placeholder', 'region_no_match', 'region_options_label',
   // App — 네 단계 (D42)
   'tagline', 'nav_label', 'share_button', 'share_button_label', 'share_warning', 'results_title',
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
@@ -30,7 +30,7 @@ export const UI_KEYS = [
   'role_label', 'role_hint', 'role_stale', 'tree_label',
   'kind_label', 'kind_default', 'kind_none', 'kind_choose', 'kind_required_hint',
   // ResourceTree — 행 · 범위 · (i) · 표지 · 존 (D50 · D53 · D54)
-  'scope_choice_label', 'scope_choose', 'scope_required_hint', 'kind_dropped_on_scope', 'zone_row_hint', 'zone_row_hint_global',
+  'scope_choice_label', 'scope_choose', 'scope_required_hint', 'kind_dropped_on_scope',
   'info_toggle', 'enter_name_at', 'badge_api_only', 'badge_api_only_title', 'badge_preview', 'badge_preview_title', 'api_only_filter',
   // 헤더 · 푸터의 문서 경로 링크 (D57)
   'nav_naming_guide', 'footer_privacy', 'back_to_app',
@@ -41,7 +41,7 @@ export const UI_KEYS = [
   'doc_token_owner', 'doc_token_system', 'doc_token_purpose', 'doc_token_env', 'doc_token_region', 'doc_token_slug',
   'doc_token_kind', 'doc_token_seq', 'doc_token_role', 'doc_regions_title', 'doc_regions_body', 'doc_regions_caption',
   'doc_col_region', 'doc_col_code', 'doc_col_location', 'doc_col_zones', 'doc_zones_title', 'doc_zones_body',
-  'doc_zones_list', 'doc_env_title', 'doc_env_body', 'doc_env_caption', 'doc_col_value', 'doc_env_prod', 'doc_env_stg',
+  'doc_env_title', 'doc_env_body', 'doc_env_caption', 'doc_col_value', 'doc_env_prod', 'doc_env_stg',
   'doc_env_dev', 'doc_env_sbx', 'doc_shrink_title', 'doc_shrink_body', 'doc_shrink_step1', 'doc_shrink_step2',
   'doc_shrink_step3', 'doc_abbr_title', 'doc_abbr_body', 'doc_abbr_principles_title', 'doc_abbr_principle_1',
   'doc_abbr_principle_2', 'doc_abbr_principle_3', 'doc_abbr_principle_4', 'doc_abbr_caption', 'doc_col_resource', 'doc_col_abbr',

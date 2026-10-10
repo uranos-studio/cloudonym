@@ -27,11 +27,11 @@ export function regionTokenOfRule(rule: Pick<ResourceRule, 'regionToken' | 'temp
   return rule.regionToken ?? (rule.template.includes('region') ? 'region' : 'none');
 }
 
-/** 지역 자리 값 (D49 · D50) — 존 규칙은 존 코드(없으면 '' → generateOne 이 name.zone_required), 리전 규칙은 리전 코드(global 이면 ''),
+/** 지역 자리 값 (D49 · D50 revised) — 리전 코드(global 이면 ''). 존 규칙도 리전 코드다 — 존은 이름에 들지 않는다,
  *  none 은 키를 넣지 않는다. 종류 자리는 토큰이고, 종류를 주지 않았거나 토큰이 없는 값이면 '' 이라 compose 가 건너뛴다 (D52) */
 export function tokenValues(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = {}): Partial<Record<Token, string>> {
   const kind = regionTokenOfRule(rule);
-  const region = kind === 'zone' ? (ctx.zone ?? '') : ctx.region === 'global' ? '' : ctx.region;
+  const region = ctx.region === 'global' ? '' : ctx.region;
   const all: Record<Token, string> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region,
                                        slug: rule.slug, kind: extra.kind === undefined ? '' : (kindTokenOfRule(rule, extra.kind) ?? ''),
                                        seq: extra.seq ?? '01', role: extra.role ?? 'sync' };

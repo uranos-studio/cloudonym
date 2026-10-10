@@ -13,7 +13,7 @@ import { ROLE_PATTERN } from '../core/selection';
 import { SCOPES } from '../core/scopes';
 import type { Category, Provider, ResourceRule, ScopeId } from '../core/types';
 import {
-  activeRule, canIncrease, isZonal, kindChoices, kindSelectValue, pickedRule, refilterKind, rowBlock, setCount, setKind, setRole, setRowScope, toggleRow,
+  activeRule, canIncrease, kindChoices, kindSelectValue, pickedRule, refilterKind, rowBlock, setCount, setKind, setRole, setRowScope, toggleRow,
   type KindChoices, type Picked, type PickedEntry, type RowBlock, type RowDraft,
 } from './selection';
 import { apiOnlyCount, categoryCounts, filterTree, isFiltering, type TreeFilter, type ViewNode } from './treeFilter';
@@ -48,17 +48,13 @@ interface Props {
   tree: TreeNode;
   picked: Picked;
   onChange: (next: Picked) => void;
-  /** 문맥에 존이 없다(리전만 · global) — 존 규칙 행을 새로 체크할 수 없다 (D50) */
-  zoneMissing: boolean;
-  /** 지역이 global — 존 select 가 없으므로 존 안내는 「존이 있는 리전을 고르라」고 한다 */
-  regionGlobal: boolean;
 }
 
 /** 행 key → 체크 전에 고른 범위 · 종류와, 범위를 바꿔 버린 종류(안내 한 줄) */
 type Drafts = ReadonlyMap<string, RowDraft & { droppedKind?: string }>;
 const NO_DRAFT: RowDraft = {};
 
-function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing, regionGlobal }: Props) {
+function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
   // 펼침 두 벌 — plain 은 거르지 않은 보기, filtered 는 걸러진 보기(필터가 바뀔 때마다 모두 펼침으로 다시 시작)
   const [plain, setPlain] = useState<OpenState>(() => initialOpen(tree, picked));
@@ -75,11 +71,10 @@ function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing, regio
     setDrafts(new Map());
   }
 
-  // 행의 콜백이 매번 바뀌지 않게 최신 선택 · draft · 존 상태를 ref 로 읽는다 — 행은 memo 라 자기 값이 같으면 다시 그리지 않는다
+  // 행의 콜백이 매번 바뀌지 않게 최신 선택 · draft 를 ref 로 읽는다 — 행은 memo 라 자기 값이 같으면 다시 그리지 않는다
   const pickedRef = useRef(picked);
   const draftsRef = useRef(drafts);
-  const zoneRef = useRef(zoneMissing);
-  useLayoutEffect(() => { pickedRef.current = picked; draftsRef.current = drafts; zoneRef.current = zoneMissing; }, [picked, drafts, zoneMissing]);
+  useLayoutEffect(() => { pickedRef.current = picked; draftsRef.current = drafts; }, [picked, drafts]);
   const putDraft = useCallback((key: string, d: RowDraft & { droppedKind?: string }) => setDrafts((m) => new Map(m).set(key, d)), []);
   const onToggleRow = useCallback((row: TreeRow) => {
     const cur = pickedRef.current;
@@ -88,15 +83,14 @@ function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing, regio
     // 체크를 풀면 그 범위 · 종류를 다시 들고 있는다 — 다시 체크하면 같은 것이 돌아온다
     if (was) putDraft(row.key, { scope: was.scope, kind: cur.get(was.resourceType)?.kind });
     else if (d.droppedKind !== undefined) putDraft(row.key, { scope: d.scope, kind: d.kind });
-    onChange(toggleRow(cur, row, { scope: d.scope, kind: d.kind }, zoneRef.current));
+    onChange(toggleRow(cur, row, { scope: d.scope, kind: d.kind }));
   }, [onChange, putDraft]);
   const onScope = useCallback((row: TreeRow, scope: ScopeId) => {
     const cur = pickedRef.current;
     const d = draftsRef.current.get(row.key) ?? NO_DRAFT;
     const was = pickedRule(row, cur);
     if (was) {
-      const res = setRowScope(cur, row, scope, zoneRef.current);
-      if (!res) return;
+      const res = setRowScope(cur, row, scope);
       putDraft(row.key, { scope, ...(res.kindDropped ? { droppedKind: cur.get(was.resourceType)?.kind } : {}) });
       onChange(res.picked);
       return;
@@ -160,7 +154,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange, zoneMissing, regio
     const entry = p && picked.get(p.resourceType);
     return (
       <Row key={row.key} row={row} rule={activeRule(row, picked, d)} entry={entry} draft={d} droppedKind={drafts.get(row.key)?.droppedKind}
-        block={rowBlock(row, picked, d, zoneMissing)} zoneMissing={zoneMissing} regionGlobal={regionGlobal} canInc={p !== undefined && canIncrease(picked, p)}
+        block={rowBlock(row, picked, d)} canInc={p !== undefined && canIncrease(picked, p)}
         onToggle={onToggleRow} onScope={onScope} onDraftKind={onDraftKind} onCount={onCount} onRole={onRole} onKind={onKind} />
     );
   });
@@ -270,8 +264,6 @@ interface RowProps {
   draft: RowDraft;
   droppedKind: string | undefined;
   block: RowBlock | undefined;
-  zoneMissing: boolean;
-  regionGlobal: boolean;
   canInc: boolean;
   onToggle: (row: TreeRow) => void;
   onScope: (row: TreeRow, scope: ScopeId) => void;
@@ -282,7 +274,7 @@ interface RowProps {
 }
 
 /** 행 하나 — 높이 44px(터치) · 체크 · 이름 · slug · (i) · 표지 · 범위 select(합친 행) · 종류 select · 입력(개수 · 역할 · 1 고정) · 안내 */
-const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zoneMissing, regionGlobal, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
+const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
   const checked = entry !== undefined;
   const shape = rule ?? row.rules[0]!;
   const input = inputKind(shape);
@@ -293,12 +285,10 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zon
   const [infoOpen, setInfoOpen] = useState(false);
   const hintId = useId();
   const infoId = useId();
-  // 행 아래 안내 — 막힌 까닭(범위 · 종류 · 존) 또는 고른 존 행인데 존이 없다
-  const zoneHint = block === 'zone' || (checked && rule !== undefined && zoneMissing && isZonal(rule));
+  // 행 아래 안내 — 막힌 까닭(범위 · 종류)
   const hint = block === 'scope' ? fillUi(en, 'scope_required_hint', name)
-    : block === 'kind' ? fillUi(en, 'kind_required_hint', name)
-      : zoneHint ? (regionGlobal ? en.ui.zone_row_hint_global : en.ui.zone_row_hint) : undefined;
-  const hintKind = block === 'scope' ? 'scope' : block === 'kind' ? 'kind' : 'zone';
+    : block === 'kind' ? fillUi(en, 'kind_required_hint', name) : undefined;
+  const hintKind = block === 'scope' ? 'scope' : 'kind';
   const onPickKind = (v: string) => {
     const next = v === '' ? undefined : v;
     if (checked && rule) onKind(rule, next);
@@ -330,11 +320,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zon
         <select data-scope-select value={rule?.scope ?? ''} onChange={(e) => onScope(row, e.target.value as ScopeId)} aria-label={fillUi(en, 'scope_choice_label', name)}
           className="shrink-0 rounded-md border border-zinc-300 bg-white px-1.5 py-1 text-xs focus-visible:outline-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-950">
           <option value="" disabled>{en.ui.scope_choose}</option>
-          {scopes.map((c) => {
-            // 고른 행을 존 범위로 옮기는 것은 존 항목을 새로 만드는 일이다 — 존이 없으면 막는다 (D50)
-            const r = rowRules(row, c.scope)[0];
-            return <option key={c.scope} value={c.scope} disabled={checked && zoneMissing && r !== undefined && isZonal(r) && r !== rule}>{c.label}</option>;
-          })}
+          {scopes.map((c) => <option key={c.scope} value={c.scope}>{c.label}</option>)}
         </select>
       )}
       {rule && choices && <KindSelect rule={rule} choices={choices} value={kindSelectValue(rule, shownKind)} onPick={onPickKind} />}
@@ -358,7 +344,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, zon
       )}
       {input === 'role' && <RoleInput rule={shape} value={entry?.role} disabled={!checked} onRole={onRole} />}
       {hint && (
-        <p id={hintId} data-scope-required={hintKind === 'scope' || undefined} data-kind-required={hintKind === 'kind' || undefined} data-zone-required={hintKind === 'zone' || undefined}
+        <p id={hintId} data-scope-required={hintKind === 'scope' || undefined} data-kind-required={hintKind === 'kind' || undefined}
           className="basis-full pb-1 pl-6 text-xs text-zinc-600 dark:text-zinc-400">{hint}</p>
       )}
       {droppedKind !== undefined && rule && (

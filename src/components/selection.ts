@@ -4,7 +4,7 @@
 import { DEFAULT_ROLE } from '../core/engine';
 import { MAX_COUNT, MAX_ITEMS, MAX_NAMES, validateSelection, type SelectionItem } from '../core/selection';
 import { inputKind, rowRules, type TreeNode, type TreeRow } from '../core/tree';
-import { regionTokenOf, rowOf } from '../core/catalog';
+import { rowOf } from '../core/catalog';
 import type { Provider, ResourceRule, ScopeId } from '../core/types';
 
 /** kind 는 고른 종류 값 이름(POSTGRES) — 고르지 않았거나 기본값을 고르면 없다(이름이 같으므로 hash 를 늘리지 않는다) */
@@ -124,11 +124,8 @@ export const rowKeyOf = (rule: ResourceRule): string => rowOf(rule.id)?.key ?? r
 
 /** 행에서 아직 체크하지 않았을 때 들고 있는 값 — 고른 범위 · 종류. 행이 걸러져 사라져도 남도록 트리가 행 key 로 든다 */
 export interface RowDraft { scope?: ScopeId; kind?: string }
-/** 행을 새로 체크할 수 없는 까닭 — 범위 미선택(D53) · 필수 종류 미선택(D52) · 존 없음(D50) · 상한 */
-export type RowBlock = 'scope' | 'kind' | 'zone' | 'limit';
-
-/** 존 규칙인가 — 지역 자리에 존 코드가 든다(catalog regionToken 'zone') */
-export const isZonal = (rule: ResourceRule): boolean => regionTokenOf(rule) === 'zone';
+/** 행을 새로 체크할 수 없는 까닭 — 범위 미선택(D53) · 필수 종류 미선택(D52) · 상한. 존은 이름에 들지 않아 막지 않는다 (D50 revised) */
+export type RowBlock = 'scope' | 'kind' | 'limit';
 
 /** 행의 규칙 중 선택에 든 것 — 행마다 하나뿐이다(applyChange · hash 디코더가 지킨다) */
 export function pickedRule(row: TreeRow, picked: Picked): ResourceRule | undefined {
@@ -143,24 +140,23 @@ export function activeRule(row: TreeRow, picked: Picked, draft: RowDraft): Resou
   return draft.scope === undefined ? undefined : rowRules(row, draft.scope)[0];
 }
 
-/** 행을 새로 체크할 수 없는 까닭 — 고른 행은 없다(끄기는 늘 된다). zoneMissing 은 문맥에 존이 없다는 뜻 */
-export function rowBlock(row: TreeRow, picked: Picked, draft: RowDraft, zoneMissing: boolean): RowBlock | undefined {
+/** 행을 새로 체크할 수 없는 까닭 — 고른 행은 없다(끄기는 늘 된다) */
+export function rowBlock(row: TreeRow, picked: Picked, draft: RowDraft): RowBlock | undefined {
   if (pickedRule(row, picked)) return undefined;
   const rule = activeRule(row, picked, draft);
   if (!rule) return 'scope';
   if (needsKind(rule, draft.kind)) return 'kind';
-  if (zoneMissing && isZonal(rule)) return 'zone';
   if (!canAdd(picked)) return 'limit';
   return undefined;
 }
 
-export const canCheck = (row: TreeRow, picked: Picked, draft: RowDraft, zoneMissing: boolean): boolean => rowBlock(row, picked, draft, zoneMissing) === undefined;
+export const canCheck = (row: TreeRow, picked: Picked, draft: RowDraft): boolean => rowBlock(row, picked, draft) === undefined;
 
 /** 행의 체크 상자 — 고른 행은 끈다(늘 된다), 아니면 막힌 까닭이 없을 때만 draft 의 범위 · 종류로 켠다. 막히면 같은 Map 을 돌려준다 */
-export function toggleRow(picked: Picked, row: TreeRow, draft: RowDraft, zoneMissing: boolean): Picked {
+export function toggleRow(picked: Picked, row: TreeRow, draft: RowDraft): Picked {
   const p = pickedRule(row, picked);
   if (p) return toggle(picked, p);
-  if (rowBlock(row, picked, draft, zoneMissing) !== undefined) return picked;
+  if (rowBlock(row, picked, draft) !== undefined) return picked;
   return toggle(picked, activeRule(row, picked, draft)!, draft.kind);
 }
 
@@ -172,12 +168,11 @@ export function refilterKind(rule: ResourceRule, kind: string | undefined): { ki
 }
 
 /** 고른 행의 범위를 바꾼다 (D53) — 옛 키를 지우고 새 키에 count · 역할을 옮기고 종류는 새 규칙의 allowed 로 거른다.
- *  고르지 않은 행 · 같은 범위면 그대로. 존이 없을 때 존 규칙으로 옮기는 것은 존 항목을 새로 만드는 일이라 막는다(undefined — D50) */
-export function setRowScope(picked: Picked, row: TreeRow, scope: ScopeId, zoneMissing: boolean): { picked: Picked; kindDropped: boolean } | undefined {
+ *  고르지 않은 행 · 같은 범위면 그대로 */
+export function setRowScope(picked: Picked, row: TreeRow, scope: ScopeId): { picked: Picked; kindDropped: boolean } {
   const from = pickedRule(row, picked);
   const to = rowRules(row, scope)[0];
   if (!from || !to || from === to) return { picked, kindDropped: false };
-  if (zoneMissing && isZonal(to)) return undefined;
   const e = picked.get(from.resourceType)!;
   const { kind, dropped } = refilterKind(to, e.kind);
   const next = new Map(picked);

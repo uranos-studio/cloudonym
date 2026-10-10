@@ -42,11 +42,11 @@ export function kindChecked(gcp, kindSources) {
 export function renderGcpCatalog(gcp, kindSources = { rows: {} }) {
   return `${HEADER}gcp.json 에서 만든다 (D46).
 // 행 하나 = 화면 행 하나. rules 는 규칙 id → 그 규칙의 범위 · 지역 토큰 종류 · 허용 종류(D52). 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
-import type { Category } from '../types';
+import type { Category, RegionToken } from '../types';
 
 /** 범위 선택지 — 'namespace' · 'project' · 'location' · 'global' · 'region' · 'zone' · 'in <부모 resourceType>' */
 export type ScopeChoice = string;
-export type RegionToken = 'none' | 'region' | 'zone';
+export type { RegionToken };
 
 export interface RuleKinds { default: string | null; allowed: readonly string[] }
 export interface CatalogRuleSpec { scope: ScopeChoice; regionToken: RegionToken; kinds?: RuleKinds }

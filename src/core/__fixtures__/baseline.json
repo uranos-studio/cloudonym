@@ -1584,12 +1584,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -1638,12 +1638,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -1656,12 +1656,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -1710,12 +1710,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -1791,21 +1791,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -1818,21 +1818,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -2142,12 +2142,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -2232,12 +2232,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -2268,12 +2268,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -2340,12 +2340,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -2385,12 +2385,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -2403,12 +2403,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -7671,12 +7671,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -7725,12 +7725,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -7743,12 +7743,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -7797,12 +7797,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -7878,21 +7878,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -7905,21 +7905,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -8229,12 +8229,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -8319,12 +8319,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -8355,12 +8355,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -8427,12 +8427,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -8472,12 +8472,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -8490,12 +8490,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -13758,12 +13758,12 @@
             "steps": 3
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -13812,12 +13812,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -13830,12 +13830,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -13884,12 +13884,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -13965,21 +13965,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -13992,21 +13992,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -14316,12 +14316,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -14406,12 +14406,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -14442,12 +14442,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -14514,12 +14514,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -14559,12 +14559,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -14577,12 +14577,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -19845,12 +19845,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -19899,12 +19899,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -19917,12 +19917,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -19971,12 +19971,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -20052,21 +20052,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -20079,21 +20079,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -20403,12 +20403,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -20493,12 +20493,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -20529,12 +20529,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -20601,12 +20601,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -20646,12 +20646,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -20664,12 +20664,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -25932,12 +25932,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-gce-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -25986,12 +25986,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-disk-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -26004,12 +26004,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-as-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -26058,12 +26058,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -26139,21 +26139,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-mig-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ig-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -26166,21 +26166,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-isg-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-isn-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -26490,12 +26490,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -26580,12 +26580,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-sp-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -26616,12 +26616,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ti-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -26688,12 +26688,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-vep-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -26733,12 +26733,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ng-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -26751,12 +26751,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "windows-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-neg-01",
-            "violations": 1,
+            "original": "windows-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -32019,12 +32019,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-gce-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -32073,12 +32073,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-disk-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -32091,12 +32091,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-as-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -32145,12 +32145,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -32226,21 +32226,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-mig-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ig-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -32253,21 +32253,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-isg-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-isn-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -32577,12 +32577,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -32667,12 +32667,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-sp-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -32703,12 +32703,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ti-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -32775,12 +32775,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-vep-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -32820,12 +32820,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ng-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -32838,12 +32838,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "google-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-neg-01",
-            "violations": 1,
+            "original": "google-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -38106,12 +38106,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-gce-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -38160,12 +38160,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-disk-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -38178,12 +38178,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-as-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -38232,12 +38232,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -38313,21 +38313,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-mig-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ig-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -38340,21 +38340,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-isg-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-isn-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -38664,12 +38664,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -38754,12 +38754,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-sp-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -38790,12 +38790,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ti-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -38862,12 +38862,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-vep-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -38907,12 +38907,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ng-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -38925,12 +38925,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "azure-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-neg-01",
-            "violations": 1,
+            "original": "azure-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -44197,7 +44197,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-gce-01",
+            "original": "매매-trade-prod-ane3-gce-01",
             "violations": 1,
             "steps": 1
           },
@@ -44251,7 +44251,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-disk-01",
+            "original": "매매-trade-prod-ane3-disk-01",
             "violations": 1,
             "steps": 1
           },
@@ -44269,7 +44269,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-as-01",
+            "original": "매매-trade-prod-ane3-as-01",
             "violations": 1,
             "steps": 1
           },
@@ -44323,7 +44323,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-frsv-01",
+            "original": "매매-trade-prod-ane3-frsv-01",
             "violations": 1,
             "steps": 1
           },
@@ -44404,7 +44404,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-mig-01",
+            "original": "매매-trade-prod-ane3-mig-01",
             "violations": 1,
             "steps": 1
           },
@@ -44413,7 +44413,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ig-01",
+            "original": "매매-trade-prod-ane3-ig-01",
             "violations": 1,
             "steps": 1
           },
@@ -44431,7 +44431,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-isg-01",
+            "original": "매매-trade-prod-ane3-isg-01",
             "violations": 1,
             "steps": 1
           },
@@ -44440,7 +44440,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-isn-01",
+            "original": "매매-trade-prod-ane3-isn-01",
             "violations": 1,
             "steps": 1
           },
@@ -44755,7 +44755,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-rsv-01",
+            "original": "매매-trade-prod-ane3-rsv-01",
             "violations": 1,
             "steps": 1
           },
@@ -44845,7 +44845,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-sp-01",
+            "original": "매매-trade-prod-ane3-sp-01",
             "violations": 1,
             "steps": 1
           },
@@ -44881,7 +44881,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ti-01",
+            "original": "매매-trade-prod-ane3-ti-01",
             "violations": 1,
             "steps": 1
           },
@@ -44953,7 +44953,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-vep-01",
+            "original": "매매-trade-prod-ane3-vep-01",
             "violations": 1,
             "steps": 1
           },
@@ -44998,7 +44998,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ng-01",
+            "original": "매매-trade-prod-ane3-ng-01",
             "violations": 1,
             "steps": 1
           },
@@ -45016,7 +45016,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-neg-01",
+            "original": "매매-trade-prod-ane3-neg-01",
             "violations": 1,
             "steps": 1
           },
@@ -50280,12 +50280,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-gce-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -50334,12 +50334,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-disk-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -50352,12 +50352,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-as-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -50406,12 +50406,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-frsv-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -50487,21 +50487,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-mig-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-ig-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -50514,21 +50514,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-isg-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-isn-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -50838,12 +50838,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-rsv-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -50928,12 +50928,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-sp-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -50964,12 +50964,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-ti-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -51036,12 +51036,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-vep-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -51081,12 +51081,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-ng-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -51099,12 +51099,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "paymentsettlement-reconciliation-dev-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-neg-01",
-            "violations": 1,
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -56367,12 +56367,12 @@
             "steps": 3
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-gce-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -56421,12 +56421,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-disk-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -56439,12 +56439,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-as-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -56493,12 +56493,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-frsv-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -56574,21 +56574,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-mig-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ig-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -56601,21 +56601,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-isg-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-isn-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -56925,12 +56925,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-rsv-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -57015,12 +57015,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-sp-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -57051,12 +57051,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ti-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -57123,12 +57123,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-vep-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -57168,12 +57168,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ng-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -57186,12 +57186,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "a-long-longpurpose-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-neg-01",
-            "violations": 1,
+            "original": "a-long-longpurpose-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -62454,11 +62454,11 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-gce-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-gce-01",
+            "original": "3tier-trade-prod-ane3-gce-01",
             "violations": 1,
             "steps": 0
           },
@@ -62508,11 +62508,11 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-disk-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-disk-01",
+            "original": "3tier-trade-prod-ane3-disk-01",
             "violations": 1,
             "steps": 0
           },
@@ -62526,11 +62526,11 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-as-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-as-01",
+            "original": "3tier-trade-prod-ane3-as-01",
             "violations": 1,
             "steps": 0
           },
@@ -62580,11 +62580,11 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-frsv-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-frsv-01",
+            "original": "3tier-trade-prod-ane3-frsv-01",
             "violations": 1,
             "steps": 0
           },
@@ -62661,20 +62661,20 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-mig-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-mig-01",
+            "original": "3tier-trade-prod-ane3-mig-01",
             "violations": 1,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-ig-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ig-01",
+            "original": "3tier-trade-prod-ane3-ig-01",
             "violations": 1,
             "steps": 0
           },
@@ -62688,20 +62688,20 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-isg-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-isg-01",
+            "original": "3tier-trade-prod-ane3-isg-01",
             "violations": 1,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-isn-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-isn-01",
+            "original": "3tier-trade-prod-ane3-isn-01",
             "violations": 1,
             "steps": 0
           },
@@ -63012,11 +63012,11 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-rsv-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-rsv-01",
+            "original": "3tier-trade-prod-ane3-rsv-01",
             "violations": 1,
             "steps": 0
           },
@@ -63102,11 +63102,11 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-sp-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-sp-01",
+            "original": "3tier-trade-prod-ane3-sp-01",
             "violations": 1,
             "steps": 0
           },
@@ -63138,11 +63138,11 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-ti-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ti-01",
+            "original": "3tier-trade-prod-ane3-ti-01",
             "violations": 1,
             "steps": 0
           },
@@ -63210,11 +63210,11 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-vep-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-vep-01",
+            "original": "3tier-trade-prod-ane3-vep-01",
             "violations": 1,
             "steps": 0
           },
@@ -63255,11 +63255,11 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-ng-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ng-01",
+            "original": "3tier-trade-prod-ane3-ng-01",
             "violations": 1,
             "steps": 0
           },
@@ -63273,11 +63273,11 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
+            "name": "3tier-trade-prod-ane3-neg-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-neg-01",
+            "original": "3tier-trade-prod-ane3-neg-01",
             "violations": 1,
             "steps": 0
           },
@@ -68541,12 +68541,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -68595,12 +68595,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -68613,12 +68613,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -68667,12 +68667,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -68748,21 +68748,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -68775,21 +68775,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -69099,12 +69099,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -69189,12 +69189,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -69225,12 +69225,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -69297,12 +69297,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -69342,12 +69342,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -69360,12 +69360,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -74628,12 +74628,12 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -74682,12 +74682,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -74700,12 +74700,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -74754,12 +74754,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -74835,21 +74835,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -74862,21 +74862,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -75186,12 +75186,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -75276,12 +75276,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -75312,12 +75312,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -75384,12 +75384,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -75429,12 +75429,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -75447,12 +75447,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -80715,12 +80715,12 @@
             "steps": 3
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -80769,12 +80769,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -80787,12 +80787,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -80841,12 +80841,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -80922,21 +80922,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -80949,21 +80949,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -81273,12 +81273,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -81363,12 +81363,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -81399,12 +81399,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -81471,12 +81471,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -81516,12 +81516,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -81534,12 +81534,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -86802,12 +86802,12 @@
             "steps": 3
           },
           "compute_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-gce-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-gce-01",
+            "violations": 0,
             "steps": 0
           },
           "vpc_network": {
@@ -86856,12 +86856,12 @@
             "steps": 0
           },
           "disk": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-disk-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-disk-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-disk-01",
+            "violations": 0,
             "steps": 0
           },
           "address": {
@@ -86874,12 +86874,12 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-as-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-as-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-as-01",
+            "violations": 0,
             "steps": 0
           },
           "backend_bucket": {
@@ -86928,12 +86928,12 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-frsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-frsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-frsv-01",
+            "violations": 0,
             "steps": 0
           },
           "global_address": {
@@ -87009,21 +87009,21 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-mig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-mig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-mig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ig-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ig-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ig-01",
+            "violations": 0,
             "steps": 0
           },
           "instance_template": {
@@ -87036,21 +87036,21 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isg-01",
+            "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-isn-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-isn-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-isn-01",
+            "violations": 0,
             "steps": 0
           },
           "interconnect_attachment_group": {
@@ -87360,12 +87360,12 @@
             "steps": 0
           },
           "reservation": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-rsv-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-rsv-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-rsv-01",
+            "violations": 0,
             "steps": 0
           },
           "resource_policy": {
@@ -87450,12 +87450,12 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-sp-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-sp-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-sp-01",
+            "violations": 0,
             "steps": 0
           },
           "target_grpc_proxy": {
@@ -87486,12 +87486,12 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ti-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ti-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ti-01",
+            "violations": 0,
             "steps": 0
           },
           "target_pool": {
@@ -87558,12 +87558,12 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-vep-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-vep-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-vep-01",
+            "violations": 0,
             "steps": 0
           },
           "kms_ekm_connection": {
@@ -87603,12 +87603,12 @@
             "steps": 0
           },
           "node_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-ng-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ng-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-ng-01",
+            "violations": 0,
             "steps": 0
           },
           "node_template": {
@@ -87621,12 +87621,12 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "",
-            "valid": false,
+            "name": "billing-trade-prod-ane3-neg-01",
+            "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-neg-01",
-            "violations": 1,
+            "original": "billing-trade-prod-ane3-neg-01",
+            "violations": 0,
             "steps": 0
           },
           "region_network_endpoint_group": {
@@ -91413,11 +91413,11 @@
             "steps": 2
           },
           "compute_instance": {
-            "name": "billing-trade-prod-ane3a-gce-01",
+            "name": "billing-trade-prod-ane3-gce-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-gce-01",
+            "original": "billing-trade-prod-ane3-gce-01",
             "violations": 0,
             "steps": 0
           },
@@ -91467,11 +91467,11 @@
             "steps": 0
           },
           "disk": {
-            "name": "billing-trade-prod-ane3a-disk-01",
+            "name": "billing-trade-prod-ane3-disk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-disk-01",
+            "original": "billing-trade-prod-ane3-disk-01",
             "violations": 0,
             "steps": 0
           },
@@ -91485,11 +91485,11 @@
             "steps": 0
           },
           "autoscaler": {
-            "name": "billing-trade-prod-ane3a-as-01",
+            "name": "billing-trade-prod-ane3-as-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-as-01",
+            "original": "billing-trade-prod-ane3-as-01",
             "violations": 0,
             "steps": 0
           },
@@ -91539,11 +91539,11 @@
             "steps": 0
           },
           "future_reservation": {
-            "name": "billing-trade-prod-ane3a-frsv-01",
+            "name": "billing-trade-prod-ane3-frsv-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-frsv-01",
+            "original": "billing-trade-prod-ane3-frsv-01",
             "violations": 0,
             "steps": 0
           },
@@ -91620,20 +91620,20 @@
             "steps": 0
           },
           "instance_group_manager": {
-            "name": "billing-trade-prod-ane3a-mig-01",
+            "name": "billing-trade-prod-ane3-mig-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-mig-01",
+            "original": "billing-trade-prod-ane3-mig-01",
             "violations": 0,
             "steps": 0
           },
           "instance_group": {
-            "name": "billing-trade-prod-ane3a-ig-01",
+            "name": "billing-trade-prod-ane3-ig-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-ig-01",
+            "original": "billing-trade-prod-ane3-ig-01",
             "violations": 0,
             "steps": 0
           },
@@ -91647,20 +91647,20 @@
             "steps": 0
           },
           "instant_snapshot_group": {
-            "name": "billing-trade-prod-ane3a-isg-01",
+            "name": "billing-trade-prod-ane3-isg-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-isg-01",
+            "original": "billing-trade-prod-ane3-isg-01",
             "violations": 0,
             "steps": 0
           },
           "instant_snapshot": {
-            "name": "billing-trade-prod-ane3a-isn-01",
+            "name": "billing-trade-prod-ane3-isn-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-isn-01",
+            "original": "billing-trade-prod-ane3-isn-01",
             "violations": 0,
             "steps": 0
           },
@@ -91971,11 +91971,11 @@
             "steps": 0
           },
           "reservation": {
-            "name": "billing-trade-prod-ane3a-rsv-01",
+            "name": "billing-trade-prod-ane3-rsv-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-rsv-01",
+            "original": "billing-trade-prod-ane3-rsv-01",
             "violations": 0,
             "steps": 0
           },
@@ -92061,11 +92061,11 @@
             "steps": 0
           },
           "storage_pool": {
-            "name": "billing-trade-prod-ane3a-sp-01",
+            "name": "billing-trade-prod-ane3-sp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-sp-01",
+            "original": "billing-trade-prod-ane3-sp-01",
             "violations": 0,
             "steps": 0
           },
@@ -92097,11 +92097,11 @@
             "steps": 0
           },
           "target_instance": {
-            "name": "billing-trade-prod-ane3a-ti-01",
+            "name": "billing-trade-prod-ane3-ti-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-ti-01",
+            "original": "billing-trade-prod-ane3-ti-01",
             "violations": 0,
             "steps": 0
           },
@@ -92169,11 +92169,11 @@
             "steps": 0
           },
           "zone_vm_extension_policy": {
-            "name": "billing-trade-prod-ane3a-vep-01",
+            "name": "billing-trade-prod-ane3-vep-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-vep-01",
+            "original": "billing-trade-prod-ane3-vep-01",
             "violations": 0,
             "steps": 0
           },
@@ -92214,11 +92214,11 @@
             "steps": 0
           },
           "node_group": {
-            "name": "billing-trade-prod-ane3a-ng-01",
+            "name": "billing-trade-prod-ane3-ng-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-ng-01",
+            "original": "billing-trade-prod-ane3-ng-01",
             "violations": 0,
             "steps": 0
           },
@@ -92232,11 +92232,11 @@
             "steps": 0
           },
           "network_endpoint_group": {
-            "name": "billing-trade-prod-ane3a-neg-01",
+            "name": "billing-trade-prod-ane3-neg-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3a-neg-01",
+            "original": "billing-trade-prod-ane3-neg-01",
             "violations": 0,
             "steps": 0
           },
@@ -215586,20 +215586,20 @@
       {
         "id": "gcp-vm2-sa-db",
         "provider": "gcp",
-        "valid": false,
+        "valid": true,
         "conflicts": 0,
         "items": [
           {
             "key": "compute_instance_01",
-            "name": "",
-            "valid": false,
-            "violations": 1
+            "name": "billing-trade-prod-ane3-gce-01",
+            "valid": true,
+            "violations": 0
           },
           {
             "key": "compute_instance_02",
-            "name": "",
-            "valid": false,
-            "violations": 1
+            "name": "billing-trade-prod-ane3-gce-02",
+            "valid": true,
+            "violations": 0
           },
           {
             "key": "service_account_db",
@@ -215916,17 +215916,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -215935,7 +215939,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -215970,6 +215978,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -215978,9 +215987,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -215988,11 +215999,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -216407,21 +216421,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -216616,17 +216616,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -216635,7 +216639,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -216670,6 +216678,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -216678,9 +216687,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -216688,11 +216699,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -217107,21 +217121,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -217310,17 +217310,21 @@
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"team-a-cafe-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"team-a-cafe-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -217329,7 +217333,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -217364,6 +217372,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -217372,9 +217381,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -217382,11 +217393,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -217802,21 +217816,7 @@
         ],
         "invalid": [
           "# INVALID: aws_tags",
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -218011,17 +218011,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -218030,7 +218034,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -218065,6 +218073,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -218073,9 +218082,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -218083,11 +218094,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -218502,21 +218516,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -218711,17 +218711,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-windows-trade-prod\"",
           "gcp_service_account = \"windows-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"windows-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"windows-trade-prod-vpc-01\"",
           "gcp_subnet = \"windows-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"windows-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-windows-trade-prod-gcs\"",
           "gcp_firewall_rule = \"windows-trade-prod-fw-01\"",
+          "gcp_disk = \"windows-trade-prod-ane3-disk-01\"",
           "gcp_address = \"windows-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"windows-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"windows-trade-prod-bb-01\"",
           "gcp_backend_service = \"windows-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"windows-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"windows-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"windows-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"windows-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"windows-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"windows-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"windows-trade-prod-pdp-01\"",
@@ -218730,7 +218734,11 @@
           "gcp_http_health_check = \"windows-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"windows-trade-prod-hhcs-01\"",
           "gcp_image = \"windows-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"windows-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"windows-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"windows-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"windows-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"windows-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"windows-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"windows-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"windows-trade-prod-icg-01\"",
@@ -218765,6 +218773,7 @@
           "gcp_region_target_https_proxy = \"windows-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"windows-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"windows-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"windows-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"windows-trade-prod-rop-01\"",
           "gcp_router = \"windows-trade-prod-ane3-cr-01\"",
           "gcp_route = \"windows-trade-prod-rt-01\"",
@@ -218773,9 +218782,11 @@
           "gcp_snapshot = \"windows-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"windows-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"windows-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"windows-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"windows-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"windows-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"windows-trade-prod-thps-01\"",
+          "gcp_target_instance = \"windows-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"windows-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"windows-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"windows-trade-prod-ttp-01\"",
@@ -218783,11 +218794,14 @@
           "gcp_url_map = \"windows-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"windows-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"windows-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"windows-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"windows-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"windows-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"windows-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"windows-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"windows-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"windows-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"windows-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"windows-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"windows-trade-prod-neg-01\"",
           "gcp_firestore_database = \"windows-trade-prod-ane3-fs-01\"",
@@ -219157,21 +219171,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_storage_account",
@@ -219410,16 +219410,20 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_service_account = \"google-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"google-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"google-trade-prod-vpc-01\"",
           "gcp_subnet = \"google-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"google-trade-prod-ane3-sql-01\"",
           "gcp_firewall_rule = \"google-trade-prod-fw-01\"",
+          "gcp_disk = \"google-trade-prod-ane3-disk-01\"",
           "gcp_address = \"google-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"google-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"google-trade-prod-bb-01\"",
           "gcp_backend_service = \"google-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"google-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"google-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"google-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"google-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"google-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"google-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"google-trade-prod-pdp-01\"",
@@ -219428,7 +219432,11 @@
           "gcp_http_health_check = \"google-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"google-trade-prod-hhcs-01\"",
           "gcp_image = \"google-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"google-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"google-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"google-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"google-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"google-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"google-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"google-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"google-trade-prod-icg-01\"",
@@ -219463,6 +219471,7 @@
           "gcp_region_target_https_proxy = \"google-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"google-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"google-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"google-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"google-trade-prod-rop-01\"",
           "gcp_router = \"google-trade-prod-ane3-cr-01\"",
           "gcp_route = \"google-trade-prod-rt-01\"",
@@ -219471,9 +219480,11 @@
           "gcp_snapshot = \"google-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"google-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"google-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"google-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"google-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"google-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"google-trade-prod-thps-01\"",
+          "gcp_target_instance = \"google-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"google-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"google-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"google-trade-prod-ttp-01\"",
@@ -219481,11 +219492,14 @@
           "gcp_url_map = \"google-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"google-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"google-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"google-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"google-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"google-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"google-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"google-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"google-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"google-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"google-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"google-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"google-trade-prod-neg-01\"",
           "gcp_firestore_database = \"google-trade-prod-ane3-fs-01\"",
@@ -219901,22 +219915,8 @@
         ],
         "invalid": [
           "# INVALID: gcp_project_id",
-          "# INVALID: gcp_compute_instance",
           "# INVALID: gcp_storage_bucket",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -220111,17 +220111,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-azure-trade-prod\"",
           "gcp_service_account = \"azure-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"azure-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"azure-trade-prod-vpc-01\"",
           "gcp_subnet = \"azure-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"azure-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-azure-trade-prod-gcs\"",
           "gcp_firewall_rule = \"azure-trade-prod-fw-01\"",
+          "gcp_disk = \"azure-trade-prod-ane3-disk-01\"",
           "gcp_address = \"azure-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"azure-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"azure-trade-prod-bb-01\"",
           "gcp_backend_service = \"azure-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"azure-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"azure-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"azure-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"azure-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"azure-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"azure-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"azure-trade-prod-pdp-01\"",
@@ -220130,7 +220134,11 @@
           "gcp_http_health_check = \"azure-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"azure-trade-prod-hhcs-01\"",
           "gcp_image = \"azure-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"azure-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"azure-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"azure-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"azure-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"azure-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"azure-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"azure-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"azure-trade-prod-icg-01\"",
@@ -220165,6 +220173,7 @@
           "gcp_region_target_https_proxy = \"azure-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"azure-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"azure-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"azure-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"azure-trade-prod-rop-01\"",
           "gcp_router = \"azure-trade-prod-ane3-cr-01\"",
           "gcp_route = \"azure-trade-prod-rt-01\"",
@@ -220173,9 +220182,11 @@
           "gcp_snapshot = \"azure-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"azure-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"azure-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"azure-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"azure-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"azure-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"azure-trade-prod-thps-01\"",
+          "gcp_target_instance = \"azure-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"azure-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"azure-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"azure-trade-prod-ttp-01\"",
@@ -220183,11 +220194,14 @@
           "gcp_url_map = \"azure-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"azure-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"azure-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"azure-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"azure-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"azure-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"azure-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"azure-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"azure-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"azure-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"azure-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"azure-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"azure-trade-prod-neg-01\"",
           "gcp_firestore_database = \"azure-trade-prod-ane3-fs-01\"",
@@ -220564,21 +220578,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_key_vault",
@@ -221511,17 +221511,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"paymentsettl-reconciliati-dev\"",
           "gcp_service_account = \"payments-reconcil-dev-sa-sync\"",
+          "gcp_compute_instance = \"paymentsettlement-reconciliation-dev-gce-01\"",
           "gcp_vpc_network = \"paymentsettlement-reconciliation-dev-vpc-01\"",
           "gcp_subnet = \"paymentsettlement-reconciliation-dev-snet-01\"",
           "gcp_cloud_sql_instance = \"paymentsettlement-reconciliation-dev-sql-01\"",
           "gcp_storage_bucket = \"platformengineering-paymentsettlement-reconciliation-dev-gcs\"",
           "gcp_firewall_rule = \"paymentsettlement-reconciliation-dev-fw-01\"",
+          "gcp_disk = \"paymentsettlement-reconciliation-dev-disk-01\"",
           "gcp_address = \"paymentsettlement-reconciliation-dev-ip-01\"",
+          "gcp_autoscaler = \"paymentsettlement-reconciliation-dev-as-01\"",
           "gcp_backend_bucket = \"paymentsettlement-reconciliation-dev-bb-01\"",
           "gcp_backend_service = \"paymentsettlement-reconciliation-dev-bs-01\"",
           "gcp_cross_site_network = \"paymentsettlement-reconciliation-dev-csn-01\"",
           "gcp_external_vpn_gateway = \"paymentsettlement-reconciliation-dev-evg-01\"",
           "gcp_forwarding_rule = \"paymentsettlement-reconciliation-dev-fwd-01\"",
+          "gcp_future_reservation = \"paymentsettlement-reconciliation-dev-frsv-01\"",
           "gcp_global_address = \"paymentsettlement-reconciliation-dev-ip-01\"",
           "gcp_global_forwarding_rule = \"paymentsettlement-reconciliation-dev-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"paymentsettlement-reconciliation-dev-pdp-01\"",
@@ -221530,7 +221534,11 @@
           "gcp_http_health_check = \"paymentsettlement-reconciliation-dev-hhc-01\"",
           "gcp_https_health_check = \"paymentsettlement-reconciliation-dev-hhcs-01\"",
           "gcp_image = \"paymentsettlement-reconciliation-dev-img-01\"",
+          "gcp_instance_group_manager = \"paymentsettlement-reconciliation-dev-mig-01\"",
+          "gcp_instance_group = \"paymentsettlement-reconciliation-dev-ig-01\"",
           "gcp_instance_template = \"paymentsettlement-reconciliation-dev-tpl-01\"",
+          "gcp_instant_snapshot_group = \"paymentsettlement-reconciliation-dev-isg-01\"",
+          "gcp_instant_snapshot = \"paymentsettlement-reconciliation-dev-isn-01\"",
           "gcp_interconnect_attachment_group = \"paymentsettlement-reconciliation-dev-iag-01\"",
           "gcp_interconnect_attachment = \"paymentsettlement-reconciliation-dev-vl-01\"",
           "gcp_interconnect_group = \"paymentsettlement-reconciliation-dev-icg-01\"",
@@ -221565,6 +221573,7 @@
           "gcp_region_target_https_proxy = \"paymentsettlement-reconciliation-dev-thps-01\"",
           "gcp_region_target_tcp_proxy = \"paymentsettlement-reconciliation-dev-ttp-01\"",
           "gcp_region_url_map = \"paymentsettlement-reconciliation-dev-url-01\"",
+          "gcp_reservation = \"paymentsettlement-reconciliation-dev-rsv-01\"",
           "gcp_rollout_plan = \"paymentsettlement-reconciliation-dev-rop-01\"",
           "gcp_router = \"paymentsettlement-reconciliation-dev-cr-01\"",
           "gcp_route = \"paymentsettlement-reconciliation-dev-rt-01\"",
@@ -221573,9 +221582,11 @@
           "gcp_snapshot = \"paymentsettlement-reconciliation-dev-snap-01\"",
           "gcp_ssl_certificate = \"paymentsettlement-reconciliation-dev-cert-01\"",
           "gcp_ssl_policy = \"paymentsettlement-reconciliation-dev-sslp-01\"",
+          "gcp_storage_pool = \"paymentsettlement-reconciliation-dev-sp-01\"",
           "gcp_target_grpc_proxy = \"paymentsettlement-reconciliation-dev-tgp-01\"",
           "gcp_target_http_proxy = \"paymentsettlement-reconciliation-dev-thp-01\"",
           "gcp_target_https_proxy = \"paymentsettlement-reconciliation-dev-thps-01\"",
+          "gcp_target_instance = \"paymentsettlement-reconciliation-dev-ti-01\"",
           "gcp_target_pool = \"paymentsettlement-reconciliation-dev-tp-01\"",
           "gcp_target_ssl_proxy = \"paymentsettlement-reconciliation-dev-tsp-01\"",
           "gcp_target_tcp_proxy = \"paymentsettlement-reconciliation-dev-ttp-01\"",
@@ -221583,11 +221594,14 @@
           "gcp_url_map = \"paymentsettlement-reconciliation-dev-url-01\"",
           "gcp_vpn_gateway = \"paymentsettlement-reconciliation-dev-vg-01\"",
           "gcp_vpn_tunnel = \"paymentsettlement-reconciliation-dev-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"paymentsettlement-reconciliation-dev-vep-01\"",
           "gcp_kms_ekm_connection = \"paymentsettlement-reconciliation-dev-ekm-01\"",
           "gcp_kms_key_ring = \"paymentsettlement-reconciliation-dev-ring-01\"",
           "gcp_kms_crypto_key = \"paymentsettlement-reconciliation-dev-key-01\"",
           "gcp_kms_import_job = \"paymentsettlement-reconciliation-dev-ij-01\"",
+          "gcp_node_group = \"paymentsettlement-reconciliation-dev-ng-01\"",
           "gcp_node_template = \"paymentsettlement-reconciliation-dev-nt-01\"",
+          "gcp_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
           "gcp_region_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
           "gcp_global_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
           "gcp_firestore_database = \"paymentsettlement-reconciliation-dev-fs-01\"",
@@ -222004,21 +222018,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function"
         ]
@@ -222211,17 +222211,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"a-long-longpurpose-prod\"",
           "gcp_service_account = \"a-long-longpurp-prod-sa-sync\"",
+          "gcp_compute_instance = \"a-long-longpurpose-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"a-long-longpurpose-prod-vpc-01\"",
           "gcp_subnet = \"a-long-longpurpose-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"a-long-longpurpose-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-a-long-longpurpose-prod-gcs\"",
           "gcp_firewall_rule = \"a-long-longpurpose-prod-fw-01\"",
+          "gcp_disk = \"a-long-longpurpose-prod-ane3-disk-01\"",
           "gcp_address = \"a-long-longpurpose-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"a-long-longpurpose-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"a-long-longpurpose-prod-bb-01\"",
           "gcp_backend_service = \"a-long-longpurpose-prod-bs-01\"",
           "gcp_cross_site_network = \"a-long-longpurpose-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"a-long-longpurpose-prod-evg-01\"",
           "gcp_forwarding_rule = \"a-long-longpurpose-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"a-long-longpurpose-prod-ane3-frsv-01\"",
           "gcp_global_address = \"a-long-longpurpose-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"a-long-longpurpose-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"a-long-longpurpose-prod-pdp-01\"",
@@ -222230,7 +222234,11 @@
           "gcp_http_health_check = \"a-long-longpurpose-prod-hhc-01\"",
           "gcp_https_health_check = \"a-long-longpurpose-prod-hhcs-01\"",
           "gcp_image = \"a-long-longpurpose-prod-img-01\"",
+          "gcp_instance_group_manager = \"a-long-longpurpose-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"a-long-longpurpose-prod-ane3-ig-01\"",
           "gcp_instance_template = \"a-long-longpurpose-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"a-long-longpurpose-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"a-long-longpurpose-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"a-long-longpurpose-prod-iag-01\"",
           "gcp_interconnect_attachment = \"a-long-longpurpose-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"a-long-longpurpose-prod-icg-01\"",
@@ -222265,6 +222273,7 @@
           "gcp_region_target_https_proxy = \"a-long-longpurpose-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"a-long-longpurpose-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"a-long-longpurpose-prod-ane3-url-01\"",
+          "gcp_reservation = \"a-long-longpurpose-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"a-long-longpurpose-prod-rop-01\"",
           "gcp_router = \"a-long-longpurpose-prod-ane3-cr-01\"",
           "gcp_route = \"a-long-longpurpose-prod-rt-01\"",
@@ -222273,9 +222282,11 @@
           "gcp_snapshot = \"a-long-longpurpose-prod-snap-01\"",
           "gcp_ssl_certificate = \"a-long-longpurpose-prod-cert-01\"",
           "gcp_ssl_policy = \"a-long-longpurpose-prod-sslp-01\"",
+          "gcp_storage_pool = \"a-long-longpurpose-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"a-long-longpurpose-prod-tgp-01\"",
           "gcp_target_http_proxy = \"a-long-longpurpose-prod-thp-01\"",
           "gcp_target_https_proxy = \"a-long-longpurpose-prod-thps-01\"",
+          "gcp_target_instance = \"a-long-longpurpose-prod-ane3-ti-01\"",
           "gcp_target_pool = \"a-long-longpurpose-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"a-long-longpurpose-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"a-long-longpurpose-prod-ttp-01\"",
@@ -222283,11 +222294,14 @@
           "gcp_url_map = \"a-long-longpurpose-prod-url-01\"",
           "gcp_vpn_gateway = \"a-long-longpurpose-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"a-long-longpurpose-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"a-long-longpurpose-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"a-long-longpurpose-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"a-long-longpurpose-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"a-long-longpurpose-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"a-long-longpurpose-prod-ane3-ij-01\"",
+          "gcp_node_group = \"a-long-longpurpose-prod-ane3-ng-01\"",
           "gcp_node_template = \"a-long-longpurpose-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"a-long-longpurpose-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"a-long-longpurpose-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"a-long-longpurpose-prod-neg-01\"",
           "gcp_firestore_database = \"a-long-longpurpose-prod-ane3-fs-01\"",
@@ -222699,21 +222713,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -223611,17 +223611,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -223630,7 +223634,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -223665,6 +223673,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -223673,9 +223682,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -223683,11 +223694,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -224096,21 +224110,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: gcp_labels",
@@ -224300,17 +224300,21 @@
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -224319,7 +224323,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -224354,6 +224362,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -224362,9 +224371,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -224372,11 +224383,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -224780,21 +224794,7 @@
         ],
         "invalid": [
           "# INVALID: aws_tags",
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: gcp_labels",
@@ -224985,17 +224985,21 @@
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"team1-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"team1-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -225004,7 +225008,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -225039,6 +225047,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -225047,9 +225056,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -225057,11 +225068,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -225477,21 +225491,7 @@
         ],
         "invalid": [
           "# INVALID: aws_tags",
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -225686,17 +225686,21 @@
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"infra-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"infra-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -225705,7 +225709,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -225740,6 +225748,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -225748,9 +225757,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -225758,11 +225769,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",
@@ -226177,21 +226191,7 @@
           "managed_by = \"cloudonym\""
         ],
         "invalid": [
-          "# INVALID: gcp_compute_instance",
-          "# INVALID: gcp_disk",
-          "# INVALID: gcp_autoscaler",
-          "# INVALID: gcp_future_reservation",
-          "# INVALID: gcp_instance_group_manager",
-          "# INVALID: gcp_instance_group",
-          "# INVALID: gcp_instant_snapshot_group",
-          "# INVALID: gcp_instant_snapshot",
-          "# INVALID: gcp_reservation",
           "# INVALID: gcp_resource_policy",
-          "# INVALID: gcp_storage_pool",
-          "# INVALID: gcp_target_instance",
-          "# INVALID: gcp_zone_vm_extension_policy",
-          "# INVALID: gcp_node_group",
-          "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
           "# INVALID: azure_virtual_machine_windows",
@@ -226211,21 +226211,21 @@
         "assignments": [
           "gcp_project_id = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
-          "gcp_compute_instance = \"billing-trade-prod-ane3a-gce-01\"",
+          "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
           "gcp_subnet = \"billing-trade-prod-ane3-snet-01\"",
           "gcp_cloud_sql_instance = \"billing-trade-prod-ane3-sql-01\"",
           "gcp_storage_bucket = \"platform-billing-trade-prod-gcs\"",
           "gcp_firewall_rule = \"billing-trade-prod-fw-01\"",
-          "gcp_disk = \"billing-trade-prod-ane3a-disk-01\"",
+          "gcp_disk = \"billing-trade-prod-ane3-disk-01\"",
           "gcp_address = \"billing-trade-prod-ane3-ip-01\"",
-          "gcp_autoscaler = \"billing-trade-prod-ane3a-as-01\"",
+          "gcp_autoscaler = \"billing-trade-prod-ane3-as-01\"",
           "gcp_backend_bucket = \"billing-trade-prod-bb-01\"",
           "gcp_backend_service = \"billing-trade-prod-bs-01\"",
           "gcp_cross_site_network = \"billing-trade-prod-csn-01\"",
           "gcp_external_vpn_gateway = \"billing-trade-prod-evg-01\"",
           "gcp_forwarding_rule = \"billing-trade-prod-ane3-fwd-01\"",
-          "gcp_future_reservation = \"billing-trade-prod-ane3a-frsv-01\"",
+          "gcp_future_reservation = \"billing-trade-prod-ane3-frsv-01\"",
           "gcp_global_address = \"billing-trade-prod-ip-01\"",
           "gcp_global_forwarding_rule = \"billing-trade-prod-fwd-01\"",
           "gcp_global_public_delegated_prefix = \"billing-trade-prod-pdp-01\"",
@@ -226234,11 +226234,11 @@
           "gcp_http_health_check = \"billing-trade-prod-hhc-01\"",
           "gcp_https_health_check = \"billing-trade-prod-hhcs-01\"",
           "gcp_image = \"billing-trade-prod-img-01\"",
-          "gcp_instance_group_manager = \"billing-trade-prod-ane3a-mig-01\"",
-          "gcp_instance_group = \"billing-trade-prod-ane3a-ig-01\"",
+          "gcp_instance_group_manager = \"billing-trade-prod-ane3-mig-01\"",
+          "gcp_instance_group = \"billing-trade-prod-ane3-ig-01\"",
           "gcp_instance_template = \"billing-trade-prod-tpl-01\"",
-          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3a-isg-01\"",
-          "gcp_instant_snapshot = \"billing-trade-prod-ane3a-isn-01\"",
+          "gcp_instant_snapshot_group = \"billing-trade-prod-ane3-isg-01\"",
+          "gcp_instant_snapshot = \"billing-trade-prod-ane3-isn-01\"",
           "gcp_interconnect_attachment_group = \"billing-trade-prod-iag-01\"",
           "gcp_interconnect_attachment = \"billing-trade-prod-ane3-vl-01\"",
           "gcp_interconnect_group = \"billing-trade-prod-icg-01\"",
@@ -226273,7 +226273,7 @@
           "gcp_region_target_https_proxy = \"billing-trade-prod-ane3-thps-01\"",
           "gcp_region_target_tcp_proxy = \"billing-trade-prod-ane3-ttp-01\"",
           "gcp_region_url_map = \"billing-trade-prod-ane3-url-01\"",
-          "gcp_reservation = \"billing-trade-prod-ane3a-rsv-01\"",
+          "gcp_reservation = \"billing-trade-prod-ane3-rsv-01\"",
           "gcp_rollout_plan = \"billing-trade-prod-rop-01\"",
           "gcp_router = \"billing-trade-prod-ane3-cr-01\"",
           "gcp_route = \"billing-trade-prod-rt-01\"",
@@ -226282,11 +226282,11 @@
           "gcp_snapshot = \"billing-trade-prod-snap-01\"",
           "gcp_ssl_certificate = \"billing-trade-prod-cert-01\"",
           "gcp_ssl_policy = \"billing-trade-prod-sslp-01\"",
-          "gcp_storage_pool = \"billing-trade-prod-ane3a-sp-01\"",
+          "gcp_storage_pool = \"billing-trade-prod-ane3-sp-01\"",
           "gcp_target_grpc_proxy = \"billing-trade-prod-tgp-01\"",
           "gcp_target_http_proxy = \"billing-trade-prod-thp-01\"",
           "gcp_target_https_proxy = \"billing-trade-prod-thps-01\"",
-          "gcp_target_instance = \"billing-trade-prod-ane3a-ti-01\"",
+          "gcp_target_instance = \"billing-trade-prod-ane3-ti-01\"",
           "gcp_target_pool = \"billing-trade-prod-ane3-tp-01\"",
           "gcp_target_ssl_proxy = \"billing-trade-prod-tsp-01\"",
           "gcp_target_tcp_proxy = \"billing-trade-prod-ttp-01\"",
@@ -226294,14 +226294,14 @@
           "gcp_url_map = \"billing-trade-prod-url-01\"",
           "gcp_vpn_gateway = \"billing-trade-prod-ane3-vg-01\"",
           "gcp_vpn_tunnel = \"billing-trade-prod-ane3-vt-01\"",
-          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3a-vep-01\"",
+          "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
           "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
           "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
-          "gcp_node_group = \"billing-trade-prod-ane3a-ng-01\"",
+          "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
-          "gcp_network_endpoint_group = \"billing-trade-prod-ane3a-neg-01\"",
+          "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
           "gcp_firestore_database = \"billing-trade-prod-ane3-fs-01\"",

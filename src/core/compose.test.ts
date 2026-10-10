@@ -24,6 +24,21 @@ describe('tokenValues · compose', () => {
   });
 });
 
+describe('tokenValues — 존은 이름에 들지 않는다 (D50 revised)', () => {
+  it('존 문맥(asia-northeast3-a)에서 compute_instance → …-ane3-gce-01 · disk → …-ane3-disk-01', () => {
+    const vm = getRule('gcp', 'compute_instance')!;
+    const disk = getRule('gcp', 'disk')!;
+    expect(compose(tokenValues(ctx, vm), vm.template, vm.separator)).toBe('billing-trade-prod-ane3-gce-01');
+    expect(compose(tokenValues(ctx, disk), disk.template, disk.separator)).toBe('billing-trade-prod-ane3-disk-01');
+    const noZone = { ...ctx, zone: undefined };
+    expect(compose(tokenValues(noZone, disk), disk.template, disk.separator)).toBe('billing-trade-prod-ane3-disk-01');
+  });
+  it('global 이면 지역 자리가 비어 있다 — 다른 지역 규칙과 같다', () => {
+    const disk = getRule('gcp', 'disk')!;
+    expect(compose(tokenValues({ ...ctx, region: 'global', zone: undefined }, disk), disk.template, disk.separator)).toBe('billing-trade-prod-disk-01');
+  });
+});
+
 describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
   it('extra 가 없으면 seq 01 · role sync — 지금 출력과 같다', () => {
     const vm = getRule('gcp', 'compute_instance')!;
@@ -34,7 +49,7 @@ describe('tokenValues — 항목 입력 seq · role (D30\')', () => {
   });
   it("seq '07' 을 주면 …-gce-07", () => {
     const vm = getRule('gcp', 'compute_instance')!;
-    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prod-ane3a-gce-07');
+    expect(compose(tokenValues(ctx, vm, { seq: '07' }), vm.template, vm.separator)).toBe('billing-trade-prod-ane3-gce-07');
   });
   it("role 'db' 를 주면 …-sa-db", () => {
     const sa = getRule('gcp', 'service_account')!;

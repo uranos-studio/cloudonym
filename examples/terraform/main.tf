@@ -88,7 +88,7 @@ variable "env" {
 
 variable "region" {
   type        = string
-  description = "Region input for the name: a Google Cloud zone (asia-northeast3-a) or its code (ane3a). A VM is zonal, so a region alone makes the name invalid (name.zone_required). It only shapes the name - the VM is placed by gcp_zone, so keep the two the same."
+  description = "Region input for the name: a Google Cloud region (asia-northeast3) or zone (asia-northeast3-a), by name or by code. A zone resolves to its region, so the name carries the region code (ane3). It only shapes the name - the VM is placed by gcp_zone."
 }
 
 # ---------------------------------------------------------------------------

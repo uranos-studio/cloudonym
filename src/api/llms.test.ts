@@ -12,7 +12,6 @@ import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { inputKind } from '../core/tree';
 import { ENABLED_PROVIDERS, PROVIDERS } from '../core/types';
 import { REGIONS } from '../core/regions-data';
-import { regionTokenOfRule } from '../core/compose';
 import { rulesFor } from '../core/constraints';
 import { AZURE_INTAKE_ROWS } from '../core/rules/azure-intake';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
@@ -67,7 +66,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(region).toEqual(['- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`']);
     expect(text).not.toContain('- `kr`');
   });
-  it('「## Regions」 절 — 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존) · 존 규칙 문장 (D49 · D50)', () => {
+  it('「## Regions」 절 — 코드 규칙 · 켜진 CSP 마다 리전 한 줄(이름 · 코드 · 위치 · 존) · 존은 리전으로 풀린다 (D49 · D50 revised)', () => {
     const start = lines.indexOf('## Regions');
     expect(start).toBeGreaterThan(lines.indexOf('## Canonical Allowed Values'));
     const end = lines.findIndex((l, i) => i > start && l.startsWith('## '));
@@ -75,19 +74,17 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const rows = section.filter((l) => /^- `[a-z0-9-]+` · `[a-z0-9]+` — /.test(l));
     expect(REGIONS.gcp).toHaveLength(43);
     expect(rows).toHaveLength(REGIONS.gcp.length);
+    // 지역 표는 입력 표다 — 존 이름 · 존 코드를 받으므로 그대로 둔다
     expect(rows).toContain('- `asia-northeast3` · `ane3` — Seoul, South Korea, APAC · zones: `asia-northeast3-a` `ane3a`, `asia-northeast3-b` `ane3b`, `asia-northeast3-c` `ane3c`');
     for (const r of REGIONS.gcp) expect(rows.some((l) => l.startsWith(`- \`${r.region}\` · \`${r.code}\` — ${r.label}`)), r.region).toBe(true);
     const body = section.join('\n');
-    // 코드 규칙 · 받는 꼴 · 거부하는 옛 값 · global
-    expect(body).toContain('zone code is the region code followed by the zone letter');
     expect(body).toContain('`kr`, `us`, `jp` and `eu` are rejected');
     expect(body).toContain('`global` puts no region token');
-    // 존 규칙 문장 — 규칙 표에서 존 토큰 규칙을 세어 적는다
-    const zonal = enabledRules.filter((r) => regionTokenOfRule(r) === 'zone').map((r) => `\`${r.id}\``);
-    expect(zonal).toHaveLength(14);
-    const sentence = section.find((l) => l.startsWith('Zonal resources'))!;
-    expect(sentence).toContain('`name.zone_required`');
-    expect(sentence).toContain(zonal.join(', '));
+    expect(body).toContain('a zone name is accepted and resolved to its region');
+    // 존 코드가 이름에 든다는 문장 · 존을 요구하는 문장이 없다
+    expect(body).not.toMatch(/carry the zone code|need a zone|zone code is the region code followed/i);
+    expect(text).not.toContain('name.zone_required');
+    expect(text).not.toMatch(/Zonal resources/);
   });
   it('「## Kind tokens」 절 — 종류 표가 있는 19행 · 행마다 값 → 토큰 · 규칙(범위)마다 기본값과 허용 값 · 기본값 근거 · 확인일 (D52)', () => {
     const start = lines.indexOf('## Kind tokens');

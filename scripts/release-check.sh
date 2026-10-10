@@ -25,7 +25,7 @@ for bin in curl jq perl; do
   command -v "${bin}" >/dev/null || { echo "missing dependency: ${bin}" >&2; exit 2; }
 done
 
-# /v1/names 의 기대 이름 — 규칙 버전 2026-10-07.11 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
+# /v1/names 의 기대 이름 — 규칙 버전 2026-10-10.1 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
 # 새 빌드에 보내 값을 다시 적는다(조용히 통과하지 않는다)
 NAMES_REQUEST='{"provider":"gcp","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"},"resources":[{"type":"vpc_network"},{"type":"storage_bucket"},{"type":"service_account","role":"db"}]}'
 NAMES_EXPECTED='{"service_account_db":"payments-batch-prod-sa-db","storage_bucket":"platform-payments-batch-prod-gcs","vpc_network_01":"payments-batch-prod-vpc-01"}'

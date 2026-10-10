@@ -3,7 +3,7 @@ import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, ty
 import { getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
 import { canonicalRegion, regionCandidates } from './regions';
-import { compose, kindTokenOfRule, regionTokenOfRule, tokenValues, type ItemExtra } from './compose';
+import { compose, kindTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { SelectionItem } from './selection';
 import { inputKind } from './tree';
@@ -34,11 +34,6 @@ function generateOne(ctx: NamingContext, rule: ResourceRule, extra: ItemExtra = 
             // 규칙 표의 notes 를 참조로 넘기지 않는다 — 호출자가 결과를 고쳐도 규칙 표가 바뀌지 않게
             notes: (rule.notes ?? []).map((m) => structuredClone(m)) },
   };
-
-  // 존 규칙에 존이 없다 (D50) — generate · generateMany 둘 다 여기를 지난다. 빈 지역 자리를 token_empty 로 알리기 전에 본다
-  if (regionTokenOfRule(rule) === 'zone' && !ctx.zone) {
-    return { ...base, name: '', valid: false, isTruncated: false, violations: [{ code: 'name.zone_required', params: { region: ctx.region } }], steps };
-  }
 
   // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다.
   // 종류 자리는 비는 것이 정상이다 — 종류를 주지 않았거나 기본값이면 토큰이 없다 (D52). 필수 종류는 아래 kind_required 가 본다
@@ -104,7 +99,7 @@ export function generateMany(ctx: NamingContext, provider: Provider, selection: 
     // 종류 — 허용 밖이면 여기서 던진다(validateSelection 을 거친 선택에는 없다)
     const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
     const k: ItemExtra = kind === undefined ? {} : { kind };
-    // 이름이 빈 항목(zone_required)에는 토큰을 싣지 않는다 — 이름에 들어가지 않은 토큰이다. 고른 값 이름은 남긴다
+    // 이름이 빈 항목(token_empty)에는 토큰을 싣지 않는다 — 이름에 들어가지 않은 토큰이다. 고른 값 이름은 남긴다
     const kindFields = (res: NameResult) => ({ ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }) });
     const one = (extra: ItemExtra, meta: { key: string; seq?: string; role?: string }): NameItem => {
       const res = generateOne(ctx, rule, { ...k, ...extra });
@@ -183,8 +178,9 @@ export function parseContext(raw: RawContext, provider: Provider):
     } else if (f === 'region') {
       const c = canonicalRegion(v, provider);
       if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: clipForDisplay(v), supported: regionCandidates(v, provider) } }); continue; }
-      // 이름에 들어가는 코드(존이면 존 코드)와 입력이 다르면 기록한다 — 리전 · 존 이름은 코드로 바뀐다
-      const to = c.zone ?? c.region;
+      // 이름에 들어가는 리전 코드와 입력이 다르면 기록한다 — 리전 · 존의 이름 · 존 코드는 리전 코드로 바뀐다 (D50 revised).
+      // 존 코드는 문맥의 zone 에 남는다(입력 왕복 · 표시용) — 이름에는 쓰지 않는다
+      const to = c.region;
       if (to !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: clipForDisplay(v), to } });
       vals[f] = c.region;
       if (c.zone) vals.zone = c.zone;

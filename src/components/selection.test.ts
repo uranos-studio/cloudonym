@@ -1,6 +1,6 @@
 // 화면의 선택 상태 (D40 · D42) — Map 하나 · 트리 순서 · 판정은 core validateSelection 하나
 import { describe, it, expect } from 'vitest';
-import { activeRule, applyChange, canAdd, canCheck, canIncrease, clearForCloudSwitch, fromItems, isZonal, kindChoices, kindSelectValue, needsKind, refilterKind, rowBlock, setCount, setKind, setRole, setRowScope, toItems, toggle, toggleRow, totalNames, treeRules, type Picked } from './selection';
+import { activeRule, applyChange, canAdd, canCheck, canIncrease, clearForCloudSwitch, fromItems, kindChoices, kindSelectValue, needsKind, refilterKind, rowBlock, setCount, setKind, setRole, setRowScope, toItems, toggle, toggleRow, totalNames, treeRules, type Picked } from './selection';
 import { buildTree, type TreeRow } from '../core/tree';
 import { generateMany, parseContext } from '../core/engine';
 import { MAX_COUNT, MAX_ITEMS, MAX_NAMES } from '../core/selection';
@@ -170,29 +170,29 @@ describe('행 ↔ 규칙 (D53 · D50) — 범위 고르기 · 존 가드', () =>
   const empty: Picked = new Map();
 
   it('범위를 고르지 않은 합친 행은 체크할 수 없다 — toggleRow 가 같은 Map 을 돌려준다', () => {
-    expect(rowBlock(ip, empty, {}, false)).toBe('scope');
-    expect(canCheck(ip, empty, {}, false)).toBe(false);
-    expect(toggleRow(empty, ip, {}, false)).toBe(empty);
-    const on = toggleRow(empty, ip, { scope: 'gcp:project_global' }, false);
+    expect(rowBlock(ip, empty, {})).toBe('scope');
+    expect(canCheck(ip, empty, {})).toBe(false);
+    expect(toggleRow(empty, ip, {})).toBe(empty);
+    const on = toggleRow(empty, ip, { scope: 'gcp:project_global' });
     expect([...on.keys()]).toEqual(['global_address']);
     expect(activeRule(ip, on, {})!.resourceType).toBe('global_address');
   });
 
   it('규칙 하나인 행은 범위가 필요 없다', () => {
-    expect(rowBlock(vm, empty, {}, false)).toBeUndefined();
-    expect([...toggleRow(empty, vm, {}, false).keys()]).toEqual(['compute_instance']);
+    expect(rowBlock(vm, empty, {})).toBeUndefined();
+    expect([...toggleRow(empty, vm, {}).keys()]).toEqual(['compute_instance']);
   });
 
   it('범위를 바꾸면 옛 키를 지우고 새 키에 count 를 옮긴다 · 키는 하나', () => {
-    let m = toggleRow(empty, ip, { scope: 'gcp:project_region' }, false);
+    let m = toggleRow(empty, ip, { scope: 'gcp:project_region' });
     m = setCount(m, g('address'), 3);
-    const r = setRowScope(m, ip, 'gcp:project_global', false)!;
+    const r = setRowScope(m, ip, 'gcp:project_global')!;
     expect([...r.picked.keys()]).toEqual(['global_address']);
     expect(r.picked.get('global_address')).toEqual({ count: 3 });
     expect(r.kindDropped).toBe(false);
     // 같은 범위 · 고르지 않은 행은 그대로
-    expect(setRowScope(r.picked, ip, 'gcp:project_global', false)!.picked).toBe(r.picked);
-    expect(setRowScope(empty, ip, 'gcp:project_global', false)!.picked).toBe(empty);
+    expect(setRowScope(r.picked, ip, 'gcp:project_global')!.picked).toBe(r.picked);
+    expect(setRowScope(empty, ip, 'gcp:project_global')!.picked).toBe(empty);
   });
 
   it('범위를 바꾸면 종류를 새 규칙의 allowed 로 거른다 — 안 맞으면 버리고 kindDropped', () => {
@@ -201,15 +201,15 @@ describe('행 ↔ 규칙 (D53 · D50) — 범위 고르기 · 존 가드', () =>
     const global = g('global_network_endpoint_group');
     const v = zonal.kinds!.allowed.find((k) => !global.kinds!.allowed.includes(k) && k !== zonal.kinds!.default)!;
     expect(v).toBeDefined();
-    const m = toggleRow(empty, neg, { scope: 'gcp:project_zone', kind: v }, false);
+    const m = toggleRow(empty, neg, { scope: 'gcp:project_zone', kind: v });
     expect(m.get('network_endpoint_group')?.kind).toBe(v);
-    const r = setRowScope(m, neg, 'gcp:project_global', false)!;
+    const r = setRowScope(m, neg, 'gcp:project_global')!;
     expect(r.picked.get('global_network_endpoint_group')).toEqual({ count: 1 });
     expect(r.kindDropped).toBe(true);
     // 맞는 값은 남는다
     const keep = global.kinds!.allowed.find((k) => zonal.kinds!.allowed.includes(k) && k !== zonal.kinds!.default && k !== global.kinds!.default);
     if (keep !== undefined) {
-      const r2 = setRowScope(toggleRow(empty, neg, { scope: 'gcp:project_zone', kind: keep }, false), neg, 'gcp:project_global', false)!;
+      const r2 = setRowScope(toggleRow(empty, neg, { scope: 'gcp:project_zone', kind: keep }), neg, 'gcp:project_global')!;
       expect(r2.picked.get('global_network_endpoint_group')?.kind).toBe(keep);
       expect(r2.kindDropped).toBe(false);
     }
@@ -217,38 +217,31 @@ describe('행 ↔ 규칙 (D53 · D50) — 범위 고르기 · 존 가드', () =>
     expect(refilterKind(global, undefined)).toEqual({ kind: undefined, dropped: false });
   });
 
-  it('존 가드 — 존이 없으면 존 행을 새로 켜지 못한다 · 끄기는 된다 · 고른 행은 canCheck 가 늘 참', () => {
-    expect(rowBlock(vm, empty, {}, true)).toBe('zone');
-    expect(toggleRow(empty, vm, {}, true)).toBe(empty);
-    expect(rowBlock(disk, empty, { scope: 'gcp:project_zone' }, true)).toBe('zone');
-    expect(rowBlock(disk, empty, { scope: 'gcp:project_region' }, true)).toBeUndefined();
-    // 존이 있을 때 고른 뒤 존을 없앴다 — 선택은 그대로 · 끌 수 있다
-    const m = toggleRow(empty, vm, {}, false);
-    expect(canCheck(vm, m, {}, true)).toBe(true);
-    expect(toggleRow(m, vm, {}, true).size).toBe(0);
-    // 고른 행의 범위를 존으로 바꾸는 것도 새로 존 항목을 만드는 일이라 막는다
-    const d = toggleRow(empty, disk, { scope: 'gcp:project_region' }, true);
-    expect(setRowScope(d, disk, 'gcp:project_zone', true)).toBeUndefined();
-    expect(setRowScope(d, disk, 'gcp:project_zone', false)!.picked.has('disk')).toBe(true);
-    expect(isZonal(g('compute_instance'))).toBe(true);
-    expect(isZonal(g('region_disk'))).toBe(false);
+  it('존 가드는 없다 (D50 revised) — 존 없는 문맥에서도 VM · 디스크 행을 켤 수 있고 범위를 존으로 바꿀 수 있다', () => {
+    expect(rowBlock(vm, empty, {})).toBeUndefined();
+    const m = toggleRow(empty, vm, {});
+    expect(m.has('compute_instance')).toBe(true);
+    expect(canCheck(vm, m, {})).toBe(true);
+    expect(toggleRow(m, vm, {}).size).toBe(0);
+    expect(rowBlock(disk, empty, { scope: 'gcp:project_zone' })).toBeUndefined();
+    const d = toggleRow(empty, disk, { scope: 'gcp:project_region' });
+    expect(setRowScope(d, disk, 'gcp:project_zone')!.picked.has('disk')).toBe(true);
   });
 
-  it('고른 존 항목은 존을 없애면 generateMany 가 name.zone_required 로 낸다 (선택은 그대로)', () => {
-    const m = toggleRow(empty, vm, {}, false);
+  it('존 없는 문맥(리전만)에서 고른 VM 항목은 리전 코드로 유효한 이름이다', () => {
+    const m = toggleRow(empty, vm, {});
     const items = toItems(gcpTree, m);
     const parsed = parseContext({ owner: 'example', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3' }, 'gcp');
     if (!parsed.ok) throw new Error('context');
     const res = generateMany(parsed.context, 'gcp', items);
     const item = res.items.find((i) => i.resourceType === 'compute_instance')!;
-    expect(item.valid).toBe(false);
-    expect(item.violations.map((e) => e.code)).toContain('name.zone_required');
+    expect(item).toMatchObject({ valid: true, name: 'billing-trade-prod-ane3-gce-01' });
   });
 
   it('필수 종류 · 상한도 같은 판정 — kind · limit', () => {
     const rp = row('gcp.resource_policy');
-    expect(rowBlock(rp, empty, {}, false)).toBe('kind');
-    expect(rowBlock(rp, empty, { kind: rp.rules[0]!.kinds!.allowed[0] }, false)).toBeUndefined();
+    expect(rowBlock(rp, empty, {})).toBe('kind');
+    expect(rowBlock(rp, empty, { kind: rp.rules[0]!.kinds!.allowed[0] })).toBeUndefined();
   });
 
   it('applyChange — 한 행의 키가 둘이면 받지 않는다', () => {

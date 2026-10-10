@@ -84,7 +84,7 @@
       "rules": {
         "gcp.compute_instance": {
           "scope": "project",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -362,7 +362,7 @@
       "rules": {
         "gcp.disk": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         },
         "gcp.region_disk": {
           "scope": "region",
@@ -473,7 +473,7 @@
       "rules": {
         "gcp.autoscaler": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         },
         "gcp.region_autoscaler": {
           "scope": "region",
@@ -771,7 +771,7 @@
       "rules": {
         "gcp.future_reservation": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -1066,7 +1066,7 @@
       "rules": {
         "gcp.instance_group_manager": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         },
         "gcp.region_instance_group_manager": {
           "scope": "region",
@@ -1109,7 +1109,7 @@
       "rules": {
         "gcp.instance_group": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -1186,7 +1186,7 @@
       "rules": {
         "gcp.instant_snapshot_group": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         },
         "gcp.region_instant_snapshot_group": {
           "scope": "region",
@@ -1221,7 +1221,7 @@
       "rules": {
         "gcp.instant_snapshot": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         },
         "gcp.region_instant_snapshot": {
           "scope": "region",
@@ -2228,7 +2228,7 @@
       "rules": {
         "gcp.reservation": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -2524,7 +2524,7 @@
       "rules": {
         "gcp.storage_pool": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -2592,7 +2592,7 @@
       "rules": {
         "gcp.target_instance": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -2796,7 +2796,7 @@
       "rules": {
         "gcp.zone_vm_extension_policy": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -2969,7 +2969,7 @@
       "rules": {
         "gcp.node_group": {
           "scope": "zone",
-          "regionToken": "zone"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -3037,7 +3037,7 @@
       "rules": {
         "gcp.network_endpoint_group": {
           "scope": "zone",
-          "regionToken": "zone",
+          "regionToken": "region",
           "kinds": {
             "default": "GCE_VM_IP_PORT",
             "allowed": [

@@ -9,8 +9,8 @@
 // ENABLED_PROVIDERS 를 세 CSP 로 바꾼다 — 라우터 · 문맥 상한 · 직렬화를 그대로 지난다. 이 값은 provider 판정과 그 supported 목록에만 쓰인다.
 // 바꾼 값이 풀리면(모듈이 옮겨지는 등) aws · azure 표본이 400 이 되어 시험이 크게 실패한다 — 조용히 통과하지 않는다
 import { describe, it, expect, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { app } from '../api/index';
 import { req, jsonPost } from '../api/test-support';
 import { parseNamesBody } from '../api/schemas';
@@ -286,10 +286,19 @@ function compareSnapshots(oracleIn: Snapshot, actualIn: Snapshot, diffs: Allowed
 
 const readJson = (name: string): unknown => JSON.parse(readFileSync(join(FIXTURE_DIR, name), 'utf-8'));
 
+/** 지금 출력을 파일로 내보낸다 — scripts/oracle-diff.mjs 가 허용 차분 줄을 뽑을 때만 쓴다. fixture 폴더에는 쓰지 않는다(오라클을 고치는 길이 아니다) */
+function dumpActual(actual: Snapshot): void {
+  const target = process.env.WIRE_COMPAT_DUMP;
+  if (!target) return;
+  if (resolve(target).startsWith(resolve(FIXTURE_DIR))) throw new Error('WIRE_COMPAT_DUMP must not point into __fixtures__');
+  writeFileSync(target, JSON.stringify(actual));
+}
+
 describe('호환 오라클 (D70) — 마법사 작업 전 출력과 같다', async () => {
   const oracle = readJson('wire-before-wizard.json') as Snapshot;
   const diffs = readJson('wire-allowed-diff.json');
   const actual = await buildSnapshot();
+  dumpActual(actual);
 
   it('동결 목록 — fixture 의 기준선 id 집합 = LEGACY_BASELINE_IDS(22) · 그 id 가 모두 BASELINE_CONTEXTS 에 남아 있다', () => {
     expect(LEGACY_BASELINE_IDS).toHaveLength(22);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { composeRegion, displayLabel, filterRegions, regionOptions, splitRegion, zoneAfter } from './regionOptions';
+import { displayLabel, filterRegions, regionOptions, splitRegion } from './regionOptions';
 import { canonicalRegion } from '../core/regions';
 import { REGIONS } from '../core/regions-data';
 
@@ -44,7 +44,7 @@ describe('filterRegions — 리전 이름 · 위치 · 코드로 거른다 (대�
   });
 });
 
-describe('splitRegion · composeRegion — 폼의 지역 문자열 하나 ↔ 리전 + 존 (D50)', () => {
+describe('splitRegion — 폼의 지역 문자열 → 리전 (존 입력도 그 리전으로 · D50 revised)', () => {
   it.each([
     ['asia-northeast3-a', 'asia-northeast3', 'asia-northeast3-a'],
     ['ane3a', 'asia-northeast3', 'asia-northeast3-a'],
@@ -59,30 +59,6 @@ describe('splitRegion · composeRegion — 폼의 지역 문자열 하나 ↔ �
   it('모르는 값은 리전 없음 — 옛 나라 값 kr 도', () => {
     expect(splitRegion('kr', gcp)).toEqual({});
     expect(splitRegion('', gcp)).toEqual({});
-  });
-  it('compose — 존이 있으면 존 이름, 없으면 리전 이름 · global 은 global', () => {
-    const r = byValue('asia-northeast3');
-    expect(composeRegion(r, r.zones[0])).toBe('asia-northeast3-a');
-    expect(composeRegion(r)).toBe('asia-northeast3');
-    expect(composeRegion(byValue('global'))).toBe('global');
-    // 왕복 — compose 한 값을 다시 나누면 같은 리전 · 존
-    const back = splitRegion(composeRegion(r, r.zones[2]), gcp);
-    expect([back.region?.value, back.zone?.zone]).toEqual(['asia-northeast3', 'asia-northeast3-c']);
-  });
-});
-
-describe('zoneAfter — 리전을 바꿀 때의 존: 같은 글자가 새 리전에 있으면 그것, 없으면 none', () => {
-  it('a → 새 리전의 a', () => {
-    const from = byValue('asia-northeast3').zones[0];
-    expect(zoneAfter(from, byValue('asia-northeast1'))?.zone).toBe('asia-northeast1-a');
-  });
-  it('f 는 us-central1 에만 있다 — 다른 리전으로 가면 none', () => {
-    const f = byValue('us-central1').zones.find((z) => z.zone.endsWith('-f'))!;
-    expect(zoneAfter(f, byValue('asia-northeast3'))).toBeUndefined();
-  });
-  it('존이 없었으면 none · global 로 가면 none', () => {
-    expect(zoneAfter(undefined, byValue('asia-northeast3'))).toBeUndefined();
-    expect(zoneAfter(byValue('asia-northeast3').zones[0], byValue('global'))).toBeUndefined();
   });
 });
 

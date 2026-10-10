@@ -24,7 +24,7 @@ describe('generate', () => {
   });
   it('정제로는 못 고치는 위반(숫자 시작)은 valid:false + 이유', () => {
     const vm = generate({ ...ctx, system: '3tier' }, ['gcp']).gcp!.compute_instance;
-    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prod-ane3a-gce-01', violations: [{ code: 'name.first_not_letter' }] });
+    expect(vm).toMatchObject({ valid: false, name: '3tier-trade-prod-ane3-gce-01', violations: [{ code: 'name.first_not_letter' }] });
   });
   it('긴 owner 는 optional 생략으로 들어간다', () => {
     const p = generate({ ...ctx, owner: 'a'.repeat(40) }, ['gcp']).gcp!.project_id;   // owner 생략 → billing-trade-prod
@@ -51,7 +51,7 @@ describe('generate', () => {
     expect(out.project_id.steps).toContainEqual({ code: 'step.normalized', field: 'owner', params: { from: '홍길동', to: '' } });
   });
   it('한 글자 system 은 축소 대상이 아니다 — GCP compute_instance 유효', () => {
-    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prod-ane3a-gce-01', valid: true });
+    expect(generate({ ...ctx, system: 'a' }, ['gcp']).gcp!.compute_instance).toMatchObject({ name: 'a-trade-prod-ane3-gce-01', valid: true });
   });
 });
 
@@ -292,12 +292,15 @@ describe('지역 · 존 (D49 · D50 · D51)', () => {
     expect(parse('asia-northeast3')).toEqual({ ok: true, context: { ...raw, region: 'ane3' },
       transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3', to: 'ane3' } }] });
   });
-  it('존 이름 → 리전 코드 + 존 코드 · 바꾼 기록의 to 는 존 코드', () => {
+  it('존 이름 → 리전 코드 + 존 코드 · 바꾼 기록의 to 는 리전 코드 (D50 revised — 이름에 드는 것은 리전 코드)', () => {
     expect(parse('asia-northeast3-a')).toEqual({ ok: true, context: { ...raw, region: 'ane3', zone: 'ane3a' },
-      transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3a' } }] });
+      transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3' } }] });
+    // 존 코드도 리전 코드로 풀린다 — 입력과 이름의 지역 글자가 달라 바꾼 기록이 남는다
+    expect(parse('ane3a')).toEqual({ ok: true, context: { ...raw, region: 'ane3', zone: 'ane3a' },
+      transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'ane3a', to: 'ane3' } }] });
   });
-  it('코드 · global 은 바꾼 기록이 없다', () => {
-    expect(parse('ane3a')).toEqual({ ok: true, context: { ...raw, region: 'ane3', zone: 'ane3a' }, transformed: [] });
+  it('리전 코드 · global 은 바꾼 기록이 없다', () => {
+    expect(parse('ane3')).toEqual({ ok: true, context: { ...raw, region: 'ane3' }, transformed: [] });
     expect(parse('global')).toEqual({ ok: true, context: { ...raw, region: 'global' }, transformed: [] });
   });
   it("옛 나라 값 kr 은 거부 — supported 는 그 CSP 의 한국 리전 이름", () => {
@@ -316,38 +319,42 @@ describe('지역 · 존 (D49 · D50 · D51)', () => {
     expect(parse('ap-northeast-2', 'aws')).toMatchObject({ ok: true, context: { region: 'apne2' } });
   });
 
-  it('존 규칙에 존이 없으면 valid:false + name.zone_required — generateMany', () => {
-    const r = generateMany(ctxOf('asia-northeast3'), 'gcp', [{ rule: gcp('disk'), count: 1 }]);
-    expect(r.items[0]).toMatchObject({ valid: false, name: '', violations: [{ code: 'name.zone_required', params: { region: 'ane3' } }] });
-  });
-  it('존 규칙에 존이 없으면 valid:false + name.zone_required — generate 도 같다 (14 규칙)', () => {
+  const ZONAL = ['compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
+    'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group'];
+  it('리전만 넣어도 옛 존 규칙 14종 전부 이름이 나온다 — name.zone_required 는 없다 (D50 revised)', () => {
     const out = generate(ctxOf('asia-northeast3'), ['gcp']).gcp!;
-    const zonal = rulesFor('gcp').filter((r) => r.regionToken === 'zone').map((r) => r.resourceType);
-    expect(zonal).toHaveLength(14);
-    for (const t of zonal) expect(out[t]!.violations.map((v) => v.code), t).toEqual(['name.zone_required']);
+    for (const t of ZONAL) {
+      expect(out[t]!.name, t).toMatch(/-ane3-/);
+      expect(out[t]!.violations.map((v) => v.code), t).not.toContain('name.zone_required');
+    }
+    const all = Object.values(out).flatMap((r) => r.violations.map((v) => v.code));
+    expect(all).not.toContain('name.zone_required');
   });
-  it('이름이 빈 항목(zone_required)에는 kindToken 을 싣지 않는다 — 고른 kind 는 남는다', () => {
+  it('존을 넣어도 리전만 넣은 것과 이름이 같다 — 존은 이름에 들지 않는다', () => {
+    const a = generate(ctxOf('asia-northeast3-a'), ['gcp']).gcp!;
+    const b = generate(ctxOf('asia-northeast3'), ['gcp']).gcp!;
+    for (const t of ZONAL) expect(a[t]!.name, t).toBe(b[t]!.name);
+    expect(ctxOf('asia-northeast3-a').zone).toBe('ane3a');
+  });
+  it('kind 를 고르면 존 없는 문맥에서도 kindToken 이 붙는다', () => {
     const r = generateMany(ctxOf('asia-northeast3'), 'gcp', [{ rule: gcp('network_endpoint_group'), count: 1, kind: 'GCE_VM_IP' }]);
-    expect(r.items[0]).toMatchObject({ valid: false, name: '', kind: 'GCE_VM_IP', violations: [{ code: 'name.zone_required' }] });
-    expect('kindToken' in r.items[0]!).toBe(false);
-    // 존이 있으면 토큰이 붙는다 — 위 단언이 「토큰이 없는 값」이라 지나가는 것이 아님을 보인다
-    const z = generateMany(ctxOf('asia-northeast3-a'), 'gcp', [{ rule: gcp('network_endpoint_group'), count: 1, kind: 'GCE_VM_IP' }]);
-    expect(z.items[0]!.kindToken).toBeTruthy();
+    expect(r.items[0]).toMatchObject({ valid: true, kind: 'GCE_VM_IP' });
+    expect(r.items[0]!.kindToken).toBeTruthy();
   });
-  it('global 입력이면 존 규칙도 name.zone_required — 존이 없다', () => {
-    expect(generate(ctxOf('global'), ['gcp']).gcp!.disk).toMatchObject({ valid: false, violations: [{ code: 'name.zone_required', params: { region: 'global' } }] });
+  it('global 입력이면 옛 존 규칙도 지역 자리가 빈다', () => {
+    expect(generate(ctxOf('global'), ['gcp']).gcp!.disk).toMatchObject({ valid: true, name: 'billing-trade-prod-disk-01' });
   });
-  it('존이 있으면 존 규칙은 존 코드 · 리전 규칙은 리전 코드 · 전역 규칙은 지역 토큰 없음', () => {
+  it('존이 있어도 옛 존 규칙 · 리전 규칙은 리전 코드 · 전역 규칙은 지역 토큰 없음', () => {
     const r = generateMany(ctxOf('asia-northeast3-a'), 'gcp', [
       { rule: gcp('disk'), count: 1 }, { rule: gcp('subnet'), count: 1 }, { rule: gcp('vpc_network'), count: 1 }, { rule: gcp('compute_instance'), count: 1 },
     ]);
-    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-ane3a-disk-01', 'billing-trade-prod-ane3-snet-01', 'billing-trade-prod-vpc-01', 'billing-trade-prod-ane3a-gce-01']);
+    expect(r.items.map((i) => i.name)).toEqual(['billing-trade-prod-ane3-disk-01', 'billing-trade-prod-ane3-snet-01', 'billing-trade-prod-vpc-01', 'billing-trade-prod-ane3-gce-01']);
     expect(r.valid).toBe(true);
   });
   it('global 입력이면 리전 규칙의 지역 토큰이 빈다', () => {
     expect(generate(ctxOf('global'), ['gcp']).gcp!.subnet).toMatchObject({ valid: true, name: 'billing-trade-prod-snet-01' });
   });
-  it('compute_instance 는 존 토큰 규칙이다', () => expect(gcp('compute_instance').regionToken).toBe('zone'));
+  it('compute_instance 는 리전 토큰 규칙이다', () => expect(gcp('compute_instance').regionToken).toBe('region'));
 });
 
 describe('종류 토큰 (D52)', () => {
