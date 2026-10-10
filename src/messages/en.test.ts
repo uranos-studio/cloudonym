@@ -231,6 +231,11 @@ describe('영어 사전 (D24)', () => {
     expect(en.ui.wizard_ha_hint).toMatch(/different zones/);
     for (const k of UI_KEYS.filter((x) => x.startsWith('wizard_'))) expect(HANGUL.test(en.ui[k]), k).toBe(false);
   });
+  it('attach 오류 문장은 코드 이름과 달리 무엇이 틀렸는지 말한다 — boot:false 같은 값도 이 코드로 온다', () => {
+    expect(format({ code: 'wizard.attach_not_object', params: { index: 0 } }, en)).toBe(
+      'picks[0]: attach must be an object whose boot, ip and ipi are true when present, and whose data is a list',
+    );
+  });
   it('fillUi 는 {이름} 자리를 채우고 없는 이름은 그대로 둔다', () => {
     expect(fillUi(en, 'version_footer', { engine: '0.1.0', rules: '2026-09-29.1' })).toBe('Engine 0.1.0 · rules 2026-09-29.1');
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');

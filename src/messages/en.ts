@@ -81,7 +81,7 @@ export const en: Catalog = {
     'name.parent_name': (m) => `'${m.params.parent}' plus '${m.params.suffix}' exceeds the limit`,
     // 마법사 딸린 것 (checkAttachments)
     'wizard.children_not_supported': (m) => `picks[${m.params.index}]: '${m.params.type}' takes no attachments`,
-    'wizard.attach_not_object': (m) => `picks[${m.params.index}]: attach must be an object`,
+    'wizard.attach_not_object': (m) => `picks[${m.params.index}]: attach must be an object whose boot, ip and ipi are true when present, and whose data is a list`,
     'wizard.attach_out_of_range': (m) => `picks[${m.params.index}]: data must list from 1 to ${m.params.max} disk numbers`,
     'wizard.invalid_data_seq': (m) => `picks[${m.params.index}]: disk number '${m.params.value}' must match ${m.params.pattern}`,
     'wizard.duplicate_seq': (m) => `picks[${m.params.index}]: '${m.params.value}' is used twice`,
