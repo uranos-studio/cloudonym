@@ -388,6 +388,7 @@ def wizard_scenarios(browser, rules_version, errors):
     v3 = state_hash(INPUT, rules_version, 'gcp', {'compute_instance': 2})
     five = state_hash(INPUT)
     ctx36 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    ctx36.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     p36 = ctx36.new_page()
     p36.on('pageerror', lambda e: errors.append(str(e)))
     for path in ('/', '/pick'):
@@ -400,13 +401,22 @@ def wizard_scenarios(browser, rules_version, errors):
             expect(p36.locator('[data-nav-wizard]')).to_have_attribute('href', '/')
             if h == v3:
                 expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
-                # 뿌리에서 연 옛 링크라도 새 Share URL 은 /pick 이다
+                # 주소창은 연 경로 그대로 · 뿌리에서 연 옛 링크라도 새 Share URL 은 /pick 이다 (D68)
                 assert p36.url.startswith(BASE + path + '#state='), p36.url
+                p36.click('[data-copy="share-url"]')
+                tree_share = p36.evaluate('navigator.clipboard.readText()')
+                assert tree_share.startswith(BASE + '/pick#state='), tree_share
+                assert 'w' not in hash_state(tree_share), tree_share
     # 같은 탭 — 뿌리의 트리에서 마법사 링크로 이동하면 마법사로 바뀐다
     goto_ready(p36, BASE + '/' + v3)
     p36.evaluate('h => { location.hash = h; }', '#' + shared.split('#', 1)[1])
     expect(p36.locator('[data-wizard]')).to_be_visible()
     expect(p36.locator('[data-tree]')).to_have_count(0)
+    # 반대 방향 — 마법사에서 옛 트리 링크로 이동하면 트리로 바뀐다
+    p36.evaluate('h => { location.hash = h; }', v3)
+    expect(p36.locator('[data-tree]')).to_have_count(1)
+    expect(p36.locator('[data-wizard]')).to_have_count(0)
+    expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
     # 깨진 뿌리 hash → 마법사 + 안내 한 줄 (조용히 버리지 않는다)
     for broken in ('#state=!!!', '#state=W10'):
         goto_ready(p36, BASE + '/?b' + broken)
