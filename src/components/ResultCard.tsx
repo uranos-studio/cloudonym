@@ -13,12 +13,14 @@ const CARD =
   'flex flex-col gap-2 rounded-lg border bg-white p-3 shadow-xs dark:bg-zinc-900 ' +
   'data-[valid=false]:border-rose-300 border-zinc-200 dark:border-zinc-800 dark:data-[valid=false]:border-rose-900';
 
-export function ResultCard({ result: r }: { result: NameResult | NameItem }) {
+/** parentName — 마법사의 딸린 이름이면 부모의 이름(카드에 「attached to」 한 줄) */
+export function ResultCard({ result: r, parentName }: { result: NameResult | NameItem; parentName?: string }) {
   const item = 'key' in r ? r : undefined;
   const key = item?.key ?? r.resourceType;
   const id = `card-${r.ruleId.replace('.', '-')}-${key}`;
   // 제목 — 이름(catalog 행 이름 — 트리 행과 같다. 행이 없으면 규칙 이름) · 종류 토큰(붙었을 때만 · D52) · 순번 또는 역할
-  const title = [rowOf(r.ruleId)?.displayName ?? r.displayName, item?.kindToken, item?.seq ?? item?.role].filter((x) => x !== undefined).join(' · ');
+  // 마법사 항목은 용도 토큰(tier) · 딸린 것의 종류(attach)도 붙인다 — `VM Instance · web · 01` · `Persistent Disk · data · 01`
+  const title = [rowOf(r.ruleId)?.displayName ?? r.displayName, item?.kindToken, item?.tier, item?.attach, item?.seq ?? item?.role].filter((x) => x !== undefined).join(' · ');
   const stepsText = visibleSteps(r.steps).map((m) => format(m, en)).join(' · ');
   // aria-invalid 는 폼 위젯 역할에만 허용된다 — 카드는 data-valid 로 상태를 들고 PASS/FAIL 글자가 뜻을 전한다
   return (
@@ -30,6 +32,9 @@ export function ResultCard({ result: r }: { result: NameResult | NameItem }) {
           : <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-700 dark:text-rose-400"><CircleX aria-hidden="true" className="size-3.5" />FAIL</span>}
       </div>
 
+      {item?.parent !== undefined && (
+        <p data-parent={item.parent} className="text-[11px] text-zinc-600 dark:text-zinc-400">{en.ui.wizard_attached_to} <code className="break-all font-mono">{parentName || item.parent}</code></p>
+      )}
       <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-2 dark:bg-zinc-950">
         <code data-name className="min-w-0 break-all font-mono text-sm text-zinc-900 dark:text-zinc-100">{r.name || '—'}</code>
         {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 */}

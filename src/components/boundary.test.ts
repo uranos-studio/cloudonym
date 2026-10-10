@@ -13,6 +13,7 @@ const ALLOWED = [
   /^lucide-react$/,
   /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes|catalog)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 · catalog 조회 (D37 · D40 · D54)
   /^(?:\.\.?\/)+core\/(?:regions|regions-data)$/,     // 지역 표 · 지역 입력 풀이 — 지역 고르기 · 공유 hash 상한 (D49 · D50)
+  /^(?:\.\.?\/)+core\/wizard\/(?:plan|presets|attachments)$/, // 마법사 모델 검사 · 펼치기 · 프리셋 · 호환표 데이터 (D64 · D67)
   /^\.\/index\.css$/, /^\.\/App\.tsx$/,              // main.tsx 의 진입
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
@@ -75,6 +76,12 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
     const main = specifiers(sources['../main.tsx'] ?? '');
     for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/route']) expect(main, m).toContain(m);
     for (const f of ['./NamingDoc.tsx', './Privacy.tsx', './DocPage.tsx', './route.ts']) expect(files, f).toContain(f);
+  });
+  it('화면은 api 를 들여오지 않는다 — 마법사도 엔진을 직접 부른다 (D17)', () => {
+    expect(specifiers("import { toWirePath } from '../api/schemas';").filter((s) => ALLOWED.some((re) => re.test(s)))).toEqual([]);
+    const all = files.flatMap((f) => specifiers(sources[f] ?? '').map((s) => `${f} → ${s}`));
+    expect(all.filter((line) => /\/api\//.test(line))).toEqual([]);
+    expect(files, 'Wizard.tsx').toContain('./Wizard.tsx');
   });
   it('이름 규칙 · 길이 판정을 화면이 스스로 하지 않는다 — maxLength · pattern 으로 검사하는 코드가 없다', () => {
     // 규칙 숫자를 읽어 표시하는 것(r.rule.maxLength)은 되지만, 그 값으로 잘라 내거나 정규식으로 판정하는 코드는 엔진 몫이다

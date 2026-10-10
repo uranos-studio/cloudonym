@@ -62,3 +62,25 @@ describe('ResultCard — 제목 · 복사', () => {
     for (const r of all.filter((x) => x.valid).slice(0, 5)) expect(copyDisabled(html(r)), r.ruleId).toBe(false);
   });
 });
+
+import { generateProject } from '../core/engine';
+describe('ResultCard — 마법사 항목 (D62 · D69)', () => {
+  const sel = {
+    project: { owner: 'platform', system: 'billing', env: 'prod' as const, region: 'ane3' },
+    projectItems: [],
+    services: [{ purpose: 'shop', items: [{ rule: getRule('gcp', 'compute_instance')!, count: 1, tier: 'web', instances: [{ seq: '01', attach: { boot: true as const, data: ['01'] } }] }] }],
+  };
+  const items = generateProject(sel, 'gcp').items;
+  it('부모 제목 — 「VM Instance · web · 01」 · 부모 줄이 없다', () => {
+    const m = html(items[1]!);
+    expect(title(m)).toBe('VM Instance · web · 01');
+    expect(m).not.toContain('data-parent');
+  });
+  it('자식 — 제목에 종류 · 순번 · 「attached to」 줄에 부모 이름', () => {
+    const disk = items.find((i) => i.attach === 'data')!;
+    const m = renderToStaticMarkup(createElement(ResultCard, { result: disk, parentName: items[1]!.name }));
+    expect(title(m)).toBe('Persistent Disk · data · 01');
+    expect(m).toContain(`data-parent="${items[1]!.key}"`);
+    expect(m).toContain('billing-shop-prod-ane3-gce-web-01</code>');
+  });
+});

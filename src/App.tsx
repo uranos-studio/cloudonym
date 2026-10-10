@@ -1,7 +1,7 @@
 // 네 단계 화면 (D42) — ① Cloud ② Context ③ Resources ④ Names · 상태 → URL hash 동기화 · 비콘.
 // 엔진은 브라우저에서 직접 부른다 (D17) — API 왕복 없음. 화면 문구는 사전(en)이 정본이다 (D24)
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, BookOpen, Cloud, FileText } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import { generateMany, parseContext } from './core/engine';
 import { labelsFor } from './core/labels';
 import { buildTree } from './core/tree';
@@ -14,10 +14,12 @@ import { NamesPanel } from './components/NamesPanel';
 import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
 import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } from './components/selection';
-import { encodeState, shareUrl } from './components/urlState';
+import { encodeState, hashKind, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
-import { NAMING_PATH, PRIVACY_PATH, withStateHash } from './components/route';
+import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './components/route';
+import { AppHeader } from './components/AppHeader';
+import { Wizard } from './components/Wizard';
 import { DEFAULT_FORM, type FormContext } from './components/formContext';
 import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './components/beacon';
 import { en } from './messages/en';
@@ -29,13 +31,31 @@ const AUTO_PROVIDER: Provider | undefined = ENABLED_PROVIDERS.length === 1 ? ENA
 const NO_PICK: Picked = new Map();
 
 const PANEL = 'rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900';
-const LINK =
-  'inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 ' +
-  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800';
 const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-/** rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
-function App({ rules }: { rules?: readonly ResourceRule[] }) {
+/** 화면 고르기 (D68) — `/pick` 은 늘 트리. 뿌리 `/` 는 hash 로 고른다: `w` 면 마법사 · `w` 없는 온전한 hash(옛 v3 · 다섯 키 링크)면 지금 자리에서 트리 ·
+ *  hash 가 없으면 마법사 · 어느 꼴로도 풀리지 않는 hash 면 마법사 + 한 줄 안내. 같은 탭 hash 이동은 다른 꼴로 풀릴 때만 화면을 바꾼다(깨진 hash 는 지금 화면이 되돌린다).
+ *  rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
+function App({ rules, route = 'app' }: { rules?: readonly ResourceRule[]; route?: 'app' | 'pick' }) {
+  return route === 'pick' ? <TreeScreen rules={rules} atRoot={false} /> : <RootScreen rules={rules} />;
+}
+
+function RootScreen({ rules }: { rules?: readonly ResourceRule[] }) {
+  const [start] = useState(() => hashKind(window.location.hash));
+  const [mode, setMode] = useState<{ screen: 'wizard' | 'tree'; broken: boolean }>(() => ({ screen: start === 'tree' ? 'tree' : 'wizard', broken: start === 'broken' }));
+  useEffect(() => {
+    const onHash = () => {
+      const k = hashKind(window.location.hash);
+      if (k === 'tree' || k === 'wizard') setMode((m) => (m.screen === k ? m : { screen: k, broken: false }));
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  return mode.screen === 'tree' ? <TreeScreen key="tree" rules={rules} atRoot /> : <Wizard key="wizard" brokenLink={mode.broken} />;
+}
+
+/** 네 단계 트리 화면 — atRoot 면 뿌리에서 옛 링크로 열린 것이다(마법사 hash 로의 이동은 RootScreen 이 맡는다) */
+function TreeScreen({ rules, atRoot }: { rules?: readonly ResourceRule[]; atRoot: boolean }) {
   // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (깨진 hash 는 decodeState 가 undefined 로 돌려준다)
   const [initial] = useState(() => openHash(window.location.hash, rules));
   // 폼은 지역 입력 문자열을 든다 — 정규화된 문맥으로 덮지 않는다(존이 떨어진다 · D50). 예시는 존 이름(R0)이다
@@ -124,6 +144,8 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
   if (nextAddressHash !== addressHash) setAddressHash(nextAddressHash);
   useEffect(() => {
     const onHashChange = () => {
+      // 뿌리에서 마법사 링크로 이동 — 화면 전환은 RootScreen 이 한다
+      if (atRoot && hashKind(window.location.hash) === 'wizard') return;
       const opened = openHash(window.location.hash, rules);
       if (opened) {
         lastSentKey.current = encodeState(opened.context, VERSION.rules);
@@ -140,31 +162,17 @@ function App({ rules }: { rules?: readonly ResourceRule[] }) {
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, [rules]);
+  }, [rules, atRoot]);
 
   const nameCount = totalNames(picked);
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <span className="rounded-lg bg-indigo-600 p-2 text-white dark:bg-indigo-500"><Cloud aria-hidden="true" className="size-5" /></span>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">{en.ui.tagline}</p>
-            </div>
-          </div>
-          <nav aria-label={en.ui.nav_label} className="flex flex-wrap items-center gap-2">
-            {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵) */}
-            {ctx && <CopyButton text={shareUrl(ctx, window.location.origin + window.location.pathname, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
-            <a href={withStateHash(NAMING_PATH, addressHash)} data-nav-naming className={LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
-            <a href="/llms.txt" target="_blank" rel="noreferrer" className={LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
-          </nav>
-          {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
-          {ctx && <p data-share-warning className="w-full text-xs text-zinc-600 sm:text-right dark:text-zinc-400">{en.ui.share_warning}</p>}
-        </div>
-      </header>
+      {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵). 새 트리 링크의 자리는 /pick 이다 (D68) */}
+      <AppHeader
+        screen="tree" otherHref={WIZARD_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)}
+        share={ctx && <CopyButton text={shareUrl(ctx, window.location.origin + PICK_PATH, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+      />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">
         <div className={PANEL}>

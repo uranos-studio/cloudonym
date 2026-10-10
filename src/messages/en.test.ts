@@ -222,6 +222,15 @@ describe('영어 사전 (D24)', () => {
     expect(run(doc)).toBe(doc.length);
     expect(run(privacy)).toBe(privacy.length);
   });
+  it('마법사 문구 (D67 · D68) — 경로 nav · 링크 복구 안내 · 깨진 링크 안내', () => {
+    expect(en.ui.nav_wizard).toBe('Wizard');
+    expect(en.ui.nav_pick).toBe('Pick resources');
+    expect(UI_KEYS.filter((k) => k.startsWith('wizard_link_'))).toEqual(['wizard_link_broken', 'wizard_link_discarded', 'wizard_link_dropped', 'wizard_link_ha_off', 'wizard_link_serverless_off', 'wizard_link_trimmed']);
+    expect(en.ui.wizard_link_broken).toMatch(/could not be opened/);
+    expect(fillUi(en, 'wizard_link_dropped', { n: 2 })).toBe('2 invalid item(s) in this link were left out.');
+    expect(en.ui.wizard_ha_hint).toMatch(/different zones/);
+    for (const k of UI_KEYS.filter((x) => x.startsWith('wizard_'))) expect(HANGUL.test(en.ui[k]), k).toBe(false);
+  });
   it('fillUi 는 {이름} 자리를 채우고 없는 이름은 그대로 둔다', () => {
     expect(fillUi(en, 'version_footer', { engine: '0.1.0', rules: '2026-09-29.1' })).toBe('Engine 0.1.0 · rules 2026-09-29.1');
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');
