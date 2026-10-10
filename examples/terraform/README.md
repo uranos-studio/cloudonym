@@ -67,6 +67,33 @@ terraform init
 terraform plan
 ```
 
+### Whole project: `/v1/wizard` → `locals`
+
+`main.tf` names one VM with `/v1/generate`. To name a whole project, send the wizard request to `POST /v1/wizard`
+(see the main README) and turn the items into one map keyed by the structured item key. Invalid items are left out
+of the map, so a missing key fails the plan instead of creating a resource with a rejected name:
+
+```hcl
+data "http" "wizard" {
+  url             = "${var.cloudonym_api_url}/v1/wizard"
+  method          = "POST"
+  request_headers = { "content-type" = "application/json" }
+  request_body    = file("${path.module}/wizard.json") # the request body, as in the README example
+}
+
+locals {
+  wizard                  = jsondecode(data.http.wizard.response_body)
+  gcp_names               = { for i in local.wizard.data.gcp.items : i.key => i.name if i.valid }
+  gcp_invalid             = [for i in local.wizard.data.gcp.items : i.key if !i.valid]
+  gcp_labels_by_namespace = local.wizard.metadata.generated_labels.gcp
+}
+```
+
+`local.gcp_names["service/shop/compute_instance/web/01/data/01"]` is then `"billing-shop-prod-ane3-gce-web-01-data-01"`
+and `local.gcp_labels_by_namespace["shop"]` the labels of service `shop`. The wizard's **Terraform** button copies the
+same two maps as a `locals` block, with invalid items as `# INVALID:` comments. The name-stability advice above
+applies here too: keep `ignore_changes = [name]` on the resources and send `rules_version`.
+
 Do not commit `terraform.tfvars`. PASS / `valid: true` means the name satisfies the documented naming checks of this
 rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it —
 uniqueness, permissions, quotas and organisation policy are not checked.
@@ -94,6 +121,24 @@ uniqueness, permissions, quotas and organisation policy are not checked.
 2. **`rules_version`** — `cloudonym_version.rules` 값을 넣는다. 규칙이 바뀌면 API 가 다른 이름을 조용히 주지 않고 409 `request.rules_version_mismatch` 로 알린다
 3. **핀 모드** — `pinned = { name, labels }` 에 이미 만든 값을 넣으면 Cloudonym 을 부르지 않는다(`count = 0`). 409 를 받았거나 API 에 닿지 않을 때의 복구 경로다. Cloudonym 은 옛 규칙 버전을 서빙하지 않는다.
    **핀 값은 Cloudonym 이 검사하지 않는다** — precondition 을 건너뛰고 `cloudonym_valid` 는 `null` 이다. 예제는 핀 이름이 유효하다고 말하지 않는다. 이미 만들어 둔 이름만 핀으로 넣는다
+
+### 프로젝트 전체 — `/v1/wizard` → `locals`
+
+`main.tf` 는 `/v1/generate` 로 VM 하나에 이름을 붙인다. 프로젝트 전체는 마법사 요청을 `POST /v1/wizard` 로 보내고(본 README 참고)
+항목을 구조 키를 맵 키로 하는 맵 하나로 바꾼다. 무효 항목은 맵에 넣지 않는다 — 키가 없으면 plan 이 실패하므로 거부된 이름으로 리소스가 만들어지지 않는다.
+
+```hcl
+locals {
+  wizard                  = jsondecode(data.http.wizard.response_body)
+  gcp_names               = { for i in local.wizard.data.gcp.items : i.key => i.name if i.valid }
+  gcp_invalid             = [for i in local.wizard.data.gcp.items : i.key if !i.valid]
+  gcp_labels_by_namespace = local.wizard.metadata.generated_labels.gcp
+}
+```
+
+`data "http" "wizard"` 블록은 위 영어 절과 같다. `local.gcp_names["service/shop/compute_instance/web/01/data/01"]` 은
+`"billing-shop-prod-ane3-gce-web-01-data-01"` 이다. 마법사의 **Terraform** 버튼은 같은 두 맵을 `locals` 블록으로 복사하고, 무효 항목은 `# INVALID:` 주석으로 남긴다.
+이름 안정성 권고(`ignore_changes = [name]` · `rules_version`)는 여기에도 그대로다.
 
 `terraform.tfvars` 는 커밋하지 않는다(`.gitignore`). GCP 자격은 `gcloud auth application-default login` 등 google provider 의 방식을 따른다.
 PASS(`valid: true`)는 이 규칙 버전의 이름 검사(길이 · 형식 · 예약어)를 통과했다는 뜻이지 그 이름을 쓸 수 있다는 뜻이 아니다 — 고유성 · 권한 · 할당량 · 조직 정책은 검사하지 않는다.

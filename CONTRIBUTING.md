@@ -80,6 +80,15 @@ For Google Cloud, the abbreviation in each name, the uniqueness class, whether a
 3. Run `npm test`. `src/core/catalog.test.ts` checks the JSON against the schema, that the generated files hold the same data as the JSON, and that catalog rule ids and the rule table cover each other; `src/core/catalog-collision.test.ts` rejects an abbreviation or kind token that equals another one, a region or zone code, or an environment value.
 4. A catalog change changes names, so bump the rules revision and rewrite the fingerprint and the baseline as in step 6 above. `/llms.txt`, `/catalog.json` and the `/docs/naming` page are built from the generated files and need no further edits.
 
+## Adding a wizard preset
+
+A wizard preset is data, not code (decisions D59 and D64): one row in `PRESETS` in `src/core/wizard/presets.ts`. The wizard functions do not know the presets; the screen, `/llms.txt` and the `/docs/naming` page read the same array.
+
+1. Add the row: `id` (the `preset` value on `/v1/wizard`), `label` (the chip text, English), `ruleId` (an existing rule), `tier` (or `null`), `ha` (`{ minInstances }` or `null`), `serverless` (rule ids or `null`), and optionally `tierChoices`, `defaultAttach` (the screen's starting attached resources) or `group` (a project-level chip such as the network). A row without `group` is a service chip; a row with `group` is a project-level chip.
+2. The tier must match `^[a-z0-9]{2,16}$` and must not be a reserved word (an abbreviation, kind token, environment value or alias, or region or zone code); a preset with a tier must point to a rule with a sequence number. `src/core/wizard/presets.test.ts` checks these, every rule id and the minimum counts.
+3. Attached resources come from the attachment table in `src/core/wizard/attachments.ts` (one row per parent rule and suffix), not from the preset.
+4. Update the expectations that pin the current list (`presets.test.ts`, the `## Wizard presets` checks in `src/api/llms.test.ts`, `src/components/namingDoc.test.ts`) and run the checks in step 7 above. A new preset adds no rule, so names of existing requests do not change.
+
 ## Pull requests
 
 - Keep each pull request focused on one change and describe what changed and why.
@@ -109,6 +118,7 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 - **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run test:rules` 다섯을 통과시킨 뒤 PR 을 연다
 - **catalog 고치기** — GCP 의 약어 · 고유성 부류 · 지역 토큰 종류 · 종류와 토큰 · 설명 · 별칭과 세 CSP 의 리전 · 존 코드는 `catalog/*.json` 이 정본이다. JSON 을 고치고 **`npm run catalog`** 로 생성 파일(`src/core/rules/gcp-catalog.ts` · `src/core/regions-data.ts`)을 다시 쓴 뒤 `npm test`(`catalog.test.ts` · `catalog-collision.test.ts`)를 돌린다. 이름이 바뀌므로 규칙 버전도 올린다
 - **규칙 더하기** — 공식 문장을 찾아 `docUrl` · `entity` · `scope` 를 정한다 → 생성 행은 `scripts/rules/build-<provider>-rules.mjs` 를 다시 돌리고(`*-intake.ts` 는 손으로 고치지 않는다), 손 행은 `src/core/rules/<provider>-manual.ts` 에 원문을 인용해 넣는다 → 규칙마다 허용 · 거부 예가 있어야 `rule-cases.test.ts` 가 통과한다 → 출처를 새로 받았으면 `check-sources.mjs … --write` 로 `docs/rule-sources.lock.json` 을 고친다 → `RULES_REVISION` 을 올리고 `UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts` (기준선이 바뀌었으면 `UPDATE_BASELINE=1 npx vitest run src/core/baseline.test.ts`) 로 지문을 다시 쓴다
+- **마법사 프리셋 더하기** — 코드가 아니라 데이터다(D59 · D64). `src/core/wizard/presets.ts` 의 `PRESETS` 에 한 행(`id` · `label` · `ruleId` · `tier` · `ha` · `serverless`, 필요하면 `tierChoices` · `defaultAttach` · `group`)을 더하면 화면 · `/llms.txt` · `/docs/naming` 이 같은 배열을 읽는다. tier 는 `^[a-z0-9]{2,16}$` 이고 예약어(약어 · 종류 토큰 · 환경 값과 별칭 · 리전 · 존 코드)가 아니어야 한다 — `presets.test.ts` 가 본다. 딸린 리소스는 `attachments.ts` 의 호환표에서 온다. 지금 목록을 고정한 기대값(`presets.test.ts` · `llms.test.ts` 의 `## Wizard presets` · `namingDoc.test.ts`)을 같이 고친다
 - **규칙 숫자에는 CSP 공식 문서 URL(`docUrl`)이 붙는다.** 출처 없는 길이 · 정규식은 받지 않는다. 무효인 이름을 유효로 표시하지 않는다 — 문서가 모호하면 보수적으로 잡고 [docs/decisions.md](docs/decisions.md) 에 적는다
 - **규칙을 바꾸면 규칙 버전을 올린다** — 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경은 `src/core/revision.ts` 의 `RULES_REVISION` 을 올리고 `src/core/rules-fingerprint.json` 을 다시 쓴다. CI 가 `main` 과 대어 본다
 - **엔진 버전은 두 곳에 있다** — `package.json` 의 `version` 을 바꾸면 `src/version.ts` 의 `ENGINE_VERSION` 도 같이 바꾼다(다르면 시험이 실패한다). `dist/` 에 devDependency 이름이 있으면 빌드가 실패한다

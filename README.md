@@ -1,12 +1,50 @@
 # Cloudonym
 
-Multi-cloud resource naming engine — **Google Cloud** in this release, with AWS and Azure in the rule table and planned for later releases. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people, and `/v1/generate` · `/v1/names` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` for AI coding agents and IaC. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+Multi-cloud resource naming engine — **Google Cloud** in this release, with AWS and Azure in the rule table and planned for later releases. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people (a **naming wizard** for a whole project, and a resource tree for any single resource), and `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` for AI coding agents and IaC. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 [한국어](#한국어)
 
-![Cloudonym web UI — four steps: cloud, naming context, resource tree and generated names](docs/screenshots/01-desktop-light.png)
+![Cloudonym naming wizard — project values, two services with their servers and disks, and the generated names](docs/screenshots/06-wizard.png)
 
-## Usage in four steps (web UI)
+<a id="naming-wizard"></a>
+## Naming wizard (web UI, `/`)
+
+The home page names a whole Google Cloud project in six steps. Names are regenerated as you type.
+
+1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet and firewall rules (`ssh`, `web`, `icmp`).
+2. **② Services** — one card per service. The service name is the `purpose` of every name in that service; **Add service** adds another.
+3. **③ Purpose** — pick what runs in the service: **web**, **was** (app server), **bastion**, **file** (file server), **db** (Cloud SQL), **object** (Cloud Storage), or **Custom…**, which opens the resource tree to pick any other catalog row.
+4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a database takes its engine. Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask.
+5. **⑤ Attached resources** — per server, a **boot** disk, numbered **data** disks and reserved external or internal addresses (**ip**, **ipi**). Their names continue the server's name.
+6. **⑥ Names** — grouped by project and service, attached resources under their server, each with `PASS`/`FAIL` and the reasons. Copy **all names**, the **JSON**, **Terraform** `locals` (one map `gcp_names` keyed by the item key, plus `gcp_labels_by_namespace`) or the **Share URL**.
+
+For example, project `platform` · `billing` · `prod` · `asia-northeast3` with a VPC network, a service `shop` (web server 01 with a boot disk and data disk 01, and a PostgreSQL database) and a service `pay` (web servers 01 and 02 with HA) gives these names — the same request is the [`POST /v1/wizard` example](#whole-project-post-v1wizard) below:
+
+```text
+platform-billing-prod                        project ID
+billing-prod-vpc-01                          VPC network (project level: no service, no region)
+billing-shop-prod-ane3-gce-web-01            web server 01 of shop
+billing-shop-prod-ane3-gce-web-01-boot       its boot disk
+billing-shop-prod-ane3-gce-web-01-data-01    its data disk 01
+billing-shop-prod-ane3-sql-pg-01             Cloud SQL (PostgreSQL)
+billing-pay-prod-ane3-gce-web-01             web server 01 of pay
+billing-pay-prod-ane3-gce-web-02             web server 02 of pay
+```
+
+The wizard and its five preset groups — web, app and bastion servers; file server; database; object storage; network — are part of this repository, and any other catalog row is a custom pick. More complex stacks are out of scope for this repository.
+
+### Name formula
+
+Most numbered resources follow `<system>-<purpose>-<env>-<region>-<abbreviation>[-<kind>][-<tier>]-<seq>`; every formula in use is listed on `/docs/naming` and in `/llms.txt`.
+
+- `region` is a region code (`ane3`), never a zone — a zone you enter resolves to its region, so VMs and disks are named like regional resources.
+- `kind` is added only when it differs from the provider default (`pg` for PostgreSQL).
+- `tier` (`web`, `was`, …; pattern `^[a-z0-9]{2,16}$`) is filled only by the wizard, so `/v1/generate` and `/v1/names` never put one in a name. It is never shortened. Abbreviations, kind tokens, environment values and region codes are not allowed as tiers.
+- Attached resources add `-boot`, `-data-<seq>`, `-ip` or `-ipi` to the server's final name and are never shortened; a name that does not fit fails with the reason.
+
+## Pick resources (`/pick`)
+
+The resource tree is at `/pick` (header link **Pick resources**), and links shared before the wizard still open it. It names single resources from one set of five values, in four steps:
 
 1. **① Cloud** — GCP is selected for you. AWS and Azure are shown as **Coming soon** and cannot be picked yet.
 2. **② Context** — type **Owner · System · Purpose** (at most 64 characters each), pick **Environment**, and pick a **Region** (searching by a zone name also finds its region). Names are regenerated as you type.
@@ -19,17 +57,18 @@ Allowed values — env: `prod` · `stg` · `dev` · `sbx` (aliases such as `prd`
 
 ### Share URL — your input is readable by anyone with the link
 
-The page keeps its state (the five values, the provider and the selection) in the URL hash, and **Share URL** copies that link. The hash is written to the address bar as you type, even if you never press the button. It is **Base64, not encryption**: anyone who gets the link can decode it and read owner, system, purpose and the rest. Do not enter sensitive values such as internal company or project names if you plan to share the link. The page shows the same warning next to the button.
+Both screens keep their state in the URL hash — the wizard its project values, services, picks and servers; the tree the five values, the provider and the selection — and **Share URL** copies that link. The hash is written to the address bar as you type, even if you never press the button. It is **Base64, not encryption**: anyone who gets the link can decode it and read owner, system, the service names and the rest. Do not enter sensitive values such as internal company or project names if you plan to share the link. The page shows the same warning next to the button.
 
 ### Screenshots
 
 | | |
 |---|---|
-| [Desktop, light](docs/screenshots/01-desktop-light.png) | GCP, four resources picked (the tree shows the selected rows only) |
+| [Naming wizard](docs/screenshots/06-wizard.png) | Two services — `shop` (server 01 with a boot disk and data disk 01) and `pay` (server 01 with a boot disk) — and their names |
+| [Desktop, light](docs/screenshots/01-desktop-light.png) | The resource tree, four resources picked (the tree shows the selected rows only) |
 | [Mobile, 360 px](docs/screenshots/02-mobile-360.png) | The same selection on a narrow screen, with the bar that jumps to the names |
 | [Desktop, dark](docs/screenshots/03-desktop-dark.png) | The same share link opened in dark mode |
 | [FAIL cards](docs/screenshots/04-fail-card.png) | A `system` made only of symbols — every name fails with the reason and cannot be copied |
-| [Naming guide](docs/screenshots/05-naming-guide.png) | `/docs/naming` — formulas, tokens, region codes, abbreviations and kind tokens, generated from the same data as the engine |
+| [Naming guide](docs/screenshots/05-naming-guide.png) | `/docs/naming` — formulas, tokens, region codes, abbreviations, kind tokens, tiers, attached resources and wizard presets, generated from the same data as the engine |
 
 ## API in three lines
 
@@ -155,14 +194,75 @@ Response of `/v1/validate`:
 
 <a id="what-pass-means"></a>**What PASS means.** PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.
 
-**Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
+**Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
+
+<a id="whole-project-post-v1wizard"></a>
+### Whole project: `POST /v1/wizard`
+
+```sh
+curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: application/json' \
+  -d '{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"project_picks":[{"preset":"vpc","instances":[{"id":"n1","seq":"01"}]}],"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]},{"preset":"db","kind":"POSTGRES","instances":[{"id":"b","seq":"01"}]}]},{"purpose":"pay","picks":[{"preset":"web","ha":true,"instances":[{"id":"c","seq":"01"},{"id":"d","seq":"02"}]}]}]}'
+```
+
+One request is one project. `project` holds four values (no `purpose`), `project_picks` the project-level resources, and each entry of `services` a `purpose` and its `picks`. A pick is a `preset` (`web`, `was`, `bastion`, `file`, `db`, `object`, `vpc`, `subnet`, `firewall`) or `"preset": null` with a `rule` id, plus optional `tier`, `kind`, `ha` and `serverless`. `instances` are the servers: each has an `id` you choose (`^[a-z0-9]{1,8}$`), a `seq` that stays its number, and `attach` (`boot`, `data`, `ip`, `ipi`) on resources that take attached resources. At most 20 services, 20 picks per service or in `project_picks`, and 200 names including the project ID. Response, trimmed to a server and its boot disk (8 items in all — the names listed under [Naming wizard](#naming-wizard)):
+
+```json
+{
+  "success": true,
+  "version": { "engine": "0.1.0", "rules": "2026-10-10.7" },
+  "data": {
+    "gcp": {
+      "valid": true,
+      "items": [
+        {
+          "key": "service/shop/compute_instance/web/01",
+          "namespace": "shop",
+          "resource_type": "compute_instance",
+          "tier": "web",
+          "seq": "01",
+          "scope": "gcp:project",
+          "uniqueness": "csp",
+          "name": "billing-shop-prod-ane3-gce-web-01",
+          "valid": true,
+          "…": "…"
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/boot/-",
+          "namespace": "shop",
+          "parent": "service/shop/compute_instance/web/01",
+          "attach": "boot",
+          "resource_type": "disk",
+          "scope": "gcp:project_zone",
+          "uniqueness": "csp",
+          "name": "billing-shop-prod-ane3-gce-web-01-boot",
+          "valid": true,
+          "…": "…"
+        }
+      ],
+      "conflicts": []
+    }
+  },
+  "metadata": {
+    "generated_labels": {
+      "gcp": {
+        "project": { "owner": "platform", "system": "billing", "environment": "prod", "managed_by": "cloudonym" },
+        "shop": { "owner": "platform", "system": "billing", "purpose": "shop", "environment": "prod", "managed_by": "cloudonym" },
+        "pay": { "owner": "platform", "system": "billing", "purpose": "pay", "environment": "prod", "managed_by": "cloudonym" }
+      }
+    },
+    "…": "…"
+  }
+}
+```
+
+Items come in order: the project ID, the project-level items, then each service, each server followed by its attached resources. `key` is a structured path (`service/shop/compute_instance/web/01/data/01`) that does not change when other items are added or removed; `parent` and `attach` mark an attached resource, and project-level items carry `"level": "project"`. Two items of the same uniqueness class with the same name anywhere in the project are both `valid: false` with `name.conflict`. A 400 names the offending element in `field` with the request names, for example `services[0].picks[0].instances[0].attach.data[1]`. `/v1/generate`, `/v1/names` and `/v1/validate` are unchanged.
 
 ## AI-agent integration
 
-- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, the region codes and the zones they accept, kind tokens, abbreviations with their sources, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, and the API summary. It is built from the rule table and the catalog, so it never drifts from the engine.
-- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/names`, `/v1/validate`, `/v1/events`, `/v1/health` and `/catalog.json`, including every error status. The test suite validates real responses against it.
+- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, the region codes and the zones they accept, kind tokens, the tier token, attached resources and wizard presets, abbreviations with their sources, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, and the API summary. It is built from the rule table and the catalog, so it never drifts from the engine.
+- **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate`, `/v1/events`, `/v1/health` and `/catalog.json`, including every error status. The test suite validates real responses against it.
 - **`GET /catalog.json`** — the resource catalog and region table of the enabled providers as JSON: one row per screen row with its rule ids, abbreviation, kinds and tokens, region-token kind, description, where the name is entered and search aliases, plus `version: { engine, rules }`. The source is `catalog/*.json` in this repository (see [CONTRIBUTING.md](CONTRIBUTING.md)).
-- **`/docs/naming`** — the same data as a page for people: formulas, tokens, the region table, how names are shortened, abbreviations and kind tokens.
+- **`/docs/naming`** — the same data as a page for people: formulas, tokens, the region table, how names are shortened, abbreviations, kind tokens, tiers, attached resources and the wizard presets.
 
 Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relative to the host that served it.
 
@@ -233,7 +333,7 @@ The site and the API count usage without collecting what you type. Generated nam
 
 ## Terraform example
 
-[examples/terraform/](examples/terraform/README.md) calls `/v1/generate` from a `data "http"` block and creates a `google_compute_instance` with the returned name and labels. `apply` is blocked unless `valid` is `true` and there are no label violations. `ignore_changes = [name]` keeps an existing VM's name when the rules change, `rules_version` turns a rules change into a 409, and `pinned` skips the API with the name you already created. `instance_name` is the VM's real name; `cloudonym_candidate_name` is what the API proposes now.
+[examples/terraform/](examples/terraform/README.md) calls `/v1/generate` from a `data "http"` block and creates a `google_compute_instance` with the returned name and labels. `apply` is blocked unless `valid` is `true` and there are no label violations. `ignore_changes = [name]` keeps an existing VM's name when the rules change, `rules_version` turns a rules change into a 409, and `pinned` skips the API with the name you already created. `instance_name` is the VM's real name; `cloudonym_candidate_name` is what the API proposes now. For a whole project, the wizard's **Terraform** button gives one map `gcp_names` keyed by the item key; the example README shows the same map built from a `/v1/wizard` response.
 
 ## Local development
 
@@ -278,9 +378,33 @@ See the LICENSE file for details.
 
 ## 한국어
 
-**Cloudonym** 은 클라우드 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 이번 릴리스는 **Google Cloud** 만 연다 — AWS · Azure 는 규칙 표에 있고 다음 릴리스에서 연다. 사람은 웹 화면으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/names` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` 으로 쓴다. 바뀐 점은 [CHANGELOG.md](CHANGELOG.md)(영어)에 있다.
+**Cloudonym** 은 클라우드 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 이번 릴리스는 **Google Cloud** 만 연다 — AWS · Azure 는 규칙 표에 있고 다음 릴리스에서 연다. 사람은 웹 화면(프로젝트 전체를 짓는 **이름 마법사**와 리소스 하나씩 고르는 리소스 트리)으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` 으로 쓴다. 바뀐 점은 [CHANGELOG.md](CHANGELOG.md)(영어)에 있다.
 
-### 네 단계 사용법 (웹 화면)
+### 이름 마법사 (웹 화면 `/`)
+
+첫 화면은 Google Cloud 프로젝트 하나의 이름을 여섯 단계로 짓는다. 입력하는 대로 이름이 다시 만들어진다.
+
+1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`)을 더한다
+2. **② Services** — 서비스마다 카드 하나. 서비스 이름이 그 서비스 안 모든 이름의 `purpose` 다. **Add service** 로 더한다
+3. **③ Purpose** — 서비스에서 돌릴 것을 고른다 — **web** · **was**(앱 서버) · **bastion** · **file**(파일 서버) · **db**(Cloud SQL) · **object**(Cloud Storage), 또는 리소스 트리를 열어 다른 catalog 행을 고르는 **Custom…**
+4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 데이터베이스는 엔진을 고른다. 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다
+5. **⑤ Attached resources** — 서버마다 **boot** 디스크 · 번호 붙은 **data** 디스크 · 예약 고정 외부 · 내부 주소(**ip** · **ipi**). 이름은 서버 이름을 잇는다
+6. **⑥ Names** — 프로젝트 → 서비스로 묶고 딸린 리소스는 서버 아래에 보인다. 카드마다 `PASS`/`FAIL` 과 이유가 있다. **이름 전부** · **JSON** · **Terraform** `locals`(항목 키를 맵 키로 하는 맵 `gcp_names` 하나와 `gcp_labels_by_namespace`) · **Share URL** 을 복사한다
+
+예 — 프로젝트 `platform` · `billing` · `prod` · `asia-northeast3` 에 VPC 네트워크, 서비스 `shop`(boot 디스크 · data 디스크 01 이 붙은 web 서버 01 과 PostgreSQL 데이터베이스), 서비스 `pay`(HA 로 web 서버 01 · 02)를 두면 위 [Naming wizard](#naming-wizard) 의 여덟 이름이 나온다. 같은 요청이 아래 `POST /v1/wizard` 예시다.
+
+마법사와 프리셋 다섯 묶음 — web · was · bastion 서버, 파일 서버, 데이터베이스, 오브젝트 스토리지, 네트워크 — 은 이 저장소에 있고, 그 밖의 catalog 행은 Custom 으로 고른다. 더 복잡한 구성은 이 저장소의 범위 밖이다.
+
+**이름 공식** — 순번이 있는 리소스 대부분은 `<system>-<purpose>-<env>-<region>-<약어>[-<kind>][-<tier>]-<seq>` 이다. 쓰이는 공식 전부는 `/docs/naming` 과 `/llms.txt` 에 있다.
+
+- `region` 은 리전 코드(`ane3`)이고 존은 들지 않는다 — 입력한 존은 그 리전으로 풀려 VM · 디스크도 리전 리소스처럼 이름 붙는다
+- `kind` 는 CSP 기본값과 다를 때만 붙는다(PostgreSQL 은 `pg`)
+- `tier`(`web` · `was` …, 꼴 `^[a-z0-9]{2,16}$`)는 마법사만 채운다 — `/v1/generate` · `/v1/names` 의 이름에는 들지 않는다. 줄이지 않는다. 약어 · 종류 토큰 · 환경 값 · 지역 코드는 tier 로 쓸 수 없다
+- 딸린 리소스는 서버의 최종 이름에 `-boot` · `-data-<seq>` · `-ip` · `-ipi` 를 붙이고 줄이지 않는다 — 들어가지 않으면 이유와 함께 실패한다
+
+### 리소스 고르기 (`/pick`)
+
+리소스 트리는 `/pick`(헤더 링크 **Pick resources**)에 있고, 마법사 전에 나간 공유 링크도 이 화면으로 열린다. 다섯 값 한 벌로 리소스를 하나씩 네 단계로 짓는다.
 
 1. **① Cloud** — GCP 가 골라져 있다. AWS · Azure 는 **Coming soon** 표지와 함께 보이고 아직 고를 수 없다
 2. **② Context** — **Owner · System · Purpose** 를 적고(각 64자까지) **Environment** 를 고르고, **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 입력하는 대로 이름이 다시 만들어진다
@@ -289,9 +413,9 @@ See the LICENSE file for details.
 
 이름 위 한 줄이 **PASS** 의 뜻을 말한다(쓸 수 있는지 · 고유한지는 검사하지 않는다). 꼬리말에 엔진 · 규칙 버전이 있고, 옛 규칙으로 만든 공유 링크는 입력을 바꿀 때까지 안내를 보인다.
 
-**공유 URL 주의** — 화면 상태(다섯 값 · CSP · 선택)는 URL hash 에 있고 **Share URL** 은 그 링크를 복사한다. hash 는 버튼을 누르지 않아도 입력하는 대로 주소창에 쓰인다. **Base64 는 암호화가 아니다** — 링크를 받은 사람은 owner · system · purpose 등 입력값을 그대로 읽는다. 링크를 넘길 생각이면 회사 내부 이름 같은 민감한 값을 넣지 않는다. 화면도 버튼 옆에 같은 경고를 보인다.
+**공유 URL 주의** — 두 화면 모두 상태를 URL hash 에 둔다(마법사는 프로젝트 값 · 서비스 · 고른 것 · 서버, 트리는 다섯 값 · CSP · 선택). **Share URL** 은 그 링크를 복사한다. hash 는 버튼을 누르지 않아도 입력하는 대로 주소창에 쓰인다. **Base64 는 암호화가 아니다** — 링크를 받은 사람은 owner · system · 서비스 이름 등 입력값을 그대로 읽는다. 링크를 넘길 생각이면 회사 내부 이름 같은 민감한 값을 넣지 않는다. 화면도 버튼 옆에 같은 경고를 보인다.
 
-스크린샷 — [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
+스크린샷 — [이름 마법사](docs/screenshots/06-wizard.png) · [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
 
 허용값 — env: `prod` · `stg` · `dev` · `sbx`(`prd` · `production` · `staging` 같은 별칭도 받아 표준값으로 바꾼다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존은 받아 그 리전으로 푼다(이름에는 리전 코드만 들고 존은 들지 않는다). 전역 리소스에는 지역 토큰이 없다. 옛 나라 값 `kr` · `us` · `jp` · `eu` 는 거부하고 해당 리전 이름을 알려 준다. 지역 표는 `/llms.txt` 와 이름 안내 쪽 `/docs/naming` 에 있다.
 
@@ -317,14 +441,28 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 - **메시지** — `violations` · `steps` · `rule.notes` · `metadata.transformed` · 라벨 위반 · 라벨 변환 · `errors` 는 전부 `{ code, field?, params?, message }` 목록이다. 분기는 `code`(바뀌지 않는다)로, 사람에게는 `message`(영어 · 문구는 다듬어질 수 있다)를 보인다
 - **오류** — 모든 실패가 `{ "success": false, "errors": [...], "supported"?: [...] }` 한 꼴이다. `supported` 는 provider 가 모르는 값이거나 켜지지 않았을 때, resource type · event · 복사 target 이 모르는 값일 때, `providers` 가 비지 않은 배열이 아닐 때 실린다(모르는 종류는 `params.supported` 에 허용 값이 실린다). `params` 에 되돌려 싣는 사용자 값은 80자로 자르고 제어 · 양방향 문자는 `\uXXXX` 로 보인다. `400` 요청 모양 오류 · `404` `/v1` 아래 없는 경로 · 메서드(`request.not_found`) · `409` `rules_version` 불일치 · `413` 본문 16KB 초과 · `429` 클라이언트 IP 당 60초 60건 초과(POST `/v1/*` · GET `/llms.txt` · GET `/catalog.json` 합산 · `Retry-After: 60`) · `500` 내부 오류. `GET /v1/health` 는 `{ "ok": true, "version": {…} }`
 - **PASS 의 뜻** — 이 규칙 버전의 이름 검사(길이 · 형식 · 예약어)를 통과했다는 뜻이다. 그 이름을 쓸 수 있다는 뜻이 아니다 — 고유성 · 권한 · 할당량 · 조직 정책은 검사하지 않고, 축소 때문에 서로 다른 문맥이 같은 이름이 될 수 있다
-- **버전 · 이름 안정성** — `/v1/generate` · `/v1/names` · `/v1/validate` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
+- **버전 · 이름 안정성** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
+
+#### 프로젝트 전체 — `POST /v1/wizard`
+
+```sh
+curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: application/json' \
+  -d '{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"project_picks":[{"preset":"vpc","instances":[{"id":"n1","seq":"01"}]}],"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]},{"preset":"db","kind":"POSTGRES","instances":[{"id":"b","seq":"01"}]}]},{"purpose":"pay","picks":[{"preset":"web","ha":true,"instances":[{"id":"c","seq":"01"},{"id":"d","seq":"02"}]}]}]}'
+```
+
+요청 하나가 프로젝트 하나다. `project` 는 네 값(`purpose` 없음), `project_picks` 는 프로젝트 공용 리소스, `services` 의 항목마다 `purpose` 와 그 `picks` 다. pick 은 `preset`(`web` · `was` · `bastion` · `file` · `db` · `object` · `vpc` · `subnet` · `firewall`)이거나 `"preset": null` 과 `rule` id 이고, `tier` · `kind` · `ha` · `serverless` 를 더할 수 있다. `instances` 는 서버다 — 저마다 고른 `id`(`^[a-z0-9]{1,8}$`) · 번호로 남는 `seq` · 딸린 리소스를 받는 리소스에만 `attach`(`boot` · `data` · `ip` · `ipi`). 서비스 20개 · 서비스마다 또는 `project_picks` 에 pick 20개 · 프로젝트 ID 를 넣어 이름 200개까지. 응답(항목 여덟)은 위 [Whole project](#whole-project-post-v1wizard) 와 같다.
+
+- 항목 순서 — 프로젝트 ID · 프로젝트 공용 · 서비스마다, 서버 바로 뒤에 그 딸린 리소스
+- `key` 는 구조 경로(`service/shop/compute_instance/web/01/data/01`)라 다른 항목을 더하거나 지워도 바뀌지 않는다. 딸린 리소스에는 `parent` · `attach`, 프로젝트 공용 항목에는 `"level": "project"` 가 실린다
+- 프로젝트 어디서든 같은 고유성 부류의 같은 이름 둘은 둘 다 `valid: false` · `name.conflict` 다
+- `400` 은 잘못된 자리를 요청의 이름으로 `field` 에 적는다(`services[0].picks[0].instances[0].attach.data[1]` 등). `/v1/generate` · `/v1/names` · `/v1/validate` 는 바뀌지 않았다
 
 ### AI 에이전트 연동
 
-- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 리전 코드와 받는 존 · 종류 토큰 · 약어와 그 출처 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약. 규칙 표와 catalog 에서 만들므로 엔진과 어긋나지 않는다
-- **`GET /openapi.json`** — `/v1/generate` · `/v1/names` · `/v1/validate` · `/v1/events` · `/v1/health` · `/catalog.json` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
+- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 리전 코드와 받는 존 · 종류 토큰 · 용도 토큰 tier · 딸린 리소스 · 마법사 프리셋 · 약어와 그 출처 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약. 규칙 표와 catalog 에서 만들므로 엔진과 어긋나지 않는다
+- **`GET /openapi.json`** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/events` · `/v1/health` · `/catalog.json` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
 - **`GET /catalog.json`** — 켜진 CSP 의 리소스 catalog 와 지역 표(JSON). 화면 행마다 규칙 id · 약어 · 종류와 토큰 · 지역 토큰 종류 · 설명 · 이름 넣는 자리 · 검색 별칭과 `version: { engine, rules }`. 정본은 이 저장소의 `catalog/*.json` 이다([CONTRIBUTING.md](CONTRIBUTING.md))
-- **`/docs/naming`** — 같은 데이터를 사람이 읽는 쪽으로 — 이름 공식 · 토큰 · 지역 표 · 축소 방법 · 약어 · 종류 토큰
+- **`/docs/naming`** — 같은 데이터를 사람이 읽는 쪽으로 — 이름 공식 · 토큰 · 지역 표 · 축소 방법 · 약어 · 종류 토큰 · tier · 딸린 리소스 · 마법사 프리셋
 
 ### 지원 리소스
 
@@ -349,7 +487,7 @@ Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.** 결
 
 ### Terraform 예제
 
-[examples/terraform/](examples/terraform/README.md) — `data "http"` 로 `/v1/generate` 를 불러 받은 이름 · 라벨로 `google_compute_instance` 를 만든다. `valid` 가 `true` 이고 라벨 위반이 없을 때만 apply 된다. `ignore_changes = [name]` 이 규칙이 바뀌어도 기존 VM 이름을 지키고, `rules_version` 은 규칙 변경을 409 로 알리고, `pinned` 는 이미 만든 이름으로 API 를 건너뛴다.
+[examples/terraform/](examples/terraform/README.md) — `data "http"` 로 `/v1/generate` 를 불러 받은 이름 · 라벨로 `google_compute_instance` 를 만든다. `valid` 가 `true` 이고 라벨 위반이 없을 때만 apply 된다. `ignore_changes = [name]` 이 규칙이 바뀌어도 기존 VM 이름을 지키고, `rules_version` 은 규칙 변경을 409 로 알리고, `pinned` 는 이미 만든 이름으로 API 를 건너뛴다. 프로젝트 전체는 마법사의 **Terraform** 버튼이 항목 키를 맵 키로 하는 맵 `gcp_names` 하나를 주고, 예제 README 가 `/v1/wizard` 응답에서 같은 맵을 만드는 법을 보인다.
 
 ### 로컬 개발
 
