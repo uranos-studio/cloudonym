@@ -1,0 +1,279 @@
+// 마법사 화면 상태 (D61 · D64) — 순수 함수. 화면 상태는 마법사 모델(WizardPlan) 하나이고, 화면은 이 함수들로만 바꾼다.
+// 순번은 슬롯의 값이다 — 서버 줄 · 디스크 줄을 지워도 남은 번호를 당기지 않는다. 「+ server」 · 「+ disk」는 다음 빈 번호를 쓴다.
+// 번호를 다시 매기는 것은 사용자가 누르는 별도 동작(renumber)이다. 판정(이름 규칙 · 검사)은 엔진(validatePlan)이 한다
+import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
+import { SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
+import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
+import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
+import { EXAMPLE_REGION } from './formContext';
+
+/** pick 의 자리 — service 가 null 이면 프로젝트 공용(Project resources) */
+export interface PickRef { service: number | null; pick: number }
+
+/** 마법사 ① 예시 넷 — 트리 화면의 예시(DEFAULT_FORM)와 같은 값 · 첫 서비스 이름 예시 */
+export const DEFAULT_PROJECT: WizardPlan['project'] = { owner: 'platform', system: 'billing', env: 'prod', region: EXAMPLE_REGION };
+export const EXAMPLE_SERVICE = 'shop';
+
+/** 첫 화면 — 서비스 하나(이름 예시) · 고른 것 없음. 칩을 켜기 전에는 이름이 하나도 나오지 않는다(숨은 기본값 없음) */
+export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT): WizardPlan {
+  return { provider: 'gcp', project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
+}
+
+/** 서버 칩(서비스 용도) · 프로젝트 칩(네트워크) — 데이터의 group 으로 나눈다 */
+export const SERVICE_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.group === undefined);
+export const PROJECT_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.group !== undefined);
+
+/** pick 의 유효 규칙 id — 프리셋이면 데이터의 규칙(서버리스를 고르면 그 규칙), custom 이면 ruleId */
+export function effectiveRuleId(pick: Pick): string | undefined {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  if (!preset) return pick.ruleId;
+  return typeof pick.serverless === 'string' && preset.serverless?.ruleIds.includes(pick.serverless) ? pick.serverless : preset.ruleId;
+}
+
+/** 딸린 것(boot · data · ip · ipi)을 받는 pick 인가 — 호환표에 부모로 있는 규칙 */
+export function canAttach(pick: Pick): boolean {
+  const id = effectiveRuleId(pick);
+  return ATTACHMENTS.some((r) => r.parent === id);
+}
+
+/** HA 토글을 보이는가 — 프리셋에 ha 가 있고 서버리스가 꺼져 있을 때 (D61 · §4-2) */
+export function showsHa(pick: Pick): boolean {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  return !!preset?.ha && !pick.serverless;
+}
+
+/** 다음 빈 번호 — 쓴 번호 중 가장 큰 것 + 1. 99 를 쓰고 있으면 비어 있는 가장 작은 번호. 다 찼으면 undefined */
+export function nextSeq(used: readonly string[]): string | undefined {
+  const nums = used.filter((s) => SEQ_PATTERN.test(s)).map(Number);
+  const max = nums.length > 0 ? Math.max(...nums) : 0;
+  if (max < MAX_COUNT) return String(max + 1).padStart(2, '0');
+  for (let i = 1; i <= MAX_COUNT; i++) {
+    const s = String(i).padStart(2, '0');
+    if (!used.includes(s)) return s;
+  }
+  return undefined;
+}
+
+/** 다음 슬롯 id — pick 안에서 쓰지 않은 가장 작은 36진 수(`1` … `9` · `a` …) · SLOT_ID_PATTERN 안 */
+export function nextSlotId(used: readonly string[]): string {
+  for (let i = 1; ; i++) {
+    const id = i.toString(36);
+    if (!used.includes(id) && SLOT_ID_PATTERN.test(id)) return id;
+  }
+}
+
+/** 슬롯 · 디스크 순번 입력이 꼴 밖인가 — 줄에 오류를 띄운다(판정 꼴은 core 의 SEQ_PATTERN) */
+export const seqInvalid = (seq: string): boolean => !SEQ_PATTERN.test(seq);
+
+// ── 내부 — 모델을 복사해 한 pick 을 바꾼다 ──
+function picksOf(plan: WizardPlan, service: number | null): Pick[] {
+  return service === null ? plan.projectPicks : plan.services[service]?.picks ?? [];
+}
+function withPicks(plan: WizardPlan, service: number | null, picks: Pick[]): WizardPlan {
+  if (service === null) return { ...plan, projectPicks: picks };
+  return { ...plan, services: plan.services.map((s, i) => (i === service ? { ...s, picks } : s)) };
+}
+function updatePick(plan: WizardPlan, ref: PickRef, fn: (p: Pick) => Pick): WizardPlan {
+  const picks = picksOf(plan, ref.service);
+  const cur = picks[ref.pick];
+  if (!cur) return plan;
+  return withPicks(plan, ref.service, picks.map((p, i) => (i === ref.pick ? fn(p) : p)));
+}
+function updateSlot(plan: WizardPlan, ref: PickRef, slot: number, fn: (s: WizardSlot) => WizardSlot): WizardPlan {
+  return updatePick(plan, ref, (p) => ({ ...p, instances: (p.instances ?? []).map((s, i) => (i === slot ? fn(s) : s)) }));
+}
+/** 새 서버 줄 — 다음 빈 번호 · 다음 id · 딸린 것을 받는 pick 이면 프리셋의 초기 딸린 것(file 의 data 01)을 모델에 보이게 넣는다 */
+function newSlot(pick: Pick, existing: readonly WizardSlot[]): WizardSlot | undefined {
+  const seq = nextSeq(existing.map((s) => s.seq));
+  if (seq === undefined) return undefined;
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  const attach = canAttach(pick) && preset?.defaultAttach ? cloneAttach(preset.defaultAttach) : undefined;
+  return { id: nextSlotId(existing.map((s) => s.id)), seq, ...(attach ? { attach } : {}) };
+}
+function cloneAttach(a: Attachments): Attachments {
+  return { ...a, ...(a.data ? { data: [...a.data] } : {}) };
+}
+
+// ── 서비스 ──
+export function addService(plan: WizardPlan): WizardPlan {
+  return { ...plan, services: [...plan.services, { purpose: '', picks: [] }] };
+}
+export function removeService(plan: WizardPlan, index: number): WizardPlan {
+  return { ...plan, services: plan.services.filter((_, i) => i !== index) };
+}
+export function renameService(plan: WizardPlan, index: number, purpose: string): WizardPlan {
+  return { ...plan, services: plan.services.map((s, i) => (i === index ? { ...s, purpose } : s)) };
+}
+export function setProject(plan: WizardPlan, project: WizardPlan['project']): WizardPlan {
+  return { ...plan, project };
+}
+
+// ── 용도 칩 ──
+/** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1 */
+export function findPreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): number {
+  return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId)?.tier) === tier));
+}
+
+/** 칩을 켠다 · 끈다. 켜면 count 규칙은 서버 줄 하나(01), 입력 없는 규칙(버킷)은 줄 없음. tier 는 방화벽처럼 tierChoices 가 있을 때만 싣는다 */
+export function togglePreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
+  const preset = presetOf(presetId);
+  if (!preset) return plan;
+  const picks = picksOf(plan, service);
+  const at = findPreset(plan, service, presetId, tier);
+  if (at >= 0) return withPicks(plan, service, picks.filter((_, i) => i !== at));
+  const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
+  // 버킷(템플릿에 seq 가 없다)만 슬롯이 없다 — 데이터의 규칙 id 로 정한다
+  const withSlots = preset.ruleId !== 'gcp.storage_bucket';
+  const slot = withSlots ? newSlot(pick, []) : undefined;
+  return withPicks(plan, service, [...picks, slot ? { ...pick, instances: [slot] } : pick]);
+}
+
+/** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음 */
+export function addCustom(plan: WizardPlan, service: number | null, rule: { ruleId: string; input: 'count' | 'role' | 'none'; count?: number; role?: string; kind?: string; tier?: string }): WizardPlan {
+  const base: Pick = {
+    preset: null, ruleId: rule.ruleId,
+    ...(rule.role === undefined ? {} : { role: rule.role }),
+    ...(rule.kind === undefined ? {} : { kind: rule.kind }),
+    ...(rule.tier === undefined || rule.tier === '' ? {} : { tier: rule.tier }),
+  };
+  if (rule.input !== 'count') return withPicks(plan, service, [...picksOf(plan, service), base]);
+  const slots: WizardSlot[] = [];
+  for (let i = 0; i < Math.max(1, rule.count ?? 1); i++) {
+    const s = newSlot(base, slots);
+    if (s) slots.push(s);
+  }
+  return withPicks(plan, service, [...picksOf(plan, service), { ...base, instances: slots }]);
+}
+
+export function removePick(plan: WizardPlan, ref: PickRef): WizardPlan {
+  return withPicks(plan, ref.service, picksOf(plan, ref.service).filter((_, i) => i !== ref.pick));
+}
+
+/** tier · role · kind — 빈 값이면 키를 지운다(없는 칸은 싣지 않는다) */
+export function setPickField(plan: WizardPlan, ref: PickRef, field: 'tier' | 'role' | 'kind', value: string | undefined): WizardPlan {
+  return updatePick(plan, ref, (p) => {
+    const next = { ...p };
+    if (value === undefined || value === '') delete next[field];
+    else next[field] = value;
+    return next;
+  });
+}
+
+// ── ④ 선택지 ──
+/** HA — 켜면 서버 줄을 minInstances 까지 보이게 늘린다 · 끄면 줄은 그대로 둔다 */
+export function setHa(plan: WizardPlan, ref: PickRef, on: boolean): WizardPlan {
+  return updatePick(plan, ref, (p) => {
+    const min = p.preset === null ? undefined : presetOf(p.preset)?.ha?.minInstances;
+    if (!on || min === undefined) {
+      const { ha: _ha, ...rest } = p;
+      return rest;
+    }
+    const slots = [...(p.instances ?? [])];
+    while (slots.length < min) {
+      const s = newSlot(p, slots);
+      if (!s) break;
+      slots.push(s);
+    }
+    return { ...p, ha: true, instances: slots };
+  });
+}
+
+/** 서버리스 — 규칙 id(데이터의 serverless.ruleIds 하나) 또는 null(끔). 켜면 HA 를 끄고 서버 줄의 딸린 것을 뗀다(관리형은 붙일 디스크 · 주소가 없다) */
+export function setServerless(plan: WizardPlan, ref: PickRef, ruleId: string | null): WizardPlan {
+  return updatePick(plan, ref, (p) => {
+    const { ha: _ha, serverless: _sv, ...rest } = p;
+    if (ruleId === null) return rest;
+    return { ...rest, serverless: ruleId, ...(p.instances ? { instances: p.instances.map(({ attach: _a, ...s }) => s) } : {}) };
+  });
+}
+
+// ── 서버 줄 ──
+export function addSlot(plan: WizardPlan, ref: PickRef): WizardPlan {
+  return updatePick(plan, ref, (p) => {
+    const slots = p.instances ?? [];
+    const s = newSlot(p, slots);
+    return s ? { ...p, instances: [...slots, s] } : p;
+  });
+}
+
+/** 서버 줄을 지운다 — 남은 줄의 번호 · 딸린 것은 그대로. 지워서 HA 의 최소 수보다 적어지면 HA 를 끈다(모순 상태를 두지 않는다) */
+export function removeSlot(plan: WizardPlan, ref: PickRef, slot: number): WizardPlan {
+  return updatePick(plan, ref, (p) => {
+    const slots = (p.instances ?? []).filter((_, i) => i !== slot);
+    const min = p.preset === null ? undefined : presetOf(p.preset)?.ha?.minInstances;
+    const next: Pick = { ...p, instances: slots };
+    if (next.ha === true && min !== undefined && slots.length < min) delete next.ha;
+    return next;
+  });
+}
+
+export function setSlotSeq(plan: WizardPlan, ref: PickRef, slot: number, seq: string): WizardPlan {
+  return updateSlot(plan, ref, slot, (s) => ({ ...s, seq }));
+}
+
+/** 다시 매기기 — 사용자가 누를 때만. 지금 줄 순서대로 01, 02, … (id 와 딸린 것은 그대로) */
+export function renumber(plan: WizardPlan, ref: PickRef): WizardPlan {
+  return updatePick(plan, ref, (p) => ({ ...p, instances: (p.instances ?? []).map((s, i) => ({ ...s, seq: String(i + 1).padStart(2, '0') })) }));
+}
+
+/** 번호에 빈 자리가 있는가 — 「Renumber」 버튼을 보일지 */
+export function hasGaps(pick: Pick): boolean {
+  return (pick.instances ?? []).some((s, i) => s.seq !== String(i + 1).padStart(2, '0'));
+}
+
+// ── ⑤ 딸린 것 ──
+function withAttach(s: WizardSlot, fn: (a: Attachments) => Attachments): WizardSlot {
+  const a = fn(s.attach ?? {});
+  const clean: Attachments = {
+    ...(a.boot === true ? { boot: true } : {}),
+    ...(a.data && a.data.length > 0 ? { data: a.data } : {}),
+    ...(a.ip === true ? { ip: true } : {}),
+    ...(a.ipi === true ? { ipi: true } : {}),
+  };
+  const { attach: _a, ...rest } = s;
+  return Object.keys(clean).length > 0 ? { ...rest, attach: clean } : rest;
+}
+
+/** boot · ip · ipi 켜기 · 끄기 */
+export function setFlag(plan: WizardPlan, ref: PickRef, slot: number, flag: 'boot' | 'ip' | 'ipi', on: boolean): WizardPlan {
+  return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => {
+    const next: Attachments = { ...a };
+    if (on) (next as Record<string, unknown>)[flag] = true;
+    else delete (next as Record<string, unknown>)[flag];
+    return next;
+  }));
+}
+
+/** 「+ disk」 — 다음 빈 번호 · 한 서버 MAX_DATA_DISKS 개까지 */
+export function addDisk(plan: WizardPlan, ref: PickRef, slot: number): WizardPlan {
+  return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => {
+    const data = a.data ?? [];
+    const seq = data.length < MAX_DATA_DISKS ? nextSeq(data) : undefined;
+    return seq ? { ...a, data: [...data, seq] } : a;
+  }));
+}
+
+/** 디스크 줄을 지운다 — 남은 디스크 번호는 그대로. 비면 data 를 뺀다 */
+export function removeDisk(plan: WizardPlan, ref: PickRef, slot: number, disk: number): WizardPlan {
+  return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => ({ ...a, data: (a.data ?? []).filter((_, i) => i !== disk) })));
+}
+
+export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: number, seq: string): WizardPlan {
+  return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => ({ ...a, data: (a.data ?? []).map((d, i) => (i === disk ? seq : d)) })));
+}
+
+// ── 검사 결과를 자리로 ──
+/** pick 의 path 머리 — services[1].picks[0] · projectPicks[2] */
+export function pickPath(ref: PickRef): string {
+  return ref.service === null ? `projectPicks[${ref.pick}]` : `services[${ref.service}].picks[${ref.pick}]`;
+}
+
+/** path 가 정확히 그 자리인 오류 */
+export function errorsAt(errors: readonly PlanError[], path: string): PlanError[] {
+  return errors.filter((e) => e.path === path);
+}
+
+/** 그 자리 아래(자기 포함)의 오류 — 서버 줄 · 디스크 줄 */
+export function errorsUnder(errors: readonly PlanError[], path: string): PlanError[] {
+  return errors.filter((e) => e.path !== undefined && (e.path === path || e.path.startsWith(`${path}.`) || e.path.startsWith(`${path}[`)));
+}

@@ -1,7 +1,9 @@
 // URL hash ↔ 화면 상태(문맥 다섯 값 · 규칙 버전 v · CSP p · 선택 r) — 화면 상태의 저장소는 URL 뿐이다 (D17 · D42).
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다. 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
-import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
-import { MAX_ITEMS, validateSelection, type SelectionItem } from '../core/selection';
+import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext, parseProjectContext } from '../core/engine';
+import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type SelectionItem } from '../core/selection';
+import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { PRESETS, presetOf } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
@@ -180,6 +182,8 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
     return undefined;
   }
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
+  // 마법사 링크(v4 · w)는 이 디코더의 몫이 아니다 — decodeWizardState
+  if ('w' in raw) return undefined;
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   if (FREE_FIELDS.some((f) => { const v = (raw as Record<string, unknown>)[f]; return typeof v === 'string' && v.length > MAX_CONTEXT_CHARS; })) return undefined;
   const { v, p, r } = raw as Record<string, unknown>;
@@ -220,4 +224,350 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
 /** 공유 URL — base 는 `location.origin + location.pathname` (도메인을 코드에 박지 않는다). 화면은 지금 규칙 버전을 넘긴다 (D27 ⑵) */
 export function shareUrl(ctx: NamingContext, base: string, rulesVersion?: string, pick: PickState = {}): string {
   return `${base}#${HASH_KEY}=${encodeState(ctx, rulesVersion, pick)}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// hash v4 — 마법사 모델 `w` (D67). 문맥 넷(owner · system · env · region 코드) + 규칙 버전 v + w. 최상위 purpose 는 싣지 않는다.
+// 키 표 (모델 ↔ hash) — 없는 칸은 싣지 않는다 · 표 밖의 키는 그 자리의 오류다:
+//   w        { pp: projectPicks, s: services }
+//   service  { n: purpose, p: picks }
+//   pick     { pr: preset(null 이면 생략 — custom), ru: ruleId(custom 만 · 규칙 id 전체 `gcp.compute_instance`), t: tier, ro: role,
+//              k: kind(값 이름 `POSTGRES`), h: ha(켜졌을 때만 · 값 1), sv: serverless(짧은 값 `gcf` · `run`), i: instances }
+//   slot     { id, q: seq, a: attach }
+//   attach   { b: boot(값 1), d: data(순번 배열), ip(값 1), ipi(값 1) }
+// 인코더 · 디코더 모두 validatePlan 을 지난다. 디코더 순서 — parseProjectContext → validatePlan(복구) → 서비스마다 parseContext
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** sv 의 짧은 값 ↔ 규칙 id — 프리셋 데이터의 serverless.ruleIds 와 같은 집합이다(urlState.test 가 센다) */
+export const SERVERLESS_SHORT: Readonly<Record<string, string>> = { gcf: 'gcp.cloud_function', run: 'gcp.run_service' };
+const SERVERLESS_LONG: Readonly<Record<string, string>> = Object.fromEntries(Object.entries(SERVERLESS_SHORT).map(([k, v]) => [v, k]));
+
+/** 마법사 hash 의 문맥 넷 — region 은 리전 코드 */
+export type ProjectFields = WizardPlan['project'];
+
+const PICK_KEYS = new Set(['pr', 'ru', 't', 'ro', 'k', 'h', 'sv', 'i']);
+const SLOT_KEYS = new Set(['id', 'q', 'a']);
+const SERVICE_KEYS = new Set(['n', 'p']);
+const W_KEYS = new Set(['pp', 's']);
+
+function shortAttach(a: Attachments | undefined): Record<string, unknown> | undefined {
+  if (!a) return undefined;
+  const out: Record<string, unknown> = {};
+  if (a.boot === true) out.b = 1;
+  if (a.data && a.data.length > 0) out.d = [...a.data];
+  if (a.ip === true) out.ip = 1;
+  if (a.ipi === true) out.ipi = 1;
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+function shortPick(p: WizardPick): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  if (p.preset !== null) out.pr = p.preset;
+  else if (p.ruleId !== undefined) out.ru = p.ruleId;
+  if (p.tier !== undefined) out.t = p.tier;
+  if (p.role !== undefined) out.ro = p.role;
+  if (p.kind !== undefined) out.k = p.kind;
+  if (p.ha === true) out.h = 1;
+  if (typeof p.serverless === 'string') out.sv = SERVERLESS_LONG[p.serverless] ?? p.serverless;
+  if (p.instances !== undefined) {
+    out.i = p.instances.map((s) => {
+      const a = shortAttach(s.attach);
+      return { id: s.id, q: s.seq, ...(a ? { a } : {}) };
+    });
+  }
+  return out;
+}
+
+/** 모델 → hash 의 w (검사하지 않는다 — encodeWizardState 가 먼저 validatePlan 을 부른다) */
+export function wizardToHash(plan: WizardPlan): Record<string, unknown> {
+  return {
+    pp: plan.projectPicks.map(shortPick),
+    s: plan.services.map((s) => ({ n: s.purpose, p: s.picks.map(shortPick) })),
+  };
+}
+
+/** 마법사 상태 → hash 문자열(Base64url). 모델이 validatePlan · 프로젝트 문맥을 지나지 못하면 undefined — 화면은 마지막 온전한 hash 를 둔다 */
+export function encodeWizardState(plan: WizardPlan, rulesVersion?: string): string | undefined {
+  const ctx = parseProjectContext(plan.project, 'gcp');
+  if (!ctx.ok || !validatePlan(plan).ok) return undefined;
+  if (plan.services.some((s) => !parseContext({ ...plan.project, purpose: s.purpose }, 'gcp').ok)) return undefined;
+  const c = ctx.context;
+  const body: Record<string, unknown> = { owner: c.owner, system: c.system, env: c.env, region: c.region };
+  if (rulesVersion !== undefined) body.v = rulesVersion;
+  body.w = wizardToHash(plan);
+  return toBase64Url(new TextEncoder().encode(JSON.stringify(body)));
+}
+
+/** 링크를 열며 고친 것 — 화면이 한 줄씩 알린다. discarded 면 w 전체를 버렸다(모델 전체 오류 · 표 밖 꼴) */
+export interface WizardNotices { dropped: number; haOff: number; serverlessOff: number; trimmed: number; discarded: boolean }
+const NO_NOTICES = (): WizardNotices => ({ dropped: 0, haOff: 0, serverlessOff: 0, trimmed: 0, discarded: false });
+
+export interface DecodedWizard {
+  project: ProjectFields;
+  rulesVersion?: string;
+  /** w 를 버렸으면 없다 */
+  plan?: WizardPlan;
+  notices: WizardNotices;
+}
+
+const isObj = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+/** hash 의 짧은 꼴 → 모델. 표 밖의 키가 든 pick · 슬롯 · 서비스는 그 자리에서 버리고 센다. 값의 꼴은 validatePlan 이 본다 */
+function longAttach(a: unknown): unknown {
+  if (!isObj(a)) return a;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(a)) {
+    if (k === 'b') out.boot = v === 1 ? true : v;
+    else if (k === 'd') out.data = v;
+    else if (k === 'ip' || k === 'ipi') out[k] = v === 1 ? true : v;
+    else out[k] = v; // 표 밖 — validatePlan 이 attach 자리의 오류로 낸다
+  }
+  return out;
+}
+
+function longPick(p: unknown, n: WizardNotices): WizardPick | undefined {
+  if (!isObj(p)) return p as WizardPick; // validatePlan 이 selection.item_not_object 로 낸다
+  if (Object.keys(p).some((k) => !PICK_KEYS.has(k))) { n.dropped++; return undefined; }
+  const out: Record<string, unknown> = { preset: p.pr === undefined ? null : p.pr };
+  if (p.ru !== undefined) out.ruleId = p.ru;
+  if (p.t !== undefined) out.tier = p.t;
+  if (p.ro !== undefined) out.role = p.ro;
+  if (p.k !== undefined) out.kind = p.k;
+  if (p.h !== undefined) out.ha = p.h === 1 ? true : p.h;
+  if (p.sv !== undefined) out.serverless = typeof p.sv === 'string' ? (SERVERLESS_SHORT[p.sv] ?? p.sv) : p.sv;
+  if (p.i !== undefined) {
+    if (!Array.isArray(p.i)) out.instances = p.i;
+    else {
+      const slots: unknown[] = [];
+      for (const s of p.i as unknown[]) {
+        if (!isObj(s)) { slots.push(s); continue; }
+        if (Object.keys(s).some((k) => !SLOT_KEYS.has(k))) { n.dropped++; continue; }
+        slots.push({ id: s.id, seq: s.q, ...(s.a === undefined ? {} : { attach: longAttach(s.a) }) });
+      }
+      out.instances = slots;
+    }
+  }
+  return out as unknown as WizardPick;
+}
+
+/** path 꼴 `services[1].picks[0].instances[2].attach.data[0]` → 토막 */
+type Seg = { key: string; index?: number };
+function segments(path: string): Seg[] | undefined {
+  const out: Seg[] = [];
+  for (const part of path.split('.')) {
+    const m = /^([A-Za-z]+)(?:\[(\d+)\])?$/.exec(part);
+    if (!m) return undefined;
+    out.push(m[2] === undefined ? { key: m[1]! } : { key: m[1]!, index: Number(m[2]) });
+  }
+  return out;
+}
+
+/** 모델 안의 pick 목록 하나와 그 pick 자리 — path 의 앞 토막(services[i].picks[j] · projectPicks[j]) */
+interface PickRef { list: WizardPick[]; index: number; service?: number }
+function pickRef(plan: WizardPlan, segs: Seg[]): { ref: PickRef; rest: Seg[] } | undefined {
+  const [a, b] = segs;
+  if (a?.key === 'projectPicks' && a.index !== undefined) return { ref: { list: plan.projectPicks, index: a.index }, rest: segs.slice(1) };
+  if (a?.key === 'services' && a.index !== undefined && b?.key === 'picks' && b.index !== undefined) {
+    const svc = plan.services[a.index];
+    if (!svc || !Array.isArray(svc.picks)) return undefined;
+    return { ref: { list: svc.picks, index: b.index, service: a.index }, rest: segs.slice(2) };
+  }
+  return undefined;
+}
+
+const FLAG_HA = new Set(['wizard.count_below_min', 'wizard.ha_not_supported']);
+
+/** 오류 하나를 고친다 — path 가 가리키는 그 자리 하나만(§5-5). 고쳤으면 true */
+function repair(plan: WizardPlan, e: PlanError, n: WizardNotices): boolean {
+  const segs = e.path === undefined ? undefined : segments(e.path);
+  if (!segs || segs.length === 0) return false;
+  // pick 수 상한 — 앞에서부터 상한까지 남긴다
+  if (e.code === 'wizard.too_many_picks') {
+    if (segs.length === 1 && segs[0]!.key === 'projectPicks' && segs[0]!.index === undefined) {
+      n.trimmed += plan.projectPicks.length - MAX_PICKS_PER_SERVICE;
+      plan.projectPicks.splice(MAX_PICKS_PER_SERVICE);
+      return true;
+    }
+    const svc = segs[0]!.key === 'services' && segs[0]!.index !== undefined ? plan.services[segs[0]!.index] : undefined;
+    if (svc && Array.isArray(svc.picks) && segs.length === 1) {
+      n.trimmed += svc.picks.length - MAX_PICKS_PER_SERVICE;
+      svc.picks.splice(MAX_PICKS_PER_SERVICE);
+      return true;
+    }
+    return false;
+  }
+  // 서비스 자체
+  if (segs.length === 1 && segs[0]!.key === 'services' && segs[0]!.index !== undefined) {
+    if (segs[0]!.index >= plan.services.length) return false;
+    plan.services.splice(segs[0]!.index, 1);
+    n.dropped++;
+    return true;
+  }
+  const found = pickRef(plan, segs);
+  if (!found) return false;
+  const { ref, rest } = found;
+  const pick = ref.list[ref.index];
+  if (pick === undefined) return false;
+  const removePick = () => {
+    ref.list.splice(ref.index, 1);
+    // 지워서 빈 서비스는 지운다
+    if (ref.service !== undefined && plan.services[ref.service]?.picks.length === 0) plan.services.splice(ref.service, 1);
+  };
+  // ⓪ 플래그 — 지우지 않고 끈다
+  if (rest.length === 0 && FLAG_HA.has(e.code) && isObj(pick)) {
+    delete (pick as { ha?: unknown }).ha;
+    n.haOff++;
+    return true;
+  }
+  if (rest.length === 0 && e.code === 'wizard.serverless_not_supported' && isObj(pick)) {
+    delete (pick as { serverless?: unknown }).serverless;
+    n.serverlessOff++;
+    return true;
+  }
+  if (rest.length === 0) { removePick(); n.dropped++; return true; }
+  const slots = (pick as { instances?: unknown }).instances;
+  const s0 = rest[0]!;
+  if (s0.key !== 'instances' || s0.index === undefined || !Array.isArray(slots) || s0.index >= slots.length) return false;
+  const slot = slots[s0.index] as Record<string, unknown>;
+  if (rest.length === 1) {
+    slots.splice(s0.index, 1);
+    n.dropped++;
+    if (slots.length === 0) { removePick(); return true; }
+    const min = pick.preset === null ? undefined : presetOf(String(pick.preset))?.ha?.minInstances;
+    if (pick.ha === true && min !== undefined && slots.length < min) { delete pick.ha; n.haOff++; }
+    return true;
+  }
+  if (!isObj(slot) || rest[1]!.key !== 'attach') return false;
+  if (rest.length === 2) { delete slot.attach; n.dropped++; return true; }
+  const attach = slot.attach;
+  if (!isObj(attach)) return false;
+  const k = rest[2]!;
+  if (k.key === 'data' && k.index !== undefined) {
+    const data = attach.data;
+    if (!Array.isArray(data) || k.index >= data.length) return false;
+    data.splice(k.index, 1);
+  } else if (k.key in attach) {
+    delete attach[k.key];
+  } else return false;
+  n.dropped++;
+  if (Array.isArray(attach.data) && attach.data.length === 0) delete attach.data;
+  if (Object.keys(attach).length === 0) delete slot.attach;
+  return true;
+}
+
+/** 서비스마다 문맥(넷 + purpose)이 풀리는가 — 안 풀리는 첫 서비스의 오류(path services[i]) */
+function serviceContextError(plan: WizardPlan): PlanError | undefined {
+  for (let i = 0; i < plan.services.length; i++) {
+    const res = parseContext({ ...plan.project, purpose: plan.services[i]!.purpose }, 'gcp');
+    if (!res.ok) return { ...res.errors[0]!, path: `services[${i}]` };
+  }
+  return undefined;
+}
+
+/** 모델을 고쳐 validatePlan 을 지나게 한다 — 오류 하나씩(지울 때 index 가 밀리지 않게). 모델 전체 오류 · 고칠 수 없는 오류면 undefined.
+ *  매 회 모델이 줄거나 플래그 하나가 꺼지므로 끝난다 */
+export function recoverPlan(plan: WizardPlan, n: WizardNotices): WizardPlan | undefined {
+  for (;;) {
+    const res = validatePlan(plan);
+    const errors: PlanError[] = res.ok ? [] : res.errors;
+    if (res.ok) {
+      const svcErr = serviceContextError(plan);
+      if (!svcErr) return plan;
+      errors.push(svcErr);
+    }
+    const pathed = errors.find((e) => e.path !== undefined);
+    if (!pathed || !repair(plan, pathed, n)) return undefined;
+  }
+}
+
+/** 마법사 hash 의 길이 상한 (D67 · 이름 수로 닫힌 식) — 인코더는 validatePlan 을 지난 모델만 싣고, 그 모델의 슬롯 · 딸린 것은 하나하나가 이름이라
+ *  합이 MAX_NAMES - 1(프로젝트 ID) 이하다. 그래서 식 = 뼈대 + 자유 입력 둘 + 서비스마다(purpose · 감싸기 + pick 마다 고정 칸) + 프로젝트 공용 pick 고정 칸
+ *  + 이름 하나의 최악 바이트 × MAX_NAMES. 값은 urlState.test 가 잰다 */
+/** 프리셋 id 의 가장 긴 길이 — 인코더는 데이터의 id 만 싣는다 */
+const MAX_PRESET_ID_CHARS = Math.max(...PRESETS.map((p) => p.id.length));
+const PICK_FIXED_JSON_BYTES = JSON.stringify({
+  pr: 'p'.repeat(MAX_PRESET_ID_CHARS), ru: 'r'.repeat(MAX_RESOURCE_TYPE_CHARS + 4), t: 't'.repeat(16), ro: 'o'.repeat(MAX_ROLE_CHARS),
+  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', i: [],
+}).length + 1;
+/** 슬롯 하나(`{"id":"<8>","q":"99","a":{}},` — attach 감싸기 · 데이터 배열 감싸기 포함) 와 딸린 것 하나(`"ipi":1,` · `"99",` 중 큰 쪽) 중 큰 쪽 */
+const NAME_JSON_BYTES = Math.max(
+  JSON.stringify({ id: 'i'.repeat(MAX_SLOT_ID_CHARS), q: '99', a: { d: [] } }).length + 1,
+  '"ipi":1,'.length, '"b":1,'.length, '"99",'.length,
+);
+const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, w: { pp: [], s: [] } }).length
+  + 2 * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
+  + MAX_SERVICES * (JSON.stringify({ n: '', p: [] }).length + 1 + MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES)
+  + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES
+  + MAX_NAMES * NAME_JSON_BYTES;
+export const MAX_WIZARD_HASH_CHARS = `#${HASH_KEY}=`.length + Math.ceil(MAX_WIZARD_JSON_BYTES / 3) * 4;
+/** v3 · v4 어느 버전이든 받을 수 있는 가장 긴 hash — 화면의 경로 분기가 쓴다 */
+export const MAX_ANY_HASH_CHARS = Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS);
+
+/** hash → JSON 객체(꼴만 본다 — 길이 · Base64 · JSON · 객체). 아니면 undefined */
+function hashJson(hash: string, max: number): Record<string, unknown> | undefined {
+  if (hash.length > max) return undefined;
+  const m = new RegExp(`^#?${HASH_KEY}=(.*)$`).exec(hash);
+  if (!m) return undefined;
+  const bytes = fromBase64Url(m[1] ?? '');
+  if (!bytes) return undefined;
+  try {
+    const raw: unknown = JSON.parse(new TextDecoder().decode(bytes));
+    return isObj(raw) ? raw : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** 뿌리 경로의 화면 고르기 (D68) — `w` 가 있으면 wizard · `w` 없는 온전한 JSON 이면 tree(옛 v3 · 다섯 키 링크) · hash 가 없으면 none · 그 밖은 broken */
+export type HashKind = 'wizard' | 'tree' | 'none' | 'broken';
+export function hashKind(hash: string): HashKind {
+  if (hash === '' || hash === '#') return 'none';
+  const raw = hashJson(hash, MAX_ANY_HASH_CHARS);
+  if (!raw) return 'broken';
+  return 'w' in raw ? 'wizard' : 'tree';
+}
+
+/** 마법사 hash 를 푼다 — 문맥 넷이 안 풀리면(깨진 링크) undefined. w 와 r 이 같이 있으면 깨진 링크다.
+ *  w 의 꼴이 틀리거나 모델 전체 오류면 w 를 버리고(notices.discarded) 문맥만 돌려준다 */
+export function decodeWizardState(hash: string): DecodedWizard | undefined {
+  const raw = hashJson(hash, MAX_WIZARD_HASH_CHARS);
+  if (!raw || !('w' in raw) || 'r' in raw) return undefined;
+  if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
+  if ((['owner', 'system'] as const).some((f) => typeof raw[f] === 'string' && (raw[f] as string).length > MAX_CONTEXT_CHARS)) return undefined;
+  const ctx = parseProjectContext(raw as RawContext, 'gcp');
+  if (!ctx.ok) return undefined;
+  const project: ProjectFields = { owner: ctx.context.owner, system: ctx.context.system, env: ctx.context.env, region: ctx.context.region };
+  const out: DecodedWizard = { project, notices: NO_NOTICES() };
+  if (typeof raw.v === 'string' && RULES_VERSION_RE.test(raw.v)) out.rulesVersion = raw.v;
+  const w = raw.w;
+  const discard = () => { out.notices.discarded = true; return out; };
+  if (!isObj(w) || Object.keys(w).some((k) => !W_KEYS.has(k))) return discard();
+  const n = out.notices;
+  const pp = w.pp === undefined ? [] : w.pp;
+  const ss = w.s === undefined ? [] : w.s;
+  if (!Array.isArray(pp) || !Array.isArray(ss)) return discard();
+  const services: WizardPlan['services'] = [];
+  for (const s of ss as unknown[]) {
+    if (!isObj(s) || Object.keys(s).some((k) => !SERVICE_KEYS.has(k))) { n.dropped++; continue; }
+    const picks = s.p === undefined ? [] : s.p;
+    services.push({
+      purpose: s.n as string,
+      picks: Array.isArray(picks) ? (picks as unknown[]).map((p) => longPick(p, n)).filter((p): p is WizardPick => p !== undefined) : (picks as WizardPick[]),
+    });
+  }
+  const plan: WizardPlan = {
+    provider: 'gcp', project,
+    projectPicks: (pp as unknown[]).map((p) => longPick(p, n)).filter((p): p is WizardPick => p !== undefined),
+    services,
+  };
+  const fixed = recoverPlan(plan, n);
+  if (!fixed) return discard();
+  out.plan = fixed;
+  return out;
+}
+
+/** 마법사 공유 URL — base 는 `location.origin + location.pathname` */
+export function wizardShareUrl(plan: WizardPlan, base: string, rulesVersion?: string): string | undefined {
+  const enc = encodeWizardState(plan, rulesVersion);
+  return enc === undefined ? undefined : `${base}#${HASH_KEY}=${enc}`;
 }

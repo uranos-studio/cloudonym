@@ -132,3 +132,49 @@ describe('기본값 종류를 적은 손 링크(「2:MYSQL」) — 상태는 종
     expect(mismatchedLinkVersion(stateKey, o.link, VERSION.rules)).toBe(old);
   });
 });
+
+// ─── 마법사 (D67) — 모델 → hash → 모델 → 같은 이름 · 같은 키 ───
+import { decodeWizardState, encodeWizardState } from './urlState';
+import { expandPlan, type WizardPlan } from '../core/wizard/plan';
+import { generateProject } from '../core/engine';
+import { removeSlot } from './wizardState';
+
+describe('마법사 공유 왕복 — 계획 표본 전체 · 서버 01 을 지운 모델', () => {
+  const plan: WizardPlan = {
+    provider: 'gcp',
+    project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' },
+    projectPicks: [
+      { preset: 'vpc', instances: [{ id: 'a', seq: '01' }] },
+      { preset: 'subnet', instances: [{ id: 'b', seq: '01' }] },
+      { preset: 'firewall', tier: 'ssh', instances: [{ id: 'c', seq: '01' }] },
+      { preset: 'firewall', tier: 'web', instances: [{ id: 'd', seq: '01' }] },
+    ],
+    services: [
+      { purpose: 'shop', picks: [
+        { preset: 'web', instances: [{ id: 'e', seq: '01', attach: { boot: true, data: ['01'], ip: true } }] },
+        { preset: 'db', kind: 'POSTGRES', instances: [{ id: 'f', seq: '01' }] },
+      ] },
+      { purpose: 'pay', picks: [
+        { preset: 'web', ha: true, instances: [{ id: 'g', seq: '01', attach: { boot: true } }, { id: 'h', seq: '02', attach: { boot: true } }] },
+      ] },
+    ],
+  };
+  const out = (p: WizardPlan) => generateProject(expandPlan(p), 'gcp').items.map((i) => [i.key, i.name]);
+  const trip = (p: WizardPlan) => decodeWizardState(`#state=${encodeWizardState(p, VERSION.rules)!}`)!.plan!;
+  it('표본 → hash → 모델 deep-equal · 같은 이름 · 같은 키 (14)', () => {
+    const back = trip(plan);
+    expect(back).toEqual(plan);
+    expect(out(back)).toEqual(out(plan));
+    expect(out(back)).toHaveLength(14);
+  });
+  it('pay 의 서버 01 을 지운 모델도 왕복하고 02 의 이름 · 딸린 것은 그대로 (HA 는 꺼진다)', () => {
+    const cut = removeSlot(plan, { service: 1, pick: 0 }, 0);
+    expect(cut.services[1]!.picks[0]).toEqual({ preset: 'web', instances: [{ id: 'h', seq: '02', attach: { boot: true } }] });
+    const back = trip(cut);
+    expect(back).toEqual(cut);
+    const names = out(back).map(([, n]) => n);
+    expect(names).toContain('billing-pay-prod-ane3-gce-web-02');
+    expect(names).toContain('billing-pay-prod-ane3-gce-web-02-boot');
+    expect(names).not.toContain('billing-pay-prod-ane3-gce-web-01');
+  });
+});

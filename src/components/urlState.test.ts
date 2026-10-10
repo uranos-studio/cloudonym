@@ -460,3 +460,241 @@ describe('hash — 종류 값의 수 자리는 MAX_COUNT 와 맞다', () => {
     expect(decodeState(hashOf(`${MAX_COUNT + 1}:POSTGRES`))!.dropped).toBe(1);
   });
 });
+
+// ─── hash v4 — 마법사 모델 w (D67) ───
+import { decodeWizardState, encodeWizardState, hashKind, wizardToHash, MAX_WIZARD_HASH_CHARS, MAX_ANY_HASH_CHARS, SERVERLESS_SHORT, type DecodedWizard } from './urlState';
+import { validatePlan, MAX_PICKS_PER_SERVICE, type Pick as WPick, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
+import { PRESETS } from '../core/wizard/presets';
+import { toWirePath } from '../api/schemas';
+
+const WP = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' };
+/** 계획의 표본 요청 — 프로젝트 네트워크 넷 · shop(web VM + boot · data 01 · ip, Cloud SQL) · pay(web HA 서버 둘 · boot 둘) */
+const W_SAMPLE: WizardPlan = {
+  provider: 'gcp',
+  project: WP,
+  projectPicks: [
+    { preset: 'vpc', instances: [{ id: 'a', seq: '01' }] },
+    { preset: 'subnet', instances: [{ id: 'b', seq: '01' }] },
+    { preset: 'firewall', tier: 'ssh', instances: [{ id: 'c', seq: '01' }] },
+    { preset: 'firewall', tier: 'web', instances: [{ id: 'd', seq: '01' }] },
+  ],
+  services: [
+    { purpose: 'shop', picks: [
+      { preset: 'web', instances: [{ id: 'e', seq: '01', attach: { boot: true, data: ['01'], ip: true } }] },
+      { preset: 'db', kind: 'POSTGRES', instances: [{ id: 'f', seq: '01' }] },
+    ] },
+    { purpose: 'pay', picks: [
+      { preset: 'web', ha: true, instances: [{ id: 'g', seq: '01', attach: { boot: true } }, { id: 'h', seq: '02', attach: { boot: true } }] },
+    ] },
+  ],
+};
+const WV = '2099-12-31.99';
+/** 검사를 건너뛰고 모델을 그대로 hash 로 — 깨진 링크를 만든다 */
+const rawWizardHash = (plan: unknown, extra: Record<string, unknown> = {}) =>
+  `#state=${btoa(unescape(encodeURIComponent(JSON.stringify({ ...WP, v: WV, ...extra, w: wizardToHash(plan as WizardPlan) }))))}`;
+const decodeW = (plan: unknown): DecodedWizard => {
+  const d = decodeWizardState(rawWizardHash(plan));
+  if (!d) throw new Error('undefined');
+  return d;
+};
+const one = (...picks: WPick[]): WizardPlan => ({ provider: 'gcp', project: WP, projectPicks: [], services: [{ purpose: 'shop', picks }] });
+const slotsW = (n: number): WizardSlot[] => Array.from({ length: n }, (_, i) => ({ id: `s${i + 1}`, seq: String(i + 1).padStart(2, '0') }));
+
+describe('hash v4 — 마법사 w 왕복 (D67)', () => {
+  it('계획 표본 전체가 모델 → hash → 모델로 deep-equal 이다 (preset · kind · ha · 슬롯 id · seq · attach)', () => {
+    const enc = encodeWizardState(W_SAMPLE, WV)!;
+    expect(enc).toBeDefined();
+    const back = decodeWizardState(`#state=${enc}`)!;
+    expect(back.plan).toEqual(W_SAMPLE);
+    expect(back.rulesVersion).toBe(WV);
+    expect(back.notices).toEqual({ dropped: 0, haOff: 0, serverlessOff: 0, trimmed: 0, discarded: false });
+    // 같은 키 — 다시 인코딩해도 같은 문자열
+    expect(encodeWizardState(back.plan!, WV)).toBe(enc);
+  });
+  it('custom pick(ruleId · tier · role) · serverless 짧은 값도 왕복한다', () => {
+    const plan = one(
+      { preset: null, ruleId: 'gcp.compute_instance', tier: 'batch', instances: [{ id: '1', seq: '03', attach: { ipi: true } }] },
+      { preset: null, ruleId: 'gcp.service_account', role: 'worker' },
+      { preset: 'was', serverless: 'gcp.run_service', instances: [{ id: 'z', seq: '01' }] },
+      { preset: 'object' },
+    );
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    const enc = encodeWizardState(plan)!;
+    const json = JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
+    expect(json.w.s[0].p[0]).toEqual({ ru: 'gcp.compute_instance', t: 'batch', i: [{ id: '1', q: '03', a: { ipi: 1 } }] });
+    expect(json.w.s[0].p[2].sv).toBe('run');
+    expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
+  });
+  it('w 가 있는 hash 에는 최상위 purpose 가 없다 · 키 순서 owner system env region v w', () => {
+    const enc = encodeWizardState(W_SAMPLE, WV)!;
+    const json = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)), (c) => c.charCodeAt(0))));
+    expect(Object.keys(json)).toEqual(['owner', 'system', 'env', 'region', 'v', 'w']);
+    expect('purpose' in json).toBe(false);
+  });
+  it('존을 넣은 지역은 리전 코드로 실린다 — 존은 이름에 없다', () => {
+    const enc = encodeWizardState({ ...W_SAMPLE, project: { ...WP, region: 'asia-northeast3-a' } })!;
+    expect(decodeWizardState(`#state=${enc}`)!.project.region).toBe('ane3');
+  });
+  it('인코더는 validatePlan 을 지나지 못한 모델을 싣지 않는다', () => {
+    expect(encodeWizardState(one({ preset: 'web', instances: [{ id: 'a', seq: 'ab' }] }))).toBeUndefined();
+    expect(encodeWizardState({ ...W_SAMPLE, projectPicks: [], services: [] })).toBeUndefined();
+  });
+  it('SERVERLESS_SHORT 는 프리셋의 serverless 규칙 id 전부를 덮는다', () => {
+    const ids = new Set(PRESETS.flatMap((p) => p.serverless?.ruleIds ?? []));
+    expect(new Set(Object.values(SERVERLESS_SHORT))).toEqual(ids);
+  });
+});
+
+describe('hash v4 — 걸린 자리만 버린다 (§5-5 path)', () => {
+  const web: WPick = { preset: 'web', instances: [{ id: 'a', seq: '01', attach: { boot: true, data: ['01'] } }] };
+  it("서비스 shop 의 둘째 pick(was · role:'worker')만 지워지고 첫째 web pick 과 딸린 것은 그대로", () => {
+    const plan = one(web, { preset: 'was', role: 'worker', instances: [{ id: 'b', seq: '01' }] });
+    const r = validatePlan(plan);
+    expect(r.ok ? [] : r.errors.map((e) => [e.code, e.path])).toContainEqual(['selection.role_not_supported', 'services[0].picks[1]']);
+    const d = decodeW(plan);
+    expect(d.plan!.services[0]!.picks).toEqual([web]);
+    expect(d.notices.dropped).toBe(1);
+  });
+  it("둘째 슬롯만 틀리면(seq 'ab') 그 슬롯만 지워진다", () => {
+    const d = decodeW(one({ preset: 'was', instances: [{ id: 'a', seq: '01', attach: { boot: true } }, { id: 'b', seq: 'ab' }] }));
+    expect(d.plan!.services[0]!.picks[0]!.instances).toEqual([{ id: 'a', seq: '01', attach: { boot: true } }]);
+  });
+  it("web · ha:true · 슬롯 [a 01 boot, b 'ab'] → b 만 지워지고 ha 는 꺼지며 a 와 boot 는 그대로 · 안내", () => {
+    const d = decodeW(one({ preset: 'web', ha: true, instances: [{ id: 'a', seq: '01', attach: { boot: true } }, { id: 'b', seq: 'ab' }] }));
+    expect(d.plan!.services[0]!.picks).toEqual([{ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { boot: true } }] }]);
+    expect(d.notices).toMatchObject({ dropped: 1, haOff: 1 });
+  });
+  it('pick 의 슬롯이 하나뿐이고 그게 틀리면 pick 이 지워지고 서비스의 다른 pick 은 그대로', () => {
+    const d = decodeW(one(web, { preset: 'was', instances: [{ id: 'b', seq: '7' }] }));
+    expect(d.plan!.services[0]!.picks).toEqual([web]);
+  });
+  it("디스크만 틀리면 — data:['00'] 이면 data 키만 사라지고 VM · boot · IP 그대로 / ['01','00'] → ['01']", () => {
+    const a = decodeW(one({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { boot: true, data: ['00'], ip: true } }] }));
+    expect(a.plan!.services[0]!.picks[0]!.instances).toEqual([{ id: 'a', seq: '01', attach: { boot: true, ip: true } }]);
+    const b = decodeW(one({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { boot: true, data: ['01', '00'], ip: true } }] }));
+    expect(b.plan!.services[0]!.picks[0]!.instances).toEqual([{ id: 'a', seq: '01', attach: { boot: true, data: ['01'], ip: true } }]);
+  });
+  it('프로젝트 공용 VM 의 디스크 — 디코더 path projectPicks[0].instances[0].attach.data[1] · API field project_picks[0].instances[0].attach.data[1]', () => {
+    const plan: WizardPlan = { provider: 'gcp', project: WP, services: [],
+      projectPicks: [{ preset: null, ruleId: 'gcp.compute_instance', instances: [{ id: 'a', seq: '01', attach: { data: ['01', 'x'] } }] }] };
+    const r = validatePlan(plan);
+    const paths = r.ok ? [] : r.errors.map((e) => e.path);
+    expect(paths).toContain('projectPicks[0].instances[0].attach.data[1]');
+    expect(toWirePath('projectPicks[0].instances[0].attach.data[1]')).toBe('project_picks[0].instances[0].attach.data[1]');
+  });
+  it('처음부터 ha:true + 슬롯 하나인 링크 → ha 만 꺼지고 서버 · boot 그대로', () => {
+    const d = decodeW(one({ preset: 'web', ha: true, instances: [{ id: 'a', seq: '01', attach: { boot: true } }] }));
+    expect(d.plan!.services[0]!.picks).toEqual([{ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { boot: true } }] }]);
+    expect(d.notices).toMatchObject({ dropped: 0, haOff: 1 });
+  });
+  it('플래그 복구 ⓪ — bastion · ha:true · 서버 둘(boot · IP) → ha 만 꺼지고 서버 둘 · boot · IP 전부 그대로', () => {
+    const slots = [{ id: 'a', seq: '01', attach: { boot: true as const, ip: true as const } }, { id: 'b', seq: '02' }];
+    const d = decodeW(one({ preset: 'bastion', ha: true, instances: slots }));
+    expect(d.plan!.services[0]!.picks).toEqual([{ preset: 'bastion', instances: slots }]);
+    expect(d.notices).toMatchObject({ dropped: 0, haOff: 1 });
+  });
+  it('web + serverless + ha → ha 만 꺼진다 · sv 가 데이터 밖이면 sv 만 지워진다', () => {
+    const a = decodeW(one({ preset: 'web', serverless: 'gcp.cloud_function', ha: true, instances: slotsW(2) }));
+    expect(a.plan!.services[0]!.picks).toEqual([{ preset: 'web', serverless: 'gcp.cloud_function', instances: slotsW(2) }]);
+    const b = decodeW(one({ preset: 'web', serverless: 'xyz', instances: slotsW(1) }));
+    expect(b.plan!.services[0]!.picks).toEqual([{ preset: 'web', instances: slotsW(1) }]);
+    expect(b.notices).toMatchObject({ serverlessOff: 1, dropped: 0 });
+  });
+  it('디코더 순서 — purpose "   " 인 서비스 + 정상 서비스 → 빈 서비스만 지워지고 나머지가 열린다', () => {
+    const d = decodeW({ provider: 'gcp', project: WP, projectPicks: [], services: [{ purpose: '   ', picks: [web] }, { purpose: 'pay', picks: [web] }] });
+    expect(d.plan!.services).toEqual([{ purpose: 'pay', picks: [web] }]);
+    expect(d.notices.dropped).toBe(1);
+  });
+  it('pick 상한 초과 — 프로젝트 공용 21 → 앞 20 만 남고 서비스는 그대로 / 서비스 쪽도 같다', () => {
+    const fw = (i: number): WPick => ({ preset: 'firewall', tier: `x${String(i).padStart(2, '0')}`, instances: [{ id: 'a', seq: '01' }] });
+    const vm = (i: number): WPick => ({ preset: null, ruleId: 'gcp.compute_instance', tier: `x${String(i).padStart(2, '0')}`, instances: [{ id: 'a', seq: '01' }] });
+    const many = Array.from({ length: MAX_PICKS_PER_SERVICE + 1 }, (_, i) => fw(i));
+    const a = decodeW({ provider: 'gcp', project: WP, projectPicks: many, services: [{ purpose: 'shop', picks: [web] }] });
+    expect(a.plan!.projectPicks).toEqual(many.slice(0, MAX_PICKS_PER_SERVICE));
+    expect(a.plan!.services).toEqual([{ purpose: 'shop', picks: [web] }]);
+    expect(a.notices.trimmed).toBe(1);
+    const svcPicks = Array.from({ length: MAX_PICKS_PER_SERVICE + 1 }, (_, i) => vm(i));
+    const b = decodeW({ provider: 'gcp', project: WP, projectPicks: [fw(0)], services: [{ purpose: 'shop', picks: svcPicks }] });
+    expect(b.plan!.services[0]!.picks).toEqual(svcPicks.slice(0, MAX_PICKS_PER_SERVICE));
+    expect(b.plan!.projectPicks).toEqual([fw(0)]);
+  });
+  it('표 밖의 키 — pick 에 있으면 그 pick 만 · 슬롯에 있으면 그 슬롯만 버린다 · w 최상위면 w 전체', () => {
+    const raw = (w: unknown) => decodeWizardState(`#state=${btoa(JSON.stringify({ ...WP, w }))}`)!;
+    const p = raw({ s: [{ n: 'shop', p: [{ pr: 'web', i: [{ id: 'a', q: '01' }] }, { pr: 'was', zz: 1, i: [{ id: 'a', q: '01' }] }] }] });
+    expect(p.plan!.services[0]!.picks).toEqual([{ preset: 'web', instances: [{ id: 'a', seq: '01' }] }]);
+    const s = raw({ s: [{ n: 'shop', p: [{ pr: 'web', i: [{ id: 'a', q: '01' }, { id: 'b', q: '02', zone: 'x' }] }] }] });
+    expect(s.plan!.services[0]!.picks[0]!.instances).toEqual([{ id: 'a', seq: '01' }]);
+    expect(raw({ s: [], x: 1 }).notices.discarded).toBe(true);
+  });
+});
+
+describe('hash v4 — 모델 전체 오류 · 옛 링크 · 깨진 링크', () => {
+  it('projectPicks:[] · services:[] → wizard.empty → w 전체를 버리고 안내(문맥은 연다)', () => {
+    const d = decodeW({ provider: 'gcp', project: WP, projectPicks: [], services: [] });
+    expect(d.plan).toBeUndefined();
+    expect(d.notices.discarded).toBe(true);
+    expect(d.project).toEqual(WP);
+  });
+  it('이름 201개 모델 → wizard.too_many_names → w 전체를 버리고 안내 · 그 hash 는 길이 상한 안이다', () => {
+    const vm = (tier: string, n: number): WPick => ({ preset: null, ruleId: 'gcp.compute_instance', tier, instances: slotsW(n) });
+    const plan = one(vm('tone', 67), vm('ttwo', 67), vm('tthree', 66));
+    const r = validatePlan(plan);
+    expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.too_many_names']);
+    const h = rawWizardHash(plan);
+    expect(h.length).toBeLessThanOrEqual(MAX_WIZARD_HASH_CHARS);
+    const d = decodeWizardState(h)!;
+    expect(d.plan).toBeUndefined();
+    expect(d.notices.discarded).toBe(true);
+  });
+  it('w + r 은 깨진 링크 · 문맥 넷이 안 풀리면 깨진 링크', () => {
+    expect(decodeWizardState(rawWizardHash(W_SAMPLE, { r: { disk: 1 } }))).toBeUndefined();
+    expect(decodeWizardState(rawWizardHash(W_SAMPLE, { env: 'nope' }))).toBeUndefined();
+  });
+  it('옛 v3 · 다섯 키 hash 는 그대로 트리로 열린다 — hashKind tree · decodeState 가 연다 · 마법사 디코더는 열지 않는다', () => {
+    const v3 = `#state=${encodeState(ctx, WV, { provider: 'gcp', selection: [] })}`;
+    const five = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' }))}`;
+    const withR = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', v: WV, p: 'gcp', r: { compute_instance: 2 } }))}`;
+    for (const h of [v3, five, withR]) {
+      expect(hashKind(h)).toBe('tree');
+      expect(decodeEnabled(h)).toBeDefined();
+      expect(decodeWizardState(h)).toBeUndefined();
+    }
+    expect(decodeEnabled(withR)?.selection?.[0]?.count).toBe(2);
+    const w = `#state=${encodeWizardState(W_SAMPLE, WV)}`;
+    expect(hashKind(w)).toBe('wizard');
+    expect(decodeEnabled(w)).toBeUndefined();
+    expect(hashKind('')).toBe('none');
+    expect(hashKind('#state=%%%')).toBe('broken');
+    expect(hashKind('#state=bm90IGpzb24')).toBe('broken');
+  });
+});
+
+/** 서비스 20 · 자유 입력 최악 · 이름 195 인 모델의 hash 길이 (잰 값) */
+const MEASURED_NEAR_MAX = 18146;
+describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
+  it('MAX_WIZARD_HASH_CHARS 를 잰다 · MAX_ANY_HASH_CHARS 는 v3 · v4 중 큰 쪽', () => {
+    expect(MAX_WIZARD_HASH_CHARS).toBe(120495);
+    expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
+  });
+  it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {
+    const worst = '\u0001'.repeat(MAX_CONTEXT_CHARS);
+    const svc = (i: number, n: number) => ({
+      purpose: `${String(i).padStart(2, '0')}${'\u0001'.repeat(MAX_CONTEXT_CHARS - 2)}`,
+      picks: [{ preset: null, ruleId: 'gcp.compute_instance', tier: 'abcdefghijklmnop', instances: Array.from({ length: n }, (_, k) => ({ id: `abcdef${String(k).padStart(2, '0')}`, seq: String(k + 1).padStart(2, '0'), attach: { boot: true as const } })) }] as WPick[],
+    });
+    // 이름 = 1 + 서비스마다 (VM n + boot n) — 19 × 10 + 1 × 4 + 1 = 195
+    const plan: WizardPlan = { provider: 'gcp', project: { ...WP, owner: worst, system: worst }, projectPicks: [], services: Array.from({ length: 20 }, (_, i) => svc(i, i === 19 ? 2 : 5)) };
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    const enc = encodeWizardState(plan, WV);
+    expect(enc).toBeDefined();
+    const h = `#state=${enc}`;
+    // 잰 값 — Base64url(패딩 없음) 길이
+    expect(h.length).toBe(MEASURED_NEAR_MAX);
+    expect(h.length).toBeLessThanOrEqual(MAX_WIZARD_HASH_CHARS);
+    expect(decodeWizardState(h)!.plan).toEqual(plan);
+  });
+  it('상한을 넘는 hash 는 풀지 않는다', () => {
+    const big = `#state=${encodeWizardState(W_SAMPLE)}${'A'.repeat(MAX_WIZARD_HASH_CHARS)}`;
+    expect(decodeWizardState(big)).toBeUndefined();
+  });
+});
