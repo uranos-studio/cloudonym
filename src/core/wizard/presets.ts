@@ -1,5 +1,5 @@
 // 마법사 프리셋 (D59 · D64) — 데이터. 용도 칩 하나 = 규칙 하나. 마법사 함수(validatePlan · expandPlan)는 프리셋을 따로 알지 않고 이 표를 읽는다.
-// 상용 저장소는 같은 꼴의 행을 더한다. 「네트워크」는 화면의 묶음 칩(group)이고 데이터에서는 pick 셋(vpc · subnet · firewall)이다
+// 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」는 화면의 묶음 칩(group)이고 데이터에서는 pick 셋(vpc · subnet · firewall)이다
 import type { Attachments } from '../selection';
 
 export interface Preset {

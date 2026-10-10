@@ -68,7 +68,7 @@ function attachLines(): string[] {
   ];
 }
 
-/** 프리셋 묶음 (D59) — 네트워크는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩. 무료 프리셋은 다섯 묶음이다 */
+/** 프리셋 묶음 (D59) — 네트워크는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩. 프리셋은 다섯 묶음이다 */
 function presetGroups(): Preset[][] {
   const groups = new Map<string, Preset[]>();
   for (const p of PRESETS) {
