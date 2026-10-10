@@ -10,8 +10,9 @@
 // ENABLED_PROVIDERS 를 세 CSP 로 바꾼다 — 라우터 · 문맥 상한 · 직렬화를 그대로 지난다. 이 값은 provider 판정과 그 supported 목록에만 쓰인다.
 // 바꾼 값이 풀리면(모듈이 옮겨지는 등) aws · azure 표본이 400 이 되어 시험이 크게 실패한다 — 조용히 통과하지 않는다
 import { describe, it, expect, vi } from 'vitest';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, sep } from 'node:path';
 import { app } from '../api/index';
 import { req, jsonPost } from '../api/test-support';
 import { parseNamesBody } from '../api/schemas';
@@ -51,6 +52,10 @@ const ZONE_RULES = [
   'compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
   'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group',
 ] as const;
+/** T4(D65)가 더하는 규칙 — 그 Task 가 'run_service' 를 넣는다. 지금은 비어 있다: 항목 꼴 줄의 resource type 은 ZONE_RULES 이거나 이 목록이어야 한다 */
+const T4_ADDED_TYPES: readonly string[] = [];
+/** T4 가 /supported 경로 줄(names-400 표본)을 쓸 때 true 로 바꾼다 */
+const T4_SUPPORTED_PATH = false;
 const zoneRuleItems = () => ZONE_RULES.map((type) => (type === 'network_endpoint_group' ? { type, kind: 'GCE_VM_IP' } : { type }));
 const MIXED = [
   { type: 'compute_instance', count: 2 }, { type: 'disk', count: 2 }, { type: 'subnet', count: 2 }, { type: 'service_account', role: 'db' },
@@ -285,13 +290,39 @@ function compareSnapshots(oracleIn: Snapshot, actualIn: Snapshot, diffs: Allowed
   return problems;
 }
 
+/** 허용 차분의 범위 (D70 예외 ① · ②) — 항목 꼴 줄은 존 규칙 14종(또는 T4 의 추가 규칙)의 항목만,
+ *  경로 꼴 줄은 지역 정규화 기록(generate:*:gcp · names:*) · names 의 전체 판정 /data/gcp/valid · (T4) /supported 만 */
+function resourceTypeOf(snap: Snapshot, sample: string, key: string): string | undefined {
+  const body = snap.wire[sample]?.body;
+  if (sample.startsWith('generate:')) return body?.data?.[sample.split(':')[2]!]?.[key] === undefined ? undefined : key;
+  return (body?.data?.gcp?.items as any[] | undefined)?.find((x) => x.key === key)?.resource_type;
+}
+function scopeProblems(diffs: AllowedDiff[], oracle: Snapshot, actual: Snapshot): string[] {
+  const allowedTypes = new Set<string>([...ZONE_RULES, ...T4_ADDED_TYPES]);
+  return diffs.flatMap((d): string[] => {
+    if (isPathDiff(d)) {
+      const normSample = /^generate:[^:]+:gcp$/.test(d.sample) || d.sample.startsWith('names:');
+      if (/^\/metadata\/transformed\/\d+(\/params\/to|\/message)?$/.test(d.path) && normSample) return [];
+      if (d.path === '/data/gcp/valid' && d.sample.startsWith('names:')) return [];
+      if (T4_SUPPORTED_PATH && d.path === '/supported' && d.sample.startsWith('names-400:')) return [];
+      return [`path ${d.sample} ${d.path} is outside the allowed sites`];
+    }
+    if (d.sample.startsWith('generate:') && !d.sample.endsWith(':gcp')) return [`${label(d)}: not a gcp sample`];
+    // 오라클의 resource_type 으로 — 오라클에 없는 항목(추가)은 지금 출력에서 찾는다
+    const type = resourceTypeOf(oracle, d.sample, d.key) ?? resourceTypeOf(actual, d.sample, d.key);
+    return type !== undefined && allowedTypes.has(type) ? [] : [`${label(d)}: resource type ${type ?? '?'} is not one of the 14 zonal rules`];
+  });
+}
+
 const readJson = (name: string): unknown => JSON.parse(readFileSync(join(FIXTURE_DIR, name), 'utf-8'));
 
-/** 지금 출력을 파일로 내보낸다 — scripts/oracle-diff.mjs 가 허용 차분 줄을 뽑을 때만 쓴다. fixture 폴더에는 쓰지 않는다(오라클을 고치는 길이 아니다) */
+/** 지금 출력을 파일로 내보낸다 — scripts/oracle-diff.mjs 가 허용 차분 줄을 뽑을 때만 쓴다.
+ *  OS 임시 폴더 아래만 받는다(실경로로 비교) — 저장소 안, 특히 오라클 fixture 에는 쓸 수 없다 */
 function dumpActual(actual: Snapshot): void {
   const target = process.env.WIRE_COMPAT_DUMP;
   if (!target) return;
-  if (resolve(target).startsWith(resolve(FIXTURE_DIR))) throw new Error('WIRE_COMPAT_DUMP must not point into __fixtures__');
+  const tmp = realpathSync(tmpdir());
+  if (!realpathSync(dirname(target)).startsWith(tmp + sep)) throw new Error('WIRE_COMPAT_DUMP must be a file under the OS temp directory');
   writeFileSync(target, JSON.stringify(actual));
 }
 
@@ -357,6 +388,10 @@ describe('호환 오라클 (D70) — 마법사 작업 전 출력과 같다', asy
 
   it('허용 차분 파일의 문법이 맞다', () => {
     expect(grammarProblems(diffs)).toEqual([]);
+  });
+
+  it('허용 차분의 범위 — 항목 꼴은 존 규칙 14종(오라클의 resource_type)의 항목만 · 경로 꼴은 지역 정규화 · names 의 /data/gcp/valid 만', () => {
+    expect(scopeProblems(diffs as AllowedDiff[], oracle, actual)).toEqual([]);
   });
 
   it('wire · HCL · JSON 셋 모두 — 허용 차분을 뺀 나머지가 오라클과 같다', () => {
@@ -430,6 +465,25 @@ describe('검사기 자체 — 잡아야 할 것을 잡는다', async () => {
     ];
     expect(compareSnapshots(oracle, actual, rows)).toEqual([]);
     expect(compareSnapshots(oracle, actual, rows.slice(1))).toEqual(['hcl names:zone-mixed differs']);
+  });
+  it('범위 검사기 — 존 규칙 밖 항목 · 허용 밖 경로 · 표본이 맞지 않는 경로를 잡는다', () => {
+    const ok: AllowedDiff[] = [
+      { sample: 'names:zone-mixed', key: 'compute_instance_01', kind: 'hcl', old: 'a', new: 'b' },
+      { sample: 'generate:base:gcp', key: 'disk', kind: 'wire', old: 1, new: 2 },
+      { sample: 'names:zone-mixed', path: '/metadata/transformed/0', old: 1, new: 2 },
+      { sample: 'generate:region-zone:gcp', path: '/metadata/transformed/0/params/to', old: 1, new: 2 },
+      { sample: 'names:region-mixed', path: '/data/gcp/valid', old: false, new: true },
+    ];
+    expect(scopeProblems(ok, oracle, oracle)).toEqual([]);
+    expect(scopeProblems([
+      { sample: 'names:zone-mixed', key: 'subnet_01', kind: 'wire', old: 1, new: 2 },
+      { sample: 'generate:base:gcp', key: 'subnet', kind: 'json', old: 1, new: 2 },
+      { sample: 'generate:base:aws', key: 'disk', kind: 'wire', old: 1, new: 2 },
+      { sample: 'generate:base:gcp', path: '/data/gcp/valid', old: 1, new: 2 },
+      { sample: 'generate:base:aws', path: '/metadata/transformed/0', old: 1, new: 2 },
+      { sample: 'names-400:unknown-type', path: '/supported', old: 1, new: 2 },
+      { sample: 'names:zone-mixed', path: '/metadata/transformed/0/params/from', old: 1, new: 2 },
+    ], oracle, oracle)).toHaveLength(7);
   });
   it('문법 검사기 — 두 꼴만 받는다', () => {
     expect(grammarProblems([])).toEqual([]);

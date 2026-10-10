@@ -87,7 +87,7 @@ describe('실제 데이터 — 공허한 통과가 아니라는 대조', () => {
     expect(r.valid).toBe(true);
   });
   it('seq 는 보호 토큰이라 같은 규칙 안에서 축소가 이름을 접지 않는다 — count 규칙 전부 · 긴 문맥 · count 3', () => {
-    // GCP 는 존 이름 — 존 규칙도 이름이 나와야 센다(global 이면 name.zone_required)
+    // GCP 는 존 이름을 넣어도 리전 코드로 풀린다 — 옛 존 규칙도 리전 코드로 이름이 나온다 (D50 revised)
     const region = { gcp: 'asia-northeast3-a', aws: 'global', azure: 'global' } as const;
     let checked = 0;
     for (const p of PROVIDERS) {

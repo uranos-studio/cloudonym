@@ -3,8 +3,9 @@
 // 허용하는 자리는 존 규칙 14종(D50 revised)의 항목뿐이다 — wire 항목 · HCL 줄 · 내보내기 JSON 항목, 그리고 항목이 아닌 자리 둘:
 // 지역 정규화 기록(/metadata/transformed/<i> — to · message 가 존 코드에서 리전 코드로) · names 응답의 전체 판정(/data/gcp/valid — 항목 판정의 논리곱).
 // 그 밖의 자리가 하나라도 다르면 줄을 쓰지 않고 실패한다(exit 1) — 허용 차분으로 회귀를 덮지 않는다.
-// 사용: node scripts/oracle-diff.mjs          (줄을 뽑아 wire-allowed-diff.json 을 다시 쓴다 — 오라클 fixture 는 건드리지 않는다)
+// 사용: node scripts/oracle-diff.mjs --write  (줄을 뽑아 wire-allowed-diff.json 을 다시 쓴다 — 오라클 fixture 는 건드리지 않는다)
 //       node scripts/oracle-diff.mjs --check  (쓰지 않고, 뽑은 줄이 파일과 같은지만 본다)
+//       인자가 없으면 요약만 보이고 아무것도 쓰지 않는다
 import { readFileSync, writeFileSync, mkdtempSync, unlinkSync, rmdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -115,14 +116,16 @@ export function deriveRows(oracle, actual) {
     // 항목을 도려낸 나머지 — 허용하는 자리 둘만 줄로 만들고, 그 밖은 문제로 센다
     const seen = new Set();
     for (const ptr of diffPointers(o.body, a.body)) {
-      const tr = /^\/metadata\/transformed\/(\d+)(\/|$)/.exec(ptr);
+      const normSample = /^generate:[^:]+:gcp$/.test(sample) || sample.startsWith('names:');
+      const tr = normSample ? /^\/metadata\/transformed\/(\d+)(\/|$)/.exec(ptr) : null;
       const site = tr ? `/metadata/transformed/${tr[1]}` : ptr === '/data/gcp/valid' && sample.startsWith('names:') ? ptr : undefined;
       if (!site) { problems.push(`wire ${sample} ${ptr} differs outside the zonal rules`); continue; }
       if (seen.has(site)) continue;
       seen.add(site);
       const ov = atPointer(oracle.wire[sample].body, site);
       const av = atPointer(actual.wire[sample].body, site);
-      if (tr && (ov?.code !== 'context.normalized' || ov?.field !== 'region') && (av?.code !== 'context.normalized' || av?.field !== 'region')) {
+      const isRegionNorm = (v) => v?.code === 'context.normalized' && v?.field === 'region';
+      if (tr && (!isRegionNorm(ov) || !isRegionNorm(av))) {
         problems.push(`wire ${sample} ${site} is not a region normalisation entry`);
         continue;
       }
@@ -167,10 +170,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const text = `${JSON.stringify(rows, null, 2)}\n`;
   const count = (f) => rows.filter(f).length;
   const summary = `rows ${rows.length} — wire ${count((r) => r.kind === 'wire')} · hcl ${count((r) => r.kind === 'hcl')} · json ${count((r) => r.kind === 'json')} · path ${count((r) => 'path' in r)}`;
-  if (process.argv.includes('--check')) {
-    const same = readFileSync(ALLOWED, 'utf-8') === text;
-    console.log(`${summary} — ${same ? 'matches' : 'DIFFERS from'} wire-allowed-diff.json`);
-    process.exit(same ? 0 : 1);
+  if (!process.argv.includes('--write')) {
+    const matches = readFileSync(ALLOWED, 'utf-8') === text;
+    console.log(`${summary} — ${matches ? 'matches' : 'DIFFERS from'} wire-allowed-diff.json${process.argv.includes('--check') ? '' : ' (nothing written; pass --write to write)'}`);
+    process.exit(matches || !process.argv.includes('--check') ? 0 : 1);
   }
   writeFileSync(ALLOWED, text);
   console.log(`${summary} — written to src/core/__fixtures__/wire-allowed-diff.json`);
