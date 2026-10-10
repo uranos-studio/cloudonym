@@ -356,6 +356,9 @@ def wizard_scenarios(browser, rules_version, errors):
     svc(page, 0).locator('[data-purpose-chip="custom"]').click()
     dialog = page.locator('[data-custom-dialog]')
     expect(dialog).to_be_visible()
+    # 프로젝트 ID 는 늘 암묵 항목이라 모달 트리에 없다(고르면 이름이 전부 사라졌다) — 같은 프로젝트 범위의 서비스 계정 행은 있다
+    expect(dialog.locator('[data-rule="gcp.service_account"]')).to_have_count(1)
+    expect(dialog.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
     # 행을 고르면 모달이 닫힌다 — check() 는 체크 상태를 기다리므로 click 으로 고른다
     row(page, 'compute_instance').locator('input[data-row-check]').click()
     expect(dialog).to_have_count(0)

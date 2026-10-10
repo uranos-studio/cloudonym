@@ -2,8 +2,10 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, type PickRef,
+  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, type PickRef,
 } from './wizardState';
+import { treeRules } from './selection';
+import { buildTree } from '../core/tree';
 import { expandPlan, validatePlan, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
 import { DEFAULT_FORM } from './formContext';
@@ -174,5 +176,15 @@ describe('서비스 · custom', () => {
     const r = validatePlan(bad);
     expect(r.ok ? [] : r.errors.map((e) => [e.code, e.path])).toEqual([['wizard.tier_reserved', 'services[0].picks[0]']]);
     expect(removePick(p, { service: 0, pick: 1 }).services[0]!.picks).toHaveLength(1);
+  });
+});
+
+describe('custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목이라 고를 수 없다', () => {
+  it('gcp.project_id 만 빠지고 나머지 GCP 규칙은 다 있다', () => {
+    const ids = treeRules(CUSTOM_TREE).map((r) => r.id);
+    expect(treeRules(buildTree('gcp')).map((r) => r.id)).toContain('gcp.project_id');
+    expect(ids).not.toContain('gcp.project_id');
+    expect(ids).toContain('gcp.service_account');
+    expect(new Set(ids)).toEqual(new Set(treeRules(buildTree('gcp')).map((r) => r.id).filter((id) => id !== 'gcp.project_id')));
   });
 });

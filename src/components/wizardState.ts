@@ -2,10 +2,15 @@
 // 순번은 슬롯의 값이다 — 서버 줄 · 디스크 줄을 지워도 남은 번호를 당기지 않는다. 「+ server」 · 「+ disk」는 다음 빈 번호를 쓴다.
 // 번호를 다시 매기는 것은 사용자가 누르는 별도 동작(renumber)이다. 판정(이름 규칙 · 검사)은 엔진(validatePlan)이 한다
 import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
-import { SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
+import { PROJECT_ID_RULE, SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
 import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGION } from './formContext';
+import { buildTree } from '../core/tree';
+import { treeRules } from './selection';
+
+/** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다) */
+export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE));
 
 /** pick 의 자리 — service 가 null 이면 프로젝트 공용(Project resources) */
 export interface PickRef { service: number | null; pick: number }

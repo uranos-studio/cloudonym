@@ -567,7 +567,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
   const name = service === null ? en.ui.wizard_project_resources : plan.services[service]?.purpose || String((service ?? 0) + 1);
   const onChange = (next: Picked) => {
     for (const [type, entry] of next) {
-      const rule = treeRules(TREE).find((r) => r.resourceType === type);
+      const rule = treeRules(S.CUSTOM_TREE).find((r) => r.resourceType === type);
       if (rule) { onPick(rule, entry); return; }
     }
   };
@@ -581,7 +581,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
         </div>
         <button type="button" data-custom-close aria-label={en.ui.wizard_custom_close} className={ICON_BTN} onClick={onClose}><X aria-hidden="true" className="size-4" /></button>
       </div>
-      <ResourceTree provider="gcp" tree={TREE} picked={new Map()} onChange={onChange} />
+      <ResourceTree provider="gcp" tree={S.CUSTOM_TREE} picked={new Map()} onChange={onChange} />
     </dialog>
   );
 }
