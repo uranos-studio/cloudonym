@@ -1,29 +1,34 @@
-// /docs/naming 모델 (D57) — 절 아홉 · PASS 문장은 사전 그대로 · 표의 행 수가 손이 아니라 넣은 데이터에서 온다(크기가 다른 두 입력) · 모델 문자열 한글 0
+// /docs/naming 모델 (D57) — 절 열둘 · PASS 문장은 사전 그대로 · 표의 행 수가 손이 아니라 넣은 데이터에서 온다(크기가 다른 두 입력) · 모델 문자열 한글 0
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { catalogFor } from '../core/catalog';
 import { REGIONS } from '../core/regions-data';
 import { buildTree } from '../core/tree';
-import { ENV_VALUES, generateMany, parseContext } from '../core/engine';
-import { PROTECTED, type ResourceRule } from '../core/types';
+import { ENV_VALUES, generateItem, generateMany, parseContext } from '../core/engine';
+import { PROTECTED, TIER_PATTERN, type ResourceRule } from '../core/types';
+import { RESERVED_TIERS } from '../core/tier';
+import { PRESETS, PRESET_TIERS } from '../core/wizard/presets';
+import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 import { treeRules } from './selection';
-import { ABBR_PRINCIPLES, NAMING_DOC_SECTIONS, namingDocModel, zoneCodeMismatches, type NamingDocInput, type NamingDocModel } from './namingDocModel';
+import { ABBR_PRINCIPLES, NAMING_DOC_SECTIONS, formulaText, namingDocModel, zoneCodeMismatches, type NamingDocInput, type NamingDocModel } from './namingDocModel';
 import { NamingDoc } from './NamingDoc';
 
 const HANGUL = /\p{Script=Hangul}/u;
 
 const real: NamingDocInput = {
   provider: 'gcp', catalog: catalogFor('gcp'), regions: REGIONS.gcp, rules: treeRules(buildTree('gcp')), messages: en, version: VERSION,
+  presets: PRESETS, attachments: ATTACHMENTS, reservedTiers: RESERVED_TIERS,
 };
-/** 작은 입력 — catalog 3행(종류 표가 있는 subnet 하나 포함) · 리전 2개 · 그 행들의 규칙 */
+/** 작은 입력 — catalog 3행(종류 표가 있는 subnet 하나 포함) · 리전 2개 · 그 행들의 규칙 · 프리셋 둘(묶음 둘) · 호환표 1행 · 예약어 둘 */
 const FIXTURE_KEYS = ['gcp.project_id', 'gcp.service_account', 'gcp.subnet'];
 const fixtureRows = real.catalog.filter((r) => FIXTURE_KEYS.includes(r.key));
 const fixtureRuleIds = new Set(fixtureRows.flatMap((r) => Object.keys(r.rules)));
 const fixture: NamingDocInput = {
   ...real, catalog: fixtureRows, regions: REGIONS.gcp.slice(0, 2), rules: real.rules.filter((r) => fixtureRuleIds.has(r.id)),
+  presets: PRESETS.filter((p) => p.id === 'db' || p.id === 'object'), attachments: ATTACHMENTS.slice(0, 1), reservedTiers: new Set(['aa', 'bb']),
 };
 
 const section = (m: NamingDocModel, id: string) => m.sections.find((s) => s.id === id)!;
@@ -40,8 +45,8 @@ function strings(value: unknown): string[] {
 describe('namingDocModel', () => {
   const model = namingDocModel(real);
 
-  it('절 아홉 — 이름 공식 · 토큰 · 지역 코드 · 존 · 환경 값 · 축소 · 약어 · 종류 토큰 · PASS 의 뜻, 이 순서', () => {
-    expect(NAMING_DOC_SECTIONS).toEqual(['formula', 'tokens', 'regions', 'zones', 'env', 'shrink', 'abbreviations', 'kinds', 'pass']);
+  it('절 열둘 — 이름 공식 · 토큰 · 지역 코드 · 존 · 환경 값 · 축소 · 약어 · 종류 토큰 · 용도 토큰 · 딸린 리소스 · 프리셋 · PASS 의 뜻, 이 순서', () => {
+    expect(NAMING_DOC_SECTIONS).toEqual(['formula', 'tokens', 'regions', 'zones', 'env', 'shrink', 'abbreviations', 'kinds', 'tiers', 'attached', 'presets', 'pass']);
     expect(model.sections.map((s) => s.id)).toEqual([...NAMING_DOC_SECTIONS]);
     for (const s of model.sections) expect(s.title.length, s.id).toBeGreaterThan(0);
   });
@@ -50,17 +55,36 @@ describe('namingDocModel', () => {
     expect(section(model, 'pass').paragraphs).toEqual([en.ui.pass_meaning]);
   });
 
-  it('용도 토큰 tier 는 아직 문서에 싣지 않는다 — 공식 · 토큰 표 · 축소 설명 (D60)', () => {
-    const text = JSON.stringify(model);
-    expect(text).not.toContain('<tier>');
-    expect(text).not.toMatch(/\btier\b/);
+  it('용도 토큰 tier 를 싣는다 — 공식은 tier 가 있는 규칙에만 `[-<tier>]` 를 순번 바로 앞에 · 토큰 표는 kind 와 seq 사이 · 축소 설명의 보호 토큰 (D60)', () => {
+    const withTier = real.rules.filter((r) => r.template.includes('tier'));
+    expect(withTier.length).toBeGreaterThan(0);
+    const formulas = rowsOf(model, 'formula').map((r) => r.cells[0]!);
+    const tiered = formulas.filter((f) => f.includes('<tier>'));
+    expect(tiered.length).toBeGreaterThan(0);
+    for (const f of tiered) expect(f, f).toMatch(/\[-<tier>\]-<seq>$|\[-<tier>\]-<seq>-/);
+    // tier 가 없는 규칙의 공식에는 없다 — 행의 규칙 수 합 = tier 가 있는 규칙 수
+    const tieredCount = rowsOf(model, 'formula').filter((r) => r.cells[0]!.includes('<tier>')).reduce((n, r) => n + Number(r.cells.at(-1)), 0);
+    expect(tieredCount).toBe(withTier.length);
+    const vm = real.rules.find((r) => r.id === 'gcp.compute_instance')!;
+    expect(formulas).toContain(formulaText(vm));
+    expect(formulaText(vm)).toBe('<system>-<purpose>-<env>-<region>-<slug>[-<tier>]-<seq>');
+    expect(rowsOf(model, 'tokens').find((r) => r.key === 'tier')!.cells[1]).toMatch(/naming wizard/);
+    expect(section(model, 'shrink').items![1]).toContain('tier');
   });
-  it('실제 데이터 — 약어 101행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 아홉', () => {
+  it('실제 데이터 — 약어 101행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 다섯', () => {
     expect(rowsOf(model, 'abbreviations')).toHaveLength(101);
     expect(rowsOf(model, 'regions')).toHaveLength(43);
     expect(rowsOf(model, 'kinds')).toHaveLength(19);
     expect(rowsOf(model, 'env').map((r) => r.cells[0])).toEqual([...ENV_VALUES]);
-    expect(rowsOf(model, 'tokens').map((r) => r.cells[0])).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'slug', 'kind', 'seq', 'role']);
+    expect(rowsOf(model, 'tokens').map((r) => r.cells[0])).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'slug', 'kind', 'tier', 'seq', 'role']);
+    expect(rowsOf(model, 'attached').map((r) => r.cells[0])).toEqual(['-boot', `-data-<seq>`, '-ip', '-ipi']);
+    expect(rowsOf(model, 'presets').map((r) => r.key)).toEqual(['server', 'file', 'db', 'object', 'network']);
+    expect(rowsOf(model, 'presets').flatMap((r) => r.cells[0]!.split(' · '))).toEqual(PRESETS.map((p) => p.id));
+    // 묶음 일부에만 있는 선택 사항은 그 프리셋을 밝힌다 — bastion 에는 HA · 서버리스가 없다
+    const server = rowsOf(model, 'presets').find((r) => r.key === 'server')!;
+    const ha = PRESETS.filter((p) => p.ha && p.ruleId === 'gcp.compute_instance' && !p.defaultAttach).map((p) => p.id);
+    expect(server.cells[4]).toContain(`${ha.join(', ')}: High availability: at least 2 servers`);
+    expect(rowsOf(model, 'presets').find((r) => r.key === 'network')!.cells[3]).toBe('firewall: ssh / web / icmp');
     expect(model.intro).toContain(VERSION.rules);
   });
 
@@ -71,6 +95,13 @@ describe('namingDocModel', () => {
     expect(rowsOf(small, 'kinds').map((r) => r.key)).toEqual(['gcp.subnet']);
     expect(section(small, 'regions').table!.caption).toContain('2');
     expect(section(model, 'regions').table!.caption).toContain('43');
+    // 프리셋 둘(묶음 둘) · 호환표 1행 · 예약어 둘
+    expect(rowsOf(small, 'presets').map((r) => r.key)).toEqual(['db', 'object']);
+    expect(section(small, 'presets').table!.caption).toContain('2');
+    expect(rowsOf(small, 'attached')).toHaveLength(1);
+    expect(section(small, 'attached').table!.caption).toContain('1');
+    expect(section(small, 'tiers').items!.join(' ')).toContain('2 reserved words');
+    expect(section(model, 'tiers').items!.join(' ')).toContain(`${RESERVED_TIERS.size} reserved words`);
     // 공식 표의 규칙 수 합 = 넣은 규칙 수
     const sum = (m: NamingDocModel) => rowsOf(m, 'formula').reduce((n, r) => n + Number(r.cells.at(-1)), 0);
     expect(sum(small)).toBe(fixture.rules.length);
@@ -177,6 +208,18 @@ describe('페이지 문장이 엔진이 하는 일과 같다', () => {
     const step2 = section(model, 'shrink').items![1]!;
     expect(step2).toContain('never shortened (step 1 may still drop the optional ones among them)');
     expect(step2).not.toMatch(/never cut/);
+  });
+
+  it('용도 토큰 — 문장의 예 이름은 엔진이 tier 로 만든 이름이다 · 꼴 · 프리셋 토큰은 데이터 그대로', () => {
+    const vm = real.rules.find((r) => r.id === 'gcp.compute_instance')!;
+    const made = generateItem(ctxOf({ purpose: 'shop' }), vm, { seq: '01', tier: 'web' });
+    expect(made.valid).toBe(true);
+    const tiers = section(model, 'tiers');
+    expect(tiers.paragraphs.join(' ')).toContain(made.name);
+    expect(tiers.items!.join(' ')).toContain(TIER_PATTERN.source);
+    for (const t of PRESET_TIERS) expect(tiers.items!.join(' '), t).toContain(t);
+    // 딸린 것 — 데이터 디스크 상한
+    expect(section(model, 'attached').paragraphs.join(' ')).toContain(`${MAX_DATA_DISKS}`);
   });
 
   it('순번 — 문장의 자릿수 · 처음 값이 엔진이 만든 seq 와 같다', () => {

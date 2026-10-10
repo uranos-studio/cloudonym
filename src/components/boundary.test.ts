@@ -13,6 +13,7 @@ const ALLOWED = [
   /^lucide-react$/,
   /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes|catalog)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 · catalog 조회 (D37 · D40 · D54)
   /^(?:\.\.?\/)+core\/(?:regions|regions-data)$/,     // 지역 표 · 지역 입력 풀이 — 지역 고르기 · 공유 hash 상한 (D49 · D50)
+  /^(?:\.\.?\/)+core\/tier$/,                        // tier 예약어 표(데이터) — 이름 안내의 Tiers 절 (D60)
   /^(?:\.\.?\/)+core\/wizard\/(?:plan|presets|attachments)$/, // 마법사 모델 검사 · 펼치기 · 프리셋 · 호환표 데이터 (D64 · D67)
   /^\.\/index\.css$/, /^\.\/App\.tsx$/,              // main.tsx 의 진입
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X

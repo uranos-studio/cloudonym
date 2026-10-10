@@ -1,4 +1,4 @@
-// /docs/naming — 이름 안내 (D57). 생성 TS(catalog · 지역 표 · 규칙 · 사전 · 버전)에서 namingDocModel 이 만든 절 아홉을 그린다.
+// /docs/naming — 이름 안내 (D57). 생성 TS(catalog · 지역 표 · 규칙 · 프리셋 · 호환표 · 예약어 · 사전 · 버전)에서 namingDocModel 이 만든 절 열둘을 그린다.
 // 넓은 표는 자기 상자 안에서 가로로 흐른다 — 360px 에서 페이지 가로 스크롤이 생기지 않는다
 import { DocPage } from './DocPage';
 import { en } from '../messages/en';
@@ -7,6 +7,9 @@ import { REGIONS } from '../core/regions-data';
 import { buildTree } from '../core/tree';
 import { ENABLED_PROVIDERS } from '../core/types';
 import { VERSION } from '../version';
+import { PRESETS } from '../core/wizard/presets';
+import { ATTACHMENTS } from '../core/wizard/attachments';
+import { RESERVED_TIERS } from '../core/tier';
 import { treeRules } from './selection';
 import { namingDocModel, type DocSection, type DocTable } from './namingDocModel';
 
@@ -59,6 +62,7 @@ export function NamingDoc() {
   const provider = ENABLED_PROVIDERS[0]!;
   const model = namingDocModel({
     provider, catalog: catalogFor(provider), regions: REGIONS[provider], rules: treeRules(buildTree(provider)), messages: en, version: VERSION,
+    presets: PRESETS, attachments: ATTACHMENTS, reservedTiers: RESERVED_TIERS,
   });
   return (
     <DocPage title={en.ui.doc_title}>
