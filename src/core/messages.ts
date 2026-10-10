@@ -34,6 +34,12 @@ export const MESSAGE_CODES = [
   'name.parent_invalid', 'name.parent_name',
   // wizard/attachments.ts checkAttachments (5)
   'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range', 'wizard.invalid_data_seq', 'wizard.duplicate_seq',
+  // wizard/plan.ts validatePlan (21)
+  'wizard.tier_reserved', 'wizard.invalid_tier', 'wizard.tier_not_supported', 'wizard.level_not_supported', 'wizard.reserved_pick',
+  'wizard.serverless_not_supported', 'wizard.instances_not_supported', 'wizard.duplicate_pick', 'wizard.empty', 'wizard.duplicate_service',
+  'wizard.reserved_service', 'wizard.empty_service', 'wizard.unknown_preset', 'wizard.count_below_min', 'wizard.ha_not_supported',
+  'wizard.too_many_names', 'wizard.too_many_services', 'wizard.too_many_picks', 'wizard.invalid_slot_id', 'wizard.duplicate_slot_id',
+  'wizard.invalid_seq',
 ] as const;
 
 export type CoreMessage =
@@ -115,7 +121,32 @@ export type CoreMessage =
   | { code: 'wizard.attach_out_of_range'; params: { index: number; max: number } }
   | { code: 'wizard.invalid_data_seq'; params: { index: number; value: string; pattern: string } }
   /** value 는 겹친 순번 — 디스크면 data/03 꼴 */
-  | { code: 'wizard.duplicate_seq'; params: { index: number; value: string } };
+  | { code: 'wizard.duplicate_seq'; params: { index: number; value: string } }
+  /** 마법사 모델 검사 (D60 · D61 · D63 · D64) — index 는 pick 의 자리(서비스 코드는 서비스의 자리). 위치는 validatePlan 이 path 로 싣는다 */
+  | { code: 'wizard.tier_reserved'; params: { index: number; value: string } }
+  | { code: 'wizard.invalid_tier'; params: { index: number; value: string; pattern: string } }
+  | { code: 'wizard.tier_not_supported'; params: { index: number; type: string } }
+  | { code: 'wizard.level_not_supported'; params: { index: number; type: string } }
+  | { code: 'wizard.reserved_pick'; params: { index: number; type: string } }
+  | { code: 'wizard.serverless_not_supported'; params: { index: number; type: string } }
+  | { code: 'wizard.instances_not_supported'; params: { index: number; type: string } }
+  /** value 는 겹친 항목 — type 또는 type/tier */
+  | { code: 'wizard.duplicate_pick'; params: { index: number; value: string } }
+  | { code: 'wizard.empty' }
+  /** value 는 정제 뒤 purpose */
+  | { code: 'wizard.duplicate_service'; params: { index: number; value: string } }
+  | { code: 'wizard.reserved_service'; params: { index: number; value: string } }
+  | { code: 'wizard.empty_service'; params: { index: number } }
+  | { code: 'wizard.unknown_preset'; params: { index: number; value: string; supported: string[] } }
+  | { code: 'wizard.count_below_min'; params: { index: number; min: number } }
+  | { code: 'wizard.ha_not_supported'; params: { index: number; type: string } }
+  | { code: 'wizard.too_many_names'; params: { max: number; actual: number } }
+  | { code: 'wizard.too_many_services'; params: { max: number; actual: number } }
+  /** index 는 서비스의 자리 — 프로젝트 공용 pick 이면 -1 (path 가 projectPicks) */
+  | { code: 'wizard.too_many_picks'; params: { index: number; max: number; actual: number } }
+  | { code: 'wizard.invalid_slot_id'; params: { index: number; value: string; pattern: string } }
+  | { code: 'wizard.duplicate_slot_id'; params: { index: number; value: string } }
+  | { code: 'wizard.invalid_seq'; params: { index: number; value: string; pattern: string } };
 
 export type CoreCode = CoreMessage['code'];
 

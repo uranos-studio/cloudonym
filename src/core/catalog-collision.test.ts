@@ -6,7 +6,9 @@ import { REGIONS } from './regions-data';
 import { RESERVED_TIERS } from './tier';
 import { TIER_PATTERN } from './types';
 import { rulesFor } from './constraints';
+import { ENV_ALIASES } from './normalize';
 import { ATTACH_KINDS } from './wizard/attachments';
+import { PRESET_TIERS } from './wizard/presets';
 
 /** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대) */
 const SHARED_SLUGS: Record<string, readonly string[]> = {
@@ -94,7 +96,6 @@ describe('catalog 겹침 검사 (D47)', () => {
 
 // ⑹ ⑺ 용도 토큰 tier · 딸린 것 접미 attach (D60 · D62) — tier 는 약어 · 종류 토큰 바로 뒤에 온다(…-{slug}[-{kind}]-{tier}-{seq}).
 // 접미는 호환표 데이터(wizard/attachments.ts)에서 읽는다. 프리셋 데이터는 뒤 작업이 들인다 — 그때까지 tier 목록이 기대값이다
-const PRESET_TIERS = ['web', 'was', 'bastion', 'file', 'ssh', 'icmp'];
 const ATTACH_SUFFIXES = [...ATTACH_KINDS];
 
 interface TierInput { tiers: readonly string[]; attach: readonly string[]; rows: readonly Pick<CatalogRow, 'key' | 'slug' | 'kind'>[]; regionCodes: readonly string[]; envValues: readonly string[] }
@@ -153,8 +154,8 @@ describe('RESERVED_TIERS — tier 로 쓸 수 없는 글자 (D60)', () => {
   it('넷 밖의 글자는 담지 않는다', () => {
     const slugs = GCP_CATALOG.map((r) => r.slug.value);
     const kinds = GCP_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {}));
-    // 환경 값은 글자로 적는다 — 옛 표준값 prd(지금은 prod 의 별칭)가 들어 있어야 한다
-    const envs = ['prod', 'prd', 'stg', 'dev', 'sbx'];
+    // 환경은 문맥 파서가 받는 별칭 전부(표준값 · prd · production · live …) — 별칭 표에서 센다
+    const envs = Object.keys(ENV_ALIASES);
     const expected = new Set([...slugs, ...kinds, ...envs, ...regionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
     expect([...RESERVED_TIERS].sort()).toEqual([...expected].sort());
   });

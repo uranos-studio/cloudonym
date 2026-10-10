@@ -35,6 +35,27 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'wizard.attach_out_of_range': { code: 'wizard.attach_out_of_range', params: { index: 2, max: 9 } },
   'wizard.invalid_data_seq': { code: 'wizard.invalid_data_seq', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
   'wizard.duplicate_seq': { code: 'wizard.duplicate_seq', params: { index: 2, value: 'BBB' } },
+  'wizard.tier_reserved': { code: 'wizard.tier_reserved', params: { index: 2, value: 'BBB' } },
+  'wizard.invalid_tier': { code: 'wizard.invalid_tier', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
+  'wizard.tier_not_supported': { code: 'wizard.tier_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.level_not_supported': { code: 'wizard.level_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.reserved_pick': { code: 'wizard.reserved_pick', params: { index: 2, type: 'AAA' } },
+  'wizard.serverless_not_supported': { code: 'wizard.serverless_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.instances_not_supported': { code: 'wizard.instances_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.duplicate_pick': { code: 'wizard.duplicate_pick', params: { index: 2, value: 'BBB' } },
+  'wizard.empty': { code: 'wizard.empty' },
+  'wizard.duplicate_service': { code: 'wizard.duplicate_service', params: { index: 2, value: 'BBB' } },
+  'wizard.reserved_service': { code: 'wizard.reserved_service', params: { index: 2, value: 'BBB' } },
+  'wizard.empty_service': { code: 'wizard.empty_service', params: { index: 2 } },
+  'wizard.unknown_preset': { code: 'wizard.unknown_preset', params: { index: 2, value: 'BBB', supported: ['CCC', 'DDD'] } },
+  'wizard.count_below_min': { code: 'wizard.count_below_min', params: { index: 2, min: 2 } },
+  'wizard.ha_not_supported': { code: 'wizard.ha_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.too_many_names': { code: 'wizard.too_many_names', params: { max: 200, actual: 201 } },
+  'wizard.too_many_services': { code: 'wizard.too_many_services', params: { max: 20, actual: 21 } },
+  'wizard.too_many_picks': { code: 'wizard.too_many_picks', params: { index: 2, max: 20, actual: 21 } },
+  'wizard.invalid_slot_id': { code: 'wizard.invalid_slot_id', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
+  'wizard.duplicate_slot_id': { code: 'wizard.duplicate_slot_id', params: { index: 2, value: 'BBB' } },
+  'wizard.invalid_seq': { code: 'wizard.invalid_seq', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
   'rule.unknown_resource_type': { code: 'rule.unknown_resource_type', params: { provider: 'AAA', supported: ['CCC', 'DDD'] } },
   'context.not_string': { code: 'context.not_string', field: 'owner' },
   'context.empty': { code: 'context.empty', field: 'owner' },
@@ -107,7 +128,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(87);
+    expect(codes).toHaveLength(108);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

@@ -61,6 +61,8 @@ describe('src/core/ 모듈 경계 — import 는 ./ 로만', () => {
     const rels = files.map((f) => relative(CORE_DIR, f));
     expect(rels.some((r) => r.includes('__fixtures__'))).toBe(false);
     expect(rels.some((r) => r.endsWith('.test.ts'))).toBe(false);
+    // 마법사 로직(wizard/) 이 대상에 든다 — 그 import 도 src/core/ 안에 머물러야 한다
+    for (const f of ['attachments.ts', 'plan.ts', 'presets.ts']) expect(rels).toContain(join('wizard', f));
   });
 
   it(`대상 파일이 10개 이상 있다 (현재 ${files.length}개)`, () => {
