@@ -281,6 +281,8 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     expect(samples.find((x) => x.id === 'wizard-ok')!.body.data.gcp.items).toHaveLength(14);
     expect(samples.find((x) => x.id === 'wizard-conflict')!.body.data.gcp.valid).toBe(false);
     expect(validatorFor('WizardRequest')(WIZARD_WIRE_SAMPLE)).toBe(true);
+    // custom pick(preset null + rule) · ha null · serverless null 도 요청 스키마에 맞는다
+    expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, services: [{ purpose: 'shop', picks: [{ preset: null, rule: 'gcp.cloud_function', ha: null, serverless: null, instances: [{ id: 'a', seq: '01' }] }] }] })).toBe(true);
     expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, extra: 1 })).toBe(false);
     expect(validatorFor('WizardResponse')({ ...samples.find((x) => x.id === 'wizard-ok')!.body, extra: 1 })).toBe(false);
   });
