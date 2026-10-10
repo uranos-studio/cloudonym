@@ -340,6 +340,18 @@ describe('POST /v1/wizard (D66)', () => {
   };
   const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
 
+  it('examples/terraform/wizard.json — README 의 curl 요청과 같고 · 200 · 예시 README 가 적은 키와 이름이 나온다', async () => {
+    const root = join(import.meta.dirname, '..', '..');
+    const body = JSON.parse(readFileSync(join(root, 'examples', 'terraform', 'wizard.json'), 'utf-8')) as unknown;
+    const curl = /POST https:\/\/<your-deployment>\/v1\/wizard[^\n]*\n\s*-d '([^']+)'/.exec(readFileSync(join(root, 'README.md'), 'utf-8'));
+    expect(curl, 'README 의 /v1/wizard curl 예시').not.toBeNull();
+    expect(body).toEqual(JSON.parse(curl![1]!));
+    const g = await itemsOf(body);
+    expect(g.valid).toBe(true);
+    expect(g.items.find((i) => i.key === 'service/shop/compute_instance/web/01/data/01')?.name).toBe('billing-shop-prod-ane3-gce-web-01-data-01');
+    expect(readFileSync(join(root, 'examples', 'terraform', 'README.md'), 'utf-8')).toContain('file("${path.module}/wizard.json")');
+  });
+
   it('라우트 · CORS — POST /v1/wizard 가 있고 OPTIONS 는 204 + *', async () => {
     expect(app.routes.map((r) => `${r.method} ${r.path}`)).toContain('POST /v1/wizard');
     const { res } = await req(app, '/v1/wizard', { method: 'OPTIONS' });

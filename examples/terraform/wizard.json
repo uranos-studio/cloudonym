@@ -1,0 +1,71 @@
+{
+  "provider": "gcp",
+  "project": {
+    "owner": "platform",
+    "system": "billing",
+    "env": "prod",
+    "region": "asia-northeast3"
+  },
+  "project_picks": [
+    {
+      "preset": "vpc",
+      "instances": [
+        {
+          "id": "n1",
+          "seq": "01"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "purpose": "shop",
+      "picks": [
+        {
+          "preset": "web",
+          "instances": [
+            {
+              "id": "a",
+              "seq": "01",
+              "attach": {
+                "boot": true,
+                "data": [
+                  "01"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "preset": "db",
+          "kind": "POSTGRES",
+          "instances": [
+            {
+              "id": "b",
+              "seq": "01"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "purpose": "pay",
+      "picks": [
+        {
+          "preset": "web",
+          "ha": true,
+          "instances": [
+            {
+              "id": "c",
+              "seq": "01"
+            },
+            {
+              "id": "d",
+              "seq": "02"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
