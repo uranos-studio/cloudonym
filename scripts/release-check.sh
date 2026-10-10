@@ -29,6 +29,10 @@ done
 # 새 빌드에 보내 값을 다시 적는다(조용히 통과하지 않는다)
 NAMES_REQUEST='{"provider":"gcp","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"},"resources":[{"type":"vpc_network"},{"type":"storage_bucket"},{"type":"service_account","role":"db"}]}'
 NAMES_EXPECTED='{"service_account_db":"payments-batch-prod-sa-db","storage_bucket":"platform-payments-batch-prod-gcs","vpc_network_01":"payments-batch-prod-vpc-01"}'
+# /v1/wizard 의 기대 항목(순서 그대로 key=name) — 규칙 버전 2026-10-10.7 의 엔진 출력이다. 프로젝트 ID 가 먼저, 서비스마다 부모 뒤에 딸린 것.
+# 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을 새 빌드에 보내 값을 다시 적는다
+WIZARD_REQUEST='{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]}]},{"purpose":"pay","picks":[{"preset":"web","instances":[{"id":"b","seq":"01","attach":{"boot":true}}]}]}]}'
+WIZARD_EXPECTED='["project/-/project_id/-/-=platform-billing-prod","service/shop/compute_instance/web/01=billing-shop-prod-ane3-gce-web-01","service/shop/compute_instance/web/01/boot/-=billing-shop-prod-ane3-gce-web-01-boot","service/shop/compute_instance/web/01/data/01=billing-shop-prod-ane3-gce-web-01-data-01","service/pay/compute_instance/web/01=billing-pay-prod-ane3-gce-web-01","service/pay/compute_instance/web/01/boot/-=billing-pay-prod-ane3-gce-web-01-boot"]'
 VALIDATE_REQUEST='{"provider":"gcp","resource_type":"storage_bucket","name":"payments-prod-bucket"}'
 # public/_headers 의 CSP 와 같은 글자다
 CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
@@ -103,15 +107,15 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_gcp} '### GCP' sections, no AWS or Azure)"; fi
 fi
 
-# 3. /catalog.json — 200 · provider 는 gcp 하나 · 100행
+# 3. /catalog.json — 200 · provider 는 gcp 하나 · 101행(run_service 를 더했다 — D65)
 name='GET /catalog.json'
 code="$(fetch GET /catalog.json)"
 if expect_status "${name}" "${code}" 200; then
   providers="$(jq -c '.providers | keys' "${body}" 2>/dev/null)"
   rows="$(jq '.providers.gcp.rows | length' "${body}" 2>/dev/null)"
   if [ "${providers}" != '["gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
-  elif [ "${rows}" != "100" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 100"
-  else pass "${name} (providers [\"gcp\"], 100 rows)"; fi
+  elif [ "${rows}" != "101" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 101"
+  else pass "${name} (providers [\"gcp\"], 101 rows)"; fi
 fi
 
 # 4. /openapi.json — provider enum 셋이 모두 ["gcp"]
@@ -152,6 +156,17 @@ if expect_status "${name}" "${code}" 200; then
   if [ "${valid}" != "true" ]; then fail "${name}" "data.gcp.valid is ${valid:-<none>}"
   elif [ "${got}" != "${NAMES_EXPECTED}" ]; then fail "${name}" "names ${got:-<none>}, expected ${NAMES_EXPECTED}"
   else pass "${name} (3 names exact)"; fi
+fi
+
+# 6b. POST /v1/wizard — 대표 요청 하나(서비스 둘 · web VM · boot · data): 항목 여섯의 순서 · key · 이름 글자 그대로
+name='POST /v1/wizard'
+code="$(fetch POST /v1/wizard -H 'content-type: application/json' --data "${WIZARD_REQUEST}")"
+if expect_status "${name}" "${code}" 200; then
+  valid="$(jq '.data.gcp.valid' "${body}" 2>/dev/null)"
+  got="$(jq -c '[.data.gcp.items[] | "\(.key)=\(.name)"]' "${body}" 2>/dev/null)"
+  if [ "${valid}" != "true" ]; then fail "${name}" "data.gcp.valid is ${valid:-<none>}"
+  elif [ "${got}" != "${WIZARD_EXPECTED}" ]; then fail "${name}" "items ${got:-<none>}, expected ${WIZARD_EXPECTED}"
+  else pass "${name} (6 items exact, in order)"; fi
 fi
 
 # 7. OPTIONS /v1/names — preflight 204 · CORS 셋(요청 헤더를 보내야 Allow-Headers 가 의미가 있다)
