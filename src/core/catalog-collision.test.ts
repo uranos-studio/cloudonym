@@ -152,7 +152,9 @@ describe('RESERVED_TIERS — tier 로 쓸 수 없는 글자 (D60)', () => {
   it('넷 밖의 글자는 담지 않는다', () => {
     const slugs = GCP_CATALOG.map((r) => r.slug.value);
     const kinds = GCP_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {}));
-    const expected = new Set([...slugs, ...kinds, ...ENV_VALUES, ...regionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
+    // 환경 값은 글자로 적는다 — 옛 표준값 prd(지금은 prod 의 별칭)가 들어 있어야 한다
+    const envs = ['prod', 'prd', 'stg', 'dev', 'sbx'];
+    const expected = new Set([...slugs, ...kinds, ...envs, ...regionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
     expect([...RESERVED_TIERS].sort()).toEqual([...expected].sort());
   });
 });

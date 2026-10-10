@@ -37,8 +37,9 @@ function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, ex
 
   // 필수 토큰이 정제 뒤 비면 compose 가 건너뛰어 엉뚱한 「유효」 이름이 나온다. 만들지 않는다.
   // 종류 자리는 비는 것이 정상이다 — 종류를 주지 않았거나 기본값이면 토큰이 없다 (D52). 필수 종류는 아래 kind_required 가 본다.
-  // 용도 자리도 같다 — tier 를 주지 않으면 빈 토큰이다 (D60). 프로젝트 수준 항목에는 purpose 자리가 없다 (D63)
-  const emptied = rule.template.filter((t) => t !== 'kind' && t !== 'tier' && !(t === 'purpose' && extra.level === 'project')
+  // 용도 자리는 주지 않았을 때만 비어도 된다 (D60) — 준 tier 가 정제 뒤 비면 빈 토큰이다(떼고 유효로 내지 않는다).
+  // 프로젝트 수준 항목에는 purpose 자리가 없다 (D63)
+  const emptied = rule.template.filter((t) => t !== 'kind' && !(t === 'tier' && extra.tier === undefined) && !(t === 'purpose' && extra.level === 'project')
                                              && !rule.optional.includes(t) && !values[t]);
   if (emptied.length > 0) {
     return { ...base, name: '', valid: false, isTruncated: false, violations: emptied.map((t): CoreMessage => ({ code: 'name.token_empty', field: t })), steps };
@@ -56,8 +57,11 @@ function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, ex
 
 /** 항목 하나의 이름 — 용도 토큰 · 프로젝트 수준을 받는 진입점 (D60 · D63). 충돌 검사는 하지 않는다(부르는 쪽이 요청 전체로 한다).
  *  extra 가 없으면 generate 의 그 규칙 결과와 같다(충돌 표시 전). generateMany 는 이 함수를 거치지 않는다 — 옛 경로 그대로다.
- *  선택은 부르는 쪽이 검사한 것이다 — 허용 밖 종류는 던진다 */
+ *  입력은 부르는 쪽이 이미 검사한 것이다 — tier 꼴(TIER_PATTERN) · 예약어 · level 을 받는 규칙인지는 마법사 모델의 검사가 본다.
+ *  여기서는 조용히 버리지 않는다: 허용 밖 종류 · tier 자리가 없는 규칙(순번 없는 규칙)의 tier 는 던진다 — 이름에 들지 않은 tier 가
+ *  항목에 실려 나가는 일이 없다. 준 tier 가 정제 뒤 비면 name.token_empty(field tier) 로 valid:false 다 */
 export function generateItem(ctx: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+  if (extra.tier !== undefined && !rule.template.includes('tier')) throw new Error(`tier not supported: ${rule.id}`);
   return generateOne(ctx, rule, extra);
 }
 

@@ -136,7 +136,7 @@ export function baselineItems(): { id: string; parse?: { ok: boolean; errors: nu
     s('tier-was-seq2', 'compute_instance', { tier: 'was', seq: '02' }),
     s('tier-none-shop-web', 'compute_instance', {}, 'shop-web'),
     s('tier-kind-sql-pg-rpt', 'cloud_sql_instance', { kind: 'POSTGRES', tier: 'rpt' }),
-    s('tier-on-bucket-ignored', 'storage_bucket', { tier: 'web' }),
+    s('tier-empty-after-normalize', 'compute_instance', { tier: '!!!' }),
     s('tier-16-purpose-60', 'compute_instance', { tier: 'x'.repeat(16) }, 'a'.repeat(60)),
     s('tier-16-hyphen-purpose-shortened', 'compute_instance', { tier: 'x'.repeat(16) }, 'reconciliation-'.repeat(4) + 'end'),
     p('project-vpc', 'vpc_network', {}),

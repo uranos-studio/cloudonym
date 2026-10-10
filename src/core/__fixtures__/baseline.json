@@ -215771,13 +215771,13 @@
         "steps": 0
       },
       {
-        "id": "tier-on-bucket-ignored",
-        "name": "platform-billing-shop-prod-gcs",
-        "valid": true,
+        "id": "tier-empty-after-normalize",
+        "name": "",
+        "valid": false,
         "isTruncated": false,
-        "original": "platform-billing-shop-prod-gcs",
-        "violations": 0,
-        "steps": 0
+        "original": "billing-shop-prod-ane3-gce-!!!-01",
+        "violations": 1,
+        "steps": 1
       },
       {
         "id": "tier-16-purpose-60",

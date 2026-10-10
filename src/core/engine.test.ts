@@ -471,8 +471,15 @@ describe('parseProjectContext · generateItem — 용도 토큰 · 프로젝트 
     const r = generateItem({ ...parsed(), purpose: '' }, vm(), { tier: 'web' });
     expect(r).toMatchObject({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'purpose' }] });
   });
-  it('generateItem — tier 가 정제 뒤 비어도 빈 토큰 오류가 아니다(빈 tier = 없음)', () => {
-    expect(generateItem(parsed(), vm(), { tier: '' })).toMatchObject({ name: 'billing-shop-prod-ane3-gce-01', valid: true });
+  it('generateItem — 준 tier 가 정제 뒤 비면 name.token_empty(tier) · valid:false — 떼고 유효로 내지 않는다', () => {
+    for (const tier of ['!!!', '', '   ']) {
+      expect(generateItem(parsed(), vm(), { tier }), JSON.stringify(tier)).toMatchObject({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'tier' }] });
+    }
+  });
+  it('generateItem — tier 자리가 없는 규칙(순번 없음)에 tier 를 주면 던진다 — 조용히 버리지 않는다', () => {
+    expect(() => generateItem(parsed(), getRule('gcp', 'storage_bucket')!, { tier: 'web' })).toThrow(/storage_bucket/);
+    expect(() => generateItem(parsed(), getRule('gcp', 'service_account')!, { tier: 'web' })).toThrow(/service_account/);
+    expect(generateItem(parsed(), getRule('gcp', 'storage_bucket')!, {})).toMatchObject({ valid: true });
   });
 
   it('같은 서비스의 web · was 는 다른 이름이라 충돌하지 않는다 · tier 가 없으면 충돌한다', () => {
@@ -499,7 +506,10 @@ describe('parseProjectContext · generateItem — 용도 토큰 · 프로젝트 
     const r = generateItem({ ...parsed(), purpose: 'a'.repeat(60) }, vm(), { tier: 'x'.repeat(16) });
     expect(r).toMatchObject({ name: 'billing-aaaaaaaaaaaaaaaa-prod-gce-xxxxxxxxxxxxxxxx-01', valid: true, isTruncated: true });
     expect(r.steps).toContainEqual({ code: 'step.token_dropped', field: 'region' });
-    expect(r.steps.some((s) => s.code === 'step.budget_shortened')).toBe(true);
+    // 균등 예산 단계에는 field 가 없다(토큰 전체에 건다) — 줄어든 것이 purpose 하나임을 이름 조각으로 센다
+    expect(r.steps).toContainEqual({ code: 'step.budget_shortened', params: { budget: 16 } });
+    expect(r.name.split('-')[1]).toBe('a'.repeat(16));
+    expect(r.name.split('-').filter((p, i) => p !== ['billing', 'a'.repeat(60), 'prod', 'gce', 'x'.repeat(16), '01'][i])).toEqual(['a'.repeat(16)]);
     expect(r.steps.filter((s) => 'field' in s && s.field === 'tier')).toEqual([]);
   });
 });
