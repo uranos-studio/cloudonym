@@ -196,3 +196,17 @@ describe('2026-10-06 추가 11종 — 경계 넷과 문서 문장의 판정', ()
     }
   });
 });
+
+describe('Cloud Run 서비스 경계 (D65)', () => {
+  const r = RULES['gcp.run_service']!;
+  it('a · 49자 통과', () => {
+    expect(checkName('a', r)).toEqual([]);
+    expect(checkName(`a${'b'.repeat(48)}`, r)).toEqual([]);
+  });
+  it('50자 거부', () => {
+    expect(checkName(`a${'b'.repeat(49)}`, r)).toContainEqual({ code: 'name.too_long', params: { actual: 50, max: 49 } });
+  });
+  it.each(['a-', 'A', 'a_b', '1a', '-a'])('%s 거부', (bad) => {
+    expect(checkName(bad, r)).not.toEqual([]);
+  });
+});

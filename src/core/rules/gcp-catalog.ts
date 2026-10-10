@@ -3551,6 +3551,42 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     ]
   },
   {
+    "key": "gcp.run_service",
+    "displayName": "Cloud Run Service",
+    "category": "compute",
+    "rules": {
+      "gcp.run_service": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "run",
+      "basis": "Product name (Cloud Run) and the gcloud command group (gcloud run); principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-10)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Run service; lowercase letters, digits and hyphens, at most 49 characters, unique per region and project. The name cannot be changed later and is publicly visible.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud run deploy"
+      ],
+      "terraform": [
+        "google_cloud_run_v2_service.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloud_run_v2_service",
+      "google_cloud_run_service",
+      "cloud run",
+      "run"
+    ]
+  },
+  {
     "key": "gcp.iam_oauth_client",
     "displayName": "IAM OAuth Client",
     "category": "identity",

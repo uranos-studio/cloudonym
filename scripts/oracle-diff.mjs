@@ -2,6 +2,8 @@
 // old 는 오라클(wire-before-wizard.json)에서, new 는 지금 코드의 출력(wire-compat.test.ts 가 WIRE_COMPAT_DUMP 로 내보낸 스냅숏)에서 그대로 옮긴다.
 // 허용하는 자리는 존 규칙 14종(D50 revised)의 항목뿐이다 — wire 항목 · HCL 줄 · 내보내기 JSON 항목, 그리고 항목이 아닌 자리 둘:
 // 지역 정규화 기록(/metadata/transformed/<i> — to · message 가 존 코드에서 리전 코드로) · names 응답의 전체 판정(/data/gcp/valid — 항목 판정의 논리곱).
+// 예외 ②(D65 · T4) — 더한 규칙(ADDED_TYPES)이 generate:*:gcp 응답에 항목 하나로 늘고(old null), names-400 표본의 /supported 목록에
+// 그 규칙 이름이 끼어든다(옛 목록의 순서는 그대로).
 // 그 밖의 자리가 하나라도 다르면 줄을 쓰지 않고 실패한다(exit 1) — 허용 차분으로 회귀를 덮지 않는다.
 // 사용: node scripts/oracle-diff.mjs --write  (줄을 뽑아 wire-allowed-diff.json 을 다시 쓴다 — 오라클 fixture 는 건드리지 않는다)
 //       node scripts/oracle-diff.mjs --check  (쓰지 않고, 뽑은 줄이 파일과 같은지만 본다)
@@ -23,6 +25,8 @@ export const ZONE_RULES = [
   'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group',
 ];
 const ZONAL = new Set(ZONE_RULES);
+/** 예외 ②(D65) — T4 가 더한 규칙 (wire-compat.test.ts 의 T4_ADDED_TYPES 와 같다) */
+export const ADDED_TYPES = ['run_service'];
 /** 존 규칙 항목 안에서 바뀌어도 되는 칸 — 이름이 존 코드에서 리전 코드로 · zone_required 가 이름으로 바뀌며 따라 바뀌는 것 */
 const ITEM_FIELDS = new Set(['name', 'valid', 'violations', 'steps', 'original', 'is_truncated', 'is_transformed', 'kind_token']);
 
@@ -92,6 +96,15 @@ export function deriveRows(oracle, actual) {
   for (const sample of Object.keys(oracle.wire)) {
     const o = clone(oracle.wire[sample]);
     const a = clone(actual.wire[sample]);
+    // 예외 ② — generate gcp 응답에 더한 규칙의 항목이 는다. 오라클에 이미 있거나 지금 출력에 없으면 문제다
+    if (/^generate:[^:]+:gcp$/.test(sample) && a.status === 200) {
+      for (const key of ADDED_TYPES) {
+        const ov = wireItem(o.body, sample, key, true);
+        const av = wireItem(a.body, sample, key, true);
+        if (ov !== undefined || av === undefined) { problems.push(`wire ${sample} ${key}: the added rule is not a new item`); continue; }
+        rows.push({ sample, key, kind: 'wire', old: null, new: av });
+      }
+    }
     const keys = zonalKeys(sample, o.body, a.body);
     for (const key of keys) {
       const ov = wireItem(o.body, sample, key, true);
@@ -118,7 +131,8 @@ export function deriveRows(oracle, actual) {
     for (const ptr of diffPointers(o.body, a.body)) {
       const normSample = /^generate:[^:]+:gcp$/.test(sample) || sample.startsWith('names:');
       const tr = normSample ? /^\/metadata\/transformed\/(\d+)(\/|$)/.exec(ptr) : null;
-      const site = tr ? `/metadata/transformed/${tr[1]}` : ptr === '/data/gcp/valid' && sample.startsWith('names:') ? ptr : undefined;
+      const sup = sample.startsWith('names-400:') && /^\/supported(\/|$)/.test(ptr);
+      const site = tr ? `/metadata/transformed/${tr[1]}` : ptr === '/data/gcp/valid' && sample.startsWith('names:') ? ptr : sup ? '/supported' : undefined;
       if (!site) { problems.push(`wire ${sample} ${ptr} differs outside the zonal rules`); continue; }
       if (seen.has(site)) continue;
       seen.add(site);
@@ -128,6 +142,11 @@ export function deriveRows(oracle, actual) {
       if (tr && (!isRegionNorm(ov) || !isRegionNorm(av))) {
         problems.push(`wire ${sample} ${site} is not a region normalisation entry`);
         continue;
+      }
+      if (sup) {
+        const kept = Array.isArray(av) ? av.filter((t) => !ADDED_TYPES.includes(t)) : null;
+        const added = Array.isArray(av) ? av.filter((t) => ADDED_TYPES.includes(t)).sort() : null;
+        if (!same(kept, ov) || !same(added, [...ADDED_TYPES].sort())) { problems.push(`wire ${sample} /supported is not the old list plus the added rules`); continue; }
       }
       rows.push({ sample, path: site, old: ov ?? null, new: av ?? null });
     }

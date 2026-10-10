@@ -111,7 +111,7 @@ const SUPPORT_SCOPE: [string, string[] | null][] = [
   ['cloudfunctions.googleapis.com/CloudFunction', ['cloudfunctions.v1.functions']],
   ['cloudfunctions.googleapis.com/Function', ['cloudfunctions.v2.functions']],
   ['run.googleapis.com/Job', null],
-  ['run.googleapis.com/Service', null],
+  ['run.googleapis.com/Service', ['run.services']],
   ['run.googleapis.com/WorkerPool', null],
   ['run.googleapis.com/Execution', null],
   ['run.googleapis.com/Revision', null],
@@ -215,7 +215,7 @@ describe('들인 GCP 행 — 원문 스냅샷과 대조', () => {
     expect(missing).toEqual([]);
     // 표에는 지원 범위 밖 유형이 없다
     expect([...tableTypes].filter((t) => !SUPPORT_SCOPE.some(([s]) => s === t))).toEqual([]);
-    expect(SUPPORT_SCOPE.filter(([, e]) => e === null)).toHaveLength(26);
+    expect(SUPPORT_SCOPE.filter(([, e]) => e === null)).toHaveLength(25);
   });
 
   it('resourceType 은 GCP 안에서 유일하고 40자 이하다', () => {

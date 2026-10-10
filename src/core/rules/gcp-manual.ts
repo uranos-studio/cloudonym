@@ -19,6 +19,7 @@ const GCP_PREFIX = { prefixes: ['gcp-'] };
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
 const ADVISORY: CoreMessage = { code: 'note.advisory_rule_enforced' };
+const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
 
 const PLACED: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
@@ -100,6 +101,16 @@ const RULES: ResourceRule[] = [
   // 두 원문의 교집합 — 대문자 · 밑줄 · 4자 미만을 더 거부한다
   rule({ id: 'gcp.cloud_function', displayName: 'Cloud Function (2nd gen)', slug: 'fn', minLength: 4, maxLength: 63, pattern: /^[a-z][a-z0-9-]{2,61}[a-z0-9]$/,
     scope: 'gcp:project_location', entity: 'cloudfunctions.v2.functions', category: 'compute', docUrl: 'https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions/create', notes: [NARROWER, SCOPE] }),
+
+  // ── Cloud Run (D65) ──
+  // REST v2 services.create serviceId "It must begin with letter, and cannot end with hyphen; must contain fewer than 50 characters."
+  // 배포 안내서 (https://docs.cloud.google.com/run/docs/deploying) "Service names must be 49 characters or less and must be unique per region and project."
+  // 두 쪽 모두 문자 집합을 적지 않는다 — 보조 출처: Cloud Service Mesh 의 Cloud Run API 참조 CloudRunBackend.service
+  // (https://docs.cloud.google.com/service-mesh/v1.28/docs/cloud-run-api-reference#gcpbackend-api) "CloudRun service name. Must be between 1 and 49 characters, follow a specific pattern, and consist only of lowercase letters, hyphens, and numbers."
+  // 「a specific pattern」은 적혀 있지 않아 RFC 1035 꼴(소문자로 시작 · 영숫자로 끝)로 잡는다 — 한 글자 a 도 통과(적힌 최소 1)
+  rule({ id: 'gcp.run_service', displayName: 'Cloud Run Service', slug: 'run', minLength: 1, maxLength: 49, pattern: /^[a-z]([a-z0-9-]*[a-z0-9])?$/,
+    scope: 'gcp:project_location', entity: 'run.services', category: 'compute', docUrl: 'https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create',
+    uniquenessDocUrl: 'https://docs.cloud.google.com/run/docs/deploying', notes: [SECONDARY] }),
 
   // ── IAM ──
   // "This value should be a string of 6 to 63 lowercase letters, digits, or hyphens. It must start with a letter, and cannot have a trailing hyphen. The prefix `gcp-` is reserved for use by Google, and may not be specified."

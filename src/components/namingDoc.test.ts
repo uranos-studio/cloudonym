@@ -55,8 +55,8 @@ describe('namingDocModel', () => {
     expect(text).not.toContain('<tier>');
     expect(text).not.toMatch(/\btier\b/);
   });
-  it('실제 데이터 — 약어 100행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 아홉', () => {
-    expect(rowsOf(model, 'abbreviations')).toHaveLength(100);
+  it('실제 데이터 — 약어 101행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 아홉', () => {
+    expect(rowsOf(model, 'abbreviations')).toHaveLength(101);
     expect(rowsOf(model, 'regions')).toHaveLength(43);
     expect(rowsOf(model, 'kinds')).toHaveLength(19);
     expect(rowsOf(model, 'env').map((r) => r.cells[0])).toEqual([...ENV_VALUES]);

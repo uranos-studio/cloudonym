@@ -2519,6 +2519,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "billing-trade-prod-ane3-oc-01",
             "valid": true,
@@ -8604,6 +8613,15 @@
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gcf-01",
             "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
             "steps": 0
           },
           "iam_oauth_client": {
@@ -14693,6 +14711,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "billing-trade-prod-ane3-oc-01",
             "valid": true,
@@ -20778,6 +20805,15 @@
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gcf-01",
             "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
             "steps": 0
           },
           "iam_oauth_client": {
@@ -26867,6 +26903,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "windows-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "windows-trade-prod-ane3-oc-01",
             "valid": true,
@@ -32952,6 +32997,15 @@
             "isTransformed": false,
             "original": "google-trade-prod-ane3-gcf-01",
             "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "google-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-run-01",
+            "violations": 0,
             "steps": 0
           },
           "iam_oauth_client": {
@@ -39041,6 +39095,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "azure-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "azure-trade-prod-ane3-oc-01",
             "valid": true,
@@ -45125,6 +45188,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-gcf-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "run_service": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-run-01",
             "violations": 1,
             "steps": 1
           },
@@ -51215,6 +51287,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "paymentsettlement-reconciliation-dev-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "paymentsettlement-reconciliation-dev-oc-01",
             "valid": true,
@@ -57302,6 +57383,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "a-long-longpurpose-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "a-long-longpurpose-prod-ane3-oc-01",
             "valid": true,
@@ -63386,6 +63476,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "3tier-trade-prod-ane3-gcf-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "3tier-trade-prod-ane3-run-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-run-01",
             "violations": 1,
             "steps": 0
           },
@@ -69476,6 +69575,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "billing-trade-prod-ane3-oc-01",
             "valid": true,
@@ -75561,6 +75669,15 @@
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gcf-01",
             "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
             "steps": 0
           },
           "iam_oauth_client": {
@@ -81650,6 +81767,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "billing-trade-prod-ane3-oc-01",
             "valid": true,
@@ -87737,6 +87863,15 @@
             "violations": 1,
             "steps": 0
           },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
+            "steps": 0
+          },
           "iam_oauth_client": {
             "name": "billing-trade-prod-ane3-oc-01",
             "valid": true,
@@ -92346,6 +92481,15 @@
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gcf-01",
             "violations": 1,
+            "steps": 0
+          },
+          "run_service": {
+            "name": "billing-trade-prod-ane3-run-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-run-01",
+            "violations": 0,
             "steps": 0
           },
           "iam_oauth_client": {
@@ -212470,6 +212614,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "run_service",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "secret",
         "name": "",
         "known": true,
@@ -216348,6 +216600,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -217048,6 +217301,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -217742,6 +217996,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -218443,6 +218698,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -219143,6 +219399,7 @@
           "gcp_spanner_backup = \"windows-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"windows-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"windows-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"windows-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"windows-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"windows-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"windows-trade-prod-ane3-pb-01\"",
@@ -219841,6 +220098,7 @@
           "gcp_spanner_backup = \"google-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"google-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"google-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"google-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"google-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"google-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"google-trade-prod-ane3-pb-01\"",
@@ -220543,6 +220801,7 @@
           "gcp_spanner_backup = \"azure-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"azure-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"azure-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"azure-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"azure-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"azure-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"azure-trade-prod-ane3-pb-01\"",
@@ -221262,6 +221521,7 @@
           "# INVALID: gcp_artifact_registry_rule",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
+          "# INVALID: gcp_run_service",
           "# INVALID: gcp_iam_oauth_client",
           "# INVALID: gcp_iam_oauth_client_credential",
           "# INVALID: gcp_iam_policy_binding",
@@ -221943,6 +222203,7 @@
           "gcp_spanner_backup = \"paymentsettlement-reconciliation-dev-bkp-01\"",
           "gcp_gke_cluster = \"paymentsettlem-reconciliation-dev-gke-01\"",
           "gcp_artifact_registry_rule = \"paymentsettlement-reconciliation-dev-rule-01\"",
+          "gcp_run_service = \"paymentsettlement-reconciliation-dev-run-01\"",
           "gcp_iam_oauth_client = \"paymentsettlement-reconciliation-dev-oc-01\"",
           "gcp_iam_oauth_client_credential = \"paymentset-reconcilia-dev-occ-01\"",
           "gcp_iam_policy_binding = \"paymentsettlement-reconciliation-dev-pb-01\"",
@@ -222643,6 +222904,7 @@
           "gcp_spanner_backup = \"a-long-longpurpose-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"a-long-longpurpose-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"a-long-longpurpose-prod-ane3-rule-01\"",
+          "gcp_run_service = \"a-long-longpurpose-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"a-long-longpurpose-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"a-long-longpurpose-prod-occ-01\"",
           "gcp_iam_policy_binding = \"a-long-longpurpose-prod-ane3-pb-01\"",
@@ -223691,6 +223953,7 @@
           "# INVALID: gcp_gke_cluster",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
+          "# INVALID: gcp_run_service",
           "# INVALID: gcp_iam_oauth_client",
           "# INVALID: gcp_iam_policy_binding",
           "# INVALID: gcp_iam_principal_access_boundary_policy",
@@ -224043,6 +224306,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -224732,6 +224996,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -225417,6 +225682,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -226118,6 +226384,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
@@ -226643,6 +226910,7 @@
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
           "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
           "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",

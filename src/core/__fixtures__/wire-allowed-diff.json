@@ -1,6 +1,35 @@
 [
   {
     "sample": "generate:base:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -697,6 +726,35 @@
   },
   {
     "sample": "generate:hangul-owner:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -1393,6 +1451,35 @@
   },
   {
     "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -2089,6 +2176,35 @@
   },
   {
     "sample": "generate:alias-env-region:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -2780,6 +2896,35 @@
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
         "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
       }
     }
   },
@@ -3481,6 +3626,35 @@
   },
   {
     "sample": "generate:reserved-google:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -4177,6 +4351,35 @@
   },
   {
     "sample": "generate:reserved-azure:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -4868,6 +5071,51 @@
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
         "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-run-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
       }
     }
   },
@@ -5933,6 +6181,35 @@
   },
   {
     "sample": "generate:long-values:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -6629,6 +6906,35 @@
   },
   {
     "sample": "generate:shrink-fail:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -7320,6 +7626,40 @@
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
         "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-run-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-run-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
       }
     }
   },
@@ -8091,6 +8431,35 @@
   },
   {
     "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -8787,6 +9156,35 @@
   },
   {
     "sample": "generate:label-gcp-transform:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -9478,6 +9876,35 @@
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
         "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "run_service",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-run-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-run-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 49,
+        "pattern": "^[a-z]([a-z0-9-]*[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create",
+        "notes": [
+          {
+            "code": "note.secondary_source",
+            "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
       }
     }
   },
@@ -14710,5 +15137,256 @@
       },
       "message": "region 'asia-northeast3-a' normalised to 'ane3'"
     }
+  },
+  {
+    "sample": "names-400:unknown-type",
+    "path": "/supported",
+    "old": [
+      "project_id",
+      "service_account",
+      "compute_instance",
+      "vpc_network",
+      "subnet",
+      "cloud_sql_instance",
+      "storage_bucket",
+      "firewall_rule",
+      "disk",
+      "address",
+      "autoscaler",
+      "backend_bucket",
+      "backend_service",
+      "cross_site_network",
+      "external_vpn_gateway",
+      "forwarding_rule",
+      "future_reservation",
+      "global_address",
+      "global_forwarding_rule",
+      "global_public_delegated_prefix",
+      "global_vm_extension_policy",
+      "health_check",
+      "http_health_check",
+      "https_health_check",
+      "image",
+      "instance_group_manager",
+      "instance_group",
+      "instance_template",
+      "instant_snapshot_group",
+      "instant_snapshot",
+      "interconnect_attachment_group",
+      "interconnect_attachment",
+      "interconnect_group",
+      "interconnect",
+      "license",
+      "machine_image",
+      "network_attachment",
+      "network_edge_security_service",
+      "packet_mirroring",
+      "public_advertised_prefix",
+      "public_delegated_prefix",
+      "region_autoscaler",
+      "region_backend_bucket",
+      "region_backend_service",
+      "region_commitment",
+      "region_composite_health_check",
+      "region_disk",
+      "region_health_aggregation_policy",
+      "region_health_check",
+      "region_health_check_service",
+      "region_health_source",
+      "region_instance_group_manager",
+      "region_instance_template",
+      "region_instant_snapshot_group",
+      "region_instant_snapshot",
+      "region_notification_endpoint",
+      "region_security_policy",
+      "region_snapshot",
+      "region_ssl_certificate",
+      "region_ssl_policy",
+      "region_target_http_proxy",
+      "region_target_https_proxy",
+      "region_target_tcp_proxy",
+      "region_url_map",
+      "reservation",
+      "resource_policy",
+      "rollout_plan",
+      "router",
+      "route",
+      "security_policy",
+      "service_attachment",
+      "snapshot",
+      "ssl_certificate",
+      "ssl_policy",
+      "storage_pool",
+      "target_grpc_proxy",
+      "target_http_proxy",
+      "target_https_proxy",
+      "target_instance",
+      "target_pool",
+      "target_ssl_proxy",
+      "target_tcp_proxy",
+      "target_vpn_gateway",
+      "url_map",
+      "vpn_gateway",
+      "vpn_tunnel",
+      "zone_vm_extension_policy",
+      "kms_ekm_connection",
+      "kms_key_ring",
+      "kms_crypto_key",
+      "kms_import_job",
+      "node_group",
+      "node_template",
+      "network_endpoint_group",
+      "region_network_endpoint_group",
+      "global_network_endpoint_group",
+      "firestore_database",
+      "spanner_instance",
+      "spanner_instance_config",
+      "spanner_instance_partition",
+      "spanner_database",
+      "spanner_backup",
+      "gke_cluster",
+      "artifact_registry_rule",
+      "cloud_function_gen1",
+      "cloud_function",
+      "iam_oauth_client",
+      "iam_oauth_client_credential",
+      "iam_policy_binding",
+      "iam_principal_access_boundary_policy",
+      "iam_deny_policy",
+      "iam_custom_role",
+      "iam_workforce_pool",
+      "iam_workforce_pool_provider",
+      "iam_workforce_pool_provider_key",
+      "iam_workload_identity_pool",
+      "iam_wip_managed_identity",
+      "iam_wip_namespace",
+      "iam_wip_provider",
+      "iam_wip_provider_key",
+      "secret"
+    ],
+    "new": [
+      "project_id",
+      "service_account",
+      "compute_instance",
+      "vpc_network",
+      "subnet",
+      "cloud_sql_instance",
+      "storage_bucket",
+      "firewall_rule",
+      "disk",
+      "address",
+      "autoscaler",
+      "backend_bucket",
+      "backend_service",
+      "cross_site_network",
+      "external_vpn_gateway",
+      "forwarding_rule",
+      "future_reservation",
+      "global_address",
+      "global_forwarding_rule",
+      "global_public_delegated_prefix",
+      "global_vm_extension_policy",
+      "health_check",
+      "http_health_check",
+      "https_health_check",
+      "image",
+      "instance_group_manager",
+      "instance_group",
+      "instance_template",
+      "instant_snapshot_group",
+      "instant_snapshot",
+      "interconnect_attachment_group",
+      "interconnect_attachment",
+      "interconnect_group",
+      "interconnect",
+      "license",
+      "machine_image",
+      "network_attachment",
+      "network_edge_security_service",
+      "packet_mirroring",
+      "public_advertised_prefix",
+      "public_delegated_prefix",
+      "region_autoscaler",
+      "region_backend_bucket",
+      "region_backend_service",
+      "region_commitment",
+      "region_composite_health_check",
+      "region_disk",
+      "region_health_aggregation_policy",
+      "region_health_check",
+      "region_health_check_service",
+      "region_health_source",
+      "region_instance_group_manager",
+      "region_instance_template",
+      "region_instant_snapshot_group",
+      "region_instant_snapshot",
+      "region_notification_endpoint",
+      "region_security_policy",
+      "region_snapshot",
+      "region_ssl_certificate",
+      "region_ssl_policy",
+      "region_target_http_proxy",
+      "region_target_https_proxy",
+      "region_target_tcp_proxy",
+      "region_url_map",
+      "reservation",
+      "resource_policy",
+      "rollout_plan",
+      "router",
+      "route",
+      "security_policy",
+      "service_attachment",
+      "snapshot",
+      "ssl_certificate",
+      "ssl_policy",
+      "storage_pool",
+      "target_grpc_proxy",
+      "target_http_proxy",
+      "target_https_proxy",
+      "target_instance",
+      "target_pool",
+      "target_ssl_proxy",
+      "target_tcp_proxy",
+      "target_vpn_gateway",
+      "url_map",
+      "vpn_gateway",
+      "vpn_tunnel",
+      "zone_vm_extension_policy",
+      "kms_ekm_connection",
+      "kms_key_ring",
+      "kms_crypto_key",
+      "kms_import_job",
+      "node_group",
+      "node_template",
+      "network_endpoint_group",
+      "region_network_endpoint_group",
+      "global_network_endpoint_group",
+      "firestore_database",
+      "spanner_instance",
+      "spanner_instance_config",
+      "spanner_instance_partition",
+      "spanner_database",
+      "spanner_backup",
+      "gke_cluster",
+      "artifact_registry_rule",
+      "cloud_function_gen1",
+      "cloud_function",
+      "run_service",
+      "iam_oauth_client",
+      "iam_oauth_client_credential",
+      "iam_policy_binding",
+      "iam_principal_access_boundary_policy",
+      "iam_deny_policy",
+      "iam_custom_role",
+      "iam_workforce_pool",
+      "iam_workforce_pool_provider",
+      "iam_workforce_pool_provider_key",
+      "iam_workload_identity_pool",
+      "iam_wip_managed_identity",
+      "iam_wip_namespace",
+      "iam_wip_provider",
+      "iam_wip_provider_key",
+      "secret"
+    ]
   }
 ]

@@ -288,3 +288,22 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     }
   });
 });
+
+describe('Cloud Run 서비스 (D65)', () => {
+  const r = RULES['gcp.run_service']!;
+  it('docUrl 은 생성 API · 범위 근거는 배포 안내서 · 길이 1~49 · RFC 1035 꼴 pattern', () => {
+    expect(r).toBeDefined();
+    expect(r.docUrl).toBe('https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create');
+    expect(r.uniquenessDocUrl).toBe('https://docs.cloud.google.com/run/docs/deploying');
+    expect([r.minLength, r.maxLength]).toEqual([1, 49]);
+    expect(r.pattern.source).toBe('^[a-z]([a-z0-9-]*[a-z0-9])?$');
+    expect(r.allowed).toBe('lower-digit-hyphen');
+  });
+  it('문자 집합은 보조 출처라 note.secondary_source 하나 — 좁힌 규칙(narrower)이 아니다', () => {
+    expect(r.notes?.map((n) => n.code)).toEqual(['note.secondary_source']);
+  });
+  it('범위 · 부류 · 분류 · 약어 · 지역 토큰', () => {
+    expect({ scope: r.scope, entity: r.entity, category: r.category, slug: r.slug, regionToken: r.regionToken })
+      .toEqual({ scope: 'gcp:project_location', entity: 'run.services', category: 'compute', slug: 'run', regionToken: 'region' });
+  });
+});

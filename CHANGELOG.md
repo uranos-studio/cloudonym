@@ -6,11 +6,11 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".
 
-Rules revision for this release: 2026-10-10.5.
+Rules revision for this release: 2026-10-10.6.
 
 ### Added
 
-- **Naming engine** for 121 Google Cloud resource types: generates a name from five context values (owner · system · purpose · env · region), shortens it in three steps (drop optional tokens → abbreviate and share the length budget → fail) and validates it against the provider's documented length, characters and reserved words. A name that cannot fit is returned with `valid: false` and the reasons; it is never cut into something the provider would reject. Every limit cites an official document.
+- **Naming engine** for 122 Google Cloud resource types: generates a name from five context values (owner · system · purpose · env · region), shortens it in three steps (drop optional tokens → abbreviate and share the length budget → fail) and validates it against the provider's documented length, characters and reserved words. A name that cannot fit is returned with `valid: false` and the reasons; it is never cut into something the provider would reject. Every limit cites an official document.
 - **Web UI in four steps** — ① Cloud ② Context ③ Resources (a tree grouped by the scope in which Google Cloud requires a name to be unique, with search, categories, a count per resource, a scope choice for merged rows, a one-line description and where the name is entered) ④ Names (PASS / FAIL per name with the reasons, copy one name, all valid names, names JSON, Terraform locals or the standard labels). The state lives in the URL hash, so a link restores the same screen.
 - **API** — `POST /v1/generate` (every resource type), `POST /v1/names` (the picked resources, with count, role and kind), `POST /v1/validate`, `GET /v1/health`, `POST /v1/events`. Successful responses carry `version: { engine, rules }`; `rules_version` in a request turns a rules change into a 409.
 - **For AI coding agents** — `GET /llms.txt` (formulas, canonical values, regions, kind tokens, abbreviations with their sources, every rule), `GET /openapi.json` and `GET /catalog.json` (the resource catalog and region table of the enabled providers), all generated from the same data as the engine.

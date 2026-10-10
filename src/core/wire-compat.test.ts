@@ -52,10 +52,10 @@ const ZONE_RULES = [
   'compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
   'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group',
 ] as const;
-/** T4(D65)가 더하는 규칙 — 그 Task 가 'run_service' 를 넣는다. 지금은 비어 있다: 항목 꼴 줄의 resource type 은 ZONE_RULES 이거나 이 목록이어야 한다 */
-const T4_ADDED_TYPES: readonly string[] = [];
-/** T4 가 /supported 경로 줄(names-400 표본)을 쓸 때 true 로 바꾼다 */
-const T4_SUPPORTED_PATH = false;
+/** T4(D65)가 더한 규칙 — Cloud Run 서비스. 이 규칙의 항목 꼴 줄은 generate:*:gcp 표본의 wire 추가(old null)만 받는다 */
+const T4_ADDED_TYPES: readonly string[] = ['run_service'];
+/** T4(D65) — names-400 표본의 /supported 경로 줄을 받는다. 새 목록은 옛 목록에 T4_ADDED_TYPES 만 더한 것이어야 한다 */
+const T4_SUPPORTED_PATH = true;
 const zoneRuleItems = () => ZONE_RULES.map((type) => (type === 'network_endpoint_group' ? { type, kind: 'GCE_VM_IP' } : { type }));
 const MIXED = [
   { type: 'compute_instance', count: 2 }, { type: 'disk', count: 2 }, { type: 'subnet', count: 2 }, { type: 'service_account', role: 'db' },
@@ -304,12 +304,22 @@ function scopeProblems(diffs: AllowedDiff[], oracle: Snapshot, actual: Snapshot)
       const normSample = /^generate:[^:]+:gcp$/.test(d.sample) || d.sample.startsWith('names:');
       if (/^\/metadata\/transformed\/\d+(\/params\/to|\/message)?$/.test(d.path) && normSample) return [];
       if (d.path === '/data/gcp/valid' && d.sample.startsWith('names:')) return [];
-      if (T4_SUPPORTED_PATH && d.path === '/supported' && d.sample.startsWith('names-400:')) return [];
+      if (T4_SUPPORTED_PATH && d.path === '/supported' && d.sample.startsWith('names-400:')) {
+        // 예외 ② — 옛 목록의 순서를 지킨 채 추가 규칙만 끼어든다
+        const ok = Array.isArray(d.old) && Array.isArray(d.new)
+          && JSON.stringify((d.new as unknown[]).filter((t) => !T4_ADDED_TYPES.includes(t as string))) === JSON.stringify(d.old)
+          && JSON.stringify((d.new as unknown[]).filter((t) => T4_ADDED_TYPES.includes(t as string)).sort()) === JSON.stringify([...T4_ADDED_TYPES].sort());
+        return ok ? [] : [`path ${d.sample} ${d.path}: new is not old plus the added rules`];
+      }
       return [`path ${d.sample} ${d.path} is outside the allowed sites`];
     }
     if (d.sample.startsWith('generate:') && !d.sample.endsWith(':gcp')) return [`${label(d)}: not a gcp sample`];
     // 오라클의 resource_type 으로 — 오라클에 없는 항목(추가)은 지금 출력에서 찾는다
     const type = resourceTypeOf(oracle, d.sample, d.key) ?? resourceTypeOf(actual, d.sample, d.key);
+    if (type !== undefined && T4_ADDED_TYPES.includes(type)) {
+      // 예외 ② — generate 응답에 항목 하나가 는다. 그 밖(names 표본 · HCL · JSON · 옛 값이 있는 줄)은 받지 않는다
+      return /^generate:[^:]+:gcp$/.test(d.sample) && d.kind === 'wire' && d.old === null ? [] : [`${label(d)}: an added rule is allowed only as a new wire item of a generate gcp sample`];
+    }
     return type !== undefined && allowedTypes.has(type) ? [] : [`${label(d)}: resource type ${type ?? '?'} is not one of the 14 zonal rules`];
   });
 }
@@ -394,6 +404,16 @@ describe('호환 오라클 (D70) — 마법사 작업 전 출력과 같다', asy
     expect(scopeProblems(diffs as AllowedDiff[], oracle, actual)).toEqual([]);
   });
 
+  it('예외 ② 의 줄은 정확히 15 — generate gcp 표본 14 의 run_service 항목 추가 · names-400 의 supported 한 줄', () => {
+    const rows = diffs as AllowedDiff[];
+    const t4 = rows.filter((d) => isPathDiff(d) ? d.path === '/supported' : T4_ADDED_TYPES.includes(d.key));
+    const gcpGenerate = Object.keys(oracle.wire).filter((k) => /^generate:[^:]+:gcp$/.test(k) && oracle.wire[k]!.status === 200);
+    expect(gcpGenerate).toHaveLength(14);
+    expect(t4.filter((d) => !isPathDiff(d)).map((d) => d.sample).sort()).toEqual(gcpGenerate.sort());
+    expect(t4.filter((d) => isPathDiff(d)).map((d) => d.sample)).toEqual(['names-400:unknown-type']);
+    expect(t4).toHaveLength(15);
+  });
+
   it('wire · HCL · JSON 셋 모두 — 허용 차분을 뺀 나머지가 오라클과 같다', () => {
     expect(compareSnapshots(oracle, actual, diffs as AllowedDiff[])).toEqual([]);
   });
@@ -473,8 +493,11 @@ describe('검사기 자체 — 잡아야 할 것을 잡는다', async () => {
       { sample: 'names:zone-mixed', path: '/metadata/transformed/0', old: 1, new: 2 },
       { sample: 'generate:region-zone:gcp', path: '/metadata/transformed/0/params/to', old: 1, new: 2 },
       { sample: 'names:region-mixed', path: '/data/gcp/valid', old: false, new: true },
+      { sample: 'names-400:unknown-type', path: '/supported', old: ['a', 'b'], new: ['a', 'run_service', 'b'] },
+      { sample: 'generate:base:gcp', key: 'run_service', kind: 'wire', old: null, new: { name: 'x' } },
     ];
-    expect(scopeProblems(ok, oracle, oracle)).toEqual([]);
+    const actual = mutate((s) => { s.wire['generate:base:gcp']!.body.data.gcp.run_service = { name: 'x' }; });
+    expect(scopeProblems(ok, oracle, actual)).toEqual([]);
     expect(scopeProblems([
       { sample: 'names:zone-mixed', key: 'subnet_01', kind: 'wire', old: 1, new: 2 },
       { sample: 'generate:base:gcp', key: 'subnet', kind: 'json', old: 1, new: 2 },
@@ -483,7 +506,14 @@ describe('검사기 자체 — 잡아야 할 것을 잡는다', async () => {
       { sample: 'generate:base:aws', path: '/metadata/transformed/0', old: 1, new: 2 },
       { sample: 'names-400:unknown-type', path: '/supported', old: 1, new: 2 },
       { sample: 'names:zone-mixed', path: '/metadata/transformed/0/params/from', old: 1, new: 2 },
-    ], oracle, oracle)).toHaveLength(7);
+      // 예외 ② 의 범위 밖 — 다른 표본의 supported · 다른 글자가 끼어든 목록 · 순서가 바뀐 목록 · 추가 규칙의 HCL 줄 · 옛 값이 있는 줄 · 다른 CSP
+      { sample: 'names:zone-mixed', path: '/supported', old: ['a'], new: ['a', 'run_service'] },
+      { sample: 'names-400:unknown-type', path: '/supported', old: ['a'], new: ['a', 'run_service', 'x'] },
+      { sample: 'names-400:unknown-type', path: '/supported', old: ['a', 'b'], new: ['b', 'a', 'run_service'] },
+      { sample: 'generate:base:gcp', key: 'run_service', kind: 'hcl', old: null, new: 'x' },
+      { sample: 'generate:base:gcp', key: 'run_service', kind: 'wire', old: { name: 'y' }, new: { name: 'x' } },
+      { sample: 'generate:base:aws', key: 'run_service', kind: 'wire', old: null, new: { name: 'x' } },
+    ], oracle, actual)).toHaveLength(13);
   });
   it('문법 검사기 — 두 꼴만 받는다', () => {
     expect(grammarProblems([])).toEqual([]);

@@ -562,6 +562,21 @@
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
   },
+  "gcp.run_service": {
+    "valid": [
+      "a",
+      "billing-shop-prod-ane3-run-01",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    ],
+    "invalid": [
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "a-",
+      "A",
+      "shop_run",
+      "1run",
+      "-run"
+    ]
+  },
   "gcp.iam_oauth_client": {
     "valid": [
       "client",

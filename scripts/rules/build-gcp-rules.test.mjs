@@ -89,6 +89,6 @@ test('규칙이 없는 자산 유형 표 — 문서 끝에 생성기 출력 그�
     assert.match(r.checked, /^https:\/\//, r.type);
     if (r.kind === 'held') assert.ok(r.confirm && r.confirm.length > 10, `${r.type} — 무엇을 열면 확정되나`);
   }
-  assert.deepEqual(kinds, { held: 8, 'no name': 13, 'external value': 5 });
+  assert.deepEqual(kinds, { held: 7, 'no name': 13, 'external value': 5 });
   assert.equal(new Set(ASSET_TYPES_WITHOUT_RULE.map((r) => r.type)).size, ASSET_TYPES_WITHOUT_RULE.length);
 });
