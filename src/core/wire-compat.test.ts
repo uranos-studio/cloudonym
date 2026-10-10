@@ -1,6 +1,7 @@
 // 호환 오라클 (D70) — 마법사 작업 전(0f47054)의 wire 응답 · Terraform locals · 이름 JSON 내보내기를 동결한 fixture 와 대어 본다.
 // 허용 차분은 __fixtures__/wire-allowed-diff.json 에 적힌 줄뿐이다(T1 · T4 만 고친다). 그 밖은 글자 그대로 같아야 한다.
 // fixture 를 다시 쓰는 길(환경변수 · 갱신 스크립트)은 두지 않는다 — 오라클을 고치는 것은 회귀를 숨기는 것이다.
+// WIRE_COMPAT_DUMP 는 지금 출력을 fixture 밖 경로에만 내보낸다(scripts/oracle-diff.mjs 가 허용 차분 줄을 뽑는 데 쓴다) — 오라클 파일은 쓰지 않는다.
 //
 // 표본 id 꼴 — `generate:<기준선 id>:<provider>` · `names:<이름>` · `names-400:unknown-type`
 // 정규화는 셋뿐이다 — wire 본문의 version.rules 삭제 · 내보내기 JSON 의 version.rules 삭제 · Terraform 머리 주석의 `rules ` 뒤 글자 → `<rules>`
