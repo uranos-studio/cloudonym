@@ -51,7 +51,7 @@ export function formulaOf(rule: ResourceRule): string {
 function tierLines(): string[] {
   return [
     '', '## Tiers', '',
-    'A tier is a short purpose token (`web`, `was`) that only `/v1/wizard` fills. It goes after the abbreviation and kind token and before the sequence number: `[-<tier>]` in the formulas, for example `billing-shop-prod-ane3-gce-web-01`. Only rules with a sequence number (`input: count`) take one; it is never shortened or dropped. A preset brings its own tier; `tier` on a pick overrides it. `/v1/generate` and `/v1/names` never put a tier in a name.',
+    'A tier is a short purpose token (`web`, `was`) that only `/v1/wizard` fills. It goes after the abbreviation and kind token and before the sequence number: `[-<tier>]` in the formulas, for example `billing-shop-prod-ane3-gce-web-01`. Rules with a sequence number (`input: count`) take it there; on Google Cloud, rules with neither a sequence number nor a role (Cloud Storage bucket, BigQuery dataset, Spanner instance config, IAM custom role) take it right after the abbreviation, so two of them in one service can be told apart (`platform-billing-shop-prod-gcs-uploads`). Role rules and the project ID never take one. It is never shortened or dropped. A preset brings its own tier; `tier` on a pick overrides it. `/v1/generate` and `/v1/names` never put a tier in a name.',
     `- \`<tier>\` = \`${TIER_PATTERN.source}\``,
     '- rejected with 400 `wizard.invalid_tier` when it does not match, and `wizard.tier_reserved` when it is one of the reserved words below: abbreviations, kind tokens, environment values and their aliases, and region and zone codes — they would read as that token',
     `- reserved: ${[...RESERVED_TIERS].sort().map((w) => `\`${w}\``).join(' ')}`,

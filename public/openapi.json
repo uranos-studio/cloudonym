@@ -1994,7 +1994,7 @@
             "type": "string",
             "maxLength": 1024,
             "pattern": "^[a-z0-9]{2,16}$",
-            "description": "The tier token placed after the abbreviation and kind token, before the sequence (billing-shop-prod-ane3-gce-web-01). Only on rules with a sequence number; overrides the preset tier. Abbreviations, kind tokens, environment values and region codes are reserved (wizard.tier_reserved)",
+            "description": "The tier token placed after the abbreviation and kind token, before the sequence (billing-shop-prod-ane3-gce-web-01). On rules with a sequence number, and on Google Cloud rules with neither a sequence number nor a role, where it goes right after the abbreviation (platform-billing-shop-prod-gcs-uploads); never on role rules. Overrides the preset tier. Abbreviations, kind tokens, environment values and region codes are reserved (wizard.tier_reserved)",
             "example": "web"
           },
           "role": {

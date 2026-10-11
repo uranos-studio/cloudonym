@@ -39,7 +39,7 @@ Most numbered resources follow `<system>-<purpose>-<env>-<region>-<abbreviation>
 
 - `region` is a region code (`ane3`), never a zone — a zone you enter resolves to its region, so VMs and disks are named like regional resources.
 - `kind` is added only when it differs from the provider default (`pg` for PostgreSQL).
-- `tier` (`web`, `was`, …; pattern `^[a-z0-9]{2,16}$`) is filled only by the wizard, so `/v1/generate` and `/v1/names` never put one in a name. It is never shortened. Abbreviations, kind tokens, environment values and region codes are not allowed as tiers.
+- `tier` (`web`, `was`, …; pattern `^[a-z0-9]{2,16}$`) is filled only by the wizard, so `/v1/generate` and `/v1/names` never put one in a name. It is never shortened. Numbered resources take it before the sequence number; resources with neither a sequence number nor a role (a bucket, a BigQuery dataset) take it right after the abbreviation, which is how two buckets in one service differ (`platform-billing-shop-prod-gcs-uploads`, `…-gcs-backups`). Abbreviations, kind tokens, environment values and region codes are not allowed as tiers.
 - Attached resources add `-boot`, `-data-<seq>`, `-ip` or `-ipi` to the server's final name and are never shortened; a name that does not fit fails with the reason.
 
 ## Pick resources (`/pick`)
@@ -399,7 +399,7 @@ See the LICENSE file for details.
 
 - `region` 은 리전 코드(`ane3`)이고 존은 들지 않는다 — 입력한 존은 그 리전으로 풀려 VM · 디스크도 리전 리소스처럼 이름 붙는다
 - `kind` 는 CSP 기본값과 다를 때만 붙는다(PostgreSQL 은 `pg`)
-- `tier`(`web` · `was` …, 꼴 `^[a-z0-9]{2,16}$`)는 마법사만 채운다 — `/v1/generate` · `/v1/names` 의 이름에는 들지 않는다. 줄이지 않는다. 약어 · 종류 토큰 · 환경 값 · 지역 코드는 tier 로 쓸 수 없다
+- `tier`(`web` · `was` …, 꼴 `^[a-z0-9]{2,16}$`)는 마법사만 채운다 — `/v1/generate` · `/v1/names` 의 이름에는 들지 않는다. 줄이지 않는다. 순번이 있는 리소스는 순번 앞에, 순번도 역할도 없는 리소스(버킷 · BigQuery 데이터셋)는 약어 바로 뒤에 든다 — 한 서비스의 버킷 둘이 이렇게 갈린다(`platform-billing-shop-prod-gcs-uploads` · `…-gcs-backups`). 약어 · 종류 토큰 · 환경 값 · 지역 코드는 tier 로 쓸 수 없다
 - 딸린 리소스는 서버의 최종 이름에 `-boot` · `-data-<seq>` · `-ip` · `-ipi` 를 붙이고 줄이지 않는다 — 들어가지 않으면 이유와 함께 실패한다
 
 ### 리소스 고르기 (`/pick`)
