@@ -13,6 +13,7 @@ import { MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { presetOf, type Preset } from '../core/wizard/presets';
 import type { CoreMessage, Env, ResourceRule } from '../core/types';
 import { AppHeader } from './AppHeader';
+import { CloudPicker } from './CloudPicker';
 import { CopyButton } from './CopyButton';
 import { RegionPicker } from './RegionPicker';
 import { ResourceTree } from './ResourceTree';
@@ -189,6 +190,10 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="min-w-0 space-y-6">
+            {/* CSP — GCP 하나만 켜져 있다. 번호 없는 머리라 ①~⑥ 은 그대로 · hash 에 provider 키가 없어 이름 · 링크는 같다 (D75) */}
+            <div data-wizard-cloud className={PANEL}>
+              <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
+            </div>
             <div className={PANEL}>
               <ProjectForm plan={plan} errors={projectParsed.ok ? [] : projectParsed.errors} projectId={projectId} onChange={(project) => edit((p) => S.setProject(p, project))} />
             </div>
@@ -468,20 +473,22 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
       )}
       {pick.preset === 'bastion' && <p data-bastion-hint className={HINT}>{en.ui.wizard_bastion_hint}</p>}
 
-      {counted && (
-        <InstanceRows pick={pick} at={at} path={path} attachable={attachable} errors={errors} edit={edit} />
+      {counted && rule && (
+        <InstanceRows pick={pick} at={at} path={path} attachable={attachable} name={rule.displayName} errors={errors} edit={edit} />
       )}
     </div>
   );
 }
 
-function InstanceRows({ pick, at, path, attachable, errors, edit }: {
-  pick: Pick; at: S.PickRef; path: string; attachable: boolean; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void;
+/** 서버 줄 — VM(딸린 것을 받는 규칙)은 「Servers」 · 「Add server」, 나머지는 규칙 이름으로(「Add Subnet」 — D75) */
+function InstanceRows({ pick, at, path, attachable, name, errors, edit }: {
+  pick: Pick; at: S.PickRef; path: string; attachable: boolean; name: string; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void;
 }) {
   const slots = pick.instances ?? [];
+  const single = S.singleSlot(pick);
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{attachable ? en.ui.wizard_servers : en.ui.wizard_instances}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{attachable ? en.ui.wizard_servers : fillUi(en, 'wizard_rows_of', { name })}</p>
       <ul className="space-y-2">
         {slots.map((slot, k) => {
           const sp = `${path}.instances[${k}]`;
@@ -511,15 +518,17 @@ function InstanceRows({ pick, at, path, attachable, errors, edit }: {
           );
         })}
       </ul>
-      <div className="flex flex-wrap items-center gap-2">
-        <button type="button" data-add-slot disabled={slots.length >= MAX_COUNT} className={BTN} onClick={() => edit((p) => S.addSlot(p, at))}>
-          <Plus aria-hidden="true" className="size-4" />{attachable ? en.ui.wizard_add_server : en.ui.wizard_add_instance}
-        </button>
-        {S.hasGaps(pick) && (
-          <button type="button" data-renumber title={en.ui.wizard_renumber_hint} className={BTN} onClick={() => edit((p) => S.renumber(p, at))}>{en.ui.wizard_renumber}</button>
-        )}
-      </div>
-      {S.hasGaps(pick) && <p className={HINT}>{en.ui.wizard_renumber_hint}</p>}
+      {!single && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" data-add-slot disabled={slots.length >= MAX_COUNT} className={BTN} onClick={() => edit((p) => S.addSlot(p, at))}>
+            <Plus aria-hidden="true" className="size-4" />{attachable ? en.ui.wizard_add_server : fillUi(en, 'wizard_add_resource', { name })}
+          </button>
+          {S.hasGaps(pick) && (
+            <button type="button" data-renumber title={en.ui.wizard_renumber_hint} className={BTN} onClick={() => edit((p) => S.renumber(p, at))}>{en.ui.wizard_renumber}</button>
+          )}
+        </div>
+      )}
+      {!single && S.hasGaps(pick) && <p className={HINT}>{en.ui.wizard_renumber_hint}</p>}
     </div>
   );
 }

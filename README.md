@@ -9,12 +9,12 @@ Multi-cloud resource naming engine — **Google Cloud** in this release, with AW
 <a id="naming-wizard"></a>
 ## Naming wizard (web UI, `/`)
 
-The home page names a whole Google Cloud project in six steps. Names are regenerated as you type.
+The home page names a whole Google Cloud project in six steps. Names are regenerated as you type. Above the steps, **Cloud** shows GCP selected; AWS and Azure are shown as **Coming soon**.
 
-1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet, firewall rules (`ssh`, `web`, `icmp`), a Cloud Router and Cloud NAT.
+1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet, firewall rules (`ssh`, `web`, `icmp`), a Cloud Router and Cloud NAT. The VPC starts as one network (a link with two still shows both), and **Custom…** there picks any other project-level resource.
 2. **② Services** — one card per service. The service name is the `purpose` of every name in that service; **Add service** adds another.
 3. **③ Purpose** — pick what runs in the service: **web**, **was** (app server), **bastion**, **file** (file server), **db** (Cloud SQL), **object** (Cloud Storage), **run** (Cloud Run service), **sa** (service account), **secret** (Secret Manager), **gke** (GKE cluster), **wip** (Workload Identity pool), or **Custom…**, which opens the resource tree to pick any other catalog row. The **Load balancer** row adds the parts of an HTTPS load balancer one name at a time — global IP address, backend service, health check, URL map, SSL certificate, target HTTPS proxy and forwarding rule; the parts are not linked to one another.
-4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a resource with kinds takes its kind (a database its engine, a GKE cluster Standard or Autopilot), and a service account its role (`sync` when left empty). Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask.
+4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a resource with kinds takes its kind (a database its engine, a GKE cluster Standard or Autopilot), and a service account its role (`sync` when left empty). Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask; other numbered resources add a line with **Add Subnet**, **Add Cloud SQL Instance** and so on. A pick without a fixed tier (a bucket, a database, a custom pick) takes an optional **Tier**, and **Duplicate** copies it so one service can hold two of a kind — for example buckets `…-gcs-uploads` and `…-gcs-backups`.
 5. **⑤ Attached resources** — per server, a **boot** disk, numbered **data** disks and reserved external or internal addresses (**ip**, **ipi**). Their names continue the server's name.
 6. **⑥ Names** — grouped by project and service, attached resources under their server, each with `PASS`/`FAIL` and the reasons. Copy **all names**, the **JSON**, **Terraform** `locals` (one map `gcp_names` keyed by the item key, plus `gcp_labels_by_namespace`) or the **Share URL**.
 
@@ -382,12 +382,12 @@ See the LICENSE file for details.
 
 ### 이름 마법사 (웹 화면 `/`)
 
-첫 화면은 Google Cloud 프로젝트 하나의 이름을 여섯 단계로 짓는다. 입력하는 대로 이름이 다시 만들어진다.
+첫 화면은 Google Cloud 프로젝트 하나의 이름을 여섯 단계로 짓는다. 입력하는 대로 이름이 다시 만들어진다. 단계 위의 **Cloud** 에는 GCP 가 골라져 있고 AWS · Azure 는 **Coming soon** 으로 보인다.
 
-1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`) · Cloud Router · Cloud NAT 를 더한다
+1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`) · Cloud Router · Cloud NAT 를 더한다. VPC 는 하나로 시작하고(둘이 든 링크는 둘 다 보인다), 거기의 **Custom…** 은 프로젝트 수준의 다른 리소스를 고른다
 2. **② Services** — 서비스마다 카드 하나. 서비스 이름이 그 서비스 안 모든 이름의 `purpose` 다. **Add service** 로 더한다
 3. **③ Purpose** — 서비스에서 돌릴 것을 고른다 — **web** · **was**(앱 서버) · **bastion** · **file**(파일 서버) · **db**(Cloud SQL) · **object**(Cloud Storage) · **run**(Cloud Run 서비스) · **sa**(서비스 계정) · **secret**(Secret Manager) · **gke**(GKE 클러스터) · **wip**(Workload Identity pool), 또는 리소스 트리를 열어 다른 catalog 행을 고르는 **Custom…**. **Load balancer** 줄은 HTTPS 로드 밸런서 부품을 이름 하나씩 더한다 — 전역 IP 주소 · 백엔드 서비스 · 상태 확인 · URL 맵 · SSL 인증서 · 대상 HTTPS 프록시 · 전달 규칙. 부품끼리 엮지는 않는다
-4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 종류가 있는 리소스는 종류를 고르고(데이터베이스는 엔진, GKE 클러스터는 Standard · Autopilot) 서비스 계정은 역할을 적는다(비우면 `sync`). 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다
+4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 종류가 있는 리소스는 종류를 고르고(데이터베이스는 엔진, GKE 클러스터는 Standard · Autopilot) 서비스 계정은 역할을 적는다(비우면 `sync`). 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다. 다른 번호 붙은 리소스는 **Add Subnet** · **Add Cloud SQL Instance** 처럼 그 이름으로 줄을 더한다. tier 가 정해지지 않은 pick(버킷 · 데이터베이스 · custom)은 **Tier** 를 적을 수 있고, **Duplicate** 로 복사하면 한 서비스에 같은 종류를 둘 둔다 — 예: 버킷 `…-gcs-uploads` · `…-gcs-backups`
 5. **⑤ Attached resources** — 서버마다 **boot** 디스크 · 번호 붙은 **data** 디스크 · 예약 고정 외부 · 내부 주소(**ip** · **ipi**). 이름은 서버 이름을 잇는다
 6. **⑥ Names** — 프로젝트 → 서비스로 묶고 딸린 리소스는 서버 아래에 보인다. 카드마다 `PASS`/`FAIL` 과 이유가 있다. **이름 전부** · **JSON** · **Terraform** `locals`(항목 키를 맵 키로 하는 맵 `gcp_names` 하나와 `gcp_labels_by_namespace`) · **Share URL** 을 복사한다
 

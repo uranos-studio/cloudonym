@@ -24,7 +24,8 @@ const BUTTON =
 
 const isEnabled = (p: Provider): boolean => ENABLED_PROVIDERS.includes(p);
 
-export function CloudPicker({ value, onPick }: { value: Provider | undefined; onPick: (p: Provider) => void }) {
+/** numbered 가 false 면 머리에 단계 번호를 붙이지 않는다 — 마법사는 ①~⑥ 번호를 그대로 두고 그 위에 「Cloud」 를 둔다 (D75) */
+export function CloudPicker({ value, onPick, numbered = true }: { value: Provider | undefined; onPick: (p: Provider) => void; numbered?: boolean }) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   // 방향키가 오가는 자리 — 켜진 버튼의 PROVIDERS 안 위치
   const live = PROVIDERS.flatMap((p, i) => (isEnabled(p) ? [i] : []));
@@ -42,7 +43,7 @@ export function CloudPicker({ value, onPick }: { value: Provider | undefined; on
   const focusIndex = value !== undefined && isEnabled(value) ? PROVIDERS.indexOf(value) : (live[0] ?? 0);
   return (
     <section aria-labelledby="step-cloud" className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <h2 id="step-cloud" className="text-base font-semibold"><span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">1</span>{en.ui.step_cloud}</h2>
+      <h2 id="step-cloud" className="text-base font-semibold">{numbered && <span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">1</span>}{en.ui.step_cloud}</h2>
       <div role="radiogroup" aria-label={en.ui.cloud_group_label} className="flex w-full gap-2 sm:w-auto">
         {PROVIDERS.map((p, i) => {
           const on = isEnabled(p);

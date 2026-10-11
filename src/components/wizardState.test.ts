@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, tierEditable, type PickRef,
+  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
@@ -243,5 +243,23 @@ describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', 
     expect(tierEditable({ preset: null, ruleId: 'gcp.cloud_sql_user' })).toBe(false);
     expect(tierEditable({ preset: null, ruleId: 'gcp.compute_instance', instances: [] })).toBe(true);
     expect(tierEditable({ preset: 'vpc', instances: [] })).toBe(true);
+  });
+});
+
+describe('VPC 는 하나로 시작한다 (D75)', () => {
+  it('VPC 칩은 줄 하나 · 더하기 · 다시 매기기를 숨긴다 · 옛 링크처럼 줄이 둘이면 보인다 · 다른 칩은 그대로', () => {
+    let p = togglePreset(initialPlan(), null, 'vpc');
+    const vpc = { service: null, pick: 0 };
+    expect(p.projectPicks[0]!.instances).toHaveLength(1);
+    expect(singleSlot(p.projectPicks[0]!)).toBe(true);
+    // 번호만 바꾼 하나(03)도 하나다 — 다시 매기기 단추가 없어도 이름이 된다
+    p = setSlotSeq(p, vpc, 0, '03');
+    expect(singleSlot(p.projectPicks[0]!)).toBe(true);
+    ok(p);
+    // 옛 링크 — VPC 둘(01 · 03)은 모델 그대로 풀리고 화면은 전부 보인다
+    p = addSlot(p, vpc);
+    expect(singleSlot(p.projectPicks[0]!)).toBe(false);
+    ok(p);
+    expect(singleSlot(togglePreset(initialPlan(), null, 'subnet').projectPicks[0]!)).toBe(false);
   });
 });
