@@ -68,7 +68,7 @@ function attachLines(): string[] {
   ];
 }
 
-/** 프리셋 묶음 (D59) — 네트워크는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩. 프리셋은 다섯 묶음이다 */
+/** 프리셋 묶음 (D59 · D73) — 네트워크 · 로드 밸런서는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩 */
 function presetGroups(): Preset[][] {
   const groups = new Map<string, Preset[]>();
   for (const p of PRESETS) {
@@ -89,7 +89,7 @@ function presetLines(): string[] {
   };
   return [
     '', '## Wizard presets', '',
-    `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets are usually project-level (\`project_picks\`). At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
+    `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets (VPC, subnet, firewall, Cloud Router, Cloud NAT) are usually project-level (\`project_picks\`); the load balancer parts are separate presets, one name each, and are not linked to one another. At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
     ...presetGroups().map((g) => {
       const ha = g.find((p) => p.ha);
       return `- ${g.map(one).join('; ')}${ha?.ha ? ` · HA (\`ha: true\`) on ${g.filter((p) => p.ha).map((p) => `\`${p.id}\``).join(' and ')} as virtual machines only: at least ${ha.ha.minInstances} servers` : ''}`;

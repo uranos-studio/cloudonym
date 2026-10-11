@@ -24,7 +24,10 @@ describe('fixture 가 덮는 것', () => {
     expect(F.tree).toHaveLength(2);
   });
   it('프리셋 9개 전부 · firewall tier 셋', () => {
-    expect(new Set(picks.map((p) => p.preset).filter((p) => p !== null))).toEqual(new Set(PRESETS.map((p) => p.id)));
+    // 얼린 때의 프리셋 아홉 — 그 뒤에 더한 칩(D73)은 옛 링크에 있을 수 없다. 아홉은 지금 데이터에도 그대로 있다
+    const FROZEN_PRESETS = ['web', 'was', 'bastion', 'file', 'db', 'object', 'vpc', 'subnet', 'firewall'];
+    expect(new Set(picks.map((p) => p.preset).filter((p) => p !== null))).toEqual(new Set(FROZEN_PRESETS));
+    expect(PRESETS.map((p) => p.id)).toEqual(expect.arrayContaining(FROZEN_PRESETS));
     expect(new Set(picks.filter((p) => p.preset === 'firewall').map((p) => p.tier))).toEqual(new Set(['ssh', 'web', 'icmp']));
   });
   it('custom count · role · none · serverless gcf · run · HA · POSTGRES', () => {

@@ -6,11 +6,13 @@ import { PROJECT_ID_RULE, SLOT_ID_PATTERN, type Pick, type PlanError, type Wizar
 import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGION } from './formContext';
-import { buildTree } from '../core/tree';
+import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
 
 /** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다) */
 export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE));
+/** GCP 규칙 — 칩의 입력 종류(count · role · none)를 본다 */
+const GCP_RULES = new Map(treeRules(buildTree('gcp')).map((r) => [r.id, r]));
 
 /** pick 의 자리 — service 가 null 이면 프로젝트 공용(Project resources) */
 export interface PickRef { service: number | null; pick: number }
@@ -24,9 +26,9 @@ export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT): W
   return { provider: 'gcp', project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
 }
 
-/** 서버 칩(서비스 용도) · 프로젝트 칩(네트워크) — 데이터의 group 으로 나눈다 */
-export const SERVICE_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.group === undefined);
-export const PROJECT_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.group !== undefined);
+/** 서비스 칩 · 프로젝트 칩(네트워크) — 데이터의 level 로 나눈다 (D73). 서비스 칸의 묶음(lb)은 화면이 group 으로 한 줄에 모은다 */
+export const SERVICE_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.level === 'service');
+export const PROJECT_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.level === 'project');
 
 /** pick 의 유효 규칙 id — 프리셋이면 데이터의 규칙(서버리스를 고르면 그 규칙), custom 이면 ruleId */
 export function effectiveRuleId(pick: Pick): string | undefined {
@@ -119,7 +121,7 @@ export function findPreset(plan: WizardPlan, service: number | null, presetId: s
   return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId)?.tier) === tier));
 }
 
-/** 칩을 켠다 · 끈다. 켜면 count 규칙은 서버 줄 하나(01), 입력 없는 규칙(버킷)은 줄 없음. tier 는 방화벽처럼 tierChoices 가 있을 때만 싣는다 */
+/** 칩을 켠다 · 끈다. 켜면 count 규칙은 서버 줄 하나(01), 입력 없는 규칙(버킷) · role 규칙(서비스 계정)은 줄 없음. tier 는 방화벽처럼 tierChoices 가 있을 때만 싣는다 */
 export function togglePreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
   const preset = presetOf(presetId);
   if (!preset) return plan;
@@ -127,8 +129,9 @@ export function togglePreset(plan: WizardPlan, service: number | null, presetId:
   const at = findPreset(plan, service, presetId, tier);
   if (at >= 0) return withPicks(plan, service, picks.filter((_, i) => i !== at));
   const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
-  // 버킷(템플릿에 seq 가 없다)만 슬롯이 없다 — 데이터의 규칙 id 로 정한다
-  const withSlots = preset.ruleId !== 'gcp.storage_bucket';
+  // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
+  const rule = GCP_RULES.get(preset.ruleId);
+  const withSlots = rule !== undefined && inputKind(rule) === 'count';
   const slot = withSlots ? newSlot(pick, []) : undefined;
   return withPicks(plan, service, [...picks, slot ? { ...pick, instances: [slot] } : pick]);
 }

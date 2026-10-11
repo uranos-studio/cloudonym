@@ -23,9 +23,9 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
     const r = validatePlan(p);
     expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.empty']);
   });
-  it('칩 데이터 — 서비스 칩 여섯(web · was · bastion · file · db · object) · 프로젝트 칩은 network 묶음', () => {
-    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'file', 'db', 'object']);
-    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall']);
+  it('칩 데이터 — 서비스 칩은 level service(로드 밸런서 묶음 포함) · 프로젝트 칩은 network 묶음 (D73)', () => {
+    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd']);
+    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat']);
   });
 });
 
@@ -41,6 +41,14 @@ describe('용도 칩 · 서버 줄 (D61)', () => {
     const p = togglePreset(togglePreset(initialPlan(), 0, 'file'), 0, 'object');
     expect(p.services[0]!.picks).toEqual([{ preset: 'file', instances: [{ id: '1', seq: '01', attach: { data: ['01'] } }] }, { preset: 'object' }]);
     ok(p);
+  });
+  it('슬롯은 규칙의 입력 종류로 — sa(role 규칙)는 줄이 없고 기본 역할 sync · secret · router · nat(count 규칙)은 줄 하나 (D73)', () => {
+    let p = togglePreset(togglePreset(initialPlan(), 0, 'sa'), 0, 'secret');
+    p = togglePreset(togglePreset(p, null, 'router'), null, 'nat');
+    expect(p.services[0]!.picks).toEqual([{ preset: 'sa' }, { preset: 'secret', instances: [{ id: '1', seq: '01' }] }]);
+    expect(p.projectPicks).toEqual([{ preset: 'router', instances: [{ id: '1', seq: '01' }] }, { preset: 'nat', instances: [{ id: '1', seq: '01' }] }]);
+    ok(p);
+    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ane3-cr-01', 'billing-prod-ane3-nat-01', 'billing-shop-prod-sa-sync', 'billing-shop-prod-ane3-secret-01']);
   });
   it('방화벽 tier 칩은 tier 마다 pick 하나', () => {
     let p = togglePreset(initialPlan(), null, 'firewall', 'ssh');

@@ -502,7 +502,7 @@
     "/wizard": {
       "post": {
         "summary": "Name a whole project: project-level resources and one or more services",
-        "description": "The naming wizard. One request is one GCP project: the project ID (always the first item), project-level resources (project_picks: network, firewall rules) and, per service (purpose), the resources picked from presets or by rule id. Servers keep their sequence number (instances[].seq), so removing server 01 does not rename server 02. A server can carry attached resources (boot disk, data disks, a static external or internal address) whose names are the server name plus a suffix (-boot, -data-01, -ip, -ipi); they are never shortened. Items are returned in order: project level, then each service, each parent followed by its attached resources. Item keys are structured paths (service/shop/compute_instance/web/01/data/01). Items that fail or collide are still returned with the reasons (status 200). The response is reproduced by repeating the same wizard request with its rules_version; /names is a separate, flat endpoint.",
+        "description": "The naming wizard. One request is one GCP project: the project ID (always the first item), project-level resources (project_picks: network, firewall rules, Cloud Router, Cloud NAT) and, per service (purpose), the resources picked from presets or by rule id. Servers keep their sequence number (instances[].seq), so removing server 01 does not rename server 02. A server can carry attached resources (boot disk, data disks, a static external or internal address) whose names are the server name plus a suffix (-boot, -data-01, -ip, -ipi); they are never shortened. Items are returned in order: project level, then each service, each parent followed by its attached resources. Item keys are structured paths (service/shop/compute_instance/web/01/data/01). Items that fail or collide are still returned with the reasons (status 200). The response is reproduced by repeating the same wizard request with its rules_version; /names is a separate, flat endpoint.",
         "operationId": "nameProject",
         "requestBody": {
           "required": true,
@@ -1981,7 +1981,7 @@
             "type": "string",
             "nullable": true,
             "maxLength": 1024,
-            "description": "A preset id: web, was, bastion, file, db, object, vpc, subnet, firewall. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
+            "description": "A preset id: web, was, bastion, file, db, object, run, sa, secret, gke, wip, ip, bs, hc, url, cert, thps, fwd, vpc, subnet, firewall, router, nat. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
             "example": "web"
           },
           "rule": {

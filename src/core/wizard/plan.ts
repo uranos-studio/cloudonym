@@ -21,8 +21,8 @@ export const SLOT_ID_PATTERN = /^[a-z0-9]{1,8}$/;
 const RESERVED_SERVICE = 'project';
 /** 프로젝트 ID 는 늘 암묵 항목 하나라 pick 으로 고를 수 없다 */
 export const PROJECT_ID_RULE = 'gcp.project_id';
-/** 프로젝트 수준(level 'project')을 받는 범위 (D63) */
-const PROJECT_SCOPES: readonly ScopeId[] = ['gcp:namespace', 'gcp:project', 'gcp:project_global', 'gcp:project_region'];
+/** 프로젝트 수준(level 'project')을 받는 범위 (D63) — Cloud NAT(라우터 안에서 고유)를 프로젝트 칸에 두려고 gcp:router 를 더했다 (D73) */
+export const PROJECT_SCOPES: readonly ScopeId[] = ['gcp:namespace', 'gcp:project', 'gcp:project_global', 'gcp:project_region', 'gcp:router'];
 /** HA 를 받는 유효 규칙 — serverless 를 푼 뒤의 규칙이 이것이어야 한다 */
 const HA_RULE = 'gcp.compute_instance';
 

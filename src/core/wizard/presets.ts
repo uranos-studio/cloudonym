@@ -1,5 +1,6 @@
 // 마법사 프리셋 (D59 · D64) — 데이터. 용도 칩 하나 = 규칙 하나. 마법사 함수(validatePlan · expandPlan)는 프리셋을 따로 알지 않고 이 표를 읽는다.
-// 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」는 화면의 묶음 칩(group)이고 데이터에서는 pick 셋(vpc · subnet · firewall)이다
+// 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」 · 「로드 밸런서」는 화면의 묶음(group)이고 데이터에서는 pick 하나씩이다.
+// 칩은 엮지 않는다 — 로드 밸런서 부품을 한 번에 켜거나 서로 참조하게 하는 묶음은 공개판 범위 밖이다(D73)
 import type { Attachments } from '../selection';
 
 export interface Preset {
@@ -19,23 +20,43 @@ export interface Preset {
   serverless: { ruleIds: readonly string[] } | null;
   /** 새 서버 줄의 초기 딸린 것 — 화면 초기값일 뿐이다. expandPlan 은 넣지 않는다(숨은 기본값 없음) */
   defaultAttach?: Attachments;
-  /** 화면 묶음 칩 — 같은 group 의 프리셋을 한 칩으로 더한다 */
+  /** 화면 자리 (D73) — project 는 프로젝트 공용 칸, service 는 서비스 칸 */
+  level: 'project' | 'service';
+  /** 화면 묶음 — 같은 group 의 프리셋을 한 줄(network · lb)로 모은다 */
   group?: string;
 }
 
 const VM = 'gcp.compute_instance';
 const SERVERLESS = { ruleIds: ['gcp.cloud_function', 'gcp.run_service'] } as const;
 
+const NONE = { tier: null, ha: null, serverless: null } as const;
+
 export const PRESETS: readonly Preset[] = [
-  { id: 'web', label: 'Web server', ruleId: VM, tier: 'web', ha: { minInstances: 2 }, serverless: SERVERLESS },
-  { id: 'was', label: 'App server', ruleId: VM, tier: 'was', ha: { minInstances: 2 }, serverless: SERVERLESS },
-  { id: 'bastion', label: 'Bastion', ruleId: VM, tier: 'bastion', ha: null, serverless: null },
-  { id: 'file', label: 'File server', ruleId: VM, tier: 'file', ha: null, serverless: null, defaultAttach: { data: ['01'] } },
-  { id: 'db', label: 'Database (Cloud SQL)', ruleId: 'gcp.cloud_sql_instance', tier: null, ha: null, serverless: null },
-  { id: 'object', label: 'Object storage', ruleId: 'gcp.storage_bucket', tier: null, ha: null, serverless: null },
-  { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', tier: null, ha: null, serverless: null, group: 'network' },
-  { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', tier: null, ha: null, serverless: null, group: 'network' },
-  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp'], ha: null, serverless: null, group: 'network' },
+  { id: 'web', label: 'Web server', ruleId: VM, tier: 'web', ha: { minInstances: 2 }, serverless: SERVERLESS, level: 'service' },
+  { id: 'was', label: 'App server', ruleId: VM, tier: 'was', ha: { minInstances: 2 }, serverless: SERVERLESS, level: 'service' },
+  { id: 'bastion', label: 'Bastion', ruleId: VM, tier: 'bastion', ha: null, serverless: null, level: 'service' },
+  { id: 'file', label: 'File server', ruleId: VM, tier: 'file', ha: null, serverless: null, defaultAttach: { data: ['01'] }, level: 'service' },
+  { id: 'db', label: 'Database (Cloud SQL)', ruleId: 'gcp.cloud_sql_instance', ...NONE, level: 'service' },
+  { id: 'object', label: 'Object storage', ruleId: 'gcp.storage_bucket', ...NONE, level: 'service' },
+  // D73 — 용도 없는 Cloud Run 서비스(Serverless 선택지와 별개) · 서비스 계정(역할) · 시크릿 · GKE · Workload Identity pool(provider 는 Custom)
+  { id: 'run', label: 'Cloud Run service', ruleId: 'gcp.run_service', ...NONE, level: 'service' },
+  { id: 'sa', label: 'Service account', ruleId: 'gcp.service_account', ...NONE, level: 'service' },
+  { id: 'secret', label: 'Secret', ruleId: 'gcp.secret', ...NONE, level: 'service' },
+  { id: 'gke', label: 'GKE cluster', ruleId: 'gcp.gke_cluster', ...NONE, level: 'service' },
+  { id: 'wip', label: 'Workload Identity pool', ruleId: 'gcp.iam_workload_identity_pool', ...NONE, level: 'service' },
+  // D73 — HTTPS 로드 밸런서 부품. 칩 하나 = 이름 하나 · 자동 연결 없음
+  { id: 'ip', label: 'Global IP address', ruleId: 'gcp.global_address', ...NONE, level: 'service', group: 'lb' },
+  { id: 'bs', label: 'Backend service', ruleId: 'gcp.backend_service', ...NONE, level: 'service', group: 'lb' },
+  { id: 'hc', label: 'Health check', ruleId: 'gcp.health_check', ...NONE, level: 'service', group: 'lb' },
+  { id: 'url', label: 'URL map', ruleId: 'gcp.url_map', ...NONE, level: 'service', group: 'lb' },
+  { id: 'cert', label: 'SSL certificate', ruleId: 'gcp.ssl_certificate', ...NONE, level: 'service', group: 'lb' },
+  { id: 'thps', label: 'Target HTTPS proxy', ruleId: 'gcp.target_https_proxy', ...NONE, level: 'service', group: 'lb' },
+  { id: 'fwd', label: 'Forwarding rule', ruleId: 'gcp.global_forwarding_rule', ...NONE, level: 'service', group: 'lb' },
+  { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', ...NONE, level: 'project', group: 'network' },
+  { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', ...NONE, level: 'project', group: 'network' },
+  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp'], ha: null, serverless: null, level: 'project', group: 'network' },
+  { id: 'router', label: 'Cloud Router', ruleId: 'gcp.router', ...NONE, level: 'project', group: 'network' },
+  { id: 'nat', label: 'Cloud NAT', ruleId: 'gcp.router_nat', ...NONE, level: 'project', group: 'network' },
 ];
 
 export function presetOf(id: string): Preset | undefined {
