@@ -11,10 +11,10 @@ Multi-cloud resource naming engine — **Google Cloud** in this release, with AW
 
 The home page names a whole Google Cloud project in six steps. Names are regenerated as you type.
 
-1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet and firewall rules (`ssh`, `web`, `icmp`).
+1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet, firewall rules (`ssh`, `web`, `icmp`), a Cloud Router and Cloud NAT.
 2. **② Services** — one card per service. The service name is the `purpose` of every name in that service; **Add service** adds another.
-3. **③ Purpose** — pick what runs in the service: **web**, **was** (app server), **bastion**, **file** (file server), **db** (Cloud SQL), **object** (Cloud Storage), or **Custom…**, which opens the resource tree to pick any other catalog row.
-4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a database takes its engine. Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask.
+3. **③ Purpose** — pick what runs in the service: **web**, **was** (app server), **bastion**, **file** (file server), **db** (Cloud SQL), **object** (Cloud Storage), **run** (Cloud Run service), **sa** (service account), **secret** (Secret Manager), **gke** (GKE cluster), **wip** (Workload Identity pool), or **Custom…**, which opens the resource tree to pick any other catalog row. The **Load balancer** row adds the parts of an HTTPS load balancer one name at a time — global IP address, backend service, health check, URL map, SSL certificate, target HTTPS proxy and forwarding rule; the parts are not linked to one another.
+4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a resource with kinds takes its kind (a database its engine, a GKE cluster Standard or Autopilot), and a service account its role (`sync` when left empty). Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask.
 5. **⑤ Attached resources** — per server, a **boot** disk, numbered **data** disks and reserved external or internal addresses (**ip**, **ipi**). Their names continue the server's name.
 6. **⑥ Names** — grouped by project and service, attached resources under their server, each with `PASS`/`FAIL` and the reasons. Copy **all names**, the **JSON**, **Terraform** `locals` (one map `gcp_names` keyed by the item key, plus `gcp_labels_by_namespace`) or the **Share URL**.
 
@@ -31,7 +31,7 @@ billing-pay-prod-ane3-gce-web-01             web server 01 of pay
 billing-pay-prod-ane3-gce-web-02             web server 02 of pay
 ```
 
-The wizard and its five preset groups — web, app and bastion servers; file server; database; object storage; network — are part of this repository, and any other catalog row is a custom pick. More complex stacks are out of scope for this repository.
+The wizard and its preset groups — web, app and bastion servers; file server; database; object storage; Cloud Run service; service account; secret; GKE cluster; Workload Identity pool; load balancer parts; network — are part of this repository, and any other catalog row is a custom pick. More complex stacks are out of scope for this repository.
 
 ### Name formula
 
@@ -204,7 +204,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
   -d '{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"project_picks":[{"preset":"vpc","instances":[{"id":"n1","seq":"01"}]}],"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]},{"preset":"db","kind":"POSTGRES","instances":[{"id":"b","seq":"01"}]}]},{"purpose":"pay","picks":[{"preset":"web","ha":true,"instances":[{"id":"c","seq":"01"},{"id":"d","seq":"02"}]}]}]}'
 ```
 
-One request is one project. `project` holds four values (no `purpose`), `project_picks` the project-level resources, and each entry of `services` a `purpose` and its `picks`. A pick is a `preset` (`web`, `was`, `bastion`, `file`, `db`, `object`, `vpc`, `subnet`, `firewall`) or `"preset": null` with a `rule` id, plus optional `tier`, `kind`, `ha` and `serverless`. `instances` are the servers: each has an `id` you choose (`^[a-z0-9]{1,8}$`), a `seq` that stays its number, and `attach` (`boot`, `data`, `ip`, `ipi`) on resources that take attached resources. At most 20 services, 20 picks per service or in `project_picks`, and 200 names including the project ID. Response, trimmed to a server and its boot disk (8 items in all — the names listed under [Naming wizard](#naming-wizard)):
+One request is one project. `project` holds four values (no `purpose`), `project_picks` the project-level resources, and each entry of `services` a `purpose` and its `picks`. A pick is a `preset` (`web`, `was`, `bastion`, `file`, `db`, `object`, `run`, `sa`, `secret`, `gke`, `wip`, the load balancer parts `ip`, `bs`, `hc`, `url`, `cert`, `thps`, `fwd`, and the network presets `vpc`, `subnet`, `firewall`, `router`, `nat`) or `"preset": null` with a `rule` id, plus optional `tier`, `kind`, `ha` and `serverless`. `instances` are the servers: each has an `id` you choose (`^[a-z0-9]{1,8}$`), a `seq` that stays its number, and `attach` (`boot`, `data`, `ip`, `ipi`) on resources that take attached resources. At most 20 services, 20 picks per service or in `project_picks`, and 200 names including the project ID. Response, trimmed to a server and its boot disk (8 items in all — the names listed under [Naming wizard](#naming-wizard)):
 
 ```json
 {
@@ -384,16 +384,16 @@ See the LICENSE file for details.
 
 첫 화면은 Google Cloud 프로젝트 하나의 이름을 여섯 단계로 짓는다. 입력하는 대로 이름이 다시 만들어진다.
 
-1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`)을 더한다
+1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`) · Cloud Router · Cloud NAT 를 더한다
 2. **② Services** — 서비스마다 카드 하나. 서비스 이름이 그 서비스 안 모든 이름의 `purpose` 다. **Add service** 로 더한다
-3. **③ Purpose** — 서비스에서 돌릴 것을 고른다 — **web** · **was**(앱 서버) · **bastion** · **file**(파일 서버) · **db**(Cloud SQL) · **object**(Cloud Storage), 또는 리소스 트리를 열어 다른 catalog 행을 고르는 **Custom…**
-4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 데이터베이스는 엔진을 고른다. 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다
+3. **③ Purpose** — 서비스에서 돌릴 것을 고른다 — **web** · **was**(앱 서버) · **bastion** · **file**(파일 서버) · **db**(Cloud SQL) · **object**(Cloud Storage) · **run**(Cloud Run 서비스) · **sa**(서비스 계정) · **secret**(Secret Manager) · **gke**(GKE 클러스터) · **wip**(Workload Identity pool), 또는 리소스 트리를 열어 다른 catalog 행을 고르는 **Custom…**. **Load balancer** 줄은 HTTPS 로드 밸런서 부품을 이름 하나씩 더한다 — 전역 IP 주소 · 백엔드 서비스 · 상태 확인 · URL 맵 · SSL 인증서 · 대상 HTTPS 프록시 · 전달 규칙. 부품끼리 엮지는 않는다
+4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 종류가 있는 리소스는 종류를 고르고(데이터베이스는 엔진, GKE 클러스터는 Standard · Autopilot) 서비스 계정은 역할을 적는다(비우면 `sync`). 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다
 5. **⑤ Attached resources** — 서버마다 **boot** 디스크 · 번호 붙은 **data** 디스크 · 예약 고정 외부 · 내부 주소(**ip** · **ipi**). 이름은 서버 이름을 잇는다
 6. **⑥ Names** — 프로젝트 → 서비스로 묶고 딸린 리소스는 서버 아래에 보인다. 카드마다 `PASS`/`FAIL` 과 이유가 있다. **이름 전부** · **JSON** · **Terraform** `locals`(항목 키를 맵 키로 하는 맵 `gcp_names` 하나와 `gcp_labels_by_namespace`) · **Share URL** 을 복사한다
 
 예 — 프로젝트 `platform` · `billing` · `prod` · `asia-northeast3` 에 VPC 네트워크, 서비스 `shop`(boot 디스크 · data 디스크 01 이 붙은 web 서버 01 과 PostgreSQL 데이터베이스), 서비스 `pay`(HA 로 web 서버 01 · 02)를 두면 위 [Naming wizard](#naming-wizard) 의 여덟 이름이 나온다. 같은 요청이 아래 `POST /v1/wizard` 예시다.
 
-마법사와 프리셋 다섯 묶음 — web · was · bastion 서버, 파일 서버, 데이터베이스, 오브젝트 스토리지, 네트워크 — 은 이 저장소에 있고, 그 밖의 catalog 행은 Custom 으로 고른다. 더 복잡한 구성은 이 저장소의 범위 밖이다.
+마법사와 프리셋 묶음 — web · was · bastion 서버, 파일 서버, 데이터베이스, 오브젝트 스토리지, Cloud Run 서비스, 서비스 계정, 시크릿, GKE 클러스터, Workload Identity pool, 로드 밸런서 부품, 네트워크 — 은 이 저장소에 있고, 그 밖의 catalog 행은 Custom 으로 고른다. 더 복잡한 구성은 이 저장소의 범위 밖이다.
 
 **이름 공식** — 순번이 있는 리소스 대부분은 `<system>-<purpose>-<env>-<region>-<약어>[-<kind>][-<tier>]-<seq>` 이다. 쓰이는 공식 전부는 `/docs/naming` 과 `/llms.txt` 에 있다.
 
@@ -450,7 +450,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
   -d '{"provider":"gcp","project":{"owner":"platform","system":"billing","env":"prod","region":"asia-northeast3"},"project_picks":[{"preset":"vpc","instances":[{"id":"n1","seq":"01"}]}],"services":[{"purpose":"shop","picks":[{"preset":"web","instances":[{"id":"a","seq":"01","attach":{"boot":true,"data":["01"]}}]},{"preset":"db","kind":"POSTGRES","instances":[{"id":"b","seq":"01"}]}]},{"purpose":"pay","picks":[{"preset":"web","ha":true,"instances":[{"id":"c","seq":"01"},{"id":"d","seq":"02"}]}]}]}'
 ```
 
-요청 하나가 프로젝트 하나다. `project` 는 네 값(`purpose` 없음), `project_picks` 는 프로젝트 공용 리소스, `services` 의 항목마다 `purpose` 와 그 `picks` 다. pick 은 `preset`(`web` · `was` · `bastion` · `file` · `db` · `object` · `vpc` · `subnet` · `firewall`)이거나 `"preset": null` 과 `rule` id 이고, `tier` · `kind` · `ha` · `serverless` 를 더할 수 있다. `instances` 는 서버다 — 저마다 고른 `id`(`^[a-z0-9]{1,8}$`) · 번호로 남는 `seq` · 딸린 리소스를 받는 리소스에만 `attach`(`boot` · `data` · `ip` · `ipi`). 서비스 20개 · 서비스마다 또는 `project_picks` 에 pick 20개 · 프로젝트 ID 를 넣어 이름 200개까지. 응답(항목 여덟)은 위 [Whole project](#whole-project-post-v1wizard) 와 같다.
+요청 하나가 프로젝트 하나다. `project` 는 네 값(`purpose` 없음), `project_picks` 는 프로젝트 공용 리소스, `services` 의 항목마다 `purpose` 와 그 `picks` 다. pick 은 `preset`(`web` · `was` · `bastion` · `file` · `db` · `object` · `run` · `sa` · `secret` · `gke` · `wip`, 로드 밸런서 부품 `ip` · `bs` · `hc` · `url` · `cert` · `thps` · `fwd`, 네트워크 `vpc` · `subnet` · `firewall` · `router` · `nat`)이거나 `"preset": null` 과 `rule` id 이고, `tier` · `kind` · `ha` · `serverless` 를 더할 수 있다. `instances` 는 서버다 — 저마다 고른 `id`(`^[a-z0-9]{1,8}$`) · 번호로 남는 `seq` · 딸린 리소스를 받는 리소스에만 `attach`(`boot` · `data` · `ip` · `ipi`). 서비스 20개 · 서비스마다 또는 `project_picks` 에 pick 20개 · 프로젝트 ID 를 넣어 이름 200개까지. 응답(항목 여덟)은 위 [Whole project](#whole-project-post-v1wizard) 와 같다.
 
 - 항목 순서 — 프로젝트 ID · 프로젝트 공용 · 서비스마다, 서버 바로 뒤에 그 딸린 리소스
 - `key` 는 구조 경로(`service/shop/compute_instance/web/01/data/01`)라 다른 항목을 더하거나 지워도 바뀌지 않는다. 딸린 리소스에는 `parent` · `attach`, 프로젝트 공용 항목에는 `"level": "project"` 가 실린다
