@@ -46,7 +46,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('켜진 CSP 만 — GCP 절만 있고 공식 줄 수는 GCP 규칙 수 · AWS · Azure 는 「planned」 한 줄 (D45)', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
     expect(enabledRules).toHaveLength(rulesFor('gcp').length);
-    expect(rulesFor('gcp')).toHaveLength(122);
+    expect(rulesFor('gcp')).toHaveLength(133);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
     expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
     expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
@@ -148,8 +148,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const formulas = lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l));
     for (const r of enabledRules) {
       const f = formulaOf(r);
-      expect(f.includes('[-<tier>]'), r.id).toBe(r.template.includes('tier'));
-      if (r.template.includes('tier')) expect(f, r.id).toMatch(/\[-<tier>\]-<seq>$/);
+      // 구분자는 규칙 것이다 — 밑줄 규칙(D72)은 [_<tier>]_<seq>
+      const s = r.separator;
+      expect(f.includes(`[${s}<tier>]`), r.id).toBe(r.template.includes('tier'));
+      if (r.template.includes('tier')) expect(f.endsWith(`[${s}<tier>]${s}<seq>`), r.id).toBe(true);
     }
     expect(formulaOf(RULES['gcp.compute_instance']!)).toBe(`<system>-<purpose>-<env>-<region>-${RULES['gcp.compute_instance']!.slug}[-<tier>]-<seq>`);
     expect(formulas.filter((l) => l.includes('<tier>')).length).toBeGreaterThan(0);

@@ -65,10 +65,10 @@ describe('생성 TS = JSON (D46 ⑵)', () => {
 });
 
 describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
-  it('101행 · 규칙 122 · 행 key 가 겹치지 않는다', () => {
-    expect(GCP_CATALOG).toHaveLength(101);
-    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(101);
-    expect(ruleIdsOfCatalog).toHaveLength(122);
+  it('112행 · 규칙 133 · 행 key 가 겹치지 않는다', () => {
+    expect(GCP_CATALOG).toHaveLength(112);
+    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(112);
+    expect(ruleIdsOfCatalog).toHaveLength(133);
   });
 
   it('모든 GCP 규칙 id 가 catalog 에 정확히 한 번 있고, catalog 의 모든 ruleId 가 규칙 표에 있다', () => {
@@ -93,13 +93,13 @@ describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
 describe('regionToken 불변식 (§4-1)', () => {
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 34 + 4 · region 84 — zone 은 없다 (D50 revised)', () => {
+  it('none 34 + 8 · region 91 — zone 은 없다 (D50 revised)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([38, 0, 84]);
-    // none 의 내역 — gcp:project_global 34 · 그 밖 4(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할)
+    expect([count('none'), count('zone'), count('region')]).toEqual([42, 0, 91]);
+    // none 의 내역 — gcp:project_global 34 · 그 밖 8(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할 · BigQuery 데이터세트 · DNS 영역 · Pub/Sub 둘)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
     expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(34);
-    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global').sort()).toEqual(['gcp.iam_custom_role', 'gcp.project_id', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
+    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global').sort()).toEqual(['gcp.bigquery_dataset', 'gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.project_id', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
   });
 
   it('none 인 규칙의 템플릿 · optional 에 region 이 없다 — 덮기 전 규칙 표에서 region 이 빠진 것은 전역 NEG 하나', () => {
@@ -227,7 +227,7 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 는 101행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 는 112행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
     expect(catalogFor('aws')).toEqual([]);
     expect(catalogFor('azure')).toEqual([]);

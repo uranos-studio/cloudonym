@@ -3327,9 +3327,11 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       }
     },
     "slug": {
-      "value": "db",
-      "basis": "Common short form of database; Cloud SQL uses sql, so db is unique",
-      "previous": []
+      "value": "spdb",
+      "basis": "Spanner names use spanner, not db, and db now belongs to the Cloud SQL database; 4 letters for meaning (principle 2 exception); GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_spanner_database\\\"\" extension:tf, 266 files): spanner 40 / sql 7 / db 3 / spdb 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": [
+        "db"
+      ]
     },
     "entity": null,
     "kind": {
@@ -3358,7 +3360,8 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "badges": [],
     "aliases": [
       "google_spanner_database",
-      "spanner databases"
+      "spanner databases",
+      "db"
     ]
   },
   {
@@ -4145,6 +4148,381 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "aliases": [
       "google_secret_manager_secret",
       "secrets"
+    ]
+  },
+  {
+    "key": "gcp.cloud_sql_database",
+    "displayName": "Cloud SQL Database",
+    "category": "database",
+    "rules": {
+      "gcp.cloud_sql_database": {
+        "scope": "in cloud_sql_instance",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "db",
+      "basis": "Common short form of database, freed by moving Spanner to spdb; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_sql_database\\\"\" extension:tf, 4672 files): db 1364 / database 380 / sqldb 4 / sdb 0; files without an instance (221): database 37 / sql 27 / db 12; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A database inside a Cloud SQL instance; lowercase letters, digits and underscores (no hyphens), at most 63 characters, joined with underscores.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud sql databases create"
+      ],
+      "terraform": [
+        "google_sql_database.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_sql_database",
+      "sql databases"
+    ]
+  },
+  {
+    "key": "gcp.cloud_sql_user",
+    "displayName": "Cloud SQL User",
+    "category": "database",
+    "rules": {
+      "gcp.cloud_sql_user": {
+        "scope": "in cloud_sql_instance",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "user",
+      "basis": "Plain word; the user belongs to the instance, not to a database; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_sql_user\\\"\" extension:tf, 4536 files): user 64 / usr 0 / dbu 0 / sqlu 0 / dbuser 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A database user of a Cloud SQL instance, named by role; lowercase letters, digits and underscores, at most 32 characters, joined with underscores.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud sql users create"
+      ],
+      "terraform": [
+        "google_sql_user.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_sql_user",
+      "sql users"
+    ]
+  },
+  {
+    "key": "gcp.router_nat",
+    "displayName": "Cloud NAT",
+    "category": "networking",
+    "rules": {
+      "gcp.router_nat": {
+        "scope": "in router",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nat",
+      "basis": "Product name; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_compute_router_nat\\\"\" extension:tf, 4704 files): nat 1000 / natgw 13 / cnat 0 / rnat 0; same letters as the subnet kind token nat (different position, same meaning); no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A NAT gateway configured on a Cloud Router; the name is unique within that router.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud compute routers nats create"
+      ],
+      "terraform": [
+        "google_compute_router_nat.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_compute_router_nat",
+      "compute routers nats",
+      "cloud nat"
+    ]
+  },
+  {
+    "key": "gcp.pubsub_topic",
+    "displayName": "Pub/Sub Topic",
+    "category": "management",
+    "rules": {
+      "gcp.pubsub_topic": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "topic",
+      "basis": "Dominant word kept (5 letters, principle 2 exception); principle 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_pubsub_topic\\\"\" extension:tf, 3344 files): topic 236 / ps 14 / tpc 10 / pst 1; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Pub/Sub topic that publishers send messages to; 3 to 255 characters, starts with a letter and must not start with goog.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud pubsub topics create"
+      ],
+      "terraform": [
+        "google_pubsub_topic.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_pubsub_topic",
+      "pubsub topics"
+    ]
+  },
+  {
+    "key": "gcp.pubsub_subscription",
+    "displayName": "Pub/Sub Subscription",
+    "category": "management",
+    "rules": {
+      "gcp.pubsub_subscription": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "sub",
+      "basis": "Most used short form; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_pubsub_subscription\\\"\" extension:tf, 2208 files): subscription 159 / sub 118 / subs 7 / pss 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Pub/Sub subscription that receives the messages of one topic; same naming rule as topics.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud pubsub subscriptions create"
+      ],
+      "terraform": [
+        "google_pubsub_subscription.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_pubsub_subscription",
+      "pubsub subscriptions"
+    ]
+  },
+  {
+    "key": "gcp.cloudbuild_trigger",
+    "displayName": "Cloud Build Trigger",
+    "category": "management",
+    "rules": {
+      "gcp.cloudbuild_trigger": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "trigger",
+      "basis": "Plain word (7 letters, principle 2 exception); short forms are unused; principle 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_cloudbuild_trigger\\\"\" extension:tf, 1688 files): build 243 / trigger 107 / cb 11 / trg 0 / cbt 0 (cb is at the noise floor); no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Build trigger that starts a build from a source event; letters, digits and hyphens, 1 to 64 characters, unique within the project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud builds triggers create"
+      ],
+      "terraform": [
+        "google_cloudbuild_trigger.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloudbuild_trigger",
+      "builds triggers"
+    ]
+  },
+  {
+    "key": "gcp.dns_managed_zone",
+    "displayName": "Cloud DNS Managed Zone",
+    "category": "networking",
+    "rules": {
+      "gcp.dns_managed_zone": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "dns",
+      "basis": "Product name; zone would read as a Compute Engine zone; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_dns_managed_zone\\\"\" extension:tf, 1844 files): dns 189 / zone 117 / mz 7 / dz 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud DNS zone that holds the records of one DNS name; this is the resource name, not the DNS name itself.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud dns managed-zones create"
+      ],
+      "terraform": [
+        "google_dns_managed_zone.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_dns_managed_zone",
+      "dns managed-zones"
+    ]
+  },
+  {
+    "key": "gcp.scheduler_job",
+    "displayName": "Cloud Scheduler Job",
+    "category": "management",
+    "rules": {
+      "gcp.scheduler_job": {
+        "scope": "project",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cron",
+      "basis": "Meaning first: job is a usage value in shared links and stays free, scheduler is long; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_cloud_scheduler_job\\\"\" extension:tf, 2608 files): scheduler 204 / job 115 / cron 35 / sch 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Scheduler cron job; letters, digits, hyphens and underscores, at most 500 characters, unique within the project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud scheduler jobs create"
+      ],
+      "terraform": [
+        "google_cloud_scheduler_job.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloud_scheduler_job",
+      "scheduler jobs"
+    ]
+  },
+  {
+    "key": "gcp.bigquery_dataset",
+    "displayName": "BigQuery Dataset",
+    "category": "database",
+    "rules": {
+      "gcp.bigquery_dataset": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "bq",
+      "basis": "Product short form; counted with underscores because dataset IDs allow no hyphens; principles 1, 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_bigquery_dataset\\\"\" extension:tf, 5760 files): with \"_xxx_\": dataset 2648 (inflated by type names) / bq 646 / ds 45 / bqds 1; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A BigQuery dataset; letters, digits and underscores only (no hyphens), so the tokens are joined with underscores. The name cannot be changed later.",
+    "enterNameAt": {
+      "gcloud": [],
+      "terraform": [
+        "google_bigquery_dataset.dataset_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_bigquery_dataset",
+      "bigquery datasets",
+      "dataset"
+    ]
+  },
+  {
+    "key": "gcp.redis_instance",
+    "displayName": "Memorystore for Redis Instance",
+    "category": "database",
+    "rules": {
+      "gcp.redis_instance": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "redis",
+      "basis": "Product name (5 letters, principle 2 exception); rds reads as AWS RDS; principle 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_redis_instance\\\"\" extension:tf, 1520 files): redis 289 / cache 72 / rds 3 / mrs 0 / mem 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Memorystore for Redis instance; lowercase letters, digits and hyphens, at most 40 characters, unique per region and project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud redis instances create"
+      ],
+      "terraform": [
+        "google_redis_instance.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_redis_instance",
+      "redis instances",
+      "memorystore"
+    ]
+  },
+  {
+    "key": "gcp.tasks_queue",
+    "displayName": "Cloud Tasks Queue",
+    "category": "management",
+    "rules": {
+      "gcp.tasks_queue": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "queue",
+      "basis": "Plain word (5 letters, principle 2 exception); short forms are unused; principle 3; GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_cloud_tasks_queue\\\"\" extension:tf, 417 files): queue 46 / tasks 34 / que 0 / tq 0 / ctq 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Tasks queue; letters, digits and hyphens, at most 100 characters. A deleted queue name can be reused only after 3 days.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud tasks queues create"
+      ],
+      "terraform": [
+        "google_cloud_tasks_queue.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloud_tasks_queue",
+      "tasks queues"
     ]
   }
 ];

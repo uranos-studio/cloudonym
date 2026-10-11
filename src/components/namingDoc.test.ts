@@ -61,7 +61,7 @@ describe('namingDocModel', () => {
     const formulas = rowsOf(model, 'formula').map((r) => r.cells[0]!);
     const tiered = formulas.filter((f) => f.includes('<tier>'));
     expect(tiered.length).toBeGreaterThan(0);
-    for (const f of tiered) expect(f, f).toMatch(/\[-<tier>\]-<seq>$|\[-<tier>\]-<seq>-/);
+    for (const f of tiered) expect(f, f).toMatch(/\[-<tier>\]-<seq>$|\[-<tier>\]-<seq>-|\[_<tier>\]_<seq>$/);   // 밑줄 규칙(D72)은 [_<tier>]_<seq>
     // tier 가 없는 규칙의 공식에는 없다 — 행의 규칙 수 합 = tier 가 있는 규칙 수
     const tieredCount = rowsOf(model, 'formula').filter((r) => r.cells[0]!.includes('<tier>')).reduce((n, r) => n + Number(r.cells.at(-1)), 0);
     expect(tieredCount).toBe(withTier.length);
@@ -71,8 +71,8 @@ describe('namingDocModel', () => {
     expect(rowsOf(model, 'tokens').find((r) => r.key === 'tier')!.cells[1]).toMatch(/naming wizard/);
     expect(section(model, 'shrink').items![1]).toContain('tier');
   });
-  it('실제 데이터 — 약어 101행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 다섯', () => {
-    expect(rowsOf(model, 'abbreviations')).toHaveLength(101);
+  it('실제 데이터 — 약어 112행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 다섯', () => {
+    expect(rowsOf(model, 'abbreviations')).toHaveLength(112);
     expect(rowsOf(model, 'regions')).toHaveLength(43);
     expect(rowsOf(model, 'kinds')).toHaveLength(19);
     expect(rowsOf(model, 'env').map((r) => r.cells[0])).toEqual([...ENV_VALUES]);

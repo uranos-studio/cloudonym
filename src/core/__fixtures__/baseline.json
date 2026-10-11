@@ -2466,13 +2466,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -2660,6 +2660,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -8562,13 +8661,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -8756,6 +8855,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -14658,13 +14856,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -14852,6 +15050,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -20754,13 +21051,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -20948,6 +21245,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -26850,13 +27246,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "windows-trade-prod-ane3-db-01",
+            "name": "windows-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-db-01",
+            "original": "windows-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "windows-trade-prod-ane3-bkp-01",
@@ -27044,6 +27440,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "windows-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "windows_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "windows_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "windows_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "windows-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "windows-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "windows-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "windows-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "windows-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "windows-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "windows_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "windows-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "windows-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -32946,11 +33441,11 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "google-trade-prod-ane3-db-01",
+            "name": "google-trade-prod-ane3-spdb-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-db-01",
+            "original": "google-trade-prod-ane3-spdb-01",
             "violations": 0,
             "steps": 0
           },
@@ -33140,6 +33635,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "google_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "google_trade_prod_ane3_user_sync",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 0
+          },
+          "router_nat": {
+            "name": "google-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "google-trade-prod-topic-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-topic-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "google-trade-prod-sub-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-sub-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "google-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "google-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "google-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "google_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "google-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "google-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -39042,11 +39636,11 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "azure-trade-prod-ane3-db-01",
+            "name": "azure-trade-prod-ane3-spdb-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-db-01",
+            "original": "azure-trade-prod-ane3-spdb-01",
             "violations": 0,
             "steps": 0
           },
@@ -39236,6 +39830,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "azure-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "azure_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "azure_trade_prod_ane3_user_sync",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 0
+          },
+          "router_nat": {
+            "name": "azure-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "azure-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "azure-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "azure-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "azure-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "azure-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "azure_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "azure-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "azure-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -45142,7 +45835,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-db-01",
+            "original": "매매-trade-prod-ane3-spdb-01",
             "violations": 1,
             "steps": 1
           },
@@ -45332,6 +46025,105 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-secret-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "cloud_sql_database": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매_trade_prod_ane3_db_01",
+            "violations": 1,
+            "steps": 1
+          },
+          "cloud_sql_user": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매_trade_prod_ane3_user_sync",
+            "violations": 1,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-nat-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "pubsub_topic": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-topic-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "pubsub_subscription": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-sub-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "cloudbuild_trigger": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-trigger-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "dns_managed_zone": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-dns-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "scheduler_job": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-cron-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "bigquery_dataset": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매_trade_prod_bq",
+            "violations": 1,
+            "steps": 1
+          },
+          "redis_instance": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-redis-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "tasks_queue": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-queue-01",
             "violations": 1,
             "steps": 1
           }
@@ -51234,11 +52026,11 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "paymentse-reconcili-dev-db-01",
+            "name": "payments-reconcil-dev-spdb-01",
             "valid": true,
             "isTruncated": true,
             "isTransformed": false,
-            "original": "paymentsettlement-reconciliation-dev-db-01",
+            "original": "paymentsettlement-reconciliation-dev-spdb-01",
             "violations": 0,
             "steps": 1
           },
@@ -51428,6 +52220,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "paymentsettlement-reconciliation-dev-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "paymentsettlement_reconciliation_dev_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement_reconciliation_dev_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "payments_reconcil_dev_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "paymentsettlement_reconciliation_dev_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "paymentsettlement-reconciliation-dev-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "paymentsettlement-reconciliation-dev-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "paymentsettlement-reconciliation-dev-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "paymentsettlement-reconciliation-dev-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "paymentsettlement-reconciliation-dev-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "paymentsettlement-reconciliation-dev-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "paymentsettlement_reconciliation_dev_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement_reconciliation_dev_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "paymentsettle-reconciliatio-dev-redis-01",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-redis-01",
+            "violations": 0,
+            "steps": 1
+          },
+          "tasks_queue": {
+            "name": "paymentsettlement-reconciliation-dev-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -57330,13 +58221,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "a-long-longpurpose-prod-db-01",
+            "name": "a-long-longpurp-prod-spdb-01",
             "valid": true,
             "isTruncated": true,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-db-01",
+            "original": "a-long-longpurpose-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 2
           },
           "spanner_backup": {
             "name": "a-long-longpurpose-prod-ane3-bkp-01",
@@ -57524,6 +58415,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "a_long_longpurpose_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "a-long_longpurpose_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 1
+          },
+          "cloud_sql_user": {
+            "name": "a_long_longpurp_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": true,
+            "original": "a-long_longpurpose_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 3
+          },
+          "router_nat": {
+            "name": "a-long-longpurpose-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "a-long-longpurpose-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "a-long-longpurpose-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "a-long-longpurpose-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "a-long-longpurpose-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "a-long-longpurpose-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "a_long_longpurpose_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "a-long_longpurpose_prod_bq",
+            "violations": 0,
+            "steps": 1
+          },
+          "redis_instance": {
+            "name": "a-long-longpurpose-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "a-long-longpurpose-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -63426,11 +64416,11 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "3tier-trade-prod-ane3-db-01",
+            "name": "3tier-trade-prod-ane3-spdb-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-db-01",
+            "original": "3tier-trade-prod-ane3-spdb-01",
             "violations": 1,
             "steps": 0
           },
@@ -63620,6 +64610,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "3tier-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "3tier_trade_prod_ane3_db_01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier_trade_prod_ane3_db_01",
+            "violations": 1,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "3tier_trade_prod_ane3_user_sync",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier_trade_prod_ane3_user_sync",
+            "violations": 1,
+            "steps": 0
+          },
+          "router_nat": {
+            "name": "3tier-trade-prod-ane3-nat-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-nat-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "3tier-trade-prod-topic-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-topic-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "3tier-trade-prod-sub-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-sub-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "3tier-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "3tier-trade-prod-dns-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-dns-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "3tier-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "3tier_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "3tier-trade-prod-ane3-redis-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-redis-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "3tier-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -69522,13 +70611,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -69716,6 +70805,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -75618,13 +76806,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -75812,6 +77000,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -81714,13 +83001,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -81908,6 +83195,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -87810,13 +89196,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -88004,6 +89390,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -92430,13 +93915,13 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "billing-trade-prod-ane3-db-01",
+            "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": false,
+            "isTruncated": true,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-db-01",
+            "original": "billing-trade-prod-ane3-spdb-01",
             "violations": 0,
-            "steps": 0
+            "steps": 1
           },
           "spanner_backup": {
             "name": "billing-trade-prod-ane3-bkp-01",
@@ -92624,6 +94109,105 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-secret-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_database": {
+            "name": "billing_trade_prod_ane3_db_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_db_01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloud_sql_user": {
+            "name": "billing_trade_prod_user_sync",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "billing_trade_prod_ane3_user_sync",
+            "violations": 0,
+            "steps": 1
+          },
+          "router_nat": {
+            "name": "billing-trade-prod-ane3-nat-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-nat-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_topic": {
+            "name": "billing-trade-prod-topic-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-topic-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "pubsub_subscription": {
+            "name": "billing-trade-prod-sub-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sub-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_trigger": {
+            "name": "billing-trade-prod-ane3-trigger-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_managed_zone": {
+            "name": "billing-trade-prod-dns-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-dns-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "scheduler_job": {
+            "name": "billing-trade-prod-ane3-cron-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cron-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_dataset": {
+            "name": "billing_trade_prod_bq",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "redis_instance": {
+            "name": "billing-trade-prod-ane3-redis-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-redis-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "tasks_queue": {
+            "name": "billing-trade-prod-ane3-queue-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-queue-01",
             "violations": 0,
             "steps": 0
           }
@@ -203020,6 +204604,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "ab_cd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_payments_prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_dataset",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "cloud_function",
         "name": "aaa",
         "known": true,
@@ -203236,6 +204928,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "ab_cd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_payments_prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_database",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "cloud_sql_instance",
         "name": "",
         "known": true,
@@ -203344,6 +205144,429 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "root",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlreplica",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlimport",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlexport",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqloneshot",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlapplier",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlobservabilityadmin",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudiamgroup",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlreadonly",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlreplicaindex",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqladmin",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlagent",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlconnpooladmin",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlimportexport",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqllogical",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlobservability",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqliamgroup",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlinactiveuser",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqliamgroupserviceaccount",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqliamgroupuser",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqliamserviceaccount",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "cloudsqlsuperuser",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "sqlserver",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "ab_cd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_payments_prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_trigger",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "compute_instance",
         "name": "",
         "known": true,
@@ -203660,6 +205883,114 @@
       {
         "provider": "gcp",
         "resourceType": "disk",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_managed_zone",
         "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
         "known": true,
         "valid": false,
@@ -209482,6 +211813,348 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "aa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "aaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "googabc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_subscription",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "aa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "aaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "googabc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "pubsub_topic",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "redis_instance",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "region_autoscaler",
         "name": "",
         "known": true,
@@ -212606,6 +215279,114 @@
       {
         "provider": "gcp",
         "resourceType": "router",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "router_nat",
         "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
         "known": true,
         "valid": false,
@@ -212719,6 +215500,114 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "scheduler_job",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6"
       },
       {
         "provider": "gcp",
@@ -215242,6 +218131,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "tasks_queue",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "url_map",
         "name": "",
         "known": true,
@@ -216596,7 +219593,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -216616,6 +219613,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -217297,7 +220305,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -217317,6 +220325,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"개발\"",
           "system = \"billing\"",
@@ -217992,7 +221011,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -218012,6 +221031,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"teamacafe\"",
           "system = \"billing\"",
@@ -218694,7 +221724,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -218714,6 +221744,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"billing\"",
@@ -219395,7 +222436,7 @@
           "gcp_spanner_instance = \"windows-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-windows-trade-prod\"",
           "gcp_spanner_instance_partition = \"windows-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"windows-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"windows-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"windows-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"windows-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"windows-trade-prod-ane3-rule-01\"",
@@ -219415,6 +222456,17 @@
           "gcp_iam_wip_provider = \"windows-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"windows-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"windows-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"windows_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"windows_trade_prod_user_sync\"",
+          "gcp_router_nat = \"windows-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"windows-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"windows-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"windows-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"windows-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"windows-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"windows_trade_prod_bq\"",
+          "gcp_redis_instance = \"windows-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"windows-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"windows\"",
@@ -220094,7 +223146,7 @@
           "gcp_spanner_instance = \"google-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-google-trade-prod\"",
           "gcp_spanner_instance_partition = \"google-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"google-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"google-trade-prod-ane3-spdb-01\"",
           "gcp_spanner_backup = \"google-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"google-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"google-trade-prod-ane3-rule-01\"",
@@ -220114,6 +223166,15 @@
           "gcp_iam_wip_provider = \"google-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"google-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"google-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"google_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"google_trade_prod_ane3_user_sync\"",
+          "gcp_router_nat = \"google-trade-prod-ane3-nat-01\"",
+          "gcp_cloudbuild_trigger = \"google-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"google-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"google-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"google_trade_prod_bq\"",
+          "gcp_redis_instance = \"google-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"google-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"google\"",
@@ -220508,6 +223569,8 @@
           "# INVALID: gcp_resource_policy",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
+          "# INVALID: gcp_pubsub_topic",
+          "# INVALID: gcp_pubsub_subscription",
           "# INVALID: azure_virtual_machine_windows",
           "# INVALID: azure_app_configuration_stores_replicas"
         ]
@@ -220797,7 +223860,7 @@
           "gcp_spanner_instance = \"azure-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-azure-trade-prod\"",
           "gcp_spanner_instance_partition = \"azure-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"azure-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"azure-trade-prod-ane3-spdb-01\"",
           "gcp_spanner_backup = \"azure-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"azure-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"azure-trade-prod-ane3-rule-01\"",
@@ -220817,6 +223880,17 @@
           "gcp_iam_wip_provider = \"azure-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"azure-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"azure-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"azure_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"azure_trade_prod_ane3_user_sync\"",
+          "gcp_router_nat = \"azure-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"azure-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"azure-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"azure-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"azure-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"azure-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"azure_trade_prod_bq\"",
+          "gcp_redis_instance = \"azure-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"azure-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"azure\"",
@@ -221537,6 +224611,17 @@
           "# INVALID: gcp_iam_wip_provider",
           "# INVALID: gcp_iam_wip_provider_key",
           "# INVALID: gcp_secret",
+          "# INVALID: gcp_cloud_sql_database",
+          "# INVALID: gcp_cloud_sql_user",
+          "# INVALID: gcp_router_nat",
+          "# INVALID: gcp_pubsub_topic",
+          "# INVALID: gcp_pubsub_subscription",
+          "# INVALID: gcp_cloudbuild_trigger",
+          "# INVALID: gcp_dns_managed_zone",
+          "# INVALID: gcp_scheduler_job",
+          "# INVALID: gcp_bigquery_dataset",
+          "# INVALID: gcp_redis_instance",
+          "# INVALID: gcp_tasks_queue",
           "# INVALID: azure_resource_group",
           "# INVALID: azure_storage_account",
           "# INVALID: azure_key_vault",
@@ -222199,7 +225284,7 @@
           "gcp_spanner_instance = \"paymentsettlement-reconciliation-dev-spn-01\"",
           "gcp_spanner_instance_config = \"custom-paymentsettlement-reconciliation-dev\"",
           "gcp_spanner_instance_partition = \"paymentsettlement-reconciliation-dev-ptn-01\"",
-          "gcp_spanner_database = \"paymentse-reconcili-dev-db-01\"",
+          "gcp_spanner_database = \"payments-reconcil-dev-spdb-01\"",
           "gcp_spanner_backup = \"paymentsettlement-reconciliation-dev-bkp-01\"",
           "gcp_gke_cluster = \"paymentsettlem-reconciliation-dev-gke-01\"",
           "gcp_artifact_registry_rule = \"paymentsettlement-reconciliation-dev-rule-01\"",
@@ -222219,6 +225304,17 @@
           "gcp_iam_wip_provider = \"paymentse-reconcili-dev-wipp-01\"",
           "gcp_iam_wip_provider_key = \"paymentse-reconcili-dev-wipk-01\"",
           "gcp_secret = \"paymentsettlement-reconciliation-dev-secret-01\"",
+          "gcp_cloud_sql_database = \"paymentsettlement_reconciliation_dev_db_01\"",
+          "gcp_cloud_sql_user = \"payments_reconcil_dev_user_sync\"",
+          "gcp_router_nat = \"paymentsettlement-reconciliation-dev-nat-01\"",
+          "gcp_pubsub_topic = \"paymentsettlement-reconciliation-dev-topic-01\"",
+          "gcp_pubsub_subscription = \"paymentsettlement-reconciliation-dev-sub-01\"",
+          "gcp_cloudbuild_trigger = \"paymentsettlement-reconciliation-dev-trigger-01\"",
+          "gcp_dns_managed_zone = \"paymentsettlement-reconciliation-dev-dns-01\"",
+          "gcp_scheduler_job = \"paymentsettlement-reconciliation-dev-cron-01\"",
+          "gcp_bigquery_dataset = \"paymentsettlement_reconciliation_dev_bq\"",
+          "gcp_redis_instance = \"paymentsettle-reconciliatio-dev-redis-01\"",
+          "gcp_tasks_queue = \"paymentsettlement-reconciliation-dev-queue-01\"",
           "gcp_labels = {",
           "owner = \"platformengineering\"",
           "system = \"paymentsettlement\"",
@@ -222900,7 +225996,7 @@
           "gcp_spanner_instance = \"a-long-longpurpose-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-a-long-longpurpose-prod\"",
           "gcp_spanner_instance_partition = \"a-long-longpurpose-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"a-long-longpurpose-prod-db-01\"",
+          "gcp_spanner_database = \"a-long-longpurp-prod-spdb-01\"",
           "gcp_spanner_backup = \"a-long-longpurpose-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"a-long-longpurpose-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"a-long-longpurpose-prod-ane3-rule-01\"",
@@ -222920,6 +226016,17 @@
           "gcp_iam_wip_provider = \"a-long-longpurpose-prod-wipp-01\"",
           "gcp_iam_wip_provider_key = \"a-long-longpurpose-prod-wipk-01\"",
           "gcp_secret = \"a-long-longpurpose-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"a_long_longpurpose_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"a_long_longpurp_prod_user_sync\"",
+          "gcp_router_nat = \"a-long-longpurpose-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"a-long-longpurpose-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"a-long-longpurpose-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"a-long-longpurpose-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"a-long-longpurpose-prod-dns-01\"",
+          "gcp_scheduler_job = \"a-long-longpurpose-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"a_long_longpurpose_prod_bq\"",
+          "gcp_redis_instance = \"a-long-longpurpose-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"a-long-longpurpose-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"a-long\"",
@@ -223506,6 +226613,10 @@
           "gcp_iam_wip_provider = \"3tier-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"3tier-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"3tier-trade-prod-ane3-secret-01\"",
+          "gcp_cloudbuild_trigger = \"3tier-trade-prod-ane3-trigger-01\"",
+          "gcp_scheduler_job = \"3tier-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"3tier_trade_prod_bq\"",
+          "gcp_tasks_queue = \"3tier-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"3tier\"",
@@ -223959,6 +227070,13 @@
           "# INVALID: gcp_iam_principal_access_boundary_policy",
           "# INVALID: gcp_iam_deny_policy",
           "# INVALID: gcp_iam_workforce_pool",
+          "# INVALID: gcp_cloud_sql_database",
+          "# INVALID: gcp_cloud_sql_user",
+          "# INVALID: gcp_router_nat",
+          "# INVALID: gcp_pubsub_topic",
+          "# INVALID: gcp_pubsub_subscription",
+          "# INVALID: gcp_dns_managed_zone",
+          "# INVALID: gcp_redis_instance",
           "# INVALID: azure_virtual_machine_windows",
           "# INVALID: azure_api_management_service",
           "# INVALID: azure_api_management_service_apis",
@@ -224302,7 +227420,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -224322,6 +227440,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
           "azure_storage_account = \"stbillingtradeprod\"",
           "azure_key_vault = \"kv-billing-trade-prod\"",
@@ -224992,7 +228121,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -225012,6 +228141,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
           "azure_storage_account = \"stbillingtradeprod\"",
           "azure_key_vault = \"kv-billing-trade-prod\"",
@@ -225678,7 +228818,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -225698,6 +228838,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"team1\"",
           "system = \"billing\"",
@@ -226380,7 +229531,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -226400,6 +229551,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"infra\"",
           "system = \"billing\"",
@@ -226906,7 +230068,7 @@
           "gcp_spanner_instance = \"billing-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"billing-trade-prod-ane3-db-01\"",
+          "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
@@ -226926,6 +230088,17 @@
           "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
           "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
+          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
+          "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
+          "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
+          "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
+          "gcp_bigquery_dataset = \"billing_trade_prod_bq\"",
+          "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
+          "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
           "system = \"billing\"",

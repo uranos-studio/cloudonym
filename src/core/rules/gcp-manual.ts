@@ -8,6 +8,7 @@ import type { ScopeDef } from '../scopes';
 const COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
 const IAM_V1_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/iam/v1/rest';
 const AR_DOWNLOAD_RULES = 'https://docs.cloud.google.com/artifact-registry/docs/restrict-artifact-downloads#gcloud';
+const ROUTERS_REST = 'https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48';
 const RFC1035 = /^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$/;
 const SPANNER_ID = /^[a-z][-a-z0-9]{0,62}[a-z0-9]$/;
 const IAM_V3_ID = /^[a-z][a-z0-9.-]{2,62}$/;
@@ -15,6 +16,8 @@ const IAM_4_32 = /^[a-z0-9-]{4,32}$/;
 const IAM_6_63 = /^[a-z][a-z0-9-]{4,61}[a-z0-9]$/;
 const IAM_63 = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const GCP_PREFIX = { prefixes: ['gcp-'] };
+const PUBSUB_ID = /^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$/;
+const PUBSUB_NAMES = 'https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names';
 
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -22,6 +25,22 @@ const ADVISORY: CoreMessage = { code: 'note.advisory_rule_enforced' };
 const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
 
 const PLACED: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
+/** 지역이 없는 순번 꼴 — 프로젝트에 하나인 리소스(Pub/Sub · DNS 영역) */
+const UNPLACED: Token[] = ['system', 'purpose', 'env', 'slug', 'seq'];
+/** 역할 꼴 — 서비스 계정처럼 순번 대신 역할(sync …)이 구별자다 */
+const ROLE: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'role'];
+/** 밑줄로 잇는 규칙(D72) — 하이픈을 받지 않는 BigQuery dataset · Cloud SQL database · user */
+const UNDERSCORE = { allowed: 'lower-digit-underscore', separator: '_', endsWithAlnum: false } as const;
+/** Cloud SQL 의 데이터베이스 · 사용자 이름 — 세 엔진의 따옴표 없는 식별자 규칙의 교집합(소문자로 시작 · 소문자 · 숫자 · 밑줄).
+ *  MySQL "Permitted characters in unquoted identifiers: ASCII: [0-9,a-z,A-Z$_]" (https://dev.mysql.com/doc/refman/8.4/en/identifiers.html)
+ *  PostgreSQL "SQL identifiers and key words must begin with a letter … or an underscore (_). Subsequent characters … can be letters, underscores, digits (0-9), or dollar signs ($)."
+ *    · "unquoted names are always folded to lower case" (https://www.postgresql.org/docs/current/sql-syntax-lexical.html)
+ *  SQL Server "they can only contain letters, digits, and certain symbols (_, @, #, $), must start with a letter or one of _, @, #"
+ *    (https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-identifiers) — 셋 다 하이픈이 없다.
+ *  소문자만 받는 것 · 밑줄로 시작하지 않는 것은 보수적으로 좁힌 것이다(NARROWER) */
+const SQL_IDENT = (max: number) => new RegExp(`^[a-z][a-z0-9_]{0,${max - 1}}$`);
+const SQL_DOCS = 'https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create';
+const SQL_USERS = 'https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user';
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
@@ -39,7 +58,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -49,6 +68,11 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:workload_identity_pool': { id: 'gcp:workload_identity_pool', provider: 'gcp', displayName: 'Workload identity pool', parent: 'gcp:project_location', ruleId: 'gcp.iam_workload_identity_pool', docUrl: IAM_V1_DISCOVERY },
   // 다운로드 규칙 "The name must be unique within your repository" — 저장소(repositoryId) 규칙은 원문이 없어 보류라 ruleId 가 없다
   'gcp:artifact_registry_repository': { id: 'gcp:artifact_registry_repository', provider: 'gcp', displayName: 'Artifact Registry repository', parent: 'gcp:project_location', docUrl: AR_DOWNLOAD_RULES },
+  // Database.name "The name of the database in the Cloud SQL instance. This does not include the project ID or instance name." · User.name 같은 꼴 —
+  // 데이터베이스 · 사용자는 인스턴스 아래다. 유일 범위 문장은 없다(규칙 notes)
+  'gcp:cloud_sql_instance': { id: 'gcp:cloud_sql_instance', provider: 'gcp', displayName: 'Cloud SQL instance', parent: 'gcp:project', ruleId: 'gcp.cloud_sql_instance', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/admin-api/rest/v1/databases#Database.FIELDS.name' },
+  // Router.nats[].name "Unique name of this Nat service. The name must be 1-63 characters long and comply with RFC1035." — NAT 는 라우터 안의 칸이다
+  'gcp:router': { id: 'gcp:router', provider: 'gcp', displayName: 'Cloud Router', parent: 'gcp:project_region', ruleId: 'gcp.router', docUrl: ROUTERS_REST },
 };
 
 const RULES: ResourceRule[] = [
@@ -79,7 +103,7 @@ const RULES: ResourceRule[] = [
   // "Valid identifiers are of the form [a-z][-a-z0-9]*[a-z0-9] and must be between 2 and 64 characters in length." · "The instance partition ID must also be unique within your instance."
   rule({ id: 'gcp.spanner_instance_partition', displayName: 'Spanner Instance Partition', slug: 'ip', minLength: 2, maxLength: 64, pattern: SPANNER_ID, scope: 'gcp:spanner_instance', entity: 'spanner.instances.instancePartitions', category: 'database', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' }),
   // "The database ID must conform to the regular expression [a-z][a-z0-9_\-]*[a-z0-9] and be between 2 and 30 characters in length."
-  rule({ id: 'gcp.spanner_database', displayName: 'Spanner Database', slug: 'db', minLength: 2, maxLength: 30, pattern: /^[a-z][a-z0-9_-]{0,28}[a-z0-9]$/, scope: 'gcp:spanner_instance', entity: 'spanner.instances.databases', category: 'database', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create' }),
+  rule({ id: 'gcp.spanner_database', displayName: 'Spanner Database', slug: 'spdb', minLength: 2, maxLength: 30, pattern: /^[a-z][a-z0-9_-]{0,28}[a-z0-9]$/, scope: 'gcp:spanner_instance', entity: 'spanner.instances.databases', category: 'database', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create' }),
   // Backup.name "Values are of the form projects/<project>/instances/<instance>/backups/[a-z][a-z0-9_\-]*[a-z0-9] The final segment of the name must be between 2 and 60 characters in length."
   rule({ id: 'gcp.spanner_backup', displayName: 'Spanner Backup', slug: 'bkp', minLength: 2, maxLength: 60, pattern: /^[a-z][a-z0-9_-]{0,58}[a-z0-9]$/, scope: 'gcp:spanner_instance', entity: 'spanner.instances.backups', category: 'database', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.backups' }),
 
@@ -148,6 +172,62 @@ const RULES: ResourceRule[] = [
   // "This must be unique within the project. A secret ID is a string with a maximum length of 255 characters and can contain uppercase and lowercase letters, numerals, and the hyphen (`-`) and underscore (`_`) characters."
   rule({ id: 'gcp.secret', displayName: 'Secret Manager Secret', slug: 'secret', minLength: 1, maxLength: 255, pattern: /^[A-Za-z0-9_-]{1,255}$/,
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project', entity: 'secretmanager.secrets', category: 'security', docUrl: 'https://www.googleapis.com/discovery/v1/apis/secretmanager/v1/rest' }),
+
+  // ── 작은 스택에 쓰는 규칙 11개 (D72 · 원문 2026-10-11) ──
+  // Cloud SQL 안내서 "The maximum length of the database name is 64 characters." (MySQL · PostgreSQL 같은 문장, SQL Server 128) ·
+  // "For more information on other criteria for this name, see Schema Object Names." — 나머지는 엔진 문서다(SQL_IDENT).
+  // PostgreSQL "By default, NAMEDATALEN is 64 so the maximum identifier length is 63 bytes." — 셋의 가장 짧은 값 63
+  rule({ id: 'gcp.cloud_sql_database', displayName: 'Cloud SQL Database', slug: 'db', minLength: 1, maxLength: 63, pattern: SQL_IDENT(63), ...UNDERSCORE,
+    scope: 'gcp:cloud_sql_instance', entity: 'sqladmin.databases', category: 'database', docUrl: SQL_DOCS, notes: [NARROWER, SCOPE] }),
+  // "Username length limits are the same for Cloud SQL as for on-premises MySQL; 32 characters for MySQL 8.0 and later, 16 characters for earlier versions."
+  // PostgreSQL · SQL Server 안내서는 「엔진과 같다」 — 식별자 63 · 128. 세 엔진의 교집합 32 (MySQL 8.0 미만의 16 은 담지 않는다 — docs/rule-verification.md)
+  // 시스템 사용자 "You can't delete, modify, or assign database roles to these users." (MySQL · PostgreSQL users 안내서의 목록) — 같은 이름은 만들 수 없다
+  rule({ id: 'gcp.cloud_sql_user', displayName: 'Cloud SQL User', slug: 'user', minLength: 1, maxLength: 32, pattern: SQL_IDENT(32), ...UNDERSCORE, template: ROLE,
+    forbidden: { exact: ['root', 'cloudsqlreplica', 'cloudsqlimport', 'cloudsqlexport', 'cloudsqloneshot', 'cloudsqlapplier', 'cloudsqlobservabilityadmin', 'cloudiamgroup',
+      'cloudsqlreadonly', 'cloudsqlreplicaindex', 'cloudsqladmin', 'cloudsqlagent', 'cloudsqlconnpooladmin', 'cloudsqlimportexport', 'cloudsqllogical', 'cloudsqlobservability',
+      'cloudsqliamgroup', 'cloudsqlinactiveuser', 'cloudsqliamgroupserviceaccount', 'cloudsqliamgroupuser', 'cloudsqliamserviceaccount', 'cloudsqlsuperuser', 'sqlserver'] },
+    scope: 'gcp:cloud_sql_instance', entity: 'sqladmin.users', category: 'database', docUrl: SQL_USERS, notes: [NARROWER, SCOPE] }),
+  // Router.nats[].name "Unique name of this Nat service. The name must be 1-63 characters long and comply with RFC1035." —
+  // 같은 쪽 Router.name 이 RFC1035 를 "[a-z]([-a-z0-9]*[a-z0-9])?" 로 적는다. 라우터 안의 칸이라 라우터 범위에 둔다
+  rule({ id: 'gcp.router_nat', displayName: 'Cloud NAT', slug: 'nat', minLength: 1, maxLength: 63, pattern: RFC1035, scope: 'gcp:router', entity: 'compute.routers.nats', category: 'networking', docUrl: ROUTERS_REST }),
+  // Pub/Sub "Not begin with the string goog" · "Start with a letter" · "Contain between 3 and 255 characters" ·
+  // "Contain only the following characters: Letters [A-Za-z], numbers [0-9], dashes -, underscores _, periods ., tildes ~, plus signs +, and percent signs %" —
+  // "projects/project-identifier/collection/ID" 꼴이라 프로젝트 안 유일. 생성은 영숫자 · - · _ 만 쓴다
+  rule({ id: 'gcp.pubsub_topic', displayName: 'Pub/Sub Topic', slug: 'topic', minLength: 3, maxLength: 255, pattern: PUBSUB_ID, forbidden: { prefixes: ['goog'] },
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'pubsub.topics', category: 'management', docUrl: PUBSUB_NAMES }),
+  // (topic 과 같은 절)
+  rule({ id: 'gcp.pubsub_subscription', displayName: 'Pub/Sub Subscription', slug: 'sub', minLength: 3, maxLength: 255, pattern: PUBSUB_ID, forbidden: { prefixes: ['goog'] },
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'pubsub.subscriptions', category: 'management', docUrl: PUBSUB_NAMES }),
+  // BuildTrigger.name "User-assigned name of the trigger. Must be unique within the project. Trigger names must meet the following requirements:
+  // They must contain only alphanumeric characters and dashes. They can be 1-64 characters long. They must begin and end with an alphanumeric character."
+  rule({ id: 'gcp.cloudbuild_trigger', displayName: 'Cloud Build Trigger', slug: 'trigger', minLength: 1, maxLength: 64, pattern: /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/,
+    allowed: 'alnum-hyphen', caseRule: 'any', startsWithLetter: false, scope: 'gcp:project', entity: 'cloudbuild.triggers', category: 'management',
+    docUrl: 'https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name' }),
+  // ManagedZone.name "User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter,
+  // end with a letter or digit, and only contain lowercase letters, digits or dashes."
+  rule({ id: 'gcp.dns_managed_zone', displayName: 'Cloud DNS Managed Zone', slug: 'dns', minLength: 1, maxLength: 63, pattern: RFC1035, template: UNPLACED, scope: 'gcp:project', entity: 'dns.managedZones', category: 'networking',
+    docUrl: 'https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name' }),
+  // Job.name "JOB_ID can contain only letters ([A-Za-z]), numbers ([0-9]), hyphens (-), or underscores (_). The maximum length is 500 characters." —
+  // 최소 길이 문장이 없어 1 로 둔다. 범위: 안내서 "In the Name field, provide a name for the job that is unique to the project."
+  rule({ id: 'gcp.scheduler_job', displayName: 'Cloud Scheduler Job', slug: 'cron', minLength: 1, maxLength: 500, pattern: /^[A-Za-z0-9_-]{1,500}$/,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project', entity: 'cloudscheduler.jobs', category: 'management',
+    docUrl: 'https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name', uniquenessDocUrl: 'https://docs.cloud.google.com/scheduler/docs/creating#create' }),
+  // DatasetReference.datasetId "The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters." ·
+  // 안내서 "the dataset name must be unique for each project" · "Dataset names cannot contain spaces or special characters such as -, &, @, or %." —
+  // 하이픈이 없어 밑줄로 잇는다(D72). 최소 길이 문장이 없어 1. 밑줄로 시작하면 숨김 데이터세트다 — 생성은 system 으로 시작한다
+  rule({ id: 'gcp.bigquery_dataset', displayName: 'BigQuery Dataset', slug: 'bq', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_]{1,1024}$/, ...UNDERSCORE,
+    caseRule: 'any', startsWithLetter: false, template: ['system', 'purpose', 'env', 'slug'], scope: 'gcp:project', entity: 'bigquery.datasets', category: 'database',
+    docUrl: 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id', uniquenessDocUrl: 'https://docs.cloud.google.com/bigquery/docs/datasets#dataset-naming' }),
+  // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
+  // Must end with a number or a letter. Must be unique within the customer project / location"
+  rule({ id: 'gcp.redis_instance', displayName: 'Memorystore for Redis Instance', slug: 'redis', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,
+    scope: 'gcp:project_location', entity: 'redis.instances', category: 'database',
+    docUrl: 'https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id' }),
+  // Queue.name "QUEUE_ID can contain letters ([A-Za-z]), numbers ([0-9]), or hyphens (-). The maximum length is 100 characters." —
+  // 최소 길이 문장이 없어 1. "Queue names consist of three parts: a project ID, a location, and a queue ID." — 유일 범위 문장은 없다(notes)
+  rule({ id: 'gcp.tasks_queue', displayName: 'Cloud Tasks Queue', slug: 'queue', minLength: 1, maxLength: 100, pattern: /^[A-Za-z0-9-]{1,100}$/,
+    allowed: 'alnum-hyphen', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'cloudtasks.queues', category: 'management',
+    docUrl: 'https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name', notes: [SCOPE] }),
 ];
 
 export const GCP_MANUAL_RULES: Record<string, ResourceRule> = Object.fromEntries(RULES.map((r) => [r.id, r]));

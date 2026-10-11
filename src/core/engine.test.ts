@@ -86,6 +86,11 @@ describe('validateName', () => {
   it('정제만으로 되면 그 값을 제안', () => {
     expect(validateName('azure', 'storage_account', 'st-web-prod')).toMatchObject({ valid: false, suggestedName: 'stwebprod' });
   });
+  it('밑줄 규칙 (D72) — 하이픈 이름은 밑줄로 정제해 제안하고, 길이 초과는 밑줄 경계에서 앞 토큰부터 뗀다', () => {
+    expect(validateName('gcp', 'bigquery_dataset', 'billing-shop-prod-bq')).toEqual({ valid: false, violations: [{ code: 'name.pattern_mismatch', params: { pattern: '^[A-Za-z0-9_]{1,1024}$' } }], suggestedName: 'billing_shop_prod_bq' });
+    expect(validateName('gcp', 'cloud_sql_user', 'platform_billing_shop_prod_ane3_user_sync')).toMatchObject({ valid: false, suggestedName: 'billing_shop_prod_ane3_user_sync' });
+    expect(validateName('gcp', 'cloud_sql_database', 'billing_shop_prod_ane3_db_01')).toEqual({ valid: true, violations: [] });
+  });
   it('구분자 없는 규칙의 길이 초과는 제안하지 않는다', () => {
     expect(validateName('azure', 'storage_account', 'st' + 'a'.repeat(23)).suggestedName).toBeUndefined();
   });

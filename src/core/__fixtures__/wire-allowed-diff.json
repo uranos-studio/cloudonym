@@ -30,6 +30,299 @@
   },
   {
     "sample": "generate:base:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -720,6 +1013,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:base:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -755,6 +1095,299 @@
   },
   {
     "sample": "generate:hangul-owner:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -1445,6 +2078,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:hangul-owner:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -1480,6 +2160,299 @@
   },
   {
     "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -2170,6 +3143,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:space-quote-combining-owner:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -2205,6 +3225,299 @@
   },
   {
     "sample": "generate:alias-env-region:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
     "key": "compute_instance",
     "kind": "wire",
     "old": {
@@ -2895,6 +4208,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:alias-env-region:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -2923,6 +4283,299 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "windows_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "windows-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -3625,6 +5278,53 @@
     }
   },
   {
+    "sample": "generate:reserved-windows:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "windows-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "windows-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "windows-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:reserved-google:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -3648,6 +5348,309 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google_trade_prod_ane3_user_sync",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-topic-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-topic-01",
+      "violations": [
+        {
+          "code": "name.forbidden_prefix",
+          "params": {
+            "value": "goog"
+          },
+          "message": "Must not start with 'goog'"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-sub-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-sub-01",
+      "violations": [
+        {
+          "code": "name.forbidden_prefix",
+          "params": {
+            "value": "goog"
+          },
+          "message": "Must not start with 'goog'"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-google:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "google-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -4350,6 +6353,47 @@
     }
   },
   {
+    "sample": "generate:reserved-google:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "google-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "google-trade-prod-ane3-spdb-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "google-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:reserved-azure:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -4373,6 +6417,293 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure_trade_prod_ane3_user_sync",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "azure-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -5075,6 +7406,47 @@
     }
   },
   {
+    "sample": "generate:reserved-azure:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "azure-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "azure-trade-prod-ane3-spdb-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "azure-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:empty-after-normalize:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -5114,6 +7486,469 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매_trade_prod_ane3_db_01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매_trade_prod_ane3_user_sync",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-nat-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-topic-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-sub-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-trigger-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-dns-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-cron-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매_trade_prod_bq",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-redis-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-queue-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -6180,6 +9015,79 @@
     }
   },
   {
+    "sample": "generate:empty-after-normalize:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-db-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "매매-trade-prod-ane3-spdb-01",
+      "violations": [
+        {
+          "code": "name.token_empty",
+          "field": "system",
+          "message": "Required token 'system' is empty after normalisation"
+        }
+      ],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "매매",
+            "to": ""
+          },
+          "message": "'system' normalised from '매매' to ''"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:long-values:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -6203,6 +9111,309 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement_reconciliation_dev_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement_reconciliation_dev_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "payments_reconcil_dev_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "paymentsettlement_reconciliation_dev_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 8
+          },
+          "message": "Shortened variable tokens to 8 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement_reconciliation_dev_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement_reconciliation_dev_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettle-reconciliatio-dev-redis-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-redis-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 13
+          },
+          "message": "Shortened variable tokens to 13 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:long-values:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "paymentsettlement-reconciliation-dev-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -6905,6 +10116,63 @@
     }
   },
   {
+    "sample": "generate:long-values:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "paymentse-reconcili-dev-db-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-db-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 9
+          },
+          "message": "Shortened variable tokens to 9 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "payments-reconcil-dev-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "paymentsettlement-reconciliation-dev-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 8
+          },
+          "message": "Shortened variable tokens to 8 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:shrink-fail:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -6928,6 +10196,335 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a_long_longpurpose_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "a-long_longpurpose_prod_ane3_db_01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "a-long",
+            "to": "a_long"
+          },
+          "message": "'system' normalised from 'a-long' to 'a_long'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a_long_longpurp_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": true,
+      "original": "a-long_longpurpose_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "a-long",
+            "to": "a_long"
+          },
+          "message": "'system' normalised from 'a-long' to 'a_long'"
+        },
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        },
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 8
+          },
+          "message": "Shortened variable tokens to 8 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a_long_longpurpose_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": true,
+      "original": "a-long_longpurpose_prod_bq",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.normalized",
+          "field": "system",
+          "params": {
+            "from": "a-long",
+            "to": "a_long"
+          },
+          "message": "'system' normalised from 'a-long' to 'a_long'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "a-long-longpurpose-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -7630,6 +11227,66 @@
     }
   },
   {
+    "sample": "generate:shrink-fail:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "a-long-longpurpose-prod-db-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-db-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "a-long-longpurp-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "a-long-longpurpose-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        },
+        {
+          "code": "step.budget_shortened",
+          "params": {
+            "budget": 8
+          },
+          "message": "Shortened variable tokens to 8 characters each"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:digit-first-system:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -7658,6 +11315,328 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier_trade_prod_ane3_db_01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier_trade_prod_ane3_db_01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier_trade_prod_ane3_user_sync",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier_trade_prod_ane3_user_sync",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-nat-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-nat-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-topic-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-topic-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-sub-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-sub-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-dns-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-dns-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-redis-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-redis-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "3tier-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -8430,6 +12409,57 @@
     }
   },
   {
+    "sample": "generate:digit-first-system:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "3tier-trade-prod-ane3-db-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-db-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "3tier-trade-prod-ane3-spdb-01",
+      "valid": false,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "3tier-trade-prod-ane3-spdb-01",
+      "violations": [
+        {
+          "code": "name.first_not_letter",
+          "message": "The first character must be a letter"
+        }
+      ],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:label-aws-invalid-char:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -8453,6 +12483,299 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -9155,6 +13478,53 @@
     }
   },
   {
+    "sample": "generate:label-aws-invalid-char:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    }
+  },
+  {
     "sample": "generate:label-gcp-transform:gcp",
     "key": "run_service",
     "kind": "wire",
@@ -9178,6 +13548,299 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -9875,6 +14538,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:label-gcp-transform:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -9903,6 +14613,299 @@
           {
             "code": "note.secondary_source",
             "message": "The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "cloud_sql_database",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_ane3_db_01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_db_01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z][a-z0-9_]{0,62}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-databases#create",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "cloud_sql_user",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_user_sync",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing_trade_prod_ane3_user_sync",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 1,
+        "max_length": 32,
+        "pattern": "^[a-z][a-z0-9_]{0,31}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/sql/docs/mysql/create-manage-users#create-user",
+        "notes": [
+          {
+            "code": "note.narrower_source_used",
+            "message": "Official sources disagree on this rule; the narrower one is used (conservative, D20)"
+          },
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "router_nat",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-nat-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-nat-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/compute/docs/reference/rest/v1/routers#Router.FIELDS.inlinedField_48",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "pubsub_topic",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-topic-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-topic-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "pubsub_subscription",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-sub-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-sub-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 3,
+        "max_length": 255,
+        "pattern": "^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "cloudbuild_trigger",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-trigger-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-trigger-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 64,
+        "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "dns_managed_zone",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-dns-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-dns-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 63,
+        "pattern": "^[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/dns/docs/reference/rest/v1/managedZones#ManagedZone.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "scheduler_job",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-cron-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-cron-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 500,
+        "pattern": "^[A-Za-z0-9_-]{1,500}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen-underscore",
+        "doc_url": "https://docs.cloud.google.com/scheduler/docs/reference/rest/v1/projects.locations.jobs#Job.FIELDS.name",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "bigquery_dataset",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing_trade_prod_bq",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing_trade_prod_bq",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 1024,
+        "pattern": "^[A-Za-z0-9_]{1,1024}$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-underscore",
+        "doc_url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "redis_instance",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-redis-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-redis-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 40,
+        "pattern": "^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://docs.cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances/create#body.QUERY_PARAMETERS.instance_id",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "tasks_queue",
+    "kind": "wire",
+    "old": null,
+    "new": {
+      "name": "billing-trade-prod-ane3-queue-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-queue-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 1,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9-]{1,100}$",
+        "pattern_flags": "",
+        "allowed": "alnum-hyphen",
+        "doc_url": "https://docs.cloud.google.com/tasks/docs/reference/rest/v2/projects.locations.queues#Queue.FIELDS.name",
+        "notes": [
+          {
+            "code": "note.scope_unconfirmed",
+            "message": "The documentation does not say within what this name must be unique, so the scope shown here is not confirmed"
           }
         ]
       }
@@ -10488,6 +15491,53 @@
         "pattern_flags": "",
         "allowed": "lower-digit-hyphen",
         "doc_url": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+        "notes": []
+      }
+    }
+  },
+  {
+    "sample": "generate:region-zone:gcp",
+    "key": "spanner_database",
+    "kind": "wire",
+    "old": {
+      "name": "billing-trade-prod-ane3-db-01",
+      "valid": true,
+      "is_truncated": false,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-db-01",
+      "violations": [],
+      "steps": [],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
+        "notes": []
+      }
+    },
+    "new": {
+      "name": "billing-trade-prod-spdb-01",
+      "valid": true,
+      "is_truncated": true,
+      "is_transformed": false,
+      "original": "billing-trade-prod-ane3-spdb-01",
+      "violations": [],
+      "steps": [
+        {
+          "code": "step.token_dropped",
+          "field": "region",
+          "message": "Dropped optional token 'region'"
+        }
+      ],
+      "rule": {
+        "min_length": 2,
+        "max_length": 30,
+        "pattern": "^[a-z][a-z0-9_-]{0,28}[a-z0-9]$",
+        "pattern_flags": "",
+        "allowed": "lower-digit-hyphen",
+        "doc_url": "https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases/create",
         "notes": []
       }
     }
@@ -15386,7 +20436,18 @@
       "iam_wip_namespace",
       "iam_wip_provider",
       "iam_wip_provider_key",
-      "secret"
+      "secret",
+      "cloud_sql_database",
+      "cloud_sql_user",
+      "router_nat",
+      "pubsub_topic",
+      "pubsub_subscription",
+      "cloudbuild_trigger",
+      "dns_managed_zone",
+      "scheduler_job",
+      "bigquery_dataset",
+      "redis_instance",
+      "tasks_queue"
     ]
   }
 ]

@@ -52,8 +52,11 @@ const ZONE_RULES = [
   'compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
   'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group',
 ] as const;
-/** T4(D65)가 더한 규칙 — Cloud Run 서비스. 이 규칙의 항목 꼴 줄은 generate:*:gcp 표본의 wire 추가(old null)만 받는다 */
-const T4_ADDED_TYPES: readonly string[] = ['run_service'];
+/** T4(D65)가 더한 규칙 — Cloud Run 서비스 · D72 가 더한 작은 스택 규칙 11개. 이 규칙의 항목 꼴 줄은 generate:*:gcp 표본의 wire 추가(old null)만 받는다 */
+const T4_ADDED_TYPES: readonly string[] = ['run_service', 'cloud_sql_database', 'cloud_sql_user', 'router_nat', 'pubsub_topic', 'pubsub_subscription', 'cloudbuild_trigger', 'dns_managed_zone',
+  'scheduler_job', 'bigquery_dataset', 'redis_instance', 'tasks_queue'];
+/** D72 가 약어를 바꾼 규칙 — Spanner database db → spdb. 존 규칙처럼 항목의 이름 칸만 바뀐다(scripts/oracle-diff.mjs 의 ITEM_FIELDS) */
+const RENAMED_TYPES: readonly string[] = ['spanner_database'];
 /** T4(D65) — names-400 표본의 /supported 경로 줄을 받는다. 새 목록은 옛 목록에 T4_ADDED_TYPES 만 더한 것이어야 한다 */
 const T4_SUPPORTED_PATH = true;
 const zoneRuleItems = () => ZONE_RULES.map((type) => (type === 'network_endpoint_group' ? { type, kind: 'GCE_VM_IP' } : { type }));
@@ -298,7 +301,7 @@ function resourceTypeOf(snap: Snapshot, sample: string, key: string): string | u
   return (body?.data?.gcp?.items as any[] | undefined)?.find((x) => x.key === key)?.resource_type;
 }
 function scopeProblems(diffs: AllowedDiff[], oracle: Snapshot, actual: Snapshot): string[] {
-  const allowedTypes = new Set<string>([...ZONE_RULES, ...T4_ADDED_TYPES]);
+  const allowedTypes = new Set<string>([...ZONE_RULES, ...T4_ADDED_TYPES, ...RENAMED_TYPES]);
   return diffs.flatMap((d): string[] => {
     if (isPathDiff(d)) {
       const normSample = /^generate:[^:]+:gcp$/.test(d.sample) || d.sample.startsWith('names:');
@@ -320,7 +323,7 @@ function scopeProblems(diffs: AllowedDiff[], oracle: Snapshot, actual: Snapshot)
       // 예외 ② — generate 응답에 항목 하나가 는다. 그 밖(names 표본 · HCL · JSON · 옛 값이 있는 줄)은 받지 않는다
       return /^generate:[^:]+:gcp$/.test(d.sample) && d.kind === 'wire' && d.old === null ? [] : [`${label(d)}: an added rule is allowed only as a new wire item of a generate gcp sample`];
     }
-    return type !== undefined && allowedTypes.has(type) ? [] : [`${label(d)}: resource type ${type ?? '?'} is not one of the 14 zonal rules`];
+    return type !== undefined && allowedTypes.has(type) ? [] : [`${label(d)}: resource type ${type ?? '?'} is not one of the 14 zonal rules or the renamed rules`];
   });
 }
 
@@ -404,14 +407,24 @@ describe('호환 오라클 (D70) — 마법사 작업 전 출력과 같다', asy
     expect(scopeProblems(diffs as AllowedDiff[], oracle, actual)).toEqual([]);
   });
 
-  it('예외 ② 의 줄은 정확히 15 — generate gcp 표본 14 의 run_service 항목 추가 · names-400 의 supported 한 줄', () => {
+  it('예외 ② 의 줄은 정확히 169 — generate gcp 표본 14 × 더한 규칙 12(run_service · D72 의 11) · names-400 의 supported 한 줄', () => {
     const rows = diffs as AllowedDiff[];
     const t4 = rows.filter((d) => isPathDiff(d) ? d.path === '/supported' : T4_ADDED_TYPES.includes(d.key));
     const gcpGenerate = Object.keys(oracle.wire).filter((k) => /^generate:[^:]+:gcp$/.test(k) && oracle.wire[k]!.status === 200);
     expect(gcpGenerate).toHaveLength(14);
-    expect(t4.filter((d) => !isPathDiff(d)).map((d) => d.sample).sort()).toEqual(gcpGenerate.sort());
+    for (const type of T4_ADDED_TYPES) {
+      expect(t4.filter((d) => !isPathDiff(d) && d.key === type).map((d) => d.sample).sort(), type).toEqual([...gcpGenerate].sort());
+    }
     expect(t4.filter((d) => isPathDiff(d)).map((d) => d.sample)).toEqual(['names-400:unknown-type']);
-    expect(t4).toHaveLength(15);
+    expect(t4).toHaveLength(14 * 12 + 1);
+  });
+
+  it('예외 ③ 의 줄 — Spanner database(db → spdb)는 generate gcp 표본 14 의 wire 항목만, 바뀐 칸은 이름 칸뿐 (D72)', () => {
+    const rows = (diffs as AllowedDiff[]).filter((d) => !isPathDiff(d) && RENAMED_TYPES.includes(d.key));
+    const gcpGenerate = Object.keys(oracle.wire).filter((k) => /^generate:[^:]+:gcp$/.test(k) && oracle.wire[k]!.status === 200);
+    expect(rows.map((d) => (d as { kind: string }).kind)).toEqual(rows.map(() => 'wire'));
+    expect(rows.map((d) => d.sample).sort()).toEqual([...gcpGenerate].sort());
+    for (const d of rows) expect(JSON.stringify((d as { new: unknown }).new), d.sample).toContain('spdb');
   });
 
   it('wire · HCL · JSON 셋 모두 — 허용 차분을 뺀 나머지가 오라클과 같다', () => {
@@ -493,8 +506,10 @@ describe('검사기 자체 — 잡아야 할 것을 잡는다', async () => {
       { sample: 'names:zone-mixed', path: '/metadata/transformed/0', old: 1, new: 2 },
       { sample: 'generate:region-zone:gcp', path: '/metadata/transformed/0/params/to', old: 1, new: 2 },
       { sample: 'names:region-mixed', path: '/data/gcp/valid', old: false, new: true },
-      { sample: 'names-400:unknown-type', path: '/supported', old: ['a', 'b'], new: ['a', 'run_service', 'b'] },
+      { sample: 'names-400:unknown-type', path: '/supported', old: ['a', 'b'], new: ['a', ...T4_ADDED_TYPES, 'b'] },
       { sample: 'generate:base:gcp', key: 'run_service', kind: 'wire', old: null, new: { name: 'x' } },
+      // 예외 ③(D72) — 약어를 바꾼 규칙의 항목
+      { sample: 'generate:base:gcp', key: 'spanner_database', kind: 'wire', old: { name: 'a-db-01' }, new: { name: 'a-spdb-01' } },
     ];
     const actual = mutate((s) => { s.wire['generate:base:gcp']!.body.data.gcp.run_service = { name: 'x' }; });
     expect(scopeProblems(ok, oracle, actual)).toEqual([]);

@@ -2,8 +2,9 @@
 // old 는 오라클(wire-before-wizard.json)에서, new 는 지금 코드의 출력(wire-compat.test.ts 가 WIRE_COMPAT_DUMP 로 내보낸 스냅숏)에서 그대로 옮긴다.
 // 허용하는 자리는 존 규칙 14종(D50 revised)의 항목뿐이다 — wire 항목 · HCL 줄 · 내보내기 JSON 항목, 그리고 항목이 아닌 자리 둘:
 // 지역 정규화 기록(/metadata/transformed/<i> — to · message 가 존 코드에서 리전 코드로) · names 응답의 전체 판정(/data/gcp/valid — 항목 판정의 논리곱).
-// 예외 ②(D65 · T4) — 더한 규칙(ADDED_TYPES)이 generate:*:gcp 응답에 항목 하나로 늘고(old null), names-400 표본의 /supported 목록에
+// 예외 ②(D65 · T4 · D72) — 더한 규칙(ADDED_TYPES)이 generate:*:gcp 응답에 항목 하나로 늘고(old null), names-400 표본의 /supported 목록에
 // 그 규칙 이름이 끼어든다(옛 목록의 순서는 그대로).
+// 예외 ③(D72) — 약어를 바꾼 규칙(RENAMED_TYPES)의 항목은 존 규칙과 같은 방식으로 이름 칸만 바뀔 수 있다.
 // 그 밖의 자리가 하나라도 다르면 줄을 쓰지 않고 실패한다(exit 1) — 허용 차분으로 회귀를 덮지 않는다.
 // 사용: node scripts/oracle-diff.mjs --write  (줄을 뽑아 wire-allowed-diff.json 을 다시 쓴다 — 오라클 fixture 는 건드리지 않는다)
 //       node scripts/oracle-diff.mjs --check  (쓰지 않고, 뽑은 줄이 파일과 같은지만 본다)
@@ -24,9 +25,13 @@ export const ZONE_RULES = [
   'compute_instance', 'disk', 'autoscaler', 'future_reservation', 'instance_group_manager', 'instance_group', 'instant_snapshot_group',
   'instant_snapshot', 'reservation', 'storage_pool', 'target_instance', 'zone_vm_extension_policy', 'node_group', 'network_endpoint_group',
 ];
-const ZONAL = new Set(ZONE_RULES);
-/** 예외 ②(D65) — T4 가 더한 규칙 (wire-compat.test.ts 의 T4_ADDED_TYPES 와 같다) */
-export const ADDED_TYPES = ['run_service'];
+/** 예외 ②(D65 · D72) — 더한 규칙 (wire-compat.test.ts 의 T4_ADDED_TYPES 와 같다). D72 가 작은 스택 규칙 11개를 더했다 */
+export const ADDED_TYPES = ['run_service', 'cloud_sql_database', 'cloud_sql_user', 'router_nat', 'pubsub_topic', 'pubsub_subscription', 'cloudbuild_trigger', 'dns_managed_zone',
+  'scheduler_job', 'bigquery_dataset', 'redis_instance', 'tasks_queue'];
+/** 예외 ③(D72) — 약어를 바꾼 규칙. 존 규칙처럼 항목 안의 이름 칸(ITEM_FIELDS)만 바뀔 수 있다 — Spanner database db → spdb */
+export const RENAMED_TYPES = ['spanner_database'];
+/** 항목 안의 이름 칸이 바뀌어도 되는 규칙 — 존 규칙 14종(D50 revised) · 약어를 바꾼 규칙(D72) */
+const ZONAL = new Set([...ZONE_RULES, ...RENAMED_TYPES]);
 /** 존 규칙 항목 안에서 바뀌어도 되는 칸 — 이름이 존 코드에서 리전 코드로 · zone_required 가 이름으로 바뀌며 따라 바뀌는 것 */
 const ITEM_FIELDS = new Set(['name', 'valid', 'violations', 'steps', 'original', 'is_truncated', 'is_transformed', 'kind_token']);
 
