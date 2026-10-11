@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73)의 ㉚~㊳ 을 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75)의 ㉚~㊴ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -29,7 +29,7 @@ from playwright.sync_api import Error, expect, sync_playwright
 BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
 # 옛 hash 링크를 여는 경로 (D68) — 기본은 뿌리 `/`(이미 나간 링크 그대로), 셋째 인자로 `/pick` 을 주면 같은 시나리오를 트리 경로에서 돈다.
-# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊳ 은 뿌리 패스에서만 돈다
+# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊴ 는 뿌리 패스에서만 돈다
 HB = sys.argv[3] if len(sys.argv) > 3 else '/'
 assert HB in ('/', '/pick'), HB
 TREE = '/pick'
@@ -202,7 +202,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73) — ㉚~㊳ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75) — ㉚~㊴ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -483,7 +483,74 @@ def wizard_scenarios(browser, rules_version, errors):
     p38.wait_for_timeout(200)
     assert p38.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '새 칩을 켠 마법사가 360px 에서 가로 스크롤이 생긴다'
     ctx38.close()
-    print('OK — 마법사 시나리오 ㉚~㊳ 통과')
+
+    # ── ㊴ D74 · D75 — 번호 없는 Cloud 줄 · VPC 하나 · 「Add Subnet」 · 버킷 둘(Duplicate + tier) · 프로젝트 공용 Custom ──
+    ctx39 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p39 = ctx39.new_page()
+    p39.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p39, BASE + '/')
+    cloud = p39.locator('[data-wizard] [data-wizard-cloud]')
+    expect(cloud.locator('#step-cloud')).to_have_text('Cloud')  # 번호 없음 — ①~⑥ 은 그대로
+    expect(p39.locator('#wizard-project')).to_contain_text('1')
+    expect(cloud.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(cloud.locator('[data-coming-soon]')).to_have_count(2)
+    expect(cloud.locator('[data-cloud="aws"]')).to_be_disabled()
+    expect(cloud.locator('[data-cloud="azure"]')).to_be_disabled()
+    fill_project(p39)
+    svc(p39, 0).locator('[data-service-name]').fill('shop')
+    # VPC 는 줄 하나 · 더하기 · 다시 매기기 없음 · 서브넷은 「Add Subnet」(VM 은 「Add server」 그대로 — ㉟)
+    p39.locator('[data-project-chip="vpc"]').click()
+    p39.locator('[data-project-chip="subnet"]').click()
+    vpc = p39.locator('[data-pick="vpc"]')
+    expect(vpc.locator('li[data-slot]')).to_have_count(1)
+    expect(vpc.locator('[data-add-slot]')).to_have_count(0)
+    expect(vpc.locator('[data-renumber]')).to_have_count(0)
+    vpc.locator('[data-slot-seq]').fill('03')
+    expect(vpc.locator('[data-renumber]')).to_have_count(0)
+    expect(p39.locator('[data-pick="subnet"] [data-add-slot]')).to_have_text('Add Subnet')
+    assert p39.locator('text=Add instance').count() == 0
+    # 버킷 둘 — Duplicate 직후 복사본에 중복 오류 · tier 를 치면 이름 둘
+    svc(p39, 0).locator('[data-purpose-chip="object"]').click()
+    obj = svc(p39, 0).locator('[data-pick="object"]')
+    expect(obj.locator('[data-tier]')).to_have_count(1)
+    expect(svc(p39, 0).locator('[data-pick="web"] [data-duplicate-pick]')).to_have_count(0)
+    obj.locator('[data-duplicate-pick]').click()
+    expect(obj).to_have_count(2)
+    expect(obj.nth(1).locator('[data-wizard-error]')).to_contain_text('storage_bucket')
+    expect(p39.locator('[data-names-empty]')).to_have_text('Fix the marked fields to see names.')
+    obj.nth(0).locator('[data-tier]').fill('uploads')
+    obj.nth(1).locator('[data-tier]').fill('backups')
+    want39 = wizard_names(p39, {
+        'project_picks': [{'preset': 'vpc', 'instances': [{'id': '1', 'seq': '03'}]}, {'preset': 'subnet', 'instances': [{'id': '1', 'seq': '01'}]}],
+        'services': [{'purpose': 'shop', 'picks': [{'preset': 'object', 'tier': 'uploads'}, {'preset': 'object', 'tier': 'backups'}]}],
+    })
+    assert screen_names(p39) == want39, (screen_names(p39), want39)
+    buckets = [n for k, n, _ in want39 if '/storage_bucket/' in k]
+    assert buckets == ['devops-payments-shop-prod-gcs-uploads', 'devops-payments-shop-prod-gcs-backups'], buckets
+    # 프로젝트 공용 Custom — 트리는 프로젝트 수준 범위만(VPC 있음 · Cloud SQL 데이터베이스 없음 · 프로젝트 ID 없음)
+    p39.locator('[data-project-chip="custom"]').click()
+    dlg = p39.locator('[data-custom-dialog]')
+    expect(dlg).to_be_visible()
+    expect(dlg.locator('[data-rule="gcp.vpc_network"]')).to_have_count(1)
+    expect(dlg.locator('[data-rule="gcp.cloud_sql_database"]')).to_have_count(0)
+    expect(dlg.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
+    row(p39, 'pubsub_topic').locator('input[data-row-check]').click()
+    expect(dlg).to_have_count(0)
+    expect(p39.locator('[data-pick-path^="projectPicks"][data-pick="custom"]')).to_have_count(1)
+    expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_count(1)
+    expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_attribute('data-valid', 'true')
+    no_hangul(p39)
+    # 옛 링크 — VPC 둘(01 · 03)은 둘 다 보이고 더하기 단추도 보인다(모델 · 이름 그대로 — wizardHashCompat 의 fixture)
+    fx = json.loads(Path(__file__).resolve().parents[2].joinpath('src/components/__fixtures__/wizard-hash-before-open.json').read_text())
+    two_vpc = next(e for e in fx['wizard'] if e['label'].startswith('project picks only'))
+    goto_ready(p39, BASE + '/?v' + two_vpc['hash'])
+    goto_ready(p39, BASE + '/' + two_vpc['hash'])
+    vpc2 = p39.locator('[data-pick="vpc"]')
+    expect(vpc2.locator('li[data-slot]')).to_have_count(2)
+    expect(vpc2.locator('[data-add-slot]')).to_have_count(1)
+    assert [(k, n) for k, n, _ in screen_names(p39)] == [(i['key'], i['name']) for i in two_vpc['items']], screen_names(p39)
+    ctx39.close()
+    print('OK — 마법사 시나리오 ㉚~㊴ 통과')
 
 
 with sync_playwright() as p:
