@@ -25,7 +25,7 @@ import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from
 import { wizardLabels, wizardTerraform } from './wizardTerraform';
 import { toWizardExport } from './wizardExport';
 import * as S from './wizardState';
-import { debounce, sendBeacon, sessionStore, visitOnce, GENERATE_DEBOUNCE_MS } from './beacon';
+import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
@@ -137,14 +137,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   useEffect(() => {
     visitOnce(sessionStore());
   }, []);
-  // ui_generate — 결과가 바뀐 뒤 1초 디바운스(첫 화면은 세지 않는다)
+  // ui_generate — 결과가 바뀐 뒤 1초 디바운스(첫 화면은 세지 않는다). 보낼 때의 모델에서 고른 규칙 id 둘만 싣는다 (D71)
   const lastSent = useRef(stateKey);
-  const schedule = useMemo(() => debounce(() => sendBeacon('ui_generate'), GENERATE_DEBOUNCE_MS), []);
+  const schedule = useMemo(() => debounce((meta: ReturnType<typeof wizardGenerateMeta>) => sendBeacon('ui_generate', meta), GENERATE_DEBOUNCE_MS), []);
   useEffect(() => {
     if (!stateKey || stateKey === lastSent.current) return;
     lastSent.current = stateKey;
-    schedule();
-  }, [stateKey, schedule]);
+    schedule(wizardGenerateMeta(plan));
+  }, [stateKey, schedule, plan]);
 
   // 같은 탭 hash 이동 — 마법사 링크면 그 상태로 바꾸고, 트리 링크면 뿌리가 화면을 바꾼다(여기서는 손대지 않는다), 깨진 hash 면 지금 상태로 되돌린다
   const current = useRef('');

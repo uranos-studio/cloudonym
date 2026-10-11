@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { COPY_TARGETS } from './copyTargets';
-import { copyTarget, debounce, sendBeacon, sessionStore, visitOnce, EVENTS_PATH, VISIT_KEY, type StorageLike, type UiBeacon } from './beacon';
+import type { WizardPlan } from '../core/wizard/plan';
+import { pickedRuleIds } from './pickedRules';
+import { copyTarget, debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, EVENTS_PATH, VISIT_KEY, type StorageLike, type UiBeacon } from './beacon';
 
 function fakeStorage(mode: 'ok' | 'throw' = 'ok'): { storage: StorageLike; map: Map<string, string> } {
   const map = new Map<string, string>();
@@ -37,6 +39,19 @@ describe('visitOnce — ui_visit 은 탭당 1회 (D17 · sessionStorage 가드)'
 });
 
 describe('debounce — ui_generate 는 마지막 입력 뒤 1초에 한 번', () => {
+  it('인자는 마지막 호출의 것 — 마법사가 보낼 때의 meta 를 싣는다 (D71)', () => {
+    vi.useFakeTimers();
+    try {
+      const fn = vi.fn();
+      const d = debounce(fn, 1000);
+      d('a'); d('b'); d('c');
+      vi.advanceTimersByTime(1000);
+      expect(fn).toHaveBeenCalledTimes(1);
+      expect(fn).toHaveBeenCalledWith('c');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('1초 안의 연속 호출 다섯 → 실행 1회 · 1초 전에는 0회', () => {
     vi.useFakeTimers();
     try {
@@ -126,6 +141,49 @@ describe('ui_copy — 어느 복사 버튼인가만 보낸다 (D56)', () => {
       expect(calls).toEqual([[EVENTS_PATH, '{"event":"ui_copy","target":"name"}']]);
       expect(Object.keys(JSON.parse(calls[0]![1] as string))).toEqual(['event', 'target']);
       for (const w of ['gcp', 'project_id', 'owner', 'example']) expect(calls[0]![1] as string).not.toContain(w);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe('wizardGenerateMeta — 마법사 ui_generate 의 두 칸 (D71)', () => {
+  const project = { owner: 'example-team', system: 'payroll', env: 'prod', region: 'asia-northeast3' };
+  it('pickedRuleIds — 칩만 · 유효 규칙 id · 중복 없음 · 정렬 (네트워크 칩 · 방화벽 둘 · web 둘)', () => {
+    const plan: WizardPlan = {
+      provider: 'gcp', project,
+      projectPicks: [{ preset: 'vpc' }, { preset: 'subnet' }, { preset: 'firewall', tier: 'ssh' }, { preset: 'firewall', tier: 'web' }],
+      services: [{ purpose: 'shop', picks: [{ preset: 'web' }, { preset: 'db', kind: 'POSTGRES' }] }, { purpose: 'pay', picks: [{ preset: 'web', ha: true }] }],
+    };
+    expect(pickedRuleIds(plan)).toEqual({ chip: ['gcp.cloud_sql_instance', 'gcp.compute_instance', 'gcp.firewall_rule', 'gcp.subnet', 'gcp.vpc_network'], custom: [] });
+  });
+  it('pickedRuleIds — serverless 를 켜면 그 규칙 · 데이터에 없는 serverless 값은 기본 규칙 · 프로젝트 ID · 모르는 프리셋은 넣지 않는다', () => {
+    const plan = {
+      provider: 'gcp', project,
+      projectPicks: [{ preset: null, ruleId: 'gcp.project_id' }, { preset: 'nope' }],
+      services: [{ purpose: 'shop', picks: [{ preset: 'web', serverless: 'gcp.cloud_function' }, { preset: 'was', serverless: 'gcp.storage_bucket' }, { preset: null, ruleId: 'gcp.secret' }, { preset: null, ruleId: 'gcp.secret' }] }],
+    } as unknown as WizardPlan;
+    expect(pickedRuleIds(plan)).toEqual({ chip: ['gcp.cloud_function', 'gcp.compute_instance'], custom: ['gcp.secret'] });
+  });
+  it('pickedRuleIds — 고른 것이 없으면 빈 배열 둘', () => {
+    expect(pickedRuleIds({ provider: 'gcp', project, projectPicks: [], services: [] })).toEqual({ chip: [], custom: [] });
+  });
+  it('칩(프리셋)의 유효 규칙 · Custom 의 규칙 — 정렬 · 중복 없음 · 입력값 없음', () => {
+    const meta = wizardGenerateMeta({
+      provider: 'gcp', project,
+      projectPicks: [{ preset: 'vpc' }, { preset: null, ruleId: 'gcp.secret' }],
+      services: [{ purpose: 'shop', picks: [{ preset: 'web', serverless: 'gcp.run_service', tier: 'front' }, { preset: null, ruleId: 'gcp.gke_cluster', role: 'sync' }] }],
+    });
+    expect(meta).toEqual({ chip_rules: ['gcp.run_service', 'gcp.vpc_network'], custom_rules: ['gcp.gke_cluster', 'gcp.secret'] });
+    const text = JSON.stringify(meta);
+    for (const w of ['example-team', 'payroll', 'shop', 'front', 'sync', 'asia-northeast3', 'project_id']) expect(text, w).not.toContain(w);
+  });
+  it('sendBeacon 본문 — event 와 두 칸', () => {
+    const calls: [string, unknown][] = [];
+    vi.stubGlobal('navigator', { sendBeacon: (url: string, body: unknown) => { calls.push([url, body]); return true; } });
+    try {
+      sendBeacon('ui_generate', { chip_rules: ['gcp.subnet'], custom_rules: [] });
+      expect(calls).toEqual([[EVENTS_PATH, '{"event":"ui_generate","chip_rules":["gcp.subnet"],"custom_rules":[]}']]);
     } finally {
       vi.unstubAllGlobals();
     }

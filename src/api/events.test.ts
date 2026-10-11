@@ -73,6 +73,56 @@ describe('POST /v1/events — ui_copy 의 target (D56)', () => {
   });
 });
 
+describe('POST /v1/events — ui_generate 의 chip_rules · custom_rules (D71)', () => {
+  it('알려진 규칙 id 만 정렬해 Axiom 에 싣는다 · KV 키는 이벤트 하나뿐 · 문맥값은 싣지 않는다', async () => {
+    const { kv, store } = fakeKv();
+    const bodies: string[] = [];
+    vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { bodies.push(init.body); return Promise.resolve(new Response('{}')); });
+    try {
+      const body = { event: 'ui_generate', chip_rules: ['gcp.run_service', 'gcp.compute_instance', 'gcp.nope'], custom_rules: ['gcp.gke_cluster'], owner: 'example-team' };
+      const { res, promises } = await req(app, '/v1/events', beaconPost(body), { CLOUDONYM_KV: kv, AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' });
+      expect(res.status).toBe(200);
+      await Promise.all(promises);
+      expect([...store.keys()]).toHaveLength(1);
+      expect([...store.keys()][0]).toMatch(/^stats:ui_generate:\d{4}-\d{2}-\d{2}$/);
+      const row = JSON.parse(bodies[0]!)[0] as Record<string, unknown>;
+      expect(row).toMatchObject({ event: 'ui_generate', chip_rules: ['gcp.compute_instance', 'gcp.run_service'], custom_rules: ['gcp.gke_cluster'] });
+      expect(bodies[0]).not.toContain('example-team');
+      expect(bodies[0]).not.toContain('gcp.nope');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+  it('배열이 아니거나 문자열 아닌 값이 섞이면 그 칸을 버린다 — 400 이 아니라 200', async () => {
+    const bodies: string[] = [];
+    vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { bodies.push(init.body); return Promise.resolve(new Response('{}')); });
+    try {
+      const { res, promises } = await req(app, '/v1/events', beaconPost({ event: 'ui_generate', chip_rules: 'gcp.compute_instance', custom_rules: ['gcp.subnet', 1] }), { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' });
+      expect(res.status).toBe(200);
+      await Promise.all(promises);
+      const row = JSON.parse(bodies[0]!)[0] as Record<string, unknown>;
+      expect('chip_rules' in row).toBe(false);
+      expect('custom_rules' in row).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+  it('ui_visit · ui_copy 에 실은 두 칸은 싣지 않는다', async () => {
+    const bodies: string[] = [];
+    vi.stubGlobal('fetch', (_url: string, init: { body: string }) => { bodies.push(init.body); return Promise.resolve(new Response('{}')); });
+    try {
+      const env = { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' };
+      for (const b of [{ event: 'ui_visit' }, { event: 'ui_copy', target: 'terraform' }]) {
+        const { promises } = await req(app, '/v1/events', beaconPost({ ...b, chip_rules: ['gcp.subnet'], custom_rules: ['gcp.subnet'] }), env);
+        await Promise.all(promises);
+      }
+      for (const raw of bodies) expect(raw).not.toContain('gcp.subnet');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
 describe('waitUntil — 응답은 텔레메트리를 기다리지 않는다', () => {
   it('KV put 이 영원히 끝나지 않아도 응답은 돌아오고 그 Promise 는 pending 이다', async () => {
     const { kv } = fakeKv('hang');

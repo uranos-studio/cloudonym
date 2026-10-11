@@ -58,6 +58,11 @@ describe('/privacy', () => {
     expect(text).toContain('never collected');
     for (const w of ['owner', 'system', 'purpose', 'environment', 'region', 'URL hash', 'raw User-Agent', 'cookies', 'identifier']) expect(text, w).toContain(w);
   });
+  it('마법사의 고른 리소스 종류 — 규칙 id 만 보내고 입력값은 보내지 않는다 (D71)', () => {
+    const text = pageText();
+    expect(text).toContain('chip_rules and custom_rules list the rule ids of the resource kinds picked in the wizard');
+    expect(text).toContain('never the values you typed');
+  });
   it('Workers Logs — 호스팅 제공자로서 요청 메타데이터를 처리할 수 있다 · 로그에는 본문 · 헤더를 쓰지 않는다(오류는 그대로 남는다)', () => {
     const text = pageText();
     expect(text).toContain('As the hosting provider, Cloudflare may process request metadata');

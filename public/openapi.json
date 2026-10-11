@@ -1516,6 +1516,27 @@
             ],
             "description": "Which copy button succeeded. Required when event is ui_copy (missing is 400 request.field_missing, unknown is 400 request.value_unsupported, both with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
             "example": "names-json"
+          },
+          "chip_rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Rule ids of the resource kinds picked in the wizard with a preset chip (the serverless rule when serverless is on). Read only on ui_generate and ignored for the other events. Only ids of the rule table are kept; a value that is not an array of strings, or is longer than the number of rules, is dropped without an error. Context values, service names, tiers and roles are never sent.",
+            "example": [
+              "gcp.compute_instance",
+              "gcp.run_service"
+            ]
+          },
+          "custom_rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Rule ids of the resource kinds picked in the wizard with Custom. Read only on ui_generate and ignored for the other events. Only ids of the rule table are kept; a value that is not an array of strings, or is longer than the number of rules, is dropped without an error. Context values, service names, tiers and roles are never sent.",
+            "example": [
+              "gcp.secret"
+            ]
           }
         }
       },

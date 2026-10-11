@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { classifyClient, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, META_KEYS, type FetchLike, type TelemetrySource } from './telemetry';
+import { classifyClient, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, META_KEYS, MAX_RULE_IDS, ruleIdList, type FetchLike, type TelemetrySource } from './telemetry';
 import { fakeKv } from './test-support';
 
 // 고정 시각 — 실제 시계를 쓰지 않는다. UTC 09-28 15:30 = KST 09-29 00:30 (자정 경계)
@@ -189,11 +189,12 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
   });
   it('이벤트마다 Axiom 한 건의 키 집합 = 공통 다섯 + 그 이벤트의 허용 meta — 모르는 meta 키 · 모르는 이벤트의 meta 는 버린다', async () => {
     const full: Record<string, Record<string, unknown>> = {
+      ui_generate: { chip_rules: ['gcp.compute_instance'], custom_rules: ['gcp.subnet'] },
       ui_copy: { target: 'terraform' },
       api_generate: { providers: ['gcp'] },
       api_names: { provider: 'gcp', resource_count: 2, name_count: 3, valid: true },
       api_validate: { provider: 'gcp', resource_type: 'project_id', valid: false },
-      api_wizard: { provider: 'gcp', service_count: 2, resource_count: 7, name_count: 14, valid: true },
+      api_wizard: { provider: 'gcp', service_count: 2, resource_count: 7, name_count: 14, valid: true, chip_rules: ['gcp.compute_instance'], custom_rules: [] },
     };
     for (const event of [...Object.keys(META_KEYS), 'unknown_event']) {
       const { fetchFn, calls } = fakeFetch();
@@ -211,9 +212,9 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
   });
   it('허용 표는 D56 의 필드 표와 같다', () => {
     expect(META_KEYS).toEqual({
-      ui_visit: [], ui_generate: [], ui_copy: ['target'],
+      ui_visit: [], ui_generate: ['chip_rules', 'custom_rules'], ui_copy: ['target'],
       api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
-      api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid'],
+      api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid', 'chip_rules', 'custom_rules'],
       llms_txt_accessed: [], catalog_json_accessed: [],
     });
   });
@@ -240,5 +241,46 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
     } finally {
       errors.mockRestore();
     }
+  });
+});
+
+describe('chip_rules · custom_rules — 받은 값을 믿지 않는다 (D71)', () => {
+  const env = { AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds' };
+  async function row(event: string, meta: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { fetchFn, calls } = fakeFetch();
+    await logTelemetry(source(env), event, meta, { now: NOW, fetchFn });
+    return (JSON.parse(calls[0]!.init.body) as Record<string, unknown>[])[0]!;
+  }
+  it('ruleIdList — 알려진 규칙 id 만 · 중복 없음 · 정렬', () => {
+    expect(ruleIdList(['gcp.subnet', 'gcp.compute_instance', 'gcp.subnet', 'gcp.nope', 'example-team'])).toEqual(['gcp.compute_instance', 'gcp.subnet']);
+    expect(ruleIdList([])).toEqual([]);
+  });
+  it('ruleIdList — 배열이 아니면 · 문자열 아닌 값이 섞이면 · 상한을 넘으면 칸째 버린다(undefined)', () => {
+    for (const v of ['gcp.subnet', 1, null, undefined, { 0: 'gcp.subnet' }, true]) expect(ruleIdList(v), String(v)).toBeUndefined();
+    expect(ruleIdList(['gcp.subnet', 1])).toBeUndefined();
+    expect(ruleIdList(['gcp.subnet', null])).toBeUndefined();
+    expect(ruleIdList(['gcp.subnet', ['gcp.vpc_network']])).toBeUndefined();
+    expect(ruleIdList(Array.from({ length: MAX_RULE_IDS + 1 }, () => 'gcp.subnet'))).toBeUndefined();
+    expect(ruleIdList(Array.from({ length: MAX_RULE_IDS }, () => 'gcp.subnet'))).toEqual(['gcp.subnet']);
+  });
+  it('상한은 규칙 수 이하이고 0 보다 크다', async () => {
+    const { RULES } = await import('../core/constraints');
+    expect(MAX_RULE_IDS).toBeGreaterThan(0);
+    expect(MAX_RULE_IDS).toBeLessThanOrEqual(Object.keys(RULES).length);
+  });
+  it('Axiom 행 — 모르는 id 는 빠지고 칸은 남는다 · 모양이 틀린 칸은 행에서 빠진다', async () => {
+    const r = await row('ui_generate', { chip_rules: ['gcp.run_service', 'gcp.compute_instance', 'gcp.nope'], custom_rules: 'gcp.subnet' });
+    expect(r.chip_rules).toEqual(['gcp.compute_instance', 'gcp.run_service']);
+    expect('custom_rules' in r).toBe(false);
+    const w = await row('api_wizard', { provider: 'gcp', chip_rules: [1], custom_rules: ['example-team'] });
+    expect('chip_rules' in w).toBe(false);
+    expect(w.custom_rules).toEqual([]);
+    expect(JSON.stringify(w)).not.toContain('example-team');
+  });
+  it('두 칸이 서버 값(_time · kst_day · event · client_class · is_ai_agent)을 덮어쓰지 못한다 · 다른 이벤트에는 싣지 않는다', async () => {
+    const r = await row('ui_generate', { chip_rules: ['gcp.subnet'], _time: 'x', kst_day: 'x', event: 'x', client_class: 'x', is_ai_agent: true });
+    expect(r).toMatchObject({ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'ui_generate', client_class: 'cli', is_ai_agent: false, chip_rules: ['gcp.subnet'] });
+    const v = await row('api_validate', { provider: 'gcp', chip_rules: ['gcp.subnet'] });
+    expect('chip_rules' in v).toBe(false);
   });
 });

@@ -80,11 +80,14 @@ v1.post('/wizard', async (c) => {
   if (!read.ok) return notJson(c);
   const parsed = parseWizardBody(read.body);
   if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported, rewrite: wizardSentence });
-  const { provider, selection, transformed, labelContexts, pickCount } = parsed.value;
+  const { provider, selection, transformed, labelContexts, pickCount, pickedRules } = parsed.value;
   const out = generateProject(selection, provider);
   const labels = labelContexts.map(({ namespace, context }) => ({ namespace, labels: labelsFor(context, provider) }));
-  // 문맥값 · 서비스 이름은 싣지 않는다 (D17 · D56)
-  c.executionCtx.waitUntil(logTelemetry(c, 'api_wizard', { provider, service_count: selection.services.length, resource_count: pickCount, name_count: out.items.length, valid: out.valid }));
+  // 문맥값 · 서비스 이름은 싣지 않는다 (D17 · D56). 고른 규칙 id 둘만 (D71)
+  c.executionCtx.waitUntil(logTelemetry(c, 'api_wizard', {
+    provider, service_count: selection.services.length, resource_count: pickCount, name_count: out.items.length, valid: out.valid,
+    chip_rules: pickedRules.chip, custom_rules: pickedRules.custom,
+  }));
   return c.json(toWireWizard(out, labels, transformed, VERSION));
 });
 
@@ -100,7 +103,7 @@ v1.post('/validate', async (c) => {
 });
 
 // Sec-Fetch-Site 는 브라우저가 붙이고 페이지 스크립트가 바꿀 수 없다 (forbidden header). 화면의 sendBeacon 은 same-origin 이다
-// 화면 비콘 (D17 · D56) — 문맥값은 받지 않는다. 카운터를 올리고, ui_copy 는 어느 버튼인가(target)만 싣는다.
+// 화면 비콘 (D17 · D56) — 문맥값은 받지 않는다. 카운터를 올리고, ui_copy 는 어느 버튼인가(target)만, ui_generate 는 고른 규칙 id(D71)만 싣는다.
 // 같은 출처가 아니면 403 — 다른 사이트에 심은 sendBeacon(cross-site) 과 헤더 없는 요청(curl 등)을 거른다. 화면이 유일한 정당한 발신자다.
 // curl 은 헤더를 꾸밀 수 있다 — 그쪽은 요청 제한이 비용을 묶는다. Fetch Metadata 를 보내지 않는 옛 브라우저의 비콘은 버려진다(근사치 · D16)
 // 브라우저는 안전한 출처(HTTPS · localhost · 127.0.0.1)에서만 Sec-Fetch-* 를 붙인다 — 개발 서버를 HTTP 로 다른 호스트 이름에서 열면 비콘이 403 이다. 운영은 HTTPS 라 해당하지 않는다
@@ -110,7 +113,7 @@ v1.post('/events', async (c) => {
   if (!read.ok) return notJson(c);
   const parsed = parseEventBody(read.body);
   if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
-  const { event, target } = parsed.value;
-  c.executionCtx.waitUntil(logTelemetry(c, event, target ? { target } : {}));
+  const { event, target, rules } = parsed.value;
+  c.executionCtx.waitUntil(logTelemetry(c, event, target ? { target } : (rules ?? {})));
   return c.json({ ok: true });
 });

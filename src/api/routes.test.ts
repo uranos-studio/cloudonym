@@ -519,6 +519,9 @@ describe('POST /v1/wizard (D66)', () => {
       expect([...store.keys()][0]).toMatch(/^stats:api_wizard:/);
       const sent = JSON.parse(axiom.mock.calls[0]![1].body)[0];
       expect(sent).toMatchObject({ event: 'api_wizard', provider: 'gcp', service_count: 2, resource_count: 7, name_count: 14, valid: true });
+      // D71 — 칩으로 고른 유효 규칙 · Custom 으로 고른 규칙 (정렬 · 중복 없음 · 프로젝트 ID 없음)
+      expect(sent.chip_rules).toEqual(['gcp.cloud_sql_instance', 'gcp.compute_instance', 'gcp.firewall_rule', 'gcp.subnet', 'gcp.vpc_network']);
+      expect(sent.custom_rules).toEqual([]);
       const raw = JSON.stringify(sent);
       for (const v of ['platform', 'billing', 'shop', 'pay', 'asia-northeast3']) expect(raw, v).not.toContain(v);
     } finally {

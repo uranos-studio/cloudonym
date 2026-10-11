@@ -2,7 +2,8 @@
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type ProjectContext, type Provider, type RawContext } from '../core/types';
 import { rulesFor } from '../core/constraints';
 import { MAX_CONTEXT_CHARS, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection } from '../core/engine';
-import { expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { expandPlan, validatePlan, PROJECT_ID_RULE, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { presetOf } from '../core/wizard/presets';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
 import type { CoreMessage } from '../core/messages';
@@ -22,6 +23,8 @@ export interface NamesInput { provider: Provider; context: NamingContext; transf
 export interface WizardInput {
   provider: Provider; selection: ProjectSelection; transformed: CoreMessage[];
   labelContexts: { namespace: string; context: NamingContext | ProjectContext }[]; pickCount: number;
+  /** 고른 규칙 id — 칩 · Custom (D71). 계측만 쓴다 */
+  pickedRules: { chip: string[]; custom: string[] };
 }
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
@@ -30,7 +33,8 @@ export type UiEvent = (typeof UI_EVENTS)[number];
 export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json'] as const;
 export type UiCopyTarget = (typeof UI_COPY_TARGETS)[number];
 /** 비콘 한 건 — target 은 ui_copy 에만 있다. 다른 이벤트에 온 target 은 버린다 */
-export interface EventInput { event: UiEvent; target?: UiCopyTarget }
+/** chip_rules · custom_rules 는 ui_generate 에서만 그대로 넘긴다 — 거르기는 telemetry.ts 의 ruleIdList 한 곳이 한다 (D71) */
+export interface EventInput { event: UiEvent; target?: UiCopyTarget; rules?: { chip_rules?: unknown; custom_rules?: unknown } }
 
 function reject(errors: Message[], supported?: string[], status: 400 | 409 = 400): { ok: false; rejection: Rejection } {
   return { ok: false, rejection: { status, errors, ...(supported ? { supported } : {}) } };
@@ -166,6 +170,11 @@ export function parseEventBody(body: unknown): Parsed<EventInput> {
   if (long.length > 0) return reject(long);
   if (typeof event !== 'string' || !(UI_EVENTS as readonly string[]).includes(event)) {
     return reject([unsupported(event, 'event')], [...UI_EVENTS]);
+  }
+  if (event === 'ui_generate') {
+    const rules: NonNullable<EventInput['rules']> = {};
+    for (const k of ['chip_rules', 'custom_rules'] as const) if (Object.hasOwn(body, k)) rules[k] = body[k];
+    return { ok: true, value: Object.keys(rules).length > 0 ? { event, rules } : { event } };
   }
   if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent } };
   const target = body.target;
@@ -314,6 +323,24 @@ export function wizardSentence(w: WireMessage): WireMessage {
   return { ...w, message: w.message.replace(/^(resources|picks)\[\d+\]/, w.field) };
 }
 
+/** 고른 규칙 id (D71) — 칩(프리셋)은 유효 규칙(serverless 를 켜면 그 규칙), Custom 은 ruleId. 검사를 지난 plan 에 부른다.
+ *  화면의 components/pickedRules.ts pickedRuleIds 와 같은 일이다(같은지 privacy-sync.test 가 본다). 엔진 밖에 둔다 — src/core 를 고치면 규칙 버전이 바뀐다 */
+export function wizardPickedRules(plan: WizardPlan): { chip: string[]; custom: string[] } {
+  const chip = new Set<string>();
+  const custom = new Set<string>();
+  for (const pick of [...plan.projectPicks, ...plan.services.flatMap((s) => s.picks)]) {
+    if (pick.preset === null) {
+      if (typeof pick.ruleId === 'string' && pick.ruleId !== PROJECT_ID_RULE) custom.add(pick.ruleId);
+      continue;
+    }
+    const preset = presetOf(pick.preset);
+    if (!preset) continue;
+    const sv = typeof pick.serverless === 'string' && preset.serverless?.ruleIds.includes(pick.serverless) ? pick.serverless : undefined;
+    chip.add(sv ?? preset.ruleId);
+  }
+  return { chip: [...chip].sort(), custom: [...custom].sort() };
+}
+
 /** POST /v1/wizard (D66) — 모양 · 길이는 여기, 마법사 검사는 core validatePlan 하나, 서비스마다 문맥(purpose 포함)은 parseContext */
 export function parseWizardBody(body: unknown): Parsed<WizardInput> {
   if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
@@ -376,5 +403,5 @@ export function parseWizardBody(body: unknown): Parsed<WizardInput> {
 
   const selection = expandPlan(plan);
   const pickCount = plan.projectPicks.length + plan.services.reduce((n, s) => n + s.picks.length, 0);
-  return { ok: true, value: { provider, selection, transformed, labelContexts, pickCount } };
+  return { ok: true, value: { provider, selection, transformed, labelContexts, pickCount, pickedRules: wizardPickedRules(plan) } };
 }

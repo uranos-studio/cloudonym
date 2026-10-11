@@ -1,5 +1,6 @@
 // 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17 · D56). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
 import type { Bindings } from './env';
+import { RULES } from '../core/constraints';
 
 /** Hono Context 가 이 모양을 만족한다 — 시험은 평범한 객체를 넣는다 */
 export interface TelemetrySource { env: Bindings; req: { header: (name: string) => string | undefined } }
@@ -32,14 +33,33 @@ export function classifyClient(userAgent: string | undefined): ClientClass {
 
 /** 이벤트마다 Axiom 에 싣는 meta 키 (D56 필드 표) — 표에 없는 키 · 표에 없는 이벤트의 meta 는 싣지 않는다 */
 export const META_KEYS: Readonly<Record<string, readonly string[]>> = {
-  ui_visit: [], ui_generate: [], ui_copy: ['target'],
+  ui_visit: [], ui_generate: ['chip_rules', 'custom_rules'], ui_copy: ['target'],
   api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
-  api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid'],
+  api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid', 'chip_rules', 'custom_rules'],
   llms_txt_accessed: [], catalog_json_accessed: [],
 };
+
+/** 고른 규칙 id 칸 (D71) — 화면이 보낸 값은 믿지 않는다. 엔진의 규칙 표에 있는 id 만 남긴다 */
+const RULE_ID_KEYS: ReadonlySet<string> = new Set(['chip_rules', 'custom_rules']);
+/** 한 칸의 배열 길이 상한 — 규칙 수. 중복 없는 정상 값은 이것을 넘을 수 없다 */
+export const MAX_RULE_IDS = Object.keys(RULES).length;
+/** 배열이 아니거나 · 문자열 아닌 원소가 있거나 · 상한을 넘으면 undefined(칸째 버린다). 아니면 알려진 id 만 · 중복 없이 · 정렬해 돌려준다 */
+export function ruleIdList(value: unknown): string[] | undefined {
+  if (!Array.isArray(value) || value.length > MAX_RULE_IDS) return undefined;
+  if (!value.every((v): v is string => typeof v === 'string')) return undefined;
+  return [...new Set(value.filter((id) => Object.hasOwn(RULES, id)))].sort();
+}
+
 function allowedMeta(event: string, meta: Record<string, unknown>): Record<string, unknown> {
   const keys = Object.hasOwn(META_KEYS, event) ? META_KEYS[event]! : [];
-  return Object.fromEntries(keys.filter((k) => Object.hasOwn(meta, k)).map((k) => [k, meta[k]]));
+  const out: Record<string, unknown> = {};
+  for (const k of keys) {
+    if (!Object.hasOwn(meta, k)) continue;
+    if (!RULE_ID_KEYS.has(k)) { out[k] = meta[k]; continue; }
+    const ids = ruleIdList(meta[k]);
+    if (ids !== undefined) out[k] = ids;
+  }
+  return out;
 }
 
 /** KV 일자 카운터의 수명 — 366일 뒤 Cloudflare 가 지운다 (D56 · /privacy 의 보존 기간) */

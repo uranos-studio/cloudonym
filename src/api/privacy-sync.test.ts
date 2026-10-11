@@ -2,8 +2,11 @@
 import { describe, it, expect } from 'vitest';
 import { KV_TTL_SECONDS, META_KEYS } from './telemetry';
 import { RATE_LIMIT } from './ratelimit';
-import { UI_COPY_TARGETS } from './schemas';
+import { UI_COPY_TARGETS, wizardPickedRules } from './schemas';
 import { COPY_TARGETS } from '../components/copyTargets';
+import { pickedRuleIds } from '../components/pickedRules';
+import type { WizardPlan } from '../core/wizard/plan';
+import { PRESETS } from '../core/wizard/presets';
 import { PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from '../components/privacyModel';
 
 describe('화면 · 안내 ↔ API 상수', () => {
@@ -17,5 +20,21 @@ describe('화면 · 안내 ↔ API 상수', () => {
   it('KV 보존 일수 × 86400 = expirationTtl · 요청 제한 숫자 = RATE_LIMIT', () => {
     expect(PRIVACY_KV_RETENTION_DAYS * 86400).toBe(KV_TTL_SECONDS);
     expect(PRIVACY_RATE_LIMIT).toEqual(RATE_LIMIT);
+  });
+});
+
+describe('고른 규칙 id — 화면(beacon.ts)과 API(schemas.ts)가 같은 값을 낸다 (D71)', () => {
+  const project = { owner: 'example-team', system: 'payroll', env: 'prod', region: 'asia-northeast3' };
+  it('프리셋 전부 · serverless 둘 · Custom · 프로젝트 ID · 모르는 프리셋', () => {
+    const picks = [
+      ...PRESETS.map((p) => ({ preset: p.id })),
+      { preset: 'web', serverless: 'gcp.run_service' }, { preset: 'was', serverless: 'gcp.cloud_function' }, { preset: 'bastion', serverless: 'gcp.run_service' },
+      { preset: null, ruleId: 'gcp.secret' }, { preset: null, ruleId: 'gcp.project_id' }, { preset: 'nope' },
+    ];
+    const plan = { provider: 'gcp', project, projectPicks: picks.slice(0, 3), services: [{ purpose: 'shop', picks: picks.slice(3) }] } as unknown as WizardPlan;
+    const out = wizardPickedRules(plan);
+    expect(pickedRuleIds(plan)).toEqual(out);
+    expect(out.chip).toContain('gcp.run_service');
+    expect(out.custom).toEqual(['gcp.secret']);
   });
 });
