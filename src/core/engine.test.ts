@@ -482,9 +482,9 @@ describe('parseProjectContext · generateItem — 용도 토큰 · 프로젝트 
       expect(generateItem(parsed(), vm(), { tier }), JSON.stringify(tier)).toMatchObject({ name: '', valid: false, violations: [{ code: 'name.token_empty', field: 'tier' }] });
     }
   });
-  it('generateItem — tier 자리가 없는 규칙(순번 없음)에 tier 를 주면 던진다 — 조용히 버리지 않는다', () => {
-    expect(() => generateItem(parsed(), getRule('gcp', 'storage_bucket')!, { tier: 'web' })).toThrow(/storage_bucket/);
+  it('generateItem — tier 자리가 없는 규칙(역할 규칙 · AWS 의 순번 없는 규칙)에 tier 를 주면 던진다 — 조용히 버리지 않는다', () => {
     expect(() => generateItem(parsed(), getRule('gcp', 'service_account')!, { tier: 'web' })).toThrow(/service_account/);
+    expect(() => generateItem(parsed(), getRule('aws', 's3_bucket')!, { tier: 'web' })).toThrow(/s3_bucket/);
     expect(generateItem(parsed(), getRule('gcp', 'storage_bucket')!, {})).toMatchObject({ valid: true });
   });
 

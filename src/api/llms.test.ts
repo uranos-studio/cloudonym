@@ -143,7 +143,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(formulaOf(RULES['gcp.cloud_sql_instance']!)).toBe('<system>-<purpose>-<env>-<region>-sql-<kind>[-<tier>]-<seq>');
     expect(formulaOf(RULES['gcp.vpc_network']!)).not.toContain('<kind>');
   });
-  it('용도 토큰 tier 는 공식에 [-<tier>] 로 — 약어 · 종류 뒤 · 순번 앞 · 순번 규칙에만 (D60)', () => {
+  it('용도 토큰 tier 는 공식에 [-<tier>] 로 — 약어 · 종류 뒤 · 순번 앞 (D60) · 순번 없는 규칙은 약어 · 종류 바로 뒤 (D74)', () => {
     expect(RULES['gcp.cloud_sql_instance']!.template).toContain('tier');
     const formulas = lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l));
     for (const r of enabledRules) {
@@ -151,8 +151,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
       // 구분자는 규칙 것이다 — 밑줄 규칙(D72)은 [_<tier>]_<seq>
       const s = r.separator;
       expect(f.includes(`[${s}<tier>]`), r.id).toBe(r.template.includes('tier'));
-      if (r.template.includes('tier')) expect(f.endsWith(`[${s}<tier>]${s}<seq>`), r.id).toBe(true);
+      if (r.template.includes('tier') && r.template.includes('seq')) expect(f.endsWith(`[${s}<tier>]${s}<seq>`), r.id).toBe(true);
+      if (r.template.includes('tier') && !r.template.includes('seq')) expect(f, r.id).toContain(`${r.slug}[${s}<tier>]`);
     }
+    expect(formulaOf(RULES['gcp.storage_bucket']!)).toBe(`<owner>-<system>-<purpose>-<env>-${RULES['gcp.storage_bucket']!.slug}[-<tier>]`);
     expect(formulaOf(RULES['gcp.compute_instance']!)).toBe(`<system>-<purpose>-<env>-<region>-${RULES['gcp.compute_instance']!.slug}[-<tier>]-<seq>`);
     expect(formulas.filter((l) => l.includes('<tier>')).length).toBeGreaterThan(0);
     // 구분자 없는 규칙은 괄호 안에 구분자도 없다

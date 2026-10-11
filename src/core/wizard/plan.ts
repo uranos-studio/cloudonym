@@ -133,10 +133,10 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     // level — 프로젝트 공용 pick 은 프로젝트 수준 범위의 규칙만
     if (level === 'project' && !PROJECT_SCOPES.includes(rule.scope)) push({ code: 'wizard.level_not_supported', params: { index, type } });
 
-    // tier — count 규칙에만 · 꼴 · 예약어
+    // tier — 템플릿에 tier 자리가 있는 규칙(count 규칙 · 순번 없는 GCP 규칙 — D74)에만 · 꼴 · 예약어
     const tier: unknown = pick.tier ?? preset?.tier ?? undefined;
     if (pick.tier !== undefined) {
-      if (input !== 'count') push({ code: 'wizard.tier_not_supported', params: { index, type } });
+      if (!rule.template.includes('tier')) push({ code: 'wizard.tier_not_supported', params: { index, type } });
       else if (typeof pick.tier !== 'string' || !TIER_PATTERN.test(pick.tier)) push({ code: 'wizard.invalid_tier', params: { index, value: shown(pick.tier), pattern: TIER_PATTERN.source } });
       else if (RESERVED_TIERS.has(pick.tier)) push({ code: 'wizard.tier_reserved', params: { index, value: pick.tier } });
     }

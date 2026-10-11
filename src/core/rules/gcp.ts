@@ -142,11 +142,21 @@ function withKind(ts: Token[]): Token[] {
   return [...ts.slice(0, at + 1), 'kind', ...ts.slice(at + 1)];
 }
 
+/** 순번 없는 규칙의 용도 토큰 자리 (D74) — 종류 토큰이 있으면 그 뒤, 없으면 약어 바로 뒤. 이미 tier 가 있거나(count 규칙 — withTier) ·
+ *  역할 규칙(역할이 구별자다) · 약어가 없는 규칙(프로젝트 ID)은 그대로. 빈 tier 는 compose 가 건너뛰어 옛 이름이 바뀌지 않는다 */
+function withPlainTier(ts: Token[]): Token[] {
+  if (ts.includes('tier') || ts.includes('role')) return ts;
+  const at = ts.includes('kind') ? ts.indexOf('kind') : ts.indexOf('slug');
+  if (at < 0) return ts;
+  return [...ts.slice(0, at + 1), 'tier', ...ts.slice(at + 1)];
+}
+
 /** catalog 가 규칙 위에 덮는다 (D47) — 약어 · entity(행에 있을 때) · 지역 토큰 종류 · 종류 표.
  *  지역 토큰이 none 이면 템플릿과 optional 에서 region 을 함께 뺀다(optional 은 template 에 있는 토큰만).
  *  존 규칙도 region 이라 optional 에 region 이 남는다 — 축소 1단계에서 뗄 수 있다 (D50 revised · D51 철회).
  *  종류 표가 있으면 템플릿의 slug 바로 뒤에 kind 를 끼운다 (D52) — optional 에는 넣지 않는다(보호 토큰).
  *  그 뒤 count 규칙이면 seq 바로 앞에 tier 를 끼운다 (D60) — 역시 보호 토큰이라 optional 밖이다.
+ *  순번 · 역할이 없는 규칙은 종류 토큰(없으면 약어) 바로 뒤에 끼운다 (D74) — 같은 종류를 한 서비스에 둘 둘 때의 구별자다.
  *  category 는 덮지 않는다 — 합친 행의 category 는 첫 규칙을 따른다 */
 export function applyCatalog(rule: ResourceRule): ResourceRule {
   const hit = CATALOG_BY_RULE.get(rule.id);
@@ -157,7 +167,7 @@ export function applyCatalog(rule: ResourceRule): ResourceRule {
     ...rule,
     slug: row.slug.value,
     entity: row.entity ?? rule.entity,
-    template: withTier(row.kind && spec.kinds ? withKind(dropRegion(rule.template)) : dropRegion(rule.template)),
+    template: withPlainTier(withTier(row.kind && spec.kinds ? withKind(dropRegion(rule.template)) : dropRegion(rule.template))),
     optional: dropRegion(rule.optional),
     regionToken: spec.regionToken,
     ...(row.kind && spec.kinds ? {

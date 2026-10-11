@@ -61,7 +61,8 @@ describe('namingDocModel', () => {
     const formulas = rowsOf(model, 'formula').map((r) => r.cells[0]!);
     const tiered = formulas.filter((f) => f.includes('<tier>'));
     expect(tiered.length).toBeGreaterThan(0);
-    for (const f of tiered) expect(f, f).toMatch(/\[-<tier>\]-<seq>$|\[-<tier>\]-<seq>-|\[_<tier>\]_<seq>$/);   // 밑줄 규칙(D72)은 [_<tier>]_<seq>
+    // 밑줄 규칙(D72)은 [_<tier>]_<seq> · 순번 없는 규칙(D74)은 약어 바로 뒤 — 끝(버킷 · 데이터셋) · 앞 약어 뒤(Spanner 구성 · 커스텀 역할)
+    for (const f of tiered) expect(f, f).toMatch(/\[-<tier>\]-<seq>$|\[-<tier>\]-<seq>-|\[_<tier>\]_<seq>$|<slug>\[-<tier>\]$|<slug>\[_<tier>\]$|^<slug>\[-?<tier>\]-?<system>/);
     // tier 가 없는 규칙의 공식에는 없다 — 행의 규칙 수 합 = tier 가 있는 규칙 수
     const tieredCount = rowsOf(model, 'formula').filter((r) => r.cells[0]!.includes('<tier>')).reduce((n, r) => n + Number(r.cells.at(-1)), 0);
     expect(tieredCount).toBe(withTier.length);

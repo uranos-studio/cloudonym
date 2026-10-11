@@ -267,10 +267,18 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     }
   });
 
-  it('용도 토큰 tier — 세 CSP 의 count 규칙 전부 seq 바로 앞 · 종류 토큰이 있으면 그 뒤 · 나머지 규칙에는 없다 (D60)', () => {
+  it('용도 토큰 tier — 세 CSP 의 count 규칙 전부 seq 바로 앞 · 종류 토큰이 있으면 그 뒤 (D60) · GCP 의 순번 없는 규칙은 종류(없으면 약어) 바로 뒤 · 역할 규칙 · 프로젝트 ID · AWS/Azure 의 나머지에는 없다 (D74)', () => {
     for (const r of Object.values(RULES)) {
       const seq = r.template.indexOf('seq');
-      if (seq < 0) { expect(r.template, r.id).not.toContain('tier'); continue; }
+      if (seq < 0) {
+        const plain = r.provider === 'gcp' && !r.template.includes('role') && r.template.includes('slug');
+        if (!plain) { expect(r.template, r.id).not.toContain('tier'); continue; }
+        const after = r.template.includes('kind') ? 'kind' : 'slug';
+        expect(r.template.indexOf('tier'), r.id).toBe(r.template.indexOf(after) + 1);
+        expect(r.template.filter((t) => t === 'tier').length, r.id).toBe(1);
+        expect(r.optional, r.id).not.toContain('tier');
+        continue;
+      }
       expect(r.template.indexOf('tier'), r.id).toBe(seq - 1);
       expect(r.template.filter((t) => t === 'tier').length, r.id).toBe(1);
       if (r.template.includes('kind')) expect(r.template.indexOf('kind'), r.id).toBe(seq - 2);
@@ -279,6 +287,13 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.compute_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
     expect(RULES['aws.ec2_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
     expect(RULES['azure.virtual_machine']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
+    expect(RULES['gcp.storage_bucket']!.template).toEqual(['owner', 'system', 'purpose', 'env', 'slug', 'tier']);
+    expect(RULES['gcp.bigquery_dataset']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'tier']);
+    expect(RULES['gcp.spanner_instance_config']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
+    expect(RULES['gcp.iam_custom_role']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
+    expect(RULES['gcp.project_id']!.template).not.toContain('tier');
+    expect(RULES['gcp.service_account']!.template).not.toContain('tier');
+    expect(RULES['gcp.cloud_sql_user']!.template).not.toContain('tier');
   });
 
   it('AWS · Azure 규칙은 덮지 않는다', () => {

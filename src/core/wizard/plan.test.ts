@@ -157,6 +157,22 @@ describe('tier · level · 중복 (D60 · D63)', () => {
     expectError(svc({ preset: null, ruleId: 'gcp.service_account', tier: 'abc' }), 'wizard.tier_not_supported', 'services[0].picks[0]', { type: 'service_account' });
     expectError(svc({ preset: 'web', tier: 'Web', instances: slots(1) }), 'wizard.invalid_tier', 'services[0].picks[0]', { value: 'Web', pattern: TIER_PATTERN.source });
   });
+  it('순번 없는 규칙의 tier (D74) — 버킷 둘은 tier 없이 duplicate_pick · uploads/backups 면 통과하고 이름 둘 · tier 없는 버킷 이름은 그대로', () => {
+    expectError(svc({ preset: 'object' }, { preset: 'object' }), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'storage_bucket' });
+    expectError(svc({ preset: 'object' }, { preset: 'object', tier: 'uploads' }, { preset: null, ruleId: 'gcp.storage_bucket', tier: 'uploads' }), 'wizard.duplicate_pick', 'services[0].picks[2]', { value: 'storage_bucket/uploads' });
+    const two = svc({ preset: 'object', tier: 'uploads' }, { preset: 'object', tier: 'backups' });
+    expect(validatePlan(two)).toEqual({ ok: true });
+    expect(names(two).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs-backups']);
+    expect(names(svc({ preset: 'object' })).slice(1)).toEqual(['platform-billing-shop-prod-gcs']);
+    // 밑줄 규칙(BigQuery 데이터셋) · 앞 약어 규칙(커스텀 역할 — 구분자 없음)
+    expect(names(svc({ preset: null, ruleId: 'gcp.bigquery_dataset', tier: 'raw' })).slice(1)).toEqual(['billing_shop_prod_bq_raw']);
+    expect(validatePlan(svc({ preset: null, ruleId: 'gcp.iam_custom_role', tier: 'audit' }))).toEqual({ ok: true });
+    // 예약어 · 꼴은 count 규칙과 같은 검사
+    expectError(svc({ preset: 'object', tier: 'gcs' }), 'wizard.tier_reserved', 'services[0].picks[0]', { value: 'gcs' });
+    expectError(svc({ preset: 'object', tier: 'Up' }), 'wizard.invalid_tier', 'services[0].picks[0]');
+    // 역할 규칙(Cloud SQL 사용자)은 여전히 받지 않는다
+    expectError(svc({ preset: null, ruleId: 'gcp.cloud_sql_user', tier: 'abc' }), 'wizard.tier_not_supported', 'services[0].picks[0]', { type: 'cloud_sql_user' });
+  });
   it('custom tier db → tier_reserved · tier run(Cloud Run 약어) → tier_reserved', () => {
     expectError(svc({ preset: null, ruleId: 'gcp.compute_instance', tier: 'db', instances: slots(1) }), 'wizard.tier_reserved', 'services[0].picks[0]', { value: 'db' });
     expectError(svc({ preset: null, ruleId: 'gcp.compute_instance', tier: 'run', instances: slots(1) }), 'wizard.tier_reserved', 'services[0].picks[0]', { value: 'run' });
