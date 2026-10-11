@@ -509,11 +509,19 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(vpc.locator('[data-renumber]')).to_have_count(0)
     expect(p39.locator('[data-pick="subnet"] [data-add-slot]')).to_have_text('Add Subnet')
     assert p39.locator('text=Add instance').count() == 0
+    # 프리셋이 tier 를 정하는 web 에는 tier 칸도 Duplicate 도 없다 — 패널이 있는 것을 먼저 본다
+    svc(p39, 0).locator('[data-purpose-chip="web"]').click()
+    web39 = svc(p39, 0).locator('[data-pick="web"]')
+    expect(web39).to_have_count(1)
+    expect(web39.locator('[data-remove-pick]')).to_have_count(1)
+    expect(web39.locator('[data-duplicate-pick]')).to_have_count(0)
+    expect(web39.locator('[data-tier]')).to_have_count(0)
+    svc(p39, 0).locator('[data-purpose-chip="web"]').click()
+    expect(web39).to_have_count(0)
     # 버킷 둘 — Duplicate 직후 복사본에 중복 오류 · tier 를 치면 이름 둘
     svc(p39, 0).locator('[data-purpose-chip="object"]').click()
     obj = svc(p39, 0).locator('[data-pick="object"]')
     expect(obj.locator('[data-tier]')).to_have_count(1)
-    expect(svc(p39, 0).locator('[data-pick="web"] [data-duplicate-pick]')).to_have_count(0)
     obj.locator('[data-duplicate-pick]').click()
     expect(obj).to_have_count(2)
     expect(obj.nth(1).locator('[data-wizard-error]')).to_contain_text('storage_bucket')

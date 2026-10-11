@@ -235,6 +235,17 @@ describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', 
     expect(p.services[0]!.picks[1]).toEqual({ preset: 'db', instances: [{ id: '1', seq: '01' }] });
     p = setPickField(p, { service: 0, pick: 1 }, 'tier', 'replica');
     ok(p);
+    // HA 를 켠 서버 두 대의 복사본은 HA 없이 줄 하나
+    let w = setHa(togglePreset(initialPlan(), 0, 'web'), shop, true);
+    expect(w.services[0]!.picks[0]!.ha).toBe(true);
+    w = duplicatePick(w, shop);
+    expect(w.services[0]!.picks[1]).toEqual({ preset: 'web', instances: [{ id: '1', seq: '01' }] });
+  });
+  it('원본에 tier 가 있으면 복사본(tier 없음)은 바로 통과한다 — 중복 오류는 tier 없는 같은 pick 이 이미 있을 때만', () => {
+    let p = setPickField(togglePreset(initialPlan(), 0, 'object'), shop, 'tier', 'uploads');
+    p = duplicatePick(p, shop);
+    ok(p);
+    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs']);
   });
   it('프리셋이 tier 를 정하면(web · 방화벽) · 역할 규칙 · tier 자리 없는 규칙은 tier 칸도 Duplicate 도 없다', () => {
     expect(tierEditable({ preset: 'web', instances: [] })).toBe(false);

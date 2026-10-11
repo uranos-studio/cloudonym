@@ -172,7 +172,7 @@ export function addCustom(plan: WizardPlan, service: number | null, rule: { rule
 }
 
 /** 같은 pick 을 바로 뒤에 하나 더 (D74) — tier 를 비운 복사본. 칩은 켜고 끄는 단추라 같은 종류 둘째를 만들 수 없다.
- *  복사 직후에는 duplicate_pick 이 복사본에 붙고, tier 를 치면 사라진다. count 규칙은 새 서버 줄 하나(01) · HA 는 끈다 */
+ *  tier 없는 같은 pick 이 이미 있으면(원본에 tier 가 없으면) 복사본에 duplicate_pick 이 붙고, tier 를 치면 사라진다. count 규칙은 새 서버 줄 하나(01) · HA 는 끈다 */
 export function duplicatePick(plan: WizardPlan, ref: PickRef): WizardPlan {
   const picks = picksOf(plan, ref.service);
   const cur = picks[ref.pick];
