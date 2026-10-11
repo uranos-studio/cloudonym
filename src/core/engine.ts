@@ -287,10 +287,10 @@ export function validateName(provider: Provider, resourceType: string, name: str
   // ⑵ 길이 초과면 정제한 값을 쪼개 앞 토큰부터 뗀다.
   // 생성의 축소 1단계(template 순서대로 optional 을 뗀다)와 다른 까닭: 검증은 이름이 어떤 template 으로 만들어졌는지 모른다
   // ⑶ 구분자 없는 규칙은 토큰 경계를 모르므로 제안하지 않는다
-  if (normalized.length > rule.maxLength && rule.separator === '-') {
-    const parts = normalized.split('-');
+  if (normalized.length > rule.maxLength && rule.separator !== '') {
+    const parts = normalized.split(rule.separator);
     for (let i = 1; i < parts.length; i++) {
-      const candidate = parts.slice(i).join('-');
+      const candidate = parts.slice(i).join(rule.separator);
       if (checkName(candidate, rule).length === 0) return { valid: false, violations, suggestedName: candidate };
     }
   }

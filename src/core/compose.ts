@@ -54,6 +54,6 @@ export function withTier(ts: readonly Token[]): Token[] {
   return [...ts.slice(0, at), 'tier', ...ts.slice(at)];
 }
 
-export function compose(values: Partial<Record<Token, string>>, order: Token[], separator: '' | '-'): string {
+export function compose(values: Partial<Record<Token, string>>, order: Token[], separator: ResourceRule['separator']): string {
   return order.map((t) => values[t] ?? '').filter((v) => v.length > 0).join(separator);
 }

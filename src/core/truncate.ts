@@ -13,11 +13,13 @@ export function fit(input: Values, rule: ResourceRule) {
   const variableTokens = () => rule.template.filter((t) => !!input[t] && values[t] !== undefined && !PROTECTED.includes(t));
   // MIN_TOKEN 은 2단계(단축·균등)가 바꾼 토큰에만 건다 — 사용자가 준 짧은 값은 축소의 결과가 아니다 (D13)
   const shrunkTooShort = (t: Token) => values[t] !== input[t] && (values[t] ?? '').length < MIN_TOKEN;
+  // 겹친 · 앞뒤 구분자 검사 — 구분자 없는 규칙은 지금처럼 하이픈을 본다. 밑줄 규칙은 밑줄을 본다(토큰에 하이픈이 남지 않는다)
+  const sep = rule.separator || '-';
   const holds = () => {
     const n = name();
     return n.length <= rule.maxLength
       && !variableTokens().some(shrunkTooShort)
-      && !n.includes('--') && !n.startsWith('-') && !n.endsWith('-');
+      && !n.includes(sep + sep) && !n.startsWith(sep) && !n.endsWith(sep);
   };
   const done = () => ({ values, name: name(), truncated: steps.length > 0, steps, fits: holds() });
 
@@ -46,7 +48,7 @@ export function fit(input: Values, rule: ResourceRule) {
   const budget = elementBudget(rule.maxLength, fixedLen, separators, variable.length);
   if (budget < MIN_TOKEN) return done();               // D13 — 한 글자 토큰은 만들지 않는다
   for (const t of variable) {
-    if (values[t]!.length > budget) values[t] = values[t]!.slice(0, budget).replace(/^-+|-+$/g, '');
+    if (values[t]!.length > budget) values[t] = values[t]!.slice(0, budget).replace(sep === '_' ? /^[-_]+|[-_]+$/g : /^-+|-+$/g, '');
   }
   steps.push({ code: 'step.budget_shortened', params: { budget } });
   return done();                                        // 3단계 — 불변조건이 깨지면 fits:false

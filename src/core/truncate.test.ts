@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { fit } from './truncate';
 import { RULES, getRule, rulesFor } from './constraints';
 import { tokenValues } from './compose';
-import { MAX_CONTEXT_CHARS, generate } from './engine';
+import { MAX_CONTEXT_CHARS, generate, generateItem } from './engine';
 import { PROTECTED, type ResourceRule } from './types';
 
 describe('fit — 3단계 축소', () => {
@@ -160,5 +160,21 @@ describe('용도 토큰 tier 는 보호 토큰이다 (D60)', () => {
   it('tier 는 PROTECTED 에 있고 어느 규칙의 optional 에도 없다', () => {
     expect(PROTECTED).toContain('tier');
     for (const r of Object.values(RULES)) expect(r.optional, r.id).not.toContain('tier');
+  });
+});
+
+describe('밑줄 구분자 — 하이픈을 받지 않는 규칙 (D72)', () => {
+  // 시험용 규칙 — SA 꼴(…-sa-<role>)을 밑줄로 바꿨다. 실제 밑줄 규칙은 rule-cases · 기준선이 덮는다
+  const sa = getRule('gcp', 'service_account')!;
+  const rule: ResourceRule = { ...sa, separator: '_', allowed: 'lower-digit-underscore', pattern: /^[a-z][a-z0-9_]*$/, startsWithLetter: true, endsWithAlnum: false };
+  it('토큰을 밑줄로 잇고 토큰 안 하이픈도 밑줄이 된다', () => {
+    const r = generateItem({ owner: 'x', system: 'billing', purpose: 'my-shop', env: 'prod', region: 'global' }, rule);
+    expect(r).toMatchObject({ name: 'x_billing_my_shop_prod_sa_sync', valid: true, isTransformed: true });
+  });
+  it('균등 예산으로 자른 토큰 끝에 밑줄이 남지 않고 겹친 밑줄도 없다', () => {
+    const ctx = { owner: 'x', system: 'abcdefg_hij', purpose: 'klmnopq_rst', env: 'prod', region: 'ane3' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);    // 30자 — region 을 떼도 넘친다 → 예산 ⌊(30-4-2-4-4)/2⌋ = 8
+    expect(r).toMatchObject({ fits: true, name: 'abcdefg_klmnopq_prod_sa_sync' });
+    expect(r.name).not.toMatch(/__|^_|_$/);
   });
 });

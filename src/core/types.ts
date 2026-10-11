@@ -33,7 +33,7 @@ export const TIER_PATTERN = /^[a-z0-9]{2,16}$/;
 export const MIN_TOKEN = 2;
 
 /** 생성에 쓰는 문자 집합 (house style · D14) */
-export type Allowed = 'lower-digit' | 'lower-digit-hyphen' | 'alnum-hyphen' | 'alnum-hyphen-underscore' | 'alnum-hyphen-underscore-period-paren';
+export type Allowed = 'lower-digit' | 'lower-digit-hyphen' | 'lower-digit-underscore' | 'alnum-hyphen' | 'alnum-hyphen-underscore' | 'alnum-hyphen-underscore-period-paren';
 
 export interface Forbidden {
   prefixes?: string[];      // 이 문자열로 시작하면 안 된다
@@ -72,7 +72,7 @@ export interface ResourceRule {
   forbidden?: Forbidden;      // CSP 예약어 · 금지 접두사 (문서에 명시된 것만 · D19)
   noConsecutiveSeparator?: boolean; // CSP 가 '--' 를 금지하는 규칙에만 true
   allowed: Allowed;           // 생성 정제용
-  separator: '' | '-';
+  separator: '' | '-' | '_';   // '_' 는 하이픈을 받지 않는 규칙(BigQuery dataset · Cloud SQL) — 토큰 사이를 밑줄로 잇는다
   caseRule: 'lower' | 'any';
   startsWithLetter: boolean;
   endsWithAlnum: boolean;

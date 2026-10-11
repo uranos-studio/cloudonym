@@ -21,6 +21,12 @@ describe('normalizeToken', () => {
   it('alnum 계열은 대소문자를 유지한다', () => {
     expect(normalizeToken('Web-App', 'alnum-hyphen').value).toBe('Web-App');
   });
+  it('밑줄 집합 — 공백 · 하이픈은 밑줄로, 겹친 밑줄은 하나로, 앞뒤 밑줄은 뗀다', () => {
+    expect(normalizeToken('My-Shop  App', 'lower-digit-underscore')).toEqual({ value: 'my_shop_app', changed: true });
+    expect(normalizeToken('_a__b-', 'lower-digit-underscore').value).toBe('a_b');
+    expect(normalizeToken('shop', 'lower-digit-underscore')).toEqual({ value: 'shop', changed: false });
+    expect(normalizeToken('a.b', 'lower-digit-underscore').value).toBe('ab');
+  });
 });
 
 describe('canonicalEnv (TC-COM-02)', () => {
