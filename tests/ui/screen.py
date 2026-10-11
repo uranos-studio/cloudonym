@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68)의 ㉚~㊲ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73)의 ㉚~㊳ 을 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -29,7 +29,7 @@ from playwright.sync_api import Error, expect, sync_playwright
 BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
 # 옛 hash 링크를 여는 경로 (D68) — 기본은 뿌리 `/`(이미 나간 링크 그대로), 셋째 인자로 `/pick` 을 주면 같은 시나리오를 트리 경로에서 돈다.
-# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊲ 는 뿌리 패스에서만 돈다
+# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊳ 은 뿌리 패스에서만 돈다
 HB = sys.argv[3] if len(sys.argv) > 3 else '/'
 assert HB in ('/', '/pick'), HB
 TREE = '/pick'
@@ -202,7 +202,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68) — ㉚~㊲ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73) — ㉚~㊳ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -445,7 +445,45 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(p36.locator('[data-wizard-notice]')).to_have_text(['1 invalid item(s) in this link were left out.'])
     expect(slot(p36, 0, 0).locator('[data-attached-summary]')).to_have_text('boot')
     ctx36.close()
-    print('OK — 마법사 시나리오 ㉚~㊲ 통과')
+
+    # ── ㊳ D73 의 새 칩 — 하나씩 켜면 이름이 하나씩 늘고 화면 이름 = POST /v1/wizard · 로드 밸런서는 하위 줄 · 종류 라벨 · 역할 입력 · 360px ──
+    ctx38 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p38 = ctx38.new_page()
+    p38.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p38, BASE + '/')
+    fill_project(p38)
+    svc(p38, 0).locator('[data-service-name]').fill('shop')
+    lb = svc(p38, 0).locator('[data-lb-parts]')
+    expect(lb.locator('[data-purpose-chip]')).to_have_count(7)
+    one = [{'id': '1', 'seq': '01'}]
+    picks, project_picks = [], []
+    for chip in ('run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd'):
+        before38 = p38.locator('#names article[data-key]').count()
+        svc(p38, 0).locator(f'[data-purpose-chip="{chip}"]').click()
+        picks.append({'preset': chip} if chip == 'sa' else {'preset': chip, 'instances': one})
+        want = wizard_names(p38, {'project_picks': project_picks, 'services': [{'purpose': 'shop', 'picks': picks}]})
+        expect(p38.locator('#names article[data-key]')).to_have_count(before38 + (2 if before38 == 0 else 1))
+        assert screen_names(p38) == want, (chip, screen_names(p38), want)
+        assert all(v for _, _, v in want), want
+    for chip in ('router', 'nat'):
+        p38.locator(f'[data-project-chip="{chip}"]').click()
+        project_picks.append({'preset': chip, 'instances': one})
+        want = wizard_names(p38, {'project_picks': project_picks, 'services': [{'purpose': 'shop', 'picks': picks}]})
+        assert screen_names(p38) == want, (chip, screen_names(p38), want)
+    assert len(want) == 1 + 12 + 2, want
+    expect(svc(p38, 0).locator('[data-pick="gke"] label[for$="-kind"]')).to_have_text('Kind of GKE Cluster')
+    sa = svc(p38, 0).locator('[data-pick="sa"]')
+    expect(sa.locator('[data-role]')).to_have_attribute('placeholder', 'sync')
+    expect(sa.locator('li[data-slot]')).to_have_count(0)
+    expect(p38.locator('#names article[data-key="service/shop/service_account/-/sync"] [data-name]')).to_have_text('payments-shop-prod-sa-sync')
+    sa.locator('[data-role]').fill('deploy')
+    expect(p38.locator('#names article[data-key="service/shop/service_account/-/deploy"] [data-name]')).to_have_text('payments-shop-prod-sa-deploy')
+    no_hangul(p38)
+    p38.set_viewport_size({'width': 360, 'height': 800})
+    p38.wait_for_timeout(200)
+    assert p38.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '새 칩을 켠 마법사가 360px 에서 가로 스크롤이 생긴다'
+    ctx38.close()
+    print('OK — 마법사 시나리오 ㉚~㊳ 통과')
 
 
 with sync_playwright() as p:
@@ -1232,7 +1270,7 @@ with sync_playwright() as p:
     no_hangul(page27)
     ctx27.close()
 
-    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 101(Cloud Run 포함) · 리전 43 · 종류 토큰 19 · 환경 4 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 5) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
+    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 112(Cloud Run · D72 포함) · 리전 43 · 종류 토큰 19 · 환경 4 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 11) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
     ctx28 = browser.new_context(viewport={'width': 360, 'height': 800})
     page28 = ctx28.new_page()
     page28.on('pageerror', lambda e: errors.append(str(e)))
@@ -1240,7 +1278,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 101, 'regions': 43, 'kinds': 19, 'env': 4, 'tokens': 10, 'attached': 4, 'presets': 5}.items():
+    for table_id, rows in {'abbreviations': 112, 'regions': 43, 'kinds': 19, 'env': 4, 'tokens': 10, 'attached': 4, 'presets': 11}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
