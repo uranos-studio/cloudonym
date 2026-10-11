@@ -1,0 +1,754 @@
+{
+  "rulesVersion": "2026-10-10.8",
+  "wizard": [
+    {
+      "label": "all nine presets · two VPC slots · HA · POSTGRES · attachments · serverless gcf and run · two services",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InByb2QiLCJyZWdpb24iOiJhbmUzIiwidiI6IjIwMjYtMTAtMTAuOCIsInciOnsicHAiOlt7InByIjoidnBjIiwiaSI6W3siaWQiOiJhIiwicSI6IjAxIn0seyJpZCI6ImIiLCJxIjoiMDMifV19LHsicHIiOiJzdWJuZXQiLCJpIjpbeyJpZCI6ImMiLCJxIjoiMDEifV19LHsicHIiOiJmaXJld2FsbCIsInQiOiJzc2giLCJpIjpbeyJpZCI6ImQiLCJxIjoiMDEifV19LHsicHIiOiJmaXJld2FsbCIsInQiOiJ3ZWIiLCJpIjpbeyJpZCI6ImUiLCJxIjoiMDEifV19LHsicHIiOiJmaXJld2FsbCIsInQiOiJpY21wIiwiaSI6W3siaWQiOiJmIiwicSI6IjAxIn1dfV0sInMiOlt7Im4iOiJzaG9wIiwicCI6W3sicHIiOiJ3ZWIiLCJpIjpbeyJpZCI6ImciLCJxIjoiMDEiLCJhIjp7ImIiOjEsImQiOlsiMDEiLCIwMiJdLCJpcCI6MX19XX0seyJwciI6IndhcyIsImgiOjEsImkiOlt7ImlkIjoiaCIsInEiOiIwMSIsImEiOnsiYiI6MX19LHsiaWQiOiJpIiwicSI6IjAyIiwiYSI6eyJiIjoxfX1dfSx7InByIjoiYmFzdGlvbiIsImkiOlt7ImlkIjoiaiIsInEiOiIwMSIsImEiOnsiaXBpIjoxfX1dfSx7InByIjoiZmlsZSIsImkiOlt7ImlkIjoiayIsInEiOiIwMSIsImEiOnsiZCI6WyIwMSJdfX1dfSx7InByIjoiZGIiLCJrIjoiUE9TVEdSRVMiLCJpIjpbeyJpZCI6ImwiLCJxIjoiMDEifV19LHsicHIiOiJvYmplY3QifV19LHsibiI6InBheSIsInAiOlt7InByIjoid2ViIiwic3YiOiJnY2YiLCJpIjpbeyJpZCI6Im0iLCJxIjoiMDEifV19LHsicHIiOiJ3YXMiLCJzdiI6InJ1biIsImkiOlt7ImlkIjoibiIsInEiOiIwMSJ9XX1dfV19fQ",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "prod",
+          "region": "ane3"
+        },
+        "projectPicks": [
+          {
+            "preset": "vpc",
+            "instances": [
+              {
+                "id": "a",
+                "seq": "01"
+              },
+              {
+                "id": "b",
+                "seq": "03"
+              }
+            ]
+          },
+          {
+            "preset": "subnet",
+            "instances": [
+              {
+                "id": "c",
+                "seq": "01"
+              }
+            ]
+          },
+          {
+            "preset": "firewall",
+            "tier": "ssh",
+            "instances": [
+              {
+                "id": "d",
+                "seq": "01"
+              }
+            ]
+          },
+          {
+            "preset": "firewall",
+            "tier": "web",
+            "instances": [
+              {
+                "id": "e",
+                "seq": "01"
+              }
+            ]
+          },
+          {
+            "preset": "firewall",
+            "tier": "icmp",
+            "instances": [
+              {
+                "id": "f",
+                "seq": "01"
+              }
+            ]
+          }
+        ],
+        "services": [
+          {
+            "purpose": "shop",
+            "picks": [
+              {
+                "preset": "web",
+                "instances": [
+                  {
+                    "id": "g",
+                    "seq": "01",
+                    "attach": {
+                      "boot": true,
+                      "data": [
+                        "01",
+                        "02"
+                      ],
+                      "ip": true
+                    }
+                  }
+                ]
+              },
+              {
+                "preset": "was",
+                "ha": true,
+                "instances": [
+                  {
+                    "id": "h",
+                    "seq": "01",
+                    "attach": {
+                      "boot": true
+                    }
+                  },
+                  {
+                    "id": "i",
+                    "seq": "02",
+                    "attach": {
+                      "boot": true
+                    }
+                  }
+                ]
+              },
+              {
+                "preset": "bastion",
+                "instances": [
+                  {
+                    "id": "j",
+                    "seq": "01",
+                    "attach": {
+                      "ipi": true
+                    }
+                  }
+                ]
+              },
+              {
+                "preset": "file",
+                "instances": [
+                  {
+                    "id": "k",
+                    "seq": "01",
+                    "attach": {
+                      "data": [
+                        "01"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "preset": "db",
+                "kind": "POSTGRES",
+                "instances": [
+                  {
+                    "id": "l",
+                    "seq": "01"
+                  }
+                ]
+              },
+              {
+                "preset": "object"
+              }
+            ]
+          },
+          {
+            "purpose": "pay",
+            "picks": [
+              {
+                "preset": "web",
+                "serverless": "gcp.cloud_function",
+                "instances": [
+                  {
+                    "id": "m",
+                    "seq": "01"
+                  }
+                ]
+              },
+              {
+                "preset": "was",
+                "serverless": "gcp.run_service",
+                "instances": [
+                  {
+                    "id": "n",
+                    "seq": "01"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-prod",
+          "valid": true
+        },
+        {
+          "key": "project/-/vpc_network/-/01",
+          "name": "billing-prod-vpc-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/vpc_network/-/03",
+          "name": "billing-prod-vpc-03",
+          "valid": true
+        },
+        {
+          "key": "project/-/subnet/-/01",
+          "name": "billing-prod-ane3-snet-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/firewall_rule/ssh/01",
+          "name": "billing-prod-fw-ssh-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/firewall_rule/web/01",
+          "name": "billing-prod-fw-web-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/firewall_rule/icmp/01",
+          "name": "billing-prod-fw-icmp-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01",
+          "name": "billing-shop-prod-ane3-gce-web-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/boot/-",
+          "name": "billing-shop-prod-ane3-gce-web-01-boot",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/data/01",
+          "name": "billing-shop-prod-ane3-gce-web-01-data-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/data/02",
+          "name": "billing-shop-prod-ane3-gce-web-01-data-02",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/ip/-",
+          "name": "billing-shop-prod-ane3-gce-web-01-ip",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/was/01",
+          "name": "billing-shop-prod-ane3-gce-was-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/was/01/boot/-",
+          "name": "billing-shop-prod-ane3-gce-was-01-boot",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/was/02",
+          "name": "billing-shop-prod-ane3-gce-was-02",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/was/02/boot/-",
+          "name": "billing-shop-prod-ane3-gce-was-02-boot",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/bastion/01",
+          "name": "billing-shop-prod-ane3-gce-bastion-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/bastion/01/ipi/-",
+          "name": "billing-shop-prod-ane3-gce-bastion-01-ipi",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/file/01",
+          "name": "billing-shop-prod-ane3-gce-file-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/file/01/data/01",
+          "name": "billing-shop-prod-ane3-gce-file-01-data-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/cloud_sql_instance/-/01",
+          "name": "billing-shop-prod-ane3-sql-pg-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/storage_bucket/-/-",
+          "name": "platform-billing-shop-prod-gcs",
+          "valid": true
+        },
+        {
+          "key": "service/pay/cloud_function/web/01",
+          "name": "billing-pay-prod-ane3-gcf-web-01",
+          "valid": true
+        },
+        {
+          "key": "service/pay/run_service/was/01",
+          "name": "billing-pay-prod-ane3-run-was-01",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "custom picks — count with tier · role · none",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6ImRldiIsInJlZ2lvbiI6Imdsb2JhbCIsInYiOiIyMDI2LTEwLTEwLjgiLCJ3Ijp7InBwIjpbeyJydSI6ImdjcC5pYW1fY3VzdG9tX3JvbGUifV0sInMiOlt7Im4iOiJiYXRjaCIsInAiOlt7InJ1IjoiZ2NwLmNvbXB1dGVfaW5zdGFuY2UiLCJ0Ijoiam9iIiwiaSI6W3siaWQiOiIxIiwicSI6IjAzIiwiYSI6eyJiIjoxLCJpcGkiOjF9fV19LHsicnUiOiJnY3Auc2VydmljZV9hY2NvdW50Iiwicm8iOiJ3b3JrZXIifSx7InJ1IjoiZ2NwLnN0b3JhZ2VfYnVja2V0In1dfV19fQ",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "dev",
+          "region": "global"
+        },
+        "projectPicks": [
+          {
+            "preset": null,
+            "ruleId": "gcp.iam_custom_role"
+          }
+        ],
+        "services": [
+          {
+            "purpose": "batch",
+            "picks": [
+              {
+                "preset": null,
+                "ruleId": "gcp.compute_instance",
+                "tier": "job",
+                "instances": [
+                  {
+                    "id": "1",
+                    "seq": "03",
+                    "attach": {
+                      "boot": true,
+                      "ipi": true
+                    }
+                  }
+                ]
+              },
+              {
+                "preset": null,
+                "ruleId": "gcp.service_account",
+                "role": "worker"
+              },
+              {
+                "preset": null,
+                "ruleId": "gcp.storage_bucket"
+              }
+            ]
+          }
+        ]
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-dev",
+          "valid": true
+        },
+        {
+          "key": "project/-/iam_custom_role/-/-",
+          "name": "rolebillingdev",
+          "valid": true
+        },
+        {
+          "key": "service/batch/compute_instance/job/03",
+          "name": "billing-batch-dev-gce-job-03",
+          "valid": true
+        },
+        {
+          "key": "service/batch/compute_instance/job/03/boot/-",
+          "name": "billing-batch-dev-gce-job-03-boot",
+          "valid": true
+        },
+        {
+          "key": "service/batch/compute_instance/job/03/ipi/-",
+          "name": "billing-batch-dev-gce-job-03-ipi",
+          "valid": true
+        },
+        {
+          "key": "service/batch/service_account/-/worker",
+          "name": "billing-batch-dev-sa-worker",
+          "valid": true
+        },
+        {
+          "key": "service/batch/storage_bucket/-/-",
+          "name": "platform-billing-batch-dev-gcs",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "web HA with three servers and data disks",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InByb2QiLCJyZWdpb24iOiJhbmUzIiwidiI6IjIwMjYtMTAtMTAuOCIsInciOnsicHAiOltdLCJzIjpbeyJuIjoic2hvcCIsInAiOlt7InByIjoid2ViIiwiaCI6MSwiaSI6W3siaWQiOiJhIiwicSI6IjAxIiwiYSI6eyJkIjpbIjAxIl19fSx7ImlkIjoiYiIsInEiOiIwMiIsImEiOnsiZCI6WyIwMSJdfX0seyJpZCI6ImMiLCJxIjoiMDMifV19XX1dfX0",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "prod",
+          "region": "ane3"
+        },
+        "projectPicks": [],
+        "services": [
+          {
+            "purpose": "shop",
+            "picks": [
+              {
+                "preset": "web",
+                "ha": true,
+                "instances": [
+                  {
+                    "id": "a",
+                    "seq": "01",
+                    "attach": {
+                      "data": [
+                        "01"
+                      ]
+                    }
+                  },
+                  {
+                    "id": "b",
+                    "seq": "02",
+                    "attach": {
+                      "data": [
+                        "01"
+                      ]
+                    }
+                  },
+                  {
+                    "id": "c",
+                    "seq": "03"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-prod",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01",
+          "name": "billing-shop-prod-ane3-gce-web-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/01/data/01",
+          "name": "billing-shop-prod-ane3-gce-web-01-data-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/02",
+          "name": "billing-shop-prod-ane3-gce-web-02",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/02/data/01",
+          "name": "billing-shop-prod-ane3-gce-web-02-data-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/compute_instance/web/03",
+          "name": "billing-shop-prod-ane3-gce-web-03",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "serverless only — gcf and run in one service",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InByb2QiLCJyZWdpb24iOiJhbmUzIiwidiI6IjIwMjYtMTAtMTAuOCIsInciOnsicHAiOltdLCJzIjpbeyJuIjoiYXBpIiwicCI6W3sicHIiOiJ3ZWIiLCJzdiI6ImdjZiIsImkiOlt7ImlkIjoiYSIsInEiOiIwMSJ9LHsiaWQiOiJiIiwicSI6IjAyIn1dfSx7InByIjoid2FzIiwic3YiOiJydW4iLCJpIjpbeyJpZCI6ImMiLCJxIjoiMDEifV19XX1dfX0",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "prod",
+          "region": "ane3"
+        },
+        "projectPicks": [],
+        "services": [
+          {
+            "purpose": "api",
+            "picks": [
+              {
+                "preset": "web",
+                "serverless": "gcp.cloud_function",
+                "instances": [
+                  {
+                    "id": "a",
+                    "seq": "01"
+                  },
+                  {
+                    "id": "b",
+                    "seq": "02"
+                  }
+                ]
+              },
+              {
+                "preset": "was",
+                "serverless": "gcp.run_service",
+                "instances": [
+                  {
+                    "id": "c",
+                    "seq": "01"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-prod",
+          "valid": true
+        },
+        {
+          "key": "service/api/cloud_function/web/01",
+          "name": "billing-api-prod-ane3-gcf-web-01",
+          "valid": true
+        },
+        {
+          "key": "service/api/cloud_function/web/02",
+          "name": "billing-api-prod-ane3-gcf-web-02",
+          "valid": true
+        },
+        {
+          "key": "service/api/run_service/was/01",
+          "name": "billing-api-prod-ane3-run-was-01",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "project picks only — two VPC slots and a subnet",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InByb2QiLCJyZWdpb24iOiJhbmUzIiwidiI6IjIwMjYtMTAtMTAuOCIsInciOnsicHAiOlt7InByIjoidnBjIiwiaSI6W3siaWQiOiJhIiwicSI6IjAxIn0seyJpZCI6ImIiLCJxIjoiMDMifV19LHsicHIiOiJzdWJuZXQiLCJpIjpbeyJpZCI6ImMiLCJxIjoiMDEifSx7ImlkIjoiZCIsInEiOiIwMiJ9XX1dLCJzIjpbXX19",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "prod",
+          "region": "ane3"
+        },
+        "projectPicks": [
+          {
+            "preset": "vpc",
+            "instances": [
+              {
+                "id": "a",
+                "seq": "01"
+              },
+              {
+                "id": "b",
+                "seq": "03"
+              }
+            ]
+          },
+          {
+            "preset": "subnet",
+            "instances": [
+              {
+                "id": "c",
+                "seq": "01"
+              },
+              {
+                "id": "d",
+                "seq": "02"
+              }
+            ]
+          }
+        ],
+        "services": []
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-prod",
+          "valid": true
+        },
+        {
+          "key": "project/-/vpc_network/-/01",
+          "name": "billing-prod-vpc-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/vpc_network/-/03",
+          "name": "billing-prod-vpc-03",
+          "valid": true
+        },
+        {
+          "key": "project/-/subnet/-/01",
+          "name": "billing-prod-ane3-snet-01",
+          "valid": true
+        },
+        {
+          "key": "project/-/subnet/-/02",
+          "name": "billing-prod-ane3-snet-02",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "three services — database kind and object storage",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InN0ZyIsInJlZ2lvbiI6ImFuZTMiLCJ2IjoiMjAyNi0xMC0xMC44IiwidyI6eyJwcCI6W10sInMiOlt7Im4iOiJzaG9wIiwicCI6W3sicHIiOiJkYiIsImsiOiJQT1NUR1JFUyIsImkiOlt7ImlkIjoiYSIsInEiOiIwMSJ9LHsiaWQiOiJiIiwicSI6IjAyIn1dfV19LHsibiI6InBheSIsInAiOlt7InByIjoib2JqZWN0In1dfSx7Im4iOiJyZXBvcnQiLCJwIjpbeyJwciI6ImJhc3Rpb24iLCJpIjpbeyJpZCI6ImMiLCJxIjoiMDEifV19XX1dfX0",
+      "plan": {
+        "provider": "gcp",
+        "project": {
+          "owner": "platform",
+          "system": "billing",
+          "env": "stg",
+          "region": "ane3"
+        },
+        "projectPicks": [],
+        "services": [
+          {
+            "purpose": "shop",
+            "picks": [
+              {
+                "preset": "db",
+                "kind": "POSTGRES",
+                "instances": [
+                  {
+                    "id": "a",
+                    "seq": "01"
+                  },
+                  {
+                    "id": "b",
+                    "seq": "02"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "purpose": "pay",
+            "picks": [
+              {
+                "preset": "object"
+              }
+            ]
+          },
+          {
+            "purpose": "report",
+            "picks": [
+              {
+                "preset": "bastion",
+                "instances": [
+                  {
+                    "id": "c",
+                    "seq": "01"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "items": [
+        {
+          "key": "project/-/project_id/-/-",
+          "name": "platform-billing-stg",
+          "valid": true
+        },
+        {
+          "key": "service/shop/cloud_sql_instance/-/01",
+          "name": "billing-shop-stg-ane3-sql-pg-01",
+          "valid": true
+        },
+        {
+          "key": "service/shop/cloud_sql_instance/-/02",
+          "name": "billing-shop-stg-ane3-sql-pg-02",
+          "valid": true
+        },
+        {
+          "key": "service/pay/storage_bucket/-/-",
+          "name": "platform-billing-pay-stg-gcs",
+          "valid": true
+        },
+        {
+          "key": "service/report/compute_instance/bastion/01",
+          "name": "billing-report-stg-ane3-gce-bastion-01",
+          "valid": true
+        }
+      ]
+    }
+  ],
+  "tree": [
+    {
+      "label": "tree — count · kind · role · none",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsInB1cnBvc2UiOiJzaG9wIiwiZW52IjoicHJvZCIsInJlZ2lvbiI6ImFuZTMiLCJ2IjoiMjAyNi0xMC0xMC44IiwicCI6ImdjcCIsInIiOnsiY29tcHV0ZV9pbnN0YW5jZSI6MiwiY2xvdWRfc3FsX2luc3RhbmNlIjoiMTpQT1NUR1JFUyIsInNlcnZpY2VfYWNjb3VudCI6IndvcmtlciIsInN0b3JhZ2VfYnVja2V0IjoxfX0",
+      "items": [
+        {
+          "key": "compute_instance_01",
+          "name": "billing-shop-prod-ane3-gce-01",
+          "valid": true
+        },
+        {
+          "key": "compute_instance_02",
+          "name": "billing-shop-prod-ane3-gce-02",
+          "valid": true
+        },
+        {
+          "key": "cloud_sql_instance_01",
+          "name": "billing-shop-prod-ane3-sql-pg-01",
+          "valid": true
+        },
+        {
+          "key": "service_account_worker",
+          "name": "billing-shop-prod-sa-worker",
+          "valid": true
+        },
+        {
+          "key": "storage_bucket",
+          "name": "platform-billing-shop-prod-gcs",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "label": "tree — network rows at global",
+      "hash": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsInB1cnBvc2UiOiJuZXQiLCJlbnYiOiJkZXYiLCJyZWdpb24iOiJnbG9iYWwiLCJ2IjoiMjAyNi0xMC0xMC44IiwicCI6ImdjcCIsInIiOnsidnBjX25ldHdvcmsiOjEsInN1Ym5ldCI6MiwiZmlyZXdhbGxfcnVsZSI6MSwic2VydmljZV9hY2NvdW50Ijoic3luYyJ9fQ",
+      "items": [
+        {
+          "key": "vpc_network_01",
+          "name": "billing-net-dev-vpc-01",
+          "valid": true
+        },
+        {
+          "key": "subnet_01",
+          "name": "billing-net-dev-snet-01",
+          "valid": true
+        },
+        {
+          "key": "subnet_02",
+          "name": "billing-net-dev-snet-02",
+          "valid": true
+        },
+        {
+          "key": "firewall_rule_01",
+          "name": "billing-net-dev-fw-01",
+          "valid": true
+        },
+        {
+          "key": "service_account_sync",
+          "name": "billing-net-dev-sa-sync",
+          "valid": true
+        }
+      ]
+    }
+  ]
+}
