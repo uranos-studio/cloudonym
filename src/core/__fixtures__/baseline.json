@@ -205181,6 +205181,15 @@
       {
         "provider": "gcp",
         "resourceType": "cloud_sql_user",
+        "name": "pg_abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloud_sql_user",
         "name": "root",
         "known": true,
         "valid": false,

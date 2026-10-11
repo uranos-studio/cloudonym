@@ -182,8 +182,9 @@ const RULES: ResourceRule[] = [
   // "Username length limits are the same for Cloud SQL as for on-premises MySQL; 32 characters for MySQL 8.0 and later, 16 characters for earlier versions."
   // PostgreSQL · SQL Server 안내서는 「엔진과 같다」 — 식별자 63 · 128. 세 엔진의 교집합 32 (MySQL 8.0 미만의 16 은 담지 않는다 — docs/rule-verification.md)
   // 시스템 사용자 "You can't delete, modify, or assign database roles to these users." (MySQL · PostgreSQL users 안내서의 목록) — 같은 이름은 만들 수 없다
+  // PostgreSQL 9.6 릴리스 노트 (https://www.postgresql.org/docs/9.6/release-9-6.html) "Treat role names beginning with pg_ as reserved" · "User creation of such role names is now disallowed."
   rule({ id: 'gcp.cloud_sql_user', displayName: 'Cloud SQL User', slug: 'user', minLength: 1, maxLength: 32, pattern: SQL_IDENT(32), ...UNDERSCORE, template: ROLE,
-    forbidden: { exact: ['root', 'cloudsqlreplica', 'cloudsqlimport', 'cloudsqlexport', 'cloudsqloneshot', 'cloudsqlapplier', 'cloudsqlobservabilityadmin', 'cloudiamgroup',
+    forbidden: { prefixes: ['pg_'], exact: ['root', 'cloudsqlreplica', 'cloudsqlimport', 'cloudsqlexport', 'cloudsqloneshot', 'cloudsqlapplier', 'cloudsqlobservabilityadmin', 'cloudiamgroup',
       'cloudsqlreadonly', 'cloudsqlreplicaindex', 'cloudsqladmin', 'cloudsqlagent', 'cloudsqlconnpooladmin', 'cloudsqlimportexport', 'cloudsqllogical', 'cloudsqlobservability',
       'cloudsqliamgroup', 'cloudsqlinactiveuser', 'cloudsqliamgroupserviceaccount', 'cloudsqliamgroupuser', 'cloudsqliamserviceaccount', 'cloudsqlsuperuser', 'sqlserver'] },
     scope: 'gcp:cloud_sql_instance', entity: 'sqladmin.users', category: 'database', docUrl: SQL_USERS, notes: [NARROWER, SCOPE] }),

@@ -1729,7 +1729,8 @@
       "a",
       "billing_shop_prod_ane3_db_01",
       "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "shop_"
+      "shop_",
+      "pg_app"
     ],
     "invalid": [
       "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -1754,7 +1755,8 @@
       "1user",
       "root",
       "cloudsqlsuperuser",
-      "sqlserver"
+      "sqlserver",
+      "pg_app"
     ]
   },
   "gcp.router_nat": {
