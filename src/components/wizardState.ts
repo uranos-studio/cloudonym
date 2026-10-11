@@ -2,7 +2,7 @@
 // 순번은 슬롯의 값이다 — 서버 줄 · 디스크 줄을 지워도 남은 번호를 당기지 않는다. 「+ server」 · 「+ disk」는 다음 빈 번호를 쓴다.
 // 번호를 다시 매기는 것은 사용자가 누르는 별도 동작(renumber)이다. 판정(이름 규칙 · 검사)은 엔진(validatePlan)이 한다
 import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
-import { PROJECT_ID_RULE, SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
+import { PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
 import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGION } from './formContext';
@@ -11,6 +11,8 @@ import { treeRules } from './selection';
 
 /** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다) */
 export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE));
+/** 프로젝트 공용 칸의 custom 트리 — 프로젝트 수준을 받는 범위(PROJECT_SCOPES)의 규칙만. 거르지 않으면 고른 뒤 level_not_supported 가 뜬다 */
+export const PROJECT_CUSTOM_TREE = buildTree('gcp', treeRules(CUSTOM_TREE).filter((r) => PROJECT_SCOPES.includes(r.scope)));
 /** GCP 규칙 — 칩의 입력 종류(count · role · none)를 본다 */
 const GCP_RULES = new Map(treeRules(buildTree('gcp')).map((r) => [r.id, r]));
 
@@ -41,6 +43,15 @@ export function effectiveRuleId(pick: Pick): string | undefined {
 export function canAttach(pick: Pick): boolean {
   const id = effectiveRuleId(pick);
   return ATTACHMENTS.some((r) => r.parent === id);
+}
+
+/** tier 를 사용자가 치는 pick 인가 (D74) — 유효 규칙에 tier 자리가 있고 프리셋이 tier 를 정하지 않을 때(custom · db · object · 새 칩).
+ *  web · was · 방화벽처럼 프리셋이 tier 를 정하면 칸을 보이지 않는다. 「Duplicate」 도 이때만 — tier 를 칠 수 없으면 복사본이 늘 중복이다 */
+export function tierEditable(pick: Pick): boolean {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  if (preset && (preset.tier !== null || preset.tierChoices)) return false;
+  const rule = GCP_RULES.get(effectiveRuleId(pick) ?? '');
+  return rule !== undefined && rule.template.includes('tier');
 }
 
 /** HA 토글을 보이는가 — 프리셋에 ha 가 있고 서버리스가 꺼져 있을 때 (D61 · §4-2) */
@@ -151,6 +162,18 @@ export function addCustom(plan: WizardPlan, service: number | null, rule: { rule
     if (s) slots.push(s);
   }
   return withPicks(plan, service, [...picksOf(plan, service), { ...base, instances: slots }]);
+}
+
+/** 같은 pick 을 바로 뒤에 하나 더 (D74) — tier 를 비운 복사본. 칩은 켜고 끄는 단추라 같은 종류 둘째를 만들 수 없다.
+ *  복사 직후에는 duplicate_pick 이 복사본에 붙고, tier 를 치면 사라진다. count 규칙은 새 서버 줄 하나(01) · HA 는 끈다 */
+export function duplicatePick(plan: WizardPlan, ref: PickRef): WizardPlan {
+  const picks = picksOf(plan, ref.service);
+  const cur = picks[ref.pick];
+  if (!cur) return plan;
+  const { tier: _t, ha: _ha, instances, ...rest } = cur;
+  const slot = instances === undefined ? undefined : newSlot(rest, []);
+  const copy: Pick = slot ? { ...rest, instances: [slot] } : rest;
+  return withPicks(plan, ref.service, [...picks.slice(0, ref.pick + 1), copy, ...picks.slice(ref.pick + 1)]);
 }
 
 export function removePick(plan: WizardPlan, ref: PickRef): WizardPlan {

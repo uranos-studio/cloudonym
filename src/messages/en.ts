@@ -420,6 +420,7 @@ export const en: Catalog = {
     wizard_ipi: 'Reserve static internal IP',
     wizard_bastion_hint: 'For SSH access from outside, reserve a static external IP',
     wizard_remove_pick: 'Remove {name}',
+    wizard_duplicate_pick: 'Duplicate {name} — give the copy its own tier',
     wizard_step_names: 'Names',
     wizard_names_empty: 'Pick what runs in a service (or a project resource) to see names here.',
     wizard_fix_errors: 'Fix the marked fields to see names.',

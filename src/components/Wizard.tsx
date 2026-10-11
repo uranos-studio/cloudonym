@@ -2,7 +2,7 @@
 // 화면 상태는 마법사 모델(WizardPlan) 하나이고 URL hash `w` 에 실린다. 결과는 모델에서 매번 다시 만든다 — validatePlan → expandPlan → generateProject (D17 · D69).
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Plus, Server, Trash2, X } from 'lucide-react';
+import { Copy, Plus, Server, Trash2, X } from 'lucide-react';
 // serviceNamespace — 결과 묶음의 서비스 이름을 모델의 purpose 와 잇는다(정제는 엔진 함수로)
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, generateProject, parseContext, parseProjectContext, serviceNamespace as serviceNamespaceOf, type NameItem, type ProjectResult } from '../core/engine';
 import { buildTree, inputKind } from '../core/tree';
@@ -193,7 +193,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
               <ProjectForm plan={plan} errors={projectParsed.ok ? [] : projectParsed.errors} projectId={projectId} onChange={(project) => edit((p) => S.setProject(p, project))} />
             </div>
             <div className={PANEL}>
-              <ProjectResources plan={plan} errors={planErrors} edit={edit} />
+              <ProjectResources plan={plan} errors={planErrors} edit={edit} onCustom={() => setCustom(null)} />
             </div>
             <ServiceList plan={plan} errors={planErrors} serviceErrors={serviceErrors} edit={edit} onCustom={setCustom} />
           </div>
@@ -272,8 +272,8 @@ function ProjectForm({ plan, errors, projectId, onChange }: { plan: WizardPlan; 
   );
 }
 
-// ── 프로젝트 공용 — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄) ──
-function ProjectResources({ plan, errors, edit }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void }) {
+// ── 프로젝트 공용 — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄) · custom(프로젝트 수준 범위의 규칙만 — D74) ──
+function ProjectResources({ plan, errors, edit, onCustom }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void; onCustom: () => void }) {
   const firewall = presetOf('firewall');
   return (
     <section aria-labelledby="wizard-project-resources" className="space-y-3">
@@ -283,6 +283,7 @@ function ProjectResources({ plan, errors, edit }: { plan: WizardPlan; errors: Pl
           <button key={p.id} type="button" data-project-chip={p.id} aria-pressed={S.findPreset(plan, null, p.id) >= 0} className={CHIP}
             onClick={() => edit((x) => S.togglePreset(x, null, p.id))}>{p.label}</button>
         ))}
+        <button type="button" data-project-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
       </div>
       {firewall?.tierChoices && (
         <div className="flex flex-wrap items-center gap-2">
@@ -390,6 +391,8 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
   const counted = rule ? inputKind(rule) === 'count' : false;
   // 역할 입력 — role 규칙이면 프리셋(sa)이든 custom 이든. 비우면 엔진이 기본 역할을 쓴다
   const roleInput = rule ? inputKind(rule) === 'role' : false;
+  // tier 입력 · 「Duplicate」 — 규칙에 tier 자리가 있고 프리셋이 tier 를 정하지 않은 pick (D74)
+  const tierInput = S.tierEditable(pick);
   const attachable = S.canAttach(pick);
   const own = S.errorsAt(errors, path);
   const base = `wizard-${path.replace(/[^a-z0-9]+/gi, '-')}`;
@@ -402,13 +405,19 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
           <Server aria-hidden="true" className="size-4 text-indigo-600 dark:text-indigo-400" />{title}
           {custom && <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">{en.ui.wizard_custom_badge}</span>}
         </h4>
-        <button type="button" data-remove-pick aria-label={fillUi(en, 'wizard_remove_pick', { name: title })} title={fillUi(en, 'wizard_remove_pick', { name: title })} className={ICON_BTN}
-          onClick={() => edit((p) => S.removePick(p, at))}><X aria-hidden="true" className="size-4" /></button>
+        <div className="flex shrink-0 items-center gap-1">
+          {tierInput && (
+            <button type="button" data-duplicate-pick aria-label={fillUi(en, 'wizard_duplicate_pick', { name: title })} title={fillUi(en, 'wizard_duplicate_pick', { name: title })} className={ICON_BTN}
+              onClick={() => edit((p) => S.duplicatePick(p, at))}><Copy aria-hidden="true" className="size-4" /></button>
+          )}
+          <button type="button" data-remove-pick aria-label={fillUi(en, 'wizard_remove_pick', { name: title })} title={fillUi(en, 'wizard_remove_pick', { name: title })} className={ICON_BTN}
+            onClick={() => edit((p) => S.removePick(p, at))}><X aria-hidden="true" className="size-4" /></button>
+        </div>
       </div>
       <ErrorList errors={own} />
 
-      {/* ④ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, custom count 규칙은 tier, role 규칙(sa 칩 포함)은 역할 */}
-      {(preset?.serverless || preset?.ha || kinds.length > 0 || (custom && counted) || roleInput) && (
+      {/* ④ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, tier 를 정하지 않은 pick 은 tier(D74), role 규칙(sa 칩 포함)은 역할 */}
+      {(preset?.serverless || preset?.ha || kinds.length > 0 || tierInput || roleInput) && (
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400"><span aria-hidden="true" className={STEP_NUM}>4</span>{en.ui.wizard_step_options}</p>
           <div className="flex flex-wrap items-end gap-4">
@@ -438,7 +447,7 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
                 </select>
               </div>
             )}
-            {custom && counted && (
+            {tierInput && (
               <div>
                 <label htmlFor={`${base}-tier`} className={LABEL}>{en.ui.wizard_tier} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_tier_hint}</span></label>
                 <input id={`${base}-tier`} data-tier type="text" value={pick.tier ?? ''} maxLength={16} autoCapitalize="off" spellCheck={false} className={CONTROL}
@@ -579,9 +588,11 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
     if (d && !d.open) d.showModal();
   }, []);
   const name = service === null ? en.ui.wizard_project_resources : plan.services[service]?.purpose || String((service ?? 0) + 1);
+  // 프로젝트 공용 칸은 프로젝트 수준 범위의 규칙만 (D74)
+  const tree = service === null ? S.PROJECT_CUSTOM_TREE : S.CUSTOM_TREE;
   const onChange = (next: Picked) => {
     for (const [type, entry] of next) {
-      const rule = treeRules(S.CUSTOM_TREE).find((r) => r.resourceType === type);
+      const rule = treeRules(tree).find((r) => r.resourceType === type);
       if (rule) { onPick(rule, entry); return; }
     }
   };
@@ -595,7 +606,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
         </div>
         <button type="button" data-custom-close aria-label={en.ui.wizard_custom_close} className={ICON_BTN} onClick={onClose}><X aria-hidden="true" className="size-4" /></button>
       </div>
-      <ResourceTree provider="gcp" tree={S.CUSTOM_TREE} picked={new Map()} onChange={onChange} />
+      <ResourceTree provider="gcp" tree={tree} picked={new Map()} onChange={onChange} />
     </dialog>
   );
 }

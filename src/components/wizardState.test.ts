@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, type PickRef,
+  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, tierEditable, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
-import { expandPlan, validatePlan, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
+import { expandPlan, validatePlan, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
 import { DEFAULT_FORM } from './formContext';
 
@@ -194,5 +194,54 @@ describe('custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목이�
     expect(ids).not.toContain('gcp.project_id');
     expect(ids).toContain('gcp.service_account');
     expect(new Set(ids)).toEqual(new Set(treeRules(buildTree('gcp')).map((r) => r.id).filter((id) => id !== 'gcp.project_id')));
+  });
+  it('프로젝트 공용 칸의 트리는 PROJECT_SCOPES 규칙만 (프로젝트 ID 제외) · 어느 것을 골라도 level_not_supported 가 없다 (D74)', () => {
+    const all = treeRules(buildTree('gcp'));
+    const want = all.filter((r) => PROJECT_SCOPES.includes(r.scope) && r.id !== PROJECT_ID_RULE).map((r) => r.id);
+    const ids = treeRules(PROJECT_CUSTOM_TREE).map((r) => r.id);
+    expect(want.length).toBeGreaterThan(5);
+    expect(new Set(ids)).toEqual(new Set(want));
+    expect(ids).toContain('gcp.vpc_network');
+    expect(ids).not.toContain('gcp.cloud_sql_database');
+    for (const r of treeRules(PROJECT_CUSTOM_TREE)) {
+      const kind = r.kinds?.rule === 'required' ? r.kinds.allowed[0] : undefined;
+      const p = addCustom({ ...initialPlan(), services: [] }, null, { ruleId: r.id, input: r.template.includes('seq') ? 'count' : r.template.includes('role') ? 'role' : 'none', ...(kind ? { kind } : {}) });
+      const res = validatePlan(p);
+      expect(res.ok ? [] : res.errors.map((e) => e.code), r.id).not.toContain('wizard.level_not_supported');
+    }
+  });
+});
+
+describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', () => {
+  it('버킷 둘: 복사 직후 duplicate_pick · uploads/backups 를 치면 통과하고 이름 둘', () => {
+    let p = togglePreset(initialPlan(), 0, 'object');
+    expect(tierEditable(p.services[0]!.picks[0]!)).toBe(true);
+    p = duplicatePick(p, shop);
+    expect(p.services[0]!.picks).toEqual([{ preset: 'object' }, { preset: 'object' }]);
+    const r = validatePlan(p);
+    expect(r.ok ? [] : r.errors.map((e) => [e.code, e.path])).toEqual([['wizard.duplicate_pick', 'services[0].picks[1]']]);
+    p = setPickField(p, shop, 'tier', 'uploads');
+    p = setPickField(p, { service: 0, pick: 1 }, 'tier', 'backups');
+    ok(p);
+    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs-backups']);
+  });
+  it('count 규칙의 복사본은 tier · HA 없이 새 서버 줄 01 하나 · 복사본은 원본 바로 뒤', () => {
+    let p = togglePreset(initialPlan(), 0, 'db');
+    p = setPickField(p, shop, 'tier', 'main');
+    p = addSlot(p, shop);
+    p = togglePreset(p, 0, 'object');
+    p = duplicatePick(p, shop);
+    expect(p.services[0]!.picks.map((x) => x.preset)).toEqual(['db', 'db', 'object']);
+    expect(p.services[0]!.picks[1]).toEqual({ preset: 'db', instances: [{ id: '1', seq: '01' }] });
+    p = setPickField(p, { service: 0, pick: 1 }, 'tier', 'replica');
+    ok(p);
+  });
+  it('프리셋이 tier 를 정하면(web · 방화벽) · 역할 규칙 · tier 자리 없는 규칙은 tier 칸도 Duplicate 도 없다', () => {
+    expect(tierEditable({ preset: 'web', instances: [] })).toBe(false);
+    expect(tierEditable({ preset: 'firewall', tier: 'ssh', instances: [] })).toBe(false);
+    expect(tierEditable({ preset: 'sa' })).toBe(false);
+    expect(tierEditable({ preset: null, ruleId: 'gcp.cloud_sql_user' })).toBe(false);
+    expect(tierEditable({ preset: null, ruleId: 'gcp.compute_instance', instances: [] })).toBe(true);
+    expect(tierEditable({ preset: 'vpc', instances: [] })).toBe(true);
   });
 });
