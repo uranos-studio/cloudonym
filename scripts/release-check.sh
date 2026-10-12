@@ -25,7 +25,7 @@ for bin in curl jq perl; do
   command -v "${bin}" >/dev/null || { echo "missing dependency: ${bin}" >&2; exit 2; }
 done
 
-# /v1/names 의 기대 이름 — 규칙 버전 2026-10-12.3 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
+# /v1/names 의 기대 이름 — 규칙 버전 2026-10-12.4 의 엔진 출력이다. 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
 # 새 빌드에 보내 값을 다시 적는다(조용히 통과하지 않는다)
 NAMES_REQUEST='{"provider":"gcp","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"},"resources":[{"type":"vpc_network"},{"type":"storage_bucket"},{"type":"service_account","role":"db"}]}'
 NAMES_EXPECTED='{"service_account_db":"payments-batch-prod-sa-db","storage_bucket":"platform-payments-batch-prod-ane3-gcs","vpc_network_01":"payments-batch-prod-vpc-01"}'
@@ -107,15 +107,15 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_gcp} '### GCP' sections, no AWS or Azure)"; fi
 fi
 
-# 3. /catalog.json — 200 · provider 는 gcp 하나 · 114행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80)
+# 3. /catalog.json — 200 · provider 는 gcp 하나 · 115행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80)
 name='GET /catalog.json'
 code="$(fetch GET /catalog.json)"
 if expect_status "${name}" "${code}" 200; then
   providers="$(jq -c '.providers | keys' "${body}" 2>/dev/null)"
   rows="$(jq '.providers.gcp.rows | length' "${body}" 2>/dev/null)"
   if [ "${providers}" != '["gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
-  elif [ "${rows}" != "114" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 114"
-  else pass "${name} (providers [\"gcp\"], 114 rows)"; fi
+  elif [ "${rows}" != "115" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 115"
+  else pass "${name} (providers [\"gcp\"], 115 rows)"; fi
 fi
 
 # 4. /openapi.json — provider enum 셋이 모두 ["gcp"]

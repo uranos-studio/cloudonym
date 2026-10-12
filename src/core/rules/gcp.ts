@@ -22,6 +22,19 @@ const GCP_HAND_RULES: Record<string, ResourceRule> = {
     docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
     // undefined · null 은 문서가 "Avoid"(권고)라 적었다 — 금지가 아니므로 넣지 않는다
   },
+  // 프로젝트 이름 (D85) — "It must be 4 to 30 characters in length. It can contain letters, numbers, single quotes, hyphens, spaces,
+  // or exclamation points. It must end with a letter or a digit." · "Project names don't need to be unique." (같은 #identifiers 절).
+  // 검증은 pattern 만 보므로 따옴표 · 공백 · ! 가 든 이름도 통과한다. 생성은 ID 와 같은 정제(소문자 · 숫자 · 하이픈)라 ID 와 같은 글자가 나온다.
+  // entity 를 ID 와 달리 둔다 — 같은 글자의 이름과 ID 가 충돌(provider|entity|name)로 잡히지 않는다. 마법사의 암묵 항목이 아니다
+  'gcp.project_name': {
+    id: 'gcp.project_name', provider: 'gcp', resourceType: 'project_name',
+    displayName: 'Project Name', slug: '', minLength: 4, maxLength: 30,
+    pattern: /^[A-Za-z0-9' !-]{3,29}[A-Za-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
+    startsWithLetter: false, endsWithAlnum: true,
+    template: ['owner', 'system', 'purpose', 'env'], optional: ['owner'],
+    scope: 'gcp:namespace', entity: 'cloudresourcemanager.projects.name', category: 'management', uniqueness: 'none',
+    docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
+  },
   'gcp.service_account': {
     id: 'gcp.service_account', provider: 'gcp', resourceType: 'service_account',
     displayName: 'Service Account', slug: 'sa', minLength: 6, maxLength: 30,

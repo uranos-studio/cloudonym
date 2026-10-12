@@ -135,10 +135,10 @@ describe('고유성 부류 · 분류 · 유일성 (D31 · D37 · D38)', () => {
     expect(RULES['azure.aks_nodepool_linux'].entity).toBe('Microsoft.ContainerService/managedClusters/agentPools');
     expect(RULES['azure.aks_nodepool_windows'].entity).toBe(RULES['azure.aks_nodepool_linux'].entity);
   });
-  it("uniqueness 'none' 인 규칙은 전부 AWS Name 태그다 — 그 역도 같다", () => {
-    for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG || r.pattern === AWS_NAME_TAG_GENERAL);
+  it("uniqueness 'none' 인 규칙은 AWS Name 태그와 GCP 프로젝트 이름(D85)뿐이다 — 그 역도 같다", () => {
+    for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG || r.pattern === AWS_NAME_TAG_GENERAL || r.id === 'gcp.project_name');
     const tagIntake = AWS_INTAKE_ROWS.filter((x) => x.kind === 'b').map((x) => x.id);
-    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ebs_volume', 'aws.ec2_instance', 'aws.internet_gateway', 'aws.route_table', 'aws.subnet', 'aws.vpc', ...tagIntake].sort());
+    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ebs_volume', 'aws.ec2_instance', 'aws.internet_gateway', 'aws.route_table', 'aws.subnet', 'aws.vpc', 'gcp.project_name', ...tagIntake].sort());
   });
   it('uniquenessDocUrl 이 있으면 https 이고 docUrl 과 다르다', () => {
     for (const r of Object.values(RULES)) {
@@ -189,7 +189,7 @@ describe('2026-10-06 추가 11종 — 범위 · 부류 · 분류 · 근거', () 
     expect(r!.template).toContain('seq');
   });
   it('규칙 수 — provider 마다 손으로 쓴 규칙 + 들인 행 + 손으로 넣은 규칙(rules/*-manual.ts)', () => {
-    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11 + AWS_INTAKE_ROWS.length + Object.keys(AWS_MANUAL_RULES).length, 9 + GCP_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length, 15 + AZURE_INTAKE_ROWS.length + AZURE_MANUAL_ROWS.length]);
+    expect([rulesFor('aws').length, rulesFor('gcp').length, rulesFor('azure').length]).toEqual([11 + AWS_INTAKE_ROWS.length + Object.keys(AWS_MANUAL_RULES).length, 10 + GCP_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length, 15 + AZURE_INTAKE_ROWS.length + AZURE_MANUAL_ROWS.length]);
   });
   it('docUrl 은 숫자가 적힌 쪽의 앵커다', () => {
     expect(RULES['gcp.firewall_rule']!.docUrl).toBe('https://docs.cloud.google.com/compute/docs/reference/rest/v1/firewalls#Firewall.FIELDS.name');
@@ -225,7 +225,7 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
 
   it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 19 · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(62);
+    expect(none).toHaveLength(63);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');

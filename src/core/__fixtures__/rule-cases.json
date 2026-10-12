@@ -11,6 +11,20 @@
       "billing-prd-"
     ]
   },
+  "gcp.project_name": {
+    "valid": [
+      "My Project 1",
+      "shop-prod",
+      "Team's app!2"
+    ],
+    "invalid": [
+      "abc",
+      "My Project!",
+      "ends-",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "under_score"
+    ]
+  },
   "gcp.service_account": {
     "valid": [
       "billing-sa-sync"

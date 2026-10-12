@@ -1574,6 +1574,15 @@
             "violations": 0,
             "steps": 0
           },
+          "project_name": {
+            "name": "platform-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-billing-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
@@ -7779,6 +7788,15 @@
         },
         "names": {
           "project_id": {
+            "name": "billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "개발-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
+          "project_name": {
             "name": "billing-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -14000,6 +14018,15 @@
             "violations": 0,
             "steps": 1
           },
+          "project_name": {
+            "name": "team-a-cafe-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "Team \"A\" café-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
@@ -20205,6 +20232,15 @@
         },
         "names": {
           "project_id": {
+            "name": "platform-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-billing-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
+          "project_name": {
             "name": "platform-billing-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -26426,6 +26462,15 @@
             "violations": 0,
             "steps": 0
           },
+          "project_name": {
+            "name": "platform-windows-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-windows-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
           "service_account": {
             "name": "windows-trade-prod-sa-sync",
             "valid": true,
@@ -32639,6 +32684,15 @@
             "violations": 1,
             "steps": 0
           },
+          "project_name": {
+            "name": "platform-google-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-google-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
           "service_account": {
             "name": "google-trade-prod-sa-sync",
             "valid": true,
@@ -38844,6 +38898,15 @@
         },
         "names": {
           "project_id": {
+            "name": "platform-azure-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-azure-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
+          "project_name": {
             "name": "platform-azure-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -45065,6 +45128,15 @@
             "violations": 1,
             "steps": 1
           },
+          "project_name": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "platform-매매-trade-prod",
+            "violations": 1,
+            "steps": 1
+          },
           "service_account": {
             "name": "",
             "valid": false,
@@ -51270,6 +51342,15 @@
         },
         "names": {
           "project_id": {
+            "name": "paymentsettl-reconciliati-dev",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "platformengineering-paymentsettlement-reconciliation-dev",
+            "violations": 0,
+            "steps": 2
+          },
+          "project_name": {
             "name": "paymentsettl-reconciliati-dev",
             "valid": true,
             "isTruncated": true,
@@ -57491,6 +57572,15 @@
             "violations": 0,
             "steps": 1
           },
+          "project_name": {
+            "name": "a-long-longpurpose-prod",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "platform-a-long-longpurpose-prod",
+            "violations": 0,
+            "steps": 1
+          },
           "service_account": {
             "name": "a-long-longpurp-prod-sa-sync",
             "valid": true,
@@ -63696,6 +63786,15 @@
         },
         "names": {
           "project_id": {
+            "name": "platform-3tier-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-3tier-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
+          "project_name": {
             "name": "platform-3tier-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -69917,6 +70016,15 @@
             "violations": 0,
             "steps": 1
           },
+          "project_name": {
+            "name": "billing-trade-prod",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
@@ -76122,6 +76230,15 @@
         },
         "names": {
           "project_id": {
+            "name": "billing-trade-prod",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
+          "project_name": {
             "name": "billing-trade-prod",
             "valid": true,
             "isTruncated": true,
@@ -82343,6 +82460,15 @@
             "violations": 0,
             "steps": 1
           },
+          "project_name": {
+            "name": "team1-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "team#1-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
@@ -88548,6 +88674,15 @@
         },
         "names": {
           "project_id": {
+            "name": "infra-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "In.Fra-billing-trade-prod",
+            "violations": 0,
+            "steps": 1
+          },
+          "project_name": {
             "name": "infra-billing-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -94793,6 +94928,15 @@
             "violations": 0,
             "steps": 0
           },
+          "project_name": {
+            "name": "platform-billing-trade-uat",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-billing-trade-uat",
+            "violations": 0,
+            "steps": 0
+          },
           "service_account": {
             "name": "billing-trade-uat-sa-sync",
             "valid": true,
@@ -99498,6 +99642,15 @@
         },
         "names": {
           "project_id": {
+            "name": "platform-billing-trade-prod",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "platform-billing-trade-prod",
+            "violations": 0,
+            "steps": 0
+          },
+          "project_name": {
             "name": "platform-billing-trade-prod",
             "valid": true,
             "isTruncated": false,
@@ -218215,6 +218368,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "aaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "aaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "project_name",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "public_advertised_prefix",
         "name": "",
         "known": true,
@@ -226221,6 +226482,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-billing-trade-prod\"",
+          "gcp_project_name = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -226935,6 +227197,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"billing-trade-prod\"",
+          "gcp_project_name = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -227643,6 +227906,7 @@
           "aws_logs_log_stream = \"billing-trade-prod-apne2-ls-01\"",
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"team-a-cafe-billing-trade-prod\"",
+          "gcp_project_name = \"team-a-cafe-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -228358,6 +228622,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-billing-trade-prod\"",
+          "gcp_project_name = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -229072,6 +229337,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-windows-trade-prod\"",
+          "gcp_project_name = \"platform-windows-trade-prod\"",
           "gcp_service_account = \"windows-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"windows-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"windows-trade-prod-vpc-01\"",
@@ -229785,6 +230051,7 @@
           "purpose = \"trade\"",
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
+          "gcp_project_name = \"platform-google-trade-prod\"",
           "gcp_service_account = \"google-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"google-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"google-trade-prod-vpc-01\"",
@@ -230500,6 +230767,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-azure-trade-prod\"",
+          "gcp_project_name = \"platform-azure-trade-prod\"",
           "gcp_service_account = \"azure-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"azure-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"azure-trade-prod-vpc-01\"",
@@ -231230,6 +231498,7 @@
           "# INVALID: aws_logs_log_stream",
           "# INVALID: aws_logs_subscription_filter",
           "# INVALID: gcp_project_id",
+          "# INVALID: gcp_project_name",
           "# INVALID: gcp_service_account",
           "# INVALID: gcp_compute_instance",
           "# INVALID: gcp_vpc_network",
@@ -231928,6 +232197,7 @@
           "environment = \"dev\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"paymentsettl-reconciliati-dev\"",
+          "gcp_project_name = \"paymentsettl-reconciliati-dev\"",
           "gcp_service_account = \"payments-reconcil-dev-sa-sync\"",
           "gcp_compute_instance = \"paymentsettlement-reconciliation-dev-gce-01\"",
           "gcp_vpc_network = \"paymentsettlement-reconciliation-dev-vpc-01\"",
@@ -232642,6 +232912,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"a-long-longpurpose-prod\"",
+          "gcp_project_name = \"a-long-longpurpose-prod\"",
           "gcp_service_account = \"a-long-longpurp-prod-sa-sync\"",
           "gcp_compute_instance = \"a-long-longpurpose-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"a-long-longpurpose-prod-vpc-01\"",
@@ -233342,6 +233613,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-3tier-trade-prod\"",
+          "gcp_project_name = \"platform-3tier-trade-prod\"",
           "gcp_storage_bucket = \"platform-3tier-trade-prod-ane3-gcs\"",
           "gcp_kms_ekm_connection = \"3tier-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"3tier-trade-prod-ane3-ring-01\"",
@@ -234070,6 +234342,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"billing-trade-prod\"",
+          "gcp_project_name = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -234773,6 +235046,7 @@
           "aws_logs_log_stream = \"billing-trade-prod-apne2-ls-01\"",
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"billing-trade-prod\"",
+          "gcp_project_name = \"billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -235472,6 +235746,7 @@
           "aws_logs_log_stream = \"billing-trade-prod-apne2-ls-01\"",
           "aws_logs_subscription_filter = \"billing-trade-prod-apne2-sf-01\"",
           "gcp_project_id = \"team1-billing-trade-prod\"",
+          "gcp_project_name = \"team1-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -236187,6 +236462,7 @@
           "environment = \"prod\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"infra-billing-trade-prod\"",
+          "gcp_project_name = \"infra-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",
@@ -236901,6 +237177,7 @@
           "environment = \"uat\"",
           "managed_by = \"cloudonym\"",
           "gcp_project_id = \"platform-billing-trade-uat\"",
+          "gcp_project_name = \"platform-billing-trade-uat\"",
           "gcp_service_account = \"billing-trade-uat-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-uat-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-uat-vpc-01\"",
@@ -237440,6 +237717,7 @@
       "terraform": {
         "assignments": [
           "gcp_project_id = \"platform-billing-trade-prod\"",
+          "gcp_project_name = \"platform-billing-trade-prod\"",
           "gcp_service_account = \"billing-trade-prod-sa-sync\"",
           "gcp_compute_instance = \"billing-trade-prod-ane3-gce-01\"",
           "gcp_vpc_network = \"billing-trade-prod-vpc-01\"",

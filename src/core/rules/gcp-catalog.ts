@@ -78,6 +78,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     ]
   },
   {
+    "key": "gcp.project_name",
+    "displayName": "Project Name",
+    "category": "management",
+    "rules": {
+      "gcp.project_name": {
+        "scope": "namespace",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "",
+      "basis": "No abbreviation: the project name is a label for the project itself",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "The project's display name: not unique and editable at any time. Cloudonym builds it from the same values as the project ID.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud projects create --name"
+      ],
+      "terraform": [
+        "google_project.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_project.name",
+      "project name"
+    ]
+  },
+  {
     "key": "gcp.service_account",
     "displayName": "Service Account",
     "category": "identity",

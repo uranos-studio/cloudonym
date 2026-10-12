@@ -63,6 +63,15 @@ describe('POST /v1/generate (D15 wire)', () => {
       { code: 'context.normalized', field: 'region', params: { from: 'asia-northeast3-a', to: 'ane3' } },
     ] });
   });
+  it('프로젝트 이름(D85) — 프로젝트 ID 와 같은 글자 · 4~30 · 따옴표 · 공백 · ! 를 받는 pattern · 다른 부류라 충돌이 아니다', async () => {
+    const body = await json((await post({ context: ctx, providers: ['gcp'] })).res);
+    expect(body.data.gcp.project_name).toMatchObject({
+      name: 'infra-billing-trade-prod', valid: true, is_truncated: false, violations: [],
+      rule: { min_length: 4, max_length: 30, pattern: "^[A-Za-z0-9' !-]{3,29}[A-Za-z0-9]$", doc_url: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers' },
+    });
+    expect(body.data.gcp.project_name.name).toBe(body.data.gcp.project_id.name);
+    expect(body.data.gcp.project_id.valid).toBe(true);
+  });
   it('providers:["gcp"] 이면 data · metadata 셋 모두 gcp 키만', async () => {
     const body = await json((await post({ context: ctx, providers: ['gcp'] })).res);
     for (const part of [body.data, body.metadata.generated_labels, body.metadata.label_violations, body.metadata.label_transformed]) {
@@ -204,11 +213,11 @@ describe('POST /v1/names (D39)', () => {
     expect(az.items[0]).toMatchObject({ valid: false, violations: [expect.objectContaining({ code: 'name.forbidden_prefix' })] });
     expect(az.items[2].valid).toBe(true);
   });
-  it('GCP 규칙은 전부 uniqueness "csp" — "none"(AWS Name 태그)은 꺼진 CSP 에만 있다 (D45)', async () => {
+  it('GCP 규칙은 프로젝트 이름 하나 빼고 uniqueness "csp" — "none" 은 AWS Name 태그와 gcp.project_name(D85 · "Project names don\'t need to be unique.")', async () => {
     const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'storage_bucket' }] })).res);
     expect(body.data.gcp.items[0]).toMatchObject({ key: 'compute_instance_01', scope: 'gcp:project', uniqueness: 'csp' });
     expect(body.data.gcp.items[1]).toMatchObject({ key: 'storage_bucket', scope: 'gcp:namespace', uniqueness: 'csp' });
-    expect(rulesFor('gcp').filter((r) => r.uniqueness === 'none')).toEqual([]);
+    expect(rulesFor('gcp').filter((r) => r.uniqueness === 'none').map((r) => r.id)).toEqual(['gcp.project_name']);
   });
   it('실제 규칙 표의 VM + 디스크는 이름이 달라 충돌 0 — 충돌 검사가 공허하게 통과하는 것이 아님을 보이는 대조 (fixture 쪽은 names-conflict.test)', async () => {
     const g = (await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance' }, { type: 'disk' }] })).res)).data.gcp;
@@ -299,7 +308,7 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     expect(body.version).toEqual(VERSION);
     expect(Object.keys(body.providers)).toEqual([...ENABLED_PROVIDERS]);
     expect(body.providers.gcp.rows).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
-    expect(body.providers.gcp.rows).toHaveLength(114);
+    expect(body.providers.gcp.rows).toHaveLength(115);
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
     expect(body.providers.aws).toBeUndefined();

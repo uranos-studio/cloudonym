@@ -46,16 +46,16 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('켜진 CSP 만 — GCP 절만 있고 공식 줄 수는 GCP 규칙 수 · AWS · Azure 는 「planned」 한 줄 (D45)', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
     expect(enabledRules).toHaveLength(rulesFor('gcp').length);
-    expect(rulesFor('gcp')).toHaveLength(135);
+    expect(rulesFor('gcp')).toHaveLength(136);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
     expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
     expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
     expect(lines.filter((l) => l.includes('planned'))).toEqual(['> AWS and Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
     expect(text).toContain('"providers"?: ["gcp"]');
   });
-  it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다 (세 CSP 를 펼친 본문)', () => {
+  it('공식 줄이 규칙 수(손 36 + 들인 행)만큼 있고 template 을 그대로 펼친다 (세 CSP 를 펼친 본문)', () => {
     expect(allLines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
-    expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length + Object.keys(AWS_MANUAL_RULES).length + AZURE_MANUAL_ROWS.length);
+    expect(rules).toHaveLength(36 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length + Object.keys(AWS_MANUAL_RULES).length + AZURE_MANUAL_ROWS.length);
     expect(formulaOf(RULES['gcp.service_account']!)).toBe('<system>-<purpose>-<env>-sa-<role>');
     expect(formulaOf(RULES['azure.storage_account']!)).toBe('st<system><purpose><env>');
     expect(text).toContain('- `gcp.service_account`: `<system>-<purpose>-<env>-sa-<role>`\n');
