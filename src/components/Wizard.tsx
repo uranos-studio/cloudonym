@@ -233,6 +233,13 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [view, setView] = useState<'plan' | 'names'>('plan');
   const drawerOpen = layout === 'tablet' && drawer;
   const sheetOpen = layout === 'phone' && sheet;
+  // 폭을 바꿨다 돌아오면 저절로 다시 열리지 않게 — 배치가 바뀌는 렌더에서 연 상태를 지운다(effect 가 아니라 렌더 중 조정)
+  const [shownLayout, setShownLayout] = useState(layout);
+  if (shownLayout !== layout) {
+    setShownLayout(layout);
+    setDrawer(false);
+    setSheet(false);
+  }
   const handleRef = useRef<HTMLButtonElement>(null);
   const closeDrawer = () => {
     setDrawer(false);
@@ -250,6 +257,15 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const openSheet = (focusFirst: boolean) => {
     setSheet(true);
     if (focusFirst) requestAnimationFrame(focusSettings);
+  };
+
+  /** 폰 탭 — 고른 탭만 Tab 순서에 두고, 좌우 · Home · End 로 옮기면서 바로 고른다 (WAI-ARIA tabs, 자동 선택) */
+  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const next = { ArrowLeft: 'plan', ArrowRight: 'names', Home: 'plan', End: 'names' }[e.key] as 'plan' | 'names' | undefined;
+    if (!next) return;
+    e.preventDefault();
+    setView(next);
+    document.getElementById(`wizard-tab-${next}`)?.focus();
   };
 
   const onSettingsKey = (e: KeyboardEvent<HTMLElement>) => {
@@ -319,6 +335,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
             <div role="tablist" aria-label={en.ui.wizard_view_tabs} data-wizard-tabs className="sticky top-0 z-20 -mx-4 flex h-12 items-stretch gap-1 border-b border-zinc-200 bg-zinc-50/95 px-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
               {(['plan', 'names'] as const).map((v) => (
                 <button key={v} type="button" role="tab" id={`wizard-tab-${v}`} aria-selected={view === v} aria-controls={`wizard-panel-${v}`} data-wizard-tab={v}
+                  tabIndex={view === v ? 0 : -1} onKeyDown={onTabKey}
                   className="min-w-0 flex-1 truncate border-b-2 border-transparent px-2 text-sm font-medium text-zinc-600 aria-selected:border-indigo-600 aria-selected:text-zinc-900 dark:text-zinc-400 dark:aria-selected:border-indigo-400 dark:aria-selected:text-zinc-100"
                   onClick={() => setView(v)}>
                   {v === 'plan' ? en.ui.wizard_list_label : results ? fillUi(en, 'wizard_names_tab', { names: nameCount, pass: passCount }) : en.ui.wizard_step_names}
