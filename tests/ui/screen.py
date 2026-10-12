@@ -662,8 +662,14 @@ def wizard_scenarios(browser, rules_version, errors):
     p41.route('https://storage.googleapis.com/storage/v1/b/**', lambda route: route.abort())
     card.locator('[data-check-bucket]').click()
     expect(card.locator('[data-bucket-verdict="unknown"]')).to_have_text('Could not tell — the request failed. Try again later.')
+    # 이름이 바뀌면 판정을 버린다 — A → B → A 에서 옛 판정이 다시 보이지 않는다 (codex 리뷰)
+    svc(p41, 0).locator('[data-service-name]').fill(purpose + 'b')
+    expect(card.locator('[data-name]')).not_to_have_text(bucket_name)
+    svc(p41, 0).locator('[data-service-name]').fill(purpose)
+    expect(card.locator('[data-name]')).to_have_text(bucket_name)
+    expect(card.locator('[data-bucket-verdict]')).to_have_attribute('data-bucket-verdict', '')
     p41.wait_for_timeout(1500)  # 디바운스된 비콘까지 기다린다
-    leaked = [(u, d) for u, d in own_calls if bucket_name in u or bucket_name in d or purpose in u or purpose in d]
+    leaked = [(u, d) for u, d in own_calls if bucket_name in u or bucket_name in d or purpose in u or purpose in d]  # ui_generate 는 규칙 id 만 싣는다
     assert leaked == [], leaked
     no_hangul(p41)
     ctx41.close()

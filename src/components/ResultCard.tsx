@@ -45,7 +45,8 @@ export function ResultCard({ result: r, parentName, scope }: { result: NameResul
         <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${scoped}`} />
       </div>
 
-      {r.valid && r.ruleId === BUCKET_RULE && <BucketCheck name={r.name} />}
+      {/* key — 이름이 바뀌면 판정을 버리고 새로 시작한다(A → B → A 에서 옛 판정 · 늦게 온 옛 응답이 보이지 않게) */}
+      {r.valid && r.ruleId === BUCKET_RULE && <BucketCheck key={r.name} name={r.name} />}
 
       {stepsText && (
         <p data-steps className="flex items-start gap-1.5 text-xs text-amber-800 dark:text-amber-300">
@@ -85,13 +86,13 @@ const VERDICT: Record<Availability, { text: string; className: string }> = {
   unknown: { text: en.ui.bucket_unknown, className: 'text-amber-800 dark:text-amber-300' },
 };
 
-/** 버킷 이름의 「Check」 (D83) — 누를 때만 브라우저가 Cloud Storage 에 직접 묻는다. 이름이 바뀌면 앞 판정은 버린다 */
+/** 버킷 이름의 「Check」 (D83) — 누를 때만 브라우저가 Cloud Storage 에 직접 묻는다. 부르는 쪽이 key={name} 으로 이름마다 새로 만든다 —
+ *  이름이 바뀌면 이 상태 · 진행 중인 요청의 결과는 버려진 인스턴스에 남는다. 조회 중에는 단추가 꺼져 요청이 겹치지 않는다 */
 function BucketCheck({ name }: { name: string }) {
-  const [state, setState] = useState<{ name: string; result: Availability | 'checking' } | undefined>(undefined);
-  const current = state?.name === name ? state.result : undefined;
+  const [current, setCurrent] = useState<Availability | 'checking' | undefined>(undefined);
   const onCheck = () => {
-    setState({ name, result: 'checking' });
-    void checkBucketName(name).then((result) => setState((s) => (s?.name === name ? { name, result } : s)));
+    setCurrent('checking');
+    void checkBucketName(name).then(setCurrent);
   };
   return (
     <div data-bucket-check className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
