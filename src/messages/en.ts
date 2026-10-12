@@ -422,7 +422,7 @@ export const en: Catalog = {
     wizard_add_service: 'Add service',
     wizard_remove_service: 'Remove service {name}',
     wizard_step_purposes: 'What runs in this service?',
-    wizard_purposes_hint: 'Pick one or more. Nothing is named until you pick.',
+    wizard_purposes_hint: 'Pick one or more. This service has no names until you pick.',
     wizard_custom: 'Custom…',
     wizard_custom_title: 'Pick any resource for {service}',
     wizard_custom_hint_service: 'Tick one row. It is added to this service with its own number rows.',

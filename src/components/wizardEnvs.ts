@@ -29,3 +29,11 @@ export function envsFromHash(raw: unknown): { envs: Env[]; dropped: number } | u
 export function withEnv(plan: WizardPlan, env: Env): WizardPlan {
   return { ...plan, project: { ...plan.project, env } };
 }
+
+/** 이름 수와 PASS 수 — env 를 모두 합친다. 이름 칸 머리 · 드로어 손잡이 · 폰 탭이 같은 값을 쓴다 */
+export function namesSummary(results: readonly { result: { items: readonly { valid: boolean }[] } }[] | undefined): { names: number; pass: number } {
+  return {
+    names: results?.reduce((n, r) => n + r.result.items.length, 0) ?? 0,
+    pass: results?.reduce((n, r) => n + r.result.items.filter((i) => i.valid).length, 0) ?? 0,
+  };
+}

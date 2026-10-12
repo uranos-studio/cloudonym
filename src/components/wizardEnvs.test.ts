@@ -1,6 +1,6 @@
 // 한 계획에 환경 여럿 (D82) — 고른 목록 · 칩 켜고 끄기 · hash 의 e 풀이
 import { describe, it, expect } from 'vitest';
-import { envList, envsFromHash, toggleEnv, withEnv } from './wizardEnvs';
+import { envList, envsFromHash, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import type { WizardPlan } from '../core/wizard/plan';
 
 describe('wizardEnvs', () => {
@@ -22,5 +22,13 @@ describe('wizardEnvs', () => {
     const plan: WizardPlan = { provider: 'gcp', project: { owner: 'a', system: 'b', env: 'prod', region: 'ane3' }, projectPicks: [], services: [] };
     expect(withEnv(plan, 'qa')).toEqual({ ...plan, project: { ...plan.project, env: 'qa' } });
     expect(plan.project.env).toBe('prod');
+  });
+});
+
+describe('namesSummary — 이름 칸 머리 · 손잡이 · 탭의 수', () => {
+  it('env 를 모두 합친다 · 결과가 없으면 0', () => {
+    const r = (v: boolean[]) => ({ result: { items: v.map((valid) => ({ valid })) } });
+    expect(namesSummary([r([true, false]), r([true])])).toEqual({ names: 3, pass: 2 });
+    expect(namesSummary(undefined)).toEqual({ names: 0, pass: 0 });
   });
 });

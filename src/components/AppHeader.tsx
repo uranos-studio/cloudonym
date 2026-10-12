@@ -1,6 +1,7 @@
 // 머리글 — 트리 화면 · 마법사가 같이 쓴다. 제품 이름 · Share URL(있을 때만) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · llms.txt
 import type { ReactNode } from 'react';
-import { BookOpen, Cloud, FileText, ListTree, Wand2 } from 'lucide-react';
+import { BookOpen, Cloud, Copy, FileText, ListTree, Wand2 } from 'lucide-react';
+import { COPY_BUTTON } from './CopyButton';
 import { en } from '../messages/en';
 
 export const NAV_LINK =
@@ -15,9 +16,11 @@ interface Props {
   /** 다른 화면의 경로 */
   otherHref: string;
   namingHref: string;
+  /** Share URL 이 없을 때도 그 자리(단추 · 경고 줄)를 비워 둔다 — 단추가 나타나고 사라질 때 머리 높이가 바뀌지 않게(마법사) */
+  reserveShare?: boolean;
 }
 
-export function AppHeader({ share, screen, otherHref, namingHref }: Props) {
+export function AppHeader({ share, screen, otherHref, namingHref, reserveShare = false }: Props) {
   return (
     <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -29,7 +32,11 @@ export function AppHeader({ share, screen, otherHref, namingHref }: Props) {
           </div>
         </div>
         <nav aria-label={en.ui.nav_label} className="flex flex-wrap items-center gap-2">
-          {share}
+          {share ?? (reserveShare && (
+            <span aria-hidden="true" data-share-reserve className="invisible inline-flex items-center gap-2">
+              <span className={COPY_BUTTON}><Copy className="size-4" />{en.ui.share_button}</span>
+            </span>
+          ))}
           {screen === 'tree'
             ? <a href={otherHref} data-nav-wizard title={en.ui.nav_wizard_label} className={NAV_LINK}><Wand2 aria-hidden="true" className="size-4" />{en.ui.nav_wizard}</a>
             : <a href={otherHref} data-nav-pick title={en.ui.nav_pick_label} className={NAV_LINK}><ListTree aria-hidden="true" className="size-4" />{en.ui.nav_pick}</a>}
@@ -38,6 +45,7 @@ export function AppHeader({ share, screen, otherHref, namingHref }: Props) {
         </nav>
         {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
         {share && <p data-share-warning className="w-full text-xs text-zinc-600 sm:text-right dark:text-zinc-400">{en.ui.share_warning}</p>}
+        {!share && reserveShare && <p aria-hidden="true" className="invisible w-full text-xs sm:text-right">{en.ui.share_warning}</p>}
       </div>
     </header>
   );

@@ -249,7 +249,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   return (
     <div className="min-h-screen">
       <AppHeader
-        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)}
+        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} reserveShare
         share={shareText && <CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
       />
       <main data-wizard className="mx-auto max-w-[100rem] space-y-4 px-4 py-4">

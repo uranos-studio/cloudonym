@@ -9,7 +9,7 @@ import { ResultCard } from './ResultCard';
 import { allNamesText } from './namesExport';
 import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTerraform';
 import { toWizardExport, toWizardExportByEnv } from './wizardExport';
-import { withEnv } from './wizardEnvs';
+import { namesSummary, withEnv } from './wizardEnvs';
 import { ErrorList } from './WizardSettings';
 import { ENV_NAMES, STEP_NUM } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
@@ -27,19 +27,24 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
 }) {
   const empty = errors.some((e) => e.code === 'wizard.empty');
   const wide = errors.filter((e) => e.path === undefined && e.code !== 'wizard.empty' && !('field' in e));
-  const names = results?.reduce((n, r) => n + r.result.items.length, 0) ?? 0;
-  const pass = results?.reduce((n, r) => n + r.result.items.filter((i) => i.valid).length, 0) ?? 0;
+  const { names, pass } = namesSummary(results);
+  const ok = results !== undefined && projectContext !== undefined;
   return (
     <section id="names" aria-labelledby="wizard-names" className="space-y-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>7</span>{en.ui.wizard_step_names}</h2>
-        {results && (
-          <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
-            ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
-            : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300'}`}>
-            {fillUi(en, 'wizard_names_summary', { names, pass })}
-          </span>
-        )}
+      {/* 머리(제목 · 요약 · 내보내기)는 이름 칸 위에 붙어 있다 — 이름이 길어 칸을 굴려도 Copy all · JSON · Terraform 이 보인다.
+          칸의 안쪽 여백(p-4)을 음수 여백 · top -1rem 으로 덮어 칸 위 끝에 딱 붙는다(sticky 의 기준은 여백 안쪽이다). 배경이 있어야 아래로 지나가는 카드가 비치지 않는다 */}
+      <div data-names-head className="sticky -top-4 z-10 -mx-4 -mt-4 space-y-2 rounded-t-xl border-b border-zinc-200 bg-white px-4 pb-3 pt-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>7</span>{en.ui.wizard_step_names}</h2>
+          {results && (
+            <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
+              : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300'}`}>
+              {fillUi(en, 'wizard_names_summary', { names, pass })}
+            </span>
+          )}
+        </div>
+        {ok && <ExportButtons plan={plan} results={results} projectContext={projectContext} />}
       </div>
       <p data-pass-meaning className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{en.ui.pass_meaning}</p>
       {!results && (
@@ -48,14 +53,14 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
         </p>
       )}
       <ErrorList errors={wide} />
-      {results && projectContext && <ResultList plan={plan} results={results} projectContext={projectContext} projectNames={projectNames} />}
+      {ok && <ResultList plan={plan} results={results} projectNames={projectNames} />}
     </section>
   );
 }
 
-function ResultList({ plan, results, projectContext, projectNames }: { plan: WizardPlan; results: EnvResult[]; projectContext: Parameters<typeof toWizardExport>[1]; projectNames: readonly (NameResult | undefined)[] }) {
+/** Copy all · JSON · Terraform — env 하나면 예전 꼴 그대로, 여럿이면 env 로 한 단계 더 묶는다 (D82) */
+function ExportButtons({ plan, results, projectContext }: { plan: WizardPlan; results: EnvResult[]; projectContext: Parameters<typeof toWizardExport>[1] }) {
   const multi = results.length > 1;
-  // 내보내기 — env 하나면 예전 꼴 그대로, 여럿이면 env 로 한 단계 더 묶는다 (D82)
   const all = useMemo(() => {
     const parts = results.map((r) => allNamesText(r.result));
     return { text: parts.map((x) => x.text).filter((t) => t !== '').join('\n'), skipped: parts.reduce((n, x) => n + x.skipped, 0) };
@@ -67,24 +72,29 @@ function ResultList({ plan, results, projectContext, projectNames }: { plan: Wiz
     ? wizardTerraformByEnv(results.map((r) => ({ env: r.env, result: r.result, labels: wizardLabels(expandPlan(withEnv(plan, r.env)), 'gcp') })), VERSION, en)
     : wizardTerraform(results[0]!.result, wizardLabels(expandPlan(plan), 'gcp'), VERSION, en)), [multi, results, plan]);
   return (
-    <>
-      <div className="flex flex-wrap gap-2">
-        <CopyButton text={all.text} label={en.ui.copy_all_names_label} disabled={all.text === ''} copyKey="all-names">
-          {all.skipped > 0 ? fillUi(en, 'copy_all_names_skipped', { n: all.skipped }) : en.ui.copy_all_names}
-        </CopyButton>
-        <CopyButton text={json} label={en.ui.copy_names_json_label} copyKey="names-json">JSON</CopyButton>
-        <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>
-      </div>
-      {multi
-        ? results.map((r) => (
+    <div className="flex flex-wrap gap-2">
+      <CopyButton text={all.text} label={en.ui.copy_all_names_label} disabled={all.text === ''} copyKey="all-names">
+        {all.skipped > 0 ? fillUi(en, 'copy_all_names_skipped', { n: all.skipped }) : en.ui.copy_all_names}
+      </CopyButton>
+      <CopyButton text={json} label={en.ui.copy_names_json_label} copyKey="names-json">JSON</CopyButton>
+      <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>
+    </div>
+  );
+}
+
+function ResultList({ plan, results, projectNames }: { plan: WizardPlan; results: EnvResult[]; projectNames: readonly (NameResult | undefined)[] }) {
+  return results.length > 1
+    ? (
+      <>
+        {results.map((r, i) => (
           <section key={r.env} data-names-env={r.env} aria-labelledby={`names-env-${r.env}`} className="space-y-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
             <h3 id={`names-env-${r.env}`} className="text-sm font-semibold">{fillUi(en, 'wizard_group_env', { env: r.env, name: ENV_NAMES[r.env] })}</h3>
-            <EnvNames plan={plan} result={r.result} scope={r.env} projectName={projectNames[results.indexOf(r)]} />
+            <EnvNames plan={plan} result={r.result} scope={r.env} projectName={projectNames[i]} />
           </section>
-        ))
-        : <EnvNames plan={plan} result={results[0]!.result} projectName={projectNames[0]} />}
-    </>
-  );
+        ))}
+      </>
+    )
+    : <EnvNames plan={plan} result={results[0]!.result} projectName={projectNames[0]} />;
 }
 
 /** env 하나의 이름 — 충돌 · 이름공간 묶음(프로젝트 → 서비스, 모델 순서). scope 는 env 가 여럿일 때 카드 id · 복사 키를 구분한다 */

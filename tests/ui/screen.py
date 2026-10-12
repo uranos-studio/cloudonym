@@ -569,7 +569,8 @@ def wizard_scenarios(browser, rules_version, errors):
     ctx36.close()
 
     # ── ㊳ D73 의 새 칩 — 하나씩 켜면 이름이 하나씩 늘고 화면 이름 = POST /v1/wizard · 로드 밸런서는 하위 줄 · 종류 라벨 · 역할 입력 · 360px ──
-    #    첫 칩 뒤로 리소스를 열셋 더해도 페이지 높이가 그대로다(세 칸이 칸마다 스크롤 — D89). 첫 칩 전에는 공유 단추와 그 경고 줄이 없어 머리가 낮다
+    #    리소스를 열넷 더해도 페이지 높이가 그대로다(세 칸이 칸마다 스크롤 — D89). 첫 칩 전에는 공유 단추와 그 경고 줄이 없지만 머리는 그 자리를 비워 둬 높이가 같다
+    #    이름 칸을 끝까지 굴려도 머리(요약 · Copy all · JSON · Terraform)는 칸 위에 붙어 있다
     ctx38 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p38 = ctx38.new_page()
     p38.on('pageerror', lambda e: errors.append(str(e)))
@@ -581,6 +582,9 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(lb.locator('[data-purpose-chip]')).to_have_count(7)
     one = [{'id': '1', 'seq': '01'}]
     picks, project_picks = [], []
+    expect(p38.locator('[data-copy="share-url"]')).to_have_count(0)
+    expect(p38.locator('[data-share-reserve]')).to_have_count(1)
+    height38 = doc_height(p38)
     for chip in ('run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd'):
         before38 = p38.locator('#names article[data-key]').count()
         svc(p38, 0).locator(f'[data-purpose-chip="{chip}"]').click()
@@ -589,8 +593,6 @@ def wizard_scenarios(browser, rules_version, errors):
         expect(p38.locator('#names article[data-key]')).to_have_count(before38 + (2 if before38 == 0 else 1))
         assert screen_names(p38) == want, (chip, screen_names(p38), want)
         assert all(v for _, _, v in want), want
-        if chip == 'run':
-            height38 = doc_height(p38)
     for chip in ('router', 'nat'):
         select(p38, 'network').locator(f'[data-project-chip="{chip}"]').click()
         project_picks.append({'preset': chip, 'instances': one})
@@ -598,6 +600,14 @@ def wizard_scenarios(browser, rules_version, errors):
         assert screen_names(p38) == want, (chip, screen_names(p38), want)
     assert len(want) == 1 + 12 + 2, want
     assert doc_height(p38) == height38, ('리소스를 더하자 페이지가 길어졌다', height38, doc_height(p38))
+    expect(p38.locator('[data-copy="share-url"]')).to_have_count(1)
+    expect(p38.locator('[data-share-reserve]')).to_have_count(0)
+    col38 = p38.locator('[data-names-column]')
+    col38.evaluate('e => { e.scrollTop = e.scrollHeight; }')
+    assert col38.evaluate('e => e.scrollTop') > 200, col38.evaluate('e => [e.scrollTop, e.scrollHeight, e.clientHeight]')
+    head38, colbox38 = p38.locator('[data-names-head]').bounding_box(), col38.bounding_box()
+    assert abs(head38['y'] - colbox38['y']) <= 2, (head38, colbox38)
+    expect(p38.locator('[data-names-head] [data-copy="terraform"]')).to_be_in_viewport()
     expect(select(p38, 'services[0].picks[3]').locator('[data-pick="gke"] label[for$="-kind"]')).to_have_text('Kind of GKE Cluster')
     sa = select(p38, 'services[0].picks[1]')
     expect(sa.locator('[data-role]')).to_have_attribute('placeholder', 'sync')

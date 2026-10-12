@@ -14,7 +14,8 @@ interface Props {
   children?: ReactNode;
 }
 
-const BUTTON =
+/** 복사 버튼의 꼴 — 머리글이 Share URL 자리를 비워 둘 때 같은 크기의 투명 자리표시를 그린다 */
+export const COPY_BUTTON =
   'inline-flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 ' +
   'hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ' +
@@ -38,7 +39,7 @@ export function CopyButton({ text, label, disabled = false, copyKey, children }:
 
   return (
     <span className="inline-flex min-w-0 items-center gap-2">
-      <button type="button" onClick={onClick} disabled={disabled} aria-label={label} title={label} data-copy={copyKey} className={BUTTON}>
+      <button type="button" onClick={onClick} disabled={disabled} aria-label={label} title={label} data-copy={copyKey} className={COPY_BUTTON}>
         {state === 'copied'
           ? <Check aria-hidden="true" className="size-4 text-emerald-600 dark:text-emerald-400" />
           : <Copy aria-hidden="true" className="size-4" />}
