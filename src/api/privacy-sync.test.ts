@@ -7,7 +7,10 @@ import { COPY_TARGETS } from '../components/copyTargets';
 import { pickedRuleIds } from '../components/pickedRules';
 import type { WizardPlan } from '../core/wizard/plan';
 import { PRESETS } from '../core/wizard/presets';
-import { PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from '../components/privacyModel';
+import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from '../components/privacyModel';
+import { AVAILABILITY_ORIGIN } from '../components/availabilityOrigin';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 describe('화면 · 안내 ↔ API 상수', () => {
   it('복사 버튼 target 여섯 — beacon.ts 와 schemas.ts', () => {
@@ -16,6 +19,15 @@ describe('화면 · 안내 ↔ API 상수', () => {
   it('안내의 계측 표 = telemetry 의 허용 표 (이벤트 · 필드 · 순서)', () => {
     expect(Object.fromEntries(PRIVACY_EVENTS.map((e) => [e.event, e.fields]))).toEqual(META_KEYS);
     expect(PRIVACY_EVENTS.map((e) => e.event)).toEqual(Object.keys(META_KEYS));
+  });
+  it('버킷 「Check」(D83) — 화면이 묻는 곳 = 안내가 적은 곳 = CSP connect-src 의 self 밖 유일한 출처', () => {
+    expect(PRIVACY_BUCKET_CHECK_ORIGIN).toBe(AVAILABILITY_ORIGIN);
+    // 주석 줄은 빼고 헤더 줄에서 읽는다
+    const headers = readFileSync(join(import.meta.dirname, '../../public/_headers'), 'utf-8').split('\n').filter((l) => l.includes('Content-Security-Policy:')).join('\n');
+    const connect = /connect-src ([^;]+);/.exec(headers)?.[1]?.trim().split(/\s+/);
+    expect(connect).toEqual(["'self'", AVAILABILITY_ORIGIN]);
+    const release = readFileSync(join(import.meta.dirname, '../../scripts/release-check.sh'), 'utf-8').split('\n').filter((l) => l.startsWith('CSP=')).join('\n');
+    expect(/connect-src ([^;]+);/.exec(release)?.[1]?.trim().split(/\s+/)).toEqual(connect);
   });
   it('KV 보존 일수 × 86400 = expirationTtl · 요청 제한 숫자 = RATE_LIMIT', () => {
     expect(PRIVACY_KV_RETENTION_DAYS * 86400).toBe(KV_TTL_SECONDS);

@@ -5,7 +5,7 @@ import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VISIT_KEY } from './beacon';
 import { COPY_TARGETS } from './copyTargets';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
 
 const CODE = 'rounded bg-zinc-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-zinc-800';
 
@@ -27,6 +27,7 @@ export function Privacy() {
         <Section id="privacy-browser" title={ui.privacy_browser_title}>
           <p data-privacy-session>{fillUi(en, 'privacy_browser_session', { key: VISIT_KEY })}</p>
           <p>{ui.privacy_browser_hash}</p>
+          <p data-privacy-bucket-check>{fillUi(en, 'privacy_bucket_check', { origin: PRIVACY_BUCKET_CHECK_ORIGIN })}</p>
         </Section>
         <Section id="privacy-api" title={ui.privacy_api_title}>
           <p>{ui.privacy_api_intro}</p>

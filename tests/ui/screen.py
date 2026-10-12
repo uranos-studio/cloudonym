@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82)의 ㉚~㊵ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83)의 ㉚~㊶ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -197,7 +197,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82) — ㉚~㊵ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83) — ㉚~㊶ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -633,7 +633,41 @@ def wizard_scenarios(browser, rules_version, errors):
     keys = [k for k, _, _ in screen_names(p39)]
     assert keys == ['project/-/project_id/-/-', 'project/-/vpc_network/-/01', 'project/-/vpc_network/-/03', 'project/-/subnet/-/01', 'project/-/subnet/-/02'], keys
     ctx39.close()
-    print('OK — 마법사 시나리오 ㉚~㊵ 통과')
+
+    # ── ㊶ 버킷 「Check」 (D83) — 누를 때만 브라우저가 storage.googleapis.com 에 직접 묻는다 · 404 available · 401 taken · 실패 unknown · 이름은 Cloudonym 에 가지 않는다 ──
+    ctx41 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p41 = ctx41.new_page()
+    p41.on('pageerror', lambda e: errors.append(str(e)))
+    gcs_calls, own_calls = [], []
+    p41.on('request', lambda r: gcs_calls.append(r.url) if r.url.startswith('https://storage.googleapis.com/') else (own_calls.append((r.url, r.post_data or '')) if r.url.startswith(BASE) else None))
+    purpose = 'chk' + str(int(time.time()))[-7:]
+    bucket_body = {'owner': 'example', 'system': 'billing', 'env': 'prod', 'region': 'ane3', 'v': rules_version, 'w': {'pp': [], 's': [{'n': purpose, 'p': [{'pr': 'object'}]}]}}
+    bucket_hash = '#state=' + base64.urlsafe_b64encode(json.dumps(bucket_body, separators=(',', ':')).encode()).rstrip(b'=').decode()
+    goto_ready(p41, BASE + '/' + bucket_hash)
+    card = p41.locator('#names article[data-rule="gcp.storage_bucket"]')
+    expect(card).to_have_count(1)
+    bucket_name = card.locator('[data-name]').inner_text()
+    expect(card.locator('[data-check-bucket]')).to_have_text('Check')
+    expect(card.locator('[data-bucket-verdict]')).to_have_text('Asks Cloud Storage directly from your browser; Cloudonym never sees the name.')
+    expect(p41.locator('[data-check-bucket]')).to_have_count(1)  # 프로젝트 ID 카드에는 없다
+    p41.wait_for_timeout(300)
+    assert gcs_calls == [], gcs_calls  # 누르기 전에는 묻지 않는다
+    card.locator('[data-check-bucket]').click()  # 실제 요청 — 없는 이름이라 404 · CORS 로 상태 코드를 읽는다
+    expect(card.locator('[data-bucket-verdict="available"]')).to_have_text('Available — no bucket has this name right now.', timeout=15000)
+    assert gcs_calls == [f'https://storage.googleapis.com/storage/v1/b/{bucket_name}?fields=name'], gcs_calls
+    p41.route('https://storage.googleapis.com/storage/v1/b/**', lambda route: route.fulfill(status=401, headers={'access-control-allow-origin': BASE}, body='{}'))
+    card.locator('[data-check-bucket]').click()
+    expect(card.locator('[data-bucket-verdict="taken"]')).to_have_text('Taken — a bucket with this name already exists.')
+    p41.unroute('https://storage.googleapis.com/storage/v1/b/**')
+    p41.route('https://storage.googleapis.com/storage/v1/b/**', lambda route: route.abort())
+    card.locator('[data-check-bucket]').click()
+    expect(card.locator('[data-bucket-verdict="unknown"]')).to_have_text('Could not tell — the request failed. Try again later.')
+    p41.wait_for_timeout(1500)  # 디바운스된 비콘까지 기다린다
+    leaked = [(u, d) for u, d in own_calls if bucket_name in u or bucket_name in d or purpose in u or purpose in d]
+    assert leaked == [], leaked
+    no_hangul(p41)
+    ctx41.close()
+    print('OK — 마법사 시나리오 ㉚~㊶ 통과')
 
 
 with sync_playwright() as p:

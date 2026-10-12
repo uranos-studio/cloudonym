@@ -2,11 +2,14 @@
 // components 는 api 를 들여오지 않으므로 값을 여기 따로 두고, 시험이 둘을 묶는다
 import { en } from '../messages/en';
 import { fillUi, type UiKey } from '../messages/catalog';
+import { AVAILABILITY_ORIGIN } from './availabilityOrigin';
 
 /** KV 일자 카운터의 수명(일) — telemetry.ts 의 KV_TTL_SECONDS / 86400 */
 export const PRIVACY_KV_RETENTION_DAYS = 366;
 /** Axiom 데이터셋에 설정한 보존 기간(일). 데이터셋을 만들기 전에는 null — 정하지 않은 숫자를 안내에 적지 않는다. 설정하면 그 값을 넣는다 */
 export const PRIVACY_AXIOM_RETENTION_DAYS: number | null = null;
+/** 버킷 이름 「Check」가 브라우저에서 직접 묻는 곳 (D83) — availability.ts 의 값 · public/_headers 의 connect-src 와 같다(privacy-sync.test) */
+export const PRIVACY_BUCKET_CHECK_ORIGIN = AVAILABILITY_ORIGIN;
 /** ratelimit.ts 의 RATE_LIMIT 과 같다 */
 export const PRIVACY_RATE_LIMIT = { limit: 60, period: 60 } as const;
 

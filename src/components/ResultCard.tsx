@@ -1,7 +1,9 @@
 // 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
 // 제목에 종류 토큰 · 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01` · `IP Address · int · 01`) data-key 로 항목을 가리킨다
+import { useState } from 'react';
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
 import { CopyButton } from './CopyButton';
+import { checkBucketName, type Availability } from './availability';
 import { visibleSteps } from './steps';
 import type { NameItem } from '../core/engine';
 import type { NameResult } from '../core/types';
@@ -43,6 +45,8 @@ export function ResultCard({ result: r, parentName, scope }: { result: NameResul
         <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${scoped}`} />
       </div>
 
+      {r.valid && r.ruleId === BUCKET_RULE && <BucketCheck name={r.name} />}
+
       {stepsText && (
         <p data-steps className="flex items-start gap-1.5 text-xs text-amber-800 dark:text-amber-300">
           {r.isTruncated ? <TriangleAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" /> : <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />}
@@ -67,5 +71,37 @@ export function ResultCard({ result: r, parentName, scope }: { result: NameResul
         {r.rule.notes.length > 0 && <p className="mt-1">{formatNotes(r.rule.notes, en)}</p>}
       </footer>
     </article>
+  );
+}
+
+const BUCKET_RULE = 'gcp.storage_bucket';
+const CHECK_BTN =
+  'inline-flex min-h-8 items-center rounded-md border border-zinc-300 bg-white px-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 ' +
+  'disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ' +
+  'dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800';
+const VERDICT: Record<Availability, { text: string; className: string }> = {
+  available: { text: en.ui.bucket_available, className: 'text-emerald-700 dark:text-emerald-400' },
+  taken: { text: en.ui.bucket_taken, className: 'text-rose-700 dark:text-rose-300' },
+  unknown: { text: en.ui.bucket_unknown, className: 'text-amber-800 dark:text-amber-300' },
+};
+
+/** 버킷 이름의 「Check」 (D83) — 누를 때만 브라우저가 Cloud Storage 에 직접 묻는다. 이름이 바뀌면 앞 판정은 버린다 */
+function BucketCheck({ name }: { name: string }) {
+  const [state, setState] = useState<{ name: string; result: Availability | 'checking' } | undefined>(undefined);
+  const current = state?.name === name ? state.result : undefined;
+  const onCheck = () => {
+    setState({ name, result: 'checking' });
+    void checkBucketName(name).then((result) => setState((s) => (s?.name === name ? { name, result } : s)));
+  };
+  return (
+    <div data-bucket-check className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+      <button type="button" data-check-bucket onClick={onCheck} disabled={current === 'checking'} aria-label={en.ui.bucket_check_label} title={en.ui.bucket_check_label} className={CHECK_BTN}>
+        {current === 'checking' ? en.ui.bucket_checking : en.ui.bucket_check}
+      </button>
+      <span role="status" aria-live="polite" data-bucket-verdict={current === undefined || current === 'checking' ? '' : current}
+        className={current === undefined || current === 'checking' ? 'text-zinc-600 dark:text-zinc-400' : VERDICT[current].className}>
+        {current === undefined || current === 'checking' ? en.ui.bucket_check_note : VERDICT[current].text}
+      </span>
+    </div>
   );
 }

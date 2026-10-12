@@ -94,3 +94,22 @@ describe('ResultCard — 축소 안내', () => {
     expect(html(generate(ctx, ['gcp']).gcp!.service_account)).not.toContain('data-steps');
   });
 });
+
+describe('ResultCard — 버킷 「Check」 (D83)', () => {
+  it('유효한 버킷 카드에만 단추 하나 · 누르기 전에는 안내 한 줄(이름이 Cloudonym 에 가지 않는다) · 다른 규칙 · 무효 버킷에는 없다', () => {
+    const bucket = generate(ctx, ['gcp']).gcp!.storage_bucket!;
+    expect(bucket.valid).toBe(true);
+    const m = html(bucket);
+    expect(m.match(/data-check-bucket/g)).toHaveLength(1);
+    expect(m).toContain('Cloudonym never sees the name');
+    expect(m).toContain('data-bucket-verdict=""');
+    expect(html(generate(ctx, ['gcp']).gcp!.compute_instance!)).not.toContain('data-check-bucket');
+    expect(html({ ...bucket, valid: false })).not.toContain('data-check-bucket');
+  });
+  it('scope 를 주면 id · 복사 키가 갈린다 (D82)', () => {
+    const [item] = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'storage_bucket')!, count: 1 }]).items;
+    const scoped = renderToStaticMarkup(createElement(ResultCard, { result: item!, scope: 'stg' }));
+    expect(scoped).toContain('data-copy="name:stg/');
+    expect(scoped).toMatch(/id="card-gcp-storage_bucket-stg\//);
+  });
+});

@@ -35,7 +35,7 @@ WIZARD_REQUEST='{"provider":"gcp","project":{"owner":"platform","system":"billin
 WIZARD_EXPECTED='["project/-/project_id/-/-=platform-billing-prod","service/shop/compute_instance/web/01=billing-shop-prod-ane3-gce-web-01","service/shop/compute_instance/web/01/boot/-=billing-shop-prod-ane3-gce-web-01-boot","service/shop/compute_instance/web/01/data/01=billing-shop-prod-ane3-gce-web-01-data-01","service/pay/compute_instance/web/01=billing-pay-prod-ane3-gce-web-01","service/pay/compute_instance/web/01/boot/-=billing-pay-prod-ane3-gce-web-01-boot"]'
 VALIDATE_REQUEST='{"provider":"gcp","resource_type":"storage_bucket","name":"payments-prod-bucket"}'
 # public/_headers 의 CSP 와 같은 글자다
-CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+CSP="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://storage.googleapis.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 
 work="$(mktemp -d)"
 trap 'rm -f "${work}"/*; rmdir "${work}"' EXIT

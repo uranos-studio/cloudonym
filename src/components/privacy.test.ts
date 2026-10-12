@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Privacy } from './Privacy';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
 import { VISIT_KEY } from './beacon';
 import { COPY_TARGETS } from './copyTargets';
 
@@ -73,6 +73,12 @@ describe('/privacy', () => {
   it('IP 를 읽는 범위는 요청 제한이 도는 곳과 같다 — POST /v1/ · GET /llms.txt · GET /catalog.json', () => {
     const ip = sentences(pageText()).find((s) => s.includes('reads the client IP'))!;
     for (const w of ['POST request to /v1/', '/llms.txt', '/catalog.json']) expect(ip, w).toContain(w);
+  });
+  it('버킷 「Check」 — 누를 때만 브라우저가 Google 에 이름을 보내고 Cloudonym 을 거치지 않는다 (D83)', () => {
+    const s = sentences(pageText()).find((x) => x.includes('Check button'))!;
+    expect(s).toBeDefined();
+    for (const w of ['when you click it, and only then', 'sends that bucket name directly to Google Cloud Storage', PRIVACY_BUCKET_CHECK_ORIGIN]) expect(s, w).toContain(w);
+    expect(pageText()).toContain('The request does not pass through Cloudonym');
   });
   it('AI 에이전트 요청은 ai_agent 일자 카운터에도 하나 더한다(telemetry.ts bump stats:ai_agent_hits)', () => {
     expect(pageText()).toContain('when the client class is ai_agent, one to a daily AI-agent counter as well');
