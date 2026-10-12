@@ -2,7 +2,7 @@
 // 화면 상태는 마법사 모델(WizardPlan) 하나이고 URL hash `w` 에 실린다. 결과는 모델에서 매번 다시 만든다 — validatePlan → expandPlan → generateProject (D17 · D69).
 // 넓은 화면은 세 칸이다(D89) — 목록(WizardList) · 고른 줄 하나의 설정(WizardSettings) · 이름(WizardNames). 고른 줄은 화면 상태이고 hash 에 싣지 않는다.
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { generateProject, parseContext, parseProjectContext } from '../core/engine';
 import { inputKind } from '../core/tree';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
@@ -84,8 +84,11 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [toggled, setToggled] = useState<ReadonlyMap<number, boolean>>(() => new Map());
   /** 칩 · 단발 추가로 막 더한 줄 — 더할 때마다 새 객체라 같은 줄을 다시 더해도 타이머가 다시 돈다 */
   const [flash, setFlash] = useState<{ path: RowPath } | undefined>(undefined);
+  /** 설정 칸에서 바꾼 것이 고른 줄을 옮겼는가 — 그러면 설정 칸이 새로 그려져 포커스를 잃는다(아래 useLayoutEffect) */
+  const refocus = useRef(false);
   /** 사용자가 바꾸면 링크 상태 · 링크 안내를 버린다. op 는 고른 줄을 어떻게 옮길지(없으면 그대로) */
   const edit: Edit = (fn, op: EditOp = { type: 'keep' }) => {
+    refocus.current = true;
     setLink(undefined);
     setNotices([]);
     // 서비스를 지우면 펼침 상태의 자리 번호도 당긴다 — 지운 서비스의 펼침이 다음 서비스에 붙지 않게
@@ -96,7 +99,10 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       return { plan: next, selected: selectionAfter(o, resolveSelection(s.plan, s.selected), s.plan, next) };
     });
   };
-  const select = (path: RowPath) => setState((s) => ({ ...s, selected: path }));
+  const select = (path: RowPath) => {
+    refocus.current = false;
+    setState((s) => ({ ...s, selected: path }));
+  };
 
   // 고른 줄이 서비스 안이면 그 서비스를 편다(고른 pick 의 서비스는 늘 펴진다) · 칩으로 더한 줄은 잠깐 강조한다
   const sel = parseRow(selected);
@@ -185,6 +191,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         const s = startFrom(window.location.hash, false);
         if (!s.broken) {
           lastSent.current = s.link?.key ?? '';
+          refocus.current = false;
           // 계획이 통째로 바뀐다 — 고른 줄이 새 계획에 없으면 project (resolveSelection)
           setState((st) => ({ plan: s.plan, selected: resolveSelection(s.plan, st.selected) }));
           setToggled(new Map());
@@ -205,6 +212,15 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   // 키보드 — Enter 는 설정 칸 첫 컨트롤로, 설정 칸의 Esc 는 고른 줄로 되돌린다
   const settingsRef = useRef<HTMLElement>(null);
   const focusSettings = () => settingsRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+  // 설정 칸에서 바꾼 것(Duplicate · Add subnet · Remove …)이 고른 줄을 옮기면 칸이 새로 그려지고 포커스가 body 로 떨어진다 —
+  // 새 칸의 첫 컨트롤로 옮겨 키보드 흐름(Esc 로 줄에 돌아가기)이 이어지게 한다. 목록 이동 · 첫 화면 · hash 이동은 건드리지 않는다
+  useLayoutEffect(() => {
+    if (!refocus.current) return;
+    refocus.current = false;
+    const active = document.activeElement;
+    if (active && active !== document.body && active.isConnected) return;
+    focusSettings();
+  }, [selected]);
   const onSettingsKey = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== 'Escape' || e.defaultPrevented) return;
     e.preventDefault();

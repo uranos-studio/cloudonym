@@ -932,14 +932,21 @@ def wizard_selection_focus(browser, errors):
     # 마지막 서비스를 지우면 이전 서비스 · 하나 남은 것을 지우면 project
     svc(pg, 1).locator('[data-remove-service]').click()
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
-    # Duplicate 는 원본 바로 뒤에 끼운다 — 강조되는 줄도 끝 줄이 아니라 끼운 줄이다
-    select(pg, 'projectPicks[1]').locator('[data-duplicate-pick]').click()
+    # Duplicate 는 원본 바로 뒤에 끼운다 — 강조되는 줄도 끝 줄이 아니라 끼운 줄이다.
+    # 키보드로 눌러도 포커스가 새 설정 칸에 남아 Esc 로 그 줄에 돌아간다(칸이 새로 그려져도 body 로 떨어지지 않는다)
+    select(pg, 'projectPicks[1]').locator('[data-duplicate-pick]').focus()
+    pg.keyboard.press('Enter')
     expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[2]')
+    assert pg.evaluate("!!document.activeElement.closest('[data-settings]')"), pg.evaluate('document.activeElement.outerHTML')
+    pg.keyboard.press('Escape')
+    expect(pg.locator('[data-row-path="projectPicks[2]"]')).to_be_focused()
     expect(pg.locator('[data-row-path="projectPicks[2]"]')).to_have_attribute('data-flash', 'true')
     expect(pg.locator('[data-row-path="projectPicks[4]"]')).to_have_attribute('data-flash', 'false')
     # 더한 뒤 1.2초 안에 값을 고쳐도 강조는 꺼진다(타이머가 계획이 아니라 강조에 묶인다)
-    select(pg, 'network').locator('[data-add-subnet]').click()
+    select(pg, 'network').locator('[data-add-subnet]').focus()
+    pg.keyboard.press('Enter')
     expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[5]')
+    assert pg.evaluate("!!document.activeElement.closest('[data-settings]')"), pg.evaluate('document.activeElement.outerHTML')
     settings(pg).locator('[data-tier]').fill('edge')
     expect(pg.locator('[data-flash="true"]')).to_have_count(0, timeout=3000)
     # 서비스 안의 pick 을 고른 채 서비스를 접으면 — 서비스 줄이 골라지고(포커스도) 접힌다
