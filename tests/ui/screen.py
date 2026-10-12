@@ -662,14 +662,41 @@ def wizard_scenarios(browser, rules_version, errors):
     p41.route('https://storage.googleapis.com/storage/v1/b/**', lambda route: route.abort())
     card.locator('[data-check-bucket]').click()
     expect(card.locator('[data-bucket-verdict="unknown"]')).to_have_text('Could not tell — the request failed. Try again later.')
-    # 이름이 바뀌면 판정을 버린다 — A → B → A 에서 옛 판정이 다시 보이지 않는다 (codex 리뷰)
-    svc(p41, 0).locator('[data-service-name]').fill(purpose + 'b')
-    expect(card.locator('[data-name]')).not_to_have_text(bucket_name)
-    svc(p41, 0).locator('[data-service-name]').fill(purpose)
-    expect(card.locator('[data-name]')).to_have_text(bucket_name)
-    expect(card.locator('[data-bucket-verdict]')).to_have_attribute('data-bucket-verdict', '')
+    # 이름이 바뀌어도 카드가 그대로인 화면(/pick — 카드 키가 리소스 종류다)에서 — A → B → A 에서 옛 판정이 다시 보이지 않고,
+    # A 를 묻는 중에 A → B → A 로 바꾸고 다시 물으면 새 응답(401 taken)이 먼저 · 옛 응답(404)이 나중에 와도 taken 이 남는다 (codex 리뷰)
+    goto_ready(p41, BASE + TREE + state_hash({**INPUT, 'owner': 'example'}, rules_version, 'gcp', {'storage_bucket': 1}))
+    pcard = p41.locator('article[data-rule="gcp.storage_bucket"]')
+    expect(pcard).to_have_count(1)
+    pname = pcard.locator('[data-name]').inner_text()
+    pcard.locator('[data-check-bucket]').click()
+    expect(pcard.locator('[data-bucket-verdict="unknown"]')).to_have_count(1)  # 위의 abort 경로가 그대로다
+    p41.fill('#field-owner', 'examplb')
+    expect(pcard.locator('[data-name]')).not_to_have_text(pname)
+    p41.fill('#field-owner', 'example')
+    expect(pcard.locator('[data-name]')).to_have_text(pname)
+    expect(pcard.locator('[data-bucket-verdict]')).to_have_attribute('data-bucket-verdict', '')
+    p41.unroute('https://storage.googleapis.com/storage/v1/b/**')
+    held = []
+    p41.route('https://storage.googleapis.com/storage/v1/b/**', lambda route: held.append(route))
+    pcard.locator('[data-check-bucket]').click()
+    expect(pcard.locator('[data-check-bucket]')).to_have_text('Checking…')
+    p41.fill('#field-owner', 'examplb')
+    p41.fill('#field-owner', 'example')
+    expect(pcard.locator('[data-check-bucket]')).to_have_text('Check')
+    pcard.locator('[data-check-bucket]').click()
+    for _ in range(50):
+        if len(held) == 2:
+            break
+        p41.wait_for_timeout(100)
+    assert len(held) == 2, held
+    held[1].fulfill(status=401, headers={'access-control-allow-origin': BASE}, body='{}')
+    expect(pcard.locator('[data-bucket-verdict="taken"]')).to_have_count(1)
+    held[0].fulfill(status=404, headers={'access-control-allow-origin': BASE}, body='{}')
+    p41.wait_for_timeout(500)
+    expect(pcard.locator('[data-bucket-verdict]')).to_have_attribute('data-bucket-verdict', 'taken')
+    p41.unroute('https://storage.googleapis.com/storage/v1/b/**')
     p41.wait_for_timeout(1500)  # 디바운스된 비콘까지 기다린다
-    leaked = [(u, d) for u, d in own_calls if bucket_name in u or bucket_name in d or purpose in u or purpose in d]  # ui_generate 는 규칙 id 만 싣는다
+    leaked = [(u, d) for u, d in own_calls if any(w in u or w in d for w in (bucket_name, purpose, pname))]  # ui_generate 는 규칙 id 만 싣는다
     assert leaked == [], leaked
     no_hangul(p41)
     ctx41.close()
