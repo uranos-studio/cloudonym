@@ -124,9 +124,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "gce",
       "basis": "gce pairs with AWS ec2; meaning (principle 1) before frequency; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): vm 1652 / gce 185 / inst 20",
-      "previous": [
-        "vm"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -205,9 +203,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "snet",
       "basis": "4-char exception, same as Azure CAF snet; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): subnet 1536 / sub 117 / snet 18 / sn 5",
-      "previous": [
-        "subnet"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -264,9 +260,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "sql",
       "basis": "Product name; db collides with Spanner database; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): db 1512 / sql 796 / csql 17",
-      "previous": [
-        "db"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -313,9 +307,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "gcs",
       "basis": "Most used; blueprint uses bkt-; principle 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): bucket 1668 / gcs 388 / bkt 38",
-      "previous": [
-        "bucket"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -406,9 +398,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "disk",
       "basis": "Most used; 3-char candidates unused; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): disk 567 / pd 28 / dsk 0 / dis 0",
-      "previous": [
-        "dis"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -463,9 +453,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "ip",
       "basis": "Most used; add reads as a verb; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): regional ip 1068 / addr 46 / add 34; global ip 1480 / addr 13 / add 27",
-      "previous": [
-        "add"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -517,9 +505,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "as",
       "basis": "aut is meaningless; low usage either way; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): autoscaler 53 / as 7 / aut 0",
-      "previous": [
-        "aut"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -757,9 +743,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "fwd",
       "basis": "fr collides with future reservation; fwd used more; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): lb 920 / rule 310 / fwd 80 / fr 33",
-      "previous": [
-        "fr"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -811,9 +795,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "frsv",
       "basis": "Pairs with reservation rsv; avoids fr collision; principles 1, 2",
-      "previous": [
-        "fr"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1032,9 +1014,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "hhcs",
       "basis": "Distinguishes from legacy HTTP hhc; principle 2",
-      "previous": [
-        "hhc"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1069,9 +1049,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "img",
       "basis": "ima is meaningless; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): image 150 / img 4 / ima 0",
-      "previous": [
-        "ima"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1110,9 +1088,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "mig",
       "basis": "Official term MIG; most used; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): mig 75 / igm 35",
-      "previous": [
-        "igm"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1187,9 +1163,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "tpl",
       "basis": "it reads as a pronoun; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): template 645 / tpl 21 / tmpl 20 / it 10",
-      "previous": [
-        "it"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1265,9 +1239,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "isn",
       "basis": "is reads as a verb; principle 1",
-      "previous": [
-        "is"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1347,9 +1319,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "vl",
       "basis": "Blueprint prefix vl-; API calls it a VLAN attachment; principle 1",
-      "previous": [
-        "ia"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -1395,9 +1365,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "icg",
       "basis": "Pairs with ic; avoids ig collision; principle 1",
-      "previous": [
-        "ig"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1440,9 +1408,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "ic",
       "basis": "Blueprint prefix ic-; int collides with the internal kind token; principle 1",
-      "previous": [
-        "int"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -1516,9 +1482,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "mimg",
       "basis": "Pairs with img; mi kept for managed identity; principles 1, 2",
-      "previous": [
-        "mi"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1587,9 +1551,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "nes",
       "basis": "4-char current value had no exception reason; principle 2",
-      "previous": [
-        "ness"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1692,9 +1654,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "cmt",
       "basis": "From gcloud group commitments; cud source unverified; principle 1",
-      "previous": [
-        "com"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -1907,9 +1867,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "waf",
       "basis": "Cloud Armor policy is a WAF policy; sp collided five ways; principle 1; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): armor 125 / policy 113 / waf 98 / ca 2 / sp 0",
-      "previous": [
-        "sp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -1956,9 +1914,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "snap",
       "basis": "Same concept as snapshot; principles 1, 2",
-      "previous": [
-        "sna"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2009,9 +1965,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "cert",
       "basis": "ssl overlaps SSL policy and health check kind; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): ssl 477 / cert 279 / sc 2",
-      "previous": [
-        "sc"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -2063,9 +2017,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "sslp",
       "basis": "ssl is taken by the health check kind token; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): ssl 229 / sslp 0 / sp 0",
-      "previous": [
-        "sp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2146,9 +2098,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "thps",
       "basis": "Distinguishes from HTTP thp; principle 2",
-      "previous": [
-        "thp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2229,9 +2179,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "url",
       "basis": "Used as the first word of url-map names; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): url 1422 / map 314 / urlmap 38 / um 3",
-      "previous": [
-        "um"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2268,9 +2216,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "rsv",
       "basis": "res is ambiguous; principle 1",
-      "previous": [
-        "res"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2361,9 +2307,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "rop",
       "basis": "Avoids rp collision; principle 1",
-      "previous": [
-        "rp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2398,9 +2342,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "cr",
       "basis": "Blueprint prefix cr-; rou unused; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): router 878 / cr 44 / rtr 28 / rou 0",
-      "previous": [
-        "rou"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2435,9 +2377,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "rt",
       "basis": "Same as CAF rt; rou unused; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): route 369 / rt 32 / rou 0",
-      "previous": [
-        "rou"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2472,9 +2412,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "psc",
       "basis": "Most used; sa is the service account; principles 1, 3; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): psc 107 / attachment 5 / sa 2",
-      "previous": [
-        "sa"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -2516,9 +2454,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "snap",
       "basis": "Same as CAF snap; sna is meaningless; principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): sna 0 / snap 0 / ss 0",
-      "previous": [
-        "sna"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -2904,9 +2840,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "ring",
       "basis": "ring (kr equals the old region value kr; kms names the service, not the key ring); principles 1, 2; GitHub code search 2026-10-07 (\"-xxx-\" <terraform type> extension:tf): keyring 124 / ring 81 / kms 79 / kr 5",
-      "previous": [
-        "kr"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -3285,9 +3219,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "ptn",
       "basis": "ip is taken by IP address; principle 1",
-      "previous": [
-        "ip"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -3329,9 +3261,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "spdb",
       "basis": "Spanner names use spanner, not db, and db now belongs to the Cloud SQL database; 4 letters for meaning (principle 2 exception); GitHub code search 2026-10-11 (\"-xxx-\" \"resource \\\"google_spanner_database\\\"\" extension:tf, 266 files): spanner 40 / sql 7 / db 3 / spdb 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-11)",
-      "previous": [
-        "db"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -3492,9 +3422,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "gcf",
       "basis": "Most used; same concept as 2nd gen; principles 1, 3; GitHub code search 2026-10-07 (google_cloudfunctions_function): gcf 26 / fn 11 / gen1 4 / v1 4",
-      "previous": [
-        "fn"
-      ]
+      "previous": []
     },
     "entity": "cloudfunctions.functions",
     "kind": null,
@@ -3529,9 +3457,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "gcf",
       "basis": "Most used; same concept as 1st gen; principles 1, 3; GitHub code search 2026-10-07 (google_cloudfunctions2_function): gcf 179 / cf 84 / fn 82 / v2 44 / func 21 / gen2 20",
-      "previous": [
-        "fn"
-      ]
+      "previous": []
     },
     "entity": "cloudfunctions.functions",
     "kind": null,
@@ -3853,9 +3779,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "wfpp",
       "basis": "Pairs with wfp; avoids wpp collision; principles 1, 2",
-      "previous": [
-        "wpp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -3899,9 +3823,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "wfpk",
       "basis": "Pairs with wfpp; avoids key collision; principles 1, 2",
-      "previous": [
-        "key"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
@@ -4047,9 +3969,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "wipp",
       "basis": "Pairs with wip; avoids wpp collision; principles 1, 2",
-      "previous": [
-        "wpp"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": {
@@ -4095,9 +4015,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "slug": {
       "value": "wipk",
       "basis": "Pairs with wipp; avoids key collision; principles 1, 2",
-      "previous": [
-        "key"
-      ]
+      "previous": []
     },
     "entity": null,
     "kind": null,
