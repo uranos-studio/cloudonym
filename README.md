@@ -4,7 +4,7 @@ Multi-cloud resource naming engine — **Google Cloud** in this release, with AW
 
 [한국어](#한국어)
 
-![Cloudonym naming wizard — project values, two services with their servers and disks, and the generated names](docs/screenshots/06-wizard.png)
+![Cloudonym naming wizard — the plan list, the settings of the selected web server with its boot and data disks, and the generated names](docs/screenshots/06-wizard.png)
 
 <a id="naming-wizard"></a>
 ## Naming wizard (web UI, `/`)
@@ -65,7 +65,9 @@ Both screens keep their state in the URL hash — the wizard its project values,
 
 | | |
 |---|---|
-| [Naming wizard](docs/screenshots/06-wizard.png) | Two services — `shop` (server 01 with a boot disk and data disk 01) and `pay` (server 01 with a boot disk) — and their names |
+| [Naming wizard](docs/screenshots/06-wizard.png) | 1280 px: the plan list, the settings of the selected row — the `shop` web server with a boot disk and data disk 01 — and the names of both services (`shop`, `pay`) |
+| [Wizard, tablet](docs/screenshots/07-wizard-tablet.png) | 768 px: the list and the settings in two columns, the names opened as a drawer from the right edge |
+| [Wizard, phone](docs/screenshots/08-wizard-phone.png) | 360 px: one column with Plan and Names tabs; the selected web server's settings open as a bottom sheet |
 | [Desktop, light](docs/screenshots/01-desktop-light.png) | The resource tree, four resources picked (the tree shows the selected rows only) |
 | [Mobile, 360 px](docs/screenshots/02-mobile-360.png) | The same selection on a narrow screen, with the bar that jumps to the names |
 | [Desktop, dark](docs/screenshots/03-desktop-dark.png) | The same share link opened in dark mode |
@@ -420,7 +422,7 @@ See the LICENSE file for details.
 
 **공유 URL 주의** — 두 화면 모두 상태를 URL hash 에 둔다(마법사는 프로젝트 값 · 서비스 · 고른 것 · 서버, 트리는 다섯 값 · CSP · 선택). **Share URL** 은 그 링크를 복사한다. hash 는 버튼을 누르지 않아도 입력하는 대로 주소창에 쓰인다. **Base64 는 암호화가 아니다** — 링크를 받은 사람은 owner · system · 서비스 이름 등 입력값을 그대로 읽는다. 링크를 넘길 생각이면 회사 내부 이름 같은 민감한 값을 넣지 않는다. 화면도 버튼 옆에 같은 경고를 보인다.
 
-스크린샷 — [이름 마법사](docs/screenshots/06-wizard.png) · [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
+스크린샷 — [이름 마법사](docs/screenshots/06-wizard.png) · [마법사 태블릿 · 이름 드로어](docs/screenshots/07-wizard-tablet.png) · [마법사 폰 · 설정 시트](docs/screenshots/08-wizard-phone.png) · [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
 
 허용값 — env: `prod` · `stg` · `dev` · `sbx` · `qa` · `uat` · `test` · `perf` · `dr`(`prd` · `production` · `staging` · `acceptance` · `performance` · `recovery` 같은 별칭도 받아 표준값으로 바꾼다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존은 받아 그 리전으로 푼다(이름에는 리전 코드만 들고 존은 들지 않는다). 전역 리소스에는 지역 토큰이 없다. 옛 나라 값 `kr` · `jp` 는 거부하고 해당 리전 이름을 알려 준다. 멀티 · 이중 리전 위치(`US` · `EU` · `ASIA` · `ASIA1` · `EUR4` · `EUR5` · `EUR7` · `EUR8` · `NAM4`, 이름이나 코드)는 그 위치를 받는 리소스에만 쓴다 — `storage_bucket` 은 아홉 전부, `bigquery_dataset` 은 `US` · `EU`. `/v1/names` 는 지역 토큰이 있는 요청 리소스가 전부 그 위치를 받을 때만 받고, 리소스 전부를 내는 `/v1/generate` 는 400 `context.location_unsupported` 로 답한다. 위치와 그 위치를 받는 리소스는 `/llms.txt` 에 있다. 지역 표는 `/llms.txt` 와 이름 안내 쪽 `/docs/naming` 에 있다.
 
