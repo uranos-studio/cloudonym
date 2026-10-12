@@ -937,6 +937,11 @@ def wizard_selection_focus(browser, errors):
     expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[2]')
     expect(pg.locator('[data-row-path="projectPicks[2]"]')).to_have_attribute('data-flash', 'true')
     expect(pg.locator('[data-row-path="projectPicks[4]"]')).to_have_attribute('data-flash', 'false')
+    # 더한 뒤 1.2초 안에 값을 고쳐도 강조는 꺼진다(타이머가 계획이 아니라 강조에 묶인다)
+    select(pg, 'network').locator('[data-add-subnet]').click()
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[5]')
+    settings(pg).locator('[data-tier]').fill('edge')
+    expect(pg.locator('[data-flash="true"]')).to_have_count(0, timeout=3000)
     no_hangul(pg)
     ctx.close()
 

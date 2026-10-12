@@ -82,7 +82,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [custom, setCustom] = useState<number | null | undefined>(undefined);
   /** 사용자가 펴고 접은 서비스 줄 — 화면 상태. 손대지 않은 서비스는 고른 줄이 그 안일 때만 펴진다 */
   const [toggled, setToggled] = useState<ReadonlyMap<number, boolean>>(() => new Map());
-  const [flash, setFlash] = useState<RowPath | undefined>(undefined);
+  /** 칩 · 단발 추가로 막 더한 줄 — 더할 때마다 새 객체라 같은 줄을 다시 더해도 타이머가 다시 돈다 */
+  const [flash, setFlash] = useState<{ path: RowPath } | undefined>(undefined);
   /** 사용자가 바꾸면 링크 상태 · 링크 안내를 버린다. op 는 고른 줄을 어떻게 옮길지(없으면 그대로) */
   const edit: Edit = (fn, op: EditOp = { type: 'keep' }) => {
     setLink(undefined);
@@ -105,11 +106,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   useEffect(() => {
     const added = addedRow(prevPlan.current, plan);
     prevPlan.current = plan;
-    if (!added) return;
-    setFlash(added);
+    if (added) setFlash({ path: added });
+  }, [plan]);
+  // 강조를 끄는 타이머는 강조에만 묶는다 — 계획에 묶으면 더한 뒤 1.2초 안에 값을 고칠 때 타이머가 지워져 강조가 남는다
+  useEffect(() => {
+    if (!flash) return;
     const t = window.setTimeout(() => setFlash(undefined), 1200);
     return () => window.clearTimeout(t);
-  }, [plan]);
+  }, [flash]);
   const onExpand = (i: number, on: boolean) => setToggled((t) => new Map(t).set(i, on));
 
   const envsKey = envList(plan.project.env, extraEnvs).join(',');
@@ -237,7 +241,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         <div data-wizard-layout className="grid gap-4 lg:h-[calc(100dvh-2rem)] lg:grid-rows-1 lg:grid-cols-[15rem_minmax(0,1fr)_22rem] xl:grid-cols-[17.5rem_minmax(0,1fr)_26rem]">
           <nav data-wizard-list-column aria-label={en.ui.wizard_list_label} className={`${COLUMN} p-2`}>
             <WizardList plan={plan} envs={envs} selected={selected} onSelect={select} isExpanded={isExpanded} onExpand={onExpand}
-              result={results?.[0]?.result} errors={planErrors} serviceErrors={serviceErrors} projectCount={projectCount} flash={flash}
+              result={results?.[0]?.result} errors={planErrors} serviceErrors={serviceErrors} projectCount={projectCount} flash={flash?.path}
               onAddService={() => edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }))} onEnter={focusSettings} />
           </nav>
           <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} className={COLUMN} onKeyDown={onSettingsKey}>
