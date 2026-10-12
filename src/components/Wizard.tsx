@@ -612,7 +612,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
           <h2 id="custom-title" className="text-base font-semibold">{fillUi(en, 'wizard_custom_title', { service: name })}</h2>
-          <p className={HINT}>{en.ui.wizard_custom_hint}</p>
+          <p className={HINT}>{service === null ? en.ui.wizard_custom_hint_project : en.ui.wizard_custom_hint_service}</p>
         </div>
         <button type="button" data-custom-close aria-label={en.ui.wizard_custom_close} className={ICON_BTN} onClick={onClose}><X aria-hidden="true" className="size-4" /></button>
       </div>

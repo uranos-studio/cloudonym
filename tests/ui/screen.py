@@ -246,6 +246,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-wizard]')).to_be_visible()
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
+    expect(page.get_by_text('Pick a cloud, then fill in five steps: project values and shared network, services, what runs in each service, options, and what attaches to each server. Names appear on the right as you go.')).to_be_visible()
     expect(page.locator('[data-names-empty]')).to_have_text('Pick what runs in a service (or a project resource) to see names here.')
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     fill_project(page)
@@ -351,6 +352,7 @@ def wizard_scenarios(browser, rules_version, errors):
     svc(page, 0).locator('[data-purpose-chip="custom"]').click()
     dialog = page.locator('[data-custom-dialog]')
     expect(dialog).to_be_visible()
+    expect(dialog.get_by_text('Tick one row. It is added to this service with its own number rows.')).to_have_count(1)
     # 프로젝트 ID 는 늘 암묵 항목이라 모달 트리에 없다(고르면 이름이 전부 사라졌다) — 같은 프로젝트 범위의 서비스 계정 행은 있다
     expect(dialog.locator('[data-rule="gcp.service_account"]')).to_have_count(1)
     expect(dialog.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
@@ -536,6 +538,7 @@ def wizard_scenarios(browser, rules_version, errors):
     p39.locator('[data-project-chip="custom"]').click()
     dlg = p39.locator('[data-custom-dialog]')
     expect(dlg).to_be_visible()
+    expect(dlg.get_by_text('Tick one row. It is added to the project resources with its own number rows.')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.vpc_network"]')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.cloud_sql_database"]')).to_have_count(0)
     expect(dlg.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
