@@ -3590,7 +3590,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_policy_binding": {
         "scope": "location",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3628,7 +3628,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_principal_access_boundary_policy": {
         "scope": "namespace",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3732,7 +3732,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_workforce_pool": {
         "scope": "namespace",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {

@@ -5,6 +5,7 @@ import { findConflicts } from './conflict';
 import { getRule, rulesFor } from './constraints';
 import { CONFLICT_CONTEXT, CONFLICT_SELECTION } from './__fixtures__/conflict';
 import { REGIONS } from './regions-data';
+import { locationError } from './regions';
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
 
 describe('generate', () => {
@@ -712,6 +713,19 @@ describe('projectItemKey · serviceNamespace · attachName (D69)', () => {
     expect(attachName(parent, { attach: 'boot' })).toMatchObject({ name: 'billing-shop-prod-ane3-gce-01-boot', valid: true });
     const sqlItem = generateProject(oneService('shop', [{ rule: getRule('gcp', 'cloud_sql_instance')!, count: 1, kind: 'POSTGRES' }]), 'gcp').items[1]!;
     expect(() => attachName(sqlItem, { attach: 'boot' })).toThrow();
+  });
+});
+
+describe('Secret 은 기본이 전역이다 (D79)', () => {
+  const at = (region: string) => { const p = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region }, 'gcp'); if (!p.ok) throw new Error(region); return p.context; };
+  const secret = getRule('gcp', 'secret')!;
+  it('generate · generateMany 는 문맥 지역과 무관하게 지역 토큰이 없다 · 멀티 리전 문맥에서도 FAIL 이 아니다', () => {
+    expect(generate(at('asia-northeast3'), ['gcp']).gcp!.secret).toMatchObject({ name: 'billing-trade-prod-secret-01', valid: true });
+    expect(generateMany(at('us'), 'gcp', [{ rule: secret, count: 1 }]).items[0]).toMatchObject({ name: 'billing-trade-prod-secret-01', valid: true });
+    expect(locationError('us', [secret])).toBeUndefined();
+  });
+  it('regional 을 주면 문맥 지역이 든다', () => {
+    expect(generateItem(at('asia-northeast3'), secret, { regional: true })).toMatchObject({ name: 'billing-trade-prod-ane3-secret-01', valid: true });
   });
 });
 

@@ -13,6 +13,10 @@ export const MAX_REGION_CHARS: number = Math.max(
   ...Object.values(LOCATIONS).flatMap((ls) => ls.map((l) => l.code.length)),
 );
 
+/** 기본이 전역인 규칙(defaultLocation 'global' — Secret)의 마법사 pick 위치 값 (D79) — 전역 대신 프로젝트 지역에 둔다(지역 Secret).
+ *  멀티 · 이중 리전 표(LOCATIONS)의 값이 아니다 */
+export const REGIONAL_LOCATION = 'regional';
+
 /** 멀티 · 이중 리전 위치 (D78) — 위치 이름(US · ASIA1) · 코드(us · asia1)를 대소문자 없이 푼다. 리전 · 존 · global 이면 undefined */
 export function canonicalLocation(raw: string, provider: Provider): LocationEntry | undefined {
   const key = raw.trim().toLowerCase();
@@ -25,11 +29,25 @@ export function locationsFor(rule: Pick<ResourceRule, 'id' | 'provider' | 'regio
   return LOCATIONS[rule.provider].filter((l) => Object.hasOwn(l.rules, rule.id));
 }
 
+/** 마법사 pick 의 위치 값 → 엔진에 넘길 값 (D78 · D79). 받지 않는 값이면 undefined.
+ *  기본이 전역인 규칙(Secret)은 regional 하나, 그 밖은 그 규칙이 받는 멀티 · 이중 리전 위치(이름 · 코드, 대소문자 없이)를 코드로 */
+export function pickLocation(rule: Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template' | 'defaultLocation'>, raw: string): string | undefined {
+  if (rule.defaultLocation === 'global') return raw.trim().toLowerCase() === REGIONAL_LOCATION ? REGIONAL_LOCATION : undefined;
+  const hit = canonicalLocation(raw, rule.provider);
+  return hit && locationsFor(rule).includes(hit) ? hit.code : undefined;
+}
+
+/** pick 위치로 받는 값의 목록 — 오류 문장의 supported */
+export function pickLocationNames(rule: Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template' | 'defaultLocation'>): string[] {
+  return rule.defaultLocation === 'global' ? [REGIONAL_LOCATION] : locationsFor(rule).map((l) => l.location);
+}
+
 /** 문맥의 지역 값(엔진 문맥 — 코드)이 이 규칙에 맞지 않는 멀티 · 이중 리전 위치면 그 위치, 아니면 undefined (D78).
  *  지역 토큰이 없는 규칙은 지역을 이름에 쓰지 않으므로 늘 맞다 */
-export function locationMismatch(region: string, rule: Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template'>): LocationEntry | undefined {
+export function locationMismatch(region: string, rule: Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template' | 'defaultLocation'>): LocationEntry | undefined {
   const loc = LOCATIONS[rule.provider].find((l) => l.code === region);
-  if (!loc || regionTokenOfRule(rule) === 'none' || Object.hasOwn(loc.rules, rule.id)) return undefined;
+  // 기본이 전역인 규칙은 문맥 지역을 이름에 쓰지 않는다 (D79)
+  if (!loc || regionTokenOfRule(rule) === 'none' || rule.defaultLocation === 'global' || Object.hasOwn(loc.rules, rule.id)) return undefined;
   return loc;
 }
 
@@ -39,7 +57,7 @@ export function locationRuleTypes(loc: LocationEntry): string[] {
 }
 
 /** 요청 단위 검사 (D78) — 문맥 지역이 멀티 · 이중 리전 위치인데 그 위치를 받지 않는 규칙이 하나라도 있으면 오류 하나. API 가 400 으로 거부할 때 쓴다 */
-export function locationError(region: string, rules: readonly Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template'>[]): CoreMessage | undefined {
+export function locationError(region: string, rules: readonly Pick<ResourceRule, 'id' | 'provider' | 'regionToken' | 'template' | 'defaultLocation'>[]): CoreMessage | undefined {
   for (const r of rules) {
     const loc = locationMismatch(region, r);
     if (loc) return { code: 'context.location_unsupported', field: 'region', params: { value: loc.location, supported: locationRuleTypes(loc) } };

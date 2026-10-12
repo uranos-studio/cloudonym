@@ -397,6 +397,8 @@ export const en: Catalog = {
     wizard_tier_hint: 'Optional word after the abbreviation, e.g. batch',
     wizard_location: 'Location',
     wizard_location_default: 'Project region',
+    wizard_location_global: 'Global (no region)',
+    wizard_location_regional: 'Regional — project region',
     wizard_step_options: 'Options',
     wizard_ha: 'HA (redundant)',
     wizard_ha_hint: 'Two servers or more. Place the servers in different zones when you create them.',

@@ -14,7 +14,7 @@ The home page names a whole Google Cloud project in six steps. Names are regener
 1. **① Project** — type **Owner · System** (at most 64 characters each), pick **Environment** and **Region** (searching by a zone name also finds its region). The project ID (`<owner>-<system>-<env>`) appears at once. **Project resources** adds the network: a VPC, a subnet, firewall rules (`ssh`, `web`, `icmp`), a Cloud Router and Cloud NAT. The VPC starts as one network (a plan with two, made through the API, still shows both), and **Custom…** there picks any other project-level resource.
 2. **② Services** — one card per service. The service name is the `purpose` of every name in that service; **Add service** adds another.
 3. **③ Purpose** — pick what runs in the service: **web**, **was** (app server), **bastion**, **file** (file server), **db** (Cloud SQL), **object** (Cloud Storage), **run** (Cloud Run service), **sa** (service account), **secret** (Secret Manager), **gke** (GKE cluster), **wip** (Workload Identity pool), or **Custom…**, which opens the resource tree to pick any other catalog row. The **Load balancer** row adds the parts of an HTTPS load balancer one name at a time — global IP address, backend service, health check, URL map, SSL certificate, target HTTPS proxy and forwarding rule; the parts are not linked to one another.
-4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a resource with kinds takes its kind (a database its engine, a GKE cluster Standard or Autopilot), and a service account its role (`sync` when left empty). Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask; other numbered resources add a line with **Add Subnet**, **Add Cloud SQL Instance** and so on. A pick without a fixed tier (a bucket, a database, a custom pick) takes an optional **Tier**, and **Duplicate** copies it without the tier so one service can hold two of a kind — for example buckets `…-gcs-uploads` and `…-gcs-backups`. A bucket or BigQuery dataset pick has a **Location** select: the project region by default, or a multi-region or dual-region location (`US` → `…-prod-us-gcs`).
+4. **④ Options and servers** — web and app servers can be **Serverless** (Cloud Functions or Cloud Run) or **HA** (at least two servers); a resource with kinds takes its kind (a database its engine, a GKE cluster Standard or Autopilot), and a service account its role (`sync` when left empty). Each server is one line with its own number: removing server 01 does not rename server 02, and **Renumber** closes the gaps only when you ask; other numbered resources add a line with **Add Subnet**, **Add Cloud SQL Instance** and so on. A pick without a fixed tier (a bucket, a database, a custom pick) takes an optional **Tier**, and **Duplicate** copies it without the tier so one service can hold two of a kind — for example buckets `…-gcs-uploads` and `…-gcs-backups`. A bucket or BigQuery dataset pick has a **Location** select: the project region by default, or a multi-region or dual-region location (`US` → `…-prod-us-gcs`). A secret pick has one too: **Global** by default, with no region token (`…-prod-secret-01`), or **Regional** for a regional secret in the project region (`…-prod-ane3-secret-01`).
 5. **⑤ Attached resources** — per server, a **boot** disk, numbered **data** disks and reserved external or internal addresses (**ip**, **ipi**). Their names continue the server's name.
 6. **⑥ Names** — grouped by project and service, attached resources under their server, each with `PASS`/`FAIL` and the reasons. Copy **all names**, the **JSON**, **Terraform** `locals` (one map `gcp_names` keyed by the item key, plus `gcp_labels_by_namespace`) or the **Share URL**.
 
@@ -37,7 +37,7 @@ The wizard and its preset groups — web, app and bastion servers; file server; 
 
 Most numbered resources follow `<system>-<purpose>-<env>-<region>-<abbreviation>[-<kind>][-<tier>]-<seq>`; every formula in use is listed on `/docs/naming` and in `/llms.txt`.
 
-- `region` is a region code (`ane3`), never a zone — a zone you enter resolves to its region, so VMs and disks are named like regional resources. Resources without a location (a service account, Workload Identity pools, deny policies) and children that inherit their parent's location (a KMS key, a Spanner database, a Cloud SQL user, Cloud NAT) carry no region token (D77); a Cloud Storage bucket or BigQuery dataset can carry a multi-region or dual-region code instead (`us`, `asia1`; D78).
+- `region` is a region code (`ane3`), never a zone — a zone you enter resolves to its region, so VMs and disks are named like regional resources. Resources without a location (a service account, Workload Identity pools, deny policies, policy bindings and workforce pools, whose only location is `global`) and children that inherit their parent's location (a KMS key, a Spanner database, a Cloud SQL user, Cloud NAT) carry no region token (D77); a Cloud Storage bucket or BigQuery dataset can carry a multi-region or dual-region code instead (`us`, `asia1`; D78); a Secret Manager secret is global unless the wizard pick asks for a regional secret (D79).
 - `kind` is added only when it differs from the provider default (`pg` for PostgreSQL).
 - `tier` (`web`, `was`, …; pattern `^[a-z0-9]{2,16}$`) is filled only by the wizard, so `/v1/generate` and `/v1/names` never put one in a name. It is never shortened. Numbered resources take it before the sequence number; resources with neither a sequence number nor a role (a bucket, a BigQuery dataset) take it right after the abbreviation, which is how two buckets in one service differ (`platform-billing-shop-prod-ane3-gcs-uploads`, `…-gcs-backups`). Abbreviations, kind tokens, environment values and region codes are not allowed as tiers.
 - Attached resources add `-boot`, `-data-<seq>`, `-ip` or `-ipi` to the server's final name and are never shortened; a name that does not fit fails with the reason.
@@ -88,7 +88,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -131,7 +131,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
   "data": {
     "gcp": {
       "valid": true,
@@ -178,7 +178,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -209,7 +209,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.1" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
   "data": {
     "gcp": {
       "valid": true,
@@ -268,7 +268,7 @@ Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relati
 
 ## Supported resources (133 rules)
 
-**GCP 133** rules are enabled in this release (rules revision `2026-10-12.1`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
+**GCP 133** rules are enabled in this release (rules revision `2026-10-12.2`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
 
 The 35 hand-written rules below (the AWS and Azure rows among them are not enabled yet) are each checked against the official document linked. On top of them, **332 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md) (29 rows), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) (10 discovery methods, and the 25 of the 116 supported GCP asset types that have no rule: 7 held, 13 with no user-chosen name, 5 named outside this engine) and [docs/aws-intake-held.md](docs/aws-intake-held.md) (33 types). A further **42 GCP rules**, **42 AWS rules** and **30 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
 
@@ -387,7 +387,7 @@ See the LICENSE file for details.
 1. **① Project** — **Owner · System** 을 적고(각 64자까지) **Environment** · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 프로젝트 ID(`<owner>-<system>-<env>`)가 바로 보인다. **Project resources** 는 네트워크 — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp`) · Cloud Router · Cloud NAT 를 더한다. VPC 는 하나로 시작하고(둘이 든 링크는 둘 다 보인다), 거기의 **Custom…** 은 프로젝트 수준의 다른 리소스를 고른다
 2. **② Services** — 서비스마다 카드 하나. 서비스 이름이 그 서비스 안 모든 이름의 `purpose` 다. **Add service** 로 더한다
 3. **③ Purpose** — 서비스에서 돌릴 것을 고른다 — **web** · **was**(앱 서버) · **bastion** · **file**(파일 서버) · **db**(Cloud SQL) · **object**(Cloud Storage) · **run**(Cloud Run 서비스) · **sa**(서비스 계정) · **secret**(Secret Manager) · **gke**(GKE 클러스터) · **wip**(Workload Identity pool), 또는 리소스 트리를 열어 다른 catalog 행을 고르는 **Custom…**. **Load balancer** 줄은 HTTPS 로드 밸런서 부품을 이름 하나씩 더한다 — 전역 IP 주소 · 백엔드 서비스 · 상태 확인 · URL 맵 · SSL 인증서 · 대상 HTTPS 프록시 · 전달 규칙. 부품끼리 엮지는 않는다
-4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 종류가 있는 리소스는 종류를 고르고(데이터베이스는 엔진, GKE 클러스터는 Standard · Autopilot) 서비스 계정은 역할을 적는다(비우면 `sync`). 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다. 다른 번호 붙은 리소스는 **Add Subnet** · **Add Cloud SQL Instance** 처럼 그 이름으로 줄을 더한다. tier 가 정해지지 않은 pick(버킷 · 데이터베이스 · custom)은 **Tier** 를 적을 수 있고, **Duplicate** 로 복사하면 한 서비스에 같은 종류를 둘 둔다 — 예: 버킷 `…-gcs-uploads` · `…-gcs-backups`. 버킷 · BigQuery 데이터셋 pick 에는 **Location** 고르기가 있다 — 기본은 프로젝트 지역, 멀티 · 이중 리전 위치를 고르면 그 코드가 든다(`US` → `…-prod-us-gcs`)
+4. **④ Options and servers** — web · was 서버는 **Serverless**(Cloud Functions · Cloud Run)나 **HA**(서버 두 대 이상)로 바꿀 수 있고, 종류가 있는 리소스는 종류를 고르고(데이터베이스는 엔진, GKE 클러스터는 Standard · Autopilot) 서비스 계정은 역할을 적는다(비우면 `sync`). 서버는 한 줄에 하나, 저마다 번호를 갖는다 — 서버 01 을 지워도 서버 02 의 이름은 그대로이고, 빈 번호는 **Renumber** 를 누를 때만 당긴다. 다른 번호 붙은 리소스는 **Add Subnet** · **Add Cloud SQL Instance** 처럼 그 이름으로 줄을 더한다. tier 가 정해지지 않은 pick(버킷 · 데이터베이스 · custom)은 **Tier** 를 적을 수 있고, **Duplicate** 로 복사하면 한 서비스에 같은 종류를 둘 둔다 — 예: 버킷 `…-gcs-uploads` · `…-gcs-backups`. 버킷 · BigQuery 데이터셋 pick 에는 **Location** 고르기가 있다 — 기본은 프로젝트 지역, 멀티 · 이중 리전 위치를 고르면 그 코드가 든다(`US` → `…-prod-us-gcs`). Secret pick 에도 있다 — 기본은 **Global** 이라 지역 토큰이 없고(`…-prod-secret-01`), **Regional** 을 고르면 프로젝트 지역의 지역 Secret 이 된다(`…-prod-ane3-secret-01`)
 5. **⑤ Attached resources** — 서버마다 **boot** 디스크 · 번호 붙은 **data** 디스크 · 예약 고정 외부 · 내부 주소(**ip** · **ipi**). 이름은 서버 이름을 잇는다
 6. **⑥ Names** — 프로젝트 → 서비스로 묶고 딸린 리소스는 서버 아래에 보인다. 카드마다 `PASS`/`FAIL` 과 이유가 있다. **이름 전부** · **JSON** · **Terraform** `locals`(항목 키를 맵 키로 하는 맵 `gcp_names` 하나와 `gcp_labels_by_namespace`) · **Share URL** 을 복사한다
 
@@ -397,7 +397,7 @@ See the LICENSE file for details.
 
 **이름 공식** — 순번이 있는 리소스 대부분은 `<system>-<purpose>-<env>-<region>-<약어>[-<kind>][-<tier>]-<seq>` 이다. 쓰이는 공식 전부는 `/docs/naming` 과 `/llms.txt` 에 있다.
 
-- `region` 은 리전 코드(`ane3`)이고 존은 들지 않는다 — 입력한 존은 그 리전으로 풀려 VM · 디스크도 리전 리소스처럼 이름 붙는다. 위치가 없는 리소스(서비스 계정 · Workload Identity 풀 · 거부 정책)와 부모의 위치를 물려받는 자식(KMS 키 · Spanner 데이터베이스 · Cloud SQL 사용자 · Cloud NAT)에는 지역 토큰이 없다(D77). Cloud Storage 버킷 · BigQuery 데이터셋은 멀티 · 이중 리전 코드(`us` · `asia1`)를 대신 가질 수 있다(D78)
+- `region` 은 리전 코드(`ane3`)이고 존은 들지 않는다 — 입력한 존은 그 리전으로 풀려 VM · 디스크도 리전 리소스처럼 이름 붙는다. 위치가 없는 리소스(서비스 계정 · Workload Identity 풀 · 거부 정책, 위치가 `global` 하나인 policy binding · workforce pool)와 부모의 위치를 물려받는 자식(KMS 키 · Spanner 데이터베이스 · Cloud SQL 사용자 · Cloud NAT)에는 지역 토큰이 없다(D77). Cloud Storage 버킷 · BigQuery 데이터셋은 멀티 · 이중 리전 코드(`us` · `asia1`)를 대신 가질 수 있다(D78). Secret Manager secret 은 마법사 pick 이 지역 Secret 을 고르지 않으면 전역이다(D79)
 - `kind` 는 CSP 기본값과 다를 때만 붙는다(PostgreSQL 은 `pg`)
 - `tier`(`web` · `was` …, 꼴 `^[a-z0-9]{2,16}$`)는 마법사만 채운다 — `/v1/generate` · `/v1/names` 의 이름에는 들지 않는다. 줄이지 않는다. 순번이 있는 리소스는 순번 앞에, 순번도 역할도 없는 리소스(버킷 · BigQuery 데이터셋)는 약어 바로 뒤에 든다 — 한 서비스의 버킷 둘이 이렇게 갈린다(`platform-billing-shop-prod-ane3-gcs-uploads` · `…-gcs-backups`). 약어 · 종류 토큰 · 환경 값 · 지역 코드는 tier 로 쓸 수 없다
 - 딸린 리소스는 서버의 최종 이름에 `-boot` · `-data-<seq>` · `-ip` · `-ipi` 를 붙이고 줄이지 않는다 — 들어가지 않으면 이유와 함께 실패한다
@@ -466,7 +466,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 
 ### 지원 리소스
 
-이번 릴리스에서 켠 것은 **GCP 133** 개 규칙이다(규칙 버전 `2026-10-12.1` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-133-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 25종 — 보류 7 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 42개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
+이번 릴리스에서 켠 것은 **GCP 133** 개 규칙이다(규칙 버전 `2026-10-12.2` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-133-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 25종 — 보류 7 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 42개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
 
 ### 한계
 

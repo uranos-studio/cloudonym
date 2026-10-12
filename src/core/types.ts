@@ -86,6 +86,7 @@ export interface ResourceRule {
   docUrl: string;             // 공식 문서 URL — 숫자의 근거
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
   regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(compose.ts regionTokenOfRule)
+  defaultLocation?: 'global'; // 지역 자리의 기본값이 문맥 지역이 아니라 global(토큰 없음)인 규칙 — Secret (D79). 마법사 pick 의 location 'regional' 일 때만 문맥 지역을 쓴다
   kinds?: RuleKinds;          // catalog 에 종류 표가 있는 규칙만
 }
 

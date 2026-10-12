@@ -44,7 +44,7 @@ const SQL_USERS = 'https://docs.cloud.google.com/sql/docs/mysql/create-manage-us
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
-  & Partial<Pick<ResourceRule, 'forbidden' | 'allowed' | 'separator' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'template' | 'notes' | 'uniquenessDocUrl'>>;
+  & Partial<Pick<ResourceRule, 'forbidden' | 'allowed' | 'separator' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'template' | 'notes' | 'uniquenessDocUrl' | 'defaultLocation'>>;
 
 /** 기본 — 소문자 · 숫자 · 하이픈, 글자로 시작 · 영숫자로 끝, 순번 꼴 */
 function rule(s: Spec): ResourceRule {
@@ -170,7 +170,9 @@ const RULES: ResourceRule[] = [
 
   // ── Secret Manager ──
   // "This must be unique within the project. A secret ID is a string with a maximum length of 255 characters and can contain uppercase and lowercase letters, numerals, and the hyphen (`-`) and underscore (`_`) characters."
-  rule({ id: 'gcp.secret', displayName: 'Secret Manager Secret', slug: 'secret', minLength: 1, maxLength: 255, pattern: /^[A-Za-z0-9_-]{1,255}$/,
+  // 위치 (D79) — 기본 secret 은 위치가 없다(projects/*/secrets, 자동 복제)라 지역 토큰이 빈다. 같은 API 의 지역 secret(projects/*/locations/*/secrets ·
+  // secrets.create parent "in the format `projects/*` or `projects/*/locations/*`")을 마법사 pick 에서 고르면 프로젝트 지역 토큰이 든다
+  rule({ id: 'gcp.secret', displayName: 'Secret Manager Secret', slug: 'secret', minLength: 1, maxLength: 255, pattern: /^[A-Za-z0-9_-]{1,255}$/, defaultLocation: 'global',
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project', entity: 'secretmanager.secrets', category: 'security', docUrl: 'https://www.googleapis.com/discovery/v1/apis/secretmanager/v1/rest' }),
 
   // ── 작은 스택에 쓰는 규칙 11개 (D72 · 원문 2026-10-11) ──

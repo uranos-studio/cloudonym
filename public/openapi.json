@@ -2025,7 +2025,7 @@
           "location": {
             "type": "string",
             "maxLength": 1024,
-            "description": "A multi-region or dual-region location for this pick, by name or code (US, us, ASIA1). Only on rules that take one: storage_bucket (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4) and bigquery_dataset (US, EU). The name carries its code in the region slot (…-prod-us-gcs). Omitted: the project region. Anything else is 400 wizard.invalid_location with the accepted locations in params.supported.",
+            "description": "A multi-region or dual-region location for this pick, by name or code (US, us, ASIA1). Only on rules that take one: storage_bucket (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4) and bigquery_dataset (US, EU). The name carries its code in the region slot (…-prod-us-gcs). Omitted: the project region. On secret picks the only value is regional (D79): omitted, the secret is global and its name has no region token; regional puts the project region in its name (…-prod-ane3-secret-01). Anything else is 400 wizard.invalid_location with the accepted locations in params.supported.",
             "example": "US"
           },
           "instances": {

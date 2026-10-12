@@ -125,6 +125,7 @@ function regionLines(order: readonly Provider[]): string[] {
         const types = Object.keys(l.rules).map((id) => `\`${id.slice(id.indexOf('.') + 1)}\``).join(', ');
         lines.push(`- \`${l.location}\` · \`${l.code}\` — ${l.type} · ${l.label} · for ${types} · ${[...new Set(Object.values(l.rules))].join(' · ')}`);
       }
+      lines.push('', 'Secret Manager secrets (`secret`, D79) carry no region token by default: a secret has no location unless it is created as a regional secret (`projects/*/locations/*/secrets`), so its name ignores the context region and a location never fails it. On a `/v1/wizard` pick, `location: "regional"` puts the project region in its name (`…-prod-ane3-secret-01`).');
     }
   }
   return lines;

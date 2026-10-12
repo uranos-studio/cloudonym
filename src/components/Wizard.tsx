@@ -7,7 +7,7 @@ import { Copy, Plus, Server, Trash2, X } from 'lucide-react';
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, generateProject, parseContext, parseProjectContext, serviceNamespace as serviceNamespaceOf, type NameItem, type ProjectResult } from '../core/engine';
 import { buildTree, inputKind } from '../core/tree';
 import { allowedKinds } from '../core/catalog';
-import { locationsFor } from '../core/regions';
+import { REGIONAL_LOCATION, locationsFor } from '../core/regions';
 import { MAX_COUNT, type Attachments } from '../core/selection';
 import { MAX_SERVICES, expandPlan, validatePlan, type Pick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { MAX_DATA_DISKS } from '../core/wizard/attachments';
@@ -395,8 +395,10 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
   const rule = ruleId ? RULES.get(ruleId) : undefined;
   const { title, custom } = pickTitle(pick);
   const kinds = rule ? allowedKinds(rule) : [];
-  // 위치 (D78) — 멀티 · 이중 리전을 받는 규칙(버킷 · BigQuery 데이터세트)만. 비우면 프로젝트 지역
+  // 위치 (D78) — 멀티 · 이중 리전을 받는 규칙(버킷 · BigQuery 데이터세트)만. 비우면 프로젝트 지역.
+  // 기본이 전역인 규칙(Secret · D79)은 전역(비움) · 지역(regional — 프로젝트 지역) 둘
   const locations = rule ? locationsFor(rule) : [];
+  const globalDefault = rule?.defaultLocation === 'global';
   const counted = rule ? inputKind(rule) === 'count' : false;
   // 역할 입력 — role 규칙이면 프리셋(sa)이든 custom 이든. 비우면 엔진이 기본 역할을 쓴다
   const roleInput = rule ? inputKind(rule) === 'role' : false;
@@ -426,7 +428,7 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
       <ErrorList errors={own} />
 
       {/* ④ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, tier 를 정하지 않은 pick 은 tier(D74), role 규칙(sa 칩 포함)은 역할 */}
-      {(preset?.serverless || preset?.ha || kinds.length > 0 || locations.length > 0 || tierInput || roleInput) && (
+      {(preset?.serverless || preset?.ha || kinds.length > 0 || locations.length > 0 || globalDefault || tierInput || roleInput) && (
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400"><span aria-hidden="true" className={STEP_NUM}>4</span>{en.ui.wizard_step_options}</p>
           <div className="flex flex-wrap items-end gap-4">
@@ -456,11 +458,12 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
                 </select>
               </div>
             )}
-            {locations.length > 0 && (
+            {(locations.length > 0 || globalDefault) && (
               <div>
                 <label htmlFor={`${base}-location`} className={LABEL}>{en.ui.wizard_location}</label>
                 <select id={`${base}-location`} data-location value={pick.location ?? ''} className={CONTROL} onChange={(e) => edit((p) => S.setPickField(p, at, 'location', e.target.value))}>
-                  <option value="">{en.ui.wizard_location_default}</option>
+                  <option value="">{globalDefault ? en.ui.wizard_location_global : en.ui.wizard_location_default}</option>
+                  {globalDefault && <option value={REGIONAL_LOCATION}>{en.ui.wizard_location_regional}</option>}
                   {locations.map((l) => <option key={l.code} value={l.code}>{`${l.location} · ${l.type} · ${l.label}`}</option>)}
                 </select>
               </div>

@@ -2,7 +2,7 @@
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type ProjectContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { RULES, getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
-import { canonicalLocation, canonicalRegion, locationMismatch, locationRuleTypes, regionCandidates } from './regions';
+import { REGIONAL_LOCATION, canonicalLocation, canonicalRegion, locationMismatch, locationRuleTypes, regionCandidates } from './regions';
 import { compose, kindTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { InstanceSlot, SelectionItem } from './selection';
@@ -19,7 +19,9 @@ function ruleInfo(rule: ResourceRule): NameResult['rule'] {
            notes: (rule.notes ?? []).map((m) => structuredClone(m)) };
 }
 
-function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+function generateOne(given: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
+  // 기본이 전역인 규칙(Secret · D79) — 마법사 pick 이 지역을 고른 때(regional)만 문맥 지역을 쓴다. global 은 지역 토큰이 빈다
+  const ctx: NamingContext | ProjectContext = rule.defaultLocation === 'global' && extra.regional !== true ? { ...given, region: 'global' } : given;
   const raw = tokenValues(ctx, rule, extra);
   const steps: CoreMessage[] = [];
   let transformed = false;
@@ -214,13 +216,15 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
 
   const add = (base: NamingContext | ProjectContext, namespace: string, it: SelectionItem, level: 'project' | undefined) => {
     const { rule, count, role, kind, tier, instances, location } = it;
-    // pick 의 위치(D78) — 멀티 · 이중 리전 코드가 문맥의 지역 자리를 대신한다(존은 없다)
-    const ctx: NamingContext | ProjectContext = location === undefined ? base : (({ zone: _zone, ...rest }) => ({ ...rest, region: location }))(base);
+    // pick 의 위치(D78) — 멀티 · 이중 리전 코드가 문맥의 지역 자리를 대신한다(존은 없다).
+    // regional(D79)은 기본이 전역인 규칙에서 프로젝트 지역을 고른 것이다 — 문맥은 그대로 두고 regional 을 넘긴다
+    const regional = location === REGIONAL_LOCATION;
+    const ctx: NamingContext | ProjectContext = location === undefined || regional ? base : (({ zone: _zone, ...rest }) => ({ ...rest, region: location }))(base);
     if (rule.provider !== provider) throw new Error(`rule ${rule.id} is not a ${provider} rule`);
     const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
     const lv = level === undefined ? {} : { level };
     const one = (extra: ItemExtra, slot: string | undefined, meta: { seq?: string; role?: string }, children: Built['children']) => {
-      const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...extra });
+      const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...(regional ? { regional: true } : {}), ...extra });
       const key = projectItemKey({ ...lv, namespace, type: rule.resourceType, ...(tier === undefined ? {} : { tier }), ...(slot === undefined ? {} : { slot }) });
       const item: NameItem = {
         ...res, key, ...meta, ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }),

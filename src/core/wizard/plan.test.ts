@@ -365,6 +365,14 @@ describe('pick 의 위치 (D78)', () => {
     expectError(svc({ preset: 'web', location: 'US', instances: slots(1) }), 'wizard.invalid_location', 'services[0].picks[0]', { type: 'compute_instance', supported: [] });
     expectError(svc({ preset: 'object', location: 'asia-northeast1' }), 'wizard.invalid_location', 'services[0].picks[0]', { value: 'asia-northeast1' });
   });
+  it('Secret 은 기본이 전역(지역 토큰 없음)이고 regional 이면 프로젝트 지역 · 그 밖의 값은 wizard.invalid_location (D79)', () => {
+    const plan = svc({ preset: 'secret', instances: slots(1) }, { preset: null, ruleId: 'gcp.secret', tier: 'api', location: 'regional', instances: slots(1) });
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    expect(names(plan).slice(1)).toEqual(['billing-shop-prod-secret-01', 'billing-shop-prod-ane3-secret-api-01']);
+    expect(expandPlan(plan).services[0]!.items[1]!.location).toBe('regional');
+    expectError(svc({ preset: null, ruleId: 'gcp.secret', location: 'US', instances: slots(1) }), 'wizard.invalid_location', 'services[0].picks[0]', { type: 'secret', value: 'US', supported: ['regional'] });
+    expectError(svc({ preset: 'object', location: 'regional' }), 'wizard.invalid_location', 'services[0].picks[0]', { value: 'regional' });
+  });
   it('프로젝트 지역은 단일 리전이다 — 멀티 리전이면 context.location_unsupported', () => {
     expectError({ ...svc({ preset: 'object' }), project: { ...PROJECT, region: 'US' } }, 'context.location_unsupported', undefined, { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] });
   });

@@ -688,8 +688,8 @@ describe('hash v4 — 모델 전체 오류 · 트리 hash · 깨진 링크', () 
 const MEASURED_NEAR_MAX = 18146;
 describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
   it('MAX_WIZARD_HASH_CHARS 를 잰다 · MAX_ANY_HASH_CHARS 는 v3 · v4 중 큰 쪽', () => {
-    // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다
-    expect(MAX_WIZARD_HASH_CHARS).toBe(127775);
+    // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다 · Secret 의 regional(8자 — D79)로 2바이트 × 420 이 더해졌다
+    expect(MAX_WIZARD_HASH_CHARS).toBe(128895);
     expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
   });
   it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {

@@ -5,7 +5,7 @@ import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type Selecti
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { PRESETS, presetOf } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
-import { MAX_REGION_CHARS, canonicalLocation } from '../core/regions';
+import { MAX_REGION_CHARS, REGIONAL_LOCATION, canonicalLocation } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 import { EXAMPLE_REGION } from './formContext';
@@ -270,7 +270,7 @@ function shortPick(p: WizardPick): Record<string, unknown> {
   if (p.kind !== undefined) out.k = p.kind;
   if (p.ha === true) out.h = 1;
   if (typeof p.serverless === 'string') out.sv = SERVERLESS_LONG[p.serverless] ?? p.serverless;
-  // 위치는 코드로 싣는다 — 검사를 지난 모델이라 늘 풀리고, 길이가 MAX_REGION_CHARS 안이라 상한식이 닫힌다 (D78)
+  // 위치는 코드로 싣는다 — 검사를 지난 모델이라 늘 풀리고, 길이가 MAX_REGION_CHARS · regional(D79) 안이라 상한식이 닫힌다 (D78)
   if (p.location !== undefined) out.l = canonicalLocation(p.location, 'gcp')?.code ?? p.location;
   if (p.instances !== undefined) {
     out.i = p.instances.map((s) => {
@@ -492,7 +492,7 @@ export function recoverPlan(plan: WizardPlan, n: WizardNotices): WizardPlan | un
 const MAX_PRESET_ID_CHARS = Math.max(...PRESETS.map((p) => p.id.length));
 const PICK_FIXED_JSON_BYTES = JSON.stringify({
   pr: 'p'.repeat(MAX_PRESET_ID_CHARS), ru: 'r'.repeat(MAX_RESOURCE_TYPE_CHARS + 4), t: 't'.repeat(16), ro: 'o'.repeat(MAX_ROLE_CHARS),
-  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', l: 'l'.repeat(MAX_REGION_CHARS), i: [],
+  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', l: 'l'.repeat(Math.max(MAX_REGION_CHARS, REGIONAL_LOCATION.length)), i: [],
 }).length + 1;
 /** 슬롯 하나(`{"id":"<8>","q":"99","a":{}},` — attach 감싸기 · 데이터 배열 감싸기 포함) 와 딸린 것 하나(`"ipi":1,` · `"99",` 중 큰 쪽) 중 큰 쪽 */
 const NAME_JSON_BYTES = Math.max(
