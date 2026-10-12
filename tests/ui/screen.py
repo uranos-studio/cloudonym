@@ -548,15 +548,18 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_count(1)
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_attribute('data-valid', 'true')
     no_hangul(p39)
-    # 옛 링크 — VPC 둘(01 · 03)은 둘 다 보이고 더하기 단추도 보인다(모델 · 이름 그대로 — wizardHashCompat 의 fixture)
-    fx = json.loads(Path(__file__).resolve().parents[2].joinpath('src/components/__fixtures__/wizard-hash-before-open.json').read_text())
-    two_vpc = next(e for e in fx['wizard'] if e['label'].startswith('project picks only'))
-    goto_ready(p39, BASE + '/?v' + two_vpc['hash'])
-    goto_ready(p39, BASE + '/' + two_vpc['hash'])
+    # 모델은 VPC 여럿을 받는다(API 로 만든 계획 · 손으로 만든 링크) — 줄이 둘(01 · 03)이면 둘 다 보이고 더하기 단추도 보인다
+    two_body = {'owner': 'platform', 'system': 'billing', 'env': 'prod', 'region': 'ane3', 'v': rules_version,
+                'w': {'pp': [{'pr': 'vpc', 'i': [{'id': 'a', 'q': '01'}, {'id': 'b', 'q': '03'}]},
+                             {'pr': 'subnet', 'i': [{'id': 'c', 'q': '01'}, {'id': 'd', 'q': '02'}]}], 's': []}}
+    two_vpc = '#state=' + base64.urlsafe_b64encode(json.dumps(two_body, separators=(',', ':')).encode()).rstrip(b'=').decode()
+    goto_ready(p39, BASE + '/?v' + two_vpc)
+    goto_ready(p39, BASE + '/' + two_vpc)
     vpc2 = p39.locator('[data-pick="vpc"]')
     expect(vpc2.locator('li[data-slot]')).to_have_count(2)
     expect(vpc2.locator('[data-add-slot]')).to_have_count(1)
-    assert [(k, n) for k, n, _ in screen_names(p39)] == [(i['key'], i['name']) for i in two_vpc['items']], screen_names(p39)
+    keys = [k for k, _, _ in screen_names(p39)]
+    assert keys == ['project/-/project_id/-/-', 'project/-/vpc_network/-/01', 'project/-/vpc_network/-/03', 'project/-/subnet/-/01', 'project/-/subnet/-/02'], keys
     ctx39.close()
     print('OK — 마법사 시나리오 ㉚~㊴ 통과')
 
