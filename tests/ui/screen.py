@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90)의 ㉚~㊷ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90)의 ㉚~㊸ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -197,7 +197,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90) — ㉚~㊷ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90) — ㉚~㊸ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -911,7 +911,29 @@ def wizard_scenarios(browser, rules_version, errors):
     assert leaked == [], leaked
     no_hangul(p41)
     ctx41.close()
-    print('OK — 마법사 시나리오 ㉚~㊷ 통과')
+    wizard_selection_focus(browser, errors)
+    print('OK — 마법사 시나리오 ㉚~㊸ 통과')
+
+
+def wizard_selection_focus(browser, errors):
+    """㊸ 선택 · 펼침 · 포커스 (D89 독립 리뷰) — 서비스를 지운 뒤의 선택과 펼침 상태"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(pg, BASE + '/')
+    # 서비스 셋(A · B · C) — B 만 손으로 펴고 A 를 지우면 B 가 펴진 채 · C 는 접힌 채다(펼침이 자리 번호로 옮겨 붙지 않는다)
+    pg.click('[data-add-service]')
+    pg.click('[data-add-service]')
+    pg.locator('[data-row-path="services[1]"] [data-row-toggle]').click()
+    svc(pg, 0).locator('[data-remove-service]').click()
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
+    expect(pg.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-expanded', 'true')
+    expect(pg.locator('[data-row-path="services[1]"]')).to_have_attribute('aria-expanded', 'false')
+    # 마지막 서비스를 지우면 이전 서비스 · 하나 남은 것을 지우면 project
+    svc(pg, 1).locator('[data-remove-service]').click()
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
+    no_hangul(pg)
+    ctx.close()
 
 
 with sync_playwright() as p:

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addedRow, firstErrorRow, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
 import { addCustom, addPresetPick, addService, clearNetwork, duplicatePick, initialPlan, removePick, removeService, renameService, setPickField, startPlan, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS } from './wizardState';
 import { expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
@@ -190,5 +190,14 @@ describe('더한 줄 — selectAdded · addedRow', () => {
     expect(addedRow(p, togglePreset(p, null, 'psa'))).toBe('projectPicks[5]');
     expect(addedRow(p, togglePreset(p, 0, 'web'))).toBeUndefined();
     expect(addedRow(p, addService(p))).toBeUndefined();
+  });
+});
+
+describe('서비스를 지운 뒤의 펼침 상태 — 자리 번호를 당긴다', () => {
+  it('지운 서비스의 펼침이 다음 서비스로 옮겨 붙지 않는다', () => {
+    const t = new Map([[0, false], [1, true], [3, false]]);
+    expect([...expandedAfterRemove(t, 1)]).toEqual([[0, false], [2, false]]);
+    expect([...expandedAfterRemove(t, 0)]).toEqual([[0, true], [2, false]]);
+    expect([...expandedAfterRemove(t, 5)]).toEqual([[0, false], [1, true], [3, false]]);
   });
 });

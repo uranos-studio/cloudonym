@@ -15,7 +15,7 @@ import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } fro
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, firstErrorRow, parseRow, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { WizardList } from './WizardList';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
 import { WizardNames, type EnvResult } from './WizardNames';
@@ -87,6 +87,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const edit: Edit = (fn, op: EditOp = { type: 'keep' }) => {
     setLink(undefined);
     setNotices([]);
+    // 서비스를 지우면 펼침 상태의 자리 번호도 당긴다 — 지운 서비스의 펼침이 다음 서비스에 붙지 않게
+    if (typeof op !== 'function' && op.type === 'removeService') setToggled((t) => expandedAfterRemove(t, op.service));
     setState((s) => {
       const next = fn(s.plan);
       const o = typeof op === 'function' ? op(s.plan, next) : op;

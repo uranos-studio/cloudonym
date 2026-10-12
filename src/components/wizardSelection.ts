@@ -206,3 +206,14 @@ export function addedRow(before: WizardPlan, after: WizardPlan): RowPath | undef
   }
   return undefined;
 }
+
+/** 서비스 i 를 지운 뒤의 펼침 상태 — 화면 상태는 서비스 자리 번호로 묶여 있어, 지운 자리는 버리고 뒤의 번호를 하나씩 당긴다.
+ *  그대로 두면 지운 서비스의 펼침이 다음 서비스에 옮겨 붙는다 */
+export function expandedAfterRemove(toggled: ReadonlyMap<number, boolean>, removed: number): Map<number, boolean> {
+  const out = new Map<number, boolean>();
+  for (const [i, on] of toggled) {
+    if (i < removed) out.set(i, on);
+    else if (i > removed) out.set(i - 1, on);
+  }
+  return out;
+}
