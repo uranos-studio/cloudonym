@@ -114,7 +114,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     const t = window.setTimeout(() => setFlash(undefined), 1200);
     return () => window.clearTimeout(t);
   }, [flash]);
-  const onExpand = (i: number, on: boolean) => setToggled((t) => new Map(t).set(i, on));
+  const onExpand = (i: number, on: boolean) => {
+    // 고른 줄이 그 서비스 안의 pick 이면 접어도 그 줄 때문에 펴진 채다 — 서비스 줄을 고르고(포커스도) 접는다
+    if (!on && sel?.kind === 'pick' && sel.ref.service === i) {
+      select(serviceRow(i));
+      requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-row-path="${serviceRow(i)}"]`)?.focus());
+    }
+    setToggled((t) => new Map(t).set(i, on));
+  };
 
   const envsKey = envList(plan.project.env, extraEnvs).join(',');
   const envs = useMemo(() => (envsKey === '' ? [] : envsKey.split(',') as Env[]), [envsKey]);

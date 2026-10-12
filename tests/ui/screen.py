@@ -942,6 +942,13 @@ def wizard_selection_focus(browser, errors):
     expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[5]')
     settings(pg).locator('[data-tier]').fill('edge')
     expect(pg.locator('[data-flash="true"]')).to_have_count(0, timeout=3000)
+    # 서비스 안의 pick 을 고른 채 서비스를 접으면 — 서비스 줄이 골라지고(포커스도) 접힌다
+    svc(pg, 0).locator('[data-purpose-chip="web"]').click()
+    select(pg, 'services[0].picks[0]')
+    pg.locator('[data-row-path="services[0]"] [data-row-toggle]').click()
+    expect(pg.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-expanded', 'false')
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
+    expect(pg.locator('[data-row-path="services[0]"]')).to_be_focused()
     no_hangul(pg)
     ctx.close()
 
