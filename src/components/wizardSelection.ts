@@ -8,7 +8,8 @@ import { inputKind } from '../core/tree';
 import { presetOf } from '../core/wizard/presets';
 import type { PlanError, WizardPlan } from '../core/wizard/plan';
 import type { CoreMessage } from '../core/types';
-import { errorsAt, errorsUnder, pickPath, pickRule, projectPickIndexes, type PickRef } from './wizardState';
+import { errorsAt, errorsUnder, pickPath, pickRule, pickTitle, projectPickIndexes, type PickRef } from './wizardState';
+import { en } from '../messages/en';
 
 export type RowPath = string;
 export const PROJECT_ROW: RowPath = 'project';
@@ -227,4 +228,15 @@ export function expandedAfterRemove(toggled: ReadonlyMap<number, boolean>, remov
     else if (i > removed) out.set(i - 1, on);
   }
   return out;
+}
+
+/** 줄의 제목 — 폰의 바텀 시트 머리에 쓴다. 목록 줄의 제목과 같은 말이다 */
+export function rowTitle(plan: WizardPlan, path: RowPath): string {
+  const r = parseRow(path);
+  if (!r || r.kind === 'project') return en.ui.wizard_step_project;
+  if (r.kind === 'network') return en.ui.wizard_project_resources;
+  if (r.kind === 'extras') return en.ui.wizard_shared_extras;
+  if (r.kind === 'service') return plan.services[r.service]?.purpose || en.ui.wizard_unnamed_service;
+  const pick = r.ref.service === null ? plan.projectPicks[r.ref.pick] : plan.services[r.ref.service]?.picks[r.ref.pick];
+  return pick ? pickTitle(pick).title : en.ui.wizard_step_project;
 }

@@ -1,6 +1,7 @@
 // 마법사 이름 칸 (D89) — ⑦ 이름 · 요약 배지 · Copy all · JSON · Terraform · 충돌 · env/이름공간 묶음. 넓은 화면에서는 자체 스크롤 칸이다.
 // 프로젝트 이름(D85)은 Project 묶음 맨 위의 표시 전용 카드다 — 수 · 내보내기에 들지 않는다(화면 이름 = POST /v1/wizard)
 import { useMemo, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 import { serviceNamespace as serviceNamespaceOf, type NameItem, type ProjectResult } from '../core/engine';
 import { expandPlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { Env, NameResult } from '../core/types';
@@ -11,7 +12,7 @@ import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTer
 import { toWizardExport, toWizardExportByEnv } from './wizardExport';
 import { namesSummary, withEnv } from './wizardEnvs';
 import { ErrorList } from './WizardSettings';
-import { ENV_NAMES, STEP_NUM } from './wizardStyles';
+import { ENV_NAMES, ICON_BTN, STEP_NUM } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
@@ -20,10 +21,12 @@ import { VERSION } from '../version';
 export interface EnvResult { env: Env; result: ProjectResult }
 
 // ── ⑦ 이름 ──
-export function WizardNames({ plan, results, errors, projectContext, projectNames }: {
+export function WizardNames({ plan, results, errors, projectContext, projectNames, onClose }: {
   plan: WizardPlan; results: EnvResult[] | undefined; errors: PlanError[]; projectContext: Parameters<typeof toWizardExport>[1] | undefined;
   /** env 마다 프로젝트 이름 (D85) — 항목이 아니라 표시 전용 카드 */
   projectNames: readonly (NameResult | undefined)[];
+  /** 드로어 안이면 머리에 닫기 단추를 단다(태블릿) */
+  onClose?: () => void;
 }) {
   const empty = errors.some((e) => e.code === 'wizard.empty');
   const wide = errors.filter((e) => e.path === undefined && e.code !== 'wizard.empty' && !('field' in e));
@@ -33,7 +36,7 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
     <section id="names" aria-labelledby="wizard-names" className="space-y-4">
       {/* 머리(제목 · 요약 · 내보내기)는 이름 칸 위에 붙어 있다 — 이름이 길어 칸을 굴려도 Copy all · JSON · Terraform 이 보인다.
           칸의 안쪽 여백(p-4)을 음수 여백 · top -1rem 으로 덮어 칸 위 끝에 딱 붙는다(sticky 의 기준은 여백 안쪽이다). 배경이 있어야 아래로 지나가는 카드가 비치지 않는다 */}
-      <div data-names-head className="sticky -top-4 z-10 -mx-4 -mt-4 space-y-2 rounded-t-xl border-b border-zinc-200 bg-white px-4 pb-3 pt-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <div data-names-head className="sticky top-12 z-10 md:-top-4 -mx-4 -mt-4 space-y-2 rounded-t-xl border-b border-zinc-200 bg-white px-4 pb-3 pt-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>7</span>{en.ui.wizard_step_names}</h2>
           {results && (
@@ -42,6 +45,11 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
               : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300'}`}>
               {fillUi(en, 'wizard_names_summary', { names, pass })}
             </span>
+          )}
+          {onClose && (
+            <button type="button" data-names-close aria-label={en.ui.wizard_names_close} title={en.ui.wizard_names_close} className={`${ICON_BTN} ml-auto self-center`} onClick={onClose}>
+              <X aria-hidden="true" className="size-5" />
+            </button>
           )}
         </div>
         {ok && <ExportButtons plan={plan} results={results} projectContext={projectContext} />}

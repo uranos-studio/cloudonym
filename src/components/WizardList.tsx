@@ -25,7 +25,7 @@ function rowElement(path: RowPath): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-row-path="${path}"]`);
 }
 
-export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpand, result, errors, serviceErrors, projectCount, flash, onAddService, onEnter }: {
+export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpand, result, errors, serviceErrors, projectCount, flash, onAddService, onEnter, onActivate }: {
   plan: WizardPlan; envs: readonly string[]; selected: RowPath; onSelect: (path: RowPath) => void;
   isExpanded: (service: number) => boolean; onExpand: (service: number, open: boolean) => void;
   /** 첫 env 의 결과 — 줄 이름(D89). 온전하지 않으면 undefined(줄 이름 —) */
@@ -34,6 +34,8 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   /** 칩으로 막 더한 줄 — 잠깐 강조하고 보이게 굴린다 */
   flash: RowPath | undefined;
   onAddService: () => void; onEnter: () => void;
+  /** 줄을 눌렀다(↑↓ 이동이 아니다) — 폰은 설정 시트를 연다 */
+  onActivate?: (path: RowPath) => void;
 }) {
   useEffect(() => {
     if (flash) rowElement(flash)?.scrollIntoView({ block: 'nearest' });
@@ -74,7 +76,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
       <li key={extra.key ?? path} role="treeitem" aria-level={level} aria-selected={path === selected} tabIndex={path === selected ? 0 : -1}
         {...(extra.expanded === undefined ? {} : { 'aria-expanded': extra.expanded })}
         data-row-path={path} {...(extra.pick === undefined ? {} : { 'data-row-pick': extra.pick })} data-flash={flash === path}
-        className={`${ROW} ${level === 2 ? 'ml-5' : ''}`} onClick={() => onSelect(path)}>
+        className={`${ROW} ${level === 2 ? 'ml-5' : ''}`} onClick={() => { onSelect(path); onActivate?.(path); }}>
         {body}
         {n > 0 && <span data-row-errors={n} className={BADGE_ERR} title={fillUi(en, 'wizard_row_errors', { n })}>!{n}</span>}
       </li>

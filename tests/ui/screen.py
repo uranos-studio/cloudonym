@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90)의 ㉚~㊸ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90)의 ㉚~㊹ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -197,7 +197,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90) — ㉚~㊸ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90) — ㉚~㊹ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -265,6 +265,16 @@ def fill_project(page):
     s.locator('#wizard-system').fill(W_PROJECT['system'])
 
 
+def wizard_shot(page, name, full_page=False):
+    """마법사 스크린샷 — 두 번 찍어도 같은 바이트가 나오게 움직이는 것을 멈춘다(새 줄 강조 1.2초 · hover · 포커스 고리 · 커서 · 전환)"""
+    expect(page.locator('[data-flash="true"]')).to_have_count(0, timeout=3000)
+    page.mouse.move(0, 0)
+    page.evaluate('document.activeElement && document.activeElement.blur && document.activeElement.blur()')
+    page.evaluate('window.scrollTo(0, 0)')
+    page.wait_for_timeout(100)
+    page.screenshot(path=str(OUT / name), full_page=full_page, animations='disabled', caret='hide')
+
+
 def doc_height(page):
     return page.evaluate('document.documentElement.scrollHeight')
 
@@ -281,7 +291,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-wizard]')).to_be_visible()
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
-    expect(page.get_by_text('Pick a cloud, then work down the list: project values, the shared network (a VPC, subnet, router and NAT are added to start — clear them if you do not need them), services with what runs in each, and shared extras. Select a row to edit it; names appear on the right as you go.')).to_be_visible()
+    expect(page.get_by_text('Pick a cloud, then work down the list: project values, the shared network (a VPC, subnet, router and NAT are added to start — clear them if you do not need them), services with what runs in each, and shared extras. Select a row to edit it; the names update as you go.')).to_be_visible()
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     # 세 칸 (D89) — 목록 · 설정 · 이름이 왼쪽부터 · 첫 선택은 Project · 목록은 tree
     boxes = [page.locator(s).bounding_box() for s in ('[data-wizard-list-column]', '[data-settings]', '[data-names-column]')]
@@ -342,8 +352,9 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('#names article[data-key="service/shop/compute_instance/-/web/01/data/01"] [data-parent]')).to_contain_text('attached to')
     expect(page.locator('[data-names-group]')).to_have_count(3)
     no_hangul(page)
-    page.evaluate('window.scrollTo(0, 0)')
-    page.screenshot(path=str(OUT / '06-wizard.png'), full_page=True)
+    # 06 — 디스크가 딸린 VM 줄(shop · Web server)을 고른 상태(B안 1-5). 고정 값만 찍는다: 강조가 꺼진 뒤 · 포인터는 구석 · 포커스 없음
+    open_attached(slot(page, 'services[0].picks[0]', 0))
+    wizard_shot(page, '06-wizard.png', full_page=True)
 
     # 내보내기 — JSON 은 구조 키 · Terraform 은 맵 하나 · 프로젝트 이름은 들지 않는다
     page.click('[data-copy="names-json"]')
@@ -495,7 +506,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('#names article[data-key$="/compute_instance/-/abcdefghijklmnop/01"]')).to_have_attribute('data-valid', 'true')
     no_hangul(page)
 
-    # 폭 360px — 가로 스크롤 없음 (세 칸이 한 칸으로 쌓인다)
+    # 폭 360px — 가로 스크롤 없음 (폰은 한 칸 · 위 탭 · 설정은 바텀 시트 — ㊹)
     page.set_viewport_size({'width': 360, 'height': 800})
     page.wait_for_timeout(200)
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '마법사가 360px 에서 가로 스크롤이 생긴다'
@@ -922,7 +933,8 @@ def wizard_scenarios(browser, rules_version, errors):
     no_hangul(p41)
     ctx41.close()
     wizard_selection_focus(browser, errors)
-    print('OK — 마법사 시나리오 ㉚~㊸ 통과')
+    wizard_narrow(browser, errors)
+    print('OK — 마법사 시나리오 ㉚~㊹ 통과')
 
 
 def wizard_selection_focus(browser, errors):
@@ -968,6 +980,184 @@ def wizard_selection_focus(browser, errors):
     expect(pg.locator('[data-row-path="services[0]"]')).to_be_focused()
     no_hangul(pg)
     ctx.close()
+
+def names_counts(page):
+    """이름 칸 머리의 요약 「N names · P/N PASS」 → (N, P)"""
+    m = re.fullmatch(r'(\d+) names · (\d+)/\1 PASS', page.locator('[data-names-summary]').inner_text())
+    assert m, page.locator('[data-names-summary]').inner_text()
+    return int(m.group(1)), int(m.group(2))
+
+
+def dialog_open(page, sel):
+    return page.evaluate(f"document.querySelector('{sel}').open")
+
+
+def no_hscroll(page, width, what):
+    assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), f'{what} — {width}px 에서 가로 스크롤이 생긴다'
+
+
+def wizard_narrow(browser, errors):
+    """㊹ 좁은 화면 (D89) — 태블릿(768–1279)은 목록 · 설정 두 칸 + 이름 드로어, 폰(<768)은 한 칸 + 설정 바텀 시트 + 위 탭. 1280 은 세 칸 그대로.
+    값은 중립 예시(devops · payments · shop · pay)다. 스크린샷 07 · 08 은 wizard_narrow_shots 가 새 창에서 찍는다"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(pg, BASE + '/')
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'wide')
+    expect(pg.locator('[data-names-handle]')).to_have_count(0)
+    expect(pg.locator('[data-wizard-tabs]')).to_have_count(0)
+    fill_project(pg)
+    svc(pg, 0).locator('[data-purpose-chip="web"]').click()
+    pg.click('[data-add-service]')
+    settings(pg).locator('[data-service-name]').fill('pay')
+    settings(pg).locator('[data-purpose-chip="db"]').click()
+    select(pg, 'services[0].picks[0]')
+
+    # ── 태블릿 768 — 두 칸(목록 왼쪽 · 설정 오른쪽) · 이름은 닫힌 드로어 · 손잡이의 수는 머리 요약과 같다 ──
+    pg.set_viewport_size({'width': 768, 'height': 1024})
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
+    lst, st = pg.locator('[data-wizard-list-column]').bounding_box(), settings(pg).bounding_box()
+    assert lst['x'] < st['x'] and abs(lst['y'] - st['y']) < 2, (lst, st)
+    assert not dialog_open(pg, '[data-names-drawer]')
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0].picks[0]')  # 고른 줄은 배치가 바뀌어도 그대로
+    handle = pg.locator('[data-names-handle]')
+    expect(handle).to_be_visible()
+    expect(handle).to_have_attribute('aria-expanded', 'false')
+    n, ok = names_counts(pg)
+    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n} · {ok}/{n}')
+    # 손잡이는 설정 칸을 가리지 않는다(내용이 손잡이 왼쪽에서 끝난다)
+    assert st['x'] + st['width'] <= handle.bounding_box()['x'], (st, handle.bounding_box())
+    no_hscroll(pg, 768, '드로어 닫힘')
+    # 손잡이를 누르면 오른쪽 가장자리에 폭 min(420px, 90vw) 드로어 · 포커스는 닫기 단추 · 머리 요약 · 내보내기가 보인다
+    handle.click()
+    assert dialog_open(pg, '[data-names-drawer]')
+    box = pg.locator('[data-names-drawer]').bounding_box()
+    assert box['width'] == 420 and box['x'] + box['width'] == 768 and box['height'] == 1024, box
+    expect(pg.locator('[data-names-close]')).to_be_focused()
+    expect(pg.locator('[data-names-drawer] [data-names-summary]')).to_have_text(f'{n} names · {ok}/{n} PASS')
+    expect(pg.locator('[data-names-drawer] [data-copy="terraform"]')).to_be_visible()
+    no_hscroll(pg, 768, '드로어 열림')
+    # Esc 로 닫히고 포커스는 손잡이로
+    pg.keyboard.press('Escape')
+    pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
+    expect(handle).to_be_focused()
+    expect(handle).to_have_attribute('aria-expanded', 'false')
+    # 닫기 단추 · 배경 누름으로도 닫힌다
+    handle.click()
+    pg.locator('[data-names-close]').click()
+    pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
+    handle.click()
+    pg.mouse.click(40, 500)  # 드로어 밖(배경)
+    pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
+    # 손잡이의 수는 계획을 바꾸면 따라 바뀐다
+    svc(pg, 1).locator('[data-purpose-chip="object"]').click()
+    n2, ok2 = names_counts(pg)
+    assert n2 == n + 1, (n, n2)
+    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n2} · {ok2}/{n2}')
+    svc(pg, 1).locator('[data-purpose-chip="object"]').click()
+    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n} · {ok}/{n}')
+    select(pg, 'services[0].picks[0]')  # shop 을 펴 둔다(폰에서 그 줄을 누른다)
+
+    # ── 폰 360 — 한 칸 · 위 탭 [Plan] [Names N · x/y PASS] · 줄을 누르면 설정이 바텀 시트(70vh 안 · 자체 스크롤) ──
+    pg.set_viewport_size({'width': 360, 'height': 800})
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
+    expect(pg.locator('[data-names-handle]')).to_have_count(0)
+    tabs = pg.locator('[data-wizard-tab]')
+    expect(tabs).to_have_text(['Plan', f'Names {n} · {ok}/{n} PASS'])
+    expect(pg.locator('[data-wizard-tab="plan"]')).to_have_attribute('aria-selected', 'true')
+    expect(pg.locator('[data-wizard-list-column]')).to_be_visible()
+    expect(pg.locator('[data-names-column]')).to_be_hidden()
+    assert not dialog_open(pg, '[data-settings-sheet]')
+    no_hscroll(pg, 360, '시트 닫힘')
+    pg.locator('[data-row-path="services[0].picks[0]"]').click()
+    pg.wait_for_function("() => document.querySelector('[data-settings-sheet]').open")
+    sheet = pg.locator('[data-settings-sheet]')
+    sb = sheet.bounding_box()
+    assert sb['width'] == 360 and abs(sb['y'] + sb['height'] - 800) <= 1 and sb['height'] <= 800 * 0.7 + 1, sb
+    expect(pg.locator('#settings-sheet-title')).to_have_text('Web server')
+    expect(sheet.locator('[data-settings]')).to_have_attribute('data-pick-path', 'services[0].picks[0]')
+    open_attached(sheet.locator('li[data-slot]').nth(0))
+    # 시트는 제 안에서 스크롤한다 — 딸린 것을 펴면 내용이 70vh 를 넘는다
+    assert sheet.locator('[data-settings]').evaluate('e => e.scrollHeight > e.clientHeight'), sheet.locator('[data-settings]').evaluate('e => [e.scrollHeight, e.clientHeight]')
+    no_hscroll(pg, 360, '시트 열림')
+    # Esc 로 닫히고 포커스는 그 줄로
+    sheet.locator('[data-settings] [data-ha]').focus()
+    pg.keyboard.press('Escape')
+    pg.wait_for_function("() => !document.querySelector('[data-settings-sheet]').open")
+    expect(pg.locator('[data-row-path="services[0].picks[0]"]')).to_be_focused()
+    # 닫기 단추로도 닫힌다 · Enter 로 열면 설정 칸 첫 컨트롤에 포커스
+    pg.locator('[data-row-path="project"]').click()
+    expect(pg.locator('#settings-sheet-title')).to_have_text('Project')
+    sheet.locator('[data-overlay-close]').click()
+    pg.wait_for_function("() => !document.querySelector('[data-settings-sheet]').open")
+    expect(pg.locator('[data-row-path="project"]')).to_be_focused()
+    pg.keyboard.press('Enter')
+    pg.wait_for_function("() => document.querySelector('[data-settings-sheet]').open")
+    expect(sheet.locator('#wizard-owner')).to_be_focused()
+    pg.keyboard.press('Escape')
+    pg.wait_for_function("() => !document.querySelector('[data-settings-sheet]').open")
+    # ↑↓ 는 고르기만 하고 시트를 열지 않는다
+    pg.keyboard.press('ArrowDown')
+    expect(pg.locator('[data-row-path="network"]')).to_be_focused()
+    assert not dialog_open(pg, '[data-settings-sheet]')
+    # 탭 — Names 를 누르면 이름 칸 · 목록은 숨는다 · 머리 요약은 탭과 같다
+    pg.click('[data-wizard-tab="names"]')
+    expect(pg.locator('[data-wizard-tab="names"]')).to_have_attribute('aria-selected', 'true')
+    expect(pg.locator('[data-names-column]')).to_be_visible()
+    expect(pg.locator('[data-wizard-list-column]')).to_be_hidden()
+    expect(pg.locator('[data-names-summary]')).to_have_text(f'{n} names · {ok}/{n} PASS')
+    no_hscroll(pg, 360, 'Names 탭')
+    pg.click('[data-wizard-tab="plan"]')
+    expect(pg.locator('[data-wizard-list-column]')).to_be_visible()
+    # 390 에서도 시트 · 가로 스크롤 없음
+    pg.set_viewport_size({'width': 390, 'height': 844})
+    pg.locator('[data-row-path="services[1]"]').click()
+    pg.wait_for_function("() => document.querySelector('[data-settings-sheet]').open")
+    expect(pg.locator('#settings-sheet-title')).to_have_text('pay')
+    no_hscroll(pg, 390, '시트 열림')
+    pg.keyboard.press('Escape')
+    pg.wait_for_function("() => !document.querySelector('[data-settings-sheet]').open")
+    # 다시 넓히면 세 칸 · 열린 창 없음
+    pg.set_viewport_size({'width': 1280, 'height': 900})
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'wide')
+    expect(pg.locator('[data-names-column]')).to_be_visible()
+    no_hangul(pg)
+    ctx.close()
+
+
+def narrow_plan(browser, errors, width, height):
+    """07 · 08 의 계획 — 1280 에서 만들고(devops · payments · shop 의 web · pay 의 db) shop 의 Web server 를 고른 뒤 폭을 줄인다.
+    스크린샷만을 위한 새 창이다: 시험 흐름의 앞 단계(스크롤 · 강조 · 포커스)가 그림에 남지 않아 두 번 찍어도 같은 바이트다"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(pg, BASE + '/')
+    fill_project(pg)
+    svc(pg, 0).locator('[data-purpose-chip="web"]').click()
+    pg.click('[data-add-service]')
+    settings(pg).locator('[data-service-name]').fill('pay')
+    settings(pg).locator('[data-purpose-chip="db"]').click()
+    select(pg, 'services[0].picks[0]')
+    pg.set_viewport_size({'width': width, 'height': height})
+    return ctx, pg
+
+
+def wizard_narrow_shots(browser, errors):
+    """07 태블릿 768 — 이름 드로어 열림 · 08 폰 360 — Web server 설정 시트 열림(딸린 것 펼침)"""
+    ctx, pg = narrow_plan(browser, errors, 768, 1024)
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
+    pg.click('[data-names-handle]')
+    pg.wait_for_function("() => document.querySelector('[data-names-drawer]').open")
+    wizard_shot(pg, '07-wizard-tablet.png')
+    ctx.close()
+    ctx, pg = narrow_plan(browser, errors, 360, 800)
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
+    pg.locator('[data-row-path="services[0].picks[0]"]').click()
+    pg.wait_for_function("() => document.querySelector('[data-settings-sheet]').open")
+    open_attached(pg.locator('[data-settings-sheet] li[data-slot]').nth(0))
+    wizard_shot(pg, '08-wizard-phone.png')
+    ctx.close()
+
 
 
 with sync_playwright() as p:
@@ -1811,6 +2001,12 @@ with sync_playwright() as p:
 
     wizard_scenarios(browser, RULES, errors)
     browser.close()
+    # 07 · 08 — 반투명 배경(::backdrop) 아래의 둥근 테두리가 프로세스마다 가끔 다르게 그려진다(25회 중 2회, 실측).
+    # 합성 단계를 그리기 전에 모두 돌리고 스크롤 스레드를 끈 브라우저에서 찍으면 같은 바이트다(25회 중 25회)
+    shots = p.chromium.launch(headless=True, args=['--run-all-compositor-stages-before-draw', '--disable-threaded-scrolling'])
+    wizard_narrow_shots(shots, errors)
+    shots.close()
 
     assert errors == [], errors
     print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addedRow, expandedAfterRemove, firstErrorRow, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, rowTitle, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
 import { addCustom, addPresetPick, addService, clearNetwork, duplicatePick, initialPlan, removePick, removeService, renameService, setPickField, startPlan, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS } from './wizardState';
 import { expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
@@ -208,5 +208,17 @@ describe('서비스를 지운 뒤의 펼침 상태 — 자리 번호를 당긴�
     expect([...expandedAfterRemove(t, 1)]).toEqual([[0, false], [2, false]]);
     expect([...expandedAfterRemove(t, 0)]).toEqual([[0, true], [2, false]]);
     expect([...expandedAfterRemove(t, 5)]).toEqual([[0, false], [1, true], [3, false]]);
+  });
+});
+
+describe('줄 제목 rowTitle — 폰 시트의 머리', () => {
+  it('머리 줄 · 서비스 · pick', () => {
+    const p = sample();
+    expect(rowTitle(p, 'project')).toBe('Project');
+    expect(rowTitle(p, 'network')).toBe('Required network');
+    expect(rowTitle(p, 'extras')).toBe('Shared extra resources');
+    expect(rowTitle(p, 'services[0]')).toBe(p.services[0]!.purpose);
+    expect(rowTitle(p, 'projectPicks[0]')).toBe('VPC network');
+    expect(rowTitle(p, 'services[9]')).toBe('unnamed');
   });
 });

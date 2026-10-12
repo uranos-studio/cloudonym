@@ -13,12 +13,15 @@ import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
-import { envList, toggleEnv, withEnv } from './wizardEnvs';
+import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, rowTitle, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { WizardList } from './WizardList';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
 import { WizardNames, type EnvResult } from './WizardNames';
+import { WizardOverlay } from './WizardOverlay';
+import { useWizardLayout } from './wizardLayout';
+import { PanelRightOpen } from 'lucide-react';
 import { NOTICE, PANEL } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi } from '../messages/catalog';
@@ -221,10 +224,39 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     if (active && active !== document.body && active.isConnected) return;
     focusSettings();
   }, [selected]);
+  const focusRow = (path: RowPath) => document.querySelector<HTMLElement>(`[data-row-path="${path}"]`)?.focus();
+
+  // 좁은 화면 (D89) — 태블릿은 이름이 드로어, 폰은 설정이 바텀 시트이고 위 탭이 목록 · 이름을 바꾼다. 배치가 바뀌면 열린 창은 닫힌 것으로 본다
+  const layout = useWizardLayout();
+  const [drawer, setDrawer] = useState(false);
+  const [sheet, setSheet] = useState(false);
+  const [view, setView] = useState<'plan' | 'names'>('plan');
+  const drawerOpen = layout === 'tablet' && drawer;
+  const sheetOpen = layout === 'phone' && sheet;
+  const handleRef = useRef<HTMLButtonElement>(null);
+  const closeDrawer = () => {
+    setDrawer(false);
+    requestAnimationFrame(() => handleRef.current?.focus());
+  };
+  /** 시트를 닫으면 포커스는 고른 줄로 — 시트 안에서 고른 줄이 바뀌었을 수 있다(Duplicate · Remove) */
+  const selectedRef = useRef(selected);
+  useEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
+  const closeSheet = () => {
+    setSheet(false);
+    requestAnimationFrame(() => focusRow(selectedRef.current));
+  };
+  const openSheet = (focusFirst: boolean) => {
+    setSheet(true);
+    if (focusFirst) requestAnimationFrame(focusSettings);
+  };
+
   const onSettingsKey = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== 'Escape' || e.defaultPrevented) return;
     e.preventDefault();
-    document.querySelector<HTMLElement>(`[data-row-path="${selected}"]`)?.focus();
+    if (sheetOpen) closeSheet();
+    else focusRow(selected);
   };
 
   const settings = (() => {
@@ -243,16 +275,36 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     return pick ? <PickPanel pick={pick} at={sel.ref} errors={planErrors} edit={edit} /> : null;
   })();
 
-  // 넓은 화면(lg 이상)의 세 칸은 높이가 고정이고 칸마다 스크롤한다 — 무엇을 더해도 페이지가 길어지지 않는다. 좁은 화면은 한 칸으로 쌓는다(2단계에서 드로어 · 시트)
-  // relative — 칸 안의 절대 위치 요소(sr-only 글자 등)가 칸의 스크롤 안에 갇히게 한다. 없으면 그 요소들이 문서 높이를 늘린다
-  const COLUMN = `${PANEL} relative min-w-0 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain`;
+  // 넓은 화면(≥1280)은 세 칸 · 태블릿(768–1279)은 목록 · 설정 두 칸 — 높이가 고정이고 칸마다 스크롤한다(무엇을 더해도 페이지가 길어지지 않는다).
+  // 폰(<768)은 한 칸이고 페이지가 스크롤한다. relative — 칸 안의 절대 위치 요소(sr-only 글자 등)가 칸의 스크롤 안에 갇히게 한다
+  const fixed = layout !== 'phone';
+  const COLUMN = `${PANEL} relative min-w-0 ${fixed ? 'min-h-0 overflow-y-auto overscroll-contain' : ''}`;
+  const GRID = {
+    wide: 'grid h-[calc(100dvh-2rem)] grid-rows-1 grid-cols-[17.5rem_minmax(0,1fr)_26rem] gap-4',
+    tablet: 'grid h-[calc(100dvh-2rem)] grid-rows-1 grid-cols-[15rem_minmax(0,1fr)] gap-4',
+    phone: 'space-y-4',
+  }[layout];
+  const { names: nameCount, pass: passCount } = namesSummary(results);
+  const allPass = results !== undefined && passCount === nameCount;
+
+  const settingsSection = (
+    <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} onKeyDown={onSettingsKey}
+      className={layout === 'phone' ? 'relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4' : COLUMN}>
+      {settings}
+    </section>
+  );
+  const names = (
+    <WizardNames plan={plan} results={results} errors={planErrors} projectContext={projectParsed.ok ? projectParsed.context : undefined} projectNames={projectNames}
+      {...(layout === 'tablet' ? { onClose: closeDrawer } : {})} />
+  );
   return (
     <div className="min-h-screen">
       <AppHeader
         screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} reserveShare
         share={shareText && <CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
       />
-      <main data-wizard className="mx-auto max-w-[100rem] space-y-4 px-4 py-4">
+      {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
+      <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
         <p className="max-w-4xl text-sm text-zinc-700 dark:text-zinc-300">{en.ui.wizard_intro}</p>
         {linkedVersion && <p data-rules-mismatch role="status" className={NOTICE}>{fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}</p>}
         {notices.map((t) => <p key={t} data-wizard-notice role="status" className={NOTICE}>{t}</p>)}
@@ -261,19 +313,60 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
         </div>
 
-        <div data-wizard-layout className="grid gap-4 lg:h-[calc(100dvh-2rem)] lg:grid-rows-1 lg:grid-cols-[15rem_minmax(0,1fr)_22rem] xl:grid-cols-[17.5rem_minmax(0,1fr)_26rem]">
-          <nav data-wizard-list-column aria-label={en.ui.wizard_list_label} className={`${COLUMN} p-2`}>
+        <div data-wizard-layout={layout} className={GRID}>
+          {layout === 'phone' && (
+            // 폰의 위 탭 — 목록과 이름을 바꾼다. 탭 막대는 페이지 위에 붙고, 이름 칸 머리는 그 바로 아래에 붙는다(top-12)
+            <div role="tablist" aria-label={en.ui.wizard_view_tabs} data-wizard-tabs className="sticky top-0 z-20 -mx-4 flex h-12 items-stretch gap-1 border-b border-zinc-200 bg-zinc-50/95 px-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
+              {(['plan', 'names'] as const).map((v) => (
+                <button key={v} type="button" role="tab" id={`wizard-tab-${v}`} aria-selected={view === v} aria-controls={`wizard-panel-${v}`} data-wizard-tab={v}
+                  className="min-w-0 flex-1 truncate border-b-2 border-transparent px-2 text-sm font-medium text-zinc-600 aria-selected:border-indigo-600 aria-selected:text-zinc-900 dark:text-zinc-400 dark:aria-selected:border-indigo-400 dark:aria-selected:text-zinc-100"
+                  onClick={() => setView(v)}>
+                  {v === 'plan' ? en.ui.wizard_list_label : results ? fillUi(en, 'wizard_names_tab', { names: nameCount, pass: passCount }) : en.ui.wizard_step_names}
+                </button>
+              ))}
+            </div>
+          )}
+          <nav data-wizard-list-column aria-label={en.ui.wizard_list_label} className={`${COLUMN} p-2`} hidden={layout === 'phone' && view !== 'plan'}
+            {...(layout === 'phone' ? { id: 'wizard-panel-plan', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-plan' } : {})}>
             <WizardList plan={plan} envs={envs} selected={selected} onSelect={select} isExpanded={isExpanded} onExpand={onExpand}
               result={results?.[0]?.result} errors={planErrors} serviceErrors={serviceErrors} projectCount={projectCount} flash={flash?.path}
-              onAddService={() => edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }))} onEnter={focusSettings} />
+              onAddService={() => edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }))}
+              onEnter={() => (layout === 'phone' ? openSheet(true) : focusSettings())}
+              {...(layout === 'phone' ? { onActivate: () => openSheet(false) } : {})} />
           </nav>
-          <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} className={COLUMN} onKeyDown={onSettingsKey}>
-            {settings}
-          </section>
-          <div data-names-column className={COLUMN}>
-            <WizardNames plan={plan} results={results} errors={planErrors} projectContext={projectParsed.ok ? projectParsed.context : undefined} projectNames={projectNames} />
-          </div>
+          {layout === 'phone'
+            ? (
+              <WizardOverlay kind="sheet" data="settings-sheet" open={sheetOpen} onClose={closeSheet} title={rowTitle(plan, selected)} closeLabel={en.ui.wizard_sheet_close}>
+                {settingsSection}
+              </WizardOverlay>
+            )
+            : settingsSection}
+          {layout === 'wide' && <div data-names-column className={COLUMN}>{names}</div>}
+          {layout === 'phone' && (
+            <div data-names-column id="wizard-panel-names" role="tabpanel" aria-labelledby="wizard-tab-names" className={COLUMN} hidden={view !== 'names'}>{names}</div>
+          )}
         </div>
+        {layout === 'tablet' && (
+          <>
+            {/* 태블릿 — 오른쪽 가장자리의 손잡이가 이름 드로어를 연다. 손잡이의 수 · PASS 는 늘 지금 값이다 */}
+            <button ref={handleRef} type="button" data-names-handle aria-expanded={drawerOpen} aria-label={en.ui.wizard_names_open} title={en.ui.wizard_names_open}
+              className="fixed right-0 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-lg border border-r-0 border-zinc-300 bg-white px-1.5 py-3 text-xs font-semibold text-zinc-800 shadow-md hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              onClick={() => { setDrawer(true); requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-names-close]')?.focus()); }}>
+              <PanelRightOpen aria-hidden="true" className="size-4" />
+              <span className="[writing-mode:vertical-rl]">{en.ui.wizard_step_names}</span>
+              {results && (
+                <span data-names-handle-summary className={`rounded-full px-1 py-1.5 text-[11px] font-medium [writing-mode:vertical-rl] ${allPass
+                  ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300'}`}>
+                  {fillUi(en, 'wizard_names_handle', { names: nameCount, pass: passCount })}
+                </span>
+              )}
+            </button>
+            <WizardOverlay kind="drawer" data="names-drawer" open={drawerOpen} onClose={closeDrawer} labelledBy="wizard-names">
+              <div data-names-column className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{names}</div>
+            </WizardOverlay>
+          </>
+        )}
       </main>
 
       {custom !== undefined && (
