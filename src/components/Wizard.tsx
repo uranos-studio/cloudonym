@@ -333,7 +333,8 @@ function ProjectResources({ plan, errors, edit, onCustom }: { plan: WizardPlan; 
       )}
       <ErrorList errors={S.errorsAt(errors, 'projectPicks')} />
       {plan.projectPicks.map((pick, i) => (
-        <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}-${pick.tier ?? ''}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />
+        // key 에 tier 를 넣지 않는다 — tier 입력칸이 글자마다 key 를 바꿔 다시 만들어지면 커서가 빠진다
+        <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />
       ))}
     </section>
   );
