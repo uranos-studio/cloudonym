@@ -365,6 +365,11 @@ describe('위치 path (§5-5)', () => {
     expectError(plan, 'selection.unknown_kind', 'services[1].picks[1]', { index: 1, type: 'cloud_sql_instance' });
     expectError(plan, 'selection.role_not_supported', 'services[1].picks[2]', { index: 2 });
   });
+  it('kind:null 은 프리셋 기본값으로 덮지 않는다 — 종류 없는 subnet · 고정 종류 psa 모두 거부', () => {
+    const plan = (preset: string) => ({ provider: 'gcp', project: PROJECT, services: [], projectPicks: [{ preset, kind: null, ...(preset === 'subnet' ? { instances: slots(1) } : {}) }] }) as unknown as WizardPlan;
+    expectError(plan('subnet'), 'selection.unknown_kind', 'projectPicks[0]', { index: 0, type: 'subnet' });
+    expectError(plan('psa'), 'wizard.preset_kind_fixed', 'projectPicks[0]', { index: 0, preset: 'psa' });
+  });
   it('입력 요소 오류는 모두 path 가 있고 §5-5 꼴 · 모델 전체 오류는 path 가 없다', () => {
     const bad: WizardPlan = { provider: 'gcp', project: PROJECT,
       projectPicks: [{ preset: null, ruleId: 'gcp.disk', instances: slots(1) }, { preset: 'vpc', instances: [{ id: 'A', seq: '00', attach: { data: ['1'] } }] }],

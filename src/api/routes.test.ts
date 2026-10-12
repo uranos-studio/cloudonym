@@ -617,6 +617,11 @@ describe('POST /v1/wizard — 되돌려 싣는 값 · 문장 (고침 1)', () => 
     expect(preset).toMatchObject({ code: 'wizard.unknown_preset', params: { value: '{"a":1}' } });
     const ids = await errs(one({ preset: 'web', instances: [{ id: { x: 1 }, seq: '01' }] }));
     expect(ids.find((e) => e.code === 'wizard.invalid_slot_id')).toMatchObject({ field: 'services[0].picks[0].instances[0]', params: { value: '{"x":1}' } });
+    // kind:null 은 「없음」이 아니다 — 프리셋 기본값(종류 없는 subnet · 고정 종류 psa)으로 덮지 않고 거부한다(/v1/names 와 같다)
+    const nullKind = await errs({ ...W, services: [], project_picks: [{ preset: 'subnet', kind: null, instances: [{ id: 'a', seq: '01' }] }] });
+    expect(nullKind.find((e) => e.code === 'selection.unknown_kind')).toMatchObject({ field: 'project_picks[0]', params: { value: 'null' } });
+    const names = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: ctx, resources: [{ type: 'subnet', count: 1, kind: null }] }));
+    expect(names.res.status).toBe(400);
     const kinds = await errs(one({ preset: 'db', kind: [1], instances: [{ id: 'a', seq: '01' }] }));
     expect(kinds.find((e) => e.code === 'selection.unknown_kind')).toMatchObject({ params: { value: '[1]' } });
     const seq = await errs(one({ preset: 'web', instances: [{ id: 'a', seq: 7, attach: { data: [{ d: 1 }] } }] }));

@@ -76,7 +76,8 @@ function resolve(pick: Pick): Resolved | undefined {
   const rule = RULES[sv ?? base ?? ''];
   if (!rule || rule.provider !== 'gcp' || rule.id === PROJECT_ID_RULE) return undefined;
   const tier = pick.tier ?? preset?.tier ?? undefined;
-  return { rule, preset, tier, kind: pick.kind ?? preset?.kind };
+  // 프리셋 종류는 pick 이 kind 를 주지 않았을 때(undefined)만 — null 은 값이라 검사로 보낸다(selection.unknown_kind)
+  return { rule, preset, tier, kind: pick.kind === undefined ? preset?.kind : pick.kind };
 }
 
 /** 한 pick 이 만들 이름 수 — 이름 총합 상한(프로젝트 ID · 자식 포함)에 쓴다. 검사 전 값이라 모양을 믿지 않는다 */
@@ -127,7 +128,8 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     if (preset?.kind !== undefined && pick.kind !== undefined && pick.kind !== preset.kind) {
       push({ code: 'wizard.preset_kind_fixed', params: { index, preset: preset.id, kind: preset.kind } });
     }
-    const kind: unknown = pick.kind ?? preset?.kind;
+    // undefined 일 때만 프리셋 값 — `??` 는 null 도 덮어 kind:null 이 검사를 건너뛴다
+    const kind: unknown = pick.kind === undefined ? preset?.kind : pick.kind;
     if (!baseRule || baseRule.provider !== 'gcp') { push({ code: 'selection.unknown_type', params: { index, value: shown(pick.ruleId) } }); return; }
 
     // serverless — 프리셋 데이터의 규칙 id 하나여야 한다(불리언 · 다른 규칙 id 는 거부)
