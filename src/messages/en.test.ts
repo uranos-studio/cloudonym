@@ -40,6 +40,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'wizard.invalid_tier': { code: 'wizard.invalid_tier', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
   'wizard.tier_not_supported': { code: 'wizard.tier_not_supported', params: { index: 2, type: 'AAA' } },
   'wizard.invalid_location': { code: 'wizard.invalid_location', params: { index: 2, type: 'AAA', value: 'BBB', supported: ['CCC'] } },
+  'wizard.location_needs_region': { code: 'wizard.location_needs_region', params: { index: 2, type: 'AAA' } },
   'wizard.level_not_supported': { code: 'wizard.level_not_supported', params: { index: 2, type: 'AAA' } },
   'wizard.reserved_pick': { code: 'wizard.reserved_pick', params: { index: 2, type: 'AAA' } },
   'wizard.serverless_not_supported': { code: 'wizard.serverless_not_supported', params: { index: 2, type: 'AAA' } },
@@ -132,7 +133,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(112);
+    expect(codes).toHaveLength(113);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

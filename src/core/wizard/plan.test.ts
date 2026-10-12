@@ -372,6 +372,10 @@ describe('pick 의 위치 (D78)', () => {
     expect(expandPlan(plan).services[0]!.items[1]!.location).toBe('regional');
     expectError(svc({ preset: null, ruleId: 'gcp.secret', location: 'US', instances: slots(1) }), 'wizard.invalid_location', 'services[0].picks[0]', { type: 'secret', value: 'US', supported: ['regional'] });
     expectError(svc({ preset: 'object', location: 'regional' }), 'wizard.invalid_location', 'services[0].picks[0]', { value: 'regional' });
+    // 지역 Secret 은 프로젝트 지역에 둔다 — 프로젝트 지역이 global 이면 둘 곳이 없다 · 위치를 비우면(전역) 통과
+    const onGlobal = (location?: string) => ({ ...svc({ preset: 'secret', ...(location === undefined ? {} : { location }), instances: slots(1) }), project: { ...PROJECT, region: 'global' } });
+    expectError(onGlobal('regional'), 'wizard.location_needs_region', 'services[0].picks[0]', { type: 'secret' });
+    expect(validatePlan(onGlobal())).toEqual({ ok: true });
   });
   it('프로젝트 지역은 단일 리전이다 — 멀티 리전이면 context.location_unsupported', () => {
     expectError({ ...svc({ preset: 'object' }), project: { ...PROJECT, region: 'US' } }, 'context.location_unsupported', undefined, { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] });

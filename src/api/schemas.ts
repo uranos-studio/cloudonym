@@ -282,6 +282,7 @@ function atPath(root: unknown, path: string): unknown {
 const VALUE_FIELD: Readonly<Record<string, string | null>> = {
   'wizard.unknown_preset': 'preset', 'selection.unknown_type': 'ruleId', 'selection.unknown_kind': 'kind', 'selection.invalid_role': 'role',
   'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null, 'wizard.invalid_location': 'location',
+  'wizard.location_needs_region': 'location',
 };
 
 /** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,

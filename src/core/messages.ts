@@ -40,7 +40,7 @@ export const MESSAGE_CODES = [
   'wizard.serverless_not_supported', 'wizard.instances_not_supported', 'wizard.duplicate_pick', 'wizard.empty', 'wizard.duplicate_service',
   'wizard.reserved_service', 'wizard.empty_service', 'wizard.unknown_preset', 'wizard.count_below_min', 'wizard.ha_not_supported',
   'wizard.too_many_names', 'wizard.too_many_services', 'wizard.too_many_picks', 'wizard.invalid_slot_id', 'wizard.duplicate_slot_id',
-  'wizard.invalid_seq', 'wizard.invalid_location',
+  'wizard.invalid_seq', 'wizard.invalid_location', 'wizard.location_needs_region',
 ] as const;
 
 export type CoreMessage =
@@ -134,6 +134,7 @@ export type CoreMessage =
   | { code: 'wizard.tier_not_supported'; params: { index: number; type: string } }
   /** pick 의 위치(D78) — 그 규칙이 받는 멀티 · 이중 리전 코드가 아니다. supported 가 비면 그 규칙은 위치를 받지 않는다 */
   | { code: 'wizard.invalid_location'; params: { index: number; type: string; value: string; supported: string[] } }
+  | { code: 'wizard.location_needs_region'; params: { index: number; type: string } }
   | { code: 'wizard.level_not_supported'; params: { index: number; type: string } }
   | { code: 'wizard.reserved_pick'; params: { index: number; type: string } }
   | { code: 'wizard.serverless_not_supported'; params: { index: number; type: string } }

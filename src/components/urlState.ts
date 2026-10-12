@@ -261,6 +261,11 @@ function shortAttach(a: Attachments | undefined): Record<string, unknown> | unde
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+/** pick 위치를 고르기의 값으로 — 멀티 · 이중 리전은 코드(us), Secret 의 regional 은 소문자(D79), 그 밖은 그대로(검사가 거부한다) */
+function locationCode(v: string): string {
+  return canonicalLocation(v, 'gcp')?.code ?? (v.trim().toLowerCase() === REGIONAL_LOCATION ? REGIONAL_LOCATION : v);
+}
+
 function shortPick(p: WizardPick): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   if (p.preset !== null) out.pr = p.preset;
@@ -271,7 +276,7 @@ function shortPick(p: WizardPick): Record<string, unknown> {
   if (p.ha === true) out.h = 1;
   if (typeof p.serverless === 'string') out.sv = SERVERLESS_LONG[p.serverless] ?? p.serverless;
   // 위치는 코드로 싣는다 — 검사를 지난 모델이라 늘 풀리고, 길이가 MAX_REGION_CHARS · regional(D79) 안이라 상한식이 닫힌다 (D78)
-  if (p.location !== undefined) out.l = canonicalLocation(p.location, 'gcp')?.code ?? p.location;
+  if (p.location !== undefined) out.l = locationCode(p.location);
   if (p.instances !== undefined) {
     out.i = p.instances.map((s) => {
       const a = shortAttach(s.attach);
@@ -339,7 +344,7 @@ function longPick(p: unknown, n: WizardNotices): WizardPick | undefined {
   if (p.h !== undefined) out.ha = p.h === 1 ? true : p.h;
   if (p.sv !== undefined) out.serverless = typeof p.sv === 'string' ? (SERVERLESS_SHORT[p.sv] ?? p.sv) : p.sv;
   // 위치는 코드로 푼다 — 화면의 고르기 값이 코드다(` US ` 로 손댄 링크도 고르기에 맞게). 모르는 값은 그대로 두어 validatePlan 이 거부한다
-  if (p.l !== undefined) out.location = typeof p.l === 'string' ? (canonicalLocation(p.l, 'gcp')?.code ?? p.l) : p.l;
+  if (p.l !== undefined) out.location = typeof p.l === 'string' ? locationCode(p.l) : p.l;
   if (p.i !== undefined) {
     if (!Array.isArray(p.i)) out.instances = p.i;
     else {

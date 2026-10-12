@@ -523,6 +523,11 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     expect(JSON.parse(atob(named.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (named.length % 4)) % 4))).w.s[0].p[0]).toEqual({ pr: 'object', l: 'us' });
     const hand = `#state=${btoa(JSON.stringify({ ...WP, v: WV, w: { pp: [], s: [{ n: 'shop', p: [{ pr: 'object', l: ' US ' }] }] } }))}`;
     expect(decodeWizardState(hand)!.plan!.services[0]!.picks[0]).toEqual({ preset: 'object', location: 'us' });
+    // Secret 의 regional(D79)도 같다 — 대소문자 · 공백이 섞인 값은 고르기의 값 regional 로 싣고 푼다
+    const sec = encodeWizardState(one({ preset: 'secret', location: ' REGIONAL ', instances: [{ id: '1', seq: '01' }] }))!;
+    expect(JSON.parse(atob(sec.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (sec.length % 4)) % 4))).w.s[0].p[0]).toMatchObject({ pr: 'secret', l: 'regional' });
+    const handSec = `#state=${btoa(JSON.stringify({ ...WP, v: WV, w: { pp: [], s: [{ n: 'shop', p: [{ pr: 'secret', l: ' Regional ', i: [{ id: '1', q: '01' }] }] }] } }))}`;
+    expect(decodeWizardState(handSec)!.plan!.services[0]!.picks[0]).toMatchObject({ preset: 'secret', location: 'regional' });
     // 모르는 위치는 그대로 두어 validatePlan 이 거부한다 — 그 pick 은 링크를 열며 버려진다
     expect(decodeW(one({ preset: 'object', location: 'mars' }, { preset: 'object', tier: 'logs' })).plan!.services[0]!.picks.map((p) => p.location)).not.toContain('mars');
   });

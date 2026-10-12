@@ -92,6 +92,7 @@ export const en: Catalog = {
     'wizard.tier_reserved': (m) => `picks[${m.params.index}]: tier '${m.params.value}' is reserved (an abbreviation, kind token, region code or environment value)`,
     'wizard.invalid_tier': (m) => `picks[${m.params.index}]: tier '${m.params.value}' must match ${m.params.pattern}`,
     'wizard.tier_not_supported': (m) => `picks[${m.params.index}]: '${m.params.type}' does not take a tier`,
+    'wizard.location_needs_region': (m) => `picks[${m.params.index}]: a regional '${m.params.type}' is placed in the project region, which is global — choose a region or leave the location empty`,
     'wizard.invalid_location': (m) => (m.params.supported.length === 0
       ? `picks[${m.params.index}]: '${m.params.type}' does not take a location; it uses the project region`
       : `picks[${m.params.index}]: location '${m.params.value}' is not one of ${list(m.params.supported)}`),

@@ -5,7 +5,7 @@ import { RULES, rulesFor } from '../constraints';
 import { DEFAULT_ROLE, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection, type ServiceSelection } from '../engine';
 import type { CoreMessage } from '../messages';
 import { MAX_NAMES, SEQ_PATTERN, validateSelection, type Attachments, type InstanceSlot, type SelectionItem } from '../selection';
-import { canonicalLocation, locationRuleTypes, pickLocation, pickLocationNames } from '../regions';
+import { REGIONAL_LOCATION, canonicalLocation, locationRuleTypes, pickLocation, pickLocationNames } from '../regions';
 import { RESERVED_TIERS } from '../tier';
 import { inputKind } from '../tree';
 import { TIER_PATTERN, type ResourceRule, type ScopeId } from '../types';
@@ -95,7 +95,7 @@ function namesOf(pick: unknown): number {
 }
 
 /** pick 목록 하나(서비스 하나 또는 프로젝트 공용)를 검사한다. base 는 그 목록의 위치(services[1] · projectPicks) */
-function checkPicks(picks: readonly unknown[], base: string, level: 'project' | undefined, out: PlanError[]): void {
+function checkPicks(picks: readonly unknown[], base: string, level: 'project' | undefined, out: PlanError[], projectRegion: string | undefined): void {
   const at = (index: number) => base === 'projectPicks' ? `projectPicks[${index}]` : `${base}.picks[${index}]`;
   const seen = new Set<string>();
   picks.forEach((raw, index) => {
@@ -147,9 +147,10 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
     // 위치 (D78 · D79) — 그 규칙이 받는 멀티 · 이중 리전 위치, 기본이 전역인 규칙(Secret)은 regional 이어야 한다
     if (pick.location !== undefined) {
-      if (typeof pick.location !== 'string' || pickLocation(rule, pick.location) === undefined) {
-        push({ code: 'wizard.invalid_location', params: { index, type, value: shown(pick.location), supported: pickLocationNames(rule) } });
-      }
+      const loc = typeof pick.location === 'string' ? pickLocation(rule, pick.location) : undefined;
+      if (loc === undefined) push({ code: 'wizard.invalid_location', params: { index, type, value: shown(pick.location), supported: pickLocationNames(rule) } });
+      // 지역 Secret 은 프로젝트 지역에 둔다 — 프로젝트 지역이 global 이면 둘 곳이 없다 (D79)
+      else if (loc === REGIONAL_LOCATION && projectRegion === 'global') push({ code: 'wizard.location_needs_region', params: { index, type } });
     }
 
     // 같은 (type, tier, role, level) 둘 — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다
@@ -213,7 +214,8 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
   if (projectPicks.length > MAX_PICKS_PER_SERVICE) {
     errors.push({ code: 'wizard.too_many_picks', params: { index: -1, max: MAX_PICKS_PER_SERVICE, actual: projectPicks.length }, path: 'projectPicks' });
   }
-  checkPicks(projectPicks, 'projectPicks', 'project', errors);
+  const projectRegion = ctx.ok ? ctx.context.region : undefined;
+  checkPicks(projectPicks, 'projectPicks', 'project', errors, projectRegion);
 
   const namespaces = new Set<string>();
   services.forEach((svc, index) => {
@@ -227,7 +229,7 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
     if (!isObject(svc) || !Array.isArray(svc.picks)) errors.push({ code: 'selection.not_array', path });
     const picks = picksOf(svc);
     if (picks.length > MAX_PICKS_PER_SERVICE) errors.push({ code: 'wizard.too_many_picks', params: { index, max: MAX_PICKS_PER_SERVICE, actual: picks.length }, path });
-    checkPicks(picks, path, undefined, errors);
+    checkPicks(picks, path, undefined, errors, projectRegion);
   });
 
   const total = 1 + projectPicks.reduce((n: number, p) => n + namesOf(p), 0) + services.reduce((n: number, s) => n + picksOf(s).reduce((m: number, p) => m + namesOf(p), 0), 0);
