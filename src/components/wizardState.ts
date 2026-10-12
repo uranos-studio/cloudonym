@@ -2,7 +2,7 @@
 // 순번은 슬롯의 값이다 — 서버 줄 · 디스크 줄을 지워도 남은 번호를 당기지 않는다. 「+ server」 · 「+ disk」는 다음 빈 번호를 쓴다.
 // 번호를 다시 매기는 것은 사용자가 누르는 별도 동작(renumber)이다. 판정(이름 규칙 · 검사)은 엔진(validatePlan)이 한다
 import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
-import { PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, checkProjectIdSuffix, validatePlan, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
 import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGION } from './formContext';
@@ -144,6 +144,11 @@ export function setProjectIdSuffix(plan: WizardPlan, value: string): WizardPlan 
 }
 
 // ── 용도 칩 ──
+/** 프로젝트 공용 pick 이 상한(MAX_PICKS_PER_SERVICE — ② 네트워크와 Shared extras 를 합친 수)에 닿았는가.
+ *  닿으면 더하는 함수는 모델을 그대로 돌려주고 화면은 더하는 단추를 끈다 — 하나 더 넣으면 wizard.too_many_picks 로 이름이 전부 사라진다 */
+export function projectPicksFull(plan: WizardPlan): boolean {
+  return plan.projectPicks.length >= MAX_PICKS_PER_SERVICE;
+}
 /** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1 */
 export function findPreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): number {
   return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId)?.tier) === tier));
@@ -164,6 +169,7 @@ export function togglePreset(plan: WizardPlan, service: number | null, presetId:
 export function addPresetPick(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
   const preset = presetOf(presetId);
   if (!preset) return plan;
+  if (service === null && projectPicksFull(plan)) return plan;
   const picks = picksOf(plan, service);
   const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
   // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
@@ -178,11 +184,18 @@ export function removePresetPicks(plan: WizardPlan, service: number | null, pres
   return withPicks(plan, service, picksOf(plan, service).filter((p) => p.preset !== presetId));
 }
 
-/** 방화벽 tier 직접 입력의 사전 검사 (D87) — 엔진 검사(validatePlan)와 같은 꼴 · 예약어에 「이미 있다」를 더한다. 통과면 undefined */
-export function firewallTierProblem(plan: WizardPlan, tier: string): 'pattern' | 'reserved' | 'exists' | undefined {
+/** 방화벽 tier 직접 입력의 사전 검사 (D87) — 꼴 · 예약어 · 상한, 그리고 「이미 있다」는 엔진에 묻는다:
+ *  더한 계획을 validatePlan 에 넣어 새 pick 자리에 wizard.duplicate_pick 이 붙는지 본다(중복 키 type|kindToken|tier|role|level —
+ *  Shared extras 의 custom 방화벽 규칙과 겹치는 것까지). 통과면 undefined */
+export function firewallTierProblem(plan: WizardPlan, tier: string): 'pattern' | 'reserved' | 'exists' | 'full' | undefined {
   if (!TIER_PATTERN.test(tier)) return 'pattern';
   if (RESERVED_TIERS.has(tier)) return 'reserved';
+  if (projectPicksFull(plan)) return 'full';
   if (findPreset(plan, null, 'firewall', tier) >= 0) return 'exists';
+  const next = addPresetPick(plan, null, 'firewall', tier);
+  const at = `projectPicks[${next.projectPicks.length - 1}]`;
+  const check = validatePlan(next);
+  if (!check.ok && check.errors.some((e) => e.code === 'wizard.duplicate_pick' && e.path === at)) return 'exists';
   return undefined;
 }
 
@@ -201,6 +214,7 @@ export function pickTitle(pick: Pick): { title: string; custom: boolean } {
 
 /** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음 */
 export function addCustom(plan: WizardPlan, service: number | null, rule: { ruleId: string; input: 'count' | 'role' | 'none'; count?: number; role?: string; kind?: string; tier?: string }): WizardPlan {
+  if (service === null && projectPicksFull(plan)) return plan;
   const base: Pick = {
     preset: null, ruleId: rule.ruleId,
     ...(rule.role === undefined ? {} : { role: rule.role }),
@@ -348,10 +362,12 @@ export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: n
 // ── ① 미리보기 (D85) ──
 const PROJECT_NAME_RULE = GCP_RULES.get('gcp.project_name');
 /** 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥이 풀리면 보인다. 이름은 암묵 항목이 아니라 이 미리보기에만 나온다(마법사 내보내기 · 키는 그대로).
- *  suffix 는 꼴 검사(checkProjectIdSuffix)를 지난 값만 준다 — ID 는 generateProject 의 첫 항목과 같다 */
+ *  ID 는 generateProject 의 첫 항목과 같다. 접미사가 꼴 · 예약어 검사(checkProjectIdSuffix)에 걸리면 ID 를 내지 않는다 —
+ *  접미사 없는 ID 를 보이면 칸의 값과 다른 ID 를 믿게 된다(링크 hash 는 마지막 온전한 계획에 머문다) */
 export function projectPreview(context: ProjectContext, suffix: string | undefined): { name: NameResult | undefined; id: NameItem | undefined } {
-  const id = generateProject({ project: context, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) }, 'gcp').items[0];
   const name = PROJECT_NAME_RULE ? generateItem(context, PROJECT_NAME_RULE, { level: 'project' }) : undefined;
+  if (checkProjectIdSuffix(suffix).length > 0) return { name, id: undefined };
+  const id = generateProject({ project: context, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) }, 'gcp').items[0];
   return { name, id };
 }
 

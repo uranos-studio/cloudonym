@@ -53,7 +53,7 @@ const ICON_BTN =
   'inline-flex size-9 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-rose-700 ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:hover:bg-zinc-800 dark:hover:text-rose-300';
 const CHIP =
-  'inline-flex min-h-9 items-center gap-1 rounded-full border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ' +
+  'inline-flex min-h-9 items-center gap-1 rounded-full border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-40 ' +
   'aria-pressed:border-indigo-600 aria-pressed:bg-indigo-600 aria-pressed:text-white border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-100 ' +
   'dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:aria-pressed:border-indigo-500 dark:aria-pressed:bg-indigo-500';
 const ERR = 'text-xs text-rose-700 dark:text-rose-300';
@@ -145,9 +145,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const results = useMemo<EnvResult[] | undefined>(() => (ready ? envs.map((env) => ({ env, result: generateProject(expandPlan(withEnv(plan, env)), 'gcp') })) : undefined), [ready, plan, envs]);
   // 프로젝트 ID 접미사 (D85) — 빈 모델이면 validatePlan 이 wizard.empty 에서 멈추므로 칸의 오류는 직접 검사한다. 미리보기에는 꼴을 지난 값만 싣는다
   const suffixErrors = useMemo(() => checkProjectIdSuffix(plan.projectIdSuffix), [plan.projectIdSuffix]);
-  const suffix = suffixErrors.length === 0 ? plan.projectIdSuffix : undefined;
   // 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다 · env 마다 하나. 이름은 암묵 항목이 아니다(D85) — 이 미리보기에만 나온다
-  const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, suffix)) : []), [projectParsed, envs, suffix]);
+  const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, plan.projectIdSuffix)) : []), [projectParsed, envs, plan.projectIdSuffix]);
   const projectIds = previews.map((x) => x.id);
   const projectNames = previews.map((x) => x.name);
 
@@ -334,8 +333,8 @@ function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames
 // ── ② 필수 네트워크 (D84) — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄 · PSA 대역)과 그 프리셋 pick ──
 // 모델은 projectPicks 하나다 — 이 칸은 프리셋 pick 만, 「Shared extra resources」는 custom pick 만 그린다(자리 번호 · path 는 모델 순서 그대로)
 const FIREWALL_HINTS: Record<string, string> = { iap: en.ui.wizard_firewall_iap_hint, lbhc: en.ui.wizard_firewall_lbhc_hint };
-const FIREWALL_PROBLEM: Record<'pattern' | 'reserved' | 'exists', string> = {
-  pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists,
+const FIREWALL_PROBLEM: Record<NonNullable<ReturnType<typeof S.firewallTierProblem>>, string> = {
+  pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists, full: en.ui.wizard_project_picks_full,
 };
 
 function NetworkSection({ plan, errors, edit }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void }) {
@@ -344,6 +343,8 @@ function NetworkSection({ plan, errors, edit }: { plan: WizardPlan; errors: Plan
   const [typed, setTyped] = useState('');
   const problem = typed === '' ? undefined : S.firewallTierProblem(plan, typed);
   const subnets = plan.projectPicks.filter((p) => p.preset === 'subnet').length;
+  // 프로젝트 pick 상한 — ② 와 Shared extras 를 합친 수. 닿으면 더하는 단추를 끄고 까닭을 보인다(켜진 칩을 끄는 것은 된다)
+  const full = S.projectPicksFull(plan);
   return (
     <section aria-labelledby="wizard-network" className="space-y-3">
       <h2 id="wizard-network" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
@@ -351,19 +352,22 @@ function NetworkSection({ plan, errors, edit }: { plan: WizardPlan; errors: Plan
         {S.PROJECT_PRESETS.filter((p) => !p.tierChoices).map((p) => (
           // 서브넷 칩 (D86) — 하나 이상이면 눌린 상태 · 끄면 「Add subnet」으로 더한 것까지 전부 뗀다
           <button key={p.id} type="button" data-project-chip={p.id} aria-pressed={S.findPreset(plan, null, p.id) >= 0} className={CHIP}
+            disabled={full && S.findPreset(plan, null, p.id) < 0} aria-describedby={full ? 'wizard-network-full' : undefined}
             onClick={() => edit((x) => (p.id === 'subnet' && subnets > 0 ? S.removePresetPicks(x, null, 'subnet') : S.togglePreset(x, null, p.id)))}>{p.label}</button>
         ))}
         {subnets > 0 && (
-          <button type="button" data-add-subnet className={BTN} onClick={() => edit((x) => S.addPresetPick(x, null, 'subnet'))}>
+          <button type="button" data-add-subnet disabled={full} aria-describedby={full ? 'wizard-network-full' : undefined} className={BTN} onClick={() => edit((x) => S.addPresetPick(x, null, 'subnet'))}>
             <Plus aria-hidden="true" className="size-4" />{en.ui.wizard_add_subnet}
           </button>
         )}
       </div>
+      {full && <p id="wizard-network-full" data-project-picks-full className={ERR}>{en.ui.wizard_project_picks_full}</p>}
       {firewall?.tierChoices && (
         <div className="flex flex-wrap items-center gap-2">
           <span className={HINT}>{en.ui.wizard_firewall_tiers}</span>
           {firewall.tierChoices.map((t) => (
             <button key={t} type="button" data-project-chip={`firewall-${t}`} aria-pressed={S.findPreset(plan, null, 'firewall', t) >= 0} className={CHIP} title={FIREWALL_HINTS[t]}
+              disabled={full && S.findPreset(plan, null, 'firewall', t) < 0}
               onClick={() => edit((x) => S.togglePreset(x, null, 'firewall', t))}>{`${firewall.label} · ${t}`}</button>
           ))}
           <form className="flex items-center gap-1" onSubmit={(e) => {
@@ -401,8 +405,9 @@ function SharedExtras({ plan, errors, edit, onCustom }: { plan: WizardPlan; erro
     <section aria-labelledby="wizard-shared-extras" className="space-y-3">
       <h2 id="wizard-shared-extras" className="text-base font-semibold">{en.ui.wizard_shared_extras} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_shared_extras_hint}</span></h2>
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" data-project-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
+        <button type="button" data-project-chip="custom" className={CHIP} disabled={S.projectPicksFull(plan)} aria-describedby={S.projectPicksFull(plan) ? 'wizard-extras-full' : undefined} onClick={onCustom}>{en.ui.wizard_custom}</button>
       </div>
+      {S.projectPicksFull(plan) && <p id="wizard-extras-full" data-project-picks-full className={ERR}>{en.ui.wizard_project_picks_full}</p>}
       {S.projectPickIndexes(plan, 'extras').map((i) => {
         const pick = plan.projectPicks[i]!;
         return <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />;

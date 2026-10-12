@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, type PickRef,
+  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, projectPicksFull, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
-import { expandPlan, validatePlan, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
+import { expandPlan, validatePlan, MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
 import { DEFAULT_FORM } from './formContext';
 
@@ -375,5 +375,31 @@ describe('① 미리보기 (D85) — 프로젝트 이름은 ID 위 · ID 는 엔
     expect([b.name?.name, b.id?.name, b.id?.key]).toEqual(['example-billing-prod', 'example-billing-prod-team1', 'project/-/project_id/-/-/-']);
     const plan = setProjectIdSuffix(togglePreset(initialPlan({ ...ctx, region: 'asia-northeast3' }), null, 'vpc'), 'team1');
     expect(names(plan)[0]).toBe(b.id?.name);
+  });
+});
+
+describe('3차 리뷰 고침 — 방화벽 사전 검사 · 프로젝트 pick 상한 · 틀린 접미사 미리보기', () => {
+  const fwCustom = (tier: string) => ({ preset: null, ruleId: 'gcp.firewall_rule', tier, instances: [{ id: '1', seq: '01' }] });
+  it('Shared extras 의 custom 방화벽(tier app)과 같은 tier 를 치면 exists — 엔진의 중복 키로 본다', () => {
+    const p: WizardPlan = { ...initialPlan(), projectPicks: [fwCustom('app')] };
+    ok(p);
+    expect(firewallTierProblem(p, 'app')).toBe('exists');
+    expect(firewallTierProblem(p, 'api')).toBeUndefined();
+  });
+  it('프로젝트 pick 이 상한(20)이면 더하는 함수는 모델을 그대로 두고 · 사전 검사는 full', () => {
+    const p: WizardPlan = { ...initialPlan(), projectPicks: Array.from({ length: MAX_PICKS_PER_SERVICE }, (_, i) => fwCustom(`t${String(i).padStart(2, '0')}`)) };
+    ok(p);
+    expect(projectPicksFull(p)).toBe(true);
+    expect(addPresetPick(p, null, 'subnet')).toBe(p);
+    expect(togglePreset(p, null, 'vpc')).toBe(p);
+    expect(addCustom(p, null, { ruleId: 'gcp.storage_bucket', input: 'none' })).toBe(p);
+    expect(firewallTierProblem(p, 'app')).toBe('full');
+    expect(projectPicksFull(initialPlan())).toBe(false);
+  });
+  it('틀린 접미사(db)면 ID 미리보기를 내지 않는다 — 접미사 없는 ID 로 속이지 않는다', () => {
+    const ctx = { owner: 'example', system: 'billing', env: 'prod' as const, region: 'ane3' };
+    expect(projectPreview(ctx, 'db').id).toBeUndefined();
+    expect(projectPreview(ctx, 'db').name?.name).toBe('example-billing-prod');
+    expect(projectPreview(ctx, '').id).toBeUndefined();
   });
 });

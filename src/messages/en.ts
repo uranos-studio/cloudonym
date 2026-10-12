@@ -409,6 +409,7 @@ export const en: Catalog = {
     wizard_firewall_custom_hint: 'Other tier: two to sixteen lowercase letters or digits, e.g. app; abbreviations, kind tokens, region codes and environment values are reserved',
     wizard_firewall_custom_exists: 'That firewall rule is already added',
     wizard_add_subnet: 'Add subnet',
+    wizard_project_picks_full: 'Up to 20 project resources (required network and shared extras together) — remove one to add another',
     wizard_add_same_subnet: 'Add number (same kind and tier)',
     wizard_firewall_iap_hint: 'SSH or RDP through IAP TCP forwarding — allow ingress from 35.235.240.0/20',
     wizard_firewall_lbhc_hint: 'Load balancer health checks — allow ingress from the probe ranges (35.191.0.0/16 and the others on the health check page)',
