@@ -13,6 +13,8 @@ The four columns are ⑴ length, ⑵ allowed characters / pattern, ⑶ start / e
 | Conservative | The code is stricter than the document. It may reject a valid name, but it never reports an invalid name as valid — kept as is and recorded in [decisions.md](decisions.md) |
 | Not applicable | The document has no rule of that kind, and the code has none either |
 
+Quotations here and in code comments copy the source word for word, typos included — for example the Compute Engine discovery document's `comply withRFC1035` (no space). Search for the source's spelling, not a corrected one.
+
 **Summary** — rules without a documented source: **0** (no rule removed) · value fixes: **3** · `docUrl` fixes: **4** (plus anchor and domain cleanup) · conservative limits kept: **4**. On 2026-09-28 **3 more conservative limits were added** (GCS consecutive dots `..` forbidden · Azure resource group rejects characters above U+FFFF · Azure VM rejects all dots — rationale in [decisions.md](decisions.md)).
 
 ## RULES
