@@ -8,6 +8,11 @@ import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGION } from './formContext';
 import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
+import { kindToken } from '../core/catalog';
+import { generateItem, generateProject, type NameItem } from '../core/engine';
+import type { NameResult, ProjectContext } from '../core/types';
+import { RESERVED_TIERS } from '../core/tier';
+import { TIER_PATTERN } from '../core/types';
 
 /** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다) */
 export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE));
@@ -132,6 +137,11 @@ export function renameService(plan: WizardPlan, index: number, purpose: string):
 export function setProject(plan: WizardPlan, project: WizardPlan['project']): WizardPlan {
   return { ...plan, project };
 }
+/** 프로젝트 ID 접미사 (D85) — 빈 값이면 키를 지운다. 빈 문자열을 남기면 꼴 검사에 걸리고, 접미사 없는 링크의 hash 바이트가 달라진다 */
+export function setProjectIdSuffix(plan: WizardPlan, value: string): WizardPlan {
+  const { projectIdSuffix: _x, ...rest } = plan;
+  return value === '' ? rest : { ...rest, projectIdSuffix: value };
+}
 
 // ── 용도 칩 ──
 /** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1 */
@@ -161,6 +171,32 @@ export function addPresetPick(plan: WizardPlan, service: number | null, presetId
   const withSlots = rule !== undefined && inputKind(rule) === 'count';
   const slot = withSlots ? newSlot(pick, []) : undefined;
   return withPicks(plan, service, [...picks, slot ? { ...pick, instances: [slot] } : pick]);
+}
+
+/** 같은 프리셋 pick 을 모두 뗀다 — 서브넷 칩을 끄면 「Add subnet」으로 더한 것까지 지운다 (D86) */
+export function removePresetPicks(plan: WizardPlan, service: number | null, presetId: string): WizardPlan {
+  return withPicks(plan, service, picksOf(plan, service).filter((p) => p.preset !== presetId));
+}
+
+/** 방화벽 tier 직접 입력의 사전 검사 (D87) — 엔진 검사(validatePlan)와 같은 꼴 · 예약어에 「이미 있다」를 더한다. 통과면 undefined */
+export function firewallTierProblem(plan: WizardPlan, tier: string): 'pattern' | 'reserved' | 'exists' | undefined {
+  if (!TIER_PATTERN.test(tier)) return 'pattern';
+  if (RESERVED_TIERS.has(tier)) return 'reserved';
+  if (findPreset(plan, null, 'firewall', tier) >= 0) return 'exists';
+  return undefined;
+}
+
+/** pick 머리의 이름 — 프리셋 이름 뒤에 tier 칩 값(방화벽) 또는 종류 토큰 · 사용자가 친 tier 를 붙여 같은 프리셋 pick 여럿을 가른다
+ *  (`Subnet · proxy` · `Subnet · web`). 고정 종류 프리셋(psa)은 종류를 붙이지 않는다. custom 은 규칙 표시 이름 */
+export function pickTitle(pick: Pick): { title: string; custom: boolean } {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  if (preset) {
+    if (preset.tierChoices) return { title: `${preset.label} · ${pick.tier ?? preset.tier}`, custom: false };
+    const token = pick.kind !== undefined && preset.kind === undefined ? kindToken(effectiveRuleId(pick) ?? preset.ruleId, pick.kind) : null;
+    const parts = [...(typeof token === 'string' && token !== '' ? [token] : []), ...(tierEditable(pick) && pick.tier ? [pick.tier] : [])];
+    return { title: [preset.label, ...parts].join(' · '), custom: false };
+  }
+  return { title: GCP_RULES.get(pick.ruleId ?? '')?.displayName ?? pick.ruleId ?? '', custom: true };
 }
 
 /** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음 */
@@ -307,6 +343,16 @@ export function removeDisk(plan: WizardPlan, ref: PickRef, slot: number, disk: n
 
 export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: number, seq: string): WizardPlan {
   return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => ({ ...a, data: (a.data ?? []).map((d, i) => (i === disk ? seq : d)) })));
+}
+
+// ── ① 미리보기 (D85) ──
+const PROJECT_NAME_RULE = GCP_RULES.get('gcp.project_name');
+/** 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥이 풀리면 보인다. 이름은 암묵 항목이 아니라 이 미리보기에만 나온다(마법사 내보내기 · 키는 그대로).
+ *  suffix 는 꼴 검사(checkProjectIdSuffix)를 지난 값만 준다 — ID 는 generateProject 의 첫 항목과 같다 */
+export function projectPreview(context: ProjectContext, suffix: string | undefined): { name: NameResult | undefined; id: NameItem | undefined } {
+  const id = generateProject({ project: context, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) }, 'gcp').items[0];
+  const name = PROJECT_NAME_RULE ? generateItem(context, PROJECT_NAME_RULE, { level: 'project' }) : undefined;
+  return { name, id };
 }
 
 // ── 프로젝트 공용 칸의 두 자리 (D84) ──

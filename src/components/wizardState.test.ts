@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, type PickRef,
+  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
@@ -319,5 +319,61 @@ describe('프로젝트 공용 칸의 두 자리 (D84) — ② 네트워크는 �
     expect(projectPickIndexes(p, 'network')).toEqual([0, 2]);
     expect(projectPickIndexes(p, 'extras')).toEqual([1]);
     expect(projectPickIndexes(initialPlan(), 'network')).toEqual([]);
+  });
+});
+
+describe('서브넷마다 종류와 tier (D86) — Add subnet · 칩 끄기 · 머리 이름', () => {
+  it('Add subnet 둘째 pick 은 따로 kind · tier 를 갖고 이름이 셋 다 다르다 · 칩을 끄면 전부 뗀다', () => {
+    let p = togglePreset(initialPlan(), null, 'subnet');
+    p = addPresetPick(p, null, 'subnet');
+    p = addPresetPick(p, null, 'subnet');
+    p = setPickField(p, { service: null, pick: 1 }, 'kind', 'REGIONAL_MANAGED_PROXY');
+    p = setPickField(p, { service: null, pick: 2 }, 'tier', 'web');
+    ok(p);
+    expect(names(p).slice(1)).toEqual(['billing-prod-ane3-snet-01', 'billing-prod-ane3-snet-proxy-01', 'billing-prod-ane3-snet-web-01']);
+    expect(p.projectPicks.map(pickTitle).map((t) => t.title)).toEqual(['Subnet', 'Subnet · proxy', 'Subnet · web']);
+    expect(removePresetPicks(p, null, 'subnet').projectPicks).toEqual([]);
+  });
+  it('고정 종류(psa)는 머리에 종류를 붙이지 않고 · 방화벽은 tier 칩 값 · custom 은 규칙 이름', () => {
+    expect(pickTitle({ preset: 'psa' }).title).toBe('Private services access range');
+    expect(pickTitle({ preset: 'firewall', tier: 'iap', instances: [] }).title).toBe('Firewall rule · iap');
+    expect(pickTitle({ preset: null, ruleId: 'gcp.storage_bucket' })).toEqual({ title: 'Cloud Storage Bucket', custom: true });
+  });
+});
+
+describe('방화벽 tier 직접 입력 (D87) — 사전 검사', () => {
+  it('꼴 · 예약어 · 이미 있음을 막고, 통과한 tier 는 규칙 하나를 더해 이름이 된다', () => {
+    let p = togglePreset(initialPlan(), null, 'firewall', 'ssh');
+    expect(firewallTierProblem(p, 'A')).toBe('pattern');
+    expect(firewallTierProblem(p, 'db')).toBe('reserved');
+    expect(firewallTierProblem(p, 'ssh')).toBe('exists');
+    expect(firewallTierProblem(p, 'app')).toBeUndefined();
+    p = togglePreset(p, null, 'firewall', 'app');
+    ok(p);
+    expect(names(p).slice(1)).toEqual(['billing-prod-fw-ssh-01', 'billing-prod-fw-app-01']);
+  });
+});
+
+describe('프로젝트 ID 접미사 (D85) — 빈 칸이면 키를 지운다', () => {
+  it('값을 넣으면 ID 끝에 붙고 · 비우면 키가 없어 접미사 없는 모델과 같다', () => {
+    const base = togglePreset(initialPlan(), null, 'vpc');
+    const withX = setProjectIdSuffix(base, 'team1');
+    ok(withX);
+    expect(names(withX)[0]).toBe('platform-billing-prod-team1');
+    const cleared = setProjectIdSuffix(withX, '');
+    expect('projectIdSuffix' in cleared).toBe(false);
+    expect(cleared).toEqual(base);
+  });
+});
+
+describe('① 미리보기 (D85) — 프로젝트 이름은 ID 위 · ID 는 엔진의 첫 항목과 같다', () => {
+  it('접미사 없으면 이름 = ID 글자 · 접미사는 ID 에만 붙는다', () => {
+    const ctx = { owner: 'example', system: 'billing', env: 'prod' as const, region: 'ane3' };
+    const a = projectPreview(ctx, undefined);
+    expect([a.name?.name, a.name?.valid, a.id?.name]).toEqual(['example-billing-prod', true, 'example-billing-prod']);
+    const b = projectPreview(ctx, 'team1');
+    expect([b.name?.name, b.id?.name, b.id?.key]).toEqual(['example-billing-prod', 'example-billing-prod-team1', 'project/-/project_id/-/-/-']);
+    const plan = setProjectIdSuffix(togglePreset(initialPlan({ ...ctx, region: 'asia-northeast3' }), null, 'vpc'), 'team1');
+    expect(names(plan)[0]).toBe(b.id?.name);
   });
 });

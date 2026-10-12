@@ -9,7 +9,7 @@ import { buildTree, inputKind } from '../core/tree';
 import { allowedKinds } from '../core/catalog';
 import { REGIONAL_LOCATION, locationsFor } from '../core/regions';
 import { MAX_COUNT, type Attachments } from '../core/selection';
-import { MAX_SERVICES, expandPlan, validatePlan, type Pick, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { MAX_SERVICES, checkProjectIdSuffix, expandPlan, validatePlan, type Pick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { presetOf, type Preset } from '../core/wizard/presets';
 import type { CoreMessage, Env, ResourceRule } from '../core/types';
@@ -143,10 +143,13 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const ready = check.ok && projectParsed.ok && serviceErrors.every((e) => e.length === 0);
   // env 마다 같은 계획을 돌린다 (D82) — env 하나면 그 하나
   const results = useMemo<EnvResult[] | undefined>(() => (ready ? envs.map((env) => ({ env, result: generateProject(expandPlan(withEnv(plan, env)), 'gcp') })) : undefined), [ready, plan, envs]);
-  // 프로젝트 ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다 · env 마다 하나
-  const projectIds = useMemo(() => (projectParsed.ok
-    ? envs.map((env) => generateProject({ project: { ...projectParsed.context, env }, projectItems: [], services: [] }, 'gcp').items[0])
-    : []), [projectParsed, envs]);
+  // 프로젝트 ID 접미사 (D85) — 빈 모델이면 validatePlan 이 wizard.empty 에서 멈추므로 칸의 오류는 직접 검사한다. 미리보기에는 꼴을 지난 값만 싣는다
+  const suffixErrors = useMemo(() => checkProjectIdSuffix(plan.projectIdSuffix), [plan.projectIdSuffix]);
+  const suffix = suffixErrors.length === 0 ? plan.projectIdSuffix : undefined;
+  // 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다 · env 마다 하나. 이름은 암묵 항목이 아니다(D85) — 이 미리보기에만 나온다
+  const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, suffix)) : []), [projectParsed, envs, suffix]);
+  const projectIds = previews.map((x) => x.id);
+  const projectNames = previews.map((x) => x.name);
 
   // hash — 모델이 온전할 때만 쓴다(마지막 온전한 hash 가 남는다). 링크로 연 그대로인 동안은 쓰지 않는다 (D27 ⑵)
   const stateKey = ready ? encodeWizardState(plan, VERSION.rules, envs) ?? '' : '';
@@ -218,7 +221,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
               <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
             </div>
             <div className={PANEL}>
-              <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectParsed.ok ? [] : projectParsed.errors} projectIds={projectIds} onChange={(project) => edit((p) => S.setProject(p, project))} />
+              <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectParsed.ok ? [] : projectParsed.errors} projectIds={projectIds} projectNames={projectNames}
+                suffixErrors={suffixErrors} onSuffix={(x) => edit((p) => S.setProjectIdSuffix(p, x))} onChange={(project) => edit((p) => S.setProject(p, project))} />
             </div>
             <div className={PANEL}>
               <NetworkSection plan={plan} errors={planErrors} edit={edit} />
@@ -255,8 +259,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 }
 
 // ── ① 프로젝트 ──
-function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, onChange }: {
-  plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void; errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; onChange: (p: WizardPlan['project']) => void;
+function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames, suffixErrors, onSuffix, onChange }: {
+  plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void; errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; projectNames: readonly ({ name: string } | undefined)[];
+  suffixErrors: readonly CoreMessage[]; onSuffix: (value: string) => void; onChange: (p: WizardPlan['project']) => void;
 }) {
   const v = plan.project;
   const errorFor = (f: string) => {
@@ -294,8 +299,22 @@ function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, onChange }: 
           </div>
         </div>
         <RegionPicker provider="gcp" value={v.region} onChange={(region) => onChange({ ...v, region })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
+        {/* 프로젝트 ID 접미사 (D85) — 선택. tier 와 같은 꼴 · 예약어. 빈 칸이면 모델에서 키를 지운다 */}
+        <div>
+          <label htmlFor="wizard-project-id-suffix" className={LABEL}>{en.ui.wizard_project_id_suffix} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_id_suffix_hint}</span></label>
+          <input id="wizard-project-id-suffix" data-project-id-suffix type="text" value={plan.projectIdSuffix ?? ''} maxLength={16} autoCapitalize="off" autoCorrect="off" spellCheck={false}
+            aria-invalid={suffixErrors.length > 0 ? true : undefined} aria-describedby={suffixErrors.length > 0 ? 'wizard-project-id-suffix-error wizard-project-id-notice' : 'wizard-project-id-notice'}
+            onChange={(e) => onSuffix(e.target.value)} className={CONTROL} />
+          <ErrorList id="wizard-project-id-suffix-error" errors={suffixErrors} />
+        </div>
       </div>
+      <p id="wizard-project-id-notice" data-project-id-notice className={HINT}>{en.ui.wizard_project_id_notice}</p>
       <dl data-project-preview className="grid gap-2 rounded-lg bg-zinc-50 p-3 text-sm sm:grid-cols-[auto_minmax(0,1fr)] dark:bg-zinc-950">
+        <dt className={HINT}>{en.ui.wizard_project_name}</dt>
+        <dd className="flex flex-col gap-0.5">
+          {projectNames.length === 0 && <code data-project-name className="break-all font-mono">—</code>}
+          {projectNames.map((n, i) => <code key={envs[i] ?? i} data-project-name className="break-all font-mono">{n?.name || '—'}</code>)}
+        </dd>
         <dt className={HINT}>{en.ui.wizard_project_id}</dt>
         <dd className="flex flex-col gap-0.5">
           {projectIds.length === 0 && <code data-project-id className="break-all font-mono">—</code>}
@@ -314,25 +333,57 @@ function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, onChange }: 
 
 // ── ② 필수 네트워크 (D84) — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄 · PSA 대역)과 그 프리셋 pick ──
 // 모델은 projectPicks 하나다 — 이 칸은 프리셋 pick 만, 「Shared extra resources」는 custom pick 만 그린다(자리 번호 · path 는 모델 순서 그대로)
+const FIREWALL_HINTS: Record<string, string> = { iap: en.ui.wizard_firewall_iap_hint, lbhc: en.ui.wizard_firewall_lbhc_hint };
+const FIREWALL_PROBLEM: Record<'pattern' | 'reserved' | 'exists', string> = {
+  pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists,
+};
+
 function NetworkSection({ plan, errors, edit }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void }) {
   const firewall = presetOf('firewall');
+  // 방화벽 tier 직접 입력 (D87) — 이 칸의 상태. 엔진 검사와 같은 꼴 · 예약어에 「이미 있다」를 더해 미리 막는다
+  const [typed, setTyped] = useState('');
+  const problem = typed === '' ? undefined : S.firewallTierProblem(plan, typed);
+  const subnets = plan.projectPicks.filter((p) => p.preset === 'subnet').length;
   return (
     <section aria-labelledby="wizard-network" className="space-y-3">
       <h2 id="wizard-network" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
       <div className="flex flex-wrap items-center gap-2">
         {S.PROJECT_PRESETS.filter((p) => !p.tierChoices).map((p) => (
+          // 서브넷 칩 (D86) — 하나 이상이면 눌린 상태 · 끄면 「Add subnet」으로 더한 것까지 전부 뗀다
           <button key={p.id} type="button" data-project-chip={p.id} aria-pressed={S.findPreset(plan, null, p.id) >= 0} className={CHIP}
-            onClick={() => edit((x) => S.togglePreset(x, null, p.id))}>{p.label}</button>
+            onClick={() => edit((x) => (p.id === 'subnet' && subnets > 0 ? S.removePresetPicks(x, null, 'subnet') : S.togglePreset(x, null, p.id)))}>{p.label}</button>
         ))}
+        {subnets > 0 && (
+          <button type="button" data-add-subnet className={BTN} onClick={() => edit((x) => S.addPresetPick(x, null, 'subnet'))}>
+            <Plus aria-hidden="true" className="size-4" />{en.ui.wizard_add_subnet}
+          </button>
+        )}
       </div>
       {firewall?.tierChoices && (
         <div className="flex flex-wrap items-center gap-2">
           <span className={HINT}>{en.ui.wizard_firewall_tiers}</span>
           {firewall.tierChoices.map((t) => (
-            <button key={t} type="button" data-project-chip={`firewall-${t}`} aria-pressed={S.findPreset(plan, null, 'firewall', t) >= 0} className={CHIP}
+            <button key={t} type="button" data-project-chip={`firewall-${t}`} aria-pressed={S.findPreset(plan, null, 'firewall', t) >= 0} className={CHIP} title={FIREWALL_HINTS[t]}
               onClick={() => edit((x) => S.togglePreset(x, null, 'firewall', t))}>{`${firewall.label} · ${t}`}</button>
           ))}
+          <form className="flex items-center gap-1" onSubmit={(e) => {
+            e.preventDefault();
+            if (typed === '' || problem) return;
+            edit((x) => S.togglePreset(x, null, 'firewall', typed));
+            setTyped('');
+          }}>
+            <label htmlFor="wizard-firewall-tier" className="sr-only">{en.ui.wizard_firewall_custom}</label>
+            <input id="wizard-firewall-tier" data-firewall-tier type="text" value={typed} maxLength={16} placeholder={en.ui.wizard_firewall_custom} autoCapitalize="off" autoCorrect="off" spellCheck={false}
+              aria-invalid={problem ? true : undefined} aria-describedby="wizard-firewall-tier-hint"
+              onChange={(e) => setTyped(e.target.value)} className={`${SMALL_INPUT} w-32 text-left`} />
+            <button type="submit" data-firewall-tier-add disabled={typed === '' || problem !== undefined} className={BTN}>
+              <Plus aria-hidden="true" className="size-4" />{en.ui.wizard_firewall_custom_add}
+            </button>
+          </form>
         </div>
+      )}
+      {firewall?.tierChoices && (
+        <p id="wizard-firewall-tier-hint" data-firewall-tier-hint className={problem ? ERR : HINT}>{problem ? FIREWALL_PROBLEM[problem] : en.ui.wizard_firewall_custom_hint}</p>
       )}
       <ErrorList errors={S.errorsAt(errors, 'projectPicks')} />
       {S.projectPickIndexes(plan, 'network').map((i) => {
@@ -433,19 +484,14 @@ function PurposeChip({ preset, pressed, onClick }: { preset: Preset; pressed: bo
 }
 
 // ── ⑤ 선택지 · 서버 줄 ──
-function pickTitle(pick: Pick): { title: string; custom: boolean } {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
-  if (preset) return { title: `${preset.label}${preset.tierChoices ? ` · ${pick.tier ?? preset.tier}` : ''}`, custom: false };
-  return { title: RULES.get(pick.ruleId ?? '')?.displayName ?? pick.ruleId ?? '', custom: true };
-}
-
 function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void }) {
   const path = S.pickPath(at);
   const preset: Preset | undefined = pick.preset === null ? undefined : presetOf(pick.preset);
   const ruleId = S.effectiveRuleId(pick);
   const rule = ruleId ? RULES.get(ruleId) : undefined;
-  const { title, custom } = pickTitle(pick);
-  const kinds = rule ? allowedKinds(rule) : [];
+  const { title, custom } = S.pickTitle(pick);
+  // 고정 종류 프리셋(psa · D88)은 종류를 고르지 않는다 — 칸을 숨긴다
+  const kinds = rule && preset?.kind === undefined ? allowedKinds(rule) : [];
   // 위치 (D78) — 멀티 · 이중 리전을 받는 규칙(버킷 · BigQuery 데이터세트)만. 비우면 프로젝트 지역.
   // 기본이 전역인 규칙(Secret · D79)은 전역(비움) · 지역(regional — 프로젝트 지역) 둘
   const locations = rule ? locationsFor(rule) : [];
@@ -539,6 +585,7 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
         </div>
       )}
       {pick.preset === 'bastion' && <p data-bastion-hint className={HINT}>{en.ui.wizard_bastion_hint}</p>}
+      {pick.preset === 'nat' && <p data-nat-hint className={HINT}>{en.ui.wizard_nat_hint}</p>}
 
       {counted && rule && (
         <InstanceRows pick={pick} at={at} path={path} attachable={attachable} name={rule.displayName} errors={errors} edit={edit} />
@@ -588,7 +635,7 @@ function InstanceRows({ pick, at, path, attachable, name, errors, edit }: {
       {!single && (
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" data-add-slot disabled={slots.length >= MAX_COUNT} className={BTN} onClick={() => edit((p) => S.addSlot(p, at))}>
-            <Plus aria-hidden="true" className="size-4" />{attachable ? en.ui.wizard_add_server : fillUi(en, 'wizard_add_resource', { name })}
+            <Plus aria-hidden="true" className="size-4" />{attachable ? en.ui.wizard_add_server : pick.preset === 'subnet' ? en.ui.wizard_add_same_subnet : fillUi(en, 'wizard_add_resource', { name })}
           </button>
           {S.hasGaps(pick) && (
             <button type="button" data-renumber title={en.ui.wizard_renumber_hint} className={BTN} onClick={() => edit((p) => S.renumber(p, at))}>{en.ui.wizard_renumber}</button>
