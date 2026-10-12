@@ -7,7 +7,7 @@ import { getRule } from './constraints';
 import { PROVIDERS, type GenerateOutput } from './types';
 
 const BASE = { owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod' };
-/** 서울 — GCP 는 존 이름을 넣어도 리전 코드로 풀린다. compute_instance · disk 두 리터럴만 D50 revised 로 ane3a → ane3 (D70 의 유일한 예외) */
+/** 서울 — GCP 는 존 이름을 넣어도 리전 코드로 풀린다. compute_instance · disk 두 리터럴만 D50 revised 로 ane3a → ane3 */
 const REGION = { gcp: 'asia-northeast3-a', aws: 'ap-northeast-2', azure: 'koreacentral' } as const;
 
 /** 리터럴 가운데 유효하지 않은 것 — env prod(4자)로 Windows VM(15자)의 축소 예산이 MIN_TOKEN 아래가 되어 name.cannot_fit (D48).

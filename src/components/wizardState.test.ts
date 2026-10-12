@@ -258,7 +258,7 @@ describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', 
 });
 
 describe('VPC 는 하나로 시작한다 (D75)', () => {
-  it('VPC 칩은 줄 하나 · 더하기 · 다시 매기기를 숨긴다 · 옛 링크처럼 줄이 둘이면 보인다 · 다른 칩은 그대로', () => {
+  it('VPC 칩은 줄 하나 · 더하기 · 다시 매기기를 숨긴다 · 줄이 둘이면(API 로 만든 계획) 보인다 · 다른 칩은 그대로', () => {
     let p = togglePreset(initialPlan(), null, 'vpc');
     const vpc = { service: null, pick: 0 };
     expect(p.projectPicks[0]!.instances).toHaveLength(1);
@@ -267,7 +267,7 @@ describe('VPC 는 하나로 시작한다 (D75)', () => {
     p = setSlotSeq(p, vpc, 0, '03');
     expect(singleSlot(p.projectPicks[0]!)).toBe(true);
     ok(p);
-    // 옛 링크 — VPC 둘(01 · 03)은 모델 그대로 풀리고 화면은 전부 보인다
+    // VPC 둘(01 · 03)인 계획 — 모델 그대로 풀리고 화면은 전부 보인다
     p = addSlot(p, vpc);
     expect(singleSlot(p.projectPicks[0]!)).toBe(false);
     ok(p);

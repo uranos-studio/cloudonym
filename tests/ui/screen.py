@@ -1029,7 +1029,7 @@ with sync_playwright() as p:
     page8.fill('#field-purpose', 'ledger')
     expect(notice).to_have_count(0)
 
-    # ── ⒁ 옛 링크(다섯 키만) → 문맥이 열리고 켜진 CSP(GCP)가 자동 선택 · hash 를 덮어쓰지 않는다 ──
+    # ── ⒁ 다섯 키만 든 링크 → 문맥이 열리고 켜진 CSP(GCP)가 자동 선택 · hash 를 덮어쓰지 않는다 ──
     v1_hash = state_hash(INPUT)
     goto_ready(page8, BASE + TREE + '?' + v1_hash)  # 경로를 바꿔 새로 불러온다
     goto_ready(page8, BASE + TREE + v1_hash)

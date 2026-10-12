@@ -183,7 +183,7 @@ describe('hash v2 — p · r 왕복 (D42)', () => {
     const items = sel('azure', [{ type: 'managed_identity' }]);
     expect(jsonOf(encodeState(ctx, V2, { provider: 'azure', selection: items })).r).toEqual({ managed_identity: 'sync' });
   });
-  it('provider 가 없으면 p · r 키가 없다 · 선택이 비면 r 키가 없다 — 옛 링크와 같은 문자열', () => {
+  it('provider 가 없으면 p · r 키가 없다 · 선택이 비면 r 키가 없다 — 다섯 키 · v 만 든 링크와 같은 문자열', () => {
     expect(encodeState(ctx, V2, {})).toBe(encodeState(ctx, V2));
     expect(Object.keys(jsonOf(encodeState(ctx, V2, { provider: 'gcp', selection: [] })))).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'v', 'p']);
   });
@@ -348,7 +348,7 @@ describe('hash v3 — r 의 종류 값 "n:값이름" (D55)', () => {
     expect(jsonOf(encoded).r).toEqual({ resource_policy: '1:snapshot-schedule' });
     expect(kinds(decodeState(`#state=${encoded}`)?.selection)).toEqual([['resource_policy', 1, 'snapshot-schedule']]);
   });
-  it('종류를 고르지 않은 항목은 지금처럼 수 하나 — 옛 링크와 같은 꼴', () => {
+  it('종류를 고르지 않은 항목은 지금처럼 수 하나 — 종류 없는 링크와 같은 꼴', () => {
     const items = sel('gcp', [{ type: 'cloud_sql_instance', count: 2 }]);
     expect(jsonOf(encodeState(gctx, V2, { provider: 'gcp', selection: items })).r).toEqual({ cloud_sql_instance: 2 });
   });

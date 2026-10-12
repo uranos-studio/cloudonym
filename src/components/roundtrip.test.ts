@@ -87,8 +87,8 @@ describe('공유 · 새로고침 왕복 — 지역은 리전 코드로 남는다
   });
 });
 
-describe('옛 링크', () => {
-  it('옛 kr 링크는 통째로 안 열린다 — 공개 전이라 허용 (D55)', () => {
+describe('국가 코드 지역', () => {
+  it('region 이 국가 코드(kr)인 링크는 통째로 안 열린다 (D55)', () => {
     const old = `#state=${btoa(JSON.stringify({ ...DEFAULT_FORM, region: 'kr', v: '2026-10-07.2', p: 'gcp', r: { disk: 1 } }))}`;
     expect(decodeState(old)).toBeUndefined();
     expect(openHash(old, undefined)).toBeUndefined();

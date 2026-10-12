@@ -55,7 +55,7 @@ export function tierEditable(pick: Pick): boolean {
 }
 
 /** 하나로 시작하는 프리셋 (D75) — VPC 는 프로젝트에 하나가 보통이라 줄을 더하는 단추 · 다시 매기기를 숨긴다.
- *  모델 · 검사는 그대로라 옛 링크의 VPC 둘은 풀리고, 줄이 둘 이상이면 지금처럼 전부 보인다 */
+ *  모델 · 검사는 그대로라 VPC 둘인 계획(API 로 만든 것 · 손으로 만든 링크)도 풀리고, 줄이 둘 이상이면 지금처럼 전부 보인다 */
 const SINGLE_PRESETS: ReadonlySet<string> = new Set(['vpc']);
 export function singleSlot(pick: Pick): boolean {
   return pick.preset !== null && SINGLE_PRESETS.has(pick.preset) && (pick.instances ?? []).length <= 1;
