@@ -518,6 +518,10 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     const json = JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
     expect(json.w.s[0].p).toEqual([{ pr: 'object', l: 'us' }, { ru: 'gcp.bigquery_dataset', l: 'eu' }]);
     expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
+    // 손댄 링크의 위치 이름(` US `)도 코드로 풀린다 — 화면의 Location 고르기 값이 코드다
+    expect(decodeW(one({ preset: 'object', location: ' US ' })).plan!.services[0]!.picks[0]).toEqual({ preset: 'object', location: 'us' });
+    // 모르는 위치는 그대로 두어 validatePlan 이 거부한다 — 그 pick 은 링크를 열며 버려진다
+    expect(decodeW(one({ preset: 'object', location: 'mars' }, { preset: 'object', tier: 'logs' })).plan!.services[0]!.picks.map((p) => p.location)).not.toContain('mars');
   });
   it('custom pick(ruleId · tier · role) · serverless 짧은 값도 왕복한다', () => {
     const plan = one(

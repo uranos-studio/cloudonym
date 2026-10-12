@@ -5,7 +5,7 @@ import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type Selecti
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { PRESETS, presetOf } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
-import { MAX_REGION_CHARS } from '../core/regions';
+import { MAX_REGION_CHARS, canonicalLocation } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 import { EXAMPLE_REGION } from './formContext';
@@ -337,7 +337,8 @@ function longPick(p: unknown, n: WizardNotices): WizardPick | undefined {
   if (p.k !== undefined) out.kind = p.k;
   if (p.h !== undefined) out.ha = p.h === 1 ? true : p.h;
   if (p.sv !== undefined) out.serverless = typeof p.sv === 'string' ? (SERVERLESS_SHORT[p.sv] ?? p.sv) : p.sv;
-  if (p.l !== undefined) out.location = p.l;
+  // 위치는 코드로 푼다 — 화면의 고르기 값이 코드다(` US ` 로 손댄 링크도 고르기에 맞게). 모르는 값은 그대로 두어 validatePlan 이 거부한다
+  if (p.l !== undefined) out.location = typeof p.l === 'string' ? (canonicalLocation(p.l, 'gcp')?.code ?? p.l) : p.l;
   if (p.i !== undefined) {
     if (!Array.isArray(p.i)) out.instances = p.i;
     else {
