@@ -502,7 +502,7 @@
     "/wizard": {
       "post": {
         "summary": "Name a whole project: project-level resources and one or more services",
-        "description": "The naming wizard. One request is one GCP project: the project ID (always the first item), project-level resources (project_picks: network, firewall rules, Cloud Router, Cloud NAT) and, per service (purpose), the resources picked from presets or by rule id. Servers keep their sequence number (instances[].seq), so removing server 01 does not rename server 02. A server can carry attached resources (boot disk, data disks, a static external or internal address) whose names are the server name plus a suffix (-boot, -data-01, -ip, -ipi); they are never shortened. Items are returned in order: project level, then each service, each parent followed by its attached resources. Item keys are structured paths (service/shop/compute_instance/web/01/data/01). Items that fail or collide are still returned with the reasons (status 200). The response is reproduced by repeating the same wizard request with its rules_version; /names is a separate, flat endpoint.",
+        "description": "The naming wizard. One request is one GCP project: the project ID (always the first item), project-level resources (project_picks: network, firewall rules, Cloud Router, Cloud NAT) and, per service (purpose), the resources picked from presets or by rule id. Servers keep their sequence number (instances[].seq), so removing server 01 does not rename server 02. A server can carry attached resources (boot disk, data disks, a static external or internal address) whose names are the server name plus a suffix (-boot, -data-01, -ip, -ipi); they are never shortened. Items are returned in order: project level, then each service, each parent followed by its attached resources. Item keys are structured paths (service/shop/compute_instance/-/web/01/data/01). Items that fail or collide are still returned with the reasons (status 200). The response is reproduced by repeating the same wizard request with its rules_version; /names is a separate, flat endpoint.",
         "operationId": "nameProject",
         "requestBody": {
           "required": true,
@@ -2125,8 +2125,8 @@
         "properties": {
           "key": {
             "type": "string",
-            "description": "Structured key, unique within the response: <level>/<service>/<resource_type>/<tier|->/<seq|role|-> for a parent (project/-/vpc_network/-/01, service/shop/compute_instance/web/01), followed by /<attach>/<seq|-> for an attached resource (service/shop/compute_instance/web/01/data/01)",
-            "example": "service/shop/compute_instance/web/01"
+            "description": "Structured key, unique within the response: <level>/<service>/<resource_type>/<kind|->/<tier|->/<seq|role|-> for a parent, where kind is the kind token in the name or - (project/-/vpc_network/-/-/01, project/-/subnet/proxy/-/01, service/shop/compute_instance/-/web/01), followed by /<attach>/<seq|-> for an attached resource (service/shop/compute_instance/-/web/01/data/01)",
+            "example": "service/shop/compute_instance/-/web/01"
           },
           "namespace": {
             "type": "string",
@@ -2143,7 +2143,7 @@
           "parent": {
             "type": "string",
             "description": "Present on attached resources: the key of the parent item",
-            "example": "service/shop/compute_instance/web/01"
+            "example": "service/shop/compute_instance/-/web/01"
           },
           "attach": {
             "type": "string",

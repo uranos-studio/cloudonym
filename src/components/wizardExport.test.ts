@@ -20,10 +20,10 @@ describe('toWizardExport', () => {
   });
   it('항목 순서 · 구조 키 · 자식의 parent · attach', () => {
     expect(out.names.map((n) => n.key)).toEqual(result.items.map((i) => i.key));
-    expect(out.names[0]).toEqual({ key: 'project/-/project_id/-/-', namespace: 'project', level: 'project', resource_type: 'project_id', name: 'platform-billing-prod' });
-    const disk = out.names.find((n) => n.key === 'service/shop/compute_instance/web/01/data/01')!;
-    expect(disk).toEqual({ key: 'service/shop/compute_instance/web/01/data/01', namespace: 'shop', resource_type: 'disk', seq: '01',
-      parent: 'service/shop/compute_instance/web/01', attach: 'data', name: 'billing-shop-prod-ane3-gce-web-01-data-01' });
+    expect(out.names[0]).toEqual({ key: 'project/-/project_id/-/-/-', namespace: 'project', level: 'project', resource_type: 'project_id', name: 'platform-billing-prod' });
+    const disk = out.names.find((n) => n.key === 'service/shop/compute_instance/-/web/01/data/01')!;
+    expect(disk).toEqual({ key: 'service/shop/compute_instance/-/web/01/data/01', namespace: 'shop', resource_type: 'disk', seq: '01',
+      parent: 'service/shop/compute_instance/-/web/01', attach: 'data', name: 'billing-shop-prod-ane3-gce-web-01-data-01' });
     expect(out.invalid).toEqual([]);
   });
   it('무효 항목은 names 에 없고 invalid 에 코드로', () => {
@@ -32,7 +32,7 @@ describe('toWizardExport', () => {
       { purpose: `${long}c`, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01' }] }] }] };
     const r = generateProject(expandPlan(bad), 'gcp');
     const e = toWizardExport(r, project, bad, V);
-    expect(e.names.map((n) => n.key)).toEqual(['project/-/project_id/-/-']);
+    expect(e.names.map((n) => n.key)).toEqual(['project/-/project_id/-/-/-']);
     expect(e.invalid.map((i) => i.codes)).toContainEqual(['name.parent_invalid']);
   });
 });

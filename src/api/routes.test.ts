@@ -363,6 +363,18 @@ describe('POST /v1/wizard (D66)', () => {
   };
   const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
 
+  it('종류만 다른 서브넷 둘(D86) — 200 · 키의 kind 칸이 다르다 · 토큰이 같은 둘은 400 wizard.duplicate_pick', async () => {
+    const subnet = (kind?: string) => ({ preset: 'subnet', ...(kind === undefined ? {} : { kind }), instances: [{ id: 'a', seq: '01' }] });
+    const g = await itemsOf({ ...W, project_picks: [subnet(), subnet('REGIONAL_MANAGED_PROXY')], services: [] });
+    expect(g.items.map((i) => [i.key, i.name])).toEqual([
+      ['project/-/project_id/-/-/-', 'platform-billing-prod'],
+      ['project/-/subnet/-/-/01', 'billing-prod-ane3-snet-01'],
+      ['project/-/subnet/proxy/-/01', 'billing-prod-ane3-snet-proxy-01'],
+    ]);
+    const dup = await wizard({ ...W, project_picks: [subnet('REGIONAL_MANAGED_PROXY'), subnet('GLOBAL_MANAGED_PROXY')], services: [] });
+    expect(dup.res.status).toBe(400);
+    expect((await json(dup.res)).errors).toMatchObject([{ code: 'wizard.duplicate_pick', field: 'project_picks[1]', params: { value: 'subnet/proxy' } }]);
+  });
   it('pick 의 location (D78) — 버킷은 받고 VM 은 wizard.invalid_location · 프로젝트 지역의 멀티 리전은 context.location_unsupported', async () => {
     const project = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
     const g = await itemsOf({ provider: 'gcp', project, services: [{ purpose: 'shop', picks: [{ preset: 'object', location: 'US' }] }] });
@@ -383,7 +395,7 @@ describe('POST /v1/wizard (D66)', () => {
     expect(body).toEqual(JSON.parse(curl![1]!));
     const g = await itemsOf(body);
     expect(g.valid).toBe(true);
-    expect(g.items.find((i) => i.key === 'service/shop/compute_instance/web/01/data/01')?.name).toBe('billing-shop-prod-ane3-gce-web-01-data-01');
+    expect(g.items.find((i) => i.key === 'service/shop/compute_instance/-/web/01/data/01')?.name).toBe('billing-shop-prod-ane3-gce-web-01-data-01');
     expect(readFileSync(join(root, 'examples', 'terraform', 'README.md'), 'utf-8')).toContain('file("${path.module}/wizard.json")');
   });
 
@@ -406,25 +418,25 @@ describe('POST /v1/wizard (D66)', () => {
     expect(g.conflicts).toEqual([]);
     expect(g.items).toHaveLength(14);
     expect(g.items.map((i: Loose) => [i.key, i.name])).toEqual([
-      ['project/-/project_id/-/-', expect.any(String)],
-      ['project/-/vpc_network/-/01', expect.any(String)],
-      ['project/-/subnet/-/01', expect.any(String)],
-      ['project/-/firewall_rule/ssh/01', expect.any(String)],
-      ['project/-/firewall_rule/web/01', expect.any(String)],
-      ['service/shop/compute_instance/web/01', 'billing-shop-prod-ane3-gce-web-01'],
-      ['service/shop/compute_instance/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot'],
-      ['service/shop/compute_instance/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01'],
-      ['service/shop/compute_instance/web/01/ip/-', 'billing-shop-prod-ane3-gce-web-01-ip'],
-      ['service/shop/cloud_sql_instance/-/01', expect.any(String)],
-      ['service/pay/compute_instance/web/01', 'billing-pay-prod-ane3-gce-web-01'],
-      ['service/pay/compute_instance/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot'],
-      ['service/pay/compute_instance/web/02', 'billing-pay-prod-ane3-gce-web-02'],
-      ['service/pay/compute_instance/web/02/boot/-', 'billing-pay-prod-ane3-gce-web-02-boot'],
+      ['project/-/project_id/-/-/-', expect.any(String)],
+      ['project/-/vpc_network/-/-/01', expect.any(String)],
+      ['project/-/subnet/-/-/01', expect.any(String)],
+      ['project/-/firewall_rule/-/ssh/01', expect.any(String)],
+      ['project/-/firewall_rule/-/web/01', expect.any(String)],
+      ['service/shop/compute_instance/-/web/01', 'billing-shop-prod-ane3-gce-web-01'],
+      ['service/shop/compute_instance/-/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot'],
+      ['service/shop/compute_instance/-/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01'],
+      ['service/shop/compute_instance/-/web/01/ip/-', 'billing-shop-prod-ane3-gce-web-01-ip'],
+      ['service/shop/cloud_sql_instance/pg/-/01', expect.any(String)],
+      ['service/pay/compute_instance/-/web/01', 'billing-pay-prod-ane3-gce-web-01'],
+      ['service/pay/compute_instance/-/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot'],
+      ['service/pay/compute_instance/-/web/02', 'billing-pay-prod-ane3-gce-web-02'],
+      ['service/pay/compute_instance/-/web/02/boot/-', 'billing-pay-prod-ane3-gce-web-02-boot'],
     ]);
     const first = g.items[0];
     expect(first).toMatchObject({ namespace: 'project', level: 'project', resource_type: 'project_id', valid: true, scope: expect.any(String), uniqueness: 'csp' });
     const boot = g.items[6];
-    expect(boot).toMatchObject({ namespace: 'shop', parent: 'service/shop/compute_instance/web/01', attach: 'boot', resource_type: 'disk' });
+    expect(boot).toMatchObject({ namespace: 'shop', parent: 'service/shop/compute_instance/-/web/01', attach: 'boot', resource_type: 'disk' });
     expect(boot.level).toBeUndefined();
     expect(g.items[7]).toMatchObject({ attach: 'data', seq: '01' });
     expect(g.items[5]).toMatchObject({ namespace: 'shop', tier: 'web', seq: '01' });

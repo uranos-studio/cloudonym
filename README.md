@@ -215,7 +215,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
       "valid": true,
       "items": [
         {
-          "key": "service/shop/compute_instance/web/01",
+          "key": "service/shop/compute_instance/-/web/01",
           "namespace": "shop",
           "resource_type": "compute_instance",
           "tier": "web",
@@ -227,9 +227,9 @@ One request is one project. `project` holds four values (no `purpose`), `project
           "…": "…"
         },
         {
-          "key": "service/shop/compute_instance/web/01/boot/-",
+          "key": "service/shop/compute_instance/-/web/01/boot/-",
           "namespace": "shop",
-          "parent": "service/shop/compute_instance/web/01",
+          "parent": "service/shop/compute_instance/-/web/01",
           "attach": "boot",
           "resource_type": "disk",
           "scope": "gcp:project_zone",
@@ -255,7 +255,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 }
 ```
 
-Items come in order: the project ID, the project-level items, then each service, each server followed by its attached resources. `key` is a structured path (`service/shop/compute_instance/web/01/data/01`) that does not change when other items are added or removed; `parent` and `attach` mark an attached resource, and project-level items carry `"level": "project"`. Two items of the same uniqueness class with the same name anywhere in the project are both `valid: false` with `name.conflict`. A 400 names the offending element in `field` with the request names, for example `services[0].picks[0].instances[0].attach.data[1]`. `/v1/generate`, `/v1/names` and `/v1/validate` are unchanged.
+Items come in order: the project ID, the project-level items, then each service, each server followed by its attached resources. `key` is a structured path (`service/shop/compute_instance/-/web/01/data/01`) that does not change when other items are added or removed; `parent` and `attach` mark an attached resource, and project-level items carry `"level": "project"`. Two items of the same uniqueness class with the same name anywhere in the project are both `valid: false` with `name.conflict`. A 400 names the offending element in `field` with the request names, for example `services[0].picks[0].instances[0].attach.data[1]`. `/v1/generate`, `/v1/names` and `/v1/validate` are unchanged.
 
 ## AI-agent integration
 
@@ -454,7 +454,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 요청 하나가 프로젝트 하나다. `project` 는 네 값(`purpose` 없음), `project_picks` 는 프로젝트 공용 리소스, `services` 의 항목마다 `purpose` 와 그 `picks` 다. pick 은 `preset`(`web` · `was` · `bastion` · `file` · `db` · `object` · `run` · `sa` · `secret` · `gke` · `wip`, 로드 밸런서 부품 `ip` · `bs` · `hc` · `url` · `cert` · `thps` · `fwd`, 네트워크 `vpc` · `subnet` · `firewall` · `router` · `nat`)이거나 `"preset": null` 과 `rule` id 이고, `tier` · `kind` · `ha` · `serverless` 를 더할 수 있다. `instances` 는 서버다 — 저마다 고른 `id`(`^[a-z0-9]{1,8}$`) · 번호로 남는 `seq` · 딸린 리소스를 받는 리소스에만 `attach`(`boot` · `data` · `ip` · `ipi`). 서비스 20개 · 서비스마다 또는 `project_picks` 에 pick 20개 · 프로젝트 ID 를 넣어 이름 200개까지. 응답(항목 여덟)은 위 [Whole project](#whole-project-post-v1wizard) 와 같다.
 
 - 항목 순서 — 프로젝트 ID · 프로젝트 공용 · 서비스마다, 서버 바로 뒤에 그 딸린 리소스
-- `key` 는 구조 경로(`service/shop/compute_instance/web/01/data/01`)라 다른 항목을 더하거나 지워도 바뀌지 않는다. 딸린 리소스에는 `parent` · `attach`, 프로젝트 공용 항목에는 `"level": "project"` 가 실린다
+- `key` 는 구조 경로(`service/shop/compute_instance/-/web/01/data/01`)라 다른 항목을 더하거나 지워도 바뀌지 않는다. 딸린 리소스에는 `parent` · `attach`, 프로젝트 공용 항목에는 `"level": "project"` 가 실린다
 - 프로젝트 어디서든 같은 고유성 부류의 같은 이름 둘은 둘 다 `valid: false` · `name.conflict` 다
 - `400` 은 잘못된 자리를 요청의 이름으로 `field` 에 적는다(`services[0].picks[0].instances[0].attach.data[1]` 등). `/v1/generate` · `/v1/names` · `/v1/validate` 는 바뀌지 않았다
 

@@ -536,31 +536,31 @@ describe('generateProject — 계획 §5-2 표본 (D69)', () => {
   it('항목 14 · 전부 valid · 충돌 0 · 자식은 부모 바로 뒤', () => {
     expect(out).toMatchObject({ provider: 'gcp', valid: true, conflicts: [] });
     expect(named(out.items)).toEqual([
-      ['project/-/project_id/-/-', 'platform-billing-prod'],
-      ['project/-/vpc_network/-/01', 'billing-prod-vpc-01'],
-      ['project/-/subnet/-/01', 'billing-prod-ane3-snet-01'],
-      ['project/-/firewall_rule/ssh/01', 'billing-prod-fw-ssh-01'],
-      ['project/-/firewall_rule/web/01', 'billing-prod-fw-web-01'],
-      ['service/shop/compute_instance/web/01', 'billing-shop-prod-ane3-gce-web-01'],
-      ['service/shop/compute_instance/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot'],
-      ['service/shop/compute_instance/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01'],
-      ['service/shop/compute_instance/web/01/ip/-', 'billing-shop-prod-ane3-gce-web-01-ip'],
-      ['service/shop/cloud_sql_instance/-/01', 'billing-shop-prod-ane3-sql-pg-01'],
-      ['service/pay/compute_instance/web/01', 'billing-pay-prod-ane3-gce-web-01'],
-      ['service/pay/compute_instance/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot'],
-      ['service/pay/compute_instance/web/02', 'billing-pay-prod-ane3-gce-web-02'],
-      ['service/pay/compute_instance/web/02/boot/-', 'billing-pay-prod-ane3-gce-web-02-boot'],
+      ['project/-/project_id/-/-/-', 'platform-billing-prod'],
+      ['project/-/vpc_network/-/-/01', 'billing-prod-vpc-01'],
+      ['project/-/subnet/-/-/01', 'billing-prod-ane3-snet-01'],
+      ['project/-/firewall_rule/-/ssh/01', 'billing-prod-fw-ssh-01'],
+      ['project/-/firewall_rule/-/web/01', 'billing-prod-fw-web-01'],
+      ['service/shop/compute_instance/-/web/01', 'billing-shop-prod-ane3-gce-web-01'],
+      ['service/shop/compute_instance/-/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot'],
+      ['service/shop/compute_instance/-/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01'],
+      ['service/shop/compute_instance/-/web/01/ip/-', 'billing-shop-prod-ane3-gce-web-01-ip'],
+      ['service/shop/cloud_sql_instance/pg/-/01', 'billing-shop-prod-ane3-sql-pg-01'],
+      ['service/pay/compute_instance/-/web/01', 'billing-pay-prod-ane3-gce-web-01'],
+      ['service/pay/compute_instance/-/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot'],
+      ['service/pay/compute_instance/-/web/02', 'billing-pay-prod-ane3-gce-web-02'],
+      ['service/pay/compute_instance/-/web/02/boot/-', 'billing-pay-prod-ane3-gce-web-02-boot'],
     ]);
     expect(out.items.every((i) => i.valid)).toBe(true);
   });
   it('§3-2 의 여섯 키 · 이름 · 길이 — 두 서비스의 01 이 같아도 키가 다르다', () => {
     const six: [string, string, number][] = [
-      ['project/-/project_id/-/-', 'platform-billing-prod', 21],
-      ['service/shop/compute_instance/web/01', 'billing-shop-prod-ane3-gce-web-01', 33],
-      ['service/shop/compute_instance/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot', 38],
-      ['service/shop/compute_instance/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01', 41],
-      ['service/pay/compute_instance/web/01', 'billing-pay-prod-ane3-gce-web-01', 32],
-      ['service/pay/compute_instance/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot', 37],
+      ['project/-/project_id/-/-/-', 'platform-billing-prod', 21],
+      ['service/shop/compute_instance/-/web/01', 'billing-shop-prod-ane3-gce-web-01', 33],
+      ['service/shop/compute_instance/-/web/01/boot/-', 'billing-shop-prod-ane3-gce-web-01-boot', 38],
+      ['service/shop/compute_instance/-/web/01/data/01', 'billing-shop-prod-ane3-gce-web-01-data-01', 41],
+      ['service/pay/compute_instance/-/web/01', 'billing-pay-prod-ane3-gce-web-01', 32],
+      ['service/pay/compute_instance/-/web/01/boot/-', 'billing-pay-prod-ane3-gce-web-01-boot', 37],
     ];
     for (const [key, name, len] of six) {
       const found = out.items.find((i) => i.key === key);
@@ -571,16 +571,16 @@ describe('generateProject — 계획 §5-2 표본 (D69)', () => {
   });
   it('항목의 구조 칸 — namespace · level · tier · parent · attach · seq · 자식 규칙', () => {
     const by = (k: string) => out.items.find((i) => i.key === k)!;
-    expect(by('project/-/project_id/-/-')).toMatchObject({ namespace: 'project', level: 'project', ruleId: 'gcp.project_id' });
-    expect(by('service/shop/compute_instance/web/01')).toMatchObject({ namespace: 'shop', tier: 'web', seq: '01', ruleId: 'gcp.compute_instance' });
-    expect(by('service/shop/compute_instance/web/01').level).toBeUndefined();
-    expect(by('service/shop/compute_instance/web/01/data/01')).toMatchObject({
-      namespace: 'shop', parent: 'service/shop/compute_instance/web/01', attach: 'data', seq: '01', ruleId: 'gcp.disk', resourceType: 'disk',
+    expect(by('project/-/project_id/-/-/-')).toMatchObject({ namespace: 'project', level: 'project', ruleId: 'gcp.project_id' });
+    expect(by('service/shop/compute_instance/-/web/01')).toMatchObject({ namespace: 'shop', tier: 'web', seq: '01', ruleId: 'gcp.compute_instance' });
+    expect(by('service/shop/compute_instance/-/web/01').level).toBeUndefined();
+    expect(by('service/shop/compute_instance/-/web/01/data/01')).toMatchObject({
+      namespace: 'shop', parent: 'service/shop/compute_instance/-/web/01', attach: 'data', seq: '01', ruleId: 'gcp.disk', resourceType: 'disk',
     });
-    expect(by('service/shop/compute_instance/web/01/boot/-')).toMatchObject({ attach: 'boot', ruleId: 'gcp.disk' });
-    expect(by('service/shop/compute_instance/web/01/boot/-').seq).toBeUndefined();
-    expect(by('service/shop/compute_instance/web/01/ip/-')).toMatchObject({ attach: 'ip', ruleId: 'gcp.address' });
-    expect(by('service/shop/cloud_sql_instance/-/01')).toMatchObject({ kind: 'POSTGRES', kindToken: 'pg' });
+    expect(by('service/shop/compute_instance/-/web/01/boot/-')).toMatchObject({ attach: 'boot', ruleId: 'gcp.disk' });
+    expect(by('service/shop/compute_instance/-/web/01/boot/-').seq).toBeUndefined();
+    expect(by('service/shop/compute_instance/-/web/01/ip/-')).toMatchObject({ attach: 'ip', ruleId: 'gcp.address' });
+    expect(by('service/shop/cloud_sql_instance/pg/-/01')).toMatchObject({ kind: 'POSTGRES', kindToken: 'pg' });
   });
   it('자식에는 fit 이 돌지 않는다 — steps 빈 배열 · isTruncated false · original 은 이름 그대로', () => {
     for (const c of out.items.filter((i) => i.attach)) {
@@ -594,8 +594,8 @@ describe('generateProject — 슬롯 · 딸린 것 (D61 · D62)', () => {
   it('슬롯 [01, 03] → …-gce-01 · …-gce-03 (순번을 당기지 않는다)', () => {
     const out = generateProject(oneService('shop', [{ rule: gvm, count: 2, tier: 'web', instances: [{ seq: '01' }, { seq: '03' }] }]), 'gcp');
     expect(named(out.items).slice(1)).toEqual([
-      ['service/shop/compute_instance/web/01', 'billing-shop-prod-ane3-gce-web-01'],
-      ['service/shop/compute_instance/web/03', 'billing-shop-prod-ane3-gce-web-03'],
+      ['service/shop/compute_instance/-/web/01', 'billing-shop-prod-ane3-gce-web-01'],
+      ['service/shop/compute_instance/-/web/03', 'billing-shop-prod-ane3-gce-web-03'],
     ]);
   });
   it('슬롯이 없으면 count 로 01…', () => {
@@ -605,8 +605,8 @@ describe('generateProject — 슬롯 · 딸린 것 (D61 · D62)', () => {
   it('ip · ipi — …-gce-01-ip · …-gce-01-ipi (예약 고정 주소)', () => {
     const out = generateProject(oneService('shop', [{ rule: gvm, count: 1, instances: [{ seq: '01', attach: { ip: true, ipi: true } }] }]), 'gcp');
     expect(named(out.items).slice(2)).toEqual([
-      ['service/shop/compute_instance/-/01/ip/-', 'billing-shop-prod-ane3-gce-01-ip'],
-      ['service/shop/compute_instance/-/01/ipi/-', 'billing-shop-prod-ane3-gce-01-ipi'],
+      ['service/shop/compute_instance/-/-/01/ip/-', 'billing-shop-prod-ane3-gce-01-ip'],
+      ['service/shop/compute_instance/-/-/01/ipi/-', 'billing-shop-prod-ane3-gce-01-ipi'],
     ]);
   });
   it('서버 01 data ["01"] · 서버 02 data 없음 → 디스크 하나 · 서버 02 의 자식 없음', () => {
@@ -626,8 +626,8 @@ describe('generateProject — 슬롯 · 딸린 것 (D61 · D62)', () => {
       { rule: gvm, count: 1, tier: 'was', instances: [{ seq: '01', attach: { boot: true } }] },
     ]), 'gcp');
     expect(out.items.slice(1).map((i) => i.key)).toEqual([
-      'service/shop/compute_instance/web/01', 'service/shop/compute_instance/web/01/boot/-',
-      'service/shop/compute_instance/was/01', 'service/shop/compute_instance/was/01/boot/-',
+      'service/shop/compute_instance/-/web/01', 'service/shop/compute_instance/-/web/01/boot/-',
+      'service/shop/compute_instance/-/was/01', 'service/shop/compute_instance/-/was/01/boot/-',
     ]);
     expect(out.valid).toBe(true);
   });
@@ -657,7 +657,7 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
     const out = generateProject(WIZARD_PARENT_FAIL, 'gcp');
     expect(out.items).toHaveLength(4);
     const [pid, p1, boot, p2] = out.items;
-    expect(pid).toMatchObject({ key: 'project/-/project_id/-/-', valid: true });
+    expect(pid).toMatchObject({ key: 'project/-/project_id/-/-/-', valid: true });
     for (const p of [p1!, p2!]) {
       expect(p.valid).toBe(false);
       expect(p.violations.map((v) => v.code)).toEqual(['name.conflict']);
@@ -673,7 +673,7 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
     expect(out.items[0]).toMatchObject({ name: 'platform-billing-prod', valid: true });
     for (const f of out.items.slice(1)) expect(f).toMatchObject({ name: 'billing-shop-prod-ane3-gcf-01', valid: false });
     expect(out.conflicts).toEqual([{ code: 'name.conflict', params: { name: 'billing-shop-prod-ane3-gcf-01',
-      keys: ['service/shop/cloud_function/-/01', 'service/shop/cloud_function_gen1/-/01'] } }]);
+      keys: ['service/shop/cloud_function/-/-/01', 'service/shop/cloud_function_gen1/-/-/01'] } }]);
     expect(out.valid).toBe(false);
   });
   it('프로젝트 방화벽 ssh 01 ↔ 서비스 ssh 의 방화벽 01 — 글자가 달라 충돌 0', () => {
@@ -696,13 +696,26 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
 });
 
 describe('projectItemKey · serviceNamespace · attachName (D69)', () => {
-  it('키 꼴 — 부모 5칸 · 자식 7칸', () => {
-    expect(projectItemKey({ level: 'project', namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('project/-/vpc_network/-/01');
-    expect(projectItemKey({ namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('service/project/vpc_network/-/01');
+  it('키 꼴 — 부모 6칸 · 자식 8칸 (D86 — type 뒤 kind 칸)', () => {
+    expect(projectItemKey({ level: 'project', namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('project/-/vpc_network/-/-/01');
+    expect(projectItemKey({ namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('service/project/vpc_network/-/-/01');
     expect(projectItemKey({ namespace: 'shop', type: 'compute_instance', tier: 'web', slot: '01' }, { attach: 'data', seq: '01' }))
-      .toBe('service/shop/compute_instance/web/01/data/01');
-    expect(projectItemKey({ namespace: 'shop', type: 'compute_instance', slot: '01' }, { attach: 'boot' })).toBe('service/shop/compute_instance/-/01/boot/-');
-    expect(projectItemKey({ namespace: 'shop', type: 'storage_bucket' })).toBe('service/shop/storage_bucket/-/-');
+      .toBe('service/shop/compute_instance/-/web/01/data/01');
+    expect(projectItemKey({ namespace: 'shop', type: 'compute_instance', slot: '01' }, { attach: 'boot' })).toBe('service/shop/compute_instance/-/-/01/boot/-');
+    expect(projectItemKey({ namespace: 'shop', type: 'storage_bucket' })).toBe('service/shop/storage_bucket/-/-/-');
+    expect(projectItemKey({ level: 'project', namespace: 'project', type: 'subnet', kindToken: 'proxy', slot: '01' })).toBe('project/-/subnet/proxy/-/01');
+  });
+  it('kind 칸은 이름에 든 종류 토큰 — 기본값(PRIVATE)은 종류를 주지 않은 것과 같은 - · 토큰만 다른 서브넷 둘은 다른 키 (D86)', () => {
+    const snet = getRule('gcp', 'subnet')!;
+    const sel = (kinds: (string | undefined)[]): ProjectSelection => ({ project: WIZARD_PROJECT, services: [],
+      projectItems: kinds.map((kind) => ({ rule: snet, count: 1, level: 'project' as const, instances: [{ seq: '01' }], ...(kind === undefined ? {} : { kind }) })) });
+    const out = generateProject(sel([undefined, 'REGIONAL_MANAGED_PROXY', 'PRIVATE_SERVICE_CONNECT']), 'gcp');
+    expect(out.items.slice(1).map((i) => [i.key, i.name])).toEqual([
+      ['project/-/subnet/-/-/01', 'billing-prod-ane3-snet-01'],
+      ['project/-/subnet/proxy/-/01', 'billing-prod-ane3-snet-proxy-01'],
+      ['project/-/subnet/psc/-/01', 'billing-prod-ane3-snet-psc-01'],
+    ]);
+    expect(generateProject(sel(['PRIVATE']), 'gcp').items[1]!.key).toBe('project/-/subnet/-/-/01');
   });
   it('namespace 는 정제 뒤 purpose', () => {
     expect(serviceNamespace('Shop')).toBe('shop');

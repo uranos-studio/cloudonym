@@ -7,6 +7,7 @@ import type { CoreMessage } from '../messages';
 import { MAX_NAMES, SEQ_PATTERN, validateSelection, type Attachments, type InstanceSlot, type SelectionItem } from '../selection';
 import { REGIONAL_LOCATION, canonicalLocation, locationRuleTypes, pickLocation, pickLocationNames } from '../regions';
 import { RESERVED_TIERS } from '../tier';
+import { kindTokenFor } from '../compose';
 import { inputKind } from '../tree';
 import { TIER_PATTERN, type ResourceRule, type ScopeId } from '../types';
 import { ATTACH_KINDS, checkAttachments } from './attachments';
@@ -94,6 +95,14 @@ function namesOf(pick: unknown): number {
   return n;
 }
 
+/** 중복 키의 종류 칸 (D86) — 이름에 드는 종류 토큰. 기본값 · 토큰 없는 값 · 종류 없음은 ''. 허용 밖 · 문자열 아님은 원래 값을 앞에 ? 를 붙여 그대로 센다(오류는 따로 난다) */
+function dupKindToken(rule: ResourceRule, kind: unknown): string {
+  if (kind === undefined) return '';
+  if (typeof kind !== 'string') return `?${shown(kind)}`;
+  const t = kindTokenFor(rule.id, rule.kinds, kind);
+  return t instanceof Error ? `?${kind}` : (t ?? '');
+}
+
 /** pick 목록 하나(서비스 하나 또는 프로젝트 공용)를 검사한다. base 는 그 목록의 위치(services[1] · projectPicks) */
 function checkPicks(picks: readonly unknown[], base: string, level: 'project' | undefined, out: PlanError[], projectRegion: string | undefined): void {
   const at = (index: number) => base === 'projectPicks' ? `projectPicks[${index}]` : `${base}.picks[${index}]`;
@@ -153,10 +162,12 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
       else if (loc === REGIONAL_LOCATION && projectRegion === 'global') push({ code: 'wizard.location_needs_region', params: { index, type } });
     }
 
-    // 같은 (type, tier, role, level) 둘 — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다
+    // 같은 (type, 종류 토큰, tier, role, level) 둘 (D86) — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다.
+    // 종류는 이름에 드는 토큰으로 센다 — 기본값 · 토큰 없는 값 · 종류 없음은 같은 이름이 되므로 같은 값('')이다. 허용 밖 종류는 아래 validateSelection 이 알린다
     const role = typeof pick.role === 'string' ? pick.role : input === 'role' ? DEFAULT_ROLE : '';
-    const dup = `${type}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
-    if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: [type, ...(typeof tier === 'string' ? [tier] : []), ...(role === '' ? [] : [role])].join('/') } });
+    const kindToken = dupKindToken(rule, pick.kind);
+    const dup = `${type}|${kindToken}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
+    if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: [type, ...(kindToken === '' ? [] : [kindToken]), ...(typeof tier === 'string' ? [tier] : []), ...(role === '' ? [] : [role])].join('/') } });
     seen.add(dup);
 
     // 슬롯 — count 규칙에만 · id 꼴 · 고유 · seq 꼴 · 고유 · attach 의 값

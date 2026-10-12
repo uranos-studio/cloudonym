@@ -33,33 +33,33 @@ describe('구조 키 — 단사 (D69)', () => {
     for (const row of GCP_CATALOG) expect(types.has(row.key.slice('gcp.'.length)), row.key).toBe(true);
     expect(out.items.length).toBeGreaterThan(1000);
   });
-  it('키 중복 0 · 꼴은 부모 5칸 · 자식 7칸 · 칸에 / 가 없다', () => {
+  it('키 중복 0 · 꼴은 부모 6칸 · 자식 8칸 · 칸에 / 가 없다 (D86 — kind 칸)', () => {
     expect(new Set(keys).size).toBe(keys.length);
-    for (const k of keys) expect([5, 7], k).toContain(k.split('/').length);
-    for (const k of keys) expect(k, k).toMatch(/^(project|service)\/[a-z0-9-]+\/[a-z0-9_]+\/([a-z0-9]{2,16}|-)\/([a-z0-9]+|-)(\/(boot|data|ip|ipi)\/(\d{2}|-))?$/);
+    for (const k of keys) expect([6, 8], k).toContain(k.split('/').length);
+    for (const k of keys) expect(k, k).toMatch(/^(project|service)\/[a-z0-9-]+\/[a-z0-9_]+\/([a-z0-9]+|-)\/([a-z0-9]{2,16}|-)\/([a-z0-9]+|-)(\/(boot|data|ip|ipi)\/(\d{2}|-))?$/);
   });
   it('instance_group + manager 와 instance_group_manager 는 다른 키', () => {
-    expect(keys).toContain('service/shop/instance_group/manager/01');
-    expect(keys).toContain('service/shop/instance_group_manager/-/01');
+    expect(keys).toContain('service/shop/instance_group/-/manager/01');
+    expect(keys).toContain('service/shop/instance_group_manager/-/-/01');
   });
   it('같은 type 의 level project 와 서비스는 다른 키', () => {
-    expect(keys).toContain('project/-/compute_instance/-/01');
-    expect(keys).toContain('service/shop/compute_instance/-/01');
+    expect(keys).toContain('project/-/compute_instance/-/-/01');
+    expect(keys).toContain('service/shop/compute_instance/-/-/01');
   });
   it('서비스 이름이 정제 뒤 project 여도 프로젝트 수준 항목과 키가 다르다 — 키의 level 칸은 namespace 가 아니라 level 에서 온다', () => {
     const vm = rulesFor('gcp').find((r) => r.id === 'gcp.compute_instance')!;
     const r = generateProject({ project: WIZARD_PROJECT, projectItems: [{ rule: vm, count: 1, level: 'project', instances: [{ seq: '01', attach: { boot: true } }] }],
       services: [{ purpose: 'Project', items: [{ rule: vm, count: 1, instances: [{ seq: '01', attach: { boot: true } }] }] }] }, 'gcp');
     const ks = r.items.map((i) => i.key);
-    expect(ks.slice(1)).toEqual(['project/-/compute_instance/-/01', 'project/-/compute_instance/-/01/boot/-',
-                                 'service/project/compute_instance/-/01', 'service/project/compute_instance/-/01/boot/-']);
+    expect(ks.slice(1)).toEqual(['project/-/compute_instance/-/-/01', 'project/-/compute_instance/-/-/01/boot/-',
+                                 'service/project/compute_instance/-/-/01', 'service/project/compute_instance/-/-/01/boot/-']);
     expect(new Set(ks).size).toBe(ks.length);
     const hcl = wizardTerraform(r, {});
     const mapKeys = [...hcl.matchAll(/^ {4}"([^"]+)" = "/gm)].map((m) => m[1]!);
     expect(new Set(mapKeys).size).toBe(mapKeys.length);
   });
   it('같은 슬롯의 자식 다섯은 다른 키이고 그 집합이 정확히 boot/- · data/01 · data/02 · ip/- · ipi/-', () => {
-    const parent = 'service/shop/compute_instance/web/01';
+    const parent = 'service/shop/compute_instance/-/web/01';
     const tails = keys.filter((k) => k.startsWith(`${parent}/`)).map((k) => k.slice(parent.length + 1));
     expect(tails).toEqual(CHILD_TAILS);
   });

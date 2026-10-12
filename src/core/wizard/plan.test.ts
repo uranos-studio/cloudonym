@@ -68,8 +68,8 @@ describe('계획의 표본 요청 (§5-2) — validatePlan → expandPlan → ge
     const byName = res.items.map((i) => i.name);
     for (const n of ['billing-shop-prod-ane3-gce-web-01', 'billing-shop-prod-ane3-gce-web-01-boot', 'billing-shop-prod-ane3-gce-web-01-data-01',
       'billing-pay-prod-ane3-gce-web-01', 'billing-pay-prod-ane3-gce-web-01-boot', 'billing-pay-prod-ane3-gce-web-02-boot']) expect(byName, n).toContain(n);
-    expect(res.items.map((i) => i.key)).toContain('service/shop/compute_instance/web/01/data/01');
-    expect(res.items[0]!.key).toBe('project/-/project_id/-/-');
+    expect(res.items.map((i) => i.key)).toContain('service/shop/compute_instance/-/web/01/data/01');
+    expect(res.items[0]!.key).toBe('project/-/project_id/-/-/-');
   });
 
   it('expandPlan 은 슬롯 id 를 싣지 않고 file 의 defaultAttach 를 넣지 않는다', () => {
@@ -199,6 +199,23 @@ describe('tier · level · 중복 (D60 · D63)', () => {
   it('같은 (type, tier) 둘 → duplicate_pick · web + was(둘 다 VM 슬롯 01) → 통과', () => {
     expectError(svc({ preset: 'web', instances: slots(1) }, { preset: 'web', instances: slots(1, 2) }), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'compute_instance/web' });
     expect(validatePlan(svc({ preset: 'web', instances: slots(1) }, { preset: 'was', instances: slots(1) }))).toEqual({ ok: true });
+  });
+  describe('중복 키에 종류 토큰 (D86) — type|kindToken|tier|role|level', () => {
+    const net = (...picks: Pick[]): WizardPlan => ({ provider: 'gcp', project: PROJECT, projectPicks: picks, services: [] });
+    const subnet = (extra: Partial<Pick> = {}): Pick => ({ preset: 'subnet', instances: slots(1), ...extra });
+    it('종류 토큰이 다른 서브넷 둘(tier 없음) — 통과하고 이름이 다르다', () => {
+      const plan = net(subnet(), subnet({ kind: 'REGIONAL_MANAGED_PROXY' }), subnet({ kind: 'PRIVATE_SERVICE_CONNECT' }));
+      expect(validatePlan(plan)).toEqual({ ok: true });
+      expect(names(plan).slice(1)).toEqual(['billing-prod-ane3-snet-01', 'billing-prod-ane3-snet-proxy-01', 'billing-prod-ane3-snet-psc-01']);
+    });
+    it('토큰이 같은 종류 둘(REGIONAL · GLOBAL_MANAGED_PROXY 는 둘 다 proxy) → duplicate_pick, value 에 토큰', () => {
+      expectError(net(subnet({ kind: 'REGIONAL_MANAGED_PROXY' }), subnet({ kind: 'GLOBAL_MANAGED_PROXY' })), 'wizard.duplicate_pick', 'projectPicks[1]', { value: 'subnet/proxy' });
+    });
+    it('기본값(PRIVATE · 토큰 없음)과 종류 없음은 같은 이름이라 duplicate_pick · tier 가 다르면 통과 (db 는 Cloud SQL 약어라 tier 예약어다)', () => {
+      expectError(net(subnet(), subnet({ kind: 'PRIVATE' })), 'wizard.duplicate_pick', 'projectPicks[1]', { value: 'subnet' });
+      expectError(net(subnet({ tier: 'db' })), 'wizard.tier_reserved', 'projectPicks[0]', { value: 'db' });
+      expect(validatePlan(net(subnet({ tier: 'web' }), subnet({ kind: 'PRIVATE', tier: 'app' })))).toEqual({ ok: true });
+    });
   });
   it('같은 서비스의 서비스 계정 둘 — role 이 다르면 통과 · 같으면 duplicate_pick', () => {
     const sa = (role: string): Pick => ({ preset: null, ruleId: 'gcp.service_account', role });

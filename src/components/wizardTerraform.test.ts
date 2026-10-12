@@ -16,7 +16,7 @@ describe('wizardTerraform (D69)', () => {
     expect(hcl.startsWith('locals {\n  gcp_names = {\n')).toBe(true);
     expect(hcl.endsWith('\n}\n')).toBe(true);
     expect(mapKeys(hcl)).toEqual(out.items.map((i) => i.key));
-    expect(hcl).toContain('    "service/shop/compute_instance/web/01/boot/-" = "billing-shop-prod-ane3-gce-web-01-boot"\n');
+    expect(hcl).toContain('    "service/shop/compute_instance/-/web/01/boot/-" = "billing-shop-prod-ane3-gce-web-01-boot"\n');
     expect(invalidKeys(hcl)).toEqual([]);
   });
   it('라벨은 이름공간별 맵 gcp_labels_by_namespace — project 는 purpose 없음 · 서비스는 purpose', () => {
@@ -32,7 +32,7 @@ describe('wizardTerraform (D69)', () => {
   it('충돌 항목과 그 자식은 맵 밖 # INVALID — 값으로 나가지 않는다', () => {
     const fail = generateProject(WIZARD_PARENT_FAIL, 'gcp');
     const h = wizardTerraform(fail, wizardLabels(WIZARD_PARENT_FAIL, 'gcp'));
-    expect(mapKeys(h)).toEqual(['project/-/project_id/-/-']);
+    expect(mapKeys(h)).toEqual(['project/-/project_id/-/-/-']);
     expect(invalidKeys(h)).toEqual(fail.items.slice(1).map((i) => i.key));
     expect(invalidKeys(h)).toHaveLength(3);
     expect(h).toMatch(/# INVALID: gcp_names\["[^"]+\/boot\/-"\] — The parent '/);
@@ -60,8 +60,8 @@ describe('wizardTerraformByEnv (D82)', () => {
     expect(hcl.startsWith('locals {\n  gcp_names_by_env = {\n    "prod" = {\n')).toBe(true);
     expect(envKeys('prod')).toEqual(entries[0]!.result.items.map((i) => i.key));
     expect(envKeys('stg')).toEqual(entries[1]!.result.items.map((i) => i.key));
-    expect(hcl).toContain('      "service/shop/compute_instance/web/01/boot/-" = "billing-shop-prod-ane3-gce-web-01-boot"\n');
-    expect(hcl).toContain('      "service/shop/compute_instance/web/01/boot/-" = "billing-shop-stg-ane3-gce-web-01-boot"\n');
+    expect(hcl).toContain('      "service/shop/compute_instance/-/web/01/boot/-" = "billing-shop-prod-ane3-gce-web-01-boot"\n');
+    expect(hcl).toContain('      "service/shop/compute_instance/-/web/01/boot/-" = "billing-shop-stg-ane3-gce-web-01-boot"\n');
     expect(hcl).not.toMatch(/^ {2}gcp_names = /m);
   });
   it('라벨은 gcp_labels_by_env — env 안에 이름공간', () => {
