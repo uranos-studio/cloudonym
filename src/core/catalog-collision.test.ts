@@ -21,7 +21,8 @@ const SHARED_KIND_TOKENS: Record<string, string> = {
   'gcp.backend_service': 'int',
   'gcp.forwarding_rule': 'int',
 };
-const ENV_VALUES = ['prod', 'prd', 'stg', 'dev', 'sbx'];
+/** 문맥 파서가 받는 env 낱말 전부(표준값 · prd · production · live …) — 별칭 표에서 만든다. RESERVED_TIERS 와 같은 집합이다 */
+const ENV_VALUES = Object.keys(ENV_ALIASES);
 
 interface Input { rows: readonly Pick<CatalogRow, 'key' | 'slug' | 'kind'>[]; regionCodes: readonly string[]; envValues: readonly string[] }
 
@@ -60,13 +61,14 @@ function collisions({ rows, regionCodes, envValues }: Input): string[] {
 const regionCodes = REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]);
 
 describe('catalog 겹침 검사 (D47)', () => {
-  it('검사기 자체 — ane3 · prod · sql 을 약어로 넣으면 셋 다 잡는다', () => {
-    const extra = ['ane3', 'prod', 'sql'].map((value, i) => ({ key: `gcp.fixture_${i}`, slug: { value, basis: 'x', previous: [] }, kind: null }));
+  it('검사기 자체 — ane3 · prod · sql · live(별칭) 를 약어로 넣으면 넷 다 잡는다', () => {
+    const extra = ['ane3', 'prod', 'sql', 'live'].map((value, i) => ({ key: `gcp.fixture_${i}`, slug: { value, basis: 'x', previous: [] }, kind: null }));
     const found = collisions({ rows: [...GCP_CATALOG, ...extra], regionCodes, envValues: ENV_VALUES });
     expect(found).toEqual([
       '(1) slug sql: gcp.cloud_sql_instance, gcp.fixture_2',
       '(3) region ane3: gcp.fixture_0 slug',
       '(4) env prod: gcp.fixture_1 slug',
+      '(4) env live: gcp.fixture_3 slug',
     ]);
   });
 
@@ -147,7 +149,7 @@ describe('RESERVED_TIERS — tier 로 쓸 수 없는 글자 (D60)', () => {
     expect(kinds.filter((k) => !RESERVED_TIERS.has(k))).toEqual([]);
     for (const r of rulesFor('gcp')) if (r.slug) expect(RESERVED_TIERS.has(r.slug), r.id).toBe(true);
   });
-  it('환경 값 다섯 · GCP 지역 코드 173 을 담는다', () => {
+  it('환경 별칭 전부 · GCP 지역 코드 173 을 담는다', () => {
     for (const e of ENV_VALUES) expect(RESERVED_TIERS.has(e), e).toBe(true);
     expect(regionCodes.filter((c) => !RESERVED_TIERS.has(c))).toEqual([]);
   });
