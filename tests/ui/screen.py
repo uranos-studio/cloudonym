@@ -932,6 +932,11 @@ def wizard_selection_focus(browser, errors):
     # 마지막 서비스를 지우면 이전 서비스 · 하나 남은 것을 지우면 project
     svc(pg, 1).locator('[data-remove-service]').click()
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
+    # Duplicate 는 원본 바로 뒤에 끼운다 — 강조되는 줄도 끝 줄이 아니라 끼운 줄이다
+    select(pg, 'projectPicks[1]').locator('[data-duplicate-pick]').click()
+    expect(settings(pg)).to_have_attribute('data-pick-path', 'projectPicks[2]')
+    expect(pg.locator('[data-row-path="projectPicks[2]"]')).to_have_attribute('data-flash', 'true')
+    expect(pg.locator('[data-row-path="projectPicks[4]"]')).to_have_attribute('data-flash', 'false')
     no_hangul(pg)
     ctx.close()
 

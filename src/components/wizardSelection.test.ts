@@ -191,6 +191,15 @@ describe('더한 줄 — selectAdded · addedRow', () => {
     expect(addedRow(p, togglePreset(p, 0, 'web'))).toBeUndefined();
     expect(addedRow(p, addService(p))).toBeUndefined();
   });
+  it('가운데에 끼운 줄은 그 자리 — Duplicate 는 원본 바로 뒤에 끼운다(끝이 아니다)', () => {
+    const dup = duplicatePick(p, { service: 0, pick: 0 });
+    expect(addedRow(p, dup)).toBe('services[0].picks[1]');
+    // 바꾸지 않은 pick 은 같은 객체 그대로다 — addedRow 가 끼운 자리를 찾는 근거
+    expect(dup.services[0]!.picks[0]).toBe(p.services[0]!.picks[0]);
+    expect(dup.services[0]!.picks[2]).toBe(p.services[0]!.picks[1]);
+    const net = duplicatePick(p, { service: null, pick: 1 });
+    expect(addedRow(p, net)).toBe('projectPicks[2]');
+  });
 });
 
 describe('서비스를 지운 뒤의 펼침 상태 — 자리 번호를 당긴다', () => {

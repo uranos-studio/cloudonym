@@ -196,13 +196,24 @@ export const selectAdded = (service: number | null): EditOp => (before, after) =
   return n(after) > n(before) ? { type: 'select', path: pickPath({ service, pick: n(after) - 1 }) } : { type: 'keep' };
 };
 
-/** 끝에 하나 더해진 pick 줄 — 목록이 잠깐 강조하고 보이게 굴린다(칩 토글은 선택을 옮기지 않으므로). 없으면 undefined */
+/** 하나 더해진 pick 의 자리 — 바꾸지 않은 pick 은 같은 객체 그대로이므로(wizardState 의 갱신은 펼침 · slice) 처음으로 달라진 자리가 끼운 자리다. 없으면 -1 */
+function insertedAt<T>(before: readonly T[], after: readonly T[]): number {
+  if (after.length !== before.length + 1) return -1;
+  let j = 0;
+  while (j < before.length && after[j] === before[j]) j++;
+  // 끼운 자리 뒤는 하나씩 밀린 같은 객체여야 한다 — 아니면 더하면서 다른 것도 바꾼 것이라 자리를 말할 수 없다
+  for (let k = j; k < before.length; k++) if (after[k + 1] !== before[k]) return after.length - 1;
+  return j;
+}
+
+/** 하나 더해진 pick 줄 — 목록이 잠깐 강조하고 보이게 굴린다(칩 토글은 선택을 옮기지 않으므로). 끝에 더한 것도 가운데 끼운 것(Duplicate)도. 없으면 undefined */
 export function addedRow(before: WizardPlan, after: WizardPlan): RowPath | undefined {
   if (before.services.length !== after.services.length) return undefined;
-  if (after.projectPicks.length === before.projectPicks.length + 1) return pickPath({ service: null, pick: after.projectPicks.length - 1 });
+  const k = insertedAt(before.projectPicks, after.projectPicks);
+  if (k >= 0) return pickPath({ service: null, pick: k });
   for (let i = 0; i < after.services.length; i++) {
-    const a = after.services[i]!.picks.length;
-    if (a === (before.services[i]?.picks.length ?? 0) + 1) return pickPath({ service: i, pick: a - 1 });
+    const j = insertedAt(before.services[i]?.picks ?? [], after.services[i]!.picks);
+    if (j >= 0) return pickPath({ service: i, pick: j });
   }
   return undefined;
 }
