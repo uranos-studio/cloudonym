@@ -35,8 +35,8 @@ export const MESSAGE_CODES = [
   'name.parent_invalid', 'name.parent_name',
   // wizard/attachments.ts checkAttachments (5)
   'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range', 'wizard.invalid_data_seq', 'wizard.duplicate_seq',
-  // wizard/plan.ts validatePlan (22)
-  'wizard.tier_reserved', 'wizard.invalid_tier', 'wizard.tier_not_supported', 'wizard.level_not_supported', 'wizard.reserved_pick',
+  // wizard/plan.ts validatePlan (24)
+  'wizard.tier_reserved', 'wizard.invalid_tier', 'wizard.invalid_project_id_suffix', 'wizard.project_id_suffix_reserved', 'wizard.tier_not_supported', 'wizard.level_not_supported', 'wizard.reserved_pick',
   'wizard.serverless_not_supported', 'wizard.instances_not_supported', 'wizard.duplicate_pick', 'wizard.empty', 'wizard.duplicate_service',
   'wizard.reserved_service', 'wizard.empty_service', 'wizard.unknown_preset', 'wizard.count_below_min', 'wizard.ha_not_supported',
   'wizard.too_many_names', 'wizard.too_many_services', 'wizard.too_many_picks', 'wizard.invalid_slot_id', 'wizard.duplicate_slot_id',
@@ -131,6 +131,8 @@ export type CoreMessage =
   /** 마법사 모델 검사 (D60 · D61 · D63 · D64) — index 는 pick 의 자리(서비스 코드는 서비스의 자리). 위치는 validatePlan 이 path 로 싣는다 */
   | { code: 'wizard.tier_reserved'; params: { index: number; value: string } }
   | { code: 'wizard.invalid_tier'; params: { index: number; value: string; pattern: string } }
+  | { code: 'wizard.invalid_project_id_suffix'; params: { value: string; pattern: string } }
+  | { code: 'wizard.project_id_suffix_reserved'; params: { value: string } }
   | { code: 'wizard.tier_not_supported'; params: { index: number; type: string } }
   /** pick 의 위치(D78) — 그 규칙이 받는 멀티 · 이중 리전 코드가 아니다. supported 가 비면 그 규칙은 위치를 받지 않는다 */
   | { code: 'wizard.invalid_location'; params: { index: number; type: string; value: string; supported: string[] } }

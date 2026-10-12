@@ -252,7 +252,8 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
       else expect(at, r.id).toBe(-1);
       expect(r.optional, r.id).not.toContain('kind');
       // 덮기 전 템플릿에서 region(none 이면) · kind · tier 만 다르다
-      expect(r.template.filter((t) => t !== 'kind' && t !== 'tier'), r.id).toEqual(GCP_BASE_RULES[r.id]!.template.filter((t) => r.regionToken !== 'none' || t !== 'region'));
+      // 프로젝트 ID 는 덮기 전부터 tier(접미사 · D85)를 갖는다
+      expect(r.template.filter((t) => t !== 'kind' && t !== 'tier'), r.id).toEqual(GCP_BASE_RULES[r.id]!.template.filter((t) => (r.regionToken !== 'none' || t !== 'region') && t !== 'tier'));
     }
   });
 
@@ -267,8 +268,12 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     }
   });
 
-  it('용도 토큰 tier — 세 CSP 의 count 규칙 전부 seq 바로 앞 · 종류 토큰이 있으면 그 뒤 (D60) · GCP 의 순번 없는 규칙은 종류(없으면 약어) 바로 뒤 · 역할 규칙 · 프로젝트 ID · AWS/Azure 의 나머지에는 없다 (D74)', () => {
+  it('용도 토큰 tier — 세 CSP 의 count 규칙 전부 seq 바로 앞 · 종류 토큰이 있으면 그 뒤 (D60) · GCP 의 순번 없는 규칙은 종류(없으면 약어) 바로 뒤 · 역할 규칙 · AWS/Azure 의 나머지에는 없다 (D74) · 프로젝트 ID 는 끝에 접미사로 (D85)', () => {
+    expect(RULES['gcp.project_id']!.template).toEqual(['owner', 'system', 'purpose', 'env', 'tier']);
+    expect(RULES['gcp.project_id']!.optional).not.toContain('tier');
+    expect(RULES['gcp.project_name']!.template).not.toContain('tier');
     for (const r of Object.values(RULES)) {
+      if (r.id === 'gcp.project_id') continue;
       const seq = r.template.indexOf('seq');
       if (seq < 0) {
         const plain = r.provider === 'gcp' && !r.template.includes('role') && r.template.includes('slug');
@@ -291,7 +296,7 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.bigquery_dataset']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier']);
     expect(RULES['gcp.spanner_instance_config']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
     expect(RULES['gcp.iam_custom_role']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
-    expect(RULES['gcp.project_id']!.template).not.toContain('tier');
+    expect(RULES['gcp.project_name']!.template).not.toContain('tier');
     expect(RULES['gcp.service_account']!.template).not.toContain('tier');
     expect(RULES['gcp.cloud_sql_user']!.template).not.toContain('tier');
   });

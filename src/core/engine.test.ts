@@ -695,6 +695,22 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
   });
 });
 
+describe('프로젝트 ID 접미사 (D85) — tier 자리 · 키 고정', () => {
+  const sel = (suffix: string | undefined, project = WIZARD_PROJECT): ProjectSelection => ({ project, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) });
+  it('접미사가 이름 끝에 붙고 키는 project/-/project_id/-/-/- 그대로 · 없으면 옛 이름', () => {
+    const a = generateProject(sel('team1'), 'gcp').items[0]!;
+    expect(a).toMatchObject({ key: 'project/-/project_id/-/-/-', name: 'platform-billing-prod-team1', valid: true, isTruncated: false, tier: 'team1' });
+    expect(generateProject(sel(undefined), 'gcp').items[0]).toMatchObject({ key: 'project/-/project_id/-/-/-', name: 'platform-billing-prod', valid: true });
+  });
+  it('30자를 넘으면 owner 를 떼고(축소 1단계) · 그래도 넘치면 system 을 줄인다(2단계) — 접미사는 보호 토큰이라 줄지 않는다', () => {
+    const long = generateProject(sel('abcdefghijklmnop'), 'gcp').items[0]!;
+    expect(long).toMatchObject({ name: 'billing-prod-abcdefghijklmnop', valid: true, isTruncated: true });
+    const two = generateProject(sel('abcdefghijklmnop', { ...WIZARD_PROJECT, system: 'zqxwvutsrq' }), 'gcp').items[0]!;
+    expect(two).toMatchObject({ name: 'zqxwvuts-prod-abcdefghijklmnop', valid: true, isTruncated: true });
+    expect(two.steps.map((s) => s.code)).toEqual(['step.token_dropped', 'step.budget_shortened']);
+  });
+});
+
 describe('projectItemKey · serviceNamespace · attachName (D69)', () => {
   it('키 꼴 — 부모 6칸 · 자식 8칸 (D86 — type 뒤 kind 칸)', () => {
     expect(projectItemKey({ level: 'project', namespace: 'project', type: 'vpc_network', slot: '01' })).toBe('project/-/vpc_network/-/-/01');

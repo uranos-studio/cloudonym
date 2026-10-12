@@ -91,6 +91,8 @@ export const en: Catalog = {
     // 마법사 모델 (validatePlan)
     'wizard.tier_reserved': (m) => `picks[${m.params.index}]: tier '${m.params.value}' is reserved (an abbreviation, kind token, region code or environment value)`,
     'wizard.invalid_tier': (m) => `picks[${m.params.index}]: tier '${m.params.value}' must match ${m.params.pattern}`,
+    'wizard.invalid_project_id_suffix': (m) => `Project ID suffix '${m.params.value}' must match ${m.params.pattern}`,
+    'wizard.project_id_suffix_reserved': (m) => `Project ID suffix '${m.params.value}' is reserved (an abbreviation, kind token, region code or environment value)`,
     'wizard.tier_not_supported': (m) => `picks[${m.params.index}]: '${m.params.type}' does not take a tier`,
     'wizard.location_needs_region': (m) => `picks[${m.params.index}]: a regional '${m.params.type}' is placed in the project region, which is global — choose a region or leave the location empty`,
     'wizard.invalid_location': (m) => (m.params.supported.length === 0

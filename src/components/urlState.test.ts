@@ -511,6 +511,23 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     // 같은 키 — 다시 인코딩해도 같은 문자열
     expect(encodeWizardState(back.plan!, WV)).toBe(enc);
   });
+  it('프로젝트 ID 접미사(D85)는 최상위 x 로 왕복한다 · 없으면 x 가 없어 옛 hash 와 같은 바이트다', () => {
+    const json = (enc: string) => JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
+    const plan: WizardPlan = { ...W_SAMPLE, projectIdSuffix: 'team1' };
+    const enc = encodeWizardState(plan, WV)!;
+    expect(json(enc).x).toBe('team1');
+    expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
+    const bare = encodeWizardState(W_SAMPLE, WV)!;
+    expect('x' in json(bare)).toBe(false);
+    expect(bare).toBe(btoa(JSON.stringify({ ...WP, v: WV, w: wizardToHash(W_SAMPLE) })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''));
+  });
+  it('x 의 꼴이 틀리거나 예약어면 접미사만 버리고 센다 — 모델은 연다', () => {
+    for (const x of ['A', 'prod', 'db', 1, 'a'.repeat(17)]) {
+      const d = decodeWizardState(rawWizardHash(W_SAMPLE, { x }))!;
+      expect(d.plan, String(x)).toEqual(W_SAMPLE);
+      expect(d.notices.dropped, String(x)).toBe(1);
+    }
+  });
   it('pick 의 위치(D78)는 키 l 로 왕복한다', () => {
     const plan = one({ preset: 'object', location: 'us' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' });
     expect(validatePlan(plan)).toEqual({ ok: true });
@@ -719,13 +736,13 @@ describe('hash v4 — 환경 여럿 e (D82)', () => {
   });
 });
 
-/** 서비스 20 · 자유 입력 최악 · 이름 195 인 모델의 hash 길이 (잰 값) */
-const MEASURED_NEAR_MAX = 18146;
+/** 서비스 20 · 자유 입력 최악 · 이름 195 · 프로젝트 ID 접미사 16자(D85) 인 모델의 hash 길이 (잰 값) */
+const MEASURED_NEAR_MAX = 18177;
 describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
   it('MAX_WIZARD_HASH_CHARS 를 잰다 · MAX_ANY_HASH_CHARS 는 v3 · v4 중 큰 쪽', () => {
     // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다 · Secret 의 regional(8자 — D79)로 2바이트 × 420 이 더해졌다
-    // 환경 목록 e(표준값 아홉 전부 — D82) 60바이트가 더해졌다
-    expect(MAX_WIZARD_HASH_CHARS).toBe(128975);
+    // 환경 목록 e(표준값 아홉 전부 — D82) 60바이트가 더해졌다 · 프로젝트 ID 접미사 x(16자 — D85) 24바이트가 더해졌다
+    expect(MAX_WIZARD_HASH_CHARS).toBe(129007);
     expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
   });
   it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {
@@ -735,7 +752,7 @@ describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
       picks: [{ preset: null, ruleId: 'gcp.compute_instance', tier: 'abcdefghijklmnop', instances: Array.from({ length: n }, (_, k) => ({ id: `abcdef${String(k).padStart(2, '0')}`, seq: String(k + 1).padStart(2, '0'), attach: { boot: true as const } })) }] as WPick[],
     });
     // 이름 = 1 + 서비스마다 (VM n + boot n) — 19 × 10 + 1 × 4 + 1 = 195
-    const plan: WizardPlan = { provider: 'gcp', project: { ...WP, owner: worst, system: worst }, projectPicks: [], services: Array.from({ length: 20 }, (_, i) => svc(i, i === 19 ? 2 : 5)) };
+    const plan: WizardPlan = { provider: 'gcp', project: { ...WP, owner: worst, system: worst }, projectPicks: [], services: Array.from({ length: 20 }, (_, i) => svc(i, i === 19 ? 2 : 5)), projectIdSuffix: 'abcdefghijklmnop' };
     expect(validatePlan(plan)).toEqual({ ok: true });
     const enc = encodeWizardState(plan, WV);
     expect(enc).toBeDefined();

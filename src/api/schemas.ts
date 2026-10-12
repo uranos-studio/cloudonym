@@ -233,7 +233,7 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
 }
 
 /** 모델 경로의 이름 → 요청 본문의 이름 (§5-5 표) — 표에 없는 글자는 같다 */
-export const WIRE_PATH_NAMES: Readonly<Record<string, string>> = { projectPicks: 'project_picks', ruleId: 'rule' };
+export const WIRE_PATH_NAMES: Readonly<Record<string, string>> = { projectPicks: 'project_picks', ruleId: 'rule', projectIdSuffix: 'project_id_suffix' };
 
 /** validatePlan 의 path(모델 표기)를 응답 field(요청 본문 표기)로 — `projectPicks[0].instances[0]` → `project_picks[0].instances[0]` */
 export function toWirePath(path: string): string {
@@ -282,7 +282,7 @@ function atPath(root: unknown, path: string): unknown {
 const VALUE_FIELD: Readonly<Record<string, string | null>> = {
   'wizard.unknown_preset': 'preset', 'selection.unknown_type': 'ruleId', 'selection.unknown_kind': 'kind', 'selection.invalid_role': 'role',
   'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null, 'wizard.invalid_location': 'location',
-  'wizard.location_needs_region': 'location',
+  'wizard.location_needs_region': 'location', 'wizard.invalid_project_id_suffix': null, 'wizard.project_id_suffix_reserved': null,
 };
 
 /** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,
@@ -367,7 +367,7 @@ export function parseWizardBody(body: unknown): Parsed<WizardInput> {
   const projectPicks = Array.isArray(body.project_picks) ? (body.project_picks as unknown[]) : [];
   const long = [
     ...tooLong({ 'project.owner': project.owner, 'project.system': project.system }, MAX_CONTEXT_CHARS),
-    ...tooLong({ 'project.env': project.env, 'project.region': project.region }),
+    ...tooLong({ 'project.env': project.env, 'project.region': project.region, project_id_suffix: body.project_id_suffix }),
     ...projectPicks.flatMap((p, j) => pickTooLong(p, `project_picks[${j}]`)),
     ...services.flatMap((s, i) => (isRecord(s) ? [
       ...tooLong({ [`services[${i}].purpose`]: s.purpose }, MAX_CONTEXT_CHARS),
@@ -381,6 +381,8 @@ export function parseWizardBody(body: unknown): Parsed<WizardInput> {
     provider, project: raw,
     projectPicks: listOf(body.project_picks, toModelPick),
     services: listOf(body.services, (s) => (isRecord(s) ? { purpose: s.purpose, picks: listOf(s.picks, toModelPick) } : s)),
+    // 프로젝트 ID 접미사 (D85) — 없으면 싣지 않는다. 꼴 · 예약어는 validatePlan 이 본다(null 도 거기서 거부된다)
+    ...(Object.hasOwn(body, 'project_id_suffix') ? { projectIdSuffix: body.project_id_suffix } : {}),
   } as unknown as WizardPlan;
   const checked = validatePlan(plan);
   if (!checked.ok) {

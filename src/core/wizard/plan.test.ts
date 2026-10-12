@@ -200,6 +200,25 @@ describe('tier · level · 중복 (D60 · D63)', () => {
     expectError(svc({ preset: 'web', instances: slots(1) }, { preset: 'web', instances: slots(1, 2) }), 'wizard.duplicate_pick', 'services[0].picks[1]', { value: 'compute_instance/web' });
     expect(validatePlan(svc({ preset: 'web', instances: slots(1) }, { preset: 'was', instances: slots(1) }))).toEqual({ ok: true });
   });
+  describe('프로젝트 ID 접미사 (D85) — projectIdSuffix', () => {
+    const withSuffix = (projectIdSuffix: unknown): WizardPlan => ({ ...SAMPLE, projectIdSuffix } as WizardPlan);
+    it('꼴이 틀리면 wizard.invalid_project_id_suffix · path projectIdSuffix', () => {
+      for (const v of ['A', 'a', 'a-b', 'a'.repeat(17), 7, null]) {
+        expectError(withSuffix(v), 'wizard.invalid_project_id_suffix', 'projectIdSuffix', { pattern: TIER_PATTERN.source });
+      }
+    });
+    it('예약어(약어 · 환경 · 지역 코드)면 wizard.project_id_suffix_reserved', () => {
+      for (const v of ['db', 'prod', 'ane3']) expectError(withSuffix(v), 'wizard.project_id_suffix_reserved', 'projectIdSuffix', { value: v });
+    });
+    it('통과하면 프로젝트 ID 끝에 붙고 다른 이름은 그대로 · expandPlan 이 싣는다', () => {
+      expect(validatePlan(withSuffix('team1'))).toEqual({ ok: true });
+      expect(expandPlan(withSuffix('team1')).projectIdSuffix).toBe('team1');
+      expect('projectIdSuffix' in expandPlan(SAMPLE)).toBe(false);
+      const [id, ...rest] = names(withSuffix('team1'));
+      expect(id).toBe('platform-billing-prod-team1');
+      expect(rest).toEqual(names(SAMPLE).slice(1));
+    });
+  });
   describe('중복 키에 종류 토큰 (D86) — type|kindToken|tier|role|level', () => {
     const net = (...picks: Pick[]): WizardPlan => ({ provider: 'gcp', project: PROJECT, projectPicks: picks, services: [] });
     const subnet = (extra: Partial<Pick> = {}): Pick => ({ preset: 'subnet', instances: slots(1), ...extra });

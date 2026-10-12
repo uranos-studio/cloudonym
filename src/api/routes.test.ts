@@ -363,6 +363,17 @@ describe('POST /v1/wizard (D66)', () => {
   };
   const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
 
+  it('project_id_suffix (D85) — 200 · 프로젝트 ID 끝에 · 키 고정 · 틀린 꼴 · 예약어 · 너무 긴 값은 400', async () => {
+    const g = await itemsOf({ ...W, project_id_suffix: 'team1' });
+    expect(g.items[0]).toMatchObject({ key: 'project/-/project_id/-/-/-', name: 'platform-billing-prod-team1', valid: true });
+    const bad = await wizard({ ...W, project_id_suffix: 'Team-1' });
+    expect(bad.res.status).toBe(400);
+    expect((await json(bad.res)).errors).toMatchObject([{ code: 'wizard.invalid_project_id_suffix', field: 'project_id_suffix', params: { value: 'Team-1' }, message: "Project ID suffix 'Team-1' must match ^[a-z0-9]{2,16}$" }]);
+    const reserved = await wizard({ ...W, project_id_suffix: 'prod' });
+    expect((await json(reserved.res)).errors).toMatchObject([{ code: 'wizard.project_id_suffix_reserved', field: 'project_id_suffix', params: { value: 'prod' } }]);
+    const long = await wizard({ ...W, project_id_suffix: 'a'.repeat(1025) });
+    expect((await json(long.res)).errors).toMatchObject([{ code: 'request.field_too_long', field: 'project_id_suffix' }]);
+  });
   it('종류만 다른 서브넷 둘(D86) — 200 · 키의 kind 칸이 다르다 · 토큰이 같은 둘은 400 wizard.duplicate_pick', async () => {
     const subnet = (kind?: string) => ({ preset: 'subnet', ...(kind === undefined ? {} : { kind }), instances: [{ id: 'a', seq: '01' }] });
     const g = await itemsOf({ ...W, project_picks: [subnet(), subnet('REGIONAL_MANAGED_PROXY')], services: [] });

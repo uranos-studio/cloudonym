@@ -17,7 +17,8 @@ const GCP_HAND_RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
     forbidden: { contains: ['google', 'ssl'] },
-    template: ['owner', 'system', 'purpose', 'env'], optional: ['owner'],
+    // tier 자리는 마법사의 프로젝트 ID 접미사다 (D85 — D74 의 「프로젝트 ID 는 tier 를 받지 않는다」를 뒤집는다). 빈 tier 는 compose 가 건너뛰어 옛 이름 그대로다
+    template: ['owner', 'system', 'purpose', 'env', 'tier'], optional: ['owner'],
     scope: 'gcp:namespace', entity: 'cloudresourcemanager.projects', category: 'management', uniqueness: 'csp',
     docUrl: 'https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects#identifiers',
     // undefined · null 은 문서가 "Avoid"(권고)라 적었다 — 금지가 아니므로 넣지 않는다

@@ -50,6 +50,8 @@ export interface WizardPlan {
   project: { owner: string; system: string; env: string; region: string };
   projectPicks: Pick[];
   services: { purpose: string; picks: Pick[] }[];
+  /** 프로젝트 ID 접미사 (D85) — 프로젝트 ID 끝에 붙는 보호 토큰. tier 와 같은 꼴 · 예약어. 없으면 접미사 없음 */
+  projectIdSuffix?: string;
 }
 /** validatePlan 의 오류 — 입력 요소에 걸린 것은 path(services[1].picks[0].instances[1].attach.data[0] · projectPicks[2] · services[1] · projectPicks) */
 export type PlanError = CoreMessage & { path?: string };
@@ -203,6 +205,16 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
   });
 }
 
+/** 프로젝트 ID 접미사 검사 (D85) — tier 와 같은 꼴(TIER_PATTERN) · 예약어. 없으면 오류 없음. hash 디코더도 부른다 */
+export function checkProjectIdSuffix(value: unknown): PlanError[] {
+  if (value === undefined) return [];
+  if (typeof value !== 'string' || !TIER_PATTERN.test(value)) {
+    return [{ code: 'wizard.invalid_project_id_suffix', params: { value: shown(value), pattern: TIER_PATTERN.source }, path: 'projectIdSuffix' }];
+  }
+  if (RESERVED_TIERS.has(value)) return [{ code: 'wizard.project_id_suffix_reserved', params: { value }, path: 'projectIdSuffix' }];
+  return [];
+}
+
 /** 마법사 모델 검사 — 오류를 모두 낸다. 검사 순서: 모델 전체(서비스 수 · 빈 모델) → 프로젝트 문맥 → 서비스(이름 · 예약 · 중복) → pick → 이름 총합 */
 export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; errors: PlanError[] } {
   // 모양 — services · projectPicks 는 배열(모델 전체 오류 · path 없음). 서비스의 picks 가 배열이 아니면 아래에서 services[i] 에 낸다
@@ -221,6 +233,7 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
   if (projectLocation) {
     errors.push({ code: 'context.location_unsupported', field: 'region', params: { value: shown(plan.project.region), supported: locationRuleTypes(projectLocation) } });
   }
+  errors.push(...checkProjectIdSuffix(plan.projectIdSuffix));
 
   if (projectPicks.length > MAX_PICKS_PER_SERVICE) {
     errors.push({ code: 'wizard.too_many_picks', params: { index: -1, max: MAX_PICKS_PER_SERVICE, actual: projectPicks.length }, path: 'projectPicks' });
@@ -276,5 +289,6 @@ export function expandPlan(plan: WizardPlan): ProjectSelection {
     if (!parseContext({ ...plan.project, purpose: s.purpose }, 'gcp').ok) throw new Error('expandPlan: invalid service context');
     return { purpose: s.purpose, items: s.picks.map((p) => item(p, undefined)) };
   });
-  return { project: ctx.context, projectItems: plan.projectPicks.map((p) => item(p, 'project')), services };
+  return { project: ctx.context, projectItems: plan.projectPicks.map((p) => item(p, 'project')), services,
+           ...(plan.projectIdSuffix === undefined ? {} : { projectIdSuffix: plan.projectIdSuffix }) };
 }

@@ -153,7 +153,8 @@ export function generateMany(ctx: NamingContext, provider: Provider, selection: 
 
 /** 프로젝트 한 번의 선택 (D69) — 프로젝트 수준 항목과 서비스(purpose)마다의 항목. 마법사 모델이 펼친 것이다(검사는 부르는 쪽) */
 export interface ServiceSelection { purpose: string; items: readonly SelectionItem[] }
-export interface ProjectSelection { project: ProjectContext; projectItems: readonly SelectionItem[]; services: readonly ServiceSelection[] }
+/** projectIdSuffix (D85) — 프로젝트 ID 끝의 보호 토큰(tier 자리). 마법사 모델 검사(꼴 · 예약어)를 지난 값이다 */
+export interface ProjectSelection { project: ProjectContext; projectItems: readonly SelectionItem[]; services: readonly ServiceSelection[]; projectIdSuffix?: string }
 export interface ProjectResult { provider: Provider; valid: boolean; items: NameItem[]; conflicts: CoreMessage[] }
 
 /** 서비스의 이름공간 — 정제 뒤 purpose (키의 service 칸 · 라벨 맵 키) */
@@ -228,7 +229,9 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
     const one = (extra: ItemExtra, slot: string | undefined, meta: { seq?: string; role?: string }, children: Built['children']) => {
       const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...(regional ? { regional: true } : {}), ...extra });
       // 키의 kind 칸은 이름이 빈 항목에서도 같은 값이다 — 이름이 아니라 선택이 키를 정한다
-      const key = projectItemKey({ ...lv, namespace, type: rule.resourceType, ...(token === null ? {} : { kindToken: token }), ...(tier === undefined ? {} : { tier }), ...(slot === undefined ? {} : { slot }) });
+      // 프로젝트 ID 의 접미사(tier 자리 · D85)는 키에 넣지 않는다 — 접미사를 바꿔도 Terraform 키(project/-/project_id/-/-/-)가 움직이지 않는다
+      const keyTier = rule.id === projectRule.id ? undefined : tier;
+      const key = projectItemKey({ ...lv, namespace, type: rule.resourceType, ...(token === null ? {} : { kindToken: token }), ...(keyTier === undefined ? {} : { tier: keyTier }), ...(slot === undefined ? {} : { slot }) });
       const item: NameItem = {
         ...res, key, ...meta, ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }),
         ...(tier === undefined ? {} : { tier }), ...lv, namespace,
@@ -259,7 +262,7 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
 
   // 입력은 중복이 없어야 한다 — 같은 이름공간으로 정제되는 서비스 · 같은 (type, 종류 토큰, tier, role, level) 항목은 T5 의 마법사 모델 검사(validatePlan)가 먼저 거부한다
   // ① 부모 전부
-  add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1 }, 'project');
+  add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1, ...(sel.projectIdSuffix === undefined ? {} : { tier: sel.projectIdSuffix }) }, 'project');
   for (const it of sel.projectItems) add(sel.project, PROJECT_NAMESPACE, it, 'project');
   for (const svc of sel.services) {
     for (const it of svc.items) {

@@ -2,7 +2,7 @@
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다. 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseContext, parseProjectContext } from '../core/engine';
 import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type SelectionItem } from '../core/selection';
-import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, checkProjectIdSuffix, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { PRESETS, presetOf } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS, REGIONAL_LOCATION, canonicalLocation } from '../core/regions';
@@ -307,6 +307,8 @@ export function encodeWizardState(plan: WizardPlan, rulesVersion?: string, envs:
   if (rulesVersion !== undefined) body.v = rulesVersion;
   const list = envList(c.env, envs);
   if (list.length > 1) body.e = list;
+  // 프로젝트 ID 접미사 (D85) — 있을 때만 x. 없으면 바이트가 옛 hash 와 같다
+  if (plan.projectIdSuffix !== undefined) body.x = plan.projectIdSuffix;
   body.w = wizardToHash(plan);
   return toBase64Url(new TextEncoder().encode(JSON.stringify(body)));
 }
@@ -511,7 +513,7 @@ const NAME_JSON_BYTES = Math.max(
   JSON.stringify({ id: 'i'.repeat(MAX_SLOT_ID_CHARS), q: '99', a: { d: [] } }).length + 1,
   '"ipi":1,'.length, '"b":1,'.length, '"99",'.length,
 );
-const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, w: { pp: [], s: [] } }).length
+const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, x: 'x'.repeat(16), w: { pp: [], s: [] } }).length
   + 2 * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_SERVICES * (JSON.stringify({ n: '', p: [] }).length + 1 + MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES)
   + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES
@@ -569,6 +571,12 @@ export function decodeWizardState(hash: string): DecodedWizard | undefined {
     }
   }
   if (typeof raw.v === 'string' && RULES_VERSION_RE.test(raw.v)) out.rulesVersion = raw.v;
+  // x — 프로젝트 ID 접미사 (D85). 꼴 · 예약어가 틀리면 그것만 버리고 센다(모델 검사가 w 전체를 버리지 않게 먼저 본다)
+  let projectIdSuffix: string | undefined;
+  if ('x' in raw) {
+    if (checkProjectIdSuffix(raw.x).length === 0) projectIdSuffix = raw.x as string;
+    else out.notices.dropped++;
+  }
   const w = raw.w;
   const discard = () => { out.notices.discarded = true; return out; };
   if (!isObj(w) || Object.keys(w).some((k) => !W_KEYS.has(k))) return discard();
@@ -589,6 +597,7 @@ export function decodeWizardState(hash: string): DecodedWizard | undefined {
     provider: 'gcp', project,
     projectPicks: (pp as unknown[]).map((p) => longPick(p, n)).filter((p): p is WizardPick => p !== undefined),
     services,
+    ...(projectIdSuffix === undefined ? {} : { projectIdSuffix }),
   };
   const fixed = recoverPlan(plan, n);
   if (!fixed) return discard();
