@@ -55,7 +55,7 @@ const TOKEN_MEANING: Record<Token, UiKey> = {
   owner: 'doc_token_owner', system: 'doc_token_system', purpose: 'doc_token_purpose', env: 'doc_token_env', region: 'doc_token_region',
   slug: 'doc_token_slug', kind: 'doc_token_kind', tier: 'doc_token_tier', seq: 'doc_token_seq', role: 'doc_token_role',
 };
-const ENV_MEANING: Record<Env, UiKey> = { prod: 'doc_env_prod', stg: 'doc_env_stg', dev: 'doc_env_dev', sbx: 'doc_env_sbx' };
+const ENV_MEANING: Record<Env, UiKey> = { prod: 'doc_env_prod', stg: 'doc_env_stg', dev: 'doc_env_dev', sbx: 'doc_env_sbx', qa: 'doc_env_qa', uat: 'doc_env_uat', test: 'doc_env_test', perf: 'doc_env_perf', dr: 'doc_env_dr' };
 /** 약어 원칙 — 번호가 곧 순서다. catalog 의 slug.basis 가 「principle N」으로 가리킨다(시험이 N 이 모두 여기 있는지 센다) */
 export const ABBR_PRINCIPLES: readonly UiKey[] = ['doc_abbr_principle_1', 'doc_abbr_principle_2', 'doc_abbr_principle_3', 'doc_abbr_principle_4'];
 const KIND_RULE: Record<NonNullable<CatalogRow['kind']>['rule'], UiKey> = {

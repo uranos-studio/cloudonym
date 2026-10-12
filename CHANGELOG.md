@@ -6,7 +6,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".
 
-Rules revision for this release: 2026-10-12.2.
+Rules revision for this release: 2026-10-12.3.
 
 ### Added
 
@@ -26,6 +26,7 @@ Rules revision for this release: 2026-10-12.2.
 - **For AI coding agents** — `GET /llms.txt` (formulas, canonical values, regions, kind tokens, the tier token, attached resources, wizard presets, abbreviations with their sources, every rule), `GET /openapi.json` and `GET /catalog.json` (the resource catalog and region table of the enabled providers), all generated from the same data as the engine.
 - **Region codes per provider** (D49) — `asia-northeast3` → `ane3`. The `region` field takes a region or a zone, by name or by code, or `global`; global resources carry no region token.
 - **Multi-region and dual-region locations** (D78) — Cloud Storage buckets take `US`, `EU`, `ASIA` and the predefined dual-regions `ASIA1`, `EUR4`, `EUR5`, `EUR7`, `EUR8`, `NAM4`; BigQuery datasets take `US` and `EU`. Both now carry a region token, the region or the location code (`…-prod-us-gcs`). Other resources refuse a location (`name.location_unsupported`, 400 `context.location_unsupported` on the API); the wizard sets it per bucket or dataset pick with a **Location** select. A secret pick has the same select (D79): **Global** by default, with no region token, or **Regional** for a regional secret in the project region.
+- **Five more environment values** (D81) — `qa`, `uat`, `test`, `perf` and `dr` join `prod`, `stg`, `dev` and `sbx`, with the aliases `quality`, `acceptance`, `testing`, `tst`, `performance`, `load`, `disaster` and `recovery`. None of them is an abbreviation, kind token, tier or region or location code; all of them are now reserved as tiers.
 - **Kind token** (D52) — an optional value such as `POSTGRES` adds a short token after the abbreviation (`…-sql-pg-01`) when it differs from the provider default. Resource policies require one (`name.kind_required`).
 - **Resource catalog** (D46, D47, D54) — `catalog/gcp.json` and `catalog/regions.json` are the source for abbreviations, uniqueness classes, region-token kind, allowed kinds, descriptions and search aliases; `npm run catalog` writes the typed constants the engine uses. A collision test keeps abbreviations, kind tokens, region codes and environment values apart.
 - **Same-name conflicts** (D41, D47) — two items of the same uniqueness class with the same name are both `valid: false` with `name.conflict`, on `/v1/names` and on `/v1/generate`.

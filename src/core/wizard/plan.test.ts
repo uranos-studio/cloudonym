@@ -355,9 +355,9 @@ describe('위치 path (§5-5)', () => {
 
 describe('pick 의 위치 (D78)', () => {
   it('버킷 · BigQuery 데이터세트는 멀티 · 이중 리전 위치를 받는다 — 코드 · 이름 둘 다 · 이름에는 코드', () => {
-    const plan = svc({ preset: 'object', tier: 'logs', location: 'US' }, { preset: 'object', tier: 'dr', location: 'asia1' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' }, { preset: 'object' });
+    const plan = svc({ preset: 'object', tier: 'logs', location: 'US' }, { preset: 'object', tier: 'archive', location: 'asia1' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' }, { preset: 'object' });
     expect(validatePlan(plan)).toEqual({ ok: true });
-    expect(names(plan).slice(1)).toEqual(['platform-billing-shop-prod-us-gcs-logs', 'platform-billing-shop-prod-asia1-gcs-dr', 'billing_shop_prod_eu_bq', 'platform-billing-shop-prod-ane3-gcs']);
+    expect(names(plan).slice(1)).toEqual(['platform-billing-shop-prod-us-gcs-logs', 'platform-billing-shop-prod-asia1-gcs-archive', 'billing_shop_prod_eu_bq', 'platform-billing-shop-prod-ane3-gcs']);
     expect(expandPlan(plan).services[0]!.items[0]!.location).toBe('us');
   });
   it('받지 않는 위치 · 위치를 받지 않는 규칙 · 모르는 값은 wizard.invalid_location', () => {

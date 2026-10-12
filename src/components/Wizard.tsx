@@ -58,7 +58,7 @@ const CHIP =
 const ERR = 'text-xs text-rose-700 dark:text-rose-300';
 const STEP_NUM = 'mr-1.5 text-indigo-600 dark:text-indigo-400';
 
-const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox' };
+const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
 /** 규칙 표 — 표시 이름 · 종류 표 · custom 모달의 트리. 화면 안에서 한 번 만든다 */
 const TREE = buildTree('gcp');
 const RULES = new Map<string, ResourceRule>(treeRules(TREE).map((r) => [r.id, r]));

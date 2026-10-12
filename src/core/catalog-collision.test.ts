@@ -61,6 +61,22 @@ function collisions({ rows, regionCodes, envValues }: Input): string[] {
 // 멀티 · 이중 리전 코드(D78)도 지역 자리에 든다 — 약어 · 종류 토큰과 겹치면 안 된다
 const regionCodes = [...REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]), ...LOCATIONS.gcp.map((l) => l.code)];
 
+describe('환경 값 ↔ 지역 코드 (D81)', () => {
+  // 환경 별칭 전부가 어느 CSP 의 리전 · 존 코드 · 멀티/이중 리전 코드와도 같은 글자가 아니다 — 이름의 env 자리와 region 자리를 읽는 사람이 헷갈리지 않게
+  const allCodes = (Object.keys(REGIONS) as (keyof typeof REGIONS)[]).flatMap((p) => [
+    ...REGIONS[p].flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]),
+    ...LOCATIONS[p].map((l) => l.code),
+  ]).map((c) => c.toLowerCase());
+  const clash = (envs: readonly string[]) => envs.filter((e) => allCodes.includes(e));
+  it('검사기 자체 — ane3 · us 를 넣으면 잡는다', () => {
+    expect(clash([...ENV_VALUES, 'ane3', 'us'])).toEqual(['ane3', 'us']);
+  });
+  it('겹침 0', () => {
+    expect(allCodes.length).toBeGreaterThan(173);
+    expect(clash(ENV_VALUES)).toEqual([]);
+  });
+});
+
 describe('catalog 겹침 검사 (D47)', () => {
   it('검사기 자체 — ane3 · prod · sql · live(별칭) 를 약어로 넣으면 넷 다 잡는다', () => {
     const extra = ['ane3', 'prod', 'sql', 'live'].map((value, i) => ({ key: `gcp.fixture_${i}`, slug: { value, basis: 'x', previous: [] }, kind: null }));

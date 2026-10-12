@@ -41,7 +41,8 @@ export const BASELINE_CONTEXTS: readonly BaselineContext[] = [
   { id: 'label-aws-257', raw: { ...BASE, owner: 'o'.repeat(257) } },
   { id: 'label-aws-invalid-char', raw: { ...BASE, owner: 'team#1' } },
   { id: 'label-gcp-transform', raw: { ...BASE, owner: 'In.Fra' } },
-  { id: 'parse-env-qa', raw: { ...BASE, env: 'qa' } },
+  { id: 'parse-env-preprod', raw: { ...BASE, env: 'preprod' } },
+  { id: 'parse-env-acceptance', raw: { ...BASE, env: 'acceptance' } },
   { id: 'parse-region-mars', raw: { ...BASE, region: 'mars' } },
   // 옛 나라 값은 받지 않는다 — supported 는 그 CSP 의 한국 리전 이름 (D49)
   { id: 'region-country-kr', raw: { ...BASE, region: 'kr' } },
@@ -131,7 +132,7 @@ export function baselineItems(): { id: string; parse?: { ok: boolean; errors: nu
   const s = (id: string, type: string, extra: ItemExtra, purpose?: string) =>
     ({ id, result: generateItem(purpose === undefined ? service.context : { ...service.context, purpose }, getRule('gcp', type)!, extra) });
   const p = (id: string, type: string, extra: ItemExtra) => ({ id, result: generateItem(project.context, getRule('gcp', type)!, { ...extra, level: 'project' }) });
-  const bad = parseProjectContext({ owner: 1, env: 'qa', region: 'mars' }, 'gcp');
+  const bad = parseProjectContext({ owner: 1, env: 'preprod', region: 'mars' }, 'gcp');
   return [
     s('tier-web', 'compute_instance', { tier: 'web' }),
     s('tier-was-seq2', 'compute_instance', { tier: 'was', seq: '02' }),

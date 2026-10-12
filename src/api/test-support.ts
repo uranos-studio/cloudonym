@@ -122,7 +122,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await gen('generate-label-chars', { context: { ...SAMPLE_CTX, owner: 'team#1' }, providers: ['gcp'] });
   await gen('generate-env-alias', { context: { ...SAMPLE_CTX, env: 'production', region: 'koreacentral' } });
   await gen('generate-pinned-current', { context: SAMPLE_CTX, providers: ['gcp'], rules_version: rulesVersion });
-  await gen('400-env-qa', { context: { ...SAMPLE_CTX, env: 'qa' } });
+  await gen('400-env-preprod', { context: { ...SAMPLE_CTX, env: 'preprod' } });
   await gen('400-context-empty-and-mars', { context: { ...SAMPLE_CTX, owner: '', region: 'mars' } });
   await gen('400-providers-oci-twice', { context: SAMPLE_CTX, providers: ['oci', 'gcp', 'oci'] });
   await gen('400-providers-empty', { context: SAMPLE_CTX, providers: [] });
@@ -153,7 +153,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await names('400-names-too-many-items', pick(Array.from({ length: 201 }, () => ({ type: 'project_id' }))));
   await names('400-names-item-shapes', pick([1, { type: 'nope' }, { type: 'project_id' }, { type: 'project_id' }, { type: 'compute_instance', count: 0 }, { type: 'storage_bucket', count: 2 }, { type: 'iam_custom_role', role: 'db' }, { type: 'service_account', role: 'Sync' }]));
   await names('400-names-too-many-names', pick([{ type: 'compute_instance', count: 99 }, { type: 'disk', count: 99 }, { type: 'subnet', count: 3 }]));
-  await names('400-names-context-and-selection', { provider: 'gcp', context: { ...SAMPLE_CTX, env: 'qa' }, resources: [{ type: 'service_account', count: 2 }] });
+  await names('400-names-context-and-selection', { provider: 'gcp', context: { ...SAMPLE_CTX, env: 'preprod' }, resources: [{ type: 'service_account', count: 2 }] });
   // 종류 (D52) — 토큰이 붙는 값 · 기본값 · 필수 종류 · 토큰을 값 이름 자리에 넣은 400 · 필수 누락 400 · 종류 없는 규칙의 kind 400
   await names('names-kinds', { ...pick([{ type: 'cloud_sql_instance', count: 2, kind: 'POSTGRES' }, { type: 'resource_policy', kind: 'snapshot-schedule' }, { type: 'backend_service', kind: 'EXTERNAL_MANAGED' }]), context: { ...SAMPLE_CTX, region: 'asia-northeast3' } });
   await names('400-names-kind-token-not-value', pick([{ type: 'cloud_sql_instance', count: 2, kind: 'pg' }]));
@@ -170,7 +170,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await wiz('400-wizard-attach-data', { ...W, services: [], project_picks: [{ preset: null, rule: 'gcp.compute_instance', instances: [{ id: 'a', seq: '01', attach: { data: ['01', '00'] } }] }] });
   await wiz('400-wizard-empty', { ...W, project_picks: [], services: [] });
   await wiz('400-wizard-too-many-picks', { ...W, project_picks: Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] })), services: [] });
-  await wiz('400-wizard-project-context', { ...W, project: { ...W.project, env: 'qa' } });
+  await wiz('400-wizard-project-context', { ...W, project: { ...W.project, env: 'preprod' } });
   await wiz('400-wizard-unknown-rule', { ...W, services: [{ purpose: 'shop', picks: [{ preset: null, rule: 'gcp.nope' }] }] });
   await wiz('400-wizard-provider-not-enabled', { ...W, provider: 'aws' });
   await wiz('409-wizard-rules-version', { ...W, rules_version: '2026-01-01.1' });

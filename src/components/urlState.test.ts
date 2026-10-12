@@ -38,7 +38,7 @@ describe('decodeState — 깨진 hash 는 전부 undefined', () => {
     [`#state=${b64(null)}`, 'JSON 이 null 이다'],
     [`#state=${b64({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod' })}`, 'region 이 빠졌다'],
     [`#state=${b64({ ...ctx, owner: 42 })}`, '값이 숫자다'],
-    [`#state=${b64({ ...ctx, env: 'qa' })}`, 'env 가 지원 밖이다'],
+    [`#state=${b64({ ...ctx, env: 'preprod' })}`, 'env 가 지원 밖이다'],
     ['', '빈 hash'],
     ['#other=abc', '다른 키'],
     ['#state=', '값이 비었다'],

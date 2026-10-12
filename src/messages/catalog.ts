@@ -42,7 +42,7 @@ export const UI_KEYS = [
   'doc_token_kind', 'doc_token_tier', 'doc_token_seq', 'doc_token_role', 'doc_regions_title', 'doc_regions_body', 'doc_regions_caption',
   'doc_col_region', 'doc_col_code', 'doc_col_location', 'doc_col_zones', 'doc_zones_title', 'doc_zones_body',
   'doc_env_title', 'doc_env_body', 'doc_env_caption', 'doc_col_value', 'doc_env_prod', 'doc_env_stg',
-  'doc_env_dev', 'doc_env_sbx', 'doc_shrink_title', 'doc_shrink_body', 'doc_shrink_step1', 'doc_shrink_step2',
+  'doc_env_dev', 'doc_env_sbx', 'doc_env_qa', 'doc_env_uat', 'doc_env_test', 'doc_env_perf', 'doc_env_dr', 'doc_shrink_title', 'doc_shrink_body', 'doc_shrink_step1', 'doc_shrink_step2',
   'doc_shrink_step3', 'doc_abbr_title', 'doc_abbr_body', 'doc_abbr_principles_title', 'doc_abbr_principle_1',
   'doc_abbr_principle_2', 'doc_abbr_principle_3', 'doc_abbr_principle_4', 'doc_abbr_caption', 'doc_col_resource', 'doc_col_abbr',
   'doc_col_basis', 'doc_col_previous', 'doc_kinds_title', 'doc_kinds_body', 'doc_kinds_caption', 'doc_col_values',

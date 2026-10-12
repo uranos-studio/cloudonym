@@ -30,11 +30,11 @@ describe('normalizeToken', () => {
 });
 
 describe('canonicalEnv (TC-COM-02)', () => {
-  it.each([['production', 'prod'], ['prd', 'prod'], ['live', 'prod'], ['real', 'prod'], ['PRD', 'prod'], ['prod', 'prod'], ['staging', 'stg'], ['sandbox', 'sbx']])('%s → %s (D48)', (i, o) => {
+  it.each([['production', 'prod'], ['prd', 'prod'], ['live', 'prod'], ['real', 'prod'], ['PRD', 'prod'], ['prod', 'prod'], ['staging', 'stg'], ['sandbox', 'sbx'], ['qa', 'qa'], ['quality', 'qa'], ['UAT', 'uat'], ['acceptance', 'uat'], ['test', 'test'], ['testing', 'test'], ['tst', 'test'], ['perf', 'perf'], ['performance', 'perf'], ['load', 'perf'], ['dr', 'dr'], ['disaster', 'dr'], ['recovery', 'dr']])('%s → %s (D48)', (i, o) => {
     expect(canonicalEnv(i)).toBe(o);
   });
   it('모르는 값 · 상속 프로퍼티는 undefined', () => {
-    expect(canonicalEnv('qa')).toBeUndefined();
+    expect(canonicalEnv('preprod')).toBeUndefined();
     expect(canonicalEnv('constructor')).toBeUndefined();
   });
 });

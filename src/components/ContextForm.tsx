@@ -14,7 +14,7 @@ const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; pl
   { key: 'purpose', label: 'Purpose', hint: en.ui.field_purpose_hint, placeholder: en.ui.field_purpose_placeholder },
 ];
 /** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름만 여기 둔다(Record 라 값이 늘면 typecheck 가 잡는다) */
-const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox' };
+const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
 const ENVS: ReadonlyArray<{ value: Env; label: string }> = ENV_VALUES.map((value) => ({ value, label: `${value} — ${ENV_NAMES[value]}` }));
 
 const LABEL = 'block text-sm font-medium text-zinc-800 dark:text-zinc-200';

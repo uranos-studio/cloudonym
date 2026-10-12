@@ -191,7 +191,7 @@ describe('parseNamesBody (D39)', () => {
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'selection.count_not_supported', params: { index: 0, type: 'storage_bucket' } }] } });
   });
   it('문맥 오류와 선택 오류는 함께 낸다 — 문맥 먼저', () => {
-    const r = parseNamesBody({ ...ok, context: { ...ctx, env: 'qa' }, resources: [] });
+    const r = parseNamesBody({ ...ok, context: { ...ctx, env: 'preprod' }, resources: [] });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.rejection.errors.map((e) => e.code)).toEqual(['context.value_unsupported', 'selection.empty']);
   });
@@ -278,8 +278,8 @@ describe('parseWizardBody (D66) — 모양은 API 가, 마법사 검사는 core 
   });
 
   it('프로젝트 문맥 오류 — context.* 의 field 에 project. 접두', () => {
-    expect(errorsOf({ ...W, project: { ...W.project, env: 'qa' } })).toEqual([
-      { code: 'context.value_unsupported', field: 'project.env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] } },
+    expect(errorsOf({ ...W, project: { ...W.project, env: 'preprod' } })).toEqual([
+      { code: 'context.value_unsupported', field: 'project.env', params: { value: 'preprod', supported: ['prod', 'stg', 'dev', 'sbx', 'qa', 'uat', 'test', 'perf', 'dr'] } },
     ]);
     expect(errorsOf({ ...W, project: { system: 'billing', env: 'prod', region: 'global' } })).toEqual([{ code: 'context.not_string', field: 'project.owner' }]);
   });

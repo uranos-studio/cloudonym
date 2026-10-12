@@ -8,8 +8,14 @@ export const ENV_ALIASES: Record<string, Env> = {
   stg: 'stg', stage: 'stg', staging: 'stg',
   dev: 'dev', develop: 'dev', development: 'dev',
   sbx: 'sbx', sandbox: 'sbx',
+  // D81 — 넷 다음에 붙인다(표준값 순서 · 오류의 supported 순서가 앞 넷은 그대로). 표준값은 4자 이하라 hash 상한식의 env 'prod' 가 그대로 최악이다
+  qa: 'qa', quality: 'qa',
+  uat: 'uat', acceptance: 'uat',
+  test: 'test', testing: 'test', tst: 'test',
+  perf: 'perf', performance: 'perf', load: 'perf',
+  dr: 'dr', disaster: 'dr', recovery: 'dr',
 };
-/** env 표준값 — 별칭 표의 값을 표 순서대로 (prod · stg · dev · sbx) */
+/** env 표준값 — 별칭 표의 값을 표 순서대로 (prod · stg · dev · sbx · qa · uat · test · perf · dr) */
 export const ENV_VALUES: readonly Env[] = [...new Set(Object.values(ENV_ALIASES))];
 
 const STRIP: Record<Allowed, RegExp> = {

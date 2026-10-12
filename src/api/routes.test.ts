@@ -87,9 +87,9 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(body.data.gcp.service_account.name).toBe('billing-trade-prod-sa-sync');
   });
   it('잘못된 env → 400 { success:false, errors }', async () => {
-    const { res } = await post({ context: { ...ctx, env: 'qa' } });
+    const { res } = await post({ context: { ...ctx, env: 'preprod' } });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] }, message: "env 'qa' is not supported (prod, stg, dev, sbx)" }] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'preprod', supported: ['prod', 'stg', 'dev', 'sbx', 'qa', 'uat', 'test', 'perf', 'dr'] }, message: "env 'preprod' is not supported (prod, stg, dev, sbx, qa, uat, test, perf, dr)" }] });
   });
   it('본문이 JSON 이 아니면 400', async () => {
     const { res } = await req(app, '/v1/generate', { method: 'POST', body: 'not json' });

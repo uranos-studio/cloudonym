@@ -53,7 +53,7 @@ The resource tree is at `/pick` (header link **Pick resources**); a tree link op
 
 One line above the names says what **PASS** means (see [What PASS means](#what-pass-means)). The footer shows the engine and rules versions; a share link made with older rules shows a notice until you change the input.
 
-Allowed values — env: `prod` · `stg` · `dev` · `sbx` (aliases such as `prd`, `production`, `staging` are accepted and normalised) · region: a region or a zone of the provider, by name or by code (`asia-northeast3`, `asia-northeast3-a`, `ane3`, `ane3a`), or `global` — a zone is accepted and resolved to its region (names carry the region code, never a zone), and global resources carry no region token. The old country values `kr` and `jp` are rejected with the matching region names. Multi-region and dual-region locations (`US`, `EU`, `ASIA`, `ASIA1`, `EUR4`, `EUR5`, `EUR7`, `EUR8`, `NAM4`; by name or code) are accepted only for the types that take them — `storage_bucket` all nine, `bigquery_dataset` `US` and `EU` — so `/v1/names` takes one when every requested type with a region token supports it, and `/v1/generate` (every type) answers 400 `context.location_unsupported`. The locations and the types that take them are listed in `/llms.txt`. The region table is in `/llms.txt` and on the naming guide page `/docs/naming`.
+Allowed values — env: `prod` · `stg` · `dev` · `sbx` · `qa` · `uat` · `test` · `perf` · `dr` (aliases such as `prd`, `production`, `staging`, `acceptance`, `performance`, `recovery` are accepted and normalised) · region: a region or a zone of the provider, by name or by code (`asia-northeast3`, `asia-northeast3-a`, `ane3`, `ane3a`), or `global` — a zone is accepted and resolved to its region (names carry the region code, never a zone), and global resources carry no region token. The old country values `kr` and `jp` are rejected with the matching region names. Multi-region and dual-region locations (`US`, `EU`, `ASIA`, `ASIA1`, `EUR4`, `EUR5`, `EUR7`, `EUR8`, `NAM4`; by name or code) are accepted only for the types that take them — `storage_bucket` all nine, `bigquery_dataset` `US` and `EU` — so `/v1/names` takes one when every requested type with a region token supports it, and `/v1/generate` (every type) answers 400 `context.location_unsupported`. The locations and the types that take them are listed in `/llms.txt`. The region table is in `/llms.txt` and on the naming guide page `/docs/naming`.
 
 ### Share URL — your input is readable by anyone with the link
 
@@ -88,7 +88,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.3" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -131,7 +131,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -178,7 +178,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.3" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -209,7 +209,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-12.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-12.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -268,7 +268,7 @@ Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relati
 
 ## Supported resources (135 rules)
 
-**GCP 135** rules are enabled in this release (rules revision `2026-10-12.2`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
+**GCP 135** rules are enabled in this release (rules revision `2026-10-12.3`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
 
 The 35 hand-written rules below (the AWS and Azure rows among them are not enabled yet) are each checked against the official document linked. On top of them, **332 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md) (29 rows), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) (10 discovery methods, and the 23 of the 116 supported GCP asset types that have no rule: 5 held, 13 with no user-chosen name, 5 named outside this engine) and [docs/aws-intake-held.md](docs/aws-intake-held.md) (33 types). A further **44 GCP rules**, **42 AWS rules** and **30 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
 
@@ -417,7 +417,7 @@ See the LICENSE file for details.
 
 스크린샷 — [이름 마법사](docs/screenshots/06-wizard.png) · [데스크톱 밝은 화면](docs/screenshots/01-desktop-light.png) · [폭 360px](docs/screenshots/02-mobile-360.png) · [데스크톱 어두운 화면](docs/screenshots/03-desktop-dark.png) · [FAIL 카드](docs/screenshots/04-fail-card.png) · [이름 안내](docs/screenshots/05-naming-guide.png).
 
-허용값 — env: `prod` · `stg` · `dev` · `sbx`(`prd` · `production` · `staging` 같은 별칭도 받아 표준값으로 바꾼다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존은 받아 그 리전으로 푼다(이름에는 리전 코드만 들고 존은 들지 않는다). 전역 리소스에는 지역 토큰이 없다. 옛 나라 값 `kr` · `jp` 는 거부하고 해당 리전 이름을 알려 준다. 멀티 · 이중 리전 위치(`US` · `EU` · `ASIA` · `ASIA1` · `EUR4` · `EUR5` · `EUR7` · `EUR8` · `NAM4`, 이름이나 코드)는 그 위치를 받는 리소스에만 쓴다 — `storage_bucket` 은 아홉 전부, `bigquery_dataset` 은 `US` · `EU`. `/v1/names` 는 지역 토큰이 있는 요청 리소스가 전부 그 위치를 받을 때만 받고, 리소스 전부를 내는 `/v1/generate` 는 400 `context.location_unsupported` 로 답한다. 위치와 그 위치를 받는 리소스는 `/llms.txt` 에 있다. 지역 표는 `/llms.txt` 와 이름 안내 쪽 `/docs/naming` 에 있다.
+허용값 — env: `prod` · `stg` · `dev` · `sbx` · `qa` · `uat` · `test` · `perf` · `dr`(`prd` · `production` · `staging` · `acceptance` · `performance` · `recovery` 같은 별칭도 받아 표준값으로 바꾼다) · region: 그 CSP 의 리전 · 존을 이름이나 코드로(`asia-northeast3` · `asia-northeast3-a` · `ane3` · `ane3a`) 또는 `global` — 존은 받아 그 리전으로 푼다(이름에는 리전 코드만 들고 존은 들지 않는다). 전역 리소스에는 지역 토큰이 없다. 옛 나라 값 `kr` · `jp` 는 거부하고 해당 리전 이름을 알려 준다. 멀티 · 이중 리전 위치(`US` · `EU` · `ASIA` · `ASIA1` · `EUR4` · `EUR5` · `EUR7` · `EUR8` · `NAM4`, 이름이나 코드)는 그 위치를 받는 리소스에만 쓴다 — `storage_bucket` 은 아홉 전부, `bigquery_dataset` 은 `US` · `EU`. `/v1/names` 는 지역 토큰이 있는 요청 리소스가 전부 그 위치를 받을 때만 받고, 리소스 전부를 내는 `/v1/generate` 는 400 `context.location_unsupported` 로 답한다. 위치와 그 위치를 받는 리소스는 `/llms.txt` 에 있다. 지역 표는 `/llms.txt` 와 이름 안내 쪽 `/docs/naming` 에 있다.
 
 ### API 세 줄
 
@@ -466,7 +466,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 
 ### 지원 리소스
 
-이번 릴리스에서 켠 것은 **GCP 135** 개 규칙이다(규칙 버전 `2026-10-12.2` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-135-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 44개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
+이번 릴리스에서 켠 것은 **GCP 135** 개 규칙이다(규칙 버전 `2026-10-12.3` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 35개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-135-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 44개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
 
 ### 한계
 

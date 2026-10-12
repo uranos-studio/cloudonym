@@ -746,7 +746,7 @@
               "env": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: prod, stg, dev, sbx. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx).",
+                "description": "Canonical: prod, stg, dev, sbx, qa, uat, test, perf, dr. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx; quality -> qa; acceptance -> uat; testing, tst -> test; performance, load -> perf; disaster, recovery -> dr).",
                 "example": "prod"
               },
               "region": {
@@ -963,7 +963,7 @@
               "env": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: prod, stg, dev, sbx. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx).",
+                "description": "Canonical: prod, stg, dev, sbx, qa, uat, test, perf, dr. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx; quality -> qa; acceptance -> uat; testing, tst -> test; performance, load -> perf; disaster, recovery -> dr).",
                 "example": "prod"
               },
               "region": {
@@ -1600,15 +1600,20 @@
                 "code": "context.value_unsupported",
                 "field": "env",
                 "params": {
-                  "value": "qa",
+                  "value": "preprod",
                   "supported": [
                     "prod",
                     "stg",
                     "dev",
-                    "sbx"
+                    "sbx",
+                    "qa",
+                    "uat",
+                    "test",
+                    "perf",
+                    "dr"
                   ]
                 },
-                "message": "env 'qa' is not supported (prod, stg, dev, sbx)"
+                "message": "env 'preprod' is not supported (prod, stg, dev, sbx, qa, uat, test, perf, dr)"
               }
             ]
           },
@@ -1917,7 +1922,7 @@
               "env": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "Canonical: prod, stg, dev, sbx. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx).",
+                "description": "Canonical: prod, stg, dev, sbx, qa, uat, test, perf, dr. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx; quality -> qa; acceptance -> uat; testing, tst -> test; performance, load -> perf; disaster, recovery -> dr).",
                 "example": "prod"
               },
               "region": {

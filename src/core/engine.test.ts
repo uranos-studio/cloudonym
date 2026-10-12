@@ -72,7 +72,7 @@ describe('parseContext', () => {
     expect(parseContext({ ...ctx, env: 'prod' }, 'gcp')).toMatchObject({ ok: true, context: { env: 'prod' }, transformed: [] });
   });
   it('모르는 env · 문자열 아닌 값', () => {
-    expect(parseContext({ ...ctx, env: 'qa' }, 'gcp')).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'qa', supported: ['prod', 'stg', 'dev', 'sbx'] } }] });
+    expect(parseContext({ ...ctx, env: 'preprod' }, 'gcp')).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'preprod', supported: ['prod', 'stg', 'dev', 'sbx', 'qa', 'uat', 'test', 'perf', 'dr'] } }] });
     expect(parseContext({ ...ctx, owner: 3 }, 'gcp')).toMatchObject({ ok: false });
   });
   it('모르는 region 문구와 필드 순서', () => {
@@ -442,7 +442,7 @@ describe('parseProjectContext · generateItem — 용도 토큰 · 프로젝트 
     if (p.ok) expect('purpose' in p.context).toBe(false);
   });
   it('parseProjectContext — 넷의 판정 · 순서는 parseContext 와 같다', () => {
-    const p = parseProjectContext({ owner: 1, env: 'qa', region: 'mars' }, 'gcp');
+    const p = parseProjectContext({ owner: 1, env: 'preprod', region: 'mars' }, 'gcp');
     expect(p.ok).toBe(false);
     if (!p.ok) expect(p.errors.map((e) => [e.code, 'field' in e ? e.field : ''])).toEqual([
       ['context.not_string', 'owner'], ['context.not_string', 'system'], ['context.value_unsupported', 'env'], ['context.value_unsupported', 'region'],

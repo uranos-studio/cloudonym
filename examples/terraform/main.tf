@@ -83,7 +83,7 @@ variable "purpose" {
 
 variable "env" {
   type        = string
-  description = "Environment. Canonical codes: prod, stg, dev, sbx (the API also accepts common aliases such as prd or production)."
+  description = "Environment. Canonical codes: prod, stg, dev, sbx, qa, uat, test, perf, dr (the API also accepts common aliases such as prd or production)."
 }
 
 variable "region" {
