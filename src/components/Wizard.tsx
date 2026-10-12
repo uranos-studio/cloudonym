@@ -1,4 +1,4 @@
-// 이름 짓기 마법사 (D59 · D64 · D67 · D68) — ① 프로젝트 ② 서비스 ③ 용도 칩 ④ 선택지(HA · Serverless · 엔진) ⑤ 서버 줄마다 딸린 것 ⑥ 이름.
+// 이름 짓기 마법사 (D59 · D64 · D67 · D68 · D84) — ① 프로젝트 ② 필수 네트워크 ③ 서비스 ④ 용도 칩 ⑤ 선택지(HA · Serverless · 엔진) ⑥ 서버 줄마다 딸린 것 · 번호 없는 공용 추가 리소스 · ⑦ 이름.
 // 화면 상태는 마법사 모델(WizardPlan) 하나이고 URL hash `w` 에 실린다. 결과는 모델에서 매번 다시 만든다 — validatePlan → expandPlan → generateProject (D17 · D69).
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -213,7 +213,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="min-w-0 space-y-6">
-            {/* CSP — GCP 하나만 켜져 있다. 번호 없는 머리라 ①~⑥ 은 그대로 · hash 에 provider 키가 없어 이름 · 링크는 같다 (D75) */}
+            {/* CSP — GCP 하나만 켜져 있다. 번호 없는 머리라 ①~⑦ 은 그대로 · hash 에 provider 키가 없어 이름 · 링크는 같다 (D75) */}
             <div data-wizard-cloud className={PANEL}>
               <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
             </div>
@@ -221,9 +221,12 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
               <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectParsed.ok ? [] : projectParsed.errors} projectIds={projectIds} onChange={(project) => edit((p) => S.setProject(p, project))} />
             </div>
             <div className={PANEL}>
-              <ProjectResources plan={plan} errors={planErrors} edit={edit} onCustom={() => setCustom(null)} />
+              <NetworkSection plan={plan} errors={planErrors} edit={edit} />
             </div>
             <ServiceList plan={plan} errors={planErrors} serviceErrors={serviceErrors} edit={edit} onCustom={setCustom} />
+            <div className={PANEL}>
+              <SharedExtras plan={plan} errors={planErrors} edit={edit} onCustom={() => setCustom(null)} />
+            </div>
           </div>
           <div className="min-w-0">
             <div className={PANEL}>
@@ -309,18 +312,18 @@ function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, onChange }: 
   );
 }
 
-// ── 프로젝트 공용 — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄) · custom(프로젝트 수준 범위의 규칙만 — D74) ──
-function ProjectResources({ plan, errors, edit, onCustom }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void; onCustom: () => void }) {
+// ── ② 필수 네트워크 (D84) — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄 · PSA 대역)과 그 프리셋 pick ──
+// 모델은 projectPicks 하나다 — 이 칸은 프리셋 pick 만, 「Shared extra resources」는 custom pick 만 그린다(자리 번호 · path 는 모델 순서 그대로)
+function NetworkSection({ plan, errors, edit }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void }) {
   const firewall = presetOf('firewall');
   return (
-    <section aria-labelledby="wizard-project-resources" className="space-y-3">
-      <h2 id="wizard-project-resources" className="text-base font-semibold">{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
+    <section aria-labelledby="wizard-network" className="space-y-3">
+      <h2 id="wizard-network" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
       <div className="flex flex-wrap items-center gap-2">
         {S.PROJECT_PRESETS.filter((p) => !p.tierChoices).map((p) => (
           <button key={p.id} type="button" data-project-chip={p.id} aria-pressed={S.findPreset(plan, null, p.id) >= 0} className={CHIP}
             onClick={() => edit((x) => S.togglePreset(x, null, p.id))}>{p.label}</button>
         ))}
-        <button type="button" data-project-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
       </div>
       {firewall?.tierChoices && (
         <div className="flex flex-wrap items-center gap-2">
@@ -332,22 +335,39 @@ function ProjectResources({ plan, errors, edit, onCustom }: { plan: WizardPlan; 
         </div>
       )}
       <ErrorList errors={S.errorsAt(errors, 'projectPicks')} />
-      {plan.projectPicks.map((pick, i) => (
+      {S.projectPickIndexes(plan, 'network').map((i) => {
+        const pick = plan.projectPicks[i]!;
         // key 에 tier 를 넣지 않는다 — tier 입력칸이 글자마다 key 를 바꿔 다시 만들어지면 커서가 빠진다
-        <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />
-      ))}
+        return <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />;
+      })}
     </section>
   );
 }
 
-// ── ② 서비스 ──
+// ── 공용 추가 리소스 (D84 · 번호 없음) — 서비스 하나에 묶이지 않는 custom(프로젝트 수준 범위의 규칙만 — D74) ──
+function SharedExtras({ plan, errors, edit, onCustom }: { plan: WizardPlan; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void; onCustom: () => void }) {
+  return (
+    <section aria-labelledby="wizard-shared-extras" className="space-y-3">
+      <h2 id="wizard-shared-extras" className="text-base font-semibold">{en.ui.wizard_shared_extras} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_shared_extras_hint}</span></h2>
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" data-project-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
+      </div>
+      {S.projectPickIndexes(plan, 'extras').map((i) => {
+        const pick = plan.projectPicks[i]!;
+        return <PickPanel key={`p-${i}-${pick.preset ?? pick.ruleId}`} pick={pick} at={{ service: null, pick: i }} errors={errors} edit={edit} />;
+      })}
+    </section>
+  );
+}
+
+// ── ③ 서비스 ──
 function ServiceList({ plan, errors, serviceErrors, edit, onCustom }: {
   plan: WizardPlan; errors: PlanError[]; serviceErrors: CoreMessage[][]; edit: (fn: (p: WizardPlan) => WizardPlan) => void; onCustom: (service: number) => void;
 }) {
   return (
     <section aria-labelledby="wizard-services" className="space-y-4">
       <div className="space-y-1">
-        <h2 id="wizard-services" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_step_services}</h2>
+        <h2 id="wizard-services" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>3</span>{en.ui.wizard_step_services}</h2>
         <p className={HINT}>{en.ui.wizard_services_hint}</p>
       </div>
       {plan.services.map((_svc, i) => (
@@ -381,7 +401,7 @@ function ServiceCard({ index, plan, errors, contextErrors, edit, onCustom }: {
       <ErrorList id={`${id}-error`} errors={own} />
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold"><span aria-hidden="true" className={STEP_NUM}>3</span>{en.ui.wizard_step_purposes} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_purposes_hint}</span></h3>
+        <h3 className="text-sm font-semibold"><span aria-hidden="true" className={STEP_NUM}>4</span>{en.ui.wizard_step_purposes} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_purposes_hint}</span></h3>
         <div className="flex flex-wrap gap-2" role="group" aria-label={en.ui.wizard_step_purposes}>
           {S.SERVICE_PRESETS.filter((p) => p.group === undefined).map((p) => (
             <PurposeChip key={p.id} preset={p} pressed={S.findPreset(plan, index, p.id) >= 0} onClick={() => edit((x) => S.togglePreset(x, index, p.id))} />
@@ -412,7 +432,7 @@ function PurposeChip({ preset, pressed, onClick }: { preset: Preset; pressed: bo
   );
 }
 
-// ── ④ 선택지 · 서버 줄 ──
+// ── ⑤ 선택지 · 서버 줄 ──
 function pickTitle(pick: Pick): { title: string; custom: boolean } {
   const preset = pick.preset === null ? undefined : presetOf(pick.preset);
   if (preset) return { title: `${preset.label}${preset.tierChoices ? ` · ${pick.tier ?? preset.tier}` : ''}`, custom: false };
@@ -458,10 +478,10 @@ function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRef; erro
       </div>
       <ErrorList errors={own} />
 
-      {/* ④ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, tier 를 정하지 않은 pick 은 tier(D74), role 규칙(sa 칩 포함)은 역할 */}
+      {/* ⑤ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, tier 를 정하지 않은 pick 은 tier(D74), role 규칙(sa 칩 포함)은 역할 */}
       {(preset?.serverless || preset?.ha || kinds.length > 0 || locations.length > 0 || globalDefault || tierInput || roleInput) && (
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400"><span aria-hidden="true" className={STEP_NUM}>4</span>{en.ui.wizard_step_options}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400"><span aria-hidden="true" className={STEP_NUM}>5</span>{en.ui.wizard_step_options}</p>
           <div className="flex flex-wrap items-end gap-4">
             {preset?.serverless && (
               <div>
@@ -580,7 +600,7 @@ function InstanceRows({ pick, at, path, attachable, name, errors, edit }: {
   );
 }
 
-/** ⑤ 서버 줄마다 딸린 것 — 접힌 칸. 요약 줄은 이름 꼬리(boot · data-01 · ip · ipi)를 보인다 */
+/** ⑥ 서버 줄마다 딸린 것 — 접힌 칸. 요약 줄은 이름 꼬리(boot · data-01 · ip · ipi)를 보인다 */
 function AttachEditor({ attach, at, slot, path, errors, edit, baseId }: {
   attach: Attachments | undefined; at: S.PickRef; slot: number; path: string; errors: PlanError[]; edit: (fn: (p: WizardPlan) => WizardPlan) => void; baseId: string;
 }) {
@@ -597,7 +617,7 @@ function AttachEditor({ attach, at, slot, path, errors, edit, baseId }: {
   return (
     <details data-attached className="mt-2 rounded-md border border-zinc-200 bg-white px-2 py-1 dark:border-zinc-800 dark:bg-zinc-900">
       <summary className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
-        <span className="font-medium"><span aria-hidden="true" className={STEP_NUM}>5</span>{en.ui.wizard_step_attached}</span>
+        <span className="font-medium"><span aria-hidden="true" className={STEP_NUM}>6</span>{en.ui.wizard_step_attached}</span>
         <span data-attached-summary className={`font-mono ${HINT}`}>{summary.length > 0 ? summary.join(' · ') : en.ui.wizard_attached_none}</span>
       </summary>
       <div className="space-y-3 py-2">
@@ -643,7 +663,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
     const d = ref.current;
     if (d && !d.open) d.showModal();
   }, []);
-  const name = service === null ? en.ui.wizard_project_resources : plan.services[service]?.purpose || String((service ?? 0) + 1);
+  const name = service === null ? en.ui.wizard_shared_extras : plan.services[service]?.purpose || String((service ?? 0) + 1);
   // 프로젝트 공용 칸은 프로젝트 수준 범위의 규칙만 (D74)
   const tree = service === null ? S.PROJECT_CUSTOM_TREE : S.CUSTOM_TREE;
   const onChange = (next: Picked) => {
@@ -667,7 +687,7 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
   );
 }
 
-// ── ⑥ 이름 ──
+// ── ⑦ 이름 ──
 function WizardResults({ plan, results, errors, projectContext }: { plan: WizardPlan; results: EnvResult[] | undefined; errors: PlanError[]; projectContext: Parameters<typeof toWizardExport>[1] | undefined }) {
   const empty = errors.some((e) => e.code === 'wizard.empty');
   const wide = errors.filter((e) => e.path === undefined && e.code !== 'wizard.empty' && !('field' in e));
@@ -676,7 +696,7 @@ function WizardResults({ plan, results, errors, projectContext }: { plan: Wizard
   return (
     <section id="names" aria-labelledby="wizard-names" className="space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>6</span>{en.ui.wizard_step_names}</h2>
+        <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>7</span>{en.ui.wizard_step_names}</h2>
         {results && (
           <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
             ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'

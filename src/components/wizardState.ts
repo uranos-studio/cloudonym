@@ -309,6 +309,12 @@ export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: n
   return updateSlot(plan, ref, slot, (s) => withAttach(s, (a) => ({ ...a, data: (a.data ?? []).map((d, i) => (i === disk ? seq : d)) })));
 }
 
+// ── 프로젝트 공용 칸의 두 자리 (D84) ──
+/** 프로젝트 공용 pick 의 자리 번호 — ② Required network 는 프리셋 pick, 「Shared extra resources」는 custom pick. 모델은 projectPicks 하나이고 자리 번호(path)는 그대로다 */
+export function projectPickIndexes(plan: WizardPlan, where: 'network' | 'extras'): number[] {
+  return plan.projectPicks.flatMap((p, i) => ((p.preset !== null) === (where === 'network') ? [i] : []));
+}
+
 // ── 검사 결과를 자리로 ──
 /** pick 의 path 머리 — services[1].picks[0] · projectPicks[2] */
 export function pickPath(ref: PickRef): string {

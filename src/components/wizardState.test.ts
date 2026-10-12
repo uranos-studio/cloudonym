@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, type PickRef,
+  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
@@ -308,5 +308,16 @@ describe('VPC 는 하나로 시작한다 (D75)', () => {
     expect(singleSlot(p.projectPicks[0]!)).toBe(false);
     ok(p);
     expect(singleSlot(togglePreset(initialPlan(), null, 'subnet').projectPicks[0]!)).toBe(false);
+  });
+});
+
+describe('프로젝트 공용 칸의 두 자리 (D84) — ② 네트워크는 프리셋 pick, Shared extra resources 는 custom pick', () => {
+  it('섞어 넣어도 자리 번호(path)는 모델 순서 그대로이고 두 칸이 겹치지 않는다', () => {
+    let p = togglePreset(initialPlan(), null, 'vpc');
+    p = addCustom(p, null, { ruleId: 'gcp.storage_bucket', input: 'none' });
+    p = togglePreset(p, null, 'subnet');
+    expect(projectPickIndexes(p, 'network')).toEqual([0, 2]);
+    expect(projectPickIndexes(p, 'extras')).toEqual([1]);
+    expect(projectPickIndexes(initialPlan(), 'network')).toEqual([]);
   });
 });

@@ -24,7 +24,7 @@ const BUTTON =
 
 const isEnabled = (p: Provider): boolean => ENABLED_PROVIDERS.includes(p);
 
-/** numbered 가 false 면 머리에 단계 번호를 붙이지 않는다 — 마법사는 ①~⑥ 번호를 그대로 두고 그 위에 「Cloud」 를 둔다 (D75) */
+/** numbered 가 false 면 머리에 단계 번호를 붙이지 않는다 — 마법사는 ①~⑦ 번호를 그대로 두고 그 위에 「Cloud」 를 둔다 (D75) */
 export function CloudPicker({ value, onPick, numbered = true }: { value: Provider | undefined; onPick: (p: Provider) => void; numbered?: boolean }) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   // 방향키가 오가는 자리 — 켜진 버튼의 PROVIDERS 안 위치
