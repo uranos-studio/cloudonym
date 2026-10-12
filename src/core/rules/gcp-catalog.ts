@@ -307,7 +307,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.storage_bucket": {
         "scope": "namespace",
-        "regionToken": "none"
+        "regionToken": "region"
       }
     },
     "slug": {
@@ -4430,7 +4430,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.bigquery_dataset": {
         "scope": "project",
-        "regionToken": "none"
+        "regionToken": "region"
       }
     },
     "slug": {

@@ -2,7 +2,7 @@
 import { PROVIDERS, type GenerateOutput, type NameResult, type NamingContext, type ProjectContext, type Provider, type RawContext, type ResourceRule, type Token } from './types';
 import { RULES, getRule, rulesFor } from './constraints';
 import { ENV_VALUES, canonicalEnv, normalizeToken } from './normalize';
-import { canonicalRegion, regionCandidates } from './regions';
+import { canonicalLocation, canonicalRegion, locationMismatch, locationRuleTypes, regionCandidates } from './regions';
 import { compose, kindTokenOfRule, tokenValues, type ItemExtra } from './compose';
 import { findConflicts } from './conflict';
 import type { InstanceSlot, SelectionItem } from './selection';
@@ -57,6 +57,9 @@ function generateOne(ctx: NamingContext | ProjectContext, rule: ResourceRule, ex
   // 종류가 필수인 규칙(리소스 정책)에 종류가 없다 (D52) — generate · generateMany 둘 다 여기를 지난다.
   // 이름 · 단계는 종류 없이 만든 그대로 두고 판정만 FAIL 로 한다(쓸 수 있는 이름이 아니다)
   if (rule.kinds?.rule === 'required' && extra.kind === undefined) violations.unshift({ code: 'name.kind_required', params: { supported: [...rule.kinds.allowed] } });
+  // 멀티 · 이중 리전 위치를 받지 않는 규칙이다 (D78) — 이름은 만든 그대로 두고 판정만 FAIL 로 한다(그 위치에 둘 수 없는 리소스다)
+  const loc = locationMismatch(ctx.region, rule);
+  if (loc) violations.unshift({ code: 'name.location_unsupported', params: { location: loc.location, supported: locationRuleTypes(loc) } });
   return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
 }
 
@@ -209,8 +212,10 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
   type Built = { item: NameItem; rule: ResourceRule; children: { attach: AttachKind; seq?: string }[] };
   const parents: Built[] = [];
 
-  const add = (ctx: NamingContext | ProjectContext, namespace: string, it: SelectionItem, level: 'project' | undefined) => {
-    const { rule, count, role, kind, tier, instances } = it;
+  const add = (base: NamingContext | ProjectContext, namespace: string, it: SelectionItem, level: 'project' | undefined) => {
+    const { rule, count, role, kind, tier, instances, location } = it;
+    // pick 의 위치(D78) — 멀티 · 이중 리전 코드가 문맥의 지역 자리를 대신한다(존은 없다)
+    const ctx: NamingContext | ProjectContext = location === undefined ? base : (({ zone: _zone, ...rest }) => ({ ...rest, region: location }))(base);
     if (rule.provider !== provider) throw new Error(`rule ${rule.id} is not a ${provider} rule`);
     const token = kind === undefined ? null : kindTokenOfRule(rule, kind);
     const lv = level === undefined ? {} : { level };
@@ -341,6 +346,13 @@ function parseFields(raw: RawContext, provider: Provider, fields: readonly Conte
       vals[f] = c;
     } else if (f === 'region') {
       const c = canonicalRegion(v, provider);
+      // 멀티 · 이중 리전 위치(US · ASIA1)는 코드로 받는다 (D78) — 받는 규칙인지는 이름마다 본다(generateOne 의 name.location_unsupported)
+      const loc = c ? undefined : canonicalLocation(v, provider);
+      if (loc) {
+        if (loc.code !== v) transformed.push({ code: 'context.normalized', field: 'region', params: { from: clipForDisplay(v), to: loc.code } });
+        vals[f] = loc.code;
+        continue;
+      }
       if (!c) { errors.push({ code: 'context.value_unsupported', field: 'region', params: { value: clipForDisplay(v), supported: regionCandidates(v, provider) } }); continue; }
       // 이름에 들어가는 리전 코드와 입력이 다르면 기록한다 — 리전 · 존의 이름 · 존 코드는 리전 코드로 바뀐다 (D50 revised).
       // 존 코드는 문맥의 zone 에 남는다(입력 왕복 · 표시용) — 이름에는 쓰지 않는다

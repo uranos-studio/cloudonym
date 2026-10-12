@@ -84,3 +84,13 @@ describe('ResultCard — 마법사 항목 (D62 · D69)', () => {
     expect(m).toContain('billing-shop-prod-ane3-gce-web-01</code>');
   });
 });
+
+describe('ResultCard — 축소 안내', () => {
+  it('축소된 이름은 「Shortened — 단계 (originally N characters)」 · 축소 없는 SA(D77)에는 안내가 없다', () => {
+    const long = { ...ctx, system: 'x'.repeat(50) };
+    const vm = generateMany(long, 'gcp', [{ rule: getRule('gcp', 'compute_instance')!, count: 1 }]).items[0]!;
+    expect(vm.isTruncated).toBe(true);
+    expect(html(vm)).toContain(`Shortened — Dropped optional token &#x27;region&#x27; · Shortened variable tokens to 25 characters each (originally ${vm.original.length} characters)`);
+    expect(html(generate(ctx, ['gcp']).gcp!.service_account)).not.toContain('data-steps');
+  });
+});

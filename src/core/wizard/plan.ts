@@ -5,6 +5,7 @@ import { RULES, rulesFor } from '../constraints';
 import { DEFAULT_ROLE, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection, type ServiceSelection } from '../engine';
 import type { CoreMessage } from '../messages';
 import { MAX_NAMES, SEQ_PATTERN, validateSelection, type Attachments, type InstanceSlot, type SelectionItem } from '../selection';
+import { canonicalLocation, locationRuleTypes, locationsFor } from '../regions';
 import { RESERVED_TIERS } from '../tier';
 import { inputKind } from '../tree';
 import { TIER_PATTERN, type ResourceRule, type ScopeId } from '../types';
@@ -39,6 +40,8 @@ export interface Pick {
   serverless?: string | null;
   /** count 규칙에만(1~99) */
   instances?: WizardSlot[];
+  /** 멀티 · 이중 리전 위치(D78) — 그 위치를 받는 규칙(버킷 · BigQuery 데이터세트)에만. 없으면 프로젝트 지역. 코드(us) · 이름(US) 둘 다 받는다 */
+  location?: string;
 }
 export interface WizardPlan {
   provider: 'gcp';
@@ -141,6 +144,13 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
       else if (RESERVED_TIERS.has(pick.tier)) push({ code: 'wizard.tier_reserved', params: { index, value: pick.tier } });
     }
 
+    // 위치 (D78) — 그 규칙이 받는 멀티 · 이중 리전 위치여야 한다
+    if (pick.location !== undefined) {
+      const accepts = locationsFor(rule);
+      const hit = typeof pick.location === 'string' ? canonicalLocation(pick.location, 'gcp') : undefined;
+      if (!hit || !accepts.includes(hit)) push({ code: 'wizard.invalid_location', params: { index, type, value: shown(pick.location), supported: accepts.map((l) => l.location) } });
+    }
+
     // 같은 (type, tier, role, level) 둘 — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다
     const role = typeof pick.role === 'string' ? pick.role : input === 'role' ? DEFAULT_ROLE : '';
     const dup = `${type}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
@@ -193,6 +203,11 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
   const errors: PlanError[] = [];
   const ctx = parseProjectContext(plan.project ?? {}, 'gcp');
   if (!ctx.ok) errors.push(...ctx.errors);
+  // 프로젝트 지역은 단일 리전이다 — 멀티 · 이중 리전 위치는 그 위치를 받는 pick 의 location 으로 준다 (D78)
+  const projectLocation = ctx.ok ? canonicalLocation(ctx.context.region, 'gcp') : undefined;
+  if (projectLocation) {
+    errors.push({ code: 'context.location_unsupported', field: 'region', params: { value: shown(plan.project.region), supported: locationRuleTypes(projectLocation) } });
+  }
 
   if (projectPicks.length > MAX_PICKS_PER_SERVICE) {
     errors.push({ code: 'wizard.too_many_picks', params: { index: -1, max: MAX_PICKS_PER_SERVICE, actual: projectPicks.length }, path: 'projectPicks' });
@@ -238,6 +253,7 @@ export function expandPlan(plan: WizardPlan): ProjectSelection {
       ...(pick.kind === undefined ? {} : { kind: pick.kind }),
       ...(tier === undefined ? {} : { tier }),
       ...(level === undefined ? {} : { level }),
+      ...(pick.location === undefined ? {} : { location: canonicalLocation(pick.location, 'gcp')!.code }),
       ...(counted ? { instances: slots.map((s): InstanceSlot => ({ seq: s.seq, ...(s.attach === undefined ? {} : { attach: s.attach }) })) } : {}),
     };
   };

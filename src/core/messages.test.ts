@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { MESSAGE_CODES } from './messages';
 
 describe('엔진 메시지 코드 (D23)', () => {
-  it('92개 — name.zone_required 삭제 (D50 revised) · 딸린 것 일곱 (D62) · 마법사 모델 스물하나 (D64) · 중복 없음 · 꼴 영역.이름', () => {
-    expect(MESSAGE_CODES).toHaveLength(92);
-    // 마법사 검사 코드는 계획 §5-5 표의 스물여섯
-    expect(MESSAGE_CODES.filter((c) => c.startsWith('wizard.'))).toHaveLength(26);
+  it('95개 — name.zone_required 삭제 (D50 revised) · 딸린 것 일곱 (D62) · 마법사 모델 스물둘 (D64 · D78) · 위치 둘 (D78) · 중복 없음 · 꼴 영역.이름', () => {
+    expect(MESSAGE_CODES).toHaveLength(95);
+    // 마법사 검사 코드는 계획 §5-5 표의 스물여섯 + 위치(D78)
+    expect(MESSAGE_CODES.filter((c) => c.startsWith('wizard.'))).toHaveLength(27);
     for (const c of ['name.parent_invalid', 'name.parent_name', 'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range',
                      'wizard.invalid_data_seq', 'wizard.duplicate_seq']) expect(MESSAGE_CODES as readonly string[]).toContain(c);
     expect(MESSAGE_CODES as readonly string[]).not.toContain('name.zone_required');

@@ -315,9 +315,12 @@ describe('지역 · 존 (D49 · D50 · D51)', () => {
     expect(parse('kr', 'aws')).toMatchObject({ ok: false, errors: [{ params: { supported: ['ap-northeast-2'] } }] });
     expect(parse('kr', 'azure')).toMatchObject({ ok: false, errors: [{ params: { supported: ['koreacentral', 'koreasouth'] } }] });
   });
-  it('us 는 GCP 미국 리전 9개 · 모르는 값은 GCP 리전 이름 43개', () => {
+  it('jp 는 GCP 일본 리전 2개 · 모르는 값은 GCP 리전 이름 43개 · us 는 멀티 리전 위치 US 로 받는다 (D78)', () => {
     const supported = (v: string) => { const r = parse(v); return r.ok ? [] : (r.errors[0] as { params: { supported: string[] } }).params.supported; };
-    expect(supported('us')).toHaveLength(9);
+    expect(supported('jp')).toEqual(['asia-northeast1', 'asia-northeast2']);
+    expect(parse('us')).toEqual({ ok: true, context: { ...raw, region: 'us' }, transformed: [] });
+    expect(parse('US')).toEqual({ ok: true, context: { ...raw, region: 'us' }, transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'US', to: 'us' } }] });
+    expect(parse('us', 'aws')).toMatchObject({ ok: false, errors: [{ code: 'context.value_unsupported', field: 'region' }] });
     expect(supported('mars')).toHaveLength(43);
     expect(supported('mars')[0]).toBe('africa-south1');
   });
@@ -709,5 +712,21 @@ describe('projectItemKey · serviceNamespace · attachName (D69)', () => {
     expect(attachName(parent, { attach: 'boot' })).toMatchObject({ name: 'billing-shop-prod-ane3-gce-01-boot', valid: true });
     const sqlItem = generateProject(oneService('shop', [{ rule: getRule('gcp', 'cloud_sql_instance')!, count: 1, kind: 'POSTGRES' }]), 'gcp').items[1]!;
     expect(() => attachName(sqlItem, { attach: 'boot' })).toThrow();
+  });
+});
+
+describe('멀티 · 이중 리전 위치 (D78)', () => {
+  const at = (region: string) => { const p = parseContext({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region }, 'gcp'); if (!p.ok) throw new Error(region); return p.context; };
+  const pick = (type: string) => ({ rule: getRule('gcp', type)!, count: 1 });
+  it('버킷 · BigQuery 데이터세트는 위치 코드를 지역 자리에 넣는다', () => {
+    const out = generateMany(at('US'), 'gcp', [pick('storage_bucket'), pick('bigquery_dataset')]);
+    expect(out.items.map((i) => [i.name, i.valid])).toEqual([['platform-billing-trade-prod-us-gcs', true], ['billing_trade_prod_us_bq', true]]);
+    expect(generateMany(at('ASIA1'), 'gcp', [pick('storage_bucket')]).items[0]).toMatchObject({ name: 'platform-billing-trade-prod-asia1-gcs', valid: true });
+  });
+  it('받지 않는 규칙은 valid:false + name.location_unsupported — 지역 토큰이 없는 규칙은 그대로', () => {
+    const out = generateMany(at('us'), 'gcp', [pick('compute_instance'), pick('vpc_network')]);
+    expect(out.items[0]).toMatchObject({ valid: false, violations: [{ code: 'name.location_unsupported', params: { location: 'US', supported: ['storage_bucket', 'bigquery_dataset'] } }] });
+    expect(out.items[1]).toMatchObject({ name: 'billing-trade-prod-vpc-01', valid: true });
+    expect(generateMany(at('asia'), 'gcp', [pick('bigquery_dataset')]).items[0]).toMatchObject({ valid: false, violations: [{ code: 'name.location_unsupported', params: { location: 'ASIA', supported: ['storage_bucket'] } }] });
   });
 });

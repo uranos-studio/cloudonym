@@ -511,6 +511,14 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     // 같은 키 — 다시 인코딩해도 같은 문자열
     expect(encodeWizardState(back.plan!, WV)).toBe(enc);
   });
+  it('pick 의 위치(D78)는 키 l 로 왕복한다', () => {
+    const plan = one({ preset: 'object', location: 'us' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' });
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    const enc = encodeWizardState(plan)!;
+    const json = JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
+    expect(json.w.s[0].p).toEqual([{ pr: 'object', l: 'us' }, { ru: 'gcp.bigquery_dataset', l: 'eu' }]);
+    expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
+  });
   it('custom pick(ruleId · tier · role) · serverless 짧은 값도 왕복한다', () => {
     const plan = one(
       { preset: null, ruleId: 'gcp.compute_instance', tier: 'batch', instances: [{ id: '1', seq: '03', attach: { ipi: true } }] },

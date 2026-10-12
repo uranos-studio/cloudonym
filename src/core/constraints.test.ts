@@ -225,7 +225,7 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
 
   it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 19 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(61);
+    expect(none).toHaveLength(59);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -287,8 +287,8 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.compute_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
     expect(RULES['aws.ec2_instance']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
     expect(RULES['azure.virtual_machine']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier', 'seq']);
-    expect(RULES['gcp.storage_bucket']!.template).toEqual(['owner', 'system', 'purpose', 'env', 'slug', 'tier']);
-    expect(RULES['gcp.bigquery_dataset']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'tier']);
+    expect(RULES['gcp.storage_bucket']!.template).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'slug', 'tier']);
+    expect(RULES['gcp.bigquery_dataset']!.template).toEqual(['system', 'purpose', 'env', 'region', 'slug', 'tier']);
     expect(RULES['gcp.spanner_instance_config']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
     expect(RULES['gcp.iam_custom_role']!.template).toEqual(['slug', 'tier', 'system', 'purpose', 'env']);
     expect(RULES['gcp.project_id']!.template).not.toContain('tier');

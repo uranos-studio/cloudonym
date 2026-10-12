@@ -98,14 +98,14 @@ describe('regionToken 불변식 (§4-1)', () => {
     'gcp.spanner_database', 'gcp.spanner_backup', 'gcp.artifact_registry_rule', 'gcp.cloud_sql_database', 'gcp.cloud_sql_user', 'gcp.router_nat'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 34 + 8 + 19 · region 72 — zone 은 없다 (D50 revised · D77)', () => {
+  it('none 34 + 6 + 19 · region 74 — zone 은 없다 (D50 revised · D77 · D78)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([61, 0, 72]);
-    // none 의 내역 — gcp:project_global 34 · 그 밖 8(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할 · BigQuery 데이터세트 · DNS 영역 · Pub/Sub 둘)
+    expect([count('none'), count('zone'), count('region')]).toEqual([59, 0, 74]);
+    // none 의 내역 — gcp:project_global 34 · 그 밖 6(Project ID · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘) — 버킷 · BigQuery 데이터세트는 D78 로 region
     // · D77 의 19(위치가 없는 리소스 · 부모의 위치를 물려받는 자식)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
     expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(34);
-    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global' && !D77.includes(id)).sort()).toEqual(['gcp.bigquery_dataset', 'gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.project_id', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
+    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global' && !D77.includes(id)).sort()).toEqual(['gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.project_id', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config']);
     for (const id of D77) expect(none, id).toContain(id);
   });
 

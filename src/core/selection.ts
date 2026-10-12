@@ -16,6 +16,8 @@ export interface InstanceSlot { seq: string; attach?: Attachments }
 export interface SelectionItem {
   rule: ResourceRule; count: number; role?: string; kind?: string;
   tier?: string;
+  /** 멀티 · 이중 리전 코드(D78) — 마법사 pick 만. 문맥의 지역 대신 이름에 든다 */
+  location?: string;
   level?: 'project';
   instances?: readonly InstanceSlot[];
 }

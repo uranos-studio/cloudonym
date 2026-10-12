@@ -77,7 +77,8 @@ const GCP_HAND_RULES: Record<string, ResourceRule> = {
     pattern: /^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true,
     forbidden: { prefixes: ['goog'], contains: ['google', 'g00gle', '..'], ipv4: true },
-    template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
+    // 지역 자리 (D78) — 리전 · 멀티/이중 리전(us · asia1) 코드. owner 를 먼저 뗀다
+    template: ['owner', 'system', 'purpose', 'env', 'region', 'slug'], optional: ['owner', 'region'],
     scope: 'gcp:namespace', entity: 'storage.buckets', category: 'storage', uniqueness: 'csp',
     docUrl: 'https://docs.cloud.google.com/storage/docs/buckets#naming',
     notes: [{ code: 'note.gcs_dotted_names_222' }],

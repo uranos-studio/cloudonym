@@ -273,7 +273,7 @@
       "rules": {
         "gcp.storage_bucket": {
           "scope": "namespace",
-          "regionToken": "none"
+          "regionToken": "region"
         }
       },
       "slug": {
@@ -4396,7 +4396,7 @@
       "rules": {
         "gcp.bigquery_dataset": {
           "scope": "project",
-          "regionToken": "none"
+          "regionToken": "region"
         }
       },
       "slug": {

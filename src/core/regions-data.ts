@@ -1,9 +1,11 @@
 // 생성 파일 — 손으로 고치지 않는다. scripts/catalog/build-catalog.mjs 가 catalog/regions.json 에서 만든다 (D46 · D49).
-// 지역 코드 표 — GCP 는 리전 · 존, AWS · Azure 는 리전만. status: GCP final · AWS · Azure draft
+// 지역 코드 표 — GCP 는 리전 · 존 · 멀티/이중 리전 위치, AWS · Azure 는 리전만. status: GCP final · AWS · Azure draft
 import type { Provider } from './types';
 
 export interface ZoneEntry { zone: string; code: string }
 export interface RegionEntry { region: string; code: string; zones: readonly ZoneEntry[]; label: string }
+/** 멀티 · 이중 리전 위치 (D78) — 받는 규칙만 받는다. rules 는 규칙 id → 그 위치를 적은 공식 문서 URL */
+export interface LocationEntry { location: string; code: string; type: 'multi-region' | 'dual-region'; label: string; rules: Readonly<Record<string, string>> }
 
 export const REGIONS_META = {
   "gcp": {
@@ -1394,4 +1396,94 @@ export const REGIONS: Readonly<Record<Provider, readonly RegionEntry[]>> = {
       "label": "West US 3"
     }
   ]
+};
+
+export const LOCATIONS: Readonly<Record<Provider, readonly LocationEntry[]>> = {
+  "gcp": [
+    {
+      "location": "US",
+      "code": "us",
+      "type": "multi-region",
+      "label": "Data centers in the United States",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#location-mr",
+        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions"
+      }
+    },
+    {
+      "location": "EU",
+      "code": "eu",
+      "type": "multi-region",
+      "label": "Data centers within member states of the European Union",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#location-mr",
+        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions"
+      }
+    },
+    {
+      "location": "ASIA",
+      "code": "asia",
+      "type": "multi-region",
+      "label": "Data centers in Asia, excluding Hong Kong and Indonesia",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#location-mr"
+      }
+    },
+    {
+      "location": "ASIA1",
+      "code": "asia1",
+      "type": "dual-region",
+      "label": "Tokyo + Osaka (asia-northeast1 + asia-northeast2)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    },
+    {
+      "location": "EUR4",
+      "code": "eur4",
+      "type": "dual-region",
+      "label": "Finland + Netherlands (europe-north1 + europe-west4)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    },
+    {
+      "location": "EUR5",
+      "code": "eur5",
+      "type": "dual-region",
+      "label": "Belgium + London (europe-west1 + europe-west2)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    },
+    {
+      "location": "EUR7",
+      "code": "eur7",
+      "type": "dual-region",
+      "label": "London + Frankfurt (europe-west2 + europe-west3)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    },
+    {
+      "location": "EUR8",
+      "code": "eur8",
+      "type": "dual-region",
+      "label": "Frankfurt + Zürich (europe-west3 + europe-west6)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    },
+    {
+      "location": "NAM4",
+      "code": "nam4",
+      "type": "dual-region",
+      "label": "Iowa + South Carolina (us-central1 + us-east1)",
+      "rules": {
+        "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#predefined"
+      }
+    }
+  ],
+  "aws": [],
+  "azure": []
 };

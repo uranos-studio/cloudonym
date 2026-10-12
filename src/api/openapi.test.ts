@@ -190,7 +190,7 @@ describe('public/openapi.json — /wizard (D66)', () => {
     expect(r.properties['services']!.items!.properties!['purpose']!.maxLength).toBe(MAX_CONTEXT_CHARS);
     expect(r.properties['project_picks']!.items!.$ref).toBe('#/components/schemas/WizardPick');
     const pick = schemas['WizardPick']!.properties!;
-    expect(keys(pick)).toEqual(['ha', 'instances', 'kind', 'preset', 'role', 'rule', 'serverless', 'tier']);
+    expect(keys(pick)).toEqual(['ha', 'instances', 'kind', 'location', 'preset', 'role', 'rule', 'serverless', 'tier']);
     expect(pick['preset']!.description).toContain(PRESETS.map((x) => x.id).join(', '));
     expect(r.properties['rules_version']!.maxLength).toBe(1024);
   });

@@ -217,7 +217,8 @@ const RULES: ResourceRule[] = [
   // 안내서 "the dataset name must be unique for each project" · "Dataset names cannot contain spaces or special characters such as -, &, @, or %." —
   // 하이픈이 없어 밑줄로 잇는다(D72). 최소 길이 문장이 없어 1. 밑줄로 시작하면 숨김 데이터세트다 — 생성은 system 으로 시작한다
   rule({ id: 'gcp.bigquery_dataset', displayName: 'BigQuery Dataset', slug: 'bq', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_]{1,1024}$/, ...UNDERSCORE,
-    caseRule: 'any', startsWithLetter: false, template: ['system', 'purpose', 'env', 'slug'], scope: 'gcp:project', entity: 'bigquery.datasets', category: 'database',
+    // 지역 자리 (D78) — 리전 · 멀티 리전(us · eu) 코드
+    caseRule: 'any', startsWithLetter: false, template: ['system', 'purpose', 'env', 'region', 'slug'], scope: 'gcp:project', entity: 'bigquery.datasets', category: 'database',
     docUrl: 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id', uniquenessDocUrl: 'https://docs.cloud.google.com/bigquery/docs/datasets#dataset-naming' }),
   // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
   // Must end with a number or a letter. Must be unique within the customer project / location"

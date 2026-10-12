@@ -89,16 +89,21 @@ export function renderRegions(regions) {
   const gcp = regions.gcp.map((r) => ({ region: r.region, code: r.code, zones: r.zones, label: r.location }));
   const aws = regions.aws.map((r) => ({ region: r.region, code: r.code, zones: [], label: r.displayName }));
   const azure = regions.azure.map((r) => ({ region: r.region, code: r.code, zones: [], label: r.displayName }));
+  const locations = regions.locations.gcp.map((l) => ({ location: l.location, code: l.code, type: l.type, label: l.description, rules: l.rules }));
   return `${HEADER}regions.json 에서 만든다 (D46 · D49).
-// 지역 코드 표 — GCP 는 리전 · 존, AWS · Azure 는 리전만. status: GCP final · AWS · Azure draft
+// 지역 코드 표 — GCP 는 리전 · 존 · 멀티/이중 리전 위치, AWS · Azure 는 리전만. status: GCP final · AWS · Azure draft
 import type { Provider } from './types';
 
 export interface ZoneEntry { zone: string; code: string }
 export interface RegionEntry { region: string; code: string; zones: readonly ZoneEntry[]; label: string }
+/** 멀티 · 이중 리전 위치 (D78) — 받는 규칙만 받는다. rules 는 규칙 id → 그 위치를 적은 공식 문서 URL */
+export interface LocationEntry { location: string; code: string; type: 'multi-region' | 'dual-region'; label: string; rules: Readonly<Record<string, string>> }
 
 export const REGIONS_META = ${literal(regions.meta)} as const;
 
 export const REGIONS: Readonly<Record<Provider, readonly RegionEntry[]>> = ${literal({ gcp, aws, azure })};
+
+export const LOCATIONS: Readonly<Record<Provider, readonly LocationEntry[]>> = ${literal({ gcp: locations, aws: [], azure: [] })};
 `;
 }
 

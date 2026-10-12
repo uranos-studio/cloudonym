@@ -162,10 +162,10 @@ describe('tier · level · 중복 (D60 · D63)', () => {
     expectError(svc({ preset: 'object' }, { preset: 'object', tier: 'uploads' }, { preset: null, ruleId: 'gcp.storage_bucket', tier: 'uploads' }), 'wizard.duplicate_pick', 'services[0].picks[2]', { value: 'storage_bucket/uploads' });
     const two = svc({ preset: 'object', tier: 'uploads' }, { preset: 'object', tier: 'backups' });
     expect(validatePlan(two)).toEqual({ ok: true });
-    expect(names(two).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs-backups']);
-    expect(names(svc({ preset: 'object' })).slice(1)).toEqual(['platform-billing-shop-prod-gcs']);
+    expect(names(two).slice(1)).toEqual(['platform-billing-shop-prod-ane3-gcs-uploads', 'platform-billing-shop-prod-ane3-gcs-backups']);
+    expect(names(svc({ preset: 'object' })).slice(1)).toEqual(['platform-billing-shop-prod-ane3-gcs']);
     // 밑줄 규칙(BigQuery 데이터셋) · 앞 약어 규칙(커스텀 역할 — 구분자 없음)
-    expect(names(svc({ preset: null, ruleId: 'gcp.bigquery_dataset', tier: 'raw' })).slice(1)).toEqual(['billing_shop_prod_bq_raw']);
+    expect(names(svc({ preset: null, ruleId: 'gcp.bigquery_dataset', tier: 'raw' })).slice(1)).toEqual(['billing_shop_prod_ane3_bq_raw']);
     expect(validatePlan(svc({ preset: null, ruleId: 'gcp.iam_custom_role', tier: 'audit' }))).toEqual({ ok: true });
     // 예약어 · 꼴은 count 규칙과 같은 검사
     expectError(svc({ preset: 'object', tier: 'gcs' }), 'wizard.tier_reserved', 'services[0].picks[0]', { value: 'gcs' });
@@ -350,5 +350,22 @@ describe('위치 path (§5-5)', () => {
   it('검사식 자체 — 틀린 꼴을 거부한다', () => {
     for (const p of ['services[0].picks[0]', 'projectPicks', 'projectPicks[2].instances[1].attach.data[0]', 'services[1]']) expect(p).toMatch(PATH_RE);
     for (const p of ['services', 'project_picks[0]', 'services[0].picks', 'services[0].picks[0].attach']) expect(p).not.toMatch(PATH_RE);
+  });
+});
+
+describe('pick 의 위치 (D78)', () => {
+  it('버킷 · BigQuery 데이터세트는 멀티 · 이중 리전 위치를 받는다 — 코드 · 이름 둘 다 · 이름에는 코드', () => {
+    const plan = svc({ preset: 'object', tier: 'logs', location: 'US' }, { preset: 'object', tier: 'dr', location: 'asia1' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' }, { preset: 'object' });
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    expect(names(plan).slice(1)).toEqual(['platform-billing-shop-prod-us-gcs-logs', 'platform-billing-shop-prod-asia1-gcs-dr', 'billing_shop_prod_eu_bq', 'platform-billing-shop-prod-ane3-gcs']);
+    expect(expandPlan(plan).services[0]!.items[0]!.location).toBe('us');
+  });
+  it('받지 않는 위치 · 위치를 받지 않는 규칙 · 모르는 값은 wizard.invalid_location', () => {
+    expectError(svc({ preset: null, ruleId: 'gcp.bigquery_dataset', location: 'ASIA' }), 'wizard.invalid_location', 'services[0].picks[0]', { type: 'bigquery_dataset', value: 'ASIA', supported: ['US', 'EU'] });
+    expectError(svc({ preset: 'web', location: 'US', instances: slots(1) }), 'wizard.invalid_location', 'services[0].picks[0]', { type: 'compute_instance', supported: [] });
+    expectError(svc({ preset: 'object', location: 'asia-northeast1' }), 'wizard.invalid_location', 'services[0].picks[0]', { value: 'asia-northeast1' });
+  });
+  it('프로젝트 지역은 단일 리전이다 — 멀티 리전이면 context.location_unsupported', () => {
+    expectError({ ...svc({ preset: 'object' }), project: { ...PROJECT, region: 'US' } }, 'context.location_unsupported', undefined, { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] });
   });
 });

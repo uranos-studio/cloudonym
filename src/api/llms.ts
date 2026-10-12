@@ -7,7 +7,7 @@ import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
 import { ENV_ALIASES } from '../core/normalize';
-import { REGIONS } from '../core/regions-data';
+import { LOCATIONS, REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { catalogFor } from '../core/catalog';
 import { GCP_KIND_CHECKED, type CatalogRow } from '../core/rules/gcp-catalog';
@@ -51,7 +51,7 @@ export function formulaOf(rule: ResourceRule): string {
 function tierLines(): string[] {
   return [
     '', '## Tiers', '',
-    'A tier is a short purpose token (`web`, `was`) that only `/v1/wizard` fills. It goes after the abbreviation and kind token and before the sequence number: `[-<tier>]` in the formulas, for example `billing-shop-prod-ane3-gce-web-01`. Rules with a sequence number (`input: count`) take it there; on Google Cloud, rules with neither a sequence number nor a role (Cloud Storage bucket, BigQuery dataset, Spanner instance config, IAM custom role) take it right after the abbreviation, so two of them in one service can be told apart (`platform-billing-shop-prod-gcs-uploads`). Role rules and the project ID never take one. It is never shortened or dropped. A preset brings its own tier; `tier` on a pick overrides it. `/v1/generate` and `/v1/names` never put a tier in a name.',
+    'A tier is a short purpose token (`web`, `was`) that only `/v1/wizard` fills. It goes after the abbreviation and kind token and before the sequence number: `[-<tier>]` in the formulas, for example `billing-shop-prod-ane3-gce-web-01`. Rules with a sequence number (`input: count`) take it there; on Google Cloud, rules with neither a sequence number nor a role (Cloud Storage bucket, BigQuery dataset, Spanner instance config, IAM custom role) take it right after the abbreviation, so two of them in one service can be told apart (`platform-billing-shop-prod-ane3-gcs-uploads`). Role rules and the project ID never take one. It is never shortened or dropped. A preset brings its own tier; `tier` on a pick overrides it. `/v1/generate` and `/v1/names` never put a tier in a name.',
     `- \`<tier>\` = \`${TIER_PATTERN.source}\``,
     '- rejected with 400 `wizard.invalid_tier` when it does not match, and `wizard.tier_reserved` when it is one of the reserved words below: abbreviations, kind tokens, environment values and their aliases, and region and zone codes — they would read as that token',
     `- reserved: ${[...RESERVED_TIERS].sort().map((w) => `\`${w}\``).join(' ')}`,
@@ -109,7 +109,7 @@ function allowedValues(dict: Record<string, string>): string[] {
 function regionLines(order: readonly Provider[]): string[] {
   const lines = [
     '', '## Regions', '',
-    '`region` takes a region or a zone of the provider you name, by name or by code, in any case: `asia-northeast3`, `asia-northeast3-a`, `ane3` or `ane3a`, or `global`. Country values such as `kr`, `us`, `jp` and `eu` are rejected (400 `context.value_unsupported`, with the matching region names in `supported`), and so are region names of another provider.',
+    '`region` takes a region or a zone of the provider you name, by name or by code, in any case: `asia-northeast3`, `asia-northeast3-a`, `ane3` or `ane3a`, or `global`. Country values such as `kr` and `jp` are rejected (400 `context.value_unsupported`, with the matching region names in `supported`), and so are region names of another provider. On Google Cloud, `us` and `eu` are the multi-region locations below, not countries.',
     'Names carry a short region code, not the region name: each region has the code listed below, and a zone name is accepted and resolved to its region (`asia-northeast3-a` and `ane3a` -> `ane3`); names never carry a zone. A region name, zone name or zone code you send is reported once as `context.normalized`. `global` puts no region token in any name.',
     'Zonal and regional resources alike carry the region code (or drop it first when the name is too long); global resources carry none.',
   ];
@@ -118,6 +118,13 @@ function regionLines(order: readonly Provider[]): string[] {
     for (const r of REGIONS[p]) {
       const zones = r.zones.length > 0 ? ` · zones: ${r.zones.map((z) => `\`${z.zone}\` \`${z.code}\``).join(', ')}` : '';
       lines.push(`- \`${r.region}\` · \`${r.code}\` — ${r.label}${zones}`);
+    }
+    if (LOCATIONS[p].length > 0) {
+      lines.push('', 'Multi-region and dual-region locations (D78): `region` (and `location` on a `/v1/wizard` pick) also takes these, by name or code in any case, but only for the resource types listed on each line — names carry the lower-case code in the region slot (`…-prod-us-gcs`). Any other type with a region token is 400 `context.location_unsupported` on `/v1/generate` (which names every type, so always) and `/v1/names`, and `wizard.invalid_location` on a wizard pick; the wizard project region stays a single region.');
+      for (const l of LOCATIONS[p]) {
+        const types = Object.keys(l.rules).map((id) => `\`${id.slice(id.indexOf('.') + 1)}\``).join(', ');
+        lines.push(`- \`${l.location}\` · \`${l.code}\` — ${l.type} · ${l.label} · for ${types} · ${[...new Set(Object.values(l.rules))].join(' · ')}`);
+      }
     }
   }
   return lines;

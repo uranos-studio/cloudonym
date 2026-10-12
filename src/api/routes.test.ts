@@ -39,6 +39,13 @@ describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
 });
 
 describe('POST /v1/generate (D15 wire)', () => {
+  it('멀티 · 이중 리전 위치는 규칙 전부를 내는 /v1/generate 에서 400 context.location_unsupported (D78)', async () => {
+    const { res } = await post({ context: { ...ctx, region: 'US' }, providers: ['gcp'] });
+    expect(res.status).toBe(400);
+    const body = await json(res);
+    expect(body.errors).toEqual([{ code: 'context.location_unsupported', field: 'region', params: { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] },
+      message: "region 'US' is a multi-region or dual-region location; only storage_bucket, bigquery_dataset take it — use a single region, or ask for those resource types only" }]);
+  });
   it('① 예시 입력 → GCP SA 는 owner · 지역 없이 그대로 들어간다 (D77)', async () => {
     const { res } = await post({ context: ctx, providers: ['gcp'] });
     expect(res.status).toBe(200);
@@ -154,6 +161,17 @@ describe('POST /v1/names (D39)', () => {
   const names = (body: unknown, env = {}) => req(app, '/v1/names', jsonPost(body), env);
   afterEach(() => { vi.unstubAllGlobals(); });
 
+  it('멀티 · 이중 리전 위치 (D78) — 받는 리소스만 고르면 200, 하나라도 받지 않으면 400', async () => {
+    const ok = await names({ provider: 'gcp', context: { ...base, region: 'EU' }, resources: [{ type: 'storage_bucket' }, { type: 'bigquery_dataset' }, { type: 'vpc_network' }] });
+    expect(ok.res.status).toBe(200);
+    const body = await json(ok.res);
+    expect(body.data.gcp.items.map((i: Loose) => i.name)).toEqual(['platform-billing-trade-prod-eu-gcs', 'billing_trade_prod_eu_bq', 'billing-trade-prod-vpc-01']);
+    expect(body.metadata.transformed).toEqual([{ code: 'context.normalized', field: 'region', params: { from: 'EU', to: 'eu' }, message: "region 'EU' normalised to 'eu'" }]);
+    const bad = await names({ provider: 'gcp', context: { ...base, region: 'asia1' }, resources: [{ type: 'storage_bucket' }, { type: 'bigquery_dataset' }] });
+    expect(bad.res.status).toBe(400);
+    expect((await json(bad.res)).errors).toMatchObject([{ code: 'context.location_unsupported', field: 'region', params: { value: 'ASIA1', supported: ['storage_bucket'] } }]);
+  });
+
   it('200 — 키 전부 · 선택 순서 → 순번 순서 · scope · uniqueness · data · metadata 는 provider 하나', async () => {
     const { res } = await names({ provider: 'gcp', context: base, resources: [{ type: 'compute_instance', count: 2 }, { type: 'storage_bucket' }, { type: 'service_account', role: 'db' }, { type: 'project_id' }] });
     expect(res.status).toBe(200);
@@ -167,7 +185,7 @@ describe('POST /v1/names (D39)', () => {
     expect(az.conflicts).toEqual([]);
     expect(az.items.map((i: { key: string; name: string }) => `${i.key}=${i.name}`)).toEqual([
       'compute_instance_01=billing-trade-prod-ane3-gce-01', 'compute_instance_02=billing-trade-prod-ane3-gce-02',
-      'storage_bucket=platform-billing-trade-prod-gcs', 'service_account_db=billing-trade-prod-sa-db', 'project_id=platform-billing-trade-prod',
+      'storage_bucket=platform-billing-trade-prod-ane3-gcs', 'service_account_db=billing-trade-prod-sa-db', 'project_id=platform-billing-trade-prod',
     ]);
     expect(Object.keys(az.items[0])).toEqual(['key', 'resource_type', 'seq', 'scope', 'uniqueness', 'name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'steps', 'rule']);
     expect(az.items[0]).toMatchObject({ resource_type: 'compute_instance', seq: '01', scope: 'gcp:project', uniqueness: 'csp' });
@@ -335,6 +353,18 @@ describe('POST /v1/wizard (D66)', () => {
     return (await json(res)).data.gcp as { valid: boolean; items: Loose[]; conflicts: Loose[] };
   };
   const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
+
+  it('pick 의 location (D78) — 버킷은 받고 VM 은 wizard.invalid_location · 프로젝트 지역의 멀티 리전은 context.location_unsupported', async () => {
+    const project = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
+    const g = await itemsOf({ provider: 'gcp', project, services: [{ purpose: 'shop', picks: [{ preset: 'object', location: 'US' }] }] });
+    expect(g.items.map((i) => i.name)).toEqual(['platform-billing-prod', 'platform-billing-shop-prod-us-gcs']);
+    const bad = await wizard({ provider: 'gcp', project, services: [{ purpose: 'shop', picks: [{ preset: 'web', location: 'US', instances: [{ id: 'a', seq: '01' }] }] }] });
+    expect(bad.res.status).toBe(400);
+    expect((await json(bad.res)).errors).toMatchObject([{ code: 'wizard.invalid_location', field: 'services[0].picks[0]', params: { type: 'compute_instance', value: 'US', supported: [] } }]);
+    const multi = await wizard({ provider: 'gcp', project: { ...project, region: 'EU' }, services: [{ purpose: 'shop', picks: [{ preset: 'object' }] }] });
+    expect(multi.res.status).toBe(400);
+    expect((await json(multi.res)).errors).toMatchObject([{ code: 'context.location_unsupported', field: 'project.region', params: { value: 'EU' } }]);
+  });
 
   it('examples/terraform/wizard.json — README 의 curl 요청과 같고 · 200 · 예시 README 가 적은 키와 이름이 나온다', async () => {
     const root = join(import.meta.dirname, '..', '..');

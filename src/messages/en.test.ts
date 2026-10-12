@@ -28,6 +28,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'name.token_empty': { code: 'name.token_empty', field: 'system' },
   'name.cannot_fit': { code: 'name.cannot_fit', params: { max: 15 } },
   'name.kind_required': { code: 'name.kind_required', params: { supported: ['CCC', 'DDD'] } },
+  'name.location_unsupported': { code: 'name.location_unsupported', params: { location: 'BBB', supported: ['CCC', 'DDD'] } },
   'name.parent_invalid': { code: 'name.parent_invalid', params: { parent: 'AAA' } },
   'name.parent_name': { code: 'name.parent_name', params: { parent: 'AAA', suffix: '-BBB' } },
   'wizard.children_not_supported': { code: 'wizard.children_not_supported', params: { index: 2, type: 'AAA' } },
@@ -38,6 +39,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'wizard.tier_reserved': { code: 'wizard.tier_reserved', params: { index: 2, value: 'BBB' } },
   'wizard.invalid_tier': { code: 'wizard.invalid_tier', params: { index: 2, value: 'BBB', pattern: 'CCC' } },
   'wizard.tier_not_supported': { code: 'wizard.tier_not_supported', params: { index: 2, type: 'AAA' } },
+  'wizard.invalid_location': { code: 'wizard.invalid_location', params: { index: 2, type: 'AAA', value: 'BBB', supported: ['CCC'] } },
   'wizard.level_not_supported': { code: 'wizard.level_not_supported', params: { index: 2, type: 'AAA' } },
   'wizard.reserved_pick': { code: 'wizard.reserved_pick', params: { index: 2, type: 'AAA' } },
   'wizard.serverless_not_supported': { code: 'wizard.serverless_not_supported', params: { index: 2, type: 'AAA' } },
@@ -60,6 +62,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'context.not_string': { code: 'context.not_string', field: 'owner' },
   'context.empty': { code: 'context.empty', field: 'owner' },
   'context.value_unsupported': { code: 'context.value_unsupported', field: 'env', params: { value: 'BBB', supported: ['CCC'] } },
+  'context.location_unsupported': { code: 'context.location_unsupported', field: 'region', params: { value: 'BBB', supported: ['CCC'] } },
   'context.normalized': { code: 'context.normalized', field: 'env', params: { from: 'AAA', to: 'BBB' } },
   'step.token_dropped': { code: 'step.token_dropped', field: 'region' },
   'step.abbreviated': { code: 'step.abbreviated', field: 'purpose', params: { from: 'AAA', to: 'BBB' } },
@@ -128,7 +131,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(108);
+    expect(codes).toHaveLength(111);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

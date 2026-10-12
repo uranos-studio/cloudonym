@@ -6,6 +6,7 @@ import { expandPlan, validatePlan, PROJECT_ID_RULE, type PlanError, type WizardP
 import { presetOf } from '../core/wizard/presets';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
+import { locationError } from '../core/regions';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
 import type { WireMessage } from './serialize';
@@ -139,6 +140,9 @@ export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
   for (const p of providers) {
     const parsed = parseContext(body.context as RawContext, p);
     if (!parsed.ok) { addOnce(errors, parsed.errors); continue; }
+    // 멀티 · 이중 리전 위치(US …)는 받는 규칙에만 — /v1/generate 는 규칙 전부라 늘 거부한다 (D78)
+    const loc = locationError(parsed.context.region, rulesFor(p));
+    if (loc) { addOnce(errors, [loc]); continue; }
     contexts[p] = parsed.context;
     addOnce(transformed, parsed.transformed);
   }
@@ -222,6 +226,9 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
     const unknownType = errors.some((m) => m.code === 'selection.unknown_type');
     return reject(errors, unknownType ? rulesFor(provider).map((r) => r.resourceType) : undefined);
   }
+  // 멀티 · 이중 리전 위치(US …)는 그 위치를 받는 리소스만 고른 요청에서만 (D78)
+  const loc = locationError(parsed.context.region, selection.items.map((i) => i.rule));
+  if (loc) return reject([loc]);
   return { ok: true, value: { provider, context: parsed.context, transformed: parsed.transformed, items: selection.items } };
 }
 
@@ -236,7 +243,7 @@ export function toWirePath(path: string): string {
 /** pick 하나의 문자열 칸 상한 — field 는 wire 경로. 객체가 아니면 여기서 보지 않는다(validatePlan 이 본다) */
 function pickTooLong(p: unknown, base: string): ApiMessage[] {
   if (!isRecord(p)) return [];
-  const own = tooLong(Object.fromEntries(['preset', 'rule', 'tier', 'role', 'kind', 'serverless'].map((k) => [`${base}.${k}`, p[k]])));
+  const own = tooLong(Object.fromEntries(['preset', 'rule', 'tier', 'role', 'kind', 'serverless', 'location'].map((k) => [`${base}.${k}`, p[k]])));
   const slots = Array.isArray(p.instances) ? (p.instances as unknown[]) : [];
   return [...own, ...slots.flatMap((s, k) => {
     if (!isRecord(s)) return [];
@@ -251,7 +258,7 @@ function toModelPick(p: unknown): unknown {
   if (!isRecord(p)) return p;
   const out: Record<string, unknown> = { preset: p.preset === undefined ? null : p.preset };
   if (p.rule !== undefined) out.ruleId = p.rule;
-  for (const k of ['tier', 'role', 'kind', 'ha', 'serverless', 'instances']) if (p[k] !== undefined) out[k] = p[k];
+  for (const k of ['tier', 'role', 'kind', 'ha', 'serverless', 'instances', 'location']) if (p[k] !== undefined) out[k] = p[k];
   return out;
 }
 
@@ -274,7 +281,7 @@ function atPath(root: unknown, path: string): unknown {
 /** 코드마다 사용자 값(value)이 온 칸 — path 가 가리키는 요소(pick · 슬롯 · 디스크 순번)에서 읽는다. null 이면 요소 자체다 */
 const VALUE_FIELD: Readonly<Record<string, string | null>> = {
   'wizard.unknown_preset': 'preset', 'selection.unknown_type': 'ruleId', 'selection.unknown_kind': 'kind', 'selection.invalid_role': 'role',
-  'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null,
+  'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null, 'wizard.invalid_location': 'location',
 };
 
 /** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,

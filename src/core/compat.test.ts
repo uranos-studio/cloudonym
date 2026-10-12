@@ -35,7 +35,7 @@ const EXPECTED: Record<string, Record<string, string>> = {
     vpc_network: 'billing-trade-prod-vpc-01',
     subnet: 'billing-trade-prod-ane3-snet-01',
     cloud_sql_instance: 'billing-trade-prod-ane3-sql-01',
-    storage_bucket: 'platform-billing-trade-prod-gcs',
+    storage_bucket: 'platform-billing-trade-prod-ane3-gcs',
     firewall_rule: 'billing-trade-prod-fw-01',
     disk: 'billing-trade-prod-ane3-disk-01',
   },

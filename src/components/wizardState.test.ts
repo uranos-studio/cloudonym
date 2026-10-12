@@ -223,7 +223,7 @@ describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', 
     p = setPickField(p, shop, 'tier', 'uploads');
     p = setPickField(p, { service: 0, pick: 1 }, 'tier', 'backups');
     ok(p);
-    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs-backups']);
+    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-ane3-gcs-uploads', 'platform-billing-shop-prod-ane3-gcs-backups']);
   });
   it('count 규칙의 복사본은 tier · HA 없이 새 서버 줄 01 하나 · 복사본은 원본 바로 뒤', () => {
     let p = togglePreset(initialPlan(), 0, 'db');
@@ -245,7 +245,7 @@ describe('같은 종류 둘 — Duplicate 는 tier 를 비운 복사본 (D74)', 
     let p = setPickField(togglePreset(initialPlan(), 0, 'object'), shop, 'tier', 'uploads');
     p = duplicatePick(p, shop);
     ok(p);
-    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-gcs-uploads', 'platform-billing-shop-prod-gcs']);
+    expect(names(p).slice(1)).toEqual(['platform-billing-shop-prod-ane3-gcs-uploads', 'platform-billing-shop-prod-ane3-gcs']);
   });
   it('프리셋이 tier 를 정하면(web · 방화벽) · 역할 규칙 · tier 자리 없는 규칙은 tier 칸도 Duplicate 도 없다', () => {
     expect(tierEditable({ preset: 'web', instances: [] })).toBe(false);

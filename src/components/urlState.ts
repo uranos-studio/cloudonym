@@ -232,7 +232,8 @@ export function shareUrl(ctx: NamingContext, base: string, rulesVersion?: string
 //   w        { pp: projectPicks, s: services }
 //   service  { n: purpose, p: picks }
 //   pick     { pr: preset(null 이면 생략 — custom), ru: ruleId(custom 만 · 규칙 id 전체 `gcp.compute_instance`), t: tier, ro: role,
-//              k: kind(값 이름 `POSTGRES`), h: ha(켜졌을 때만 · 값 1), sv: serverless(짧은 값 `gcf` · `run`), i: instances }
+//              k: kind(값 이름 `POSTGRES`), h: ha(켜졌을 때만 · 값 1), sv: serverless(짧은 값 `gcf` · `run`), i: instances,
+//              l: location(멀티 · 이중 리전 코드 `us` · `asia1` — D78) }
 //   slot     { id, q: seq, a: attach }
 //   attach   { b: boot(값 1), d: data(순번 배열), ip(값 1), ipi(값 1) }
 // 인코더 · 디코더 모두 validatePlan 을 지난다. 디코더 순서 — parseProjectContext → validatePlan(복구) → 서비스마다 parseContext
@@ -245,7 +246,7 @@ const SERVERLESS_LONG: Readonly<Record<string, string>> = Object.fromEntries(Obj
 /** 마법사 hash 의 문맥 넷 — region 은 리전 코드 */
 export type ProjectFields = WizardPlan['project'];
 
-const PICK_KEYS = new Set(['pr', 'ru', 't', 'ro', 'k', 'h', 'sv', 'i']);
+const PICK_KEYS = new Set(['pr', 'ru', 't', 'ro', 'k', 'h', 'sv', 'i', 'l']);
 const SLOT_KEYS = new Set(['id', 'q', 'a']);
 const SERVICE_KEYS = new Set(['n', 'p']);
 const W_KEYS = new Set(['pp', 's']);
@@ -269,6 +270,7 @@ function shortPick(p: WizardPick): Record<string, unknown> {
   if (p.kind !== undefined) out.k = p.kind;
   if (p.ha === true) out.h = 1;
   if (typeof p.serverless === 'string') out.sv = SERVERLESS_LONG[p.serverless] ?? p.serverless;
+  if (p.location !== undefined) out.l = p.location;
   if (p.instances !== undefined) {
     out.i = p.instances.map((s) => {
       const a = shortAttach(s.attach);
@@ -335,6 +337,7 @@ function longPick(p: unknown, n: WizardNotices): WizardPick | undefined {
   if (p.k !== undefined) out.kind = p.k;
   if (p.h !== undefined) out.ha = p.h === 1 ? true : p.h;
   if (p.sv !== undefined) out.serverless = typeof p.sv === 'string' ? (SERVERLESS_SHORT[p.sv] ?? p.sv) : p.sv;
+  if (p.l !== undefined) out.location = p.l;
   if (p.i !== undefined) {
     if (!Array.isArray(p.i)) out.instances = p.i;
     else {

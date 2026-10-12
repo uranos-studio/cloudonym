@@ -102,7 +102,7 @@
     "regions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["meta", "gcp", "aws", "azure"],
+      "required": ["meta", "gcp", "aws", "azure", "locations"],
       "properties": {
         "meta": {
           "type": "object",
@@ -160,6 +160,33 @@
               "code": { "type": "string", "pattern": "^[a-z0-9]{2,5}$" },
               "displayName": { "$ref": "#/definitions/nonEmpty" },
               "location": { "type": "string" }
+            }
+          }
+        },
+        "locations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gcp"],
+          "properties": {
+            "gcp": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["location", "code", "type", "description", "rules"],
+                "properties": {
+                  "location": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{1,7}$" },
+                  "code": { "type": "string", "pattern": "^[a-z0-9]{2,5}$" },
+                  "type": { "enum": ["multi-region", "dual-region"] },
+                  "description": { "$ref": "#/definitions/nonEmpty" },
+                  "rules": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "propertyNames": { "pattern": "^gcp\\.[a-z0-9_]+$" },
+                    "additionalProperties": { "type": "string", "pattern": "^https://" }
+                  }
+                }
+              }
             }
           }
         }

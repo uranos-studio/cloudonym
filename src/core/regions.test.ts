@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { COUNTRY_HINTS, MAX_REGION_CHARS, canonicalRegion, regionLabel, zonesOf } from './regions';
-import { REGIONS } from './regions-data';
+import { COUNTRY_HINTS, MAX_REGION_CHARS, canonicalLocation, canonicalRegion, locationError, locationMismatch, locationsFor, regionLabel, zonesOf } from './regions';
+import { LOCATIONS, REGIONS } from './regions-data';
 import { RULES } from './constraints';
 import { PROVIDERS } from './types';
 
@@ -110,5 +110,45 @@ describe('regionLabel · zonesOf', () => {
     expect(zonesOf('ane3', 'gcp').map((z) => z.zone)).toEqual(['asia-northeast3-a', 'asia-northeast3-b', 'asia-northeast3-c']);
     expect(zonesOf('ap-northeast-2', 'aws')).toEqual([]);
     expect(zonesOf('mars', 'gcp')).toEqual([]);
+  });
+});
+
+describe('멀티 · 이중 리전 위치 (D78)', () => {
+  const bucket = RULES['gcp.storage_bucket']!;
+  const bq = RULES['gcp.bigquery_dataset']!;
+  const vm = RULES['gcp.compute_instance']!;
+  it('GCS 멀티 셋 · 이중(사전 정의) 여섯 · BigQuery 멀티 둘 — 규칙마다 공식 위치 문서 URL', () => {
+    expect(LOCATIONS.gcp.map((l) => l.location)).toEqual(['US', 'EU', 'ASIA', 'ASIA1', 'EUR4', 'EUR5', 'EUR7', 'EUR8', 'NAM4']);
+    expect(LOCATIONS.aws).toEqual([]);
+    expect(LOCATIONS.azure).toEqual([]);
+    for (const l of LOCATIONS.gcp) {
+      expect(l.code, l.location).toBe(l.location.toLowerCase());
+      for (const [id, url] of Object.entries(l.rules)) {
+        expect(RULES[id], id).toBeDefined();
+        expect(RULES[id]!.regionToken, id).toBe('region');
+        expect(url, id).toMatch(id === 'gcp.bigquery_dataset' ? /^https:\/\/docs\.cloud\.google\.com\/bigquery\/docs\/locations#/ : /^https:\/\/docs\.cloud\.google\.com\/storage\/docs\/locations#/);
+      }
+    }
+    expect(locationsFor(bucket).map((l) => l.code)).toEqual(['us', 'eu', 'asia', 'asia1', 'eur4', 'eur5', 'eur7', 'eur8', 'nam4']);
+    expect(locationsFor(bq).map((l) => l.code)).toEqual(['us', 'eu']);
+    expect(locationsFor(vm)).toEqual([]);
+    expect(locationsFor(RULES['gcp.vpc_network']!)).toEqual([]);
+  });
+  it('위치 이름 · 코드를 대소문자 없이 푼다 — 리전 풀이(canonicalRegion)는 그대로 받지 않는다', () => {
+    expect(canonicalLocation('US', 'gcp')?.code).toBe('us');
+    expect(canonicalLocation(' asia1 ', 'gcp')?.location).toBe('ASIA1');
+    expect(canonicalLocation('asia-northeast3', 'gcp')).toBeUndefined();
+    expect(canonicalLocation('us', 'aws')).toBeUndefined();
+    expect(canonicalRegion('us', 'gcp')).toBeUndefined();
+  });
+  it('받지 않는 규칙에만 어긋난다 — 지역 토큰이 없는 규칙은 늘 맞다 · 요청 단위 오류는 받는 resourceType 을 싣는다', () => {
+    expect(locationMismatch('us', bucket)).toBeUndefined();
+    expect(locationMismatch('ane3', vm)).toBeUndefined();
+    expect(locationMismatch('us', vm)?.location).toBe('US');
+    expect(locationMismatch('asia', bq)?.location).toBe('ASIA');
+    expect(locationMismatch('us', RULES['gcp.vpc_network']!)).toBeUndefined();
+    expect(locationError('eu', [bucket, bq])).toBeUndefined();
+    expect(locationError('eu', [bucket, vm])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'EU', supported: ['storage_bucket', 'bigquery_dataset'] } });
+    expect(locationError('nam4', [bq])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'NAM4', supported: ['storage_bucket'] } });
   });
 });

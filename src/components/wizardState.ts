@@ -187,8 +187,8 @@ export function removePick(plan: WizardPlan, ref: PickRef): WizardPlan {
   return withPicks(plan, ref.service, picksOf(plan, ref.service).filter((_, i) => i !== ref.pick));
 }
 
-/** tier · role · kind — 빈 값이면 키를 지운다(없는 칸은 싣지 않는다) */
-export function setPickField(plan: WizardPlan, ref: PickRef, field: 'tier' | 'role' | 'kind', value: string | undefined): WizardPlan {
+/** tier · role · kind · location(D78) — 빈 값이면 키를 지운다(없는 칸은 싣지 않는다) */
+export function setPickField(plan: WizardPlan, ref: PickRef, field: 'tier' | 'role' | 'kind' | 'location', value: string | undefined): WizardPlan {
   return updatePick(plan, ref, (p) => {
     const next = { ...p };
     if (value === undefined || value === '') delete next[field];

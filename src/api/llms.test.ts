@@ -90,7 +90,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(rows).toContain('- `asia-northeast3` · `ane3` — Seoul, South Korea, APAC · zones: `asia-northeast3-a` `ane3a`, `asia-northeast3-b` `ane3b`, `asia-northeast3-c` `ane3c`');
     for (const r of REGIONS.gcp) expect(rows.some((l) => l.startsWith(`- \`${r.region}\` · \`${r.code}\` — ${r.label}`)), r.region).toBe(true);
     const body = section.join('\n');
-    expect(body).toContain('`kr`, `us`, `jp` and `eu` are rejected');
+    expect(body).toContain('`kr` and `jp` are rejected');
+    // 멀티 · 이중 리전 위치 (D78) — 줄마다 받는 resourceType 과 공식 위치 문서
+    expect(body).toContain('- `US` · `us` — multi-region · Data centers in the United States · for `storage_bucket`, `bigquery_dataset` · https://docs.cloud.google.com/storage/docs/locations#location-mr · https://docs.cloud.google.com/bigquery/docs/locations#multi-regions');
+    expect(body).toContain('- `NAM4` · `nam4` — dual-region · Iowa + South Carolina (us-central1 + us-east1) · for `storage_bucket` · https://docs.cloud.google.com/storage/docs/locations#predefined');
     expect(body).toContain('`global` puts no region token');
     expect(body).toContain('a zone name is accepted and resolved to its region');
     // 존 코드가 이름에 든다는 문장 · 존을 요구하는 문장이 없다
@@ -155,7 +158,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
       if (r.template.includes('tier') && r.template.includes('seq')) expect(f.endsWith(`[${s}<tier>]${s}<seq>`), r.id).toBe(true);
       if (r.template.includes('tier') && !r.template.includes('seq')) expect(f, r.id).toContain(`${r.slug}[${s}<tier>]`);
     }
-    expect(formulaOf(RULES['gcp.storage_bucket']!)).toBe(`<owner>-<system>-<purpose>-<env>-${RULES['gcp.storage_bucket']!.slug}[-<tier>]`);
+    expect(formulaOf(RULES['gcp.storage_bucket']!)).toBe(`<owner>-<system>-<purpose>-<env>-<region>-${RULES['gcp.storage_bucket']!.slug}[-<tier>]`);
     expect(formulaOf(RULES['gcp.compute_instance']!)).toBe(`<system>-<purpose>-<env>-<region>-${RULES['gcp.compute_instance']!.slug}[-<tier>]-<seq>`);
     expect(formulas.filter((l) => l.includes('<tier>')).length).toBeGreaterThan(0);
     // 구분자 없는 규칙은 괄호 안에 구분자도 없다

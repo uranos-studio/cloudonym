@@ -115,8 +115,8 @@ describe('tokenValues — 용도 토큰 tier · 프로젝트 수준 (D60 · D63)
     expect('purpose' in tokenValues(project, getRule('gcp', 'vpc_network')!, { level: 'project' })).toBe(false);
   });
   it('순번 없는 GCP 규칙은 약어 바로 뒤에 tier (D74) · 역할 규칙에는 tier 가 들어가지 않는다', () => {
-    expect(named(seoul, 'storage_bucket', { tier: 'web' })).toBe('platform-billing-shop-prod-gcs-web');
-    expect(named(seoul, 'storage_bucket')).toBe('platform-billing-shop-prod-gcs');
+    expect(named(seoul, 'storage_bucket', { tier: 'web' })).toBe('platform-billing-shop-prod-ane3-gcs-web');
+    expect(named(seoul, 'storage_bucket')).toBe('platform-billing-shop-prod-ane3-gcs');
     expect('tier' in tokenValues(seoul, getRule('gcp', 'service_account')!, { tier: 'web' })).toBe(false);
   });
 });

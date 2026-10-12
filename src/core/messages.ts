@@ -10,9 +10,10 @@ export const MESSAGE_CODES = [
   'name.empty', 'name.too_long', 'name.too_short', 'name.first_not_letter', 'name.last_not_alnum', 'name.pattern_mismatch',
   'name.consecutive_separator', 'name.forbidden_prefix', 'name.forbidden_suffix', 'name.forbidden_substring',
   'name.forbidden_exact', 'name.forbidden_word', 'name.ipv4_form',
-  // engine.ts (10)
+  // engine.ts (12)
   'step.normalized', 'step.separator_removed', 'name.token_empty', 'name.cannot_fit', 'rule.unknown_resource_type',
   'context.not_string', 'context.empty', 'context.value_unsupported', 'context.normalized', 'name.kind_required',
+  'context.location_unsupported', 'name.location_unsupported',
   // truncate.ts (3)
   'step.token_dropped', 'step.abbreviated', 'step.budget_shortened',
   // labels.ts (3)
@@ -34,12 +35,12 @@ export const MESSAGE_CODES = [
   'name.parent_invalid', 'name.parent_name',
   // wizard/attachments.ts checkAttachments (5)
   'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range', 'wizard.invalid_data_seq', 'wizard.duplicate_seq',
-  // wizard/plan.ts validatePlan (21)
+  // wizard/plan.ts validatePlan (22)
   'wizard.tier_reserved', 'wizard.invalid_tier', 'wizard.tier_not_supported', 'wizard.level_not_supported', 'wizard.reserved_pick',
   'wizard.serverless_not_supported', 'wizard.instances_not_supported', 'wizard.duplicate_pick', 'wizard.empty', 'wizard.duplicate_service',
   'wizard.reserved_service', 'wizard.empty_service', 'wizard.unknown_preset', 'wizard.count_below_min', 'wizard.ha_not_supported',
   'wizard.too_many_names', 'wizard.too_many_services', 'wizard.too_many_picks', 'wizard.invalid_slot_id', 'wizard.duplicate_slot_id',
-  'wizard.invalid_seq',
+  'wizard.invalid_seq', 'wizard.invalid_location',
 ] as const;
 
 export type CoreMessage =
@@ -62,10 +63,14 @@ export type CoreMessage =
   | { code: 'name.cannot_fit'; params: { max: number } }
   /** 종류가 필수인 규칙(리소스 정책)에 종류가 없다 — supported 는 그 규칙의 허용 값 (D52). 이름은 종류 없이 만든 것을 싣는다 */
   | { code: 'name.kind_required'; params: { supported: string[] } }
+  /** 문맥의 지역이 이 규칙이 받지 않는 멀티 · 이중 리전 위치다 (D78) — supported 는 그 위치를 받는 resourceType */
+  | { code: 'name.location_unsupported'; params: { location: string; supported: string[] } }
   | { code: 'rule.unknown_resource_type'; params: { provider: string; supported: string[] } }
   | { code: 'context.not_string'; field: ContextField }
   | { code: 'context.empty'; field: ContextField }
   | { code: 'context.value_unsupported'; field: 'env' | 'region'; params: { value: string; supported: string[] } }
+  /** 멀티 · 이중 리전 위치를 그 위치를 받지 않는 규칙에 썼다 (D78) — supported 는 그 위치를 받는 resourceType */
+  | { code: 'context.location_unsupported'; field: 'region'; params: { value: string; supported: string[] } }
   | { code: 'context.normalized'; field: 'env' | 'region'; params: { from: string; to: string } }
   | { code: 'step.token_dropped'; field: Token }
   | { code: 'step.abbreviated'; field: Token; params: { from: string; to: string } }
@@ -126,6 +131,8 @@ export type CoreMessage =
   | { code: 'wizard.tier_reserved'; params: { index: number; value: string } }
   | { code: 'wizard.invalid_tier'; params: { index: number; value: string; pattern: string } }
   | { code: 'wizard.tier_not_supported'; params: { index: number; type: string } }
+  /** pick 의 위치(D78) — 그 규칙이 받는 멀티 · 이중 리전 코드가 아니다. supported 가 비면 그 규칙은 위치를 받지 않는다 */
+  | { code: 'wizard.invalid_location'; params: { index: number; type: string; value: string; supported: string[] } }
   | { code: 'wizard.level_not_supported'; params: { index: number; type: string } }
   | { code: 'wizard.reserved_pick'; params: { index: number; type: string } }
   | { code: 'wizard.serverless_not_supported'; params: { index: number; type: string } }

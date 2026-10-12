@@ -2,7 +2,7 @@
 // ⑸ 약어 ↔ 종류 토큰은 자리가 달라(…-{slug}-{kind}-…) 검사하지 않는다
 import { describe, it, expect } from 'vitest';
 import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
-import { REGIONS } from './regions-data';
+import { LOCATIONS, REGIONS } from './regions-data';
 import { RESERVED_TIERS } from './tier';
 import { TIER_PATTERN } from './types';
 import { rulesFor } from './constraints';
@@ -58,7 +58,8 @@ function collisions({ rows, regionCodes, envValues }: Input): string[] {
   return out;
 }
 
-const regionCodes = REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]);
+// 멀티 · 이중 리전 코드(D78)도 지역 자리에 든다 — 약어 · 종류 토큰과 겹치면 안 된다
+const regionCodes = [...REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]), ...LOCATIONS.gcp.map((l) => l.code)];
 
 describe('catalog 겹침 검사 (D47)', () => {
   it('검사기 자체 — ane3 · prod · sql · live(별칭) 를 약어로 넣으면 넷 다 잡는다', () => {
@@ -77,8 +78,9 @@ describe('catalog 겹침 검사 (D47)', () => {
     expect(collisions({ rows: [row], regionCodes, envValues: ENV_VALUES })).toEqual(['(2) kind gcp.fixture: ab x2', '(3) region ane3a: gcp.fixture kind']);
   });
 
-  it('지역 코드 표 — GCP 43 리전 + 130 존 = 173', () => {
-    expect(new Set(regionCodes).size).toBe(173);
+  it('지역 코드 표 — GCP 43 리전 + 130 존 + 멀티/이중 리전 9 (D78) = 182 · 겹침 없음', () => {
+    expect(regionCodes).toHaveLength(182);
+    expect(new Set(regionCodes).size).toBe(182);
   });
 
   it('GCP catalog 에 겹침이 없다 (⑴ snap · gcf · ⑵ proxy · int 는 의도한 묶음)', () => {
