@@ -10,7 +10,7 @@ import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
 import { kindToken } from '../core/catalog';
 import { generateItem, generateProject, type NameItem } from '../core/engine';
-import type { NameResult, ProjectContext } from '../core/types';
+import type { NameResult, ProjectContext, ResourceRule } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
 import { TIER_PATTERN } from '../core/types';
 
@@ -31,6 +31,22 @@ export const EXAMPLE_SERVICE = 'shop';
 /** 첫 화면 — 서비스 하나(이름 예시) · 고른 것 없음. 칩을 켜기 전에는 이름이 하나도 나오지 않는다(숨은 기본값 없음) */
 export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT): WizardPlan {
   return { provider: 'gcp', project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
+}
+
+/** 첫 화면 (D90) — hash 가 없을 때만. initialPlan 위에 네트워크 넷(VPC · 서브넷(PRIVATE) · Cloud Router · Cloud NAT, 각 01)을 얹는다.
+ *  화면 초기값일 뿐이다 — expandPlan · API 에 숨은 기본값이 생기지 않고, 링크는 pick 넷을 그대로 싣는다. 링크에서 연 계획(깨진 링크 포함)은 initialPlan 을 쓴다 */
+export function startPlan(): WizardPlan {
+  return ['vpc', 'subnet', 'router', 'nat'].reduce((p, id) => addPresetPick(p, null, id), initialPlan());
+}
+
+/** 「Clear network」 (D90) — ② 네트워크의 프리셋 pick 을 전부 뗀다. Shared extras(custom pick)는 남긴다 */
+export function clearNetwork(plan: WizardPlan): WizardPlan {
+  return { ...plan, projectPicks: plan.projectPicks.filter((p) => p.preset === null) };
+}
+
+/** pick 의 유효 규칙 — 화면 목록의 줄 이름(rowNames)이 항목 키 머리를 만들 때 쓴다 */
+export function pickRule(pick: Pick): ResourceRule | undefined {
+  return GCP_RULES.get(effectiveRuleId(pick) ?? '');
 }
 
 /** 서비스 칩 · 프로젝트 칩(네트워크) — 데이터의 level 로 나눈다 (D73). 서비스 칸의 묶음(lb)은 화면이 group 으로 한 줄에 모은다 */
