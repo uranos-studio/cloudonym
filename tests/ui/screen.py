@@ -691,8 +691,11 @@ def wizard_scenarios(browser, rules_version, errors):
     assert len(held) == 2, held
     held[1].fulfill(status=401, headers={'access-control-allow-origin': BASE}, body='{}')
     expect(pcard.locator('[data-bucket-verdict="taken"]')).to_have_count(1)
-    held[0].fulfill(status=404, headers={'access-control-allow-origin': BASE}, body='{}')
-    p41.wait_for_timeout(500)
+    old_req = held[0].request
+    with p41.expect_event('requestfinished', predicate=lambda r: r == old_req):
+        held[0].fulfill(status=404, headers={'access-control-allow-origin': BASE}, body='{}')
+    # 옛 응답의 then(setState) 와 React 의 다시 그리기가 끝날 때까지 — 마이크로태스크 · 다음 프레임 · 매크로태스크를 지나게 한다
+    p41.evaluate('() => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50)))')
     expect(pcard.locator('[data-bucket-verdict]')).to_have_attribute('data-bucket-verdict', 'taken')
     p41.unroute('https://storage.googleapis.com/storage/v1/b/**')
     p41.wait_for_timeout(1500)  # 디바운스된 비콘까지 기다린다
