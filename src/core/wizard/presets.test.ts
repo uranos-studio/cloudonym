@@ -19,16 +19,16 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 일곱 · 네트워크 다섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 일곱 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
-      'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'vpc', 'subnet', 'firewall', 'router', 'nat',
+      'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
-    expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat']);
+    expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
     expect(PRESETS.filter((p) => p.group === 'lb').map((p) => p.ruleId)).toEqual([
       'gcp.global_address', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
     ]);
-    expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp']);
+    expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp', 'iap', 'lbhc']);
     expect(presetOf('firewall')?.tier).toBe('ssh');
   });
 
@@ -62,7 +62,7 @@ describe('프리셋 데이터 (D64)', () => {
   });
 
   it('level — 네트워크 묶음만 project 이고 그 규칙은 프로젝트 수준 범위 · 나머지(lb 묶음 포함)는 service (D73)', () => {
-    expect(PRESETS.filter((p) => p.level === 'project').map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat']);
+    expect(PRESETS.filter((p) => p.level === 'project').map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
     for (const p of PRESETS) {
       expect(p.level === 'project', p.id).toBe(p.group === 'network');
       if (p.level === 'project') expect(PROJECT_SCOPES, p.id).toContain(RULES[p.ruleId]!.scope);
@@ -106,5 +106,21 @@ describe('프리셋 데이터 (D64)', () => {
     }
     const fromData = new Set(PRESETS.flatMap((p) => [p.tier, ...(p.tierChoices ?? [])]).filter((t): t is string => t !== null));
     expect([...PRESET_TIERS].sort()).toEqual([...fromData].sort());
+  });
+
+  it('고정 종류(D88) — 종류 표가 있는 규칙의 허용 값이고 · pick 이 다른 종류를 주면 wizard.preset_kind_fixed · 같은 값이면 통과', () => {
+    for (const p of PRESETS.filter((x) => x.kind !== undefined)) expect(RULES[p.ruleId]!.kinds?.allowed, p.id).toContain(p.kind);
+    expect(PRESETS.filter((x) => x.kind !== undefined).map((x) => [x.id, x.kind])).toEqual([['psa', 'INTERNAL']]);
+    const one = [{ id: 'a', seq: '01' }];
+    const plan = (pick: Pick): WizardPlan => ({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' }, projectPicks: [{ ...pick, instances: one }], services: [] });
+    const r = validatePlan(plan({ preset: 'psa', kind: 'EXTERNAL' }));
+    expect(r.ok ? [] : r.errors).toEqual([{ code: 'wizard.preset_kind_fixed', params: { index: 0, preset: 'psa', kind: 'INTERNAL' }, path: 'projectPicks[0]' }]);
+    expect(validatePlan(plan({ preset: 'psa', kind: 'INTERNAL' }))).toEqual({ ok: true });
+    expect(expandPlan(plan({ preset: 'psa' })).projectItems[0]).toMatchObject({ kind: 'INTERNAL', tier: 'psa', level: 'project' });
+    expect(generateProject(expandPlan(plan({ preset: 'psa' })), 'gcp').items[1]).toMatchObject({ key: 'project/-/global_address/int/psa/01', name: 'billing-prod-ip-int-psa-01', kind: 'INTERNAL', kindToken: 'int' });
+  });
+  it('psa 와 로드 밸런서의 전역 IP(ip)는 같은 규칙이지만 종류 · tier · 자리가 달라 함께 쓴다', () => {
+    const r = validatePlan({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' }, projectPicks: [{ preset: 'psa', instances: [{ id: 'a', seq: '01' }] }, { preset: null, ruleId: 'gcp.global_address', instances: [{ id: 'a', seq: '01' }] }], services: [{ purpose: 'shop', picks: [{ preset: 'ip', instances: [{ id: 'a', seq: '01' }] }] }] });
+    expect(r).toEqual({ ok: true });
   });
 });

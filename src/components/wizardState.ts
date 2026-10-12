@@ -146,6 +146,15 @@ export function togglePreset(plan: WizardPlan, service: number | null, presetId:
   const picks = picksOf(plan, service);
   const at = findPreset(plan, service, presetId, tier);
   if (at >= 0) return withPicks(plan, service, picks.filter((_, i) => i !== at));
+  return addPresetPick(plan, service, presetId, tier);
+}
+
+/** 프리셋 pick 을 하나 더한다 — 켜고 끄지 않는다 (D86). 「Add subnet」이 쓴다: 이미 있는 pick 과 종류 · tier 가 같으면 duplicate_pick 이 붙고, 종류나 tier 를 고치면 사라진다.
+ *  count 규칙은 서버 줄 하나(01), 입력 없는 규칙 · role 규칙은 줄 없음. tier 는 tierChoices 가 있을 때만 싣는다 */
+export function addPresetPick(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
+  const preset = presetOf(presetId);
+  if (!preset) return plan;
+  const picks = picksOf(plan, service);
   const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
   // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
   const rule = GCP_RULES.get(preset.ruleId);

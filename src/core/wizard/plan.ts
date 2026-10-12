@@ -67,7 +67,7 @@ const shown = (v: unknown): string => {
 const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v);
 
 /** pick 의 유효 규칙 — 프리셋이면 데이터의 규칙(serverless 를 고르면 그 규칙), custom 이면 ruleId. 못 풀면 undefined */
-interface Resolved { rule: ResourceRule; preset: Preset | undefined; tier: string | undefined }
+interface Resolved { rule: ResourceRule; preset: Preset | undefined; tier: string | undefined; kind: string | undefined }
 function resolve(pick: Pick): Resolved | undefined {
   const preset = pick.preset === null ? undefined : presetOf(pick.preset);
   if (pick.preset !== null && !preset) return undefined;
@@ -76,7 +76,7 @@ function resolve(pick: Pick): Resolved | undefined {
   const rule = RULES[sv ?? base ?? ''];
   if (!rule || rule.provider !== 'gcp' || rule.id === PROJECT_ID_RULE) return undefined;
   const tier = pick.tier ?? preset?.tier ?? undefined;
-  return { rule, preset, tier };
+  return { rule, preset, tier, kind: pick.kind ?? preset?.kind };
 }
 
 /** 한 pick 이 만들 이름 수 — 이름 총합 상한(프로젝트 ID · 자식 포함)에 쓴다. 검사 전 값이라 모양을 믿지 않는다 */
@@ -123,6 +123,11 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     if (pick.preset === null && pick.ruleId === PROJECT_ID_RULE) { push({ code: 'wizard.reserved_pick', params: { index, type: 'project_id' } }); return; }
     const preset = pick.preset === null ? undefined : presetOf(pick.preset);
     const baseRule = RULES[preset ? preset.ruleId : shown(pick.ruleId)];
+    // 고정 종류 프리셋 (D88) — 다른 종류를 주면 거부한다. 주지 않으면 프리셋의 종류다
+    if (preset?.kind !== undefined && pick.kind !== undefined && pick.kind !== preset.kind) {
+      push({ code: 'wizard.preset_kind_fixed', params: { index, preset: preset.id, kind: preset.kind } });
+    }
+    const kind: unknown = pick.kind ?? preset?.kind;
     if (!baseRule || baseRule.provider !== 'gcp') { push({ code: 'selection.unknown_type', params: { index, value: shown(pick.ruleId) } }); return; }
 
     // serverless — 프리셋 데이터의 규칙 id 하나여야 한다(불리언 · 다른 규칙 id 는 거부)
@@ -167,7 +172,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     // 같은 (type, 종류 토큰, tier, role, level) 둘 (D86) — role 규칙에서 role 을 빼면 엔진이 DEFAULT_ROLE 을 채우므로 그 값으로 센다.
     // 종류는 이름에 드는 토큰으로 센다 — 기본값 · 토큰 없는 값 · 종류 없음은 같은 이름이 되므로 같은 값('')이다. 허용 밖 종류는 아래 validateSelection 이 알린다
     const role = typeof pick.role === 'string' ? pick.role : input === 'role' ? DEFAULT_ROLE : '';
-    const kindToken = dupKindToken(rule, pick.kind);
+    const kindToken = dupKindToken(rule, kind);
     const dup = `${type}|${kindToken}|${typeof tier === 'string' ? tier : ''}|${role}|${level ?? ''}`;
     if (seen.has(dup)) push({ code: 'wizard.duplicate_pick', params: { index, value: [type, ...(kindToken === '' ? [] : [kindToken]), ...(typeof tier === 'string' ? [tier] : []), ...(role === '' ? [] : [role])].join('/') } });
     seen.add(dup);
@@ -198,7 +203,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
     // 지금 검사(한 항목짜리 목록) — type · count · kind · role. index 는 pick 의 자리로 바꿔 싣는다
     const count = input === 'count' ? (Array.isArray(slots) ? slots.length : 0) : 1;
-    const one = validateSelection('gcp', [{ type, count, ...(pick.role === undefined ? {} : { role: pick.role }), ...(pick.kind === undefined ? {} : { kind: pick.kind }) }], rulesFor('gcp'));
+    const one = validateSelection('gcp', [{ type, count, ...(pick.role === undefined ? {} : { role: pick.role }), ...(kind === undefined ? {} : { kind: kind as string }) }], rulesFor('gcp'));
     if (!one.ok) {
       for (const e of one.errors) push('params' in e && isObject(e.params) && 'index' in e.params ? ({ ...e, params: { ...e.params, index } } as CoreMessage) : e);
     }
@@ -271,13 +276,13 @@ export function expandPlan(plan: WizardPlan): ProjectSelection {
   const item = (pick: Pick, level: 'project' | undefined): SelectionItem => {
     const r = resolve(pick);
     if (!r) throw new Error('expandPlan: unresolved pick');
-    const { rule, tier } = r;
+    const { rule, tier, kind } = r;
     const counted = inputKind(rule) === 'count';
     const slots = pick.instances ?? [];
     return {
       rule, count: counted ? slots.length : 1,
       ...(pick.role === undefined ? {} : { role: pick.role }),
-      ...(pick.kind === undefined ? {} : { kind: pick.kind }),
+      ...(kind === undefined ? {} : { kind }),
       ...(tier === undefined ? {} : { tier }),
       ...(level === undefined ? {} : { level }),
       ...(pick.location === undefined ? {} : { location: pickLocation(rule, pick.location)! }),

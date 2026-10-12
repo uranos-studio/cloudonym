@@ -521,6 +521,13 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     expect('x' in json(bare)).toBe(false);
     expect(bare).toBe(btoa(JSON.stringify({ ...WP, v: WV, w: wizardToHash(W_SAMPLE) })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''));
   });
+  it('psa 칩(D88)은 종류를 hash 에 싣지 않고 왕복한다 — 종류는 프리셋 데이터가 정한다', () => {
+    const plan: WizardPlan = { provider: 'gcp', project: WP, projectPicks: [{ preset: 'psa', instances: [{ id: 'a', seq: '01' }] }], services: [] };
+    const enc = encodeWizardState(plan)!;
+    const json = JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
+    expect(json.w.pp).toEqual([{ pr: 'psa', i: [{ id: 'a', q: '01' }] }]);
+    expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
+  });
   it('x 의 꼴이 틀리거나 예약어면 접미사만 버리고 센다 — 모델은 연다', () => {
     for (const x of ['A', 'prod', 'db', 1, 'a'.repeat(17)]) {
       const d = decodeWizardState(rawWizardHash(W_SAMPLE, { x }))!;

@@ -35,12 +35,12 @@ export const MESSAGE_CODES = [
   'name.parent_invalid', 'name.parent_name',
   // wizard/attachments.ts checkAttachments (5)
   'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range', 'wizard.invalid_data_seq', 'wizard.duplicate_seq',
-  // wizard/plan.ts validatePlan (24)
+  // wizard/plan.ts validatePlan (25)
   'wizard.tier_reserved', 'wizard.invalid_tier', 'wizard.invalid_project_id_suffix', 'wizard.project_id_suffix_reserved', 'wizard.tier_not_supported', 'wizard.level_not_supported', 'wizard.reserved_pick',
   'wizard.serverless_not_supported', 'wizard.instances_not_supported', 'wizard.duplicate_pick', 'wizard.empty', 'wizard.duplicate_service',
   'wizard.reserved_service', 'wizard.empty_service', 'wizard.unknown_preset', 'wizard.count_below_min', 'wizard.ha_not_supported',
   'wizard.too_many_names', 'wizard.too_many_services', 'wizard.too_many_picks', 'wizard.invalid_slot_id', 'wizard.duplicate_slot_id',
-  'wizard.invalid_seq', 'wizard.invalid_location', 'wizard.location_needs_region',
+  'wizard.invalid_seq', 'wizard.invalid_location', 'wizard.location_needs_region', 'wizard.preset_kind_fixed',
 ] as const;
 
 export type CoreMessage =
@@ -133,6 +133,7 @@ export type CoreMessage =
   | { code: 'wizard.invalid_tier'; params: { index: number; value: string; pattern: string } }
   | { code: 'wizard.invalid_project_id_suffix'; params: { value: string; pattern: string } }
   | { code: 'wizard.project_id_suffix_reserved'; params: { value: string } }
+  | { code: 'wizard.preset_kind_fixed'; params: { index: number; preset: string; kind: string } }
   | { code: 'wizard.tier_not_supported'; params: { index: number; type: string } }
   /** pick 의 위치(D78) — 그 규칙이 받는 멀티 · 이중 리전 코드가 아니다. supported 가 비면 그 규칙은 위치를 받지 않는다 */
   | { code: 'wizard.invalid_location'; params: { index: number; type: string; value: string; supported: string[] } }

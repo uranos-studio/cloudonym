@@ -85,7 +85,7 @@ describe('namingDocModel', () => {
     const server = rowsOf(model, 'presets').find((r) => r.key === 'server')!;
     const ha = PRESETS.filter((p) => p.ha && p.ruleId === 'gcp.compute_instance' && !p.defaultAttach).map((p) => p.id);
     expect(server.cells[4]).toContain(`${ha.join(', ')}: High availability: at least 2 servers`);
-    expect(rowsOf(model, 'presets').find((r) => r.key === 'network')!.cells[3]).toBe('firewall: ssh / web / icmp');
+    expect(rowsOf(model, 'presets').find((r) => r.key === 'network')!.cells[3]).toBe('firewall: ssh / web / icmp / iap / lbhc · psa');
     expect(model.intro).toContain(VERSION.rules);
   });
 

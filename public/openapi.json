@@ -1993,7 +1993,7 @@
             "type": "string",
             "nullable": true,
             "maxLength": 1024,
-            "description": "A preset id: web, was, bastion, file, db, object, run, sa, secret, gke, wip, ip, bs, hc, url, cert, thps, fwd, vpc, subnet, firewall, router, nat. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
+            "description": "A preset id: web, was, bastion, file, db, object, run, sa, secret, gke, wip, ip, bs, hc, url, cert, thps, fwd, vpc, subnet, firewall, router, nat, psa. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
             "example": "web"
           },
           "rule": {

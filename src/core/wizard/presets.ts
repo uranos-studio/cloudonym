@@ -1,6 +1,6 @@
 // 마법사 프리셋 (D59 · D64) — 데이터. 용도 칩 하나 = 규칙 하나. 마법사 함수(validatePlan · expandPlan)는 프리셋을 따로 알지 않고 이 표를 읽는다.
 // 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」 · 「로드 밸런서」는 화면의 묶음(group)이고 데이터에서는 pick 하나씩이다.
-// 칩은 엮지 않는다 — 로드 밸런서 부품을 한 번에 켜거나 서로 참조하게 하는 묶음은 공개판 범위 밖이다(D73)
+// 칩은 엮지 않는다 — 로드 밸런서 부품을 한 번에 켜거나 서로 참조하게 하는 묶음은 공개판 범위 밖이다(D73). Cloud NAT 와 Cloud Router 도 따로 켠다(안내 문구만 둔다)
 import type { Attachments } from '../selection';
 
 export interface Preset {
@@ -14,6 +14,8 @@ export interface Preset {
   tier: string | null;
   /** 화면이 고를 수 있게 보이는 tier 칩(방화벽) — 첫 값이 기본. 없으면 tier 하나 */
   tierChoices?: readonly string[];
+  /** 고정 종류 (D88) — pick 이 kind 를 주지 않으면 이 값이고, 다른 값을 주면 wizard.preset_kind_fixed. 없으면 pick 의 kind 그대로 */
+  kind?: string;
   /** HA 토글 (D61) — 켜면 서버 슬롯이 minInstances 이상. null 이면 토글 없음 */
   ha: { minInstances: number } | null;
   /** 서버리스로 바꿀 수 있는 규칙 id (D65 · Q5 ⑵). null 이면 없음 */
@@ -54,9 +56,12 @@ export const PRESETS: readonly Preset[] = [
   { id: 'fwd', label: 'Forwarding rule', ruleId: 'gcp.global_forwarding_rule', ...NONE, level: 'service', group: 'lb' },
   { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', ...NONE, level: 'project', group: 'network' },
   { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', ...NONE, level: 'project', group: 'network' },
-  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp'], ha: null, serverless: null, level: 'project', group: 'network' },
+  // D87 — iap: IAP TCP forwarding 소스 35.235.240.0/20 을 받는 규칙 · lbhc: 로드 밸런서 health check 프로브 대역(35.191.0.0/16 등)을 받는 규칙
+  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp', 'iap', 'lbhc'], ha: null, serverless: null, level: 'project', group: 'network' },
   { id: 'router', label: 'Cloud Router', ruleId: 'gcp.router', ...NONE, level: 'project', group: 'network' },
   { id: 'nat', label: 'Cloud NAT', ruleId: 'gcp.router_nat', ...NONE, level: 'project', group: 'network' },
+  // D88 — Private services access 대역: 전역 내부 주소(--global --purpose=VPC_PEERING). purpose 는 종류 표(address_type)와 다른 API 필드라 kind 는 INTERNAL 로 고정한다
+  { id: 'psa', label: 'Private services access range', ruleId: 'gcp.global_address', tier: 'psa', kind: 'INTERNAL', ha: null, serverless: null, level: 'project', group: 'network' },
 ];
 
 export function presetOf(id: string): Preset | undefined {

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, type PickRef,
+  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
@@ -25,7 +25,7 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
   });
   it('칩 데이터 — 서비스 칩은 level service(로드 밸런서 묶음 포함) · 프로젝트 칩은 network 묶음 (D73)', () => {
     expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd']);
-    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat']);
+    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
   });
 });
 
@@ -49,6 +49,42 @@ describe('용도 칩 · 서버 줄 (D61)', () => {
     expect(p.projectPicks).toEqual([{ preset: 'router', instances: [{ id: '1', seq: '01' }] }, { preset: 'nat', instances: [{ id: '1', seq: '01' }] }]);
     ok(p);
     expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ane3-cr-01', 'billing-prod-nat-01', 'billing-shop-prod-sa-sync', 'billing-shop-prod-secret-01']);
+  });
+  it('NAT 와 Router 는 따로 켜고 끈다 — nat 만 켜도 router 가 생기지 않고 router 를 꺼도 nat 은 남는다 (D73)', () => {
+    const nat = togglePreset(initialPlan(), null, 'nat');
+    expect(nat.projectPicks.map((p) => p.preset)).toEqual(['nat']);
+    const both = togglePreset(nat, null, 'router');
+    expect(togglePreset(both, null, 'router').projectPicks.map((p) => p.preset)).toEqual(['nat']);
+  });
+  it('addPresetPick (D86) — 켜고 끄지 않고 하나 더 · 종류를 바꾸면 이름이 셋 · 같은 그대로면 duplicate_pick', () => {
+    let p = addPresetPick(addPresetPick(initialPlan(), null, 'subnet'), null, 'subnet');
+    expect(p.projectPicks).toEqual([{ preset: 'subnet', instances: [{ id: '1', seq: '01' }] }, { preset: 'subnet', instances: [{ id: '1', seq: '01' }] }]);
+    const r = validatePlan(p);
+    expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.duplicate_pick']);
+    p = { ...p, projectPicks: [{ ...p.projectPicks[0]!, tier: 'web' }, { ...p.projectPicks[1]!, tier: 'app' }] };
+    p = addPresetPick(p, null, 'subnet');
+    p = { ...p, projectPicks: p.projectPicks.map((x, i) => (i === 2 ? { ...x, kind: 'REGIONAL_MANAGED_PROXY' } : x)) };
+    ok(p);
+    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ane3-snet-web-01', 'billing-prod-ane3-snet-app-01', 'billing-prod-ane3-snet-proxy-01']);
+  });
+  it('addPresetPick — 모르는 프리셋이면 그대로 · 서비스 칸에도 더한다', () => {
+    const base = initialPlan();
+    expect(addPresetPick(base, null, 'nope')).toBe(base);
+    expect(addPresetPick(addPresetPick(base, 0, 'object'), 0, 'object').services[0]!.picks).toEqual([{ preset: 'object' }, { preset: 'object' }]);
+  });
+  it('방화벽 — iap · lbhc 칩과 직접 친 tier 도 pick 하나씩 · 이름 (D87)', () => {
+    let p = togglePreset(initialPlan(), null, 'firewall', 'iap');
+    p = togglePreset(p, null, 'firewall', 'lbhc');
+    p = togglePreset(p, null, 'firewall', 'smtp');
+    ok(p);
+    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-fw-iap-01', 'billing-prod-fw-lbhc-01', 'billing-prod-fw-smtp-01']);
+    expect(findPreset(p, null, 'firewall', 'smtp')).toBe(2);
+  });
+  it('psa 칩 (D88) — 종류를 싣지 않아도 INTERNAL(int) · tier psa · 전역이라 지역 토큰 없음 · count 규칙이라 줄 하나', () => {
+    const p = togglePreset(initialPlan(), null, 'psa');
+    expect(p.projectPicks).toEqual([{ preset: 'psa', instances: [{ id: '1', seq: '01' }] }]);
+    ok(p);
+    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ip-int-psa-01']);
   });
   it('방화벽 tier 칩은 tier 마다 pick 하나', () => {
     let p = togglePreset(initialPlan(), null, 'firewall', 'ssh');
