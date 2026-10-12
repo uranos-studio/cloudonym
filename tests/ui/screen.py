@@ -8,8 +8,6 @@
 실행(저장소 루트) — 터미널 둘:
   ① npm run dev -- --host 127.0.0.1 --port 5199 --strictPort
   ② uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://127.0.0.1:5199 docs/screenshots
-  ③ 같은 트리 시나리오를 /pick 경로의 hash 로 — 스크린샷은 버릴 폴더에:
-     uv run --python 3.12 --with "playwright==1.63.0" python tests/ui/screen.py http://127.0.0.1:5199 <임시 폴더> /pick
 
 ①이 뜬 뒤(`curl -s http://127.0.0.1:5199/v1/health` → {"ok":true}) ②를 돌리고, 끝나면 ①을 멈춘다.
 500행 성능 측정은 tests/ui/perf.py 다(같은 서버).
@@ -28,10 +26,7 @@ from playwright.sync_api import Error, expect, sync_playwright
 
 BASE = sys.argv[1].rstrip('/')
 OUT = Path(sys.argv[2])
-# 옛 hash 링크를 여는 경로 (D68) — 기본은 뿌리 `/`(이미 나간 링크 그대로), 셋째 인자로 `/pick` 을 주면 같은 시나리오를 트리 경로에서 돈다.
-# hash 없는 첫 방문(⑴) · 깨진 hash(⑶)는 늘 `/pick` 이다 — 뿌리의 hash 없는 화면은 마법사다. 마법사 시나리오 ㉚~㊴ 는 뿌리 패스에서만 돈다
-HB = sys.argv[3] if len(sys.argv) > 3 else '/'
-assert HB in ('/', '/pick'), HB
+# 트리 화면의 경로 (D68 · D76) — 뿌리 `/` 는 늘 마법사이고, 트리 꼴 hash 로 뿌리를 열면 `/pick` 으로 옮겨 간다(㊱)
 TREE = '/pick'
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -386,8 +381,8 @@ def wizard_scenarios(browser, rules_version, errors):
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '마법사가 360px 에서 가로 스크롤이 생긴다'
     ctx.close()
 
-    # ── ㊱ 지금 나간 꼴 그대로의 뿌리 링크(v3 r · 다섯 키)는 트리 화면으로 열린다 · 깨진 뿌리 hash 는 마법사 + 한 줄 안내 ──
-    # ── ㊲ /pick#state=… 도 같다 ──
+    # ── ㊱ 트리 꼴 hash(v3 r · 다섯 키)로 뿌리를 열면 `/pick` 으로 옮겨 트리가 열린다 (D76) · 깨진 뿌리 hash 는 마법사 + 한 줄 안내 ──
+    # ── ㊲ /pick#state=… 는 그 자리에서 트리 ──
     v3 = state_hash(INPUT, rules_version, 'gcp', {'compute_instance': 2})
     five = state_hash(INPUT)
     ctx36 = browser.new_context(viewport={'width': 1280, 'height': 900})
@@ -396,22 +391,25 @@ def wizard_scenarios(browser, rules_version, errors):
     p36.on('pageerror', lambda e: errors.append(str(e)))
     for path in ('/', '/pick'):
         for h in (v3, five):
-            goto_ready(p36, BASE + path + '?r' + h)
+            goto_ready(p36, BASE + '/pick?r' + h)
             goto_ready(p36, BASE + path + h)
+            p36.wait_for_url(BASE + '/pick' + h)
             expect(p36.locator('[data-tree]')).to_have_count(1)
             expect(p36.locator('[data-wizard]')).to_have_count(0)
             expect_ctx(p36, INPUT)
             expect(p36.locator('[data-nav-wizard]')).to_have_attribute('href', '/')
             if h == v3:
                 expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
-                # 주소창은 연 경로 그대로 · 뿌리에서 연 옛 링크라도 새 Share URL 은 /pick 이다 (D68)
-                assert p36.url.startswith(BASE + path + '#state='), p36.url
                 p36.click('[data-copy="share-url"]')
                 tree_share = p36.evaluate('navigator.clipboard.readText()')
                 assert tree_share.startswith(BASE + '/pick#state='), tree_share
                 assert 'w' not in hash_state(tree_share), tree_share
-    # 같은 탭 — 뿌리의 트리에서 풀리지 않는 마법사 hash(문맥이 틀림)로 이동하면 트리에 남고 주소창이 되돌아간다
-    goto_ready(p36, BASE + '/' + v3)
+    # query 도 실어 간다 — `/?x#트리` → `/pick?x#트리`
+    goto_ready(p36, BASE + '/?keep' + v3)
+    p36.wait_for_url(BASE + '/pick?keep' + v3)
+    expect(p36.locator('[data-tree]')).to_have_count(1)
+    # 같은 탭 — 트리에서 풀리지 않는 마법사 hash(문맥이 틀림)로 이동하면 트리에 남고 주소창이 되돌아간다
+    goto_ready(p36, BASE + '/pick' + v3)
     bad_w = json.loads(json.dumps(hash_state(shared)))
     bad_w['env'] = 'nope'
     bad_w_hash = '#state=' + base64.urlsafe_b64encode(json.dumps(bad_w, separators=(',', ':')).encode()).rstrip(b'=').decode()
@@ -419,12 +417,11 @@ def wizard_scenarios(browser, rules_version, errors):
     p36.wait_for_function('h => location.hash === h', arg=v3)
     expect(p36.locator('[data-tree]')).to_have_count(1)
     expect(p36.locator('[data-wizard]')).to_have_count(0)
-    # 같은 탭 — 뿌리의 트리에서 마법사 링크로 이동하면 마법사로 바뀐다
-    p36.evaluate('h => { location.hash = h; }', '#' + shared.split('#', 1)[1])
+    # 같은 탭 — 마법사에서 트리 hash 로 이동하면 `/pick` 으로 옮겨 트리가 열린다
+    goto_ready(p36, BASE + '/')
     expect(p36.locator('[data-wizard]')).to_be_visible()
-    expect(p36.locator('[data-tree]')).to_have_count(0)
-    # 반대 방향 — 마법사에서 옛 트리 링크로 이동하면 트리로 바뀐다
     p36.evaluate('h => { location.hash = h; }', v3)
+    p36.wait_for_url(BASE + '/pick' + v3)
     expect(p36.locator('[data-tree]')).to_have_count(1)
     expect(p36.locator('[data-wizard]')).to_have_count(0)
     expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
@@ -1003,7 +1000,7 @@ with sync_playwright() as p:
     page8.on('pageerror', lambda e: errors.append(str(e)))
     # r 순서를 트리 순서와 다르게 — 같은 선택이면 링크를 연 직후 hash 를 덮어쓰지 않는다
     old_hash = state_hash(INPUT, OLD_RULES, 'gcp', {'compute_instance': 2, 'project_id': 1})
-    goto_ready(page8, BASE + HB + old_hash)
+    goto_ready(page8, BASE + TREE + old_hash)
     notice = page8.locator('[data-rules-mismatch]')
     expect(notice).to_have_text(f'This link was made with rules {OLD_RULES}; the current rules are {RULES}. Names may differ.')
     expect_ctx(page8, INPUT)
@@ -1034,8 +1031,8 @@ with sync_playwright() as p:
 
     # ── ⒁ 옛 링크(다섯 키만) → 문맥이 열리고 켜진 CSP(GCP)가 자동 선택 · hash 를 덮어쓰지 않는다 ──
     v1_hash = state_hash(INPUT)
-    goto_ready(page8, BASE + HB + '?' + v1_hash)  # 경로를 바꿔 새로 불러온다
-    goto_ready(page8, BASE + HB + v1_hash)
+    goto_ready(page8, BASE + TREE + '?' + v1_hash)  # 경로를 바꿔 새로 불러온다
+    goto_ready(page8, BASE + TREE + v1_hash)
     expect_ctx(page8, INPUT)
     expect(page8.locator('[role="radio"][aria-checked="true"]')).to_have_count(1)
     expect(page8.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
@@ -1045,8 +1042,8 @@ with sync_playwright() as p:
 
     # ── ⒂ 모르는 type · 종류가 안 맞는 값이 든 링크 → 그 항목만 버리고 한 줄 안내 ──
     odd = state_hash(INPUT, RULES, 'gcp', {'no_such_type': 1, 'compute_instance': 2, 'service_account': 1})
-    goto_ready(page8, BASE + HB + '?x' + odd)
-    goto_ready(page8, BASE + HB + odd)
+    goto_ready(page8, BASE + TREE + '?x' + odd)
+    goto_ready(page8, BASE + TREE + odd)
     expect(page8.locator('[data-selection-dropped]')).to_have_text('This link had 2 resource selections that do not fit the current rules or limits; they were left out.')
     expect(page8.locator('article[data-key]')).to_have_count(2)
     expect(page8.locator('[data-selected-count]')).to_have_text('1 selected')
@@ -1055,8 +1052,8 @@ with sync_playwright() as p:
 
     # ── ⒄ 지금 버전 링크로 연 뒤 개수 +1 → −1 — 주소창 hash 가 화면의 선택을 따라간다(링크 상태가 남아 hash 쓰기를 막으면 안 된다) ──
     linked = state_hash(INPUT, RULES, 'gcp', {'compute_instance': 2})
-    goto_ready(page8, BASE + HB + '?y' + linked)
-    goto_ready(page8, BASE + HB + linked)
+    goto_ready(page8, BASE + TREE + '?y' + linked)
+    goto_ready(page8, BASE + TREE + linked)
     vm8 = row(page8, 'compute_instance')
     expect(vm8.locator('[data-count]')).to_have_text('2')
     vm8.locator('[data-inc]').click()
@@ -1074,7 +1071,7 @@ with sync_playwright() as p:
     page18 = ctx18.new_page()
     page18.on('pageerror', lambda e: errors.append(str(e)))
     full = state_hash(INPUT, RULES, 'gcp', {'compute_instance': 2})
-    goto_ready(page18, BASE + HB + full)
+    goto_ready(page18, BASE + TREE + full)
     expect(page18.locator('[data-copy="share-url"]')).to_have_count(1)
     page18.fill('#field-owner', '')
     expect(page18.locator('[data-names-empty]')).to_have_text('Fill in Owner · System · Purpose to generate names.')
@@ -1095,7 +1092,7 @@ with sync_playwright() as p:
     page19 = ctx19.new_page()
     page19.on('pageerror', lambda e: errors.append(str(e)))
     sel200 = {f'fx500_{i:03d}': ('sync' if i % 4 == 2 else 1) for i in range(200)}  # src/dev/fixtureRules.ts 의 입력 종류 순환
-    goto_ready(page19, BASE + HB + '?fixture=rules500' + state_hash(INPUT, RULES, 'gcp', sel200))
+    goto_ready(page19, BASE + TREE + '?fixture=rules500' + state_hash(INPUT, RULES, 'gcp', sel200))
     expect(page19.locator('[data-selected-count]')).to_have_text('200 selected')
     # 바로 다음 보이는 상자가 비활성이고 그 뒤에 활성 상자가 있는 체크된 행 — 기대값은 그 뒤 첫 활성 상자
     plan = page19.evaluate('''() => {
@@ -1119,7 +1116,7 @@ with sync_playwright() as p:
     ctx16 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page16 = ctx16.new_page()
     page16.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(page16, BASE + HB + '?fixture=conflict' + state_hash(INPUT, RULES, 'gcp', {'test_conflict_a': 1, 'test_conflict_b': 1, 'project_id': 1}))
+    goto_ready(page16, BASE + TREE + '?fixture=conflict' + state_hash(INPUT, RULES, 'gcp', {'test_conflict_a': 1, 'test_conflict_b': 1, 'project_id': 1}))
     for k in ('test_conflict_a_01', 'test_conflict_b_01'):
         card = page16.locator(f'article[data-key="{k}"]')
         expect(card).to_have_attribute('data-valid', 'false')
@@ -1137,7 +1134,7 @@ with sync_playwright() as p:
     ctxR.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     pr = ctxR.new_page()
     pr.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pr, BASE + HB + state_hash(INPUT, RULES, 'gcp'))
+    goto_ready(pr, BASE + TREE + state_hash(INPUT, RULES, 'gcp'))
     expect_ctx(pr, INPUT)
     pr.click('[data-expand-all]')
 
@@ -1386,7 +1383,7 @@ with sync_playwright() as p:
     page20 = ctx20.new_page()
     page20.on('pageerror', lambda e: errors.append(str(e)))
     az_link = state_hash({**INPUT, 'region': 'koreacentral'}, RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})  # Azure 가 풀 수 있는 지역이라야 이 분기다
-    goto_ready(page20, BASE + HB + az_link)
+    goto_ready(page20, BASE + TREE + az_link)
     expect(page20.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(page20.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'false')
     expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the region was reset to the example and the selection was cleared.')
@@ -1402,9 +1399,8 @@ with sync_playwright() as p:
     assert hash_state(page20.url) == {**reset, 'v': RULES, 'p': 'gcp', 'r': {'project_id': 1}}, hash_state(page20.url)
     ctx20.close()
 
-    if HB == '/':
-        wizard_scenarios(browser, RULES, errors)
+    wizard_scenarios(browser, RULES, errors)
     browser.close()
 
     assert errors == [], errors
-    print(f'OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과(옛 hash 경로 {HB}) · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))
+    print('OK — 시나리오 ⑴~⒆ · ⒇~㉙ 통과 · 비콘', sent, '· 스크린샷', sorted(p.name for p in OUT.glob('*.png')))

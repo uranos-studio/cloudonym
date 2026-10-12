@@ -75,7 +75,7 @@ function itemValue(item: SelectionItem): number | string {
 const KIND_VALUE_RE = new RegExp(`^([1-9]\\d?):([A-Za-z0-9_-]{1,${MAX_KIND_VALUE_CHARS}})$`);
 
 /** 다섯 필드를 고정 순서로 담고(region 은 리전 코드 — 존은 싣지 않는다 · D50 revised · D55), 규칙 버전 `v` · CSP `p` · 선택 `r` 을 이 순서로 붙인다 — 같은 상태면 같은 문자열.
- *  p 가 없으면 p · r 을 모두 빼고, 선택이 비면 r 을 뺀다 — 옛 링크(다섯 키 · v)와 같은 문자열이 나와 링크 상태가 유지된다 */
+ *  p 가 없으면 p · r 을 모두 빼고, 선택이 비면 r 을 뺀다 — 다섯 키 · v 만 든 링크와 같은 문자열이 나와 링크 상태가 유지된다 */
 export function encodeState(ctx: NamingContext, rulesVersion?: string, pick: PickState = {}): string {
   const body: Record<string, unknown> = { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.region };
   if (rulesVersion !== undefined) body.v = rulesVersion;
@@ -518,8 +518,9 @@ function hashJson(hash: string, max: number): Record<string, unknown> | undefine
   }
 }
 
-/** 뿌리 경로의 화면 고르기 (D68) — 디코더가 받는 꼴만 그 화면이다: decodeWizardState 가 받으면 wizard · `w` 가 없고 decodeState 가 받으면 tree
- *  (옛 v3 · 다섯 키 링크 — 걸린 항목은 그 디코더가 버리고 연다) · hash 가 없으면 none · 그 밖(풀리지 않는 꼴 · 문맥이 틀린 링크)은 broken */
+/** hash 의 꼴 (D68 · D76) — 디코더가 받는 꼴만 그 화면이다: decodeWizardState 가 받으면 wizard · `w` 가 없고 decodeState 가 받으면 tree
+ *  (v3 · 다섯 키 — 걸린 항목은 그 디코더가 버리고 연다) · hash 가 없으면 none · 그 밖(풀리지 않는 꼴 · 문맥이 틀린 링크)은 broken.
+ *  뿌리 `/` 는 tree 꼴이면 `/pick` 으로 옮기고, broken 이면 마법사에 한 줄 안내를 띄운다 */
 export type HashKind = 'wizard' | 'tree' | 'none' | 'broken';
 export function hashKind(hash: string): HashKind {
   if (hash === '' || hash === '#') return 'none';
@@ -527,12 +528,6 @@ export function hashKind(hash: string): HashKind {
   if (!raw) return 'broken';
   if ('w' in raw) return decodeWizardState(hash) !== undefined ? 'wizard' : 'broken';
   return decodeState(hash) !== undefined ? 'tree' : 'broken';
-}
-
-/** 뿌리에서 같은 탭 hash 이동 — 다른 화면의 디코더가 받는 hash 일 때만 화면을 바꾼다. 아니면 지금 화면이 그 hash 를 다룬다(깨진 hash 는 되돌린다) */
-export function nextRootScreen(current: 'wizard' | 'tree', hash: string): 'wizard' | 'tree' {
-  const k = hashKind(hash);
-  return k === 'wizard' || k === 'tree' ? k : current;
 }
 
 /** 마법사 hash 를 푼다 — 문맥 넷이 안 풀리면(깨진 링크) undefined. w 와 r 이 같이 있으면 깨진 링크다.

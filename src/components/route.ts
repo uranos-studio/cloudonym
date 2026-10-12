@@ -3,7 +3,7 @@ export type Route = 'app' | 'pick' | 'naming' | 'privacy';
 
 export const NAMING_PATH = '/docs/naming';
 export const PRIVACY_PATH = '/privacy';
-/** 트리 화면(리소스 고르기) — 새로 만드는 트리 Share URL 의 자리 (D68). 뿌리 `/` 는 hash 로 마법사 · 트리를 고른다 */
+/** 트리 화면(리소스 고르기) — 트리 Share URL 의 자리 (D68). 뿌리 `/` 는 늘 마법사다 — 트리 꼴 hash 는 이 경로로 옮긴다 (D76) */
 export const PICK_PATH = '/pick';
 export const WIZARD_PATH = '/';
 

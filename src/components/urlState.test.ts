@@ -628,7 +628,7 @@ describe('hash v4 — 걸린 자리만 버린다 (§5-5 path)', () => {
   });
 });
 
-describe('hash v4 — 모델 전체 오류 · 옛 링크 · 깨진 링크', () => {
+describe('hash v4 — 모델 전체 오류 · 트리 hash · 깨진 링크', () => {
   it('projectPicks:[] · services:[] → wizard.empty → w 전체를 버리고 안내(문맥은 연다)', () => {
     const d = decodeW({ provider: 'gcp', project: WP, projectPicks: [], services: [] });
     expect(d.plan).toBeUndefined();
@@ -650,7 +650,7 @@ describe('hash v4 — 모델 전체 오류 · 옛 링크 · 깨진 링크', () =
     expect(decodeWizardState(rawWizardHash(W_SAMPLE, { r: { disk: 1 } }))).toBeUndefined();
     expect(decodeWizardState(rawWizardHash(W_SAMPLE, { env: 'nope' }))).toBeUndefined();
   });
-  it('옛 v3 · 다섯 키 hash 는 그대로 트리로 열린다 — hashKind tree · decodeState 가 연다 · 마법사 디코더는 열지 않는다', () => {
+  it('트리 hash(v3 · 다섯 키)는 트리 디코더가 연다 — hashKind tree · decodeState 가 연다 · 마법사 디코더는 열지 않는다', () => {
     const v3 = `#state=${encodeState(ctx, WV, { provider: 'gcp', selection: [] })}`;
     const five = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' }))}`;
     const withR = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', v: WV, p: 'gcp', r: { compute_instance: 2 } }))}`;
@@ -699,12 +699,11 @@ describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
   });
 });
 
-// ─── 뿌리 화면 고르기 — 풀리는 꼴만 그 화면이다 (D68 · 검토 M-2 · M-3) ───
-import { nextRootScreen } from './urlState';
+// ─── hash 의 꼴 — 풀리는 꼴만 그 화면이다 (D68 · D76 · 검토 M-2 · M-3) ───
 describe('hashKind — 디코더가 받는 hash 만 tree · wizard', () => {
   const five = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' }))}`;
   const v3Bad = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', v: WV, p: 'gcp', r: { nope_type: 1, compute_instance: 'x' } }))}`;
-  it('옛 링크 — 다섯 키 · 걸린 항목이 든 v3(decodeState 가 받고 그 항목만 버린다)는 tree', () => {
+  it('다섯 키 · 걸린 항목이 든 v3(decodeState 가 받고 그 항목만 버린다)는 tree', () => {
     expect(decodeEnabled(v3Bad)).toBeDefined();
     expect(hashKind(five)).toBe('tree');
     expect(hashKind(v3Bad)).toBe('tree');
@@ -721,14 +720,5 @@ describe('hashKind — 디코더가 받는 hash 만 tree · wizard', () => {
     expect(hashKind(rawWizardHash(W_SAMPLE, { r: { disk: 1 } }))).toBe('broken');
     // w 의 꼴만 틀리면(문맥은 온전) 디코더가 받고 w 를 버린다 — wizard
     expect(hashKind(`#state=${btoa(JSON.stringify({ ...WP, w: 5 }))}`)).toBe('wizard');
-  });
-  it('nextRootScreen — 같은 탭 이동은 다른 화면으로 풀릴 때만 바꾼다', () => {
-    const w = `#state=${encodeWizardState(W_SAMPLE, WV)}`;
-    expect(nextRootScreen('tree', w)).toBe('wizard');
-    expect(nextRootScreen('wizard', five)).toBe('tree');
-    for (const h of [rawWizardHash(W_SAMPLE, { env: 'nope' }), '#state=!!!', `#state=${btoa('{"owner":42}')}`, '']) {
-      expect(nextRootScreen('tree', h)).toBe('tree');
-      expect(nextRootScreen('wizard', h)).toBe('wizard');
-    }
   });
 });

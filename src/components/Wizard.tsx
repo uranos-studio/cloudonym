@@ -147,7 +147,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     schedule(wizardGenerateMeta(plan));
   }, [stateKey, schedule, plan]);
 
-  // 같은 탭 hash 이동 — 마법사 링크면 그 상태로 바꾸고, 트리 링크면 뿌리가 화면을 바꾼다(여기서는 손대지 않는다), 깨진 hash 면 지금 상태로 되돌린다
+  // 같은 탭 hash 이동 — 마법사 링크면 그 상태로 바꾸고, 트리 링크면 `/pick` 으로 옮기고, 깨진 hash 면 지금 상태로 되돌린다
   const current = useRef('');
   useEffect(() => {
     current.current = hashToRestore(stateKey, link, current.current);
@@ -158,7 +158,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   useEffect(() => {
     const onHash = () => {
       const kind = hashKind(window.location.hash);
-      if (kind === 'tree') return;
+      // 트리 꼴 hash 는 트리 경로에서 연다 (D76)
+      if (kind === 'tree') { window.location.replace(PICK_PATH + window.location.search + window.location.hash); return; }
       if (kind === 'wizard') {
         const s = startFrom(window.location.hash, false);
         if (!s.broken) {

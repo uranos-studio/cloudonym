@@ -14,7 +14,7 @@ import { NamesPanel } from './components/NamesPanel';
 import { LabelsPanel } from './components/LabelsPanel';
 import { CopyButton } from './components/CopyButton';
 import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } from './components/selection';
-import { encodeState, hashKind, nextRootScreen, shareUrl } from './components/urlState';
+import { encodeState, hashKind, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './components/route';
@@ -33,29 +33,16 @@ const NO_PICK: Picked = new Map();
 const PANEL = 'rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900';
 const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-/** 화면 고르기 (D68) — `/pick` 은 늘 트리. 뿌리 `/` 는 hash 로 고른다: `w` 면 마법사 · `w` 없는 온전한 hash(옛 v3 · 다섯 키 링크)면 지금 자리에서 트리 ·
- *  hash 가 없으면 마법사 · 어느 꼴로도 풀리지 않는 hash 면 마법사 + 한 줄 안내. 같은 탭 hash 이동은 다른 꼴로 풀릴 때만 화면을 바꾼다(깨진 hash 는 지금 화면이 되돌린다).
+/** 화면 고르기 (D68 · D76) — `/pick` 은 늘 트리, 뿌리 `/` 는 늘 마법사다. 트리 꼴 hash 로 뿌리를 열면 main.tsx 가 `/pick` 으로 옮긴다.
+ *  어느 꼴로도 풀리지 않는 뿌리 hash 면 마법사 + 한 줄 안내.
  *  rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
 function App({ rules, route = 'app' }: { rules?: readonly ResourceRule[]; route?: 'app' | 'pick' }) {
-  return route === 'pick' ? <TreeScreen rules={rules} atRoot={false} /> : <RootScreen rules={rules} />;
+  const [broken] = useState(() => route === 'app' && hashKind(window.location.hash) === 'broken');
+  return route === 'pick' ? <TreeScreen rules={rules} /> : <Wizard brokenLink={broken} />;
 }
 
-function RootScreen({ rules }: { rules?: readonly ResourceRule[] }) {
-  const [start] = useState(() => hashKind(window.location.hash));
-  const [mode, setMode] = useState<{ screen: 'wizard' | 'tree'; broken: boolean }>(() => ({ screen: start === 'tree' ? 'tree' : 'wizard', broken: start === 'broken' }));
-  useEffect(() => {
-    const onHash = () => {
-      // 다른 화면의 디코더가 받는 hash 일 때만 바꾼다 — 아니면 지금 화면이 다룬다(깨진 hash 는 되돌린다)
-      setMode((m) => { const k = nextRootScreen(m.screen, window.location.hash); return m.screen === k ? m : { screen: k, broken: false }; });
-    };
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
-  }, []);
-  return mode.screen === 'tree' ? <TreeScreen key="tree" rules={rules} atRoot /> : <Wizard key="wizard" brokenLink={mode.broken} />;
-}
-
-/** 네 단계 트리 화면 — atRoot 면 뿌리에서 옛 링크로 열린 것이다(마법사 hash 로의 이동은 RootScreen 이 맡는다) */
-function TreeScreen({ rules, atRoot }: { rules?: readonly ResourceRule[]; atRoot: boolean }) {
+/** 네 단계 트리 화면 (`/pick`) */
+function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
   // 첫 상태 — hash 가 온전하면 그것, 아니면 예시 (깨진 hash 는 decodeState 가 undefined 로 돌려준다)
   const [initial] = useState(() => openHash(window.location.hash, rules));
   // 폼은 지역 입력 문자열을 든다 — 정규화된 문맥으로 덮지 않는다(존이 떨어진다 · D50). 예시는 존 이름(R0)이다
@@ -144,8 +131,6 @@ function TreeScreen({ rules, atRoot }: { rules?: readonly ResourceRule[]; atRoot
   if (nextAddressHash !== addressHash) setAddressHash(nextAddressHash);
   useEffect(() => {
     const onHashChange = () => {
-      // 뿌리에서 마법사 링크로 이동 — 화면 전환은 RootScreen 이 한다
-      if (atRoot && hashKind(window.location.hash) === 'wizard') return;
       const opened = openHash(window.location.hash, rules);
       if (opened) {
         lastSentKey.current = encodeState(opened.context, VERSION.rules);
@@ -162,7 +147,7 @@ function TreeScreen({ rules, atRoot }: { rules?: readonly ResourceRule[]; atRoot
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, [rules, atRoot]);
+  }, [rules]);
 
   const nameCount = totalNames(picked);
 
