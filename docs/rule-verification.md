@@ -158,6 +158,19 @@ No page states the length or characters of these two IDs (re-checked 2026-10-11 
 - **Scope:** both are unique per project and location (`gcp:project_location`) and carry a region token. Jobs: the REST path `projects/{project}/locations/{location}/jobs`; repositories: the sentence quoted above.
 - Abbreviations `crj` and `ar` were reserved in D72 and are used now.
 
+## Wizard presets and project ID facts checked on 2026-10-12
+
+The wizard's firewall chips, the private services access chip and the project ID notice (D85, D87, D88) state facts that are not length or character rules. Each was read on the official page on 2026-10-12; the quotes are word for word.
+
+| Fact used | URL | Quote | Where it is used |
+|---|---|---|---|
+| IAP TCP forwarding source range | https://docs.cloud.google.com/iap/docs/using-tcp-forwarding | "allows ingress traffic from the IP range `35.235.240.0/20`." · "This range contains all IP addresses that IAP uses for TCP forwarding." | Title of the `iap` firewall chip |
+| Load balancer health check probe ranges | https://docs.cloud.google.com/load-balancing/docs/health-check-concepts | "Google Cloud requires that you create the necessary ingress `allow` firewall rules to permit traffic from probers to your backends or other resources." · IPv4 `35.191.0.0/16` and the other ranges listed there · "As a best practice, create ingress firewall rules that allow all of the probe IP ranges as sources." `130.211.0.0/22` is not on this page; https://docs.cloud.google.com/load-balancing/docs/firewall-rules lists it as a proxy range, so the hint does not name it | Title of the `lbhc` firewall chip |
+| Global address `purpose` is a separate field | https://docs.cloud.google.com/compute/docs/reference/rest/v1/globalAddresses | "The purpose of this resource, which can be one of the following values: GCE_ENDPOINT … VPC_PEERING for global internal IP addresses used for private services access allocated ranges." | `psa` keeps kind `INTERNAL` (`addressType`); `VPC_PEERING` is not added to the kind table |
+| Private services access range is a global internal address | https://docs.cloud.google.com/vpc/docs/configure-private-services-access | `gcloud compute addresses create RESERVED_RANGE_NAME --global --purpose=VPC_PEERING …` · Terraform `google_compute_global_address` with `purpose = "VPC_PEERING"` and `address_type = "INTERNAL"`. No sentence says "must be global"; only the examples do | `psa` uses `gcp.global_address` (no region token) |
+| A project ID cannot be reused | https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects | "It cannot be in use or previously used; this includes deleted projects." · "After project creation, the project ID is permanent." No sentence says what the console does when a taken ID is entered, so the notice does not say it | Project ID notice and suffix (D85) |
+| No anonymous project lookup | https://docs.cloud.google.com/resource-manager/reference/rest/v1/projects/get | "The caller must have read permissions for this Project." · "Authorization requires the following IAM permission on the specified resource `projectId`:" `resourcemanager.projects.get` | Cloudonym does not check whether a project ID is free (D85) |
+
 ## Azure reserved words (added 2026-09-29)
 
 Source: https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words or trademarks in the name." The naming rules page (`resource-name-rules`) also says: "Resources with a public endpoint can't include reserved words or trademarks in the name." The ⑷ verdicts in the RULES table above were made before this document was consulted; for the rules listed below, this section supersedes ⑷.

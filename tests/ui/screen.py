@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83)의 ㉚~㊶ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D88)의 ㉚~㊷ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -197,7 +197,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83) — ㉚~㊶ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D88) — ㉚~㊷ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -246,7 +246,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-wizard]')).to_be_visible()
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
-    expect(page.get_by_text('Pick a cloud, then fill in five steps: project values and shared network, services, what runs in each service, options, and what attaches to each server. Names appear on the right as you go.')).to_be_visible()
+    expect(page.get_by_text('Pick a cloud, then fill in the steps: project values, the shared network, services with what runs in each, options, and what attaches to each server. Extra project-wide resources come last. Names appear on the right as you go.')).to_be_visible()
     expect(page.locator('[data-names-empty]')).to_have_text('Pick what runs in a service (or a project resource) to see names here.')
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     fill_project(page)
@@ -275,8 +275,8 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-names-summary]')).to_have_text('6 names · 6/6 PASS')
     # 자식은 부모 아래 들여쓰기 · 「attached to」 줄 · 제목 VM Instance · web · 01
     expect(page.locator('#names [data-child]')).to_have_count(3)
-    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/01"] h4')).to_have_text('VM Instance · web · 01')
-    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/01/data/01"] [data-parent]')).to_contain_text('attached to')
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/-/web/01"] h4')).to_have_text('VM Instance · web · 01')
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/-/web/01/data/01"] [data-parent]')).to_contain_text('attached to')
     expect(page.locator('[data-names-group]')).to_have_count(3)
     no_hangul(page)
     page.evaluate('window.scrollTo(0, 0)')
@@ -289,7 +289,7 @@ def wizard_scenarios(browser, rules_version, errors):
     assert exported['project'] == {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'ane3'}, exported['project']
     page.click('[data-copy="terraform"]')
     hcl = page.evaluate('navigator.clipboard.readText()')
-    assert '  gcp_names = {\n' in hcl and '"service/shop/compute_instance/web/01/data/01" = "' in hcl and 'gcp_labels_by_namespace' in hcl, hcl
+    assert '  gcp_names = {\n' in hcl and '"service/shop/compute_instance/-/web/01/data/01" = "' in hcl and 'gcp_labels_by_namespace' in hcl, hcl
 
     # ── ㊵ 환경 여럿 (D82) — stg 칩을 켜면 같은 계획을 env 마다 · 이름은 env 로 묶인다 · 내보내기는 env 맵 · 공유 링크의 e 가 왕복한다 · 끄면 그대로 ──
     expect(page.locator('[data-env-chip]')).to_have_count(9)
@@ -341,12 +341,12 @@ def wizard_scenarios(browser, rules_version, errors):
     s02 = slot(page, 0, 1)
     open_attached(s02)
     s02.locator('[data-attach="ip"]').check()
-    name02 = page.locator('#names article[data-key="service/shop/compute_instance/web/02"] [data-name]').inner_text()
+    name02 = page.locator('#names article[data-key="service/shop/compute_instance/-/web/02"] [data-name]').inner_text()
     slot(page, 0, 0).locator('[data-remove-slot]').click()
     expect(svc(page, 0).locator('li[data-slot]')).to_have_count(1)
     expect(slot(page, 0, 0)).to_have_attribute('data-seq', '02')
     expect(svc(page, 0).locator('[data-renumber]')).to_be_visible()
-    expect(page.locator('#names article[data-key="service/shop/compute_instance/web/02"] [data-name]')).to_have_text(name02)
+    expect(page.locator('#names article[data-key="service/shop/compute_instance/-/web/02"] [data-name]')).to_have_text(name02)
     page.click('[data-copy="share-url"]')
     shared = page.evaluate('navigator.clipboard.readText()')
     assert shared.startswith(BASE + '/#state='), shared
@@ -370,14 +370,14 @@ def wizard_scenarios(browser, rules_version, errors):
     pay.locator('[data-ha]').check()
     expect(pay.locator('li[data-slot]')).to_have_count(2)
     expect(pay.locator('[data-ha-hint]')).to_have_text('Two servers or more. Place the servers in different zones when you create them.')
-    expect(page.locator('#names article[data-key="service/pay/compute_instance/web/02"]')).to_have_count(1)
+    expect(page.locator('#names article[data-key="service/pay/compute_instance/-/web/02"]')).to_have_count(1)
     pay.locator('li[data-slot]').nth(1).locator('[data-remove-slot]').click()
     expect(pay.locator('[data-ha]')).not_to_be_checked()
     expect(pay.locator('[data-ha-hint]')).to_have_count(0)
     # Serverless 를 고르면 HA 토글이 숨고 이름이 Cloud Run 이 된다 · 끄면 돌아온다
     pay.locator('[data-serverless]').select_option('run')
     expect(pay.locator('[data-ha]')).to_have_count(0)
-    expect(page.locator('#names article[data-key="service/pay/run_service/web/01"] [data-name]')).to_have_text('payments-pay-prod-ane3-run-web-01')
+    expect(page.locator('#names article[data-key="service/pay/run_service/-/web/01"] [data-name]')).to_have_text('payments-pay-prod-ane3-run-web-01')
     pay.locator('[data-serverless]').select_option('')
     expect(pay.locator('[data-ha]')).to_have_count(1)
 
@@ -416,10 +416,10 @@ def wizard_scenarios(browser, rules_version, errors):
     crow = custom.locator('li[data-slot]').nth(0)
     open_attached(crow)
     crow.locator('[data-add-disk]').click()
-    child = page.locator('#names article[data-key$="/compute_instance/abcdefghijklmnop/01/data/01"]')
+    child = page.locator('#names article[data-key$="/compute_instance/-/abcdefghijklmnop/01/data/01"]')
     expect(child).to_have_attribute('data-valid', 'false')
     expect(child.locator('[data-violations]')).to_contain_text('exceeds the limit')
-    expect(page.locator('#names article[data-key$="/compute_instance/abcdefghijklmnop/01"]')).to_have_attribute('data-valid', 'true')
+    expect(page.locator('#names article[data-key$="/compute_instance/-/abcdefghijklmnop/01"]')).to_have_attribute('data-valid', 'true')
     no_hangul(page)
 
     # 폭 360px — 가로 스크롤 없음
@@ -519,13 +519,13 @@ def wizard_scenarios(browser, rules_version, errors):
     sa = svc(p38, 0).locator('[data-pick="sa"]')
     expect(sa.locator('[data-role]')).to_have_attribute('placeholder', 'sync')
     expect(sa.locator('li[data-slot]')).to_have_count(0)
-    expect(p38.locator('#names article[data-key="service/shop/service_account/-/sync"] [data-name]')).to_have_text('payments-shop-prod-sa-sync')
+    expect(p38.locator('#names article[data-key="service/shop/service_account/-/-/sync"] [data-name]')).to_have_text('payments-shop-prod-sa-sync')
     sa.locator('[data-role]').fill('deploy')
-    expect(p38.locator('#names article[data-key="service/shop/service_account/-/deploy"] [data-name]')).to_have_text('payments-shop-prod-sa-deploy')
+    expect(p38.locator('#names article[data-key="service/shop/service_account/-/-/deploy"] [data-name]')).to_have_text('payments-shop-prod-sa-deploy')
     # Secret 의 Location (D79) — 기본은 전역(지역 토큰 없음) · Regional 을 고르면 프로젝트 지역이 들고 API 와 같다 · 되돌리면 원래 이름
     sec = svc(p38, 0).locator('[data-pick="secret"]')
     sec_loc = sec.locator('[data-location]')
-    sec_name = p38.locator('#names article[data-key="service/shop/secret/-/01"] [data-name]')
+    sec_name = p38.locator('#names article[data-key="service/shop/secret/-/-/01"] [data-name]')
     expect(sec_loc).to_have_value('')
     expect(sec_loc.locator('option')).to_have_count(2)
     expect(sec_name).to_have_text('payments-shop-prod-secret-01')
@@ -542,13 +542,13 @@ def wizard_scenarios(browser, rules_version, errors):
     assert p38.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), '새 칩을 켠 마법사가 360px 에서 가로 스크롤이 생긴다'
     ctx38.close()
 
-    # ── ㊴ D74 · D75 — 번호 없는 Cloud 줄 · VPC 하나 · 「Add Subnet」 · 버킷 둘(Duplicate + tier) · 프로젝트 공용 Custom ──
+    # ── ㊴ D74 · D75 — 번호 없는 Cloud 줄 · VPC 하나 · 서브넷 번호 줄 · 버킷 둘(Duplicate + tier) · 프로젝트 공용 Custom ──
     ctx39 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p39 = ctx39.new_page()
     p39.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(p39, BASE + '/')
     cloud = p39.locator('[data-wizard] [data-wizard-cloud]')
-    expect(cloud.locator('#step-cloud')).to_have_text('Cloud')  # 번호 없음 — ①~⑥ 은 그대로
+    expect(cloud.locator('#step-cloud')).to_have_text('Cloud')  # 번호 없음 — ①~⑦ 은 그대로
     expect(p39.locator('#wizard-project')).to_contain_text('1')
     expect(cloud.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     expect(cloud.locator('[data-coming-soon]')).to_have_count(2)
@@ -556,7 +556,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(cloud.locator('[data-cloud="azure"]')).to_be_disabled()
     fill_project(p39)
     svc(p39, 0).locator('[data-service-name]').fill('shop')
-    # VPC 는 줄 하나 · 더하기 · 다시 매기기 없음 · 서브넷은 「Add Subnet」(VM 은 「Add server」 그대로 — ㉟)
+    # VPC 는 줄 하나 · 더하기 · 다시 매기기 없음 · 서브넷의 번호 줄은 「Add number (same kind and tier)」(D86 · VM 은 「Add server」 그대로 — ㉟)
     p39.locator('[data-project-chip="vpc"]').click()
     p39.locator('[data-project-chip="subnet"]').click()
     vpc = p39.locator('[data-pick="vpc"]')
@@ -565,7 +565,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(vpc.locator('[data-renumber]')).to_have_count(0)
     vpc.locator('[data-slot-seq]').fill('03')
     expect(vpc.locator('[data-renumber]')).to_have_count(0)
-    expect(p39.locator('[data-pick="subnet"] [data-add-slot]')).to_have_text('Add Subnet')
+    expect(p39.locator('[data-pick="subnet"] [data-add-slot]')).to_have_text('Add number (same kind and tier)')
     assert p39.locator('text=Add instance').count() == 0
     # 프리셋이 tier 를 정하는 web 에는 tier 칸도 Duplicate 도 없다 — 패널이 있는 것을 먼저 본다
     svc(p39, 0).locator('[data-purpose-chip="web"]').click()
@@ -598,25 +598,29 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(loc).to_have_value('')
     expect(loc.locator('option')).to_have_count(10)
     loc.select_option('us')
-    expect(p39.locator('#names article[data-key="service/shop/storage_bucket/uploads/-"] [data-name]')).to_have_text('devops-payments-shop-prod-us-gcs-uploads')
+    expect(p39.locator('#names article[data-key="service/shop/storage_bucket/-/uploads/-"] [data-name]')).to_have_text('devops-payments-shop-prod-us-gcs-uploads')
     want39l = wizard_names(p39, {
         'project_picks': [{'preset': 'vpc', 'instances': [{'id': '1', 'seq': '03'}]}, {'preset': 'subnet', 'instances': [{'id': '1', 'seq': '01'}]}],
         'services': [{'purpose': 'shop', 'picks': [{'preset': 'object', 'tier': 'uploads', 'location': 'us'}, {'preset': 'object', 'tier': 'backups'}]}],
     })
     assert screen_names(p39) == want39l, (screen_names(p39), want39l)
     loc.select_option('')
-    expect(p39.locator('#names article[data-key="service/shop/storage_bucket/uploads/-"] [data-name]')).to_have_text('devops-payments-shop-prod-ane3-gcs-uploads')
-    # 프로젝트 공용 Custom — 트리는 프로젝트 수준 범위만(VPC 있음 · Cloud SQL 데이터베이스 없음 · 프로젝트 ID 없음)
+    expect(p39.locator('#names article[data-key="service/shop/storage_bucket/-/uploads/-"] [data-name]')).to_have_text('devops-payments-shop-prod-ane3-gcs-uploads')
+    # 공용 추가 리소스의 Custom (D84) — 트리는 프로젝트 수준 범위만(VPC 있음 · Cloud SQL 데이터베이스 없음 · 프로젝트 ID 없음)
     p39.locator('[data-project-chip="custom"]').click()
     dlg = p39.locator('[data-custom-dialog]')
     expect(dlg).to_be_visible()
-    expect(dlg.get_by_text('Tick one row. It is added to the project resources with its own number rows.')).to_have_count(1)
+    expect(dlg.get_by_text('Tick one row. It is added to the shared extra resources with its own number rows.')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.vpc_network"]')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.cloud_sql_database"]')).to_have_count(0)
     expect(dlg.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
     row(p39, 'pubsub_topic').locator('input[data-row-check]').click()
     expect(dlg).to_have_count(0)
     expect(p39.locator('[data-pick-path^="projectPicks"][data-pick="custom"]')).to_have_count(1)
+    # custom pick 은 「Shared extra resources」 칸에 · 프리셋 pick 은 ② 네트워크 칸에 (D84)
+    expect(p39.locator('section[aria-labelledby="wizard-shared-extras"] [data-pick="custom"]')).to_have_count(1)
+    expect(p39.locator('section[aria-labelledby="wizard-network"] [data-pick="custom"]')).to_have_count(0)
+    expect(p39.locator('section[aria-labelledby="wizard-network"] [data-pick="subnet"]')).to_have_count(1)
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_count(1)
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_attribute('data-valid', 'true')
     no_hangul(p39)
@@ -631,8 +635,82 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(vpc2.locator('li[data-slot]')).to_have_count(2)
     expect(vpc2.locator('[data-add-slot]')).to_have_count(1)
     keys = [k for k, _, _ in screen_names(p39)]
-    assert keys == ['project/-/project_id/-/-', 'project/-/vpc_network/-/01', 'project/-/vpc_network/-/03', 'project/-/subnet/-/01', 'project/-/subnet/-/02'], keys
+    assert keys == ['project/-/project_id/-/-/-', 'project/-/vpc_network/-/-/01', 'project/-/vpc_network/-/-/03', 'project/-/subnet/-/-/01', 'project/-/subnet/-/-/02'], keys
     ctx39.close()
+
+    # ── ㊷ 3차 (D84~D88) — 화면 순서 · 프로젝트 이름 · ID 접미사 · Add subnet · 방화벽 직접 입력 · NAT 와 Router 는 따로 · psa 종류 칸 없음 · tier 입력 포커스 ──
+    ctx42 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p42 = ctx42.new_page()
+    p42.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p42, BASE + '/')
+    heads = [h.inner_text().replace('\n', ' ') for h in p42.locator('main h2').all()]
+    order = [h for h in heads if h.split(' ')[0] in ('Cloud',) or h[:1].isdigit() or h.startswith('Shared')]
+    assert [h[:1] if h[:1].isdigit() else h.split(' ')[0] for h in order] == ['Cloud', '1', '2', '3', 'Shared', '7'], heads
+    fill_project(p42)
+    svc(p42, 0).locator('[data-service-name]').fill('shop')
+    # 프로젝트 이름은 ID 위 · 접미사는 ID 에만 · 예약어는 칸에 오류 · 빈 칸이면 원래 ID
+    expect(p42.locator('[data-project-preview] dt')).to_have_text(['Project name', 'Project ID', 'Every name carries'])
+    expect(p42.locator('[data-project-name]')).to_have_text('devops-payments-prod')
+    p42.fill('[data-project-id-suffix]', 'team1')
+    expect(p42.locator('[data-project-id]')).to_have_text('devops-payments-prod-team1')
+    expect(p42.locator('[data-project-name]')).to_have_text('devops-payments-prod')
+    p42.fill('[data-project-id-suffix]', 'db')
+    expect(p42.locator('#wizard-project-id-suffix-error')).to_contain_text("Project ID suffix 'db' is reserved")
+    p42.fill('[data-project-id-suffix]', '')
+    expect(p42.locator('[data-project-id]')).to_have_text('devops-payments-prod')
+    expect(p42.locator('[data-project-id-notice]')).to_contain_text('Cloudonym cannot check whether this ID is free')
+    # 서브넷 둘 — Add subnet 둘째는 따로 종류 · tier · 머리 이름 · 칩은 눌린 채 · tier 를 치는 동안 포커스가 남는다
+    p42.click('[data-project-chip="subnet"]')
+    p42.click('[data-add-subnet]')
+    sn = p42.locator('[data-pick="subnet"]')
+    expect(sn).to_have_count(2)
+    sn.nth(1).locator('[data-kind]').select_option('REGIONAL_MANAGED_PROXY')
+    t42 = sn.nth(1).locator('[data-tier]')
+    t42.click()
+    p42.keyboard.type('edge')
+    expect(t42).to_have_value('edge')
+    assert p42.evaluate("document.activeElement.hasAttribute('data-tier')")
+    expect(sn.locator('h4')).to_have_text(['Subnet', 'Subnet · proxy · edge'])
+    expect(p42.locator('[data-project-chip="subnet"]')).to_have_attribute('aria-pressed', 'true')
+    # 서비스 pick 의 tier 칸도 포커스가 남는다
+    svc(p42, 0).locator('[data-purpose-chip="object"]').click()
+    ot = svc(p42, 0).locator('[data-pick="object"] [data-tier]')
+    ot.click()
+    p42.keyboard.type('uploads')
+    expect(ot).to_have_value('uploads')
+    assert p42.evaluate("document.activeElement.hasAttribute('data-tier')")
+    # 방화벽 — iap · lbhc 칩의 title · 직접 입력(예약어는 단추가 꺼진다 · 통과하면 규칙 하나)
+    expect(p42.locator('[data-project-chip="firewall-iap"]')).to_have_attribute('title', re.compile('35.235.240.0/20'))
+    expect(p42.locator('[data-project-chip="firewall-lbhc"]')).to_have_attribute('title', re.compile('35.191.0.0/16'))
+    p42.fill('[data-firewall-tier]', 'db')
+    expect(p42.locator('[data-firewall-tier-add]')).to_be_disabled()
+    p42.fill('[data-firewall-tier]', 'app')
+    p42.click('[data-firewall-tier-add]')
+    expect(p42.locator('[data-pick="firewall"] h4')).to_have_text('Firewall rule · app')
+    expect(p42.locator('[data-firewall-tier]')).to_have_value('')
+    # NAT 와 Router 는 따로 켜고 끈다 · NAT 에 안내 한 줄
+    p42.click('[data-project-chip="nat"]')
+    expect(p42.locator('[data-project-chip="router"]')).to_have_attribute('aria-pressed', 'false')
+    expect(p42.locator('[data-nat-hint]')).to_have_count(1)
+    p42.click('[data-project-chip="router"]')
+    p42.click('[data-project-chip="router"]')
+    expect(p42.locator('[data-project-chip="nat"]')).to_have_attribute('aria-pressed', 'true')
+    # psa — 종류 칸 없음 (고정 INTERNAL)
+    p42.click('[data-project-chip="psa"]')
+    expect(p42.locator('[data-pick="psa"] [data-kind]')).to_have_count(0)
+    one42 = [{'id': '1', 'seq': '01'}]
+    want42 = wizard_names(p42, {
+        'project_picks': [{'preset': 'subnet', 'instances': one42}, {'preset': 'subnet', 'kind': 'REGIONAL_MANAGED_PROXY', 'tier': 'edge', 'instances': one42},
+                          {'preset': 'firewall', 'tier': 'app', 'instances': one42}, {'preset': 'nat', 'instances': one42}, {'preset': 'psa', 'instances': one42}],
+        'services': [{'purpose': 'shop', 'picks': [{'preset': 'object', 'tier': 'uploads'}]}],
+    })
+    assert screen_names(p42) == want42, (screen_names(p42), want42)
+    assert [n for _, n, _ in want42][1:6] == ['payments-prod-ane3-snet-01', 'payments-prod-ane3-snet-proxy-edge-01', 'payments-prod-fw-app-01', 'payments-prod-nat-01', 'payments-prod-ip-int-psa-01'], want42
+    # 서브넷 칩을 끄면 둘 다 떨어진다
+    p42.click('[data-project-chip="subnet"]')
+    expect(p42.locator('[data-pick="subnet"]')).to_have_count(0)
+    no_hangul(p42)
+    ctx42.close()
 
     # ── ㊶ 버킷 「Check」 (D83) — 누를 때만 브라우저가 storage.googleapis.com 에 직접 묻는다 · 404 available · 401 taken · 실패 unknown · 이름은 Cloudonym 에 가지 않는다 ──
     ctx41 = browser.new_context(viewport={'width': 1280, 'height': 900})
@@ -703,7 +781,7 @@ def wizard_scenarios(browser, rules_version, errors):
     assert leaked == [], leaked
     no_hangul(p41)
     ctx41.close()
-    print('OK — 마법사 시나리오 ㉚~㊶ 통과')
+    print('OK — 마법사 시나리오 ㉚~㊷ 통과')
 
 
 with sync_playwright() as p:
@@ -1491,7 +1569,7 @@ with sync_playwright() as p:
     no_hangul(page27)
     ctx27.close()
 
-    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 114(Cloud Run · D72 · D80 포함) · 리전 43 · 종류 토큰 19 · 환경 9 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 11) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
+    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 115(Cloud Run · D72 · D80 · 프로젝트 이름 D85 포함) · 리전 43 · 종류 토큰 19 · 환경 9 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 11) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
     ctx28 = browser.new_context(viewport={'width': 360, 'height': 800})
     page28 = ctx28.new_page()
     page28.on('pageerror', lambda e: errors.append(str(e)))
@@ -1499,7 +1577,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 114, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 11}.items():
+    for table_id, rows in {'abbreviations': 115, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 11}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
