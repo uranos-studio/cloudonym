@@ -1,6 +1,6 @@
 // 마법사 Terraform (D69) — 구조 키를 그대로 맵 키로 쓴다. toTerraformLocals 는 그대로다(terraform.test 가 센다)
 import { describe, it, expect } from 'vitest';
-import { wizardLabels, wizardTerraform } from './wizardTerraform';
+import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTerraform';
 import { generateProject } from '../core/engine';
 import { WIZARD_PARENT_FAIL, WIZARD_SAMPLE } from '../core/__fixtures__/project';
 import type { LabelSet } from '../core/types';
@@ -45,5 +45,33 @@ describe('wizardTerraform (D69)', () => {
     const h = wizardTerraform(out, { project: bad });
     expect(h).toContain('  # INVALID: gcp_labels_by_namespace["project"] — ');
     expect(h).not.toContain('    "project" = {');
+  });
+});
+
+describe('wizardTerraformByEnv (D82)', () => {
+  const withEnv = (env: 'prod' | 'stg') => ({ ...WIZARD_SAMPLE, project: { ...WIZARD_SAMPLE.project, env } });
+  const entries = (['prod', 'stg'] as const).map((env) => ({ env, result: generateProject(withEnv(env), 'gcp'), labels: wizardLabels(withEnv(env), 'gcp') }));
+  const hcl = wizardTerraformByEnv(entries);
+  const envKeys = (env: string) => {
+    const block = hcl.slice(hcl.indexOf(`    "${env}" = {\n`), hcl.indexOf('\n    }\n', hcl.indexOf(`    "${env}" = {\n`)));
+    return [...block.matchAll(/^ {6}"([^"]+)" = "/gm)].map((m) => m[1]!);
+  };
+  it('gcp_names_by_env — env 마다 항목 키 그대로 · 이름은 그 env 의 것', () => {
+    expect(hcl.startsWith('locals {\n  gcp_names_by_env = {\n    "prod" = {\n')).toBe(true);
+    expect(envKeys('prod')).toEqual(entries[0]!.result.items.map((i) => i.key));
+    expect(envKeys('stg')).toEqual(entries[1]!.result.items.map((i) => i.key));
+    expect(hcl).toContain('      "service/shop/compute_instance/web/01/boot/-" = "billing-shop-prod-ane3-gce-web-01-boot"\n');
+    expect(hcl).toContain('      "service/shop/compute_instance/web/01/boot/-" = "billing-shop-stg-ane3-gce-web-01-boot"\n');
+    expect(hcl).not.toMatch(/^ {2}gcp_names = /m);
+  });
+  it('라벨은 gcp_labels_by_env — env 안에 이름공간', () => {
+    expect(hcl).toContain('  gcp_labels_by_env = {\n    "prod" = {\n      "project" = {\n        owner = "platform"\n');
+    expect(hcl).toMatch(/ {4}"stg" = \{\n {6}"project" = \{\n(?: {8}.+\n)*? {8}environment = "stg"\n/);
+  });
+  it('무효는 env 를 단 # INVALID 주석 — 값으로 나가지 않는다', () => {
+    const fail = generateProject(WIZARD_PARENT_FAIL, 'gcp');
+    const h = wizardTerraformByEnv([{ env: 'dev', result: fail, labels: {} }]);
+    expect(h).toContain(`# INVALID: gcp_names_by_env["dev"]["${fail.items[1]!.key}"] — `);
+    expect(h).not.toContain('gcp_labels_by_env');
   });
 });

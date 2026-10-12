@@ -689,12 +689,43 @@ describe('hash v4 — 모델 전체 오류 · 트리 hash · 깨진 링크', () 
   });
 });
 
+describe('hash v4 — 환경 여럿 e (D82)', () => {
+  it('하나면 e 를 싣지 않는다 — envs 를 넘겨도 env 하나면 hash 가 같다', () => {
+    const enc = encodeWizardState(W_SAMPLE, WV)!;
+    expect(encodeWizardState(W_SAMPLE, WV, ['prod'])).toBe(enc);
+    expect('e' in jsonOf(enc)).toBe(false);
+    expect(decodeWizardState(`#state=${enc}`)!.envs).toBeUndefined();
+  });
+  it('둘 이상이면 표준값 순서로 싣고 왕복한다 — env 가 첫째', () => {
+    const enc = encodeWizardState(W_SAMPLE, WV, ['dr', 'stg', 'prod'])!;
+    expect(jsonOf(enc).e).toEqual(['prod', 'stg', 'dr']);
+    const back = decodeWizardState(`#state=${enc}`)!;
+    expect(back.envs).toEqual(['prod', 'stg', 'dr']);
+    expect(back.plan).toEqual(W_SAMPLE);
+    expect(back.notices.dropped).toBe(0);
+    expect(encodeWizardState(back.plan!, WV, back.envs)).toBe(enc);
+  });
+  it('표준값이 아닌 항목은 버리고 센다 · 배열이 아니면 통째로 버린다 · env 가 뒤에 와도 첫째가 모델의 env 가 된다', () => {
+    const d1 = decodeWizardState(rawWizardHash(W_SAMPLE, { e: ['prod', 'production', 'qa', 7, 'qa'] }))!;
+    expect(d1.envs).toEqual(['prod', 'qa']);
+    expect(d1.notices.dropped).toBe(2);
+    const d2 = decodeWizardState(rawWizardHash(W_SAMPLE, { e: 'stg' }))!;
+    expect(d2.envs).toBeUndefined();
+    expect(d2.notices.dropped).toBe(1);
+    expect(d2.plan).toEqual(W_SAMPLE);
+    const d3 = decodeWizardState(rawWizardHash(W_SAMPLE, { env: 'uat', e: ['stg'] }))!;
+    expect(d3.envs).toEqual(['stg', 'uat']);
+    expect(d3.plan!.project.env).toBe('stg');
+  });
+});
+
 /** 서비스 20 · 자유 입력 최악 · 이름 195 인 모델의 hash 길이 (잰 값) */
 const MEASURED_NEAR_MAX = 18146;
 describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
   it('MAX_WIZARD_HASH_CHARS 를 잰다 · MAX_ANY_HASH_CHARS 는 v3 · v4 중 큰 쪽', () => {
     // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다 · Secret 의 regional(8자 — D79)로 2바이트 × 420 이 더해졌다
-    expect(MAX_WIZARD_HASH_CHARS).toBe(128895);
+    // 환경 목록 e(표준값 아홉 전부 — D82) 60바이트가 더해졌다
+    expect(MAX_WIZARD_HASH_CHARS).toBe(128975);
     expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
   });
   it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {

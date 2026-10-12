@@ -1,14 +1,15 @@
 // URL hash ↔ 화면 상태(문맥 다섯 값 · 규칙 버전 v · CSP p · 선택 r) — 화면 상태의 저장소는 URL 뿐이다 (D17 · D42).
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다. 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
-import { DEFAULT_ROLE, MAX_CONTEXT_CHARS, parseContext, parseProjectContext } from '../core/engine';
+import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseContext, parseProjectContext } from '../core/engine';
 import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type SelectionItem } from '../core/selection';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { PRESETS, presetOf } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS, REGIONAL_LOCATION, canonicalLocation } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
-import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type Env, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
 import { EXAMPLE_REGION } from './formContext';
+import { envList, envsFromHash } from './wizardEnvs';
 
 export const HASH_KEY = 'state';
 /** env · region 등 자유 입력이 아닌 필드의 상한 — API 의 MAX_FIELD_CHARS(src/api/schemas.ts)와 같다. 화면은 api 를 들여오지 않으므로 값을 두고 시험이 둘을 대어 본다.
@@ -228,6 +229,7 @@ export function shareUrl(ctx: NamingContext, base: string, rulesVersion?: string
 
 // ─────────────────────────────────────────────────────────────────────────────
 // hash v4 — 마법사 모델 `w` (D67). 문맥 넷(owner · system · env · region 코드) + 규칙 버전 v + w. 최상위 purpose 는 싣지 않는다.
+// 환경을 둘 이상 고르면 최상위 `e` 에 표준값 목록(ENV_VALUES 순서 · env 가 첫째)을 싣는다 — 하나면 싣지 않아 hash 가 그대로다 (D82)
 // 키 표 (모델 ↔ hash) — 없는 칸은 싣지 않는다 · 표 밖의 키는 그 자리의 오류다:
 //   w        { pp: projectPicks, s: services }
 //   service  { n: purpose, p: picks }
@@ -294,14 +296,17 @@ export function wizardToHash(plan: WizardPlan): Record<string, unknown> {
   };
 }
 
-/** 마법사 상태 → hash 문자열(Base64url). 모델이 validatePlan · 프로젝트 문맥을 지나지 못하면 undefined — 화면은 마지막 온전한 hash 를 둔다 */
-export function encodeWizardState(plan: WizardPlan, rulesVersion?: string): string | undefined {
+/** 마법사 상태 → hash 문자열(Base64url). 모델이 validatePlan · 프로젝트 문맥을 지나지 못하면 undefined — 화면은 마지막 온전한 hash 를 둔다.
+ *  envs — 화면에서 고른 환경 목록(D82). 모델의 env 와 합쳐 둘 이상이면 `e` 로 싣는다 */
+export function encodeWizardState(plan: WizardPlan, rulesVersion?: string, envs: readonly Env[] = []): string | undefined {
   const ctx = parseProjectContext(plan.project, 'gcp');
   if (!ctx.ok || !validatePlan(plan).ok) return undefined;
   if (plan.services.some((s) => !parseContext({ ...plan.project, purpose: s.purpose }, 'gcp').ok)) return undefined;
   const c = ctx.context;
   const body: Record<string, unknown> = { owner: c.owner, system: c.system, env: c.env, region: c.region };
   if (rulesVersion !== undefined) body.v = rulesVersion;
+  const list = envList(c.env, envs);
+  if (list.length > 1) body.e = list;
   body.w = wizardToHash(plan);
   return toBase64Url(new TextEncoder().encode(JSON.stringify(body)));
 }
@@ -315,6 +320,8 @@ export interface DecodedWizard {
   rulesVersion?: string;
   /** w 를 버렸으면 없다 */
   plan?: WizardPlan;
+  /** `e` 로 고른 환경이 둘 이상일 때만 — 첫째가 project.env 다 (D82) */
+  envs?: Env[];
   notices: WizardNotices;
 }
 
@@ -504,7 +511,7 @@ const NAME_JSON_BYTES = Math.max(
   JSON.stringify({ id: 'i'.repeat(MAX_SLOT_ID_CHARS), q: '99', a: { d: [] } }).length + 1,
   '"ipi":1,'.length, '"b":1,'.length, '"99",'.length,
 );
-const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, w: { pp: [], s: [] } }).length
+const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, w: { pp: [], s: [] } }).length
   + 2 * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_SERVICES * (JSON.stringify({ n: '', p: [] }).length + 1 + MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES)
   + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES
@@ -551,6 +558,16 @@ export function decodeWizardState(hash: string): DecodedWizard | undefined {
   if (!ctx.ok) return undefined;
   const project: ProjectFields = { owner: ctx.context.owner, system: ctx.context.system, env: ctx.context.env, region: ctx.context.region };
   const out: DecodedWizard = { project, notices: NO_NOTICES() };
+  // e — 배열이 아니면 통째로, 표준값이 아닌 항목은 하나씩 버리고 센다. env 와 합쳐 둘 이상이면 첫째(표준값 순서)가 모델의 env 다
+  if ('e' in raw) {
+    const e = envsFromHash(raw.e);
+    if (!e) out.notices.dropped++;
+    else {
+      out.notices.dropped += e.dropped;
+      const list = envList(project.env, e.envs);
+      if (list.length > 1) { out.envs = list; project.env = list[0]!; }
+    }
+  }
   if (typeof raw.v === 'string' && RULES_VERSION_RE.test(raw.v)) out.rulesVersion = raw.v;
   const w = raw.w;
   const discard = () => { out.notices.discarded = true; return out; };

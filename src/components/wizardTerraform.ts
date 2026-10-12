@@ -46,3 +46,46 @@ export function wizardTerraform(result: ProjectResult, labels: Readonly<Record<s
   lines.push('}');
   return `${lines.join('\n')}\n`;
 }
+
+/**
+ * 환경 여럿 (D82) — `<provider>_names_by_env = { "<env>" = { "<key>" = "<name>" … } … }` +
+ * `<provider>_labels_by_env = { "<env>" = { "<namespace>" = { … } … } … }`. 무효 이름 · 라벨 위반은 위와 같이 맵 밖 `# INVALID:` 주석이다
+ */
+export function wizardTerraformByEnv(
+  entries: readonly { env: string; result: ProjectResult; labels: Readonly<Record<string, LabelSet>> }[], version?: Version, catalog: Catalog = en,
+): string {
+  const p = entries[0]?.result.provider ?? 'gcp';
+  const reasons = (ms: LabelSet['violations']) => ms.map((m) => format(m, catalog)).join(' · ');
+  const lines: string[] = version
+    ? [`# ${fillUi(catalog, 'terraform_header_version', version)}`, `# ${fillUi(catalog, 'terraform_header_pass')}`]
+    : [];
+  lines.push('locals {', `  ${p}_names_by_env = {`);
+  for (const e of entries) {
+    lines.push(`    ${hclString(e.env)} = {`);
+    for (const i of e.result.items) if (i.valid) lines.push(`      ${hclString(i.key)} = ${hclString(i.name)}`);
+    lines.push('    }');
+  }
+  lines.push('  }');
+  for (const e of entries) {
+    for (const i of e.result.items) if (!i.valid) lines.push(`  # INVALID: ${p}_names_by_env[${hclString(e.env)}][${hclString(i.key)}] — ${reasons(i.violations)}`);
+  }
+  if (entries.some((e) => Object.keys(e.labels).length > 0)) {
+    lines.push(`  ${p}_labels_by_env = {`);
+    for (const e of entries) {
+      lines.push(`    ${hclString(e.env)} = {`);
+      for (const [ns, set] of Object.entries(e.labels)) {
+        if (set.violations.length > 0) continue;
+        lines.push(`      ${hclString(ns)} = {`);
+        for (const [k, v] of Object.entries(set.labels)) lines.push(`        ${k} = ${hclString(v)}`);
+        lines.push('      }');
+      }
+      lines.push('    }');
+    }
+    lines.push('  }');
+    for (const e of entries) {
+      for (const [ns, set] of Object.entries(e.labels)) if (set.violations.length > 0) lines.push(`  # INVALID: ${p}_labels_by_env[${hclString(e.env)}][${hclString(ns)}] — ${reasons(set.violations)}`);
+    }
+  }
+  lines.push('}');
+  return `${lines.join('\n')}\n`;
+}

@@ -1,4 +1,4 @@
-"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75)의 ㉚~㊴ 를 재고 스크린샷을 남긴다.
+"""화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82)의 ㉚~㊵ 를 재고 스크린샷을 남긴다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -197,7 +197,7 @@ def no_hangul(page):
     assert not any('가' <= ch <= '힣' or 'ㄱ' <= ch <= 'ㆎ' for ch in body_text), body_text
 
 
-# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75) — ㉚~㊴ ──
+# ── 마법사 (D59 · D64 · D67 · D68 · D73 · D74 · D75 · D82) — ㉚~㊵ ──
 # 화면 값은 중립 예시다(공개 저장소). 기대 이름은 화면 밖(POST /v1/wizard — 같은 엔진)에서 받는다
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
@@ -290,6 +290,51 @@ def wizard_scenarios(browser, rules_version, errors):
     page.click('[data-copy="terraform"]')
     hcl = page.evaluate('navigator.clipboard.readText()')
     assert '  gcp_names = {\n' in hcl and '"service/shop/compute_instance/web/01/data/01" = "' in hcl and 'gcp_labels_by_namespace' in hcl, hcl
+
+    # ── ㊵ 환경 여럿 (D82) — stg 칩을 켜면 같은 계획을 env 마다 · 이름은 env 로 묶인다 · 내보내기는 env 맵 · 공유 링크의 e 가 왕복한다 · 끄면 그대로 ──
+    expect(page.locator('[data-env-chip]')).to_have_count(9)
+    expect(page.locator('[data-env-chip="prod"]')).to_have_attribute('aria-pressed', 'true')
+    page.click('[data-env-chip="stg"]')
+    expect(page.locator('[data-names-env]')).to_have_count(2)
+    expect(page.locator('#names article[data-key]')).to_have_count(12)
+    expect(page.locator('[data-names-summary]')).to_have_text('12 names · 12/12 PASS')
+    expect(page.locator('[data-project-id]')).to_have_text(['devops-payments-prod', 'devops-payments-stg'])
+    expect(page.locator('[data-names-env="stg"] h3').first).to_have_text('Environment stg · Staging')
+    stg_names = [n for _, n, _ in wizard_names(page, {'project': {**W_PROJECT, 'env': 'stg'}, 'services': [
+        {'purpose': 'shop', 'picks': [{'preset': 'web', 'instances': [{'id': '1', 'seq': '01', 'attach': {'boot': True, 'data': ['01']}}]}]},
+        {'purpose': 'pay', 'picks': [{'preset': 'web', 'instances': [{'id': '1', 'seq': '01', 'attach': {'boot': True}}]}]},
+    ]})]
+    assert page.locator('[data-names-env="stg"] article[data-key] [data-name]').all_inner_texts() == stg_names, stg_names
+    assert page.locator('[data-names-env="prod"] article[data-key] [data-name]').all_inner_texts() == [n for _, n, _ in expected]
+    page.click('[data-copy="names-json"]')
+    by_env = json.loads(page.evaluate('navigator.clipboard.readText()'))
+    assert list(by_env['environments']) == ['prod', 'stg'] and by_env['environments']['stg']['project']['env'] == 'stg', by_env
+    assert [n['name'] for n in by_env['environments']['stg']['names']] == stg_names
+    page.click('[data-copy="terraform"]')
+    hcl_env = page.evaluate('navigator.clipboard.readText()')
+    assert '  gcp_names_by_env = {\n    "prod" = {\n' in hcl_env and '    "stg" = {\n' in hcl_env and 'gcp_labels_by_env' in hcl_env and '  gcp_names = {' not in hcl_env, hcl_env
+    page.click('[data-copy="share-url"]')
+    shared_env = page.evaluate('navigator.clipboard.readText()')
+    assert hash_state(shared_env)['e'] == ['prod', 'stg'], hash_state(shared_env)
+    ctx40 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p40 = ctx40.new_page()
+    p40.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p40, shared_env)
+    expect(p40.locator('[data-names-env]')).to_have_count(2)
+    expect(p40.locator('[data-env-chip="stg"]')).to_have_attribute('aria-pressed', 'true')
+    assert p40.url == shared_env, (p40.url, shared_env)
+    ctx40.close()
+    page.click('[data-env-chip="prod"]')  # prod 를 끄면 stg 하나 — 모델의 env 가 stg
+    expect(page.locator('[data-names-env]')).to_have_count(0)
+    expect(page.locator('[data-project-id]')).to_have_text('devops-payments-stg')
+    page.click('[data-env-chip="stg"]')  # 마지막 하나는 꺼지지 않는다
+    expect(page.locator('[data-env-chip="stg"]')).to_have_attribute('aria-pressed', 'true')
+    page.click('[data-env-chip="prod"]')
+    page.click('[data-env-chip="stg"]')
+    expect(page.locator('[data-env-chip][aria-pressed="true"]')).to_have_count(1)
+    assert screen_names(page) == expected, (screen_names(page), expected)
+    page.click('[data-copy="share-url"]')
+    assert 'e' not in hash_state(page.evaluate('navigator.clipboard.readText()'))
 
     # ── ㉟ Share URL 왕복 — shop 에 서버 02 를 더하고(ip) 01 을 지운 뒤에도 02 의 이름 · 딸린 것이 그대로 ──
     svc(page, 0).locator('[data-add-slot]').click()
@@ -588,7 +633,7 @@ def wizard_scenarios(browser, rules_version, errors):
     keys = [k for k, _, _ in screen_names(p39)]
     assert keys == ['project/-/project_id/-/-', 'project/-/vpc_network/-/01', 'project/-/vpc_network/-/03', 'project/-/subnet/-/01', 'project/-/subnet/-/02'], keys
     ctx39.close()
-    print('OK — 마법사 시나리오 ㉚~㊴ 통과')
+    print('OK — 마법사 시나리오 ㉚~㊵ 통과')
 
 
 with sync_playwright() as p:

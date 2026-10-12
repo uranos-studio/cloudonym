@@ -13,11 +13,13 @@ const CARD =
   'flex flex-col gap-2 rounded-lg border bg-white p-3 shadow-xs dark:bg-zinc-900 ' +
   'data-[valid=false]:border-rose-300 border-zinc-200 dark:border-zinc-800 dark:data-[valid=false]:border-rose-900';
 
-/** parentName — 마법사의 딸린 이름이면 부모의 이름(카드에 「attached to」 한 줄) */
-export function ResultCard({ result: r, parentName }: { result: NameResult | NameItem; parentName?: string }) {
+/** parentName — 마법사의 딸린 이름이면 부모의 이름(카드에 「attached to」 한 줄).
+ *  scope — 한 화면에 같은 key 의 카드가 여럿일 때(마법사의 환경 여럿 · D82) id · 복사 키를 가르는 접두 */
+export function ResultCard({ result: r, parentName, scope }: { result: NameResult | NameItem; parentName?: string; scope?: string }) {
   const item = 'key' in r ? r : undefined;
   const key = item?.key ?? r.resourceType;
-  const id = `card-${r.ruleId.replace('.', '-')}-${key}`;
+  const scoped = scope === undefined ? key : `${scope}/${key}`;
+  const id = `card-${r.ruleId.replace('.', '-')}-${scoped}`;
   // 제목 — 이름(catalog 행 이름 — 트리 행과 같다. 행이 없으면 규칙 이름) · 종류 토큰(붙었을 때만 · D52) · 순번 또는 역할
   // 마법사 항목은 용도 토큰(tier) · 딸린 것의 종류(attach)도 붙인다 — `VM Instance · web · 01` · `Persistent Disk · data · 01`
   const title = [rowOf(r.ruleId)?.displayName ?? r.displayName, item?.kindToken, item?.tier, item?.attach, item?.seq ?? item?.role].filter((x) => x !== undefined).join(' · ');
@@ -38,7 +40,7 @@ export function ResultCard({ result: r, parentName }: { result: NameResult | Nam
       <div className="flex items-center justify-between gap-2 rounded-md bg-zinc-50 px-2.5 py-2 dark:bg-zinc-950">
         <code data-name className="min-w-0 break-all font-mono text-sm text-zinc-900 dark:text-zinc-100">{r.name || '—'}</code>
         {/* 무효한 이름은 복사할 수 없다 — 「유효하지 않은 이름을 유효로」 내보내지 않는다 */}
-        <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${key}`} />
+        <CopyButton text={r.name} label={r.valid ? fillUi(en, 'copy_name_label', { displayName: title }) : en.ui.copy_invalid_label} disabled={!r.valid} copyKey={`name:${scoped}`} />
       </div>
 
       {stepsText && (

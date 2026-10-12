@@ -50,3 +50,20 @@ export function toWizardExport(result: ProjectResult, project: Omit<NamingContex
     names, invalid,
   };
 }
+
+/** 환경 여럿 (D82) — 환경마다 위와 같은 꼴(version · provider 는 한 번만). 키 순서는 고른 순서(표준값 순서) */
+export interface WizardExportByEnv {
+  version: Version;
+  provider: Provider;
+  environments: Record<string, Omit<WizardExport, 'version' | 'provider'>>;
+}
+export function toWizardExportByEnv(
+  entries: readonly { env: string; result: ProjectResult; project: Omit<NamingContext, 'purpose'>; plan: WizardPlan }[], version: Version,
+): WizardExportByEnv {
+  const environments: WizardExportByEnv['environments'] = {};
+  for (const e of entries) {
+    const { version: _v, provider: _p, ...rest } = toWizardExport(e.result, e.project, e.plan, version);
+    environments[e.env] = rest;
+  }
+  return { version, provider: entries[0]?.result.provider ?? 'gcp', environments };
+}

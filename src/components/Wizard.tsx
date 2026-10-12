@@ -24,8 +24,9 @@ import { treeRules, type Picked } from './selection';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, SERVERLESS_SHORT, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
-import { wizardLabels, wizardTerraform } from './wizardTerraform';
-import { toWizardExport } from './wizardExport';
+import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTerraform';
+import { toWizardExport, toWizardExportByEnv } from './wizardExport';
+import { envList, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi, format } from '../messages/catalog';
@@ -78,17 +79,21 @@ function ErrorList({ errors, id }: { errors: readonly CoreMessage[]; id?: string
 }
 
 // ── 첫 상태 — hash 가 마법사 링크면 그것, 아니면 예시 ──
-interface Start { plan: WizardPlan; notices?: WizardNotices; broken: boolean; link?: LinkState }
+interface Start { plan: WizardPlan; envs: Env[]; notices?: WizardNotices; broken: boolean; link?: LinkState }
 function startFrom(hash: string, brokenAtRoot: boolean): Start {
   if (hashKind(hash) === 'wizard') {
     const d = decodeWizardState(hash);
-    if (!d) return { plan: S.initialPlan(), broken: true };
+    if (!d) return { plan: S.initialPlan(), envs: [], broken: true };
     const plan = d.plan ?? S.initialPlan(d.project);
-    const key = encodeWizardState(plan, VERSION.rules) ?? '';
-    return { plan, notices: d.notices, broken: false, link: { key, hash, ...(d.rulesVersion === undefined ? {} : { rulesVersion: d.rulesVersion }) } };
+    const envs = d.envs ?? [];
+    const key = encodeWizardState(plan, VERSION.rules, envs) ?? '';
+    return { plan, envs, notices: d.notices, broken: false, link: { key, hash, ...(d.rulesVersion === undefined ? {} : { rulesVersion: d.rulesVersion }) } };
   }
-  return { plan: S.initialPlan(), broken: brokenAtRoot };
+  return { plan: S.initialPlan(), envs: [], broken: brokenAtRoot };
 }
+
+/** env 하나의 결과 — 같은 계획을 그 env 로 돌린 것 (D82) */
+interface EnvResult { env: Env; result: ProjectResult }
 
 function noticeLines(n: WizardNotices | undefined): string[] {
   if (!n) return [];
@@ -105,6 +110,8 @@ function noticeLines(n: WizardNotices | undefined): string[] {
 export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [start] = useState(() => startFrom(window.location.hash, brokenLink));
   const [plan, setPlanState] = useState<WizardPlan>(start.plan);
+  /** 고른 환경(D82) — 모델의 env 와 합친 목록이 화면의 환경이다. 첫째(표준값 순서)가 모델의 env 다 */
+  const [extraEnvs, setExtraEnvs] = useState<Env[]>(start.envs);
   const [notices, setNotices] = useState<string[]>(() => [...(start.broken ? [en.ui.wizard_link_broken] : []), ...noticeLines(start.notices)]);
   const [link, setLink] = useState<LinkState | undefined>(start.link);
   const [custom, setCustom] = useState<number | null | undefined>(undefined);
@@ -113,6 +120,16 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     setLink(undefined);
     setNotices([]);
     setPlanState(fn);
+  };
+
+  const envsKey = envList(plan.project.env, extraEnvs).join(',');
+  const envs = useMemo(() => (envsKey === '' ? [] : envsKey.split(',') as Env[]), [envsKey]);
+  const onToggleEnv = (env: Env) => {
+    const next = toggleEnv(envs.length > 0 ? envs : [env], env);
+    setLink(undefined);
+    setNotices([]);
+    setExtraEnvs(next);
+    setPlanState((p) => S.setProject(p, { ...p.project, env: next[0]! }));
   };
 
   const projectParsed = useMemo(() => parseProjectContext(plan.project, 'gcp'), [plan.project]);
@@ -124,12 +141,15 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     return r.ok ? [] : r.errors.filter((e) => 'field' in e && e.field === 'purpose');
   }), [plan]);
   const ready = check.ok && projectParsed.ok && serviceErrors.every((e) => e.length === 0);
-  const result = useMemo<ProjectResult | undefined>(() => (ready ? generateProject(expandPlan(plan), 'gcp') : undefined), [ready, plan]);
-  // 프로젝트 ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다
-  const projectId = useMemo(() => (projectParsed.ok ? generateProject({ project: projectParsed.context, projectItems: [], services: [] }, 'gcp').items[0] : undefined), [projectParsed]);
+  // env 마다 같은 계획을 돌린다 (D82) — env 하나면 그 하나
+  const results = useMemo<EnvResult[] | undefined>(() => (ready ? envs.map((env) => ({ env, result: generateProject(expandPlan(withEnv(plan, env)), 'gcp') })) : undefined), [ready, plan, envs]);
+  // 프로젝트 ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다 · env 마다 하나
+  const projectIds = useMemo(() => (projectParsed.ok
+    ? envs.map((env) => generateProject({ project: { ...projectParsed.context, env }, projectItems: [], services: [] }, 'gcp').items[0])
+    : []), [projectParsed, envs]);
 
   // hash — 모델이 온전할 때만 쓴다(마지막 온전한 hash 가 남는다). 링크로 연 그대로인 동안은 쓰지 않는다 (D27 ⑵)
-  const stateKey = ready ? encodeWizardState(plan, VERSION.rules) ?? '' : '';
+  const stateKey = ready ? encodeWizardState(plan, VERSION.rules, envs) ?? '' : '';
   const linkedVersion = mismatchedLinkVersion(stateKey, link, VERSION.rules);
   useEffect(() => {
     const hash = hashToWrite(stateKey, link);
@@ -166,6 +186,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         if (!s.broken) {
           lastSent.current = s.link?.key ?? '';
           setPlanState(s.plan);
+          setExtraEnvs(s.envs);
           setLink(s.link);
           setNotices(noticeLines(s.notices));
           return;
@@ -197,7 +218,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
               <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
             </div>
             <div className={PANEL}>
-              <ProjectForm plan={plan} errors={projectParsed.ok ? [] : projectParsed.errors} projectId={projectId} onChange={(project) => edit((p) => S.setProject(p, project))} />
+              <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectParsed.ok ? [] : projectParsed.errors} projectIds={projectIds} onChange={(project) => edit((p) => S.setProject(p, project))} />
             </div>
             <div className={PANEL}>
               <ProjectResources plan={plan} errors={planErrors} edit={edit} onCustom={() => setCustom(null)} />
@@ -206,7 +227,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           </div>
           <div className="min-w-0">
             <div className={PANEL}>
-              <WizardResults plan={plan} result={result} errors={planErrors} projectContext={projectParsed.ok ? projectParsed.context : undefined} />
+              <WizardResults plan={plan} results={results} errors={planErrors} projectContext={projectParsed.ok ? projectParsed.context : undefined} />
             </div>
           </div>
         </div>
@@ -231,7 +252,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 }
 
 // ── ① 프로젝트 ──
-function ProjectForm({ plan, errors, projectId, onChange }: { plan: WizardPlan; errors: CoreMessage[]; projectId: NameItem | undefined; onChange: (p: WizardPlan['project']) => void }) {
+function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, onChange }: {
+  plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void; errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; onChange: (p: WizardPlan['project']) => void;
+}) {
   const v = plan.project;
   const errorFor = (f: string) => {
     const e = errors.find((m) => 'field' in m && m.field === f);
@@ -257,20 +280,27 @@ function ProjectForm({ plan, errors, projectId, onChange }: { plan: WizardPlan; 
       <div className="grid gap-4 sm:grid-cols-2">
         {text('owner', 'Owner', en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
         {text('system', 'System', en.ui.field_system_hint, en.ui.field_system_placeholder)}
-        <div>
-          <label htmlFor="wizard-env" className={LABEL}>Environment</label>
-          <select id="wizard-env" value={v.env} onChange={(e) => onChange({ ...v, env: e.target.value })} className={CONTROL}>
-            {ENV_VALUES.map((x) => <option key={x} value={x}>{`${x} — ${ENV_NAMES[x]}`}</option>)}
-          </select>
+        {/* 환경 — 칩 여럿 (D82). 둘 이상 고르면 같은 계획을 env 마다 짓는다 · 마지막 하나는 끌 수 없다 */}
+        <div role="group" aria-labelledby="wizard-envs-label" aria-describedby="wizard-envs-hint" className="sm:col-span-2">
+          <p id="wizard-envs-label" className={LABEL}>{en.ui.wizard_envs} <span id="wizard-envs-hint" className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_envs_hint}</span></p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {ENV_VALUES.map((x) => (
+              <button key={x} type="button" data-env-chip={x} aria-pressed={envs.includes(x)} title={ENV_NAMES[x]} className={CHIP}
+                onClick={() => onToggleEnv(x)}>{x}</button>
+            ))}
+          </div>
         </div>
         <RegionPicker provider="gcp" value={v.region} onChange={(region) => onChange({ ...v, region })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
       </div>
       <dl data-project-preview className="grid gap-2 rounded-lg bg-zinc-50 p-3 text-sm sm:grid-cols-[auto_minmax(0,1fr)] dark:bg-zinc-950">
         <dt className={HINT}>{en.ui.wizard_project_id}</dt>
-        <dd><code data-project-id className="break-all font-mono">{projectId?.name || '—'}</code></dd>
+        <dd className="flex flex-col gap-0.5">
+          {projectIds.length === 0 && <code data-project-id className="break-all font-mono">—</code>}
+          {projectIds.map((id, i) => <code key={envs[i] ?? i} data-project-id className="break-all font-mono">{id?.name || '—'}</code>)}
+        </dd>
         <dt className={HINT}>{en.ui.wizard_common_parts}</dt>
         <dd data-common-parts className="flex flex-wrap gap-1.5">
-          {parsed.ok && [parsed.context.system, parsed.context.env, parsed.context.region].map((t, i) => (
+          {parsed.ok && [parsed.context.system, ...(envs.length > 0 ? envs : [parsed.context.env]), parsed.context.region].map((t, i) => (
             <code key={`${t}-${i}`} className="rounded bg-white px-1.5 py-0.5 font-mono text-xs ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-700">{t}</code>
           ))}
         </dd>
@@ -637,16 +667,16 @@ function CustomDialog({ service, plan, onClose, onPick }: { service: number | nu
 }
 
 // ── ⑥ 이름 ──
-function WizardResults({ plan, result, errors, projectContext }: { plan: WizardPlan; result: ProjectResult | undefined; errors: PlanError[]; projectContext: Parameters<typeof toWizardExport>[1] | undefined }) {
+function WizardResults({ plan, results, errors, projectContext }: { plan: WizardPlan; results: EnvResult[] | undefined; errors: PlanError[]; projectContext: Parameters<typeof toWizardExport>[1] | undefined }) {
   const empty = errors.some((e) => e.code === 'wizard.empty');
   const wide = errors.filter((e) => e.path === undefined && e.code !== 'wizard.empty' && !('field' in e));
-  const names = result?.items.length ?? 0;
-  const pass = result?.items.filter((i) => i.valid).length ?? 0;
+  const names = results?.reduce((n, r) => n + r.result.items.length, 0) ?? 0;
+  const pass = results?.reduce((n, r) => n + r.result.items.filter((i) => i.valid).length, 0) ?? 0;
   return (
     <section id="names" aria-labelledby="wizard-names" className="space-y-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>6</span>{en.ui.wizard_step_names}</h2>
-        {result && (
+        {results && (
           <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
             ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
             : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300'}`}>
@@ -655,21 +685,53 @@ function WizardResults({ plan, result, errors, projectContext }: { plan: WizardP
         )}
       </div>
       <p data-pass-meaning className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{en.ui.pass_meaning}</p>
-      {!result && (
+      {!results && (
         <p role="status" data-names-empty className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
           {empty ? en.ui.wizard_names_empty : en.ui.wizard_fix_errors}
         </p>
       )}
       <ErrorList errors={wide} />
-      {result && projectContext && <ResultList plan={plan} result={result} projectContext={projectContext} />}
+      {results && projectContext && <ResultList plan={plan} results={results} projectContext={projectContext} />}
     </section>
   );
 }
 
-function ResultList({ plan, result, projectContext }: { plan: WizardPlan; result: ProjectResult; projectContext: Parameters<typeof toWizardExport>[1] }) {
-  const all = useMemo(() => allNamesText(result), [result]);
-  const json = useMemo(() => JSON.stringify(toWizardExport(result, projectContext, plan, VERSION), null, 2), [result, projectContext, plan]);
-  const hcl = useMemo(() => wizardTerraform(result, wizardLabels(expandPlan(plan), 'gcp'), VERSION, en), [result, plan]);
+function ResultList({ plan, results, projectContext }: { plan: WizardPlan; results: EnvResult[]; projectContext: Parameters<typeof toWizardExport>[1] }) {
+  const multi = results.length > 1;
+  // 내보내기 — env 하나면 예전 꼴 그대로, 여럿이면 env 로 한 단계 더 묶는다 (D82)
+  const all = useMemo(() => {
+    const parts = results.map((r) => allNamesText(r.result));
+    return { text: parts.map((x) => x.text).filter((t) => t !== '').join('\n'), skipped: parts.reduce((n, x) => n + x.skipped, 0) };
+  }, [results]);
+  const json = useMemo(() => JSON.stringify(multi
+    ? toWizardExportByEnv(results.map((r) => ({ env: r.env, result: r.result, project: { ...projectContext, env: r.env }, plan: withEnv(plan, r.env) })), VERSION)
+    : toWizardExport(results[0]!.result, projectContext, plan, VERSION), null, 2), [multi, results, projectContext, plan]);
+  const hcl = useMemo(() => (multi
+    ? wizardTerraformByEnv(results.map((r) => ({ env: r.env, result: r.result, labels: wizardLabels(expandPlan(withEnv(plan, r.env)), 'gcp') })), VERSION, en)
+    : wizardTerraform(results[0]!.result, wizardLabels(expandPlan(plan), 'gcp'), VERSION, en)), [multi, results, plan]);
+  return (
+    <>
+      <div className="flex flex-wrap gap-2">
+        <CopyButton text={all.text} label={en.ui.copy_all_names_label} disabled={all.text === ''} copyKey="all-names">
+          {all.skipped > 0 ? fillUi(en, 'copy_all_names_skipped', { n: all.skipped }) : en.ui.copy_all_names}
+        </CopyButton>
+        <CopyButton text={json} label={en.ui.copy_names_json_label} copyKey="names-json">JSON</CopyButton>
+        <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>
+      </div>
+      {multi
+        ? results.map((r) => (
+          <section key={r.env} data-names-env={r.env} aria-labelledby={`names-env-${r.env}`} className="space-y-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+            <h3 id={`names-env-${r.env}`} className="text-sm font-semibold">{fillUi(en, 'wizard_group_env', { env: r.env, name: ENV_NAMES[r.env] })}</h3>
+            <EnvNames plan={plan} result={r.result} scope={r.env} />
+          </section>
+        ))
+        : <EnvNames plan={plan} result={results[0]!.result} />}
+    </>
+  );
+}
+
+/** env 하나의 이름 — 충돌 · 이름공간 묶음(프로젝트 → 서비스, 모델 순서). scope 는 env 가 여럿일 때 카드 id · 복사 키를 가른다 */
+function EnvNames({ plan, result, scope }: { plan: WizardPlan; result: ProjectResult; scope?: string }) {
   const byKey = useMemo(() => new Map(result.items.map((i) => [i.key, i])), [result]);
   // 이름공간마다 묶는다 — 프로젝트 → 서비스(모델 순서). 항목 순서는 엔진 순서(부모 바로 뒤 자식)
   const groups = useMemo(() => {
@@ -685,13 +747,6 @@ function ResultList({ plan, result, projectContext }: { plan: WizardPlan; result
   const serviceName = (ns: string) => plan.services.find((s) => serviceNamespaceOf(s.purpose) === ns)?.purpose ?? ns;
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        <CopyButton text={all.text} label={en.ui.copy_all_names_label} disabled={all.text === ''} copyKey="all-names">
-          {all.skipped > 0 ? fillUi(en, 'copy_all_names_skipped', { n: all.skipped }) : en.ui.copy_all_names}
-        </CopyButton>
-        <CopyButton text={json} label={en.ui.copy_names_json_label} copyKey="names-json">JSON</CopyButton>
-        <CopyButton text={hcl} label={en.ui.copy_terraform_label} copyKey="terraform">Terraform</CopyButton>
-      </div>
       {result.conflicts.length > 0 && (
         <ul data-conflicts className="space-y-1 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200">
           {result.conflicts.map((c) => { const t = format(c, en); return <li key={t}>{en.ui.conflict_prefix} {t}</li>; })}
@@ -705,7 +760,7 @@ function ResultList({ plan, result, projectContext }: { plan: WizardPlan; result
           <div className="space-y-2">
             {g.items.map((r) => (
               <Indented key={r.key} child={r.parent !== undefined}>
-                <ResultCard result={r} parentName={r.parent === undefined ? undefined : byKey.get(r.parent)?.name} />
+                <ResultCard result={r} parentName={r.parent === undefined ? undefined : byKey.get(r.parent)?.name} {...(scope === undefined ? {} : { scope })} />
               </Indented>
             ))}
           </div>

@@ -1,6 +1,6 @@
 // 마법사 JSON 내보내기 — 구조 키 · 이름공간 · 부모 · 무효 분리. 트리 화면의 namesExport 는 그대로다(namesExport.test)
 import { describe, it, expect } from 'vitest';
-import { toWizardExport } from './wizardExport';
+import { toWizardExport, toWizardExportByEnv } from './wizardExport';
 import { expandPlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
 
@@ -34,5 +34,23 @@ describe('toWizardExport', () => {
     const e = toWizardExport(r, project, bad, V);
     expect(e.names.map((n) => n.key)).toEqual(['project/-/project_id/-/-']);
     expect(e.invalid.map((i) => i.codes)).toContainEqual(['name.parent_invalid']);
+  });
+});
+
+describe('toWizardExportByEnv (D82)', () => {
+  const plan: WizardPlan = { provider: 'gcp', project, projectPicks: [], services: [{ purpose: 'shop', picks: [{ preset: 'object' }] }] };
+  const entries = (['prod', 'uat'] as const).map((env) => {
+    const p = { ...plan, project: { ...project, env } };
+    return { env, result: generateProject(expandPlan(p), 'gcp'), project: { ...project, env }, plan: p };
+  });
+  const out = toWizardExportByEnv(entries, V);
+  it('version · provider 한 번 · environments 는 고른 순서 · env 마다 toWizardExport 와 같은 본문', () => {
+    expect(out.version).toEqual(V);
+    expect(out.provider).toBe('gcp');
+    expect(Object.keys(out.environments)).toEqual(['prod', 'uat']);
+    const { version: _v, provider: _p, ...uat } = toWizardExport(entries[1]!.result, entries[1]!.project, entries[1]!.plan, V);
+    expect(out.environments.uat).toEqual(uat);
+    expect(out.environments.uat!.project.env).toBe('uat');
+    expect(out.environments.uat!.names.map((n) => n.name)).toEqual(['platform-billing-uat', 'platform-billing-shop-uat-ane3-gcs']);
   });
 });
