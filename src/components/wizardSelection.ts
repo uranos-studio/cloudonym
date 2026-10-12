@@ -112,7 +112,7 @@ export function firstErrorRow(plan: WizardPlan, errors: readonly PlanError[], se
  *  - keep: 칩 토글 · 값 입력 — 선택은 그대로(사라졌으면 부모 줄)
  *  - select: 단발 추가(Custom · Add subnet · 방화벽 Add · Duplicate · Add service) — 새 줄
  *  - removePick: 그 pick 삭제 — 다음 형제, 없으면 이전 형제, 없으면 부모 줄
- *  - removeService: 그 서비스 삭제 — 다음 서비스, 없으면 project */
+ *  - removeService: 그 서비스 삭제 — 다음 서비스, 없으면 이전 서비스, 없으면 project */
 export type SelectionOp =
   | { type: 'keep' }
   | { type: 'select'; path: RowPath }
@@ -132,6 +132,7 @@ export function selectionAfter(op: SelectionOp, prev: RowPath, before: WizardPla
       return rowExists(after, op.path) ? op.path : resolveSelection(after, prev);
     case 'removeService':
       if (op.service < after.services.length) return serviceRow(op.service);
+      if (after.services.length > 0) return serviceRow(after.services.length - 1);
       return PROJECT_ROW;
     case 'removePick': {
       const r = parseRow(op.path);

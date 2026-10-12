@@ -96,9 +96,11 @@ describe('선택이 옮겨 가는 규칙 (§2)', () => {
     expect(rm('projectPicks[1]', { service: null, pick: 1 })).toBe('projectPicks[1]');
     expect(rm('projectPicks[4]', { service: null, pick: 4 })).toBe('extras');
   });
-  it('서비스 삭제 — 다음 서비스 · 없으면 project', () => {
+  it('서비스 삭제 — 다음 서비스 · 없으면 이전 서비스 · 없으면 project', () => {
     expect(selectionAfter({ type: 'removeService', service: 0 }, 'services[0]', p, removeService(p, 0))).toBe('services[0]');
-    expect(selectionAfter({ type: 'removeService', service: 1 }, 'services[1]', p, removeService(p, 1))).toBe('project');
+    expect(selectionAfter({ type: 'removeService', service: 1 }, 'services[1]', p, removeService(p, 1))).toBe('services[0]');
+    const one = removeService(p, 1);
+    expect(selectionAfter({ type: 'removeService', service: 0 }, 'services[0]', one, removeService(one, 0))).toBe('project');
   });
   it('계획이 통째로 바뀌어 경로가 사라지면 project', () => {
     expect(selectionAfter({ type: 'keep' }, 'services[1].picks[0]', p, initialPlan())).toBe('project');
