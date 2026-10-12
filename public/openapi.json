@@ -898,7 +898,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prod-ane3-sa-sync"
+            "example": "billing-trade-prod-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -1273,7 +1273,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prod-ane3-sa-sync"
+            "example": "billing-trade-prod-sa-sync"
           },
           "violations": {
             "type": "array",
@@ -2318,7 +2318,7 @@
           "original": {
             "type": "string",
             "description": "Name assembled before normalisation and shortening",
-            "example": "platform-billing-trade-prod-ane3-sa-sync"
+            "example": "billing-trade-prod-sa-sync"
           },
           "violations": {
             "type": "array",

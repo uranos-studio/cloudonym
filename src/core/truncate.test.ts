@@ -5,15 +5,30 @@ import { tokenValues } from './compose';
 import { MAX_CONTEXT_CHARS, generate, generateItem } from './engine';
 import { PROTECTED, type ResourceRule } from './types';
 
+/** 시험용 규칙 — D77 전의 SA 꼴(owner · region 둘 다 생략 토큰, optional 은 공식에서 뒤인 region 이 먼저).
+ *  실제 SA 는 owner · 지역이 없어 1단계 축소가 없다 — 1단계의 순서 · 빈 토큰 판정은 이 꼴로 본다 */
+const twoOptional = (): ResourceRule => ({ ...getRule('gcp', 'service_account')!, id: 'test.two-optional', regionToken: 'region',
+  template: ['owner', 'system', 'purpose', 'env', 'region', 'slug', 'role'], optional: ['region', 'owner'] });
+
 describe('fit — 3단계 축소', () => {
-  it('TC-GCP-01 42자 SA → region·owner 를 떼고 29자', () => {
+  it('TC-GCP-01 SA 30자 축약 — system+purpose 가 길면 균등 예산으로 줄인다 (D77 뒤에는 뗄 생략 토큰이 없다)', () => {
     const rule = getRule('gcp', 'service_account')!;
+    const ctx = { owner: 'example', system: 'antigravity', purpose: 'synchronize', env: 'prod', region: 'ane3' } as const;
+    const r = fit(tokenValues(ctx, rule), rule);      // antigravity-synchronize-prod-sa-sync = 36자
+    expect(r.fits).toBe(true);
+    expect(r.truncated).toBe(true);
+    expect(r.steps.map((s) => s.code)).not.toContain('step.token_dropped');
+    expect(r.name.length).toBeLessThanOrEqual(30);
+    expect(r.name).toMatch(/-prod-sa-sync$/);
+  });
+  it('생략 토큰 둘이면 optional 순서(region · owner)로 뗀다 — SA 의 옛 꼴 42자 → 29자', () => {
+    const rule = twoOptional();
     const ctx = { owner: 'example', system: 'antigravity', purpose: 'sync', env: 'prod', region: 'ane3' } as const;
     const r = fit(tokenValues(ctx, rule), rule);      // example-antigravity-sync-prod-ane3-sa-sync = 42자
     expect(r).toMatchObject({ fits: true, truncated: true, name: 'antigravity-sync-prod-sa-sync', steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }] });
     expect(r.name.length).toBe(29);
   });
-  it('① 예시: 37자 SA → region 만 떼면 32, owner 까지 떼면 26', () => {
+  it('① 예시: SA 는 owner · 지역 없이 26자 그대로 (D77)', () => {
     const rule = getRule('gcp', 'service_account')!;
     const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' } as const;
     expect(fit(tokenValues(ctx, rule), rule).name).toBe('billing-trade-prod-sa-sync');
@@ -69,8 +84,8 @@ describe('fit — 3단계 축소', () => {
     expect(fit({ slug: 'kv', system: 'a-', purpose: 'bb', env: 'prod' }, rule).fits).toBe(false);   // kv-a--bb-prod
   });
   // MIN_TOKEN 은 축소가 만든 토큰에만, 빈 선택 토큰은 가변 토큰으로 세지 않는다 (D13)
-  it('정제로 비워진 선택 토큰(owner \'\')은 가변 토큰으로 세지 않는다 (SA)', () => {
-    const rule = getRule('gcp', 'service_account')!;
+  it('정제로 비워진 선택 토큰(owner \'\')은 가변 토큰으로 세지 않는다 (SA 의 옛 꼴)', () => {
+    const rule = twoOptional();
     const r = fit({ owner: '', system: 'billing', purpose: 'trade', env: 'prod', region: 'kr', slug: 'sa', role: 'sync' }, rule);
     expect(r).toMatchObject({ fits: true, truncated: false, name: 'billing-trade-prod-kr-sa-sync' });
   });
@@ -123,7 +138,7 @@ describe('지역 토큰과 축소 (D50 revised — D51 철회)', () => {
 
   it("PROTECTED 에 region 이 있어도 region 규칙의 1단계 결과는 같다 — region 이 먼저 떨어진다", () => {
     expect(PROTECTED).toContain('region');
-    const rule = getRule('gcp', 'service_account')!;
+    const rule = twoOptional();
     const ctx = { owner: 'example', system: 'antigravity', purpose: 'sync', env: 'prod' as const, region: 'ane3' };
     expect(fit(tokenValues(ctx, rule), rule)).toMatchObject({ fits: true, name: 'antigravity-sync-prod-sa-sync',
       steps: [{ code: 'step.token_dropped', field: 'region' }, { code: 'step.token_dropped', field: 'owner' }] });
@@ -164,8 +179,8 @@ describe('용도 토큰 tier 는 보호 토큰이다 (D60)', () => {
 });
 
 describe('밑줄 구분자 — 하이픈을 받지 않는 규칙 (D72)', () => {
-  // 시험용 규칙 — SA 꼴(…-sa-<role>)을 밑줄로 바꿨다. 실제 밑줄 규칙은 rule-cases · 기준선이 덮는다
-  const sa = getRule('gcp', 'service_account')!;
+  // 시험용 규칙 — SA 의 옛 꼴(…-sa-<role>)을 밑줄로 바꿨다. 실제 밑줄 규칙은 rule-cases · 기준선이 덮는다
+  const sa = twoOptional();
   const rule: ResourceRule = { ...sa, separator: '_', allowed: 'lower-digit-underscore', pattern: /^[a-z][a-z0-9_]*$/, startsWithLetter: true, endsWithAlnum: false };
   it('토큰을 밑줄로 잇고 토큰 안 하이픈도 밑줄이 된다', () => {
     const r = generateItem({ owner: 'x', system: 'billing', purpose: 'my-shop', env: 'prod', region: 'global' }, rule);

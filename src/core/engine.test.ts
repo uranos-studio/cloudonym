@@ -8,9 +8,9 @@ import { REGIONS } from './regions-data';
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3', zone: 'ane3a' } as const;
 
 describe('generate', () => {
-  it('① 응답 예시: GCP SA 는 축약, Azure Storage 는 변환(하이픈 제거)', () => {
+  it('① 응답 예시: GCP SA 는 처음부터 들어간다(D77), Azure Storage 는 변환(하이픈 제거)', () => {
     const out = generate(ctx, ['gcp', 'azure']);
-    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prod-sa-sync', valid: true, isTruncated: true, original: 'infra-billing-trade-prod-ane3-sa-sync' });
+    expect(out.gcp?.service_account).toMatchObject({ name: 'billing-trade-prod-sa-sync', valid: true, isTruncated: false, original: 'billing-trade-prod-sa-sync', steps: [] });
     expect(out.azure?.storage_account).toMatchObject({ name: 'stbillingtradeprod', valid: true, isTransformed: true });
     expect(out.azure?.storage_account.steps).toContainEqual({ code: 'step.separator_removed' });
     expect(out.aws).toBeUndefined();

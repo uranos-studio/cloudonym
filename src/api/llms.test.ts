@@ -56,9 +56,10 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('공식 줄이 규칙 수(손 35 + 들인 행)만큼 있고 template 을 그대로 펼친다 (세 CSP 를 펼친 본문)', () => {
     expect(allLines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
     expect(rules).toHaveLength(35 + AZURE_INTAKE_ROWS.length + GCP_INTAKE_ROWS.length + AWS_INTAKE_ROWS.length + Object.keys(GCP_MANUAL_RULES).length + Object.keys(AWS_MANUAL_RULES).length + AZURE_MANUAL_ROWS.length);
-    expect(formulaOf(RULES['gcp.service_account']!)).toBe('<owner>-<system>-<purpose>-<env>-<region>-sa-<role>');
+    expect(formulaOf(RULES['gcp.service_account']!)).toBe('<system>-<purpose>-<env>-sa-<role>');
     expect(formulaOf(RULES['azure.storage_account']!)).toBe('st<system><purpose><env>');
-    expect(text).toContain('- `gcp.service_account`: `<owner>-<system>-<purpose>-<env>-<region>-sa-<role>` · optional: region, owner');
+    expect(text).toContain('- `gcp.service_account`: `<system>-<purpose>-<env>-sa-<role>`\n');
+    expect(text).toContain(`- \`gcp.compute_instance\`: \`${formulaOf(RULES['gcp.compute_instance']!)}\` · optional: region\n`);
   });
   it('제약 줄이 규칙 수만큼 있고 docUrl 이 전부 들어 있다', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+` \(/.test(l))).toHaveLength(enabledRules.length);

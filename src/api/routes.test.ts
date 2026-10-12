@@ -39,19 +39,15 @@ describe('라우팅 재구성 — root 앱 + app.route(/v1, v1)', () => {
 });
 
 describe('POST /v1/generate (D15 wire)', () => {
-  it('① 예시 입력 → GCP SA 축약', async () => {
+  it('① 예시 입력 → GCP SA 는 owner · 지역 없이 그대로 들어간다 (D77)', async () => {
     const { res } = await post({ context: ctx, providers: ['gcp'] });
     expect(res.status).toBe(200);
     const body = await json(res);
     expect(body.success).toBe(true);
     expect(body.version).toEqual(VERSION);
     expect(body.data.gcp.service_account).toEqual({
-      name: 'billing-trade-prod-sa-sync', valid: true, is_truncated: true, is_transformed: false,
-      original: 'infra-billing-trade-prod-ane3-sa-sync', violations: [],
-      steps: [
-        { code: 'step.token_dropped', field: 'region', message: "Dropped optional token 'region'" },
-        { code: 'step.token_dropped', field: 'owner', message: "Dropped optional token 'owner'" },
-      ],
+      name: 'billing-trade-prod-sa-sync', valid: true, is_truncated: false, is_transformed: false,
+      original: 'billing-trade-prod-sa-sync', violations: [], steps: [],
       rule: { min_length: 6, max_length: 30, pattern: '^[a-z][a-z0-9-]{4,28}[a-z0-9]$', pattern_flags: '', allowed: 'lower-digit-hyphen', doc_url: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create', notes: [] },
     });
     expect(body.metadata.generated_labels.gcp).toEqual({ owner: 'infra', system: 'billing', purpose: 'trade', environment: 'prod', managed_by: 'cloudonym' });

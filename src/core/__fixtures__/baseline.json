@@ -1577,11 +1577,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-billing-trade-prod-ane3-sa-sync",
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -2367,20 +2367,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -2468,18 +2468,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -2493,11 +2493,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -2529,20 +2529,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -2565,11 +2565,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -2592,65 +2592,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -2664,29 +2664,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -7772,11 +7772,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
-            "isTransformed": true,
-            "original": "개발-billing-trade-prod-ane3-sa-sync",
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -8562,20 +8562,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -8663,18 +8663,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -8688,11 +8688,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -8724,20 +8724,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -8760,11 +8760,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -8787,65 +8787,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -8859,29 +8859,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -13967,11 +13967,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
-            "isTransformed": true,
-            "original": "Team \"A\" café-billing-trade-prod-ane3-sa-sync",
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 3
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -14757,20 +14757,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -14858,18 +14858,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -14883,11 +14883,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -14919,20 +14919,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -14955,11 +14955,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -14982,65 +14982,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -15054,29 +15054,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -20162,11 +20162,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-billing-trade-prod-ane3-sa-sync",
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -20952,20 +20952,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -21053,18 +21053,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -21078,11 +21078,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -21114,20 +21114,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -21150,11 +21150,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -21177,65 +21177,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -21249,29 +21249,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -26357,11 +26357,11 @@
           "service_account": {
             "name": "windows-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-windows-trade-prod-ane3-sa-sync",
+            "original": "windows-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "windows-trade-prod-ane3-gce-01",
@@ -27147,20 +27147,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "windows-trade-prod-ane3-key-01",
+            "name": "windows-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-key-01",
+            "original": "windows-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "windows-trade-prod-ane3-ij-01",
+            "name": "windows-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-ij-01",
+            "original": "windows-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -27248,18 +27248,18 @@
           "spanner_database": {
             "name": "windows-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-spdb-01",
+            "original": "windows-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "windows-trade-prod-ane3-bkp-01",
+            "name": "windows-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-bkp-01",
+            "original": "windows-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -27273,11 +27273,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "windows-trade-prod-ane3-rule-01",
+            "name": "windows-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-rule-01",
+            "original": "windows-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -27309,20 +27309,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "windows-trade-prod-ane3-oc-01",
+            "name": "windows-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-oc-01",
+            "original": "windows-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "windows-trade-prod-ane3-occ-01",
+            "name": "windows-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-occ-01",
+            "original": "windows-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -27345,11 +27345,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "windows-trade-prod-ane3-deny-01",
+            "name": "windows-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-deny-01",
+            "original": "windows-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -27372,65 +27372,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "windows-trade-prod-ane3-wfpp-01",
+            "name": "windows-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-wfpp-01",
+            "original": "windows-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "windows-trade-prod-ane3-wfpk-01",
+            "name": "windows-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-wfpk-01",
+            "original": "windows-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "windows-trade-prod-ane3-wip-01",
+            "name": "windows-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-wip-01",
+            "original": "windows-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "windows-trade-prod-ane3-mi-01",
+            "name": "windows-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-mi-01",
+            "original": "windows-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "windows-trade-prod-ane3-ns-01",
+            "name": "windows-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-ns-01",
+            "original": "windows-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "windows-trade-prod-ane3-wipp-01",
+            "name": "windows-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-wipp-01",
+            "original": "windows-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "windows-trade-prod-ane3-wipk-01",
+            "name": "windows-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-wipk-01",
+            "original": "windows-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -27444,29 +27444,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "windows_trade_prod_ane3_db_01",
+            "name": "windows_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows_trade_prod_ane3_db_01",
+            "original": "windows_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "windows_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "windows_trade_prod_ane3_user_sync",
+            "original": "windows_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "windows-trade-prod-ane3-nat-01",
+            "name": "windows-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-nat-01",
+            "original": "windows-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -32552,11 +32552,11 @@
           "service_account": {
             "name": "google-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-google-trade-prod-ane3-sa-sync",
+            "original": "google-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "google-trade-prod-ane3-gce-01",
@@ -33342,20 +33342,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "google-trade-prod-ane3-key-01",
+            "name": "google-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-key-01",
+            "original": "google-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "google-trade-prod-ane3-ij-01",
+            "name": "google-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-ij-01",
+            "original": "google-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -33441,20 +33441,20 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "google-trade-prod-ane3-spdb-01",
+            "name": "google-trade-prod-spdb-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-spdb-01",
+            "original": "google-trade-prod-spdb-01",
             "violations": 0,
             "steps": 0
           },
           "spanner_backup": {
-            "name": "google-trade-prod-ane3-bkp-01",
+            "name": "google-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-bkp-01",
+            "original": "google-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -33468,11 +33468,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "google-trade-prod-ane3-rule-01",
+            "name": "google-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-rule-01",
+            "original": "google-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -33504,20 +33504,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "google-trade-prod-ane3-oc-01",
+            "name": "google-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-oc-01",
+            "original": "google-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "google-trade-prod-ane3-occ-01",
+            "name": "google-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-occ-01",
+            "original": "google-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -33540,11 +33540,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "google-trade-prod-ane3-deny-01",
+            "name": "google-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-deny-01",
+            "original": "google-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -33567,65 +33567,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "google-trade-prod-ane3-wfpp-01",
+            "name": "google-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-wfpp-01",
+            "original": "google-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "google-trade-prod-ane3-wfpk-01",
+            "name": "google-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-wfpk-01",
+            "original": "google-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "google-trade-prod-ane3-wip-01",
+            "name": "google-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-wip-01",
+            "original": "google-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "google-trade-prod-ane3-mi-01",
+            "name": "google-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-mi-01",
+            "original": "google-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "google-trade-prod-ane3-ns-01",
+            "name": "google-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-ns-01",
+            "original": "google-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "google-trade-prod-ane3-wipp-01",
+            "name": "google-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-wipp-01",
+            "original": "google-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "google-trade-prod-ane3-wipk-01",
+            "name": "google-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-wipk-01",
+            "original": "google-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -33639,29 +33639,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "google_trade_prod_ane3_db_01",
+            "name": "google_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google_trade_prod_ane3_db_01",
+            "original": "google_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
-            "name": "google_trade_prod_ane3_user_sync",
+            "name": "google_trade_prod_user_sync",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google_trade_prod_ane3_user_sync",
+            "original": "google_trade_prod_user_sync",
             "violations": 0,
             "steps": 0
           },
           "router_nat": {
-            "name": "google-trade-prod-ane3-nat-01",
+            "name": "google-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-nat-01",
+            "original": "google-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -38747,11 +38747,11 @@
           "service_account": {
             "name": "azure-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-azure-trade-prod-ane3-sa-sync",
+            "original": "azure-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "azure-trade-prod-ane3-gce-01",
@@ -39537,20 +39537,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "azure-trade-prod-ane3-key-01",
+            "name": "azure-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-key-01",
+            "original": "azure-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "azure-trade-prod-ane3-ij-01",
+            "name": "azure-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-ij-01",
+            "original": "azure-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -39636,20 +39636,20 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "azure-trade-prod-ane3-spdb-01",
+            "name": "azure-trade-prod-spdb-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-spdb-01",
+            "original": "azure-trade-prod-spdb-01",
             "violations": 0,
             "steps": 0
           },
           "spanner_backup": {
-            "name": "azure-trade-prod-ane3-bkp-01",
+            "name": "azure-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-bkp-01",
+            "original": "azure-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -39663,11 +39663,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "azure-trade-prod-ane3-rule-01",
+            "name": "azure-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-rule-01",
+            "original": "azure-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -39699,20 +39699,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "azure-trade-prod-ane3-oc-01",
+            "name": "azure-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-oc-01",
+            "original": "azure-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "azure-trade-prod-ane3-occ-01",
+            "name": "azure-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-occ-01",
+            "original": "azure-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -39735,11 +39735,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "azure-trade-prod-ane3-deny-01",
+            "name": "azure-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-deny-01",
+            "original": "azure-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -39762,65 +39762,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "azure-trade-prod-ane3-wfpp-01",
+            "name": "azure-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-wfpp-01",
+            "original": "azure-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "azure-trade-prod-ane3-wfpk-01",
+            "name": "azure-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-wfpk-01",
+            "original": "azure-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "azure-trade-prod-ane3-wip-01",
+            "name": "azure-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-wip-01",
+            "original": "azure-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "azure-trade-prod-ane3-mi-01",
+            "name": "azure-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-mi-01",
+            "original": "azure-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "azure-trade-prod-ane3-ns-01",
+            "name": "azure-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-ns-01",
+            "original": "azure-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "azure-trade-prod-ane3-wipp-01",
+            "name": "azure-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-wipp-01",
+            "original": "azure-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "azure-trade-prod-ane3-wipk-01",
+            "name": "azure-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-wipk-01",
+            "original": "azure-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -39834,29 +39834,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "azure_trade_prod_ane3_db_01",
+            "name": "azure_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure_trade_prod_ane3_db_01",
+            "original": "azure_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
-            "name": "azure_trade_prod_ane3_user_sync",
+            "name": "azure_trade_prod_user_sync",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure_trade_prod_ane3_user_sync",
+            "original": "azure_trade_prod_user_sync",
             "violations": 0,
             "steps": 0
           },
           "router_nat": {
-            "name": "azure-trade-prod-ane3-nat-01",
+            "name": "azure-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-nat-01",
+            "original": "azure-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -44944,7 +44944,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "platform-매매-trade-prod-ane3-sa-sync",
+            "original": "매매-trade-prod-sa-sync",
             "violations": 1,
             "steps": 1
           },
@@ -45736,7 +45736,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-key-01",
+            "original": "매매-trade-prod-key-01",
             "violations": 1,
             "steps": 1
           },
@@ -45745,7 +45745,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-ij-01",
+            "original": "매매-trade-prod-ij-01",
             "violations": 1,
             "steps": 1
           },
@@ -45835,7 +45835,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-spdb-01",
+            "original": "매매-trade-prod-spdb-01",
             "violations": 1,
             "steps": 1
           },
@@ -45844,7 +45844,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-bkp-01",
+            "original": "매매-trade-prod-bkp-01",
             "violations": 1,
             "steps": 1
           },
@@ -45862,7 +45862,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-rule-01",
+            "original": "매매-trade-prod-rule-01",
             "violations": 1,
             "steps": 1
           },
@@ -45898,7 +45898,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-oc-01",
+            "original": "매매-trade-prod-oc-01",
             "violations": 1,
             "steps": 1
           },
@@ -45907,7 +45907,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-occ-01",
+            "original": "매매-trade-prod-occ-01",
             "violations": 1,
             "steps": 1
           },
@@ -45934,7 +45934,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-deny-01",
+            "original": "매매-trade-prod-deny-01",
             "violations": 1,
             "steps": 1
           },
@@ -45961,7 +45961,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-wfpp-01",
+            "original": "매매-trade-prod-wfpp-01",
             "violations": 1,
             "steps": 1
           },
@@ -45970,7 +45970,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-wfpk-01",
+            "original": "매매-trade-prod-wfpk-01",
             "violations": 1,
             "steps": 1
           },
@@ -45979,7 +45979,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-wip-01",
+            "original": "매매-trade-prod-wip-01",
             "violations": 1,
             "steps": 1
           },
@@ -45988,7 +45988,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-mi-01",
+            "original": "매매-trade-prod-mi-01",
             "violations": 1,
             "steps": 1
           },
@@ -45997,7 +45997,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-ns-01",
+            "original": "매매-trade-prod-ns-01",
             "violations": 1,
             "steps": 1
           },
@@ -46006,7 +46006,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-wipp-01",
+            "original": "매매-trade-prod-wipp-01",
             "violations": 1,
             "steps": 1
           },
@@ -46015,7 +46015,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-wipk-01",
+            "original": "매매-trade-prod-wipk-01",
             "violations": 1,
             "steps": 1
           },
@@ -46033,7 +46033,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매_trade_prod_ane3_db_01",
+            "original": "매매_trade_prod_db_01",
             "violations": 1,
             "steps": 1
           },
@@ -46042,7 +46042,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매_trade_prod_ane3_user_sync",
+            "original": "매매_trade_prod_user_sync",
             "violations": 1,
             "steps": 1
           },
@@ -46051,7 +46051,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-nat-01",
+            "original": "매매-trade-prod-nat-01",
             "violations": 1,
             "steps": 1
           },
@@ -51139,9 +51139,9 @@
             "valid": true,
             "isTruncated": true,
             "isTransformed": false,
-            "original": "platformengineering-paymentsettlement-reconciliation-dev-sa-sync",
+            "original": "paymentsettlement-reconciliation-dev-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 1
           },
           "compute_instance": {
             "name": "paymentsettlement-reconciliation-dev-gce-01",
@@ -57334,9 +57334,9 @@
             "valid": true,
             "isTruncated": true,
             "isTransformed": false,
-            "original": "platform-a-long-longpurpose-prod-ane3-sa-sync",
+            "original": "a-long-longpurpose-prod-sa-sync",
             "violations": 0,
-            "steps": 3
+            "steps": 1
           },
           "compute_instance": {
             "name": "a-long-longpurpose-prod-ane3-gce-01",
@@ -58122,20 +58122,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "a-long-longpurpose-prod-ane3-key-01",
+            "name": "a-long-longpurpose-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-key-01",
+            "original": "a-long-longpurpose-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "a-long-longpurpose-prod-ane3-ij-01",
+            "name": "a-long-longpurpose-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-ij-01",
+            "original": "a-long-longpurpose-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -58225,16 +58225,16 @@
             "valid": true,
             "isTruncated": true,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-spdb-01",
+            "original": "a-long-longpurpose-prod-spdb-01",
             "violations": 0,
-            "steps": 2
+            "steps": 1
           },
           "spanner_backup": {
-            "name": "a-long-longpurpose-prod-ane3-bkp-01",
+            "name": "a-long-longpurpose-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-bkp-01",
+            "original": "a-long-longpurpose-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -58248,11 +58248,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "a-long-longpurpose-prod-ane3-rule-01",
+            "name": "a-long-longpurpose-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-rule-01",
+            "original": "a-long-longpurpose-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -58284,22 +58284,22 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "a-long-longpurpose-prod-ane3-oc-01",
+            "name": "a-long-longpurpose-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-oc-01",
+            "original": "a-long-longpurpose-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
             "name": "a-long-longpurpose-prod-occ-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-occ-01",
+            "original": "a-long-longpurpose-prod-occ-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "iam_policy_binding": {
             "name": "a-long-longpurpose-prod-ane3-pb-01",
@@ -58320,11 +58320,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "a-long-longpurpose-prod-ane3-deny-01",
+            "name": "a-long-longpurpose-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-deny-01",
+            "original": "a-long-longpurpose-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -58349,65 +58349,65 @@
           "iam_workforce_pool_provider": {
             "name": "a-long-longpurpose-prod-wfpp-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-wfpp-01",
+            "original": "a-long-longpurpose-prod-wfpp-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "iam_workforce_pool_provider_key": {
             "name": "a-long-longpurpose-prod-wfpk-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-wfpk-01",
+            "original": "a-long-longpurpose-prod-wfpk-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "iam_workload_identity_pool": {
             "name": "a-long-longpurpose-prod-wip-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-wip-01",
+            "original": "a-long-longpurpose-prod-wip-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "a-long-longpurpose-prod-ane3-mi-01",
+            "name": "a-long-longpurpose-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-mi-01",
+            "original": "a-long-longpurpose-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "a-long-longpurpose-prod-ane3-ns-01",
+            "name": "a-long-longpurpose-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-ns-01",
+            "original": "a-long-longpurpose-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
             "name": "a-long-longpurpose-prod-wipp-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-wipp-01",
+            "original": "a-long-longpurpose-prod-wipp-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "iam_wip_provider_key": {
             "name": "a-long-longpurpose-prod-wipk-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-wipk-01",
+            "original": "a-long-longpurpose-prod-wipk-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "secret": {
             "name": "a-long-longpurpose-prod-ane3-secret-01",
@@ -58419,11 +58419,11 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "a_long_longpurpose_prod_ane3_db_01",
+            "name": "a_long_longpurpose_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "a-long_longpurpose_prod_ane3_db_01",
+            "original": "a-long_longpurpose_prod_db_01",
             "violations": 0,
             "steps": 1
           },
@@ -58432,16 +58432,16 @@
             "valid": true,
             "isTruncated": true,
             "isTransformed": true,
-            "original": "a-long_longpurpose_prod_ane3_user_sync",
+            "original": "a-long_longpurpose_prod_user_sync",
             "violations": 0,
-            "steps": 3
+            "steps": 2
           },
           "router_nat": {
-            "name": "a-long-longpurpose-prod-ane3-nat-01",
+            "name": "a-long-longpurpose-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-nat-01",
+            "original": "a-long-longpurpose-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -63527,11 +63527,11 @@
           "service_account": {
             "name": "3tier-trade-prod-sa-sync",
             "valid": false,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-3tier-trade-prod-ane3-sa-sync",
+            "original": "3tier-trade-prod-sa-sync",
             "violations": 1,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "3tier-trade-prod-ane3-gce-01",
@@ -64317,20 +64317,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "3tier-trade-prod-ane3-key-01",
+            "name": "3tier-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-key-01",
+            "original": "3tier-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "3tier-trade-prod-ane3-ij-01",
+            "name": "3tier-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-ij-01",
+            "original": "3tier-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -64416,20 +64416,20 @@
             "steps": 0
           },
           "spanner_database": {
-            "name": "3tier-trade-prod-ane3-spdb-01",
+            "name": "3tier-trade-prod-spdb-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-spdb-01",
+            "original": "3tier-trade-prod-spdb-01",
             "violations": 1,
             "steps": 0
           },
           "spanner_backup": {
-            "name": "3tier-trade-prod-ane3-bkp-01",
+            "name": "3tier-trade-prod-bkp-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-bkp-01",
+            "original": "3tier-trade-prod-bkp-01",
             "violations": 1,
             "steps": 0
           },
@@ -64443,11 +64443,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "3tier-trade-prod-ane3-rule-01",
+            "name": "3tier-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-rule-01",
+            "original": "3tier-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -64479,20 +64479,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "3tier-trade-prod-ane3-oc-01",
+            "name": "3tier-trade-prod-oc-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-oc-01",
+            "original": "3tier-trade-prod-oc-01",
             "violations": 1,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "3tier-trade-prod-ane3-occ-01",
+            "name": "3tier-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-occ-01",
+            "original": "3tier-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -64515,11 +64515,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "3tier-trade-prod-ane3-deny-01",
+            "name": "3tier-trade-prod-deny-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-deny-01",
+            "original": "3tier-trade-prod-deny-01",
             "violations": 1,
             "steps": 0
           },
@@ -64542,65 +64542,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "3tier-trade-prod-ane3-wfpp-01",
+            "name": "3tier-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-wfpp-01",
+            "original": "3tier-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "3tier-trade-prod-ane3-wfpk-01",
+            "name": "3tier-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-wfpk-01",
+            "original": "3tier-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "3tier-trade-prod-ane3-wip-01",
+            "name": "3tier-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-wip-01",
+            "original": "3tier-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "3tier-trade-prod-ane3-mi-01",
+            "name": "3tier-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-mi-01",
+            "original": "3tier-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "3tier-trade-prod-ane3-ns-01",
+            "name": "3tier-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-ns-01",
+            "original": "3tier-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "3tier-trade-prod-ane3-wipp-01",
+            "name": "3tier-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-wipp-01",
+            "original": "3tier-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "3tier-trade-prod-ane3-wipk-01",
+            "name": "3tier-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-wipk-01",
+            "original": "3tier-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -64614,29 +64614,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "3tier_trade_prod_ane3_db_01",
+            "name": "3tier_trade_prod_db_01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier_trade_prod_ane3_db_01",
+            "original": "3tier_trade_prod_db_01",
             "violations": 1,
             "steps": 0
           },
           "cloud_sql_user": {
-            "name": "3tier_trade_prod_ane3_user_sync",
+            "name": "3tier_trade_prod_user_sync",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier_trade_prod_ane3_user_sync",
+            "original": "3tier_trade_prod_user_sync",
             "violations": 1,
             "steps": 0
           },
           "router_nat": {
-            "name": "3tier-trade-prod-ane3-nat-01",
+            "name": "3tier-trade-prod-nat-01",
             "valid": false,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-nat-01",
+            "original": "3tier-trade-prod-nat-01",
             "violations": 1,
             "steps": 0
           },
@@ -69722,11 +69722,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prod-ane3-sa-sync",
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -70512,20 +70512,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -70613,18 +70613,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -70638,11 +70638,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -70674,20 +70674,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -70710,11 +70710,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -70737,65 +70737,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -70809,29 +70809,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -75917,11 +75917,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo-billing-trade-prod-ane3-sa-sync",
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -76707,20 +76707,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -76808,18 +76808,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -76833,11 +76833,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -76869,20 +76869,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -76905,11 +76905,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -76932,65 +76932,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -77004,29 +77004,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -82112,11 +82112,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
-            "isTransformed": true,
-            "original": "team#1-billing-trade-prod-ane3-sa-sync",
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 3
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -82902,20 +82902,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -83003,18 +83003,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -83028,11 +83028,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -83064,20 +83064,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -83100,11 +83100,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -83127,65 +83127,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -83199,29 +83199,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -88307,11 +88307,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
-            "isTransformed": true,
-            "original": "In.Fra-billing-trade-prod-ane3-sa-sync",
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 3
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -89097,20 +89097,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -89198,18 +89198,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -89223,11 +89223,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -89259,20 +89259,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -89295,11 +89295,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -89322,65 +89322,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -89394,29 +89394,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -93026,11 +93026,11 @@
           "service_account": {
             "name": "billing-trade-prod-sa-sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "platform-billing-trade-prod-ane3-sa-sync",
+            "original": "billing-trade-prod-sa-sync",
             "violations": 0,
-            "steps": 2
+            "steps": 0
           },
           "compute_instance": {
             "name": "billing-trade-prod-ane3-gce-01",
@@ -93816,20 +93816,20 @@
             "steps": 0
           },
           "kms_crypto_key": {
-            "name": "billing-trade-prod-ane3-key-01",
+            "name": "billing-trade-prod-key-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-key-01",
+            "original": "billing-trade-prod-key-01",
             "violations": 0,
             "steps": 0
           },
           "kms_import_job": {
-            "name": "billing-trade-prod-ane3-ij-01",
+            "name": "billing-trade-prod-ij-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ij-01",
+            "original": "billing-trade-prod-ij-01",
             "violations": 0,
             "steps": 0
           },
@@ -93917,18 +93917,18 @@
           "spanner_database": {
             "name": "billing-trade-prod-spdb-01",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-spdb-01",
+            "original": "billing-trade-prod-spdb-01",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "spanner_backup": {
-            "name": "billing-trade-prod-ane3-bkp-01",
+            "name": "billing-trade-prod-bkp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-bkp-01",
+            "original": "billing-trade-prod-bkp-01",
             "violations": 0,
             "steps": 0
           },
@@ -93942,11 +93942,11 @@
             "steps": 0
           },
           "artifact_registry_rule": {
-            "name": "billing-trade-prod-ane3-rule-01",
+            "name": "billing-trade-prod-rule-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-rule-01",
+            "original": "billing-trade-prod-rule-01",
             "violations": 0,
             "steps": 0
           },
@@ -93978,20 +93978,20 @@
             "steps": 0
           },
           "iam_oauth_client": {
-            "name": "billing-trade-prod-ane3-oc-01",
+            "name": "billing-trade-prod-oc-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-oc-01",
+            "original": "billing-trade-prod-oc-01",
             "violations": 0,
             "steps": 0
           },
           "iam_oauth_client_credential": {
-            "name": "billing-trade-prod-ane3-occ-01",
+            "name": "billing-trade-prod-occ-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-occ-01",
+            "original": "billing-trade-prod-occ-01",
             "violations": 0,
             "steps": 0
           },
@@ -94014,11 +94014,11 @@
             "steps": 0
           },
           "iam_deny_policy": {
-            "name": "billing-trade-prod-ane3-deny-01",
+            "name": "billing-trade-prod-deny-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-deny-01",
+            "original": "billing-trade-prod-deny-01",
             "violations": 0,
             "steps": 0
           },
@@ -94041,65 +94041,65 @@
             "steps": 0
           },
           "iam_workforce_pool_provider": {
-            "name": "billing-trade-prod-ane3-wfpp-01",
+            "name": "billing-trade-prod-wfpp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpp-01",
+            "original": "billing-trade-prod-wfpp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workforce_pool_provider_key": {
-            "name": "billing-trade-prod-ane3-wfpk-01",
+            "name": "billing-trade-prod-wfpk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wfpk-01",
+            "original": "billing-trade-prod-wfpk-01",
             "violations": 0,
             "steps": 0
           },
           "iam_workload_identity_pool": {
-            "name": "billing-trade-prod-ane3-wip-01",
+            "name": "billing-trade-prod-wip-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wip-01",
+            "original": "billing-trade-prod-wip-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_managed_identity": {
-            "name": "billing-trade-prod-ane3-mi-01",
+            "name": "billing-trade-prod-mi-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-mi-01",
+            "original": "billing-trade-prod-mi-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_namespace": {
-            "name": "billing-trade-prod-ane3-ns-01",
+            "name": "billing-trade-prod-ns-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-ns-01",
+            "original": "billing-trade-prod-ns-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider": {
-            "name": "billing-trade-prod-ane3-wipp-01",
+            "name": "billing-trade-prod-wipp-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipp-01",
+            "original": "billing-trade-prod-wipp-01",
             "violations": 0,
             "steps": 0
           },
           "iam_wip_provider_key": {
-            "name": "billing-trade-prod-ane3-wipk-01",
+            "name": "billing-trade-prod-wipk-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-wipk-01",
+            "original": "billing-trade-prod-wipk-01",
             "violations": 0,
             "steps": 0
           },
@@ -94113,29 +94113,29 @@
             "steps": 0
           },
           "cloud_sql_database": {
-            "name": "billing_trade_prod_ane3_db_01",
+            "name": "billing_trade_prod_db_01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_db_01",
+            "original": "billing_trade_prod_db_01",
             "violations": 0,
             "steps": 0
           },
           "cloud_sql_user": {
             "name": "billing_trade_prod_user_sync",
             "valid": true,
-            "isTruncated": true,
+            "isTruncated": false,
             "isTransformed": false,
-            "original": "billing_trade_prod_ane3_user_sync",
+            "original": "billing_trade_prod_user_sync",
             "violations": 0,
-            "steps": 1
+            "steps": 0
           },
           "router_nat": {
-            "name": "billing-trade-prod-ane3-nat-01",
+            "name": "billing-trade-prod-nat-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-nat-01",
+            "original": "billing-trade-prod-nat-01",
             "violations": 0,
             "steps": 0
           },
@@ -219591,8 +219591,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -219603,28 +219603,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -220303,8 +220303,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -220315,28 +220315,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -221009,8 +221009,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -221021,28 +221021,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -221722,8 +221722,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -221734,28 +221734,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -222434,8 +222434,8 @@
           "gcp_zone_vm_extension_policy = \"windows-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"windows-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"windows-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"windows-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"windows-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"windows-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"windows-trade-prod-ij-01\"",
           "gcp_node_group = \"windows-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"windows-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"windows-trade-prod-ane3-neg-01\"",
@@ -222446,28 +222446,28 @@
           "gcp_spanner_instance_config = \"custom-windows-trade-prod\"",
           "gcp_spanner_instance_partition = \"windows-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"windows-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"windows-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"windows-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"windows-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"windows-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"windows-trade-prod-rule-01\"",
           "gcp_run_service = \"windows-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"windows-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"windows-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"windows-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"windows-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"windows-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"windows-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"windows-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"windows-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolewindowstradeprod\"",
           "gcp_iam_workforce_pool = \"windows-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"windows-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"windows-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"windows-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"windows-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"windows-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"windows-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"windows-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"windows-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"windows-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"windows-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"windows-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"windows-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"windows-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"windows-trade-prod-wipk-01\"",
           "gcp_secret = \"windows-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"windows_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"windows_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"windows_trade_prod_user_sync\"",
-          "gcp_router_nat = \"windows-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"windows-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"windows-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"windows-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"windows-trade-prod-ane3-trigger-01\"",
@@ -223144,8 +223144,8 @@
           "gcp_zone_vm_extension_policy = \"google-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"google-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"google-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"google-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"google-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"google-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"google-trade-prod-ij-01\"",
           "gcp_node_group = \"google-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"google-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"google-trade-prod-ane3-neg-01\"",
@@ -223155,29 +223155,29 @@
           "gcp_spanner_instance = \"google-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-google-trade-prod\"",
           "gcp_spanner_instance_partition = \"google-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"google-trade-prod-ane3-spdb-01\"",
-          "gcp_spanner_backup = \"google-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_database = \"google-trade-prod-spdb-01\"",
+          "gcp_spanner_backup = \"google-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"google-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"google-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"google-trade-prod-rule-01\"",
           "gcp_run_service = \"google-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"google-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"google-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"google-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"google-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"google-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"google-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"google-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"google-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolegoogletradeprod\"",
           "gcp_iam_workforce_pool = \"google-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"google-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"google-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"google-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"google-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"google-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"google-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"google-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"google-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"google-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"google-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"google-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"google-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"google-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"google-trade-prod-wipk-01\"",
           "gcp_secret = \"google-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"google_trade_prod_ane3_db_01\"",
-          "gcp_cloud_sql_user = \"google_trade_prod_ane3_user_sync\"",
-          "gcp_router_nat = \"google-trade-prod-ane3-nat-01\"",
+          "gcp_cloud_sql_database = \"google_trade_prod_db_01\"",
+          "gcp_cloud_sql_user = \"google_trade_prod_user_sync\"",
+          "gcp_router_nat = \"google-trade-prod-nat-01\"",
           "gcp_cloudbuild_trigger = \"google-trade-prod-ane3-trigger-01\"",
           "gcp_dns_managed_zone = \"google-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"google-trade-prod-ane3-cron-01\"",
@@ -223858,8 +223858,8 @@
           "gcp_zone_vm_extension_policy = \"azure-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"azure-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"azure-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"azure-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"azure-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"azure-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"azure-trade-prod-ij-01\"",
           "gcp_node_group = \"azure-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"azure-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"azure-trade-prod-ane3-neg-01\"",
@@ -223869,29 +223869,29 @@
           "gcp_spanner_instance = \"azure-trade-prod-ane3-spn-01\"",
           "gcp_spanner_instance_config = \"custom-azure-trade-prod\"",
           "gcp_spanner_instance_partition = \"azure-trade-prod-ane3-ptn-01\"",
-          "gcp_spanner_database = \"azure-trade-prod-ane3-spdb-01\"",
-          "gcp_spanner_backup = \"azure-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_database = \"azure-trade-prod-spdb-01\"",
+          "gcp_spanner_backup = \"azure-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"azure-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"azure-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"azure-trade-prod-rule-01\"",
           "gcp_run_service = \"azure-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"azure-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"azure-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"azure-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"azure-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"azure-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"azure-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"azure-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"azure-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"roleazuretradeprod\"",
           "gcp_iam_workforce_pool = \"azure-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"azure-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"azure-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"azure-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"azure-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"azure-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"azure-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"azure-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"azure-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"azure-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"azure-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"azure-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"azure-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"azure-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"azure-trade-prod-wipk-01\"",
           "gcp_secret = \"azure-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"azure_trade_prod_ane3_db_01\"",
-          "gcp_cloud_sql_user = \"azure_trade_prod_ane3_user_sync\"",
-          "gcp_router_nat = \"azure-trade-prod-ane3-nat-01\"",
+          "gcp_cloud_sql_database = \"azure_trade_prod_db_01\"",
+          "gcp_cloud_sql_user = \"azure_trade_prod_user_sync\"",
+          "gcp_router_nat = \"azure-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"azure-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"azure-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"azure-trade-prod-ane3-trigger-01\"",
@@ -225994,8 +225994,8 @@
           "gcp_zone_vm_extension_policy = \"a-long-longpurpose-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"a-long-longpurpose-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"a-long-longpurpose-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"a-long-longpurpose-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"a-long-longpurpose-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"a-long-longpurpose-prod-key-01\"",
+          "gcp_kms_import_job = \"a-long-longpurpose-prod-ij-01\"",
           "gcp_node_group = \"a-long-longpurpose-prod-ane3-ng-01\"",
           "gcp_node_template = \"a-long-longpurpose-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"a-long-longpurpose-prod-ane3-neg-01\"",
@@ -226006,28 +226006,28 @@
           "gcp_spanner_instance_config = \"custom-a-long-longpurpose-prod\"",
           "gcp_spanner_instance_partition = \"a-long-longpurpose-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"a-long-longpurp-prod-spdb-01\"",
-          "gcp_spanner_backup = \"a-long-longpurpose-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"a-long-longpurpose-prod-bkp-01\"",
           "gcp_gke_cluster = \"a-long-longpurpose-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"a-long-longpurpose-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"a-long-longpurpose-prod-rule-01\"",
           "gcp_run_service = \"a-long-longpurpose-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"a-long-longpurpose-prod-ane3-oc-01\"",
+          "gcp_iam_oauth_client = \"a-long-longpurpose-prod-oc-01\"",
           "gcp_iam_oauth_client_credential = \"a-long-longpurpose-prod-occ-01\"",
           "gcp_iam_policy_binding = \"a-long-longpurpose-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"a-long-longpurpose-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"a-long-longpurpose-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"a-long-longpurpose-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolealonglongpurposeprod\"",
           "gcp_iam_workforce_pool = \"a-long-longpurpose-prod-ane3-wfp-01\"",
           "gcp_iam_workforce_pool_provider = \"a-long-longpurpose-prod-wfpp-01\"",
           "gcp_iam_workforce_pool_provider_key = \"a-long-longpurpose-prod-wfpk-01\"",
           "gcp_iam_workload_identity_pool = \"a-long-longpurpose-prod-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"a-long-longpurpose-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"a-long-longpurpose-prod-ane3-ns-01\"",
+          "gcp_iam_wip_managed_identity = \"a-long-longpurpose-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"a-long-longpurpose-prod-ns-01\"",
           "gcp_iam_wip_provider = \"a-long-longpurpose-prod-wipp-01\"",
           "gcp_iam_wip_provider_key = \"a-long-longpurpose-prod-wipk-01\"",
           "gcp_secret = \"a-long-longpurpose-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"a_long_longpurpose_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"a_long_longpurpose_prod_db_01\"",
           "gcp_cloud_sql_user = \"a_long_longpurp_prod_user_sync\"",
-          "gcp_router_nat = \"a-long-longpurpose-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"a-long-longpurpose-prod-nat-01\"",
           "gcp_pubsub_topic = \"a-long-longpurpose-prod-topic-01\"",
           "gcp_pubsub_subscription = \"a-long-longpurpose-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"a-long-longpurpose-prod-ane3-trigger-01\"",
@@ -226608,19 +226608,19 @@
           "gcp_storage_bucket = \"platform-3tier-trade-prod-gcs\"",
           "gcp_kms_ekm_connection = \"3tier-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"3tier-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"3tier-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"3tier-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"3tier-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"3tier-trade-prod-ij-01\"",
           "gcp_spanner_instance_config = \"custom-3tier-trade-prod\"",
-          "gcp_artifact_registry_rule = \"3tier-trade-prod-ane3-rule-01\"",
-          "gcp_iam_oauth_client_credential = \"3tier-trade-prod-ane3-occ-01\"",
+          "gcp_artifact_registry_rule = \"3tier-trade-prod-rule-01\"",
+          "gcp_iam_oauth_client_credential = \"3tier-trade-prod-occ-01\"",
           "gcp_iam_custom_role = \"role3tiertradeprod\"",
-          "gcp_iam_workforce_pool_provider = \"3tier-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"3tier-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"3tier-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"3tier-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"3tier-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"3tier-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"3tier-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"3tier-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"3tier-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"3tier-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"3tier-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"3tier-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"3tier-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"3tier-trade-prod-wipk-01\"",
           "gcp_secret = \"3tier-trade-prod-ane3-secret-01\"",
           "gcp_cloudbuild_trigger = \"3tier-trade-prod-ane3-trigger-01\"",
           "gcp_scheduler_job = \"3tier-trade-prod-ane3-cron-01\"",
@@ -227418,8 +227418,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -227430,28 +227430,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -228119,8 +228119,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -228131,28 +228131,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -228816,8 +228816,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -228828,28 +228828,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -229529,8 +229529,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -229541,28 +229541,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
@@ -230066,8 +230066,8 @@
           "gcp_zone_vm_extension_policy = \"billing-trade-prod-ane3-vep-01\"",
           "gcp_kms_ekm_connection = \"billing-trade-prod-ane3-ekm-01\"",
           "gcp_kms_key_ring = \"billing-trade-prod-ane3-ring-01\"",
-          "gcp_kms_crypto_key = \"billing-trade-prod-ane3-key-01\"",
-          "gcp_kms_import_job = \"billing-trade-prod-ane3-ij-01\"",
+          "gcp_kms_crypto_key = \"billing-trade-prod-key-01\"",
+          "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
@@ -230078,28 +230078,28 @@
           "gcp_spanner_instance_config = \"custom-billing-trade-prod\"",
           "gcp_spanner_instance_partition = \"billing-trade-prod-ane3-ptn-01\"",
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
-          "gcp_spanner_backup = \"billing-trade-prod-ane3-bkp-01\"",
+          "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
-          "gcp_artifact_registry_rule = \"billing-trade-prod-ane3-rule-01\"",
+          "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
-          "gcp_iam_oauth_client = \"billing-trade-prod-ane3-oc-01\"",
-          "gcp_iam_oauth_client_credential = \"billing-trade-prod-ane3-occ-01\"",
+          "gcp_iam_oauth_client = \"billing-trade-prod-oc-01\"",
+          "gcp_iam_oauth_client_credential = \"billing-trade-prod-occ-01\"",
           "gcp_iam_policy_binding = \"billing-trade-prod-ane3-pb-01\"",
           "gcp_iam_principal_access_boundary_policy = \"billing-trade-prod-ane3-pab-01\"",
-          "gcp_iam_deny_policy = \"billing-trade-prod-ane3-deny-01\"",
+          "gcp_iam_deny_policy = \"billing-trade-prod-deny-01\"",
           "gcp_iam_custom_role = \"rolebillingtradeprod\"",
           "gcp_iam_workforce_pool = \"billing-trade-prod-ane3-wfp-01\"",
-          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-ane3-wfpp-01\"",
-          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-ane3-wfpk-01\"",
-          "gcp_iam_workload_identity_pool = \"billing-trade-prod-ane3-wip-01\"",
-          "gcp_iam_wip_managed_identity = \"billing-trade-prod-ane3-mi-01\"",
-          "gcp_iam_wip_namespace = \"billing-trade-prod-ane3-ns-01\"",
-          "gcp_iam_wip_provider = \"billing-trade-prod-ane3-wipp-01\"",
-          "gcp_iam_wip_provider_key = \"billing-trade-prod-ane3-wipk-01\"",
+          "gcp_iam_workforce_pool_provider = \"billing-trade-prod-wfpp-01\"",
+          "gcp_iam_workforce_pool_provider_key = \"billing-trade-prod-wfpk-01\"",
+          "gcp_iam_workload_identity_pool = \"billing-trade-prod-wip-01\"",
+          "gcp_iam_wip_managed_identity = \"billing-trade-prod-mi-01\"",
+          "gcp_iam_wip_namespace = \"billing-trade-prod-ns-01\"",
+          "gcp_iam_wip_provider = \"billing-trade-prod-wipp-01\"",
+          "gcp_iam_wip_provider_key = \"billing-trade-prod-wipk-01\"",
           "gcp_secret = \"billing-trade-prod-ane3-secret-01\"",
-          "gcp_cloud_sql_database = \"billing_trade_prod_ane3_db_01\"",
+          "gcp_cloud_sql_database = \"billing_trade_prod_db_01\"",
           "gcp_cloud_sql_user = \"billing_trade_prod_user_sync\"",
-          "gcp_router_nat = \"billing-trade-prod-ane3-nat-01\"",
+          "gcp_router_nat = \"billing-trade-prod-nat-01\"",
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",

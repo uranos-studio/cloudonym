@@ -84,7 +84,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.service_account": {
         "scope": "project",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -2935,7 +2935,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.kms_crypto_key": {
         "scope": "in kms_key_ring",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -2969,7 +2969,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.kms_import_job": {
         "scope": "in kms_key_ring",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3316,7 +3316,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.spanner_database": {
         "scope": "in spanner_instance",
-        "regionToken": "region",
+        "regionToken": "none",
         "kinds": {
           "default": "GOOGLE_STANDARD_SQL",
           "allowed": [
@@ -3371,7 +3371,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.spanner_backup": {
         "scope": "in spanner_instance",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3452,7 +3452,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.artifact_registry_rule": {
         "scope": "in artifact_registry_repository",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3596,7 +3596,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_oauth_client": {
         "scope": "location",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3630,7 +3630,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_oauth_client_credential": {
         "scope": "location",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3736,7 +3736,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_deny_policy": {
         "scope": "project",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3840,7 +3840,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_workforce_pool_provider": {
         "scope": "in workforce_pool",
-        "regionToken": "region",
+        "regionToken": "none",
         "kinds": {
           "default": null,
           "allowed": [
@@ -3893,7 +3893,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_workforce_pool_provider_key": {
         "scope": "in workforce_pool",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3930,7 +3930,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_workload_identity_pool": {
         "scope": "location",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3964,7 +3964,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_wip_managed_identity": {
         "scope": "in workload_identity_pool",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -3998,7 +3998,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_wip_namespace": {
         "scope": "in workload_identity_pool",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -4032,7 +4032,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_wip_provider": {
         "scope": "in workload_identity_pool",
-        "regionToken": "region",
+        "regionToken": "none",
         "kinds": {
           "default": null,
           "allowed": [
@@ -4089,7 +4089,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.iam_wip_provider_key": {
         "scope": "in workload_identity_pool",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -4157,7 +4157,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.cloud_sql_database": {
         "scope": "in cloud_sql_instance",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -4191,7 +4191,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.cloud_sql_user": {
         "scope": "in cloud_sql_instance",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {
@@ -4225,7 +4225,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     "rules": {
       "gcp.router_nat": {
         "scope": "in router",
-        "regionToken": "region"
+        "regionToken": "none"
       }
     },
     "slug": {

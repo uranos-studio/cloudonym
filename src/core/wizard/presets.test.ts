@@ -91,10 +91,10 @@ describe('프리셋 데이터 (D64)', () => {
     }
     expect(names).toEqual({
       run: 'billing-shop-prod-ane3-run-01', sa: 'billing-shop-prod-sa-sync', secret: 'billing-shop-prod-ane3-secret-01',
-      gke: 'billing-shop-prod-ane3-gke-01', wip: 'billing-shop-prod-ane3-wip-01',
+      gke: 'billing-shop-prod-ane3-gke-01', wip: 'billing-shop-prod-wip-01',
       ip: 'billing-shop-prod-ip-01', bs: 'billing-shop-prod-bs-01', hc: 'billing-shop-prod-hc-01', url: 'billing-shop-prod-url-01',
       cert: 'billing-shop-prod-cert-01', thps: 'billing-shop-prod-thps-01', fwd: 'billing-shop-prod-fwd-01',
-      router: 'billing-prod-ane3-cr-01', nat: 'billing-prod-ane3-nat-01',
+      router: 'billing-prod-ane3-cr-01', nat: 'billing-prod-nat-01',
     });
   });
 

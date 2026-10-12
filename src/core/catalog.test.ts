@@ -91,22 +91,30 @@ describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
 });
 
 describe('regionToken 불변식 (§4-1)', () => {
+  /** D77 — 위치가 없는 리소스(global 전용 · 경로에 location 없음)와 부모의 위치를 물려받는 자식. spanner_instance_partition 은 자기 위치를 골라 남는다 */
+  const D77 = ['gcp.service_account', 'gcp.iam_deny_policy', 'gcp.iam_oauth_client', 'gcp.iam_oauth_client_credential', 'gcp.iam_workload_identity_pool',
+    'gcp.iam_wip_managed_identity', 'gcp.iam_wip_namespace', 'gcp.iam_wip_provider', 'gcp.iam_wip_provider_key',
+    'gcp.iam_workforce_pool_provider', 'gcp.iam_workforce_pool_provider_key', 'gcp.kms_crypto_key', 'gcp.kms_import_job',
+    'gcp.spanner_database', 'gcp.spanner_backup', 'gcp.artifact_registry_rule', 'gcp.cloud_sql_database', 'gcp.cloud_sql_user', 'gcp.router_nat'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 34 + 8 · region 91 — zone 은 없다 (D50 revised)', () => {
+  it('none 34 + 8 + 19 · region 72 — zone 은 없다 (D50 revised · D77)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([42, 0, 91]);
+    expect([count('none'), count('zone'), count('region')]).toEqual([61, 0, 72]);
     // none 의 내역 — gcp:project_global 34 · 그 밖 8(Project ID · 버킷 · Spanner 인스턴스 구성 · IAM 커스텀 역할 · BigQuery 데이터세트 · DNS 영역 · Pub/Sub 둘)
+    // · D77 의 19(위치가 없는 리소스 · 부모의 위치를 물려받는 자식)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
     expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(34);
-    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global').sort()).toEqual(['gcp.bigquery_dataset', 'gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.project_id', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
+    expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global' && !D77.includes(id)).sort()).toEqual(['gcp.bigquery_dataset', 'gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.project_id', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.storage_bucket']);
+    for (const id of D77) expect(none, id).toContain(id);
   });
 
   it('none 인 규칙의 템플릿 · optional 에 region 이 없다 — 덮기 전 규칙 표에서 region 이 빠진 것은 전역 NEG 하나', () => {
     const bad = specs.filter(([id, s]) => s.regionToken === 'none' && (GCP_RULES[id]!.template.includes('region') || GCP_RULES[id]!.optional.includes('region'))).map(([id]) => id);
     expect(bad).toEqual([]);
     const removed = Object.keys(GCP_RULES).filter((id) => GCP_BASE_RULES[id]!.template.includes('region') && !GCP_RULES[id]!.template.includes('region'));
-    expect(removed).toEqual(['gcp.global_network_endpoint_group']);
+    // D77 의 19 가운데 서비스 계정은 덮기 전 규칙 표(rules/gcp.ts)에서 이미 region 을 뺐다 — 나머지 18 이 catalog 로 빠진다
+    expect(removed.sort()).toEqual(['gcp.global_network_endpoint_group', ...D77.filter((id) => id !== 'gcp.service_account')].sort());
   });
 
   it('옛 존 규칙 14종은 region 이고 optional 에 region 이 있다 — 축소 1단계가 뗄 수 있다 (D50 revised · D51 철회)', () => {

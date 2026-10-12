@@ -27,7 +27,8 @@ const GCP_HAND_RULES: Record<string, ResourceRule> = {
     displayName: 'Service Account', slug: 'sa', minLength: 6, maxLength: 30,
     pattern: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: true, endsWithAlnum: true,
-    template: ['owner', 'system', 'purpose', 'env', 'region', 'slug', 'role'], optional: ['region', 'owner'],
+    // owner 는 없다 (D77) — 30자에서 owner 는 늘 축소 1단계로 떨어졌다. 지역도 없다(위치가 없는 리소스 — catalog regionToken none)
+    template: ['system', 'purpose', 'env', 'slug', 'role'], optional: [],
     scope: 'gcp:project', entity: 'iam.serviceAccounts', category: 'identity', uniqueness: 'csp',
     docUrl: 'https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/create',
   },

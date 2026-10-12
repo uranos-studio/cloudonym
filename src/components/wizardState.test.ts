@@ -48,7 +48,7 @@ describe('용도 칩 · 서버 줄 (D61)', () => {
     expect(p.services[0]!.picks).toEqual([{ preset: 'sa' }, { preset: 'secret', instances: [{ id: '1', seq: '01' }] }]);
     expect(p.projectPicks).toEqual([{ preset: 'router', instances: [{ id: '1', seq: '01' }] }, { preset: 'nat', instances: [{ id: '1', seq: '01' }] }]);
     ok(p);
-    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ane3-cr-01', 'billing-prod-ane3-nat-01', 'billing-shop-prod-sa-sync', 'billing-shop-prod-ane3-secret-01']);
+    expect(names(p)).toEqual(['platform-billing-prod', 'billing-prod-ane3-cr-01', 'billing-prod-nat-01', 'billing-shop-prod-sa-sync', 'billing-shop-prod-ane3-secret-01']);
   });
   it('방화벽 tier 칩은 tier 마다 pick 하나', () => {
     let p = togglePreset(initialPlan(), null, 'firewall', 'ssh');

@@ -175,18 +175,20 @@ describe('페이지 문장이 엔진이 하는 일과 같다', () => {
     generateMany(ctxOf(raw), 'gcp', [{ rule, count, ...(rule.kinds?.rule === 'required' ? { kind: rule.kinds.allowed[0]! } : {}) }]).items;
   const sa = real.rules.find((r) => r.id === 'gcp.service_account')!;
 
-  it('축소 1단계 — 규칙의 optional 순서로 뗀다(service_account 는 공식에서 뒤인 region 을 먼저) · 문장은 공식 순서라 하지 않는다', () => {
-    expect(sa.template.indexOf('owner')).toBeLessThan(sa.template.indexOf('region'));
-    expect(sa.optional[0]).toBe('region');
-    const long = 'x'.repeat(20);
-    const dropped = one(sa, { owner: long, system: long })[0]!.steps.filter((m) => m.code === 'step.token_dropped').map((m) => m.field);
-    expect(dropped[0]).toBe('region');
+  it('축소 1단계 — 규칙의 optional 을 뗀다 · 문장은 공식 순서라 하지 않는다', () => {
+    // SA 는 D77 로 생략 토큰이 없다 — owner · 지역 없이 시작한다
+    expect(sa.optional).toEqual([]);
+    const vm = real.rules.find((r) => r.id === 'gcp.compute_instance')!;
+    expect(vm.optional).toEqual(['region']);
+    const long = 'x'.repeat(50);
+    const dropped = one(vm, { system: long })[0]!.steps.filter((m) => m.code === 'step.token_dropped').map((m) => m.field);
+    expect(dropped).toEqual(['region']);
     const step1 = section(model, 'shrink').items![0]!;
     expect(step1).toContain(en.ui.doc_col_optional);
     expect(step1).not.toMatch(/order the formula lists/);
     // 공식 표의 생략 칸은 규칙의 optional 순서 그대로다
-    const row = rowsOf(model, 'formula').find((r) => r.cells[0] === `<${sa.template.join('>-<')}>`)!;
-    expect(row.cells[1]).toBe(sa.optional.join(', '));
+    const row = rowsOf(model, 'formula').find((r) => r.cells[0] === formulaText(vm))!;
+    expect(row.cells[1]).toBe(vm.optional.join(', '));
   });
 
   it('빈 토큰 — 필수 토큰이 비면 FAIL(name.token_empty) · 생략 토큰 · 종류만 건너뛴다고 말한다', () => {
