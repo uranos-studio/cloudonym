@@ -60,6 +60,15 @@ export interface RuleKinds {
   omitValues: readonly string[];     // 기본값과 같이 토큰을 붙이지 않는 값 묶음 — 행 공통
 }
 
+/** 문서 문장이 아닌 근거 (D80) — 안내서가 길이 · 문자를 적지 않은 규칙만. docUrl(안내서)과 함께 싣는다.
+ *  sdk = Google 이 배포한 SDK 의 검증 코드 · api_error = 실제 프로젝트에 보낸 요청의 서버 응답(프로젝트 ID 는 <project> 로 가린다) */
+export interface RuleEvidence {
+  kind: 'sdk' | 'api_error';
+  source: string;   // sdk: 패키지 · 버전 · 파일 · 함수 / api_error: 메서드와 요청 경로
+  date: string;     // 읽거나 잰 날 (YYYY-MM-DD, KST)
+  quote: string;    // 정규식 · 오류 메시지 · 관측 결과 원문
+}
+
 export interface ResourceRule {
   id: string;                 // 'gcp.service_account'
   provider: Provider;
@@ -83,7 +92,8 @@ export interface ResourceRule {
   category: Category;         // 표시 분류 — 콘솔 메뉴를 따른 것이라 근거 URL 이 없다
   uniqueness: 'csp' | 'none'; // none = CSP 가 고유성을 매기지 않는다(AWS Name 태그 · D38)
   uniquenessDocUrl?: string;  // 범위 근거가 docUrl 과 다른 쪽에 있을 때 그 URL
-  docUrl: string;             // 공식 문서 URL — 숫자의 근거
+  docUrl: string;             // 공식 문서 URL — 숫자의 근거 (evidence 가 있으면 안내서)
+  evidence?: readonly RuleEvidence[]; // 안내서가 적지 않은 숫자 · 문자의 근거 (D80)
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
   regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(compose.ts regionTokenOfRule)
   defaultLocation?: 'global'; // 지역 자리의 기본값이 문맥 지역이 아니라 global(토큰 없음)인 규칙 — Secret (D79). 마법사 pick 의 location 'regional' 일 때만 문맥 지역을 쓴다

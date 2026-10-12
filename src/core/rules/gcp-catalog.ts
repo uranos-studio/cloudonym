@@ -3376,6 +3376,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     ]
   },
   {
+    "key": "gcp.artifact_registry_repository",
+    "displayName": "Artifact Registry Repository",
+    "category": "containers",
+    "rules": {
+      "gcp.artifact_registry_repository": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ar",
+      "basis": "Artifact Registry initials; docker is a repository format and repo is generic; principles 1, 3; GitHub code search 2026-10-11 (resource \"google_artifact_registry_repository\", 7584 declarations): docker 132 / registry 110 / repo 92 / gar 12 / ar 11; reserved since D72; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-12)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An Artifact Registry repository for container images or packages; lowercase letters, digits and hyphens, at most 63 characters, starting with a letter, unique per location and project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud artifacts repositories create"
+      ],
+      "terraform": [
+        "google_artifact_registry_repository.repository_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_artifact_registry_repository",
+      "artifacts repositories"
+    ]
+  },
+  {
     "key": "gcp.artifact_registry_rule",
     "displayName": "Artifact Registry Rule",
     "category": "containers",
@@ -3513,6 +3547,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       "google_cloud_run_service",
       "cloud run",
       "run"
+    ]
+  },
+  {
+    "key": "gcp.run_job",
+    "displayName": "Cloud Run Job",
+    "category": "compute",
+    "rules": {
+      "gcp.run_job": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "crj",
+      "basis": "Cloud Run Job initials; run is the Cloud Run service and job is a usage value in shared links (D72); principles 1, 3; GitHub code search 2026-10-11 (resource \"google_cloud_run_v2_job\", 1312 declarations): job 121 / run 102 / crj 2 / rj 0 / rjob 0; reserved since D72; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-12)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Run job; lowercase letters, digits and hyphens, at most 63 characters, starting with a letter, unique per region and project. The name cannot be changed later.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud run jobs create"
+      ],
+      "terraform": [
+        "google_cloud_run_v2_job.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloud_run_v2_job",
+      "run jobs"
     ]
   },
   {

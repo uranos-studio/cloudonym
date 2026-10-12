@@ -2,7 +2,7 @@
 // 행마다 위 주석이 근거 URL 과 원문 인용이다. 보수적으로 좁힌 행은 notes 에 무엇을 더 거부하는지 코드로 싣는다 (D20).
 // rules/gcp.ts 가 손 규칙 · 들인 행과 합친다.
 import type { CoreMessage } from '../messages';
-import type { ResourceRule, Token } from '../types';
+import type { ResourceRule, RuleEvidence, Token } from '../types';
 import type { ScopeDef } from '../scopes';
 
 const COMPUTE_DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/compute/v1/rest';
@@ -19,7 +19,22 @@ const GCP_PREFIX = { prefixes: ['gcp-'] };
 const PUBSUB_ID = /^[A-Za-z][A-Za-z0-9_.~+%-]{2,254}$/;
 const PUBSUB_NAMES = 'https://docs.cloud.google.com/pubsub/docs/pubsub-basics#resource_names';
 
+const AR_CREATE_REPOS = 'https://docs.cloud.google.com/artifact-registry/docs/repositories/create-repos';
+const RUN_CREATE_JOBS = 'https://docs.cloud.google.com/run/docs/create-jobs';
+/** 문서 문장이 없어 SDK 검증 코드 · 서버 응답으로 정한 규칙의 근거 (D80) — 프로젝트 ID 는 <project> */
+const RUN_JOB_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://run.googleapis.com/v2/projects/<project>/locations/asia-northeast3/jobs?jobId=<id>&validateOnly=true', date: '2026-10-12',
+    quote: 'Violation in CreateJobRequest.job_id: only lowercase, digits, and hyphens; must begin with letter, cannot end with hyphen. Must be no longer than 63 characters.' },
+  { kind: 'sdk', source: 'Google Cloud SDK 588.0.0 googlecloudsdk/command_lib/run/flags.py ValidateResource', date: '2026-10-12',
+    quote: '(?=^[a-z0-9-]{1,63}$)(?!^\\-.*)(?!.*\\-$)' },
+];
+const AR_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://artifactregistry.googleapis.com/v1/projects/<project>/locations/asia-northeast3/repositories?repositoryId=<id>', date: '2026-10-12',
+    quote: 'Invalid repository ID: "<id>" for Abc, a_b, a.b, a-, -a, 1abc and 64 or 100 characters; a, a1, a-1, a--b and 49, 50 or 63 characters pass the ID check; a 63-character DOCKER repository was created and deleted' },
+];
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
+const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
 const ADVISORY: CoreMessage = { code: 'note.advisory_rule_enforced' };
 const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
@@ -44,7 +59,7 @@ const SQL_USERS = 'https://docs.cloud.google.com/sql/docs/mysql/create-manage-us
 const NOSEP: Token[] = ['slug', 'system', 'purpose', 'env'];
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
-  & Partial<Pick<ResourceRule, 'forbidden' | 'allowed' | 'separator' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'template' | 'notes' | 'uniquenessDocUrl' | 'defaultLocation'>>;
+  & Partial<Pick<ResourceRule, 'forbidden' | 'allowed' | 'separator' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'template' | 'notes' | 'uniquenessDocUrl' | 'defaultLocation' | 'evidence'>>;
 
 /** 기본 — 소문자 · 숫자 · 하이픈, 글자로 시작 · 영숫자로 끝, 순번 꼴 */
 function rule(s: Spec): ResourceRule {
@@ -66,8 +81,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:workforce_pool': { id: 'gcp:workforce_pool', provider: 'gcp', displayName: 'Workforce pool', parent: 'gcp:namespace', ruleId: 'gcp.iam_workforce_pool', docUrl: IAM_V1_DISCOVERY },
   // 관리 ID · 네임스페이스 · 공급자 · 키는 workloadIdentityPools/{pool} 아래 — 유일 범위 문장은 없다(규칙 notes)
   'gcp:workload_identity_pool': { id: 'gcp:workload_identity_pool', provider: 'gcp', displayName: 'Workload identity pool', parent: 'gcp:project_location', ruleId: 'gcp.iam_workload_identity_pool', docUrl: IAM_V1_DISCOVERY },
-  // 다운로드 규칙 "The name must be unique within your repository" — 저장소(repositoryId) 규칙은 원문이 없어 보류라 ruleId 가 없다
-  'gcp:artifact_registry_repository': { id: 'gcp:artifact_registry_repository', provider: 'gcp', displayName: 'Artifact Registry repository', parent: 'gcp:project_location', docUrl: AR_DOWNLOAD_RULES },
+  // 다운로드 규칙 "The name must be unique within your repository" — 저장소 규칙은 gcp.artifact_registry_repository (D80)
+  'gcp:artifact_registry_repository': { id: 'gcp:artifact_registry_repository', provider: 'gcp', displayName: 'Artifact Registry repository', parent: 'gcp:project_location', ruleId: 'gcp.artifact_registry_repository', docUrl: AR_DOWNLOAD_RULES },
   // Database.name "The name of the database in the Cloud SQL instance. This does not include the project ID or instance name." · User.name 같은 꼴 —
   // 데이터베이스 · 사용자는 인스턴스 아래다. 유일 범위 문장은 없다(규칙 notes)
   'gcp:cloud_sql_instance': { id: 'gcp:cloud_sql_instance', provider: 'gcp', displayName: 'Cloud SQL instance', parent: 'gcp:project', ruleId: 'gcp.cloud_sql_instance', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/admin-api/rest/v1/databases#Database.FIELDS.name' },
@@ -112,6 +127,12 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.gke_cluster', displayName: 'GKE Cluster', slug: 'gke', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/, scope: 'gcp:project_location', entity: 'container.clusters', category: 'containers', docUrl: 'https://www.googleapis.com/discovery/v1/apis/container/v1/rest' }),
 
   // ── Artifact Registry ──
+  // 저장소 (D80) — 안내서 · REST 참조 · gcloud 어디에도 길이 · 문자 문장이 없다("Required. The repository id to use for this repository."). 유일 범위만 있다:
+  // 안내서 "For each repository location in a project, repository names must be unique." gcloud 는 선언형이라 클라이언트 검증이 없다 — 서버 응답만 근거다.
+  // 2026-10-12 탐침(repositories.create, 본문 format FORMAT_UNSPECIFIED — 이름 검사가 format 검사보다 먼저다): Abc · a_b · a.b · a- · -a · 1abc · 64자 · 100자는
+  // `Invalid repository ID: "<id>"`, a · a1 · a-1 · a--b · 49 · 50 · 63자는 format 오류(이름 통과). 63자는 DOCKER 로 실제로 만들고 지웠다. 서버 규칙 = RFC1035 꼴 1-63
+  rule({ id: 'gcp.artifact_registry_repository', displayName: 'Artifact Registry Repository', slug: 'ar', minLength: 1, maxLength: 63, pattern: RFC1035,
+    scope: 'gcp:project_location', entity: 'artifactregistry.repositories', category: 'containers', docUrl: AR_CREATE_REPOS, evidence: AR_REPOSITORY_EVIDENCE, notes: [OBSERVED] }),
   // 다운로드 규칙 gcloud "RULE_NAME: the name of the rule. The name must be unique within your repository, have a max length of 256 characters, and consist of alpha-numeric characters, percent-encoded characters, or characters in the list [-, ., _, ~, :, @, +, ^]."
   // 디스커버리 rules.create ruleId 는 "The rule id to use for this repository." 뿐이다. 최소 길이 문장이 없어 1 로 둔다. 생성은 영숫자 · - · _ 만 쓴다(나머지 문자는 검증만 받는다)
   rule({ id: 'gcp.artifact_registry_rule', displayName: 'Artifact Registry Rule', slug: 'rule', minLength: 1, maxLength: 256, pattern: /^(?:[A-Za-z0-9._~:@+^-]|%[0-9A-Fa-f]{2})+$/,
@@ -135,6 +156,13 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.run_service', displayName: 'Cloud Run Service', slug: 'run', minLength: 1, maxLength: 49, pattern: /^[a-z]([a-z0-9-]*[a-z0-9])?$/,
     scope: 'gcp:project_location', entity: 'run.services', category: 'compute', docUrl: 'https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/create',
     uniquenessDocUrl: 'https://docs.cloud.google.com/run/docs/deploying', notes: [SECONDARY] }),
+
+  // Job (D80) — REST v2 jobs.create jobId 는 "The unique identifier for the Job." 뿐이고 안내서는 "After you submit the form, you can't edit the name of the job." ·
+  // "The sum of job name and token length must be fewer than 63 characters." 만 적는다. 서버 응답(validateOnly, 2026-10-12) "only lowercase, digits, and hyphens;
+  // must begin with letter, cannot end with hyphen. Must be no longer than 63 characters." — Abc · a_b · a.b · a- · -a · 1abc · 64 · 100자 거부, a · a--b · 49 · 50 · 63자 통과.
+  // gcloud(SDK 588.0.0)의 클라이언트 검증 정규식은 숫자로 시작하는 이름도 받지만 서버가 1abc 를 거부한다 — 좁은 서버 쪽을 따른다
+  rule({ id: 'gcp.run_job', displayName: 'Cloud Run Job', slug: 'crj', minLength: 1, maxLength: 63, pattern: RFC1035,
+    scope: 'gcp:project_location', entity: 'run.jobs', category: 'compute', docUrl: RUN_CREATE_JOBS, evidence: RUN_JOB_EVIDENCE, notes: [OBSERVED] }),
 
   // ── IAM ──
   // "This value should be a string of 6 to 63 lowercase letters, digits, or hyphens. It must start with a letter, and cannot have a trailing hyphen. The prefix `gcp-` is reserved for use by Google, and may not be specified."

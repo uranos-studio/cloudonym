@@ -107,15 +107,15 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_gcp} '### GCP' sections, no AWS or Azure)"; fi
 fi
 
-# 3. /catalog.json — 200 · provider 는 gcp 하나 · 112행(run_service — D65 · 작은 스택 규칙 11개 — D72)
+# 3. /catalog.json — 200 · provider 는 gcp 하나 · 114행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80)
 name='GET /catalog.json'
 code="$(fetch GET /catalog.json)"
 if expect_status "${name}" "${code}" 200; then
   providers="$(jq -c '.providers | keys' "${body}" 2>/dev/null)"
   rows="$(jq '.providers.gcp.rows | length' "${body}" 2>/dev/null)"
   if [ "${providers}" != '["gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
-  elif [ "${rows}" != "112" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 112"
-  else pass "${name} (providers [\"gcp\"], 112 rows)"; fi
+  elif [ "${rows}" != "114" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 114"
+  else pass "${name} (providers [\"gcp\"], 114 rows)"; fi
 fi
 
 # 4. /openapi.json — provider enum 셋이 모두 ["gcp"]

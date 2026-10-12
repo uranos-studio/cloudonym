@@ -89,10 +89,10 @@ describe('「API only」 칩 (D54 · 6-3) — 표지 행만 · 기본은 거르�
 });
 
 describe('categoryCounts — 분류별 행 수 · 분류 순서', () => {
-  it('GCP — 합이 행 수 112(규칙 수가 아니다) · catalog 행의 분류로 센다', () => {
+  it('GCP — 합이 행 수 114(규칙 수가 아니다) · catalog 행의 분류로 센다', () => {
     const c = categoryCounts(gcpTree);
-    expect([...c.values()].reduce((a, b) => a + b, 0)).toBe(112);
-    expect(rulesFor('gcp').length).toBeGreaterThan(112);
+    expect([...c.values()].reduce((a, b) => a + b, 0)).toBe(114);
+    expect(rulesFor('gcp').length).toBeGreaterThan(114);
     expect(c.get('networking')).toBe(catalogFor('gcp').filter((r) => r.category === 'networking').length);
   });
   it('Azure — 합이 규칙 수 · 0 인 분류는 없다', () => {

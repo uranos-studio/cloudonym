@@ -24,7 +24,7 @@ export const MESSAGE_CODES = [
   'note.gcp_vm_project_unique', 'note.aws_key_pair_scope_unconfirmed', 'note.aws_schema_scope_unconfirmed',
   // rules/*-manual.ts notes (9)
   'note.scope_unconfirmed', 'note.narrower_source_used', 'note.blocklist_narrowed', 'note.parent_length_limit', 'note.unicode_excluded',
-  'note.variant_narrowed', 'note.secondary_source', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
+  'note.variant_narrowed', 'note.secondary_source', 'note.observed_server_rule', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
   // conflict.ts (1)
   'name.conflict',
   // selection.ts (14)
@@ -96,6 +96,7 @@ export type CoreMessage =
   | { code: 'note.unicode_excluded' }
   | { code: 'note.variant_narrowed' }
   | { code: 'note.secondary_source' }
+  | { code: 'note.observed_server_rule' }
   | { code: 'note.obsolete_source_applied' }
   | { code: 'note.advisory_rule_enforced' }
   /** keys 는 충돌한 항목의 key(NameItem.key) — 처음 나온 순 */

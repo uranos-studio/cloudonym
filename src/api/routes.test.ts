@@ -299,7 +299,7 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     expect(body.version).toEqual(VERSION);
     expect(Object.keys(body.providers)).toEqual([...ENABLED_PROVIDERS]);
     expect(body.providers.gcp.rows).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
-    expect(body.providers.gcp.rows).toHaveLength(112);
+    expect(body.providers.gcp.rows).toHaveLength(114);
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
     expect(body.providers.aws).toBeUndefined();

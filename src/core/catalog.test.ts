@@ -65,10 +65,10 @@ describe('생성 TS = JSON (D46 ⑵)', () => {
 });
 
 describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
-  it('112행 · 규칙 133 · 행 key 가 겹치지 않는다', () => {
-    expect(GCP_CATALOG).toHaveLength(112);
-    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(112);
-    expect(ruleIdsOfCatalog).toHaveLength(133);
+  it('114행 · 규칙 135 · 행 key 가 겹치지 않는다', () => {
+    expect(GCP_CATALOG).toHaveLength(114);
+    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(114);
+    expect(ruleIdsOfCatalog).toHaveLength(135);
   });
 
   it('모든 GCP 규칙 id 가 catalog 에 정확히 한 번 있고, catalog 의 모든 ruleId 가 규칙 표에 있다', () => {
@@ -100,9 +100,9 @@ describe('regionToken 불변식 (§4-1)', () => {
   const D79 = ['gcp.iam_policy_binding', 'gcp.iam_principal_access_boundary_policy', 'gcp.iam_workforce_pool'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 34 + 6 + 19 + 3 · region 71 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
+  it('none 34 + 6 + 19 + 3 · region 73 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([62, 0, 71]);
+    expect([count('none'), count('zone'), count('region')]).toEqual([62, 0, 73]);
     // none 의 내역 — gcp:project_global 34 · 그 밖 6(Project ID · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘) — 버킷 · BigQuery 데이터세트는 D78 로 region
     // · D77 의 19(위치가 없는 리소스 · 부모의 위치를 물려받는 자식) · D79 의 3(위치가 global 하나인 IAM)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
@@ -237,7 +237,7 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 는 112행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 는 114행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
     expect(catalogFor('aws')).toEqual([]);
     expect(catalogFor('azure')).toEqual([]);

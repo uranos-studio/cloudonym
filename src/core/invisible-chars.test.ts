@@ -59,7 +59,7 @@ describe('모든 규칙은 보이지 않는 글자 하나를 끼운 이름을 �
   const ids = Object.keys(RULES).sort();
   it('규칙 수 · 예외 수 — 예외는 EC2 Name 태그(원문 「any character」)뿐', () => {
     const exempt = ids.filter((id) => EXEMPT(RULES[id]!));
-    expect(ids.length).toBe(679);
+    expect(ids.length).toBe(681);
     expect(exempt.every((id) => id.startsWith('aws.'))).toBe(true);
     expect(exempt.every((id) => RULES[id]!.docUrl.endsWith('Using_Tags.html#tag-restrictions'))).toBe(true);
   });

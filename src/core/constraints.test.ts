@@ -322,3 +322,33 @@ describe('Cloud Run 서비스 (D65)', () => {
       .toEqual({ scope: 'gcp:project_location', entity: 'run.services', category: 'compute', slug: 'run', regionToken: 'region' });
   });
 });
+
+describe('문서 문장이 아닌 근거 (D80)', () => {
+  const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 둘뿐 — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.run_job']);
+    for (const r of withEvidence) {
+      expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
+      expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
+      expect(r.evidence!.some((e) => e.kind === 'api_error'), r.id).toBe(true);
+    }
+  });
+  it('근거마다 종류 · 날짜 · 원문이 있고 api_error 의 요청 경로는 프로젝트 ID 를 <project> 로 가린다', () => {
+    for (const r of withEvidence) {
+      for (const e of r.evidence!) {
+        expect(['sdk', 'api_error'], r.id).toContain(e.kind);
+        expect(e.date, r.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        expect(e.quote.length, r.id).toBeGreaterThan(10);
+        if (e.kind === 'api_error') expect(e.source, r.id).toMatch(/^POST https:\/\/[a-z]+\.googleapis\.com\/v\d\/projects\/<project>\/locations\//);
+      }
+    }
+  });
+  it('두 규칙은 RFC1035 꼴 1-63 · 위치마다 유일 · 지역 토큰이 있다', () => {
+    for (const id of ['gcp.run_job', 'gcp.artifact_registry_repository']) {
+      const r = RULES[id]!;
+      expect({ min: r.minLength, max: r.maxLength, scope: r.scope, regionToken: r.regionToken }, id).toEqual({ min: 1, max: 63, scope: 'gcp:project_location', regionToken: 'region' });
+    }
+    expect(RULES['gcp.run_job']!.slug).toBe('crj');
+    expect(RULES['gcp.artifact_registry_repository']!.slug).toBe('ar');
+  });
+});
