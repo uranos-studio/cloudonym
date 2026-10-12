@@ -270,7 +270,8 @@ function shortPick(p: WizardPick): Record<string, unknown> {
   if (p.kind !== undefined) out.k = p.kind;
   if (p.ha === true) out.h = 1;
   if (typeof p.serverless === 'string') out.sv = SERVERLESS_LONG[p.serverless] ?? p.serverless;
-  if (p.location !== undefined) out.l = p.location;
+  // 위치는 코드로 싣는다 — 검사를 지난 모델이라 늘 풀리고, 길이가 MAX_REGION_CHARS 안이라 상한식이 닫힌다 (D78)
+  if (p.location !== undefined) out.l = canonicalLocation(p.location, 'gcp')?.code ?? p.location;
   if (p.instances !== undefined) {
     out.i = p.instances.map((s) => {
       const a = shortAttach(s.attach);
@@ -491,7 +492,7 @@ export function recoverPlan(plan: WizardPlan, n: WizardNotices): WizardPlan | un
 const MAX_PRESET_ID_CHARS = Math.max(...PRESETS.map((p) => p.id.length));
 const PICK_FIXED_JSON_BYTES = JSON.stringify({
   pr: 'p'.repeat(MAX_PRESET_ID_CHARS), ru: 'r'.repeat(MAX_RESOURCE_TYPE_CHARS + 4), t: 't'.repeat(16), ro: 'o'.repeat(MAX_ROLE_CHARS),
-  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', i: [],
+  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', l: 'l'.repeat(MAX_REGION_CHARS), i: [],
 }).length + 1;
 /** 슬롯 하나(`{"id":"<8>","q":"99","a":{}},` — attach 감싸기 · 데이터 배열 감싸기 포함) 와 딸린 것 하나(`"ipi":1,` · `"99",` 중 큰 쪽) 중 큰 쪽 */
 const NAME_JSON_BYTES = Math.max(

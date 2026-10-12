@@ -518,8 +518,11 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     const json = JSON.parse(atob(enc.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (enc.length % 4)) % 4)));
     expect(json.w.s[0].p).toEqual([{ pr: 'object', l: 'us' }, { ru: 'gcp.bigquery_dataset', l: 'eu' }]);
     expect(decodeWizardState(`#state=${enc}`)!.plan).toEqual(plan);
-    // 손댄 링크의 위치 이름(` US `)도 코드로 풀린다 — 화면의 Location 고르기 값이 코드다
-    expect(decodeW(one({ preset: 'object', location: ' US ' })).plan!.services[0]!.picks[0]).toEqual({ preset: 'object', location: 'us' });
+    // 인코더는 위치를 코드로 싣는다 · 손댄 링크의 위치 이름(` US `)도 디코더가 코드로 푼다 — 화면의 Location 고르기 값이 코드다
+    const named = encodeWizardState(one({ preset: 'object', location: ' US ' }))!;
+    expect(JSON.parse(atob(named.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (named.length % 4)) % 4))).w.s[0].p[0]).toEqual({ pr: 'object', l: 'us' });
+    const hand = `#state=${btoa(JSON.stringify({ ...WP, v: WV, w: { pp: [], s: [{ n: 'shop', p: [{ pr: 'object', l: ' US ' }] }] } }))}`;
+    expect(decodeWizardState(hand)!.plan!.services[0]!.picks[0]).toEqual({ preset: 'object', location: 'us' });
     // 모르는 위치는 그대로 두어 validatePlan 이 거부한다 — 그 pick 은 링크를 열며 버려진다
     expect(decodeW(one({ preset: 'object', location: 'mars' }, { preset: 'object', tier: 'logs' })).plan!.services[0]!.picks.map((p) => p.location)).not.toContain('mars');
   });
@@ -685,7 +688,8 @@ describe('hash v4 — 모델 전체 오류 · 트리 hash · 깨진 링크', () 
 const MEASURED_NEAR_MAX = 18146;
 describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
   it('MAX_WIZARD_HASH_CHARS 를 잰다 · MAX_ANY_HASH_CHARS 는 v3 · v4 중 큰 쪽', () => {
-    expect(MAX_WIZARD_HASH_CHARS).toBe(120495);
+    // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다
+    expect(MAX_WIZARD_HASH_CHARS).toBe(127775);
     expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
   });
   it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {
