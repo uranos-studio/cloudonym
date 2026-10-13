@@ -1,7 +1,7 @@
-// 마법사 화면의 배치 (D89) — 폭에 따라 셋이다. 경계는 Tailwind 의 md(768px) · xl(1280px) 와 같다(클래스와 JS 가 같은 폭에서 바뀐다)
+// 마법사 화면의 배치 (D89 · D93) — 폭에 따라 셋이다. 경계는 Tailwind 의 md(768px) · xl(1280px) 와 같다(클래스와 JS 가 같은 폭에서 바뀐다)
 //   wide   ≥1280  목록 · 설정 · 이름 세 칸
 //   tablet 768–1279  목록 · 설정 두 칸 + 오른쪽 가장자리에서 여는 이름 드로어
-//   phone  <768   한 칸 — 위 탭 [Plan] [Names] · 줄을 누르면 설정이 바텀 시트로
+//   phone  <768   한 칸 — 위 탭 [Plan] [Edit] [Names] · 줄을 누르면 Edit 탭이 그 줄의 설정을 연다
 import { useSyncExternalStore } from 'react';
 
 export type WizardLayout = 'wide' | 'tablet' | 'phone';

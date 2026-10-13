@@ -388,7 +388,7 @@ export function projectPreview(context: ProjectContext, suffix: string | undefin
 }
 
 // ── 프로젝트 공용 칸의 두 자리 (D84) ──
-/** 프로젝트 공용 pick 의 자리 번호 — ② Required network 는 프리셋 pick, 「Shared extra resources」는 custom pick. 모델은 projectPicks 하나이고 자리 번호(path)는 그대로다 */
+/** 프로젝트 공용 pick 의 자리 번호 — 네트워크(Network) 는 프리셋 pick, 「Shared extra resources」는 custom pick. 모델은 projectPicks 하나이고 자리 번호(path)는 그대로다 */
 export function projectPickIndexes(plan: WizardPlan, where: 'network' | 'extras'): number[] {
   return plan.projectPicks.flatMap((p, i) => ((p.preset !== null) === (where === 'network') ? [i] : []));
 }
