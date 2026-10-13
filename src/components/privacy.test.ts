@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { Privacy } from './Privacy';
 import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
 import { VISIT_KEY } from './beacon';
-import { INTRO_KEY } from './localPrefs';
+import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
 
 /** 태그를 벗긴 본문 — 문장 검사는 사람이 읽는 글자로 한다 */
@@ -54,6 +54,7 @@ describe('/privacy', () => {
     for (const t of COPY_TARGETS) expect(text, t).toContain(t);
     expect(text).toContain(VISIT_KEY);
     expect(text).toContain(INTRO_KEY);
+    expect(text).toContain(THEME_KEY);
   });
   it('모으지 않는 것 — 이름 · 다섯 값 · hash · UA 원문 · 쿠키 · 식별자 · never collected', () => {
     const text = pageText();

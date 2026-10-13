@@ -5,15 +5,20 @@ import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VERSION } from '../version';
 import { PRIVACY_PATH, withStateHash } from './route';
+import { ThemeToggle } from './ThemeToggle';
 
 export function DocPage({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="min-h-screen">
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-        {/* 앱에서 실어 온 상태 hash 로 돌아간다 — 입력 · 선택이 그대로 열린다 */}
-        <a href={withStateHash('/', window.location.hash)} data-back-to-app className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-300">
-          <ArrowLeft aria-hidden="true" className="size-4" />{en.ui.back_to_app}
-        </a>
+        <div className="flex items-center justify-between gap-3">
+          {/* 앱에서 실어 온 상태 hash 로 돌아간다 — 입력 · 선택이 그대로 열린다 */}
+          <a href={withStateHash('/', window.location.hash)} data-back-to-app className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-indigo-300">
+            <ArrowLeft aria-hidden="true" className="size-4" />{en.ui.back_to_app}
+          </a>
+          {/* 화면 모드 (D94) — 앱 머리와 같은 고르기 */}
+          <ThemeToggle />
+        </div>
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         {children}
       </main>

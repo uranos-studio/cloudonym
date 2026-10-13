@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { BookOpen, Cloud, Copy, FileText, ListTree, Wand2 } from 'lucide-react';
 import { COPY_BUTTON } from './CopyButton';
+import { ThemeToggle } from './ThemeToggle';
 import { en } from '../messages/en';
 
 export const NAV_LINK =
@@ -49,6 +50,7 @@ export function AppHeader({ share, screen, otherHref, namingHref, reserveShare =
             : <a href={otherHref} data-nav-pick title={en.ui.nav_pick_label} className={NAV_LINK}><ListTree aria-hidden="true" className="size-4" />{en.ui.nav_pick}</a>}
           <a href={namingHref} data-nav-naming className={NAV_LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
           <a href="/llms.txt" target="_blank" rel="noreferrer" className={NAV_LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
+          <ThemeToggle />
         </nav>
         {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
         {shareWarning && share && <p data-share-warning className="w-full text-xs text-zinc-600 sm:text-right dark:text-zinc-400">{en.ui.share_warning}</p>}

@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
-/* 다크 모드는 prefers-color-scheme (Tailwind v4 기본 dark: 변형). 폼 컨트롤 · 스크롤바도 따라오게 color-scheme 을 준다 */
+/* 화면 모드 (D94) — dark: 변형은 <html class="dark"> 를 본다. 클래스는 public/theme.js(첫 칠 전)와 src/components/theme.ts(고른 뒤)가 단다 —
+   System 이면 기기 설정(prefers-color-scheme)을 따르고, Light · Dark 를 고르면 기기 설정보다 이긴다 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
+  /* 폼 컨트롤 · 스크롤바도 고른 모드를 따른다 — 기기가 다크여도 Light 를 고르면 밝게 */
   html {
-    color-scheme: light dark;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
