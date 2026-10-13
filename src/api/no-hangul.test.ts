@@ -80,3 +80,12 @@ describe('API 응답 — 한글 0 · 모든 실패에 code 와 message', () => {
     for (const x of samples.filter((s) => s.status === 200 && s.path !== '/v1/events')) expect(x.body.version, x.id).toEqual(VERSION);
   });
 });
+
+// 정적 자산도 공개 화면이다 — index.html 은 빌드에 그대로 실려 배포 점검(release-check)의 「GET / Hangul in body」에 걸린다
+describe('정적 index.html — 한글 0', () => {
+  it('주석까지 한글이 없다', async () => {
+    const { readFile } = await import('node:fs/promises');
+    const html = await readFile(new URL('../../index.html', import.meta.url), 'utf8');
+    expect(html.split('\n').filter((l) => HANGUL.test(l))).toEqual([]);
+  });
+});
