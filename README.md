@@ -11,7 +11,7 @@ Multi-cloud resource naming engine — **Google Cloud** in this release, with AW
 
 The home page names a whole Google Cloud project (D84, D89, D93). It is three columns — **Plan** (the list), **Edit** (the selected row) and **Names**; below 768 px they are three tabs. Names are regenerated as you type. The header badge shows **Google Cloud** (AWS and Azure soon) and a **Light · Dark · System** screen mode switch (D94).
 
-**Cards** (D93) — the first screen asks *What are you building?* in the first service. A card adds every resource a working setup needs, named and checked: **Website** (a web server VM behind an HTTPS load balancer, HTTP redirected to HTTPS, with the firewall rules the load balancer needs; a database on by default), **Serverless web** (Cloud Run behind a serverless NEG), **Static site** (a bucket behind a backend bucket), **Internal app on VMs** (web, app and database servers with a bastion) and **HTTPS load balancer** (the front only, in front of a web server, Cloud Run service or bucket the service already has). Website and Internal app on VMs were built and tested on Google Cloud. Selecting a card in the list opens its checklist: each part with its name, the network parts it added, and a warning that lists missing parts if you untick one (a load balancer does not serve without them). Removing a card keeps the database option and the network firewall rules. Cards are not stored: the screen recognises them from the resources a service has, so share links and `POST /v1/wizard` are unchanged.
+**Cards** (D93) — the first screen asks *What are you building?* in the first service. A card adds every resource a working setup needs, named and checked: **Website** (a web server VM behind an HTTPS load balancer, HTTP redirected to HTTPS, with the firewall rules the load balancer needs; a database on by default), **Serverless web** (Cloud Run behind a serverless NEG), **Static site** (a bucket behind a backend bucket), **Internal app on VMs** (web, app and database servers with a bastion) and **HTTPS load balancer** (the front only, in front of a web server, Cloud Run service or bucket the service already has). Website, Serverless web, Static site and Internal app on VMs were built and tested on Google Cloud (D91, D96); the HTTPS load balancer card alone has no backend to serve. Serverless web and Static site also need settings that have no name — public access to the Cloud Run service, and a public, index-page bucket — and their checklists say so with a link to the Google Cloud page. Selecting a card in the list opens its checklist: each part with its name, the network parts it added, and a warning that lists missing parts if you untick one (a load balancer does not serve without them). Removing a card keeps the database option and the network firewall rules. Cards are not stored: the screen recognises them from the resources a service has, so share links and `POST /v1/wizard` are unchanged.
 
 1. **Project** — type **Owner · System** (at most 64 characters each), pick one or more **Environments** and a **Region** (searching by a zone name also finds its region). The **project name** and the **project ID** (`<owner>-<system>-<env>`) appear at once, one per environment; with several environments the same plan is named once for each. An optional **Project ID suffix** (a team code or a year, e.g. `team1` → `platform-billing-prod-team1`) makes a predictable ID your own: project IDs are unique across Google Cloud and never reusable, and Cloudonym cannot check whether one is free (D85).
 2. **Network** (one row in the list; select it to see its parts) — a VPC, subnets, firewall rules (`ssh`, `web`, `icmp`, `iap` for IAP TCP forwarding, `lbhc` for load balancer health checks, or any other tier you type), a Cloud Router, Cloud NAT and a private services access range (`psa`, a global internal address). The VPC starts as one network (a plan with two, made through the API, still shows both). **Add subnet** adds another subnet with its own kind and tier — for example a proxy-only subnet beside the private one (`…-snet-01`, `…-snet-proxy-01`) (D86, D87, D88).
@@ -96,7 +96,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -139,7 +139,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -186,7 +186,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -217,7 +217,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.2" },
+  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -276,7 +276,7 @@ Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relati
 
 ## Supported resources (136 rules)
 
-**GCP 136** rules are enabled in this release (rules revision `2026-10-13.2`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
+**GCP 136** rules are enabled in this release (rules revision `2026-10-13.3`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
 
 The 36 hand-written rules below (the AWS and Azure rows among them are not enabled yet) are each checked against the official document linked. On top of them, **332 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md) (29 rows), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) (10 discovery methods, and the 23 of the 116 supported GCP asset types that have no rule: 5 held, 13 with no user-chosen name, 5 named outside this engine) and [docs/aws-intake-held.md](docs/aws-intake-held.md) (33 types). A further **44 GCP rules**, **42 AWS rules** and **30 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
 
@@ -393,7 +393,7 @@ See the LICENSE file for details.
 
 첫 화면은 Google Cloud 프로젝트 하나의 이름을 짓는다(D84 · D89 · D93). 세 칸이다 — **Plan**(목록) · **Edit**(고른 줄) · **Names**. 768px 아래에서는 탭 셋이다. 입력하는 대로 이름이 다시 만들어진다. 머리의 배지는 **Google Cloud**(AWS · Azure 는 곧)를 보이고, **Light · Dark · System** 화면 모드를 고를 수 있다(D94).
 
-**카드**(D93) — 첫 화면은 첫 서비스에서 *What are you building?* 을 묻는다. 카드 하나가 동작하는 구성에 필요한 리소스를 이름과 판정까지 한 번에 더한다 — **Website**(HTTPS 로드 밸런서 뒤의 웹 서버 VM, HTTP 는 HTTPS 로 전환, 로드 밸런서에 필요한 방화벽 규칙까지 · 데이터베이스는 기본으로 켜짐) · **Serverless web**(서버리스 NEG 뒤의 Cloud Run) · **Static site**(백엔드 버킷 뒤의 버킷) · **Internal app on VMs**(웹 · 앱 · DB 서버와 bastion) · **HTTPS load balancer**(서비스에 이미 있는 웹 서버 · Cloud Run · 버킷 앞에 앞쪽만). Website 와 Internal app on VMs 는 Google Cloud 에 실제로 만들어 시험했다. 목록에서 카드를 고르면 점검표가 열린다 — 부품마다 이름, 네트워크에 더한 부품, 하나를 빼면 빠진 부품을 말하는 경고(로드 밸런서는 그것 없이 응답하지 않는다). 카드를 지워도 데이터베이스 선택과 네트워크 방화벽 규칙은 남는다. 카드는 저장하지 않는다 — 화면이 서비스에 있는 리소스에서 알아보므로 공유 링크와 `POST /v1/wizard` 는 그대로다.
+**카드**(D93) — 첫 화면은 첫 서비스에서 *What are you building?* 을 묻는다. 카드 하나가 동작하는 구성에 필요한 리소스를 이름과 판정까지 한 번에 더한다 — **Website**(HTTPS 로드 밸런서 뒤의 웹 서버 VM, HTTP 는 HTTPS 로 전환, 로드 밸런서에 필요한 방화벽 규칙까지 · 데이터베이스는 기본으로 켜짐) · **Serverless web**(서버리스 NEG 뒤의 Cloud Run) · **Static site**(백엔드 버킷 뒤의 버킷) · **Internal app on VMs**(웹 · 앱 · DB 서버와 bastion) · **HTTPS load balancer**(서비스에 이미 있는 웹 서버 · Cloud Run · 버킷 앞에 앞쪽만). Website · Serverless web · Static site · Internal app on VMs 는 Google Cloud 에 실제로 만들어 시험했다(D91 · D96). HTTPS load balancer 카드는 혼자서는 응답할 백엔드가 없다. Serverless web 과 Static site 는 이름이 없는 설정도 필요하다 — Cloud Run 서비스의 공개 호출 허용, 버킷의 공개 읽기와 기본 문서 — 점검표가 그것을 Google Cloud 문서 링크와 함께 말한다. 목록에서 카드를 고르면 점검표가 열린다 — 부품마다 이름, 네트워크에 더한 부품, 하나를 빼면 빠진 부품을 말하는 경고(로드 밸런서는 그것 없이 응답하지 않는다). 카드를 지워도 데이터베이스 선택과 네트워크 방화벽 규칙은 남는다. 카드는 저장하지 않는다 — 화면이 서비스에 있는 리소스에서 알아보므로 공유 링크와 `POST /v1/wizard` 는 그대로다.
 
 1. **Project** — **Owner · System** 을 적고(각 64자까지) **Environments** 를 하나 이상 · **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). **프로젝트 이름**과 **프로젝트 ID**(`<owner>-<system>-<env>`)가 환경마다 바로 보인다. 환경을 여럿 고르면 같은 계획을 환경마다 한 번씩 짓는다. 선택 칸 **Project ID suffix**(팀 코드나 연도 — `team1` → `platform-billing-prod-team1`)는 예측할 수 있는 ID 를 내 것으로 만든다 — 프로젝트 ID 는 Google Cloud 전체에서 유일하고 다시 쓸 수 없으며, Cloudonym 은 그 ID 가 비어 있는지 확인할 수 없다(D85)
 2. **Network**(목록에서 한 줄 · 고르면 부품이 보인다) — VPC · 서브넷 · 방화벽 규칙(`ssh` · `web` · `icmp` · IAP TCP forwarding 용 `iap` · 로드 밸런서 상태 확인용 `lbhc`, 또는 직접 적은 tier) · Cloud Router · Cloud NAT · private services access 대역(`psa`, 전역 내부 주소). VPC 는 하나로 시작한다(둘이 든 링크는 둘 다 보인다). **Add subnet** 은 종류와 tier 를 따로 갖는 서브넷을 하나 더 둔다 — 예: 사설 서브넷 옆의 프록시 전용 서브넷(`…-snet-01` · `…-snet-proxy-01`) (D86 · D87 · D88)
@@ -479,7 +479,7 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 
 ### 지원 리소스
 
-이번 릴리스에서 켠 것은 **GCP 136** 개 규칙이다(규칙 버전 `2026-10-13.2` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 36개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-136-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 44개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
+이번 릴리스에서 켠 것은 **GCP 136** 개 규칙이다(규칙 버전 `2026-10-13.3` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 36개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-136-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 44개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
 
 ### 한계
 
