@@ -203,8 +203,18 @@ def no_hangul(page):
 W_PROJECT = {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'asia-northeast3'}
 
 
+def post_api(page, path, data):
+    """화면 밖 API 호출 — 요청 제한(분당 60 — src/api/ratelimit.ts)에 걸리면 Retry-After 만큼 쉬고 다시 보낸다(세 번까지). 시험 한 번이 분당 60 을 넘는다"""
+    for _ in range(3):
+        res = page.request.post(BASE + path, data=data)
+        if res.status != 429:
+            return res
+        time.sleep(int(res.headers.get('retry-after', '60')) + 1)
+    return res
+
+
 def wizard_names(page, body):
-    res = page.request.post(BASE + '/v1/wizard', data={'provider': 'gcp', 'project': W_PROJECT, **body})
+    res = post_api(page, '/v1/wizard', {'provider': 'gcp', 'project': W_PROJECT, **body})
     assert res.status == 200, res.text()
     return [(i['key'], i['name'], i['valid']) for i in res.json()['data']['gcp']['items']]
 
@@ -2071,7 +2081,7 @@ with sync_playwright() as p:
     pr.click('[data-expand-all]')
 
     def api(resources, region=INPUT['region']):
-        res = pr.request.post(BASE + '/v1/names', data={'provider': 'gcp', 'context': {**INPUT, 'region': region}, 'resources': resources})
+        res = post_api(pr, '/v1/names', {'provider': 'gcp', 'context': {**INPUT, 'region': region}, 'resources': resources})
         assert res.ok, res.text()
         return {i['key']: i for i in res.json()['data']['gcp']['items']}
 
