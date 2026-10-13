@@ -505,6 +505,8 @@ export const en: Catalog = {
     wizard_card_missing_lb: 'The load balancer does not serve without them.',
     wizard_card_missing_other: 'The setup is not complete without them.',
     wizard_card_no_backend: 'No backend — add a web server, a Cloud Run service or a bucket to this service.',
+    wizard_card_turn_on_full: 'Up to {max} resources per service and {max} project resources — remove some to turn more parts on.',
+    wizard_card_turn_on_duplicate: 'A part that is off would get the same name as a resource already here — remove that resource or change its tier to turn it on.',
     wizard_card_fill: 'Add missing parts',
     wizard_card_remove: 'Remove card',
     wizard_card_remove_hint: 'Removes the parts listed above from this service. Options and the network resources stay.',

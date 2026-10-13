@@ -1,6 +1,6 @@
 // 카드 화면 상태 (D93) — 더하기 · 되읽기 · 미완성 · 가족 · 상한 · 지우기(공용 방화벽은 남는다)
 import { describe, it, expect } from 'vitest';
-import { addBundle, cardBlocked, cardIn, cardsIn, optionOn, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
+import { addBundle, cardBlocked, cardIn, cardsIn, optionBlocked, optionOn, partBlocked, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
 import { addPresetPick, addService, findPreset, renameService, startPlan, togglePreset } from './wizardState';
 import { cardRow, parentRow, parseRow, rowExists, rowTitle, selectionAfter, visibleRows } from './wizardSelection';
 import { decodeWizardState, encodeWizardState } from './urlState';
@@ -171,6 +171,24 @@ describe('가족 · 상한 · 지우기 · 선택 (D93)', () => {
     expect(presets(r, 0)).toEqual(['db']);
     expect(presets(r, null)).toEqual(presets(p, null));
     expect(cardsIn(r, 0)).toEqual([]);
+  });
+
+  it('점검표 · 선택도 상한을 넘기지 않는다 — 공용 40 에서 Bastion 을 켜도 방화벽만 빠진 채 들어가지 않고, 서비스 40 에서 부품을 켜도 41 이 되지 않는다', () => {
+    const filler = (k: number) => ({ preset: null, ruleId: 'gcp.pubsub_topic', tier: `t${k}`, instances: [{ id: '1', seq: '01' }] });
+    const base = addBundle(startPlan(), 0, 'website', { db: false });
+    const prjFull: WizardPlan = { ...base, projectPicks: [...base.projectPicks, ...Array.from({ length: MAX_PICKS_PER_SERVICE - base.projectPicks.length }, (_, k) => filler(k))] };
+    const bastion = bundleById('website')!.options.find((o) => o.id === 'bastion')!.parts;
+    expect(optionBlocked(prjFull, 0, bastion)).toBe('full');
+    expect(setOption(prjFull, 0, bastion, true)).toBe(prjFull);
+    // 서비스 40 — hc 를 뗀 자리에 다른 pick 을 채우면 hc 를 다시 켤 수 없다
+    const noHc = setPart(base, 0, { preset: 'hc' }, false);
+    const svcFull: WizardPlan = { ...noHc, services: [{ ...noHc.services[0]!, picks: [...noHc.services[0]!.picks, ...Array.from({ length: MAX_PICKS_PER_SERVICE - noHc.services[0]!.picks.length }, (_, k) => filler(k))] }] };
+    expect(partBlocked(svcFull, 0, { preset: 'hc' })).toBe('full');
+    expect(setPart(svcFull, 0, { preset: 'hc' }, true)).toBe(svcFull);
+    expect(optionBlocked(svcFull, 0, bundleById('website')!.options.find((o) => o.id === 'was')!.parts)).toBe('full');
+    // 자리가 있으면 막지 않는다 · 켜진 선택을 끄는 것은 막지 않는다
+    expect(partBlocked(noHc, 0, { preset: 'hc' })).toBeUndefined();
+    expect(optionBlocked(setOption(base, 0, bastion, true), 0, bastion)).toBeUndefined();
   });
 
   it('선택 켜고 끄기 — 켜면 공용 부품까지, 끄면 서비스 부품만', () => {

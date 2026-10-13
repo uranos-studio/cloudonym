@@ -134,14 +134,21 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
     const i = findPreset(plan, at, p.preset, p.tier);
     return i < 0 ? undefined : { path: at === null ? `projectPicks[${i}]` : `services[${service}].picks[${i}]`, names: rowNames(plan, { service: at, pick: i }, result) };
   };
+  // 켤 수 없는 체크 상자(상한 · 이름 겹침) — 끄고, 까닭 문단을 aria-describedby 로 잇는다
+  const turnOnId = (why: 'full' | 'duplicate') => `${titleId}-turn-on-${why}`;
+  const partWhy = (p: BundlePart) => B.partBlocked(plan, service, p);
+  const optionWhy = (parts: readonly BundlePart[]) => B.optionBlocked(plan, service, parts);
+  const whys = new Set([...m.parts.map(partWhy), ...b.options.map((o) => optionWhy(o.parts))].filter((x) => x !== undefined));
   const partRow = (p: BundlePart) => {
     const on = B.partPresent(plan, service, p);
+    const why = on ? undefined : partWhy(p);
     const n = nameOf(p);
     const id = `${titleId}-${partKey(p).replace(':', '-')}`;
     return (
       <li key={partKey(p)} data-card-part={partKey(p)} data-present={on} className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-zinc-100 py-1 last:border-b-0 dark:border-zinc-800">
         <label htmlFor={id} className="inline-flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm">
-          <input id={id} type="checkbox" checked={on} className="size-4 shrink-0 accent-indigo-600" onChange={(e) => edit((x) => B.setPart(x, service, p, e.target.checked))} />
+          <input id={id} type="checkbox" checked={on} disabled={why !== undefined} aria-describedby={why ? turnOnId(why) : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
+            onChange={(e) => edit((x) => B.setPart(x, service, p, e.target.checked))} />
           <span className={on ? '' : 'text-zinc-500 line-through dark:text-zinc-400'}>{label(p)}</span>
         </label>
         <code data-card-part-name className={`min-w-0 max-w-full truncate font-mono text-xs ${HINT}`} title={n?.names?.first}>{n?.names ? n.names.first : '—'}</code>
@@ -190,16 +197,24 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_options}</p>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
-            {b.options.map((o) => (
-              <label key={o.id} className="inline-flex min-h-8 items-center gap-2 text-sm">
-                <input type="checkbox" data-card-option={o.id} checked={B.optionOn(plan, service, o.parts)} className="size-4 accent-indigo-600"
-                  onChange={(e) => edit((x) => B.setOption(x, service, o.parts, e.target.checked))} />
-                {o.label}
-              </label>
-            ))}
+            {b.options.map((o) => {
+              const why = optionWhy(o.parts);
+              return (
+                <label key={o.id} className="inline-flex min-h-8 items-center gap-2 text-sm">
+                  <input type="checkbox" data-card-option={o.id} checked={B.optionOn(plan, service, o.parts)} disabled={why !== undefined} aria-describedby={why ? turnOnId(why) : undefined}
+                    className="size-4 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40" onChange={(e) => edit((x) => B.setOption(x, service, o.parts, e.target.checked))} />
+                  {o.label}
+                </label>
+              );
+            })}
           </div>
         </div>
       )}
+      {[...whys].map((why) => (
+        <p key={why} id={turnOnId(why)} data-card-turn-on-blocked={why} className={HINT}>
+          {why === 'full' ? fillUi(en, 'wizard_card_turn_on_full', { max: MAX_PICKS_PER_SERVICE }) : en.ui.wizard_card_turn_on_duplicate}
+        </p>
+      ))}
 
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_parts}</p>

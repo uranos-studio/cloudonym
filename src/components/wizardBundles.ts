@@ -165,11 +165,22 @@ export function removeBundle(plan: WizardPlan, service: number, id: string): Wiz
   return { ...plan, services: plan.services.map((s, i) => (i === service ? { ...s, picks: s.picks.filter((_, j) => owned.get(j) !== id) } : s)) };
 }
 
-/** 부품 하나를 켜고 끈다 — 점검표의 체크 상자. 끄면 그 pick 을 뗀다(카드는 미완성으로 보인다), 켜면 칩과 같은 pick 을 더한다 */
+/** 부품 하나를 켤 수 없는 까닭 — 상한 · 이름 겹침(addProblem). 이미 있으면 undefined */
+export function partBlocked(plan: WizardPlan, service: number, part: BundlePart): 'full' | 'duplicate' | undefined {
+  return has(plan, service, part) ? undefined : addProblem(plan, service, [part]);
+}
+
+/** 선택을 켤 수 없는 까닭 — 빠진 부품(공용 포함)을 한꺼번에 더할 때의 상한 · 이름 겹침. 켜져 있으면 undefined(끄는 것은 막지 않는다) */
+export function optionBlocked(plan: WizardPlan, service: number, parts: readonly BundlePart[]): 'full' | 'duplicate' | undefined {
+  if (optionOn(plan, service, parts)) return undefined;
+  return addProblem(plan, service, parts.filter((p) => !has(plan, service, p)));
+}
+
+/** 부품 하나를 켜고 끈다 — 점검표의 체크 상자. 끄면 그 pick 을 뗀다(카드는 미완성으로 보인다), 켜면 칩과 같은 pick 을 더한다(상한 · 이름 겹침이면 그대로) */
 export function setPart(plan: WizardPlan, service: number, part: BundlePart, on: boolean): WizardPlan {
   const at = partIsProject(part) ? null : service;
   const i = findPreset(plan, at, part.preset, part.tier);
-  if (on) return i >= 0 ? plan : addPresetPick(plan, at, part.preset, part.tier);
+  if (on) return i >= 0 || partBlocked(plan, service, part) !== undefined ? plan : addPresetPick(plan, at, part.preset, part.tier);
   if (i < 0) return plan;
   if (at === null) return { ...plan, projectPicks: plan.projectPicks.filter((_, k) => k !== i) };
   return { ...plan, services: plan.services.map((s, k) => (k === service ? { ...s, picks: s.picks.filter((_, j) => j !== i) } : s)) };
@@ -181,9 +192,12 @@ export function optionOn(plan: WizardPlan, service: number, part: readonly Bundl
   return own.length > 0 && own.every((p) => has(plan, service, p));
 }
 
-/** 선택을 켜고 끈다 — 켜면 그 부품(프로젝트 공용 포함)을 더하고, 끄면 서비스 부품만 뗀다(공용 부품은 남긴다) */
+/** 선택을 켜고 끈다 — 켜면 그 부품(프로젝트 공용 포함)을 한꺼번에 더하고(optionBlocked 면 그대로 — 방화벽만 빠진 Bastion 을 만들지 않는다), 끄면 서비스 부품만 뗀다(공용 부품은 남긴다) */
 export function setOption(plan: WizardPlan, service: number, parts: readonly BundlePart[], on: boolean): WizardPlan {
-  if (on) return parts.reduce((p, part) => (has(p, service, part) ? p : addPresetPick(p, partIsProject(part) ? null : service, part.preset, part.tier)), plan);
+  if (on) {
+    const miss = parts.filter((p) => !has(plan, service, p));
+    return addProblem(plan, service, miss) !== undefined ? plan : applyParts(plan, service, miss);
+  }
   return parts.filter((p) => !partIsProject(p)).reduce((p, part) => setPart(p, service, part, false), plan);
 }
 
