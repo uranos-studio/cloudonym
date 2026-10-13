@@ -498,7 +498,7 @@ export function CustomDialog({ service, plan, onClose, onPick }: { service: numb
         </div>
         <button type="button" data-custom-close aria-label={en.ui.wizard_custom_close} className={ICON_BTN} onClick={onClose}><X aria-hidden="true" className="size-4" /></button>
       </div>
-      <ResourceTree provider="gcp" tree={tree} picked={new Map()} onChange={onChange} />
+      <ResourceTree provider="gcp" tree={tree} picked={new Map()} onChange={onChange} start="collapsed" />
     </dialog>
   );
 }

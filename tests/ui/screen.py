@@ -520,6 +520,12 @@ def wizard_scenarios(browser, rules_version, errors):
     # 프로젝트 ID 는 늘 암묵 항목이라 모달 트리에 없다(고르면 이름이 전부 사라졌다) — 같은 프로젝트 범위의 서비스 계정 행은 있다
     expect(dialog.locator('[data-rule="gcp.service_account"]')).to_have_count(1)
     expect(dialog.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
+    # 처음에는 뿌리만 열리고 범위 · 분류가 모두 접혀 있다 (D95) — 검색어를 넣으면 맞는 것만 펼친다
+    expect(dialog.locator('details[data-scope][open]')).to_have_count(1)
+    expect(dialog.locator('details[data-group][open]')).to_have_count(0)
+    expect(row(page, 'compute_instance')).not_to_be_visible()
+    dialog.locator('[data-tree-search]').fill('compute_instance')
+    expect(row(page, 'compute_instance')).to_be_visible()
     # 행을 고르면 모달이 닫힌다 — check() 는 체크 상태를 기다리므로 click 으로 고른다
     row(page, 'compute_instance').locator('input[data-row-check]').click()
     expect(dialog).to_have_count(0)
@@ -765,6 +771,8 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(dlg.locator('[data-rule="gcp.vpc_network"]')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.cloud_sql_database"]')).to_have_count(0)
     expect(dlg.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
+    expect(dlg.locator('details[data-scope][open]')).to_have_count(1)
+    dlg.locator('[data-tree-search]').fill('pubsub_topic')
     row(p39, 'pubsub_topic').locator('input[data-row-check]').click()
     expect(dlg).to_have_count(0)
     expect(settings(p39)).to_have_attribute('data-pick-path', 'projectPicks[2]')

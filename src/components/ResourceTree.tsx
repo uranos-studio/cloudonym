@@ -48,16 +48,20 @@ interface Props {
   tree: TreeNode;
   picked: Picked;
   onChange: (next: Picked) => void;
+  /** 처음 펼침 — 'default' 는 뿌리와 한 단계 · 고른 행의 조상(트리 화면), 'collapsed' 는 뿌리만 열고 범위 · 분류를 모두 접는다(마법사 Custom 창 — D95).
+   *  검색 · 분류 칩으로 거른 보기는 어느 쪽이든 모두 펼쳐 시작한다 */
+  start?: 'default' | 'collapsed';
 }
 
 /** 행 key → 체크 전에 고른 범위 · 종류와, 범위를 바꿔 버린 종류(안내 한 줄) */
 type Drafts = ReadonlyMap<string, RowDraft & { droppedKind?: string }>;
 const NO_DRAFT: RowDraft = {};
 
-function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
+function ResourceTreeImpl({ provider, tree, picked, onChange, start = 'default' }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
+  const firstOpen = (t: TreeNode) => (start === 'collapsed' ? collapseAll(t) : initialOpen(t, picked));
   // 펼침 두 벌 — plain 은 거르지 않은 보기, filtered 는 걸러진 보기(필터가 바뀔 때마다 모두 펼침으로 다시 시작)
-  const [plain, setPlain] = useState<OpenState>(() => initialOpen(tree, picked));
+  const [plain, setPlain] = useState<OpenState>(() => firstOpen(tree));
   const [filtered, setFiltered] = useState<OpenState>(() => expandAll(tree));
   // 트리가 바뀌면(CSP 전환) 펼침을 처음으로 — 렌더 중 이전 값과 대어 본다(React 문서의 「props 가 바뀔 때 state 조정」)
   const [shownTree, setShownTree] = useState(tree);
@@ -65,7 +69,7 @@ function ResourceTreeImpl({ provider, tree, picked, onChange }: Props) {
   const [drafts, setDrafts] = useState<Drafts>(() => new Map());
   if (shownTree !== tree) {
     setShownTree(tree);
-    setPlain(initialOpen(tree, picked));
+    setPlain(firstOpen(tree));
     setFiltered(expandAll(tree));
     setFilter({ query: '', selectedOnly: false });
     setDrafts(new Map());
