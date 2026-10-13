@@ -4,7 +4,6 @@
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { generateProject, parseContext, parseProjectContext } from '../core/engine';
-import { inputKind } from '../core/tree';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { CoreMessage, Env } from '../core/types';
 import { AppHeader } from './AppHeader';
@@ -14,10 +13,11 @@ import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } fro
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
 import { WizardList } from './WizardList';
+import { lastAddedPath, selectionAfterCustomRemove } from './wizardCustom';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
@@ -90,6 +90,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [notices, setNotices] = useState<string[]>(() => [...(start.broken ? [en.ui.wizard_link_broken] : []), ...noticeLines(start.notices)]);
   const [link, setLink] = useState<LinkState | undefined>(start.link);
   const [custom, setCustom] = useState<number | null | undefined>(undefined);
+  /** Custom 창에서 더한 규칙 id — 창을 닫을 때 고를 줄을 정한다 */
+  const customAdded = useRef<string[]>([]);
   /** 사용자가 펴고 접은 서비스 줄 — 화면 상태. 손대지 않은 서비스는 고른 줄이 그 안일 때만 펴진다 */
   const [toggled, setToggled] = useState<ReadonlyMap<number, boolean>>(() => new Map());
   /** 칩 · 단발 추가로 막 더한 줄 — 더할 때마다 새 객체라 같은 줄을 다시 더해도 타이머가 다시 돈다 */
@@ -419,10 +421,17 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       </main>
 
       {custom !== undefined && (
-        <CustomDialog service={custom} plan={plan} onClose={() => setCustom(undefined)}
-          onPick={(rule, entry) => {
-            edit((p) => S.addCustom(p, custom, { ruleId: rule.id, input: inputKind(rule), count: entry.count, ...(entry.role === undefined ? {} : { role: entry.role }), ...(entry.kind === undefined ? {} : { kind: entry.kind }) }), selectAdded(custom));
+        <CustomDialog service={custom} plan={plan}
+          onClose={() => {
+            // 닫을 때 — 이 창에서 더한 것 가운데 남은 마지막 pick 을 고른다. 더한 것이 없으면 고른 줄을 그대로 둔다 (D95)
+            const path = lastAddedPath(plan, custom, customAdded.current);
+            customAdded.current = [];
             setCustom(undefined);
+            if (path !== undefined) edit((p) => p, { type: 'select', path });
+          }}
+          onApply={(fn, change) => {
+            customAdded.current.push(...change.added);
+            edit(fn, selectionAfterCustomRemove(selected, custom, change.removed));
           }} />
       )}
 

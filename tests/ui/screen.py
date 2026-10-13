@@ -512,23 +512,50 @@ def wizard_scenarios(browser, rules_version, errors):
         expect(select(page, f'services[1].picks[{j}]').locator(f'[data-pick="{chip}"] [data-ha]')).to_have_count(0)
     expect(select(page, 'services[1].picks[3]').locator('[data-pick="file"] [data-attached-summary]')).to_have_text('data-01')
 
-    # ── ㉝ custom 용도 — 트리를 모달로 열어 한 행을 고르고(새 줄이 선택된다) tier 를 db 로 → 거부 안내 · 이름 대신 「고칠 칸」 ──
+    # ── ㉝ custom 용도 — 트리를 모달로 열어 여러 행을 고르고(창은 열린 채) 하나는 풀고 「Done」 → 마지막에 더한 줄이 선택된다 (D95)
+    #    → tier 를 db 로 → 거부 안내 · 이름 대신 「고칠 칸」 ──
     svc(page, 0).locator('[data-purpose-chip="custom"]').click()
     dialog = page.locator('[data-custom-dialog]')
     expect(dialog).to_be_visible()
-    expect(dialog.get_by_text('Tick one row. It is added to this service with its own number rows.')).to_have_count(1)
-    # 프로젝트 ID 는 늘 암묵 항목이라 모달 트리에 없다(고르면 이름이 전부 사라졌다) — 같은 프로젝트 범위의 서비스 계정 행은 있다
+    expect(dialog.get_by_text('Tick rows to add them to this service, each with its own number rows. Untick a row to remove it.')).to_have_count(1)
+    # 프로젝트 ID · 프로젝트 이름은 Project 칸이 만들어 모달 트리에 없다(D95) — 같은 프로젝트 범위의 서비스 계정 행은 있다
     expect(dialog.locator('[data-rule="gcp.service_account"]')).to_have_count(1)
     expect(dialog.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
+    expect(dialog.locator('[data-rule="gcp.project_name"]')).to_have_count(0)
     # 처음에는 뿌리만 열리고 범위 · 분류가 모두 접혀 있다 (D95) — 검색어를 넣으면 맞는 것만 펼친다
     expect(dialog.locator('details[data-scope][open]')).to_have_count(1)
     expect(dialog.locator('details[data-group][open]')).to_have_count(0)
     expect(row(page, 'compute_instance')).not_to_be_visible()
     dialog.locator('[data-tree-search]').fill('compute_instance')
     expect(row(page, 'compute_instance')).to_be_visible()
-    # 행을 고르면 모달이 닫힌다 — check() 는 체크 상태를 기다리므로 click 으로 고른다
-    row(page, 'compute_instance').locator('input[data-row-check]').click()
+    # 행을 골라도 모달은 열려 있다 — 체크된 채 보이고 다음 행을 고른다. 고른 줄은 닫을 때까지 그대로다
+    row(page, 'compute_instance').locator('input[data-row-check]').check()
+    expect(dialog).to_be_visible()
+    expect(row(page, 'compute_instance').locator('input[data-row-check]')).to_be_checked()
+    expect(settings(page)).to_have_attribute('data-pick-path', 'services[0]')
+    dialog.locator('[data-tree-search]').fill('service_account')
+    row(page, 'service_account').locator('input[data-row-check]').check()
+    expect(page.locator('[data-row-path="services[0].picks[2]"]')).to_have_count(1)
+    # 체크를 풀면 그 custom pick 이 지워진다
+    row(page, 'service_account').locator('input[data-row-check]').uncheck()
+    expect(page.locator('[data-row-path="services[0].picks[2]"]')).to_have_count(0)
+    # 「Done」 — 닫고, 이 창에서 더한 것 가운데 남은 마지막 pick(VM)을 고른다
+    dialog.locator('[data-custom-done]').click()
     expect(dialog).to_have_count(0)
+    expect(settings(page)).to_have_attribute('data-pick-path', 'services[0].picks[1]')
+    # 다시 열면 custom 으로 더한 VM 은 체크된 채 보이고 · 프리셋 칩(web)으로 더한 VM 은 트리 선택에 들지 않는다 · Esc 는 닫고 고른 줄을 그대로 둔다
+    select(page, 'services[0]')
+    svc(page, 0).locator('[data-purpose-chip="custom"]').click()
+    expect(dialog).to_be_visible()
+    expect(dialog.locator('[data-selected-count]')).to_have_text('1 selected')
+    dialog.locator('[data-tree-search]').fill('compute_instance')
+    expect(row(page, 'compute_instance').locator('input[data-row-check]')).to_be_checked()
+    # 검색 칸의 Esc 는 브라우저가 먼저 검색어를 지운다 — 체크 상자에서 누른다
+    row(page, 'compute_instance').locator('input[data-row-check]').focus()
+    page.keyboard.press('Escape')
+    expect(dialog).to_have_count(0)
+    expect(settings(page)).to_have_attribute('data-pick-path', 'services[0]')
+    select(page, 'services[0].picks[1]')
     expect(settings(page)).to_have_attribute('data-pick-path', 'services[0].picks[1]')
     custom = settings(page).locator('[data-pick="custom"]')
     expect(custom).to_have_count(1)
@@ -767,13 +794,19 @@ def wizard_scenarios(browser, rules_version, errors):
     select(p39, 'extras').locator('[data-project-chip="custom"]').click()
     dlg = p39.locator('[data-custom-dialog]')
     expect(dlg).to_be_visible()
-    expect(dlg.get_by_text('Tick one row. It is added to the shared extra resources with its own number rows.')).to_have_count(1)
+    expect(dlg.get_by_text('Tick rows to add them to the shared extra resources, each with its own number rows. Untick a row to remove it.')).to_have_count(1)
+    expect(dlg.locator('[data-rule="gcp.project_name"]')).to_have_count(0)
     expect(dlg.locator('[data-rule="gcp.vpc_network"]')).to_have_count(1)
     expect(dlg.locator('[data-rule="gcp.cloud_sql_database"]')).to_have_count(0)
     expect(dlg.locator('[data-rule="gcp.project_id"]')).to_have_count(0)
     expect(dlg.locator('details[data-scope][open]')).to_have_count(1)
+    # 같은 이름이 될 행은 체크할 수 없고 까닭을 보인다 — ② 네트워크의 VPC 칩과 같은 이름(D95 · duplicate_pick)
+    dlg.locator('[data-tree-search]').fill('vpc_network')
+    expect(row(p39, 'vpc_network').locator('input[data-row-check]')).to_be_disabled()
+    expect(row(p39, 'vpc_network').locator('[data-add-blocked]')).to_have_text('A resource here already gets this name — remove it or change its tier first')
     dlg.locator('[data-tree-search]').fill('pubsub_topic')
-    row(p39, 'pubsub_topic').locator('input[data-row-check]').click()
+    row(p39, 'pubsub_topic').locator('input[data-row-check]').check()
+    dlg.locator('[data-custom-close]').click()
     expect(dlg).to_have_count(0)
     expect(settings(p39)).to_have_attribute('data-pick-path', 'projectPicks[2]')
     expect(p39.locator('[data-settings] [data-pick-path^="projectPicks"][data-pick="custom"]')).to_have_count(1)
@@ -784,6 +817,21 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_count(1)
     expect(p39.locator('#names article[data-key^="project/-/pubsub_topic/"]')).to_have_attribute('data-valid', 'true')
     no_hangul(p39)
+    # 목록 상한(40) — 서비스에 pick 이 40 이면 Custom 창의 행을 체크할 수 없고 까닭을 보인다 (D95)
+    full_body = {'owner': 'platform', 'system': 'billing', 'env': 'prod', 'region': 'ane3', 'v': rules_version,
+                 'w': {'pp': [], 's': [{'n': 'shop', 'p': [{'ru': 'gcp.storage_bucket', 't': f't{i:02d}'} for i in range(40)]}]}}
+    full_hash = '#state=' + base64.urlsafe_b64encode(json.dumps(full_body, separators=(',', ':')).encode()).rstrip(b'=').decode()
+    goto_ready(p39, BASE + '/?v' + full_hash)
+    goto_ready(p39, BASE + '/' + full_hash)
+    svc(p39, 0).locator('[data-purpose-chip="custom"]').click()
+    dlg.locator('[data-tree-search]').fill('compute_instance')
+    expect(row(p39, 'compute_instance').locator('input[data-row-check]')).to_be_disabled()
+    expect(row(p39, 'compute_instance').locator('[data-add-blocked]')).to_have_text('Up to 40 resources here — untick one or remove one to add another')
+    # 이미 고른 행(버킷)은 풀 수 있다 — 풀면 그 규칙의 custom pick 이 모두 지워진다
+    dlg.locator('[data-tree-search]').fill('storage_bucket')
+    expect(row(p39, 'storage_bucket').locator('input[data-row-check]')).to_be_enabled()
+    dlg.locator('[data-custom-done]').click()
+    expect(dlg).to_have_count(0)
     # 모델은 VPC 여럿을 받는다(API 로 만든 계획 · 손으로 만든 링크) — 줄이 둘(01 · 03)이면 둘 다 보이고 더하기 단추도 보인다
     two_body = {'owner': 'platform', 'system': 'billing', 'env': 'prod', 'region': 'ane3', 'v': rules_version,
                 'w': {'pp': [{'pr': 'vpc', 'i': [{'id': 'a', 'q': '01'}, {'id': 'b', 'q': '03'}]},

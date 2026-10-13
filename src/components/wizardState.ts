@@ -231,9 +231,10 @@ export function pickTitle(pick: Pick): { title: string; custom: boolean } {
   return { title: GCP_RULES.get(pick.ruleId ?? '')?.displayName ?? pick.ruleId ?? '', custom: true };
 }
 
-/** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음 */
+/** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음.
+ *  목록(서비스 하나 · 프로젝트 공용)이 상한(MAX_PICKS_PER_SERVICE)이면 그대로 돌려준다 */
 export function addCustom(plan: WizardPlan, service: number | null, rule: { ruleId: string; input: 'count' | 'role' | 'none'; count?: number; role?: string; kind?: string; tier?: string }): WizardPlan {
-  if (service === null && projectPicksFull(plan)) return plan;
+  if (picksOf(plan, service).length >= MAX_PICKS_PER_SERVICE) return plan;
   const base: Pick = {
     preset: null, ruleId: rule.ruleId,
     ...(rule.role === undefined ? {} : { role: rule.role }),

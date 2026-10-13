@@ -1,7 +1,7 @@
 // 마법사 설정 칸 (D89) — 목록에서 고른 줄 하나의 설정. ① 프로젝트 · ② 네트워크 칩 · 공용 추가 리소스 · ③ 서비스(④ 용도 칩) · pick(⑤ 선택지 · 서버 줄 · ⑥ 딸린 것).
 // 판정은 전부 엔진 값이다 — 오류는 엔진이 준 path 로 그 자리에 붙인다. 이 칸은 선택 경로로 key 한 컴포넌트 하나이고,
 // 안의 입력칸은 tier · kind 로 key 하지 않는다(글자마다 다시 만들어지면 커서가 빠진다)
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, Copy, Plus, Server, Trash2, X } from 'lucide-react';
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseProjectContext, type NameItem } from '../core/engine';
 import { inputKind } from '../core/tree';
@@ -14,7 +14,8 @@ import { presetOf, type Preset } from '../core/wizard/presets';
 import type { CoreMessage, Env, ResourceRule } from '../core/types';
 import { RegionPicker } from './RegionPicker';
 import { ResourceTree } from './ResourceTree';
-import { treeRules, type Picked } from './selection';
+import type { Picked } from './selection';
+import { applyCustomChange, customBlock, customPicked, type CustomChange } from './wizardCustom';
 import { SERVERLESS_SHORT } from './urlState';
 import * as S from './wizardState';
 import { selectAdded, type Edit, type RowPath } from './wizardSelection';
@@ -25,6 +26,7 @@ import { en } from '../messages/en';
 
 // 프로젝트 pick 상한 안내 — 숫자는 엔진 상수에서 온다(D91: 20 → 40)
 const PICKS_FULL = fillUi(en, 'wizard_project_picks_full', { max: MAX_PICKS_PER_SERVICE });
+const CUSTOM_FULL = fillUi(en, 'wizard_custom_full', { max: MAX_PICKS_PER_SERVICE });
 const SERVERLESS_LABEL: Record<string, string> = { gcf: en.ui.wizard_serverless_gcf, run: en.ui.wizard_serverless_run };
 
 export function ErrorList({ errors, id }: { errors: readonly CoreMessage[]; id?: string }) {
@@ -473,7 +475,9 @@ function AttachEditor({ attach, at, slot, path, errors, edit, baseId }: {
 }
 
 // ── custom — 트리를 모달로 (ResourceTree 재사용) ──
-export function CustomDialog({ service, plan, onClose, onPick }: { service: number | null; plan: WizardPlan; onClose: () => void; onPick: (rule: ResourceRule, entry: { count: number; role?: string; kind?: string }) => void }) {
+// 창은 열린 채로 여러 행을 고른다 (D95) — 체크하면 그 목록에 더하고 · 풀면 그 custom pick 을 지운다. 프리셋 칩 · 카드로 더한 pick 은 보이지도 건드리지도 않는다.
+// 범위 · 분류는 모두 접힌 채 연다. 「Done」 · ✕ · Esc 가 닫는다 — 닫을 때 고를 줄은 Wizard 가 정한다
+export function CustomDialog({ service, plan, onClose, onApply }: { service: number | null; plan: WizardPlan; onClose: () => void; onApply: (fn: (p: WizardPlan) => WizardPlan, change: CustomChange) => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
@@ -482,23 +486,29 @@ export function CustomDialog({ service, plan, onClose, onPick }: { service: numb
   const name = service === null ? en.ui.wizard_shared_extras : plan.services[service]?.purpose || String((service ?? 0) + 1);
   // 프로젝트 공용 칸은 프로젝트 수준 범위의 규칙만 (D74)
   const tree = service === null ? S.PROJECT_CUSTOM_TREE : S.CUSTOM_TREE;
+  const picked = useMemo(() => customPicked(plan, service, tree), [plan, service, tree]);
   const onChange = (next: Picked) => {
-    for (const [type, entry] of next) {
-      const rule = treeRules(tree).find((r) => r.resourceType === type);
-      if (rule) { onPick(rule, entry); return; }
-    }
+    const change = applyCustomChange(plan, service, tree, next);
+    if (change.plan !== plan) onApply((p) => applyCustomChange(p, service, tree, next).plan, change);
   };
+  const addBlock = useCallback((rule: ResourceRule, kind: string | undefined) => {
+    const b = customBlock(plan, service, rule, kind);
+    return b === 'full' ? CUSTOM_FULL : b === 'duplicate' ? en.ui.wizard_custom_duplicate : undefined;
+  }, [plan, service]);
   return (
-    <dialog ref={ref} data-custom-dialog aria-labelledby="custom-title" onClose={onClose} onCancel={onClose}
-      className="m-auto max-h-[90vh] w-[min(56rem,calc(100vw-2rem))] overflow-auto rounded-xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-xl backdrop:bg-zinc-900/50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+    <dialog ref={ref} data-custom-dialog aria-labelledby="custom-title" aria-describedby="custom-hint" onClose={onClose} onCancel={onClose}
+      className="m-auto max-h-[90vh] w-[min(56rem,calc(100vw-2rem))] overflow-auto rounded-xl border border-zinc-200 bg-white p-4 pb-0 text-zinc-900 shadow-xl backdrop:bg-zinc-900/50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
           <h2 id="custom-title" className="text-base font-semibold">{fillUi(en, 'wizard_custom_title', { service: name })}</h2>
-          <p className={HINT}>{service === null ? en.ui.wizard_custom_hint_project : en.ui.wizard_custom_hint_service}</p>
+          <p id="custom-hint" className={HINT}>{service === null ? en.ui.wizard_custom_hint_project : en.ui.wizard_custom_hint_service}</p>
         </div>
         <button type="button" data-custom-close aria-label={en.ui.wizard_custom_close} className={ICON_BTN} onClick={onClose}><X aria-hidden="true" className="size-4" /></button>
       </div>
-      <ResourceTree provider="gcp" tree={tree} picked={new Map()} onChange={onChange} start="collapsed" />
+      <ResourceTree provider="gcp" tree={tree} picked={picked} onChange={onChange} start="collapsed" addBlock={addBlock} />
+      <div className="sticky bottom-0 -mx-4 mt-3 flex justify-end border-t border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+        <button type="button" data-custom-done className={BTN} onClick={onClose}>{en.ui.wizard_custom_done}</button>
+      </div>
     </dialog>
   );
 }

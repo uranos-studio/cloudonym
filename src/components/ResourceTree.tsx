@@ -51,13 +51,16 @@ interface Props {
   /** 처음 펼침 — 'default' 는 뿌리와 한 단계 · 고른 행의 조상(트리 화면), 'collapsed' 는 뿌리만 열고 범위 · 분류를 모두 접는다(마법사 Custom 창 — D95).
    *  검색 · 분류 칩으로 거른 보기는 어느 쪽이든 모두 펼쳐 시작한다 */
   start?: 'default' | 'collapsed';
+  /** 고르지 않은 행을 새로 체크할 수 없는 바깥 까닭(문장) — 트리 자신의 막힘(범위 · 종류 · 상한)이 없을 때만 묻는다. 있으면 체크 상자를 끄고 행 아래에 보인다
+   *  (마법사 Custom 창의 목록 상한 · 중복 — D95). 트리 화면은 두지 않는다 */
+  addBlock?: (rule: ResourceRule, kind: string | undefined) => string | undefined;
 }
 
 /** 행 key → 체크 전에 고른 범위 · 종류와, 범위를 바꿔 버린 종류(안내 한 줄) */
 type Drafts = ReadonlyMap<string, RowDraft & { droppedKind?: string }>;
 const NO_DRAFT: RowDraft = {};
 
-function ResourceTreeImpl({ provider, tree, picked, onChange, start = 'default' }: Props) {
+function ResourceTreeImpl({ provider, tree, picked, onChange, start = 'default', addBlock }: Props) {
   const [filter, setFilter] = useState<TreeFilter>({ query: '', selectedOnly: false });
   const firstOpen = (t: TreeNode) => (start === 'collapsed' ? collapseAll(t) : initialOpen(t, picked));
   // 펼침 두 벌 — plain 은 거르지 않은 보기, filtered 는 걸러진 보기(필터가 바뀔 때마다 모두 펼침으로 다시 시작)
@@ -156,9 +159,12 @@ function ResourceTreeImpl({ provider, tree, picked, onChange, start = 'default' 
     const d = drafts.get(row.key) ?? NO_DRAFT;
     const p = pickedRule(row, picked);
     const entry = p && picked.get(p.resourceType);
+    const rule = activeRule(row, picked, d);
+    const block = rowBlock(row, picked, d);
+    const blockedBy = block === undefined && !p && rule && addBlock ? addBlock(rule, d.kind) : undefined;
     return (
-      <Row key={row.key} row={row} rule={activeRule(row, picked, d)} entry={entry} draft={d} droppedKind={drafts.get(row.key)?.droppedKind}
-        block={rowBlock(row, picked, d)} canInc={p !== undefined && canIncrease(picked, p)}
+      <Row key={row.key} row={row} rule={rule} entry={entry} draft={d} droppedKind={drafts.get(row.key)?.droppedKind}
+        block={block} blockedBy={blockedBy} canInc={p !== undefined && canIncrease(picked, p)}
         onToggle={onToggleRow} onScope={onScope} onDraftKind={onDraftKind} onCount={onCount} onRole={onRole} onKind={onKind} />
     );
   });
@@ -268,6 +274,8 @@ interface RowProps {
   draft: RowDraft;
   droppedKind: string | undefined;
   block: RowBlock | undefined;
+  /** 바깥 까닭(addBlock)의 문장 — 있으면 체크할 수 없다 */
+  blockedBy: string | undefined;
   canInc: boolean;
   onToggle: (row: TreeRow) => void;
   onScope: (row: TreeRow, scope: ScopeId) => void;
@@ -278,7 +286,7 @@ interface RowProps {
 }
 
 /** 행 하나 — 높이 44px(터치) · 체크 · 이름 · slug · (i) · 표지 · 범위 select(합친 행) · 종류 select · 입력(개수 · 역할 · 1 고정) · 안내 */
-const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
+const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, blockedBy, canInc, onToggle, onScope, onDraftKind, onCount, onRole, onKind }: RowProps) {
   const checked = entry !== undefined;
   const shape = rule ?? row.rules[0]!;
   const input = inputKind(shape);
@@ -291,8 +299,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, can
   const infoId = useId();
   // 행 아래 안내 — 막힌 까닭(범위 · 종류)
   const hint = block === 'scope' ? fillUi(en, 'scope_required_hint', name)
-    : block === 'kind' ? fillUi(en, 'kind_required_hint', name) : undefined;
-  const hintKind = block === 'scope' ? 'scope' : 'kind';
+    : block === 'kind' ? fillUi(en, 'kind_required_hint', name) : blockedBy;
   const onPickKind = (v: string) => {
     const next = v === '' ? undefined : v;
     if (checked && rule) onKind(rule, next);
@@ -303,7 +310,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, can
     <div data-row={row.key} data-rule={rule?.id} data-type={rule?.resourceType} data-rule-category={row.category} data-entity={rule?.entity} data-checked={checked}
       className="flex min-h-11 flex-wrap items-center gap-x-2 rounded-md px-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
       <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-sm">
-        <input type="checkbox" data-row-check checked={checked} disabled={!checked && block !== undefined} onChange={() => onToggle(row)}
+        <input type="checkbox" data-row-check checked={checked} disabled={!checked && (block !== undefined || blockedBy !== undefined)} onChange={() => onToggle(row)}
           aria-label={fillUi(en, 'select_resource_label', name)} aria-describedby={hint ? hintId : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed" />
         <span className="min-w-0 truncate text-zinc-900 dark:text-zinc-100">{row.displayName}</span>
         {shape.slug && <code className="hidden shrink-0 font-mono text-xs text-zinc-500 sm:inline dark:text-zinc-400">{shape.slug}</code>}
@@ -348,7 +355,7 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, can
       )}
       {input === 'role' && <RoleInput rule={shape} value={entry?.role} disabled={!checked} onRole={onRole} />}
       {hint && (
-        <p id={hintId} data-scope-required={hintKind === 'scope' || undefined} data-kind-required={hintKind === 'kind' || undefined}
+        <p id={hintId} data-scope-required={block === 'scope' || undefined} data-kind-required={block === 'kind' || undefined} data-add-blocked={blockedBy !== undefined && block === undefined ? true : undefined}
           className="basis-full pb-1 pl-6 text-xs text-zinc-600 dark:text-zinc-400">{hint}</p>
       )}
       {droppedKind !== undefined && rule && (
