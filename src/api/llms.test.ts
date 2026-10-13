@@ -167,7 +167,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   });
   it('절 목록 — 마법사 절 셋(Tiers · Attached resources · Wizard presets)이 Kind tokens 뒤에 있다', () => {
     expect(lines.filter((l) => l.startsWith('## '))).toEqual([
-      '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets',
+      '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets', '## Wizard cards',
       '## Provider Constraints', '## Resource tree', '## What PASS means', '## API',
     ]);
   });
@@ -196,6 +196,16 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');
+  });
+  it('「## Wizard cards」 (D93) — 카드 다섯 · 서비스 부품과 project 부품 · API 에는 카드가 없다고 말한다', () => {
+    const sec = section('## Wizard cards');
+    const rows = sec.filter((l) => l.startsWith('- '));
+    expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb']);
+    expect(rows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `lbhc`');
+    expect(rows[0]).toContain('built and tested on Google Cloud');
+    expect(rows[1]).toContain('`neg`');
+    expect(rows[1]).not.toContain('`hc`');
+    expect(sec.join('\n')).toContain('Cards are not part of `/v1/wizard`');
   });
   it('API 절 — POST /v1/wizard 한 줄 · 재현 문장 · 머리말에도', () => {
     const api = section('## API').join('\n');

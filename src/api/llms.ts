@@ -3,6 +3,7 @@ import { ENABLED_PROVIDERS, PROVIDERS, TIER_PATTERN, type Provider, type Resourc
 import { RESERVED_TIERS } from '../core/tier';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
 import { PRESETS, PRESET_TIERS, type Preset } from '../core/wizard/presets';
+import { BUNDLES, partIsProject, partKey } from '../core/wizard/bundles';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
@@ -89,11 +90,31 @@ function presetLines(): string[] {
   };
   return [
     '', '## Wizard presets', '',
-    `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets (VPC, subnet, firewall, Cloud Router, Cloud NAT) are usually project-level (\`project_picks\`); the load balancer parts are separate presets, one name each, and are not linked to one another. At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
+    `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets (VPC, subnet, firewall, Cloud Router, Cloud NAT) are usually project-level (\`project_picks\`); the load balancer parts are separate presets, one name each. A working set of them is listed under "Wizard cards" below. At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
     ...presetGroups().map((g) => {
       const ha = g.find((p) => p.ha);
       return `- ${g.map(one).join('; ')}${ha?.ha ? ` · HA (\`ha: true\`) on ${g.filter((p) => p.ha).map((p) => `\`${p.id}\``).join(' and ')} as virtual machines only: at least ${ha.ha.minInstances} servers` : ''}`;
     }),
+  ];
+}
+
+/** 「## Wizard cards」 절 (D93) — 카드마다 한 줄: 서비스 picks · project_picks · 선택. 카드는 화면의 동작이고 API 에는 없다 — 같은 picks 를 보내면 같은 이름이다 */
+function cardLines(): string[] {
+  const list = (ps: readonly { preset: string; tier?: string }[]) => ps.map((p) => (p.tier === undefined ? `\`${p.preset}\`` : `\`${p.preset}\` tier \`${p.tier}\``)).join(', ');
+  return [
+    '', '## Wizard cards', '',
+    'A card on the wizard screen adds a working set of presets at once. Cards are not part of `/v1/wizard`: send the same picks to get the same names. Project parts go in `project_picks`; the rest in the service.',
+    ...BUNDLES.map((b) => {
+      const svc = b.parts.filter((p) => !partIsProject(p));
+      const prj = b.parts.filter(partIsProject);
+      const bits = [`\`${b.id}\` (${b.label}): ${svc.length > 0 ? list(svc) : 'no service parts'}`];
+      if (b.backends) bits.push(`plus one backend by what the service has: ${b.backends.map((x) => `\`${x.needs}\` → ${list(x.parts)}`).join('; ')}`);
+      if (prj.length > 0) bits.push(`project: ${list(prj)}`);
+      if (b.options.length > 0) bits.push(`options: ${b.options.map((o) => `${o.label} (${list(o.parts)}${o.on ? ', on by default' : ''})`).join('; ')}`);
+      bits.push(b.tested ? 'built and tested on Google Cloud' : 'rules verified, the set not yet applied');
+      return `- ${bits.join(' · ')}`;
+    }),
+    `One load balancer card per service (shared parts such as \`${partKey({ preset: 'ip' })}\` and \`${partKey({ preset: 'url' })}\` would be duplicate picks); add another service for a second one.`,
   ];
 }
 
@@ -214,7 +235,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '- a region or a zone of the provider, by name or by code — see `## Regions`', '- `global`');
   lines.push(...regionLines(order));
   lines.push(...kindLines(order));
-  lines.push(...tierLines(), ...attachLines(), ...presetLines());
+  lines.push(...tierLines(), ...attachLines(), ...presetLines(), ...cardLines());
   lines.push('', '## Provider Constraints');
   for (const p of order) {
     lines.push('', `### ${p.toUpperCase()}`);
