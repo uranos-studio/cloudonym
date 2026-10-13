@@ -73,7 +73,7 @@ export const UI_KEYS = [
   // ProviderSection
   'provider_name_aws', 'provider_name_gcp', 'provider_name_azure',
   // Terraform 내보내기 첫 줄 주석 (D26)
-  'terraform_header_version', 'terraform_header_pass',
+  'terraform_header_version', 'terraform_header_pass', 'terraform_boot_disk_note',
   // clipboard
   'copy_done', 'copy_unavailable', 'copy_failed',
   // 마법사 — 경로 nav · 일곱 단계 · 공용 추가 리소스 · 링크 복구 안내 (D67 · D68 · D84)

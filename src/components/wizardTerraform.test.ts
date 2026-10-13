@@ -40,6 +40,20 @@ describe('wizardTerraform (D69)', () => {
     const close = h.indexOf('\n  }\n');
     expect(h.indexOf('# INVALID')).toBeGreaterThan(close);
   });
+  it('부팅 디스크 이름이 맵에 있으면 맵 뒤에 안내 주석 한 줄 · 없으면 없다 (D91)', () => {
+    const note = '  # Boot disk names (keys ending in /boot/-): create the disk with google_compute_disk and attach it with google_compute_instance boot_disk.source; boot_disk.initialize_params has no name field. https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance\n';
+    expect(out.items.some((i) => i.valid && i.attach === 'boot')).toBe(true);
+    expect(hcl.split(note)).toHaveLength(2);
+    expect(hcl.indexOf(note)).toBeGreaterThan(hcl.indexOf('\n  }\n'));
+    const noBoot = { ...out, items: out.items.filter((i) => i.attach !== 'boot') };
+    expect(wizardTerraform(noBoot, {})).not.toContain('Boot disk names');
+    // 부모가 무효라 부팅 디스크 이름이 맵에 들지 않으면(# INVALID 만) 안내도 없다
+    const fail = generateProject(WIZARD_PARENT_FAIL, 'gcp');
+    expect(fail.items.some((i) => i.attach === 'boot' && !i.valid)).toBe(true);
+    expect(wizardTerraform(fail, {})).not.toContain('Boot disk names');
+    expect(wizardTerraformByEnv([{ env: 'prod', result: out, labels: {} }]).split(note)).toHaveLength(2);
+    expect(wizardTerraformByEnv([{ env: 'prod', result: noBoot, labels: {} }])).not.toContain('Boot disk names');
+  });
   it('라벨 위반이 있는 이름공간은 맵 밖 # INVALID', () => {
     const bad: LabelSet = { labels: { owner: 'x' }, violations: [{ code: 'label.too_long', field: 'owner', params: { actual: 65, max: 63 } }], transformed: [] };
     const h = wizardTerraform(out, { project: bad });

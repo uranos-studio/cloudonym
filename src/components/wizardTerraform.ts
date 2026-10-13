@@ -15,6 +15,10 @@ export function wizardLabels(sel: ProjectSelection, provider: Provider): Record<
   return out;
 }
 
+/** 맵에 든 부팅 디스크 이름(attach boot · valid)이 있는가 (D91) — google_compute_instance 의 boot_disk.initialize_params 에는 이름 칸이 없어
+ *  이 이름은 google_compute_disk 로 만들어 boot_disk.source 로 붙일 때만 쓰인다. 있으면 맵 뒤에 그 안내 주석 한 줄을 둔다 */
+const hasBootName = (items: ProjectResult['items']): boolean => items.some((i) => i.valid && i.attach === 'boot');
+
 /**
  * `<provider>_names = { "<key>" = "<name>" … }` + `<provider>_labels_by_namespace = { "<namespace>" = { … } … }`.
  * valid:false 항목(축소 실패 · 충돌 · 부모가 무효인 자식)은 맵 밖 `# INVALID: <provider>_names["<key>"] — 이유` 주석이다 — 무효한 이름을 값으로 내주지 않는다.
@@ -30,6 +34,7 @@ export function wizardTerraform(result: ProjectResult, labels: Readonly<Record<s
   for (const i of result.items) if (i.valid) lines.push(`    ${hclString(i.key)} = ${hclString(i.name)}`);
   lines.push('  }');
   for (const i of result.items) if (!i.valid) lines.push(`  # INVALID: ${p}_names[${hclString(i.key)}] — ${reasons(i.violations)}`);
+  if (hasBootName(result.items)) lines.push(`  # ${fillUi(catalog, 'terraform_boot_disk_note')}`);
 
   const spaces = Object.entries(labels);
   if (spaces.length > 0) {
@@ -69,6 +74,7 @@ export function wizardTerraformByEnv(
   for (const e of entries) {
     for (const i of e.result.items) if (!i.valid) lines.push(`  # INVALID: ${p}_names_by_env[${hclString(e.env)}][${hclString(i.key)}] — ${reasons(i.violations)}`);
   }
+  if (entries.some((e) => hasBootName(e.result.items))) lines.push(`  # ${fillUi(catalog, 'terraform_boot_disk_note')}`);
   if (entries.some((e) => Object.keys(e.labels).length > 0)) {
     lines.push(`  ${p}_labels_by_env = {`);
     for (const e of entries) {
