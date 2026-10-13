@@ -8,7 +8,7 @@ import { inputKind } from '../core/tree';
 import { allowedKinds } from '../core/catalog';
 import { REGIONAL_LOCATION, locationsFor } from '../core/regions';
 import { MAX_COUNT, type Attachments } from '../core/selection';
-import { type Pick, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, type Pick, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { presetOf, type Preset } from '../core/wizard/presets';
 import type { CoreMessage, Env, ResourceRule } from '../core/types';
@@ -22,6 +22,8 @@ import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, RULES, SMALL
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 
+// 프로젝트 pick 상한 안내 — 숫자는 엔진 상수에서 온다(D91: 20 → 40)
+const PICKS_FULL = fillUi(en, 'wizard_project_picks_full', { max: MAX_PICKS_PER_SERVICE });
 const SERVERLESS_LABEL: Record<string, string> = { gcf: en.ui.wizard_serverless_gcf, run: en.ui.wizard_serverless_run };
 
 export function ErrorList({ errors, id }: { errors: readonly CoreMessage[]; id?: string }) {
@@ -110,7 +112,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
 // 모델은 projectPicks 하나다 — 이 칸은 프리셋 pick 만, 「Shared extra resources」는 custom pick 만 그린다(자리 번호 · path 는 모델 순서 그대로)
 const FIREWALL_HINTS: Record<string, string> = { iap: en.ui.wizard_firewall_iap_hint, lbhc: en.ui.wizard_firewall_lbhc_hint };
 const FIREWALL_PROBLEM: Record<NonNullable<ReturnType<typeof S.firewallTierProblem>>, string> = {
-  pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists, full: en.ui.wizard_project_picks_full,
+  pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists, full: PICKS_FULL,
 };
 
 export function NetworkSettings({ plan, errors, edit }: { plan: WizardPlan; errors: PlanError[]; edit: Edit }) {
@@ -137,7 +139,7 @@ export function NetworkSettings({ plan, errors, edit }: { plan: WizardPlan; erro
           </button>
         )}
       </div>
-      {full && <p id="wizard-network-full" data-project-picks-full className={ERR}>{en.ui.wizard_project_picks_full}</p>}
+      {full && <p id="wizard-network-full" data-project-picks-full className={ERR}>{PICKS_FULL}</p>}
       {firewall?.tierChoices && (
         <div className="flex flex-wrap items-center gap-2">
           <span className={HINT}>{en.ui.wizard_firewall_tiers}</span>
@@ -184,7 +186,7 @@ export function ExtrasSettings({ plan, onCustom }: { plan: WizardPlan; onCustom:
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" data-project-chip="custom" className={CHIP} disabled={S.projectPicksFull(plan)} aria-describedby={S.projectPicksFull(plan) ? 'wizard-extras-full' : undefined} onClick={onCustom}>{en.ui.wizard_custom}</button>
       </div>
-      {S.projectPicksFull(plan) && <p id="wizard-extras-full" data-project-picks-full className={ERR}>{en.ui.wizard_project_picks_full}</p>}
+      {S.projectPicksFull(plan) && <p id="wizard-extras-full" data-project-picks-full className={ERR}>{PICKS_FULL}</p>}
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { MESSAGE_CODES } from '../core/messages';
 import { API_CODES } from '../api/codes';
 import { NOTE_SEPARATOR, UI_KEYS, displayMessage, escapeInvisible, fillUi, format, formatNotes, type Message, type MessageCode } from './catalog';
 import { en } from './en';
+import { MAX_PICKS_PER_SERVICE } from '../core/wizard/plan';
 
 const HANGUL = /\p{Script=Hangul}/u;
 
@@ -206,6 +207,10 @@ describe('영어 사전 (D24)', () => {
     expect(en.ui.kind_choose).toBe('choose…');
     expect(fillUi(en, 'kind_required_hint', { displayName: 'Resource Policy' })).toBe('Choose a kind to select Resource Policy');
     expect(fillUi(en, 'kind_label', { displayName: 'Cloud SQL Instance' })).toBe('Kind of Cloud SQL Instance');
+  });
+  it('프로젝트 pick 상한 안내는 엔진 상수를 채운다 (D91)', () => {
+    expect(fillUi(en, 'wizard_project_picks_full', { max: MAX_PICKS_PER_SERVICE })).toContain(`Up to ${MAX_PICKS_PER_SERVICE} project resources (`);
+    expect(fillUi(en, 'wizard_project_picks_full', { max: MAX_PICKS_PER_SERVICE })).not.toContain('{');
   });
   it('행 · 범위 · (i) · 표지 문구 (D53 · D54)', () => {
     expect(fillUi(en, 'scope_choice_label', { displayName: 'IP Address' })).toBe('Scope of IP Address');

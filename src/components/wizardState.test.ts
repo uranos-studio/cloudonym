@@ -397,7 +397,7 @@ describe('3차 리뷰 고침 — 방화벽 사전 검사 · 프로젝트 pick �
     expect(firewallTierProblem(p, 'app')).toBe('exists');
     expect(firewallTierProblem(p, 'api')).toBeUndefined();
   });
-  it('프로젝트 pick 이 상한(20)이면 더하는 함수는 모델을 그대로 두고 · 사전 검사는 full', () => {
+  it('프로젝트 pick 이 상한(MAX_PICKS_PER_SERVICE)이면 더하는 함수는 모델을 그대로 두고 · 사전 검사는 full', () => {
     const p: WizardPlan = { ...initialPlan(), projectPicks: Array.from({ length: MAX_PICKS_PER_SERVICE }, (_, i) => fwCustom(`t${String(i).padStart(2, '0')}`)) };
     ok(p);
     expect(projectPicksFull(p)).toBe(true);
