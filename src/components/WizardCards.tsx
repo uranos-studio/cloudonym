@@ -136,18 +136,22 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
   };
   // 켤 수 없는 체크 상자(상한 · 이름 겹침) — 끄고, 까닭 문단을 aria-describedby 로 잇는다
   const turnOnId = (why: 'full' | 'duplicate') => `${titleId}-turn-on-${why}`;
+  const networkHintId = `${titleId}-network-hint`;
+  const fillWhy = B.fillBlocked(plan, service, b.id);
   const partWhy = (p: BundlePart) => B.partBlocked(plan, service, p);
   const optionWhy = (parts: readonly BundlePart[]) => B.optionBlocked(plan, service, parts);
   const whys = new Set([...m.parts.map(partWhy), ...b.options.map((o) => optionWhy(o.parts))].filter((x) => x !== undefined));
   const partRow = (p: BundlePart) => {
     const on = B.partPresent(plan, service, p);
     const why = on ? undefined : partWhy(p);
+    // 네트워크 부품은 카드에서 지우지 않는다(B.setPart) — 있으면 체크 상자를 끄고 안내 문단을 잇는다. 빠졌으면 켤 수 있다
+    const shared = on && partIsProject(p);
     const n = nameOf(p);
     const id = `${titleId}-${partKey(p).replace(':', '-')}`;
     return (
       <li key={partKey(p)} data-card-part={partKey(p)} data-present={on} className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-zinc-100 py-1 last:border-b-0 dark:border-zinc-800">
         <label htmlFor={id} className="inline-flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm">
-          <input id={id} type="checkbox" checked={on} disabled={why !== undefined} aria-describedby={why ? turnOnId(why) : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
+          <input id={id} type="checkbox" checked={on} disabled={why !== undefined || shared} aria-describedby={why ? turnOnId(why) : shared ? networkHintId : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
             onChange={(e) => edit((x) => B.setPart(x, service, p, e.target.checked))} />
           <span className={on ? '' : 'text-zinc-500 line-through dark:text-zinc-400'}>{label(p)}</span>
         </label>
@@ -187,8 +191,8 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
             </span>
           </p>
           {m.missing.length > 0 && (
-            <button type="button" data-card-fill disabled={B.cardBlocked(plan, service, b.id, {}) !== undefined} className={BTN}
-              onClick={() => edit((x) => B.addBundle(x, service, b.id, Object.fromEntries(b.options.map((o) => [o.id, false]))))}>{en.ui.wizard_card_fill}</button>
+            <button type="button" data-card-fill disabled={fillWhy !== undefined} className={BTN}
+              onClick={() => edit((x) => B.fillMissing(x, service, b.id))}>{en.ui.wizard_card_fill}</button>
           )}
         </div>
       )}
@@ -224,7 +228,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
         <div className="space-y-1 rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-950">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_network}</p>
           <ul data-card-network>{netParts.map(partRow)}</ul>
-          <p className={HINT}>{en.ui.wizard_card_network_hint}</p>
+          <p id={networkHintId} className={HINT}>{en.ui.wizard_card_network_hint}</p>
         </div>
       )}
 

@@ -1,6 +1,6 @@
 // 카드 화면 상태 (D93) — 더하기 · 되읽기 · 미완성 · 가족 · 상한 · 지우기(공용 방화벽은 남는다)
 import { describe, it, expect } from 'vitest';
-import { addBundle, cardBlocked, cardIn, cardsIn, optionBlocked, optionOn, partBlocked, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
+import { addBundle, cardBlocked, cardIn, cardsIn, fillBlocked, fillMissing, optionBlocked, optionOn, partBlocked, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
 import { addPresetPick, addService, findPreset, renameService, startPlan, togglePreset } from './wizardState';
 import { cardRow, parentRow, parseRow, rowExists, rowTitle, selectionAfter, visibleRows } from './wizardSelection';
 import { decodeWizardState, encodeWizardState } from './urlState';
@@ -189,6 +189,28 @@ describe('가족 · 상한 · 지우기 · 선택 (D93)', () => {
     // 자리가 있으면 막지 않는다 · 켜진 선택을 끄는 것은 막지 않는다
     expect(partBlocked(noHc, 0, { preset: 'hc' })).toBeUndefined();
     expect(optionBlocked(setOption(base, 0, bastion, true), 0, bastion)).toBeUndefined();
+  });
+
+  it('「Add missing parts」는 빠진 필수 부품만 — 끄는 판정과 동작이 같은 선택(전부 끔)을 쓴다', () => {
+    const filler = (k: number) => ({ preset: null, ruleId: 'gcp.pubsub_topic', tier: `t${k}`, instances: [{ id: '1', seq: '01' }] });
+    const noHc = setPart(addBundle(startPlan(), 0, 'website', { db: false }), 0, { preset: 'hc' }, false);
+    // 39 — hc 하나는 들어가지만 기본 선택(db)까지면 넘는다
+    const p: WizardPlan = { ...noHc, services: [{ ...noHc.services[0]!, picks: [...noHc.services[0]!.picks, ...Array.from({ length: MAX_PICKS_PER_SERVICE - 1 - noHc.services[0]!.picks.length }, (_, k) => filler(k))] }] };
+    expect(cardBlocked(p, 0, 'website', {})).toBe('full');
+    expect(fillBlocked(p, 0, 'website')).toBeUndefined();
+    const filled = fillMissing(p, 0, 'website');
+    expect(cardIn(filled, 0, 'website')?.complete).toBe(true);
+    expect(filled.services[0]!.picks.length).toBe(MAX_PICKS_PER_SERVICE);
+  });
+
+  it('카드는 공용 부품을 지우지 않는다 — 점검표의 네트워크 부품 끄기는 아무것도 바꾸지 않아 다른 서비스의 카드가 미완성이 되지 않는다', () => {
+    let p = addBundle(startPlan(), 0, 'website', { db: false });
+    p = addBundle(renameService(addService(p), 1, 'blog'), 1, 'website', { db: false });
+    expect(setPart(p, 0, { preset: 'firewall', tier: 'lbhc' }, false)).toBe(p);
+    expect(ids(p, 1)).toEqual([['website', true]]);
+    // 빠졌으면 켜는 것은 된다(빠진 부품 채우기)
+    const noLbhc = togglePreset(p, null, 'firewall', 'lbhc');
+    expect(ids(setPart(noLbhc, 0, { preset: 'firewall', tier: 'lbhc' }, true), 1)).toEqual([['website', true]]);
   });
 
   it('선택 켜고 끄기 — 켜면 공용 부품까지, 끄면 서비스 부품만', () => {

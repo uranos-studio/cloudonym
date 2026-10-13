@@ -159,6 +159,17 @@ export function addBundle(plan: WizardPlan, service: number, id: string, options
   return applyParts(plan, service, partsToAdd(plan, service, id, options));
 }
 
+/** 「Add missing parts」 — 빠진 필수 부품만 더한다(선택은 전부 끈 채). 판정(fillBlocked)과 동작이 같은 선택을 쓴다 */
+function fillOptions(id: string): Record<string, boolean> {
+  return Object.fromEntries((bundleById(id)?.options ?? []).map((o) => [o.id, false]));
+}
+export function fillBlocked(plan: WizardPlan, service: number, id: string): ReturnType<typeof cardBlocked> {
+  return cardBlocked(plan, service, id, fillOptions(id));
+}
+export function fillMissing(plan: WizardPlan, service: number, id: string): WizardPlan {
+  return addBundle(plan, service, id, fillOptions(id));
+}
+
 /** 카드를 지운다 — 그 카드가 차지한 서비스 pick 만(선택 부품 · 다른 카드가 차지한 pick · 프로젝트 공용 부품은 남긴다 — 방화벽은 다른 서비스가 쓸 수 있다) */
 export function removeBundle(plan: WizardPlan, service: number, id: string): WizardPlan {
   const { owned } = serviceLayout(plan, service);
@@ -176,13 +187,13 @@ export function optionBlocked(plan: WizardPlan, service: number, parts: readonly
   return addProblem(plan, service, parts.filter((p) => !has(plan, service, p)));
 }
 
-/** 부품 하나를 켜고 끈다 — 점검표의 체크 상자. 끄면 그 pick 을 뗀다(카드는 미완성으로 보인다), 켜면 칩과 같은 pick 을 더한다(상한 · 이름 겹침이면 그대로) */
+/** 부품 하나를 켜고 끈다 — 점검표의 체크 상자. 끄면 그 pick 을 뗀다(카드는 미완성으로 보인다), 켜면 칩과 같은 pick 을 더한다(상한 · 이름 겹침이면 그대로).
+ *  프로젝트 공용 부품(방화벽 · PSA)은 끄지 않는다 — 다른 서비스의 카드가 쓸 수 있다. 지우는 곳은 네트워크다 */
 export function setPart(plan: WizardPlan, service: number, part: BundlePart, on: boolean): WizardPlan {
   const at = partIsProject(part) ? null : service;
   const i = findPreset(plan, at, part.preset, part.tier);
   if (on) return i >= 0 || partBlocked(plan, service, part) !== undefined ? plan : addPresetPick(plan, at, part.preset, part.tier);
-  if (i < 0) return plan;
-  if (at === null) return { ...plan, projectPicks: plan.projectPicks.filter((_, k) => k !== i) };
+  if (i < 0 || at === null) return plan;
   return { ...plan, services: plan.services.map((s, k) => (k === service ? { ...s, picks: s.picks.filter((_, j) => j !== i) } : s)) };
 }
 

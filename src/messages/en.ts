@@ -513,7 +513,7 @@ export const en: Catalog = {
     wizard_card_options: 'Options',
     wizard_card_parts: 'Parts — each is one name',
     wizard_card_network: 'Also in Network',
-    wizard_card_network_hint: 'Shared by every service. They stay when you remove the card — another service may use them.',
+    wizard_card_network_hint: 'Shared by every service, so they stay here and when you remove the card — another service may use them. Remove them in Network.',
     wizard_card_edit: 'Edit',
     wizard_card_edit_label: 'Edit {part}',
     wizard_card_back: 'Back to {service}',
