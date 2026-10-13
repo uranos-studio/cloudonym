@@ -1116,6 +1116,7 @@ def wizard_cards(browser, errors):
     expect(panel.locator('h2 [data-card-state]')).to_have_text('complete · 12 of 12 parts')
     expect(panel.locator('[data-card-parts] [data-card-part]')).to_have_count(12)
     expect(panel.locator('[data-card-network] [data-card-part]')).to_have_count(2)
+    expect(panel.locator('[data-card-setup]')).to_have_count(0)  # website 는 이름 없는 설정 안내가 없다 (D96)
     expect(pg.locator('[data-row-path="services[0].card.website"] [data-card-state]')).to_have_text('complete')
     pg.locator('[data-row-path="project"]').click(); clicks += 1
     pg.fill('#wizard-owner', 'acme')
@@ -1203,6 +1204,11 @@ def wizard_cards(browser, errors):
     select(pg, 'services[2].card.serverless-web').locator('[data-card-fill]').click()
     expect(settings(pg).locator('h2 [data-card-state]')).to_have_text('complete · 11 of 11 parts')
     expect(settings(pg).locator('[data-card-part="hc"]')).to_have_count(0)  # 서버리스 NEG 에는 헬스 체크가 없다
+    # 이름이 없는 설정 안내 (D96) — 점검표에만 · 공식 문서 링크 · 실제로 만들어 본 카드
+    setup = settings(pg).locator('[data-card-setup="serverless-web"]')
+    expect(setup).to_contain_text('the Cloud Run service must accept unauthenticated calls')
+    expect(setup.locator('a')).to_have_attribute('href', 'https://docs.cloud.google.com/run/docs/authenticating/public')
+    expect(settings(pg).locator('[data-card-sources]')).to_contain_text('Built and tested on Google Cloud')
     # 링크로 다시 열어도 같은 카드 줄 — 카드는 hash 에 없다(있는 부품에서 되읽는다)
     pg.click('[data-copy="share-url"]')
     expect(pg.locator('[data-share-warning]')).to_have_text('The share link and the address bar hold your input as Base64, which is not encrypted — anyone with the link can read owner, system, purpose and the other values. Do not enter sensitive values such as internal company or project names.')

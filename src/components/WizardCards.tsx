@@ -5,13 +5,13 @@ import { ChevronRight, CircleCheck, ExternalLink, TriangleAlert, X } from 'lucid
 import type { ProjectResult } from '../core/engine';
 import type { WizardPlan } from '../core/wizard/plan';
 import { MAX_PICKS_PER_SERVICE } from '../core/wizard/plan';
-import { BUNDLES, partIsProject, partKey, type Bundle, type BundlePart } from '../core/wizard/bundles';
+import { BUNDLES, partIsProject, partKey, RUN_PUBLIC_DOC, STATIC_SITE_DOC, type Bundle, type BundlePart } from '../core/wizard/bundles';
 import { presetOf } from '../core/wizard/presets';
 import * as B from './wizardBundles';
 import { findPreset } from './wizardState';
 import { cardRow, rowNames, serviceRow, type Edit, type RowPath } from './wizardSelection';
 import { BTN, HINT, ICON_BTN } from './wizardStyles';
-import { fillUi } from '../messages/catalog';
+import { fillUi, type UiKey } from '../messages/catalog';
 import { en } from '../messages/en';
 
 const CARD = 'flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900';
@@ -116,6 +116,12 @@ function GalleryCard({ plan, service, bundle: b, edit, onSelect }: { plan: Wizar
   );
 }
 
+/** 이름이 없는 설정 (D96) — 카드가 이름을 다 줘도 공개 웹이 되려면 손으로 할 것. 점검표에만 둔다(갤러리 카드는 고르는 자리라 짧게 둔다) */
+const CARD_SETUP: Readonly<Record<string, { text: UiKey; doc: string }>> = {
+  'serverless-web': { text: 'wizard_card_setup_run', doc: RUN_PUBLIC_DOC },
+  'static-site': { text: 'wizard_card_setup_static', doc: STATIC_SITE_DOC },
+};
+
 /** 카드 줄의 설정 — 점검표(부품마다 체크 상자 · 이름 · 고치기), 선택, 네트워크 부품, 빠진 부품 경고, 카드 지우기 */
 export function CardPanel({ plan, service, card, result, edit, onSelect }: {
   plan: WizardPlan; service: number; card: string; result: ProjectResult | undefined; edit: Edit; onSelect: (path: RowPath) => void;
@@ -123,6 +129,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
   const m = B.cardIn(plan, service, card);
   if (!m) return null;
   const b = m.bundle;
+  const setup = CARD_SETUP[b.id];
   const svcName = plan.services[service]?.purpose || en.ui.wizard_unnamed_service;
   const svcParts = m.parts.filter((p) => !partIsProject(p));
   const netParts = m.parts.filter(partIsProject);
@@ -194,6 +201,18 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
             <button type="button" data-card-fill disabled={fillWhy !== undefined} className={BTN}
               onClick={() => edit((x) => B.fillMissing(x, service, b.id))}>{en.ui.wizard_card_fill}</button>
           )}
+        </div>
+      )}
+
+      {setup && (
+        <div data-card-setup={b.id} className="space-y-1 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_setup}</p>
+          <p className="text-sm text-zinc-700 dark:text-zinc-300">
+            {en.ui[setup.text]}{' '}
+            <a href={setup.doc} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-indigo-700 underline-offset-2 hover:underline dark:text-indigo-300">
+              {en.ui.wizard_card_setup_doc}<ExternalLink aria-hidden="true" className="size-3" />
+            </a>
+          </p>
         </div>
       )}
 
