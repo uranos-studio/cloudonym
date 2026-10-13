@@ -1,5 +1,5 @@
 // 생성 파일 — 손으로 고치지 않는다. scripts/rules/build-gcp-rules.mjs 로 다시 만든다 (D43).
-// 출처: Compute 디스커버리 revision 20260922 · Cloud KMS 디스커버리 revision 20261001.
+// 출처: Compute 디스커버리 revision 20261007 · Cloud KMS 디스커버리 revision 20261001.
 // pattern 은 원문 그대로(compute name.pattern · KMS 설명 문장 안 정규식)이고 rules/gcp.ts 가 ^(?:…)$ 로 감싼다.
 import type { ResourceRule } from '../types';
 import type { ScopeDef } from '../scopes';
