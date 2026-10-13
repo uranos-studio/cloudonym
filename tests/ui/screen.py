@@ -590,13 +590,13 @@ def wizard_scenarios(browser, rules_version, errors):
     fill_project(p38)
     svc(p38, 0).locator('[data-service-name]').fill('shop')
     lb = svc(p38, 0).locator('[data-lb-parts]')
-    expect(lb.locator('[data-purpose-chip]')).to_have_count(7)
+    expect(lb.locator('[data-purpose-chip]')).to_have_count(11)
     one = [{'id': '1', 'seq': '01'}]
     picks, project_picks = [], []
     expect(p38.locator('[data-copy="share-url"]')).to_have_count(0)
     expect(p38.locator('[data-share-reserve]')).to_have_count(1)
     height38 = doc_height(p38)
-    for chip in ('run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd'):
+    for chip in ('run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'ig', 'urlredir', 'thp', 'fwdredir'):
         before38 = p38.locator('#names article[data-key]').count()
         svc(p38, 0).locator(f'[data-purpose-chip="{chip}"]').click()
         picks.append({'preset': chip} if chip == 'sa' else {'preset': chip, 'instances': one})
@@ -609,7 +609,7 @@ def wizard_scenarios(browser, rules_version, errors):
         project_picks.append({'preset': chip, 'instances': one})
         want = wizard_names(p38, {'project_picks': project_picks, 'services': [{'purpose': 'shop', 'picks': picks}]})
         assert screen_names(p38) == want, (chip, screen_names(p38), want)
-    assert len(want) == 1 + 12 + 2, want
+    assert len(want) == 1 + 16 + 2, want
     assert doc_height(p38) == height38, ('리소스를 더하자 페이지가 길어졌다', height38, doc_height(p38))
     expect(p38.locator('[data-copy="share-url"]')).to_have_count(1)
     expect(p38.locator('[data-share-reserve]')).to_have_count(0)

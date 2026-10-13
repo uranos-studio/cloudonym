@@ -48,12 +48,17 @@ export const PRESETS: readonly Preset[] = [
   { id: 'wip', label: 'Workload Identity pool', ruleId: 'gcp.iam_workload_identity_pool', ...NONE, level: 'service' },
   // D73 — HTTPS 로드 밸런서 부품. 칩 하나 = 이름 하나 · 자동 연결 없음
   { id: 'ip', label: 'Global IP address', ruleId: 'gcp.global_address', ...NONE, level: 'service', group: 'lb' },
+  { id: 'ig', label: 'Instance group', ruleId: 'gcp.instance_group', ...NONE, level: 'service', group: 'lb' },
   { id: 'bs', label: 'Backend service', ruleId: 'gcp.backend_service', ...NONE, level: 'service', group: 'lb' },
   { id: 'hc', label: 'Health check', ruleId: 'gcp.health_check', ...NONE, level: 'service', group: 'lb' },
   { id: 'url', label: 'URL map', ruleId: 'gcp.url_map', ...NONE, level: 'service', group: 'lb' },
   { id: 'cert', label: 'SSL certificate', ruleId: 'gcp.ssl_certificate', ...NONE, level: 'service', group: 'lb' },
   { id: 'thps', label: 'Target HTTPS proxy', ruleId: 'gcp.target_https_proxy', ...NONE, level: 'service', group: 'lb' },
   { id: 'fwd', label: 'Forwarding rule', ruleId: 'gcp.global_forwarding_rule', ...NONE, level: 'service', group: 'lb' },
+  // HTTP → HTTPS 전환 (D91) — 80 포트로 들어온 요청을 HTTPS 로 돌려보내는 URL 맵 · HTTP 프록시 · 전달 규칙. 위 url · fwd 와 같은 규칙이라 tier redir 로 가른다
+  { id: 'urlredir', label: 'Redirect URL map (HTTP to HTTPS)', ruleId: 'gcp.url_map', tier: 'redir', ha: null, serverless: null, level: 'service', group: 'lb' },
+  { id: 'thp', label: 'Target HTTP proxy', ruleId: 'gcp.target_http_proxy', ...NONE, level: 'service', group: 'lb' },
+  { id: 'fwdredir', label: 'Forwarding rule (HTTP, port 80)', ruleId: 'gcp.global_forwarding_rule', tier: 'redir', ha: null, serverless: null, level: 'service', group: 'lb' },
   { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', ...NONE, level: 'project', group: 'network' },
   { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', ...NONE, level: 'project', group: 'network' },
   // D87 — iap: IAP TCP forwarding 소스 35.235.240.0/20 을 받는 규칙 · lbhc: 로드 밸런서 health check 프로브 대역(35.191.0.0/16 등)을 받는 규칙

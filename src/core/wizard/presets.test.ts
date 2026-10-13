@@ -19,14 +19,15 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 일곱 · 네트워크 여섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 열하나 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
-      'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
+      'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
     expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
     expect(PRESETS.filter((p) => p.group === 'lb').map((p) => p.ruleId)).toEqual([
-      'gcp.global_address', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
+      'gcp.global_address', 'gcp.instance_group', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
+      'gcp.url_map', 'gcp.target_http_proxy', 'gcp.global_forwarding_rule',
     ]);
     expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp', 'iap', 'lbhc']);
     expect(presetOf('firewall')?.tier).toBe('ssh');
@@ -75,7 +76,7 @@ describe('프리셋 데이터 (D64)', () => {
 
   it('D73 의 새 칩 — 각각 켜면 이름 하나(PASS) · 서비스 계정은 기본 역할 sync', () => {
     const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
-    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'router', 'nat'];
+    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'router', 'nat'];
     const names: Record<string, string> = {};
     for (const id of created) {
       const p = presetOf(id)!;
@@ -94,6 +95,7 @@ describe('프리셋 데이터 (D64)', () => {
       gke: 'billing-shop-prod-ane3-gke-01', wip: 'billing-shop-prod-wip-01',
       ip: 'billing-shop-prod-ip-01', bs: 'billing-shop-prod-bs-01', hc: 'billing-shop-prod-hc-01', url: 'billing-shop-prod-url-01',
       cert: 'billing-shop-prod-cert-01', thps: 'billing-shop-prod-thps-01', fwd: 'billing-shop-prod-fwd-01',
+      ig: 'billing-shop-prod-ane3-ig-01', urlredir: 'billing-shop-prod-url-redir-01', thp: 'billing-shop-prod-thp-01', fwdredir: 'billing-shop-prod-fwd-redir-01',
       router: 'billing-prod-ane3-cr-01', nat: 'billing-prod-nat-01',
     });
   });
@@ -118,6 +120,31 @@ describe('프리셋 데이터 (D64)', () => {
     expect(validatePlan(plan({ preset: 'psa', kind: 'INTERNAL' }))).toEqual({ ok: true });
     expect(expandPlan(plan({ preset: 'psa' })).projectItems[0]).toMatchObject({ kind: 'INTERNAL', tier: 'psa', level: 'project' });
     expect(generateProject(expandPlan(plan({ preset: 'psa' })), 'gcp').items[1]).toMatchObject({ key: 'project/-/global_address/int/psa/01', name: 'billing-prod-ip-int-psa-01', kind: 'INTERNAL', kindToken: 'int' });
+  });
+  it('D91 — 전환용 url · fwd 는 같은 규칙의 url · fwd 와 tier(redir)로 갈려 한 서비스에 함께 들고 · 키 · 이름이 다르다 · 한 칩을 두 번 넣으면 중복', () => {
+    const one = [{ id: 'a', seq: '01' }];
+    const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' };
+    const plan = (ids: string[]): WizardPlan => ({ provider: 'gcp', project: PROJECT, projectPicks: [], services: [{ purpose: 'shop', picks: ids.map((id) => ({ preset: id, instances: one })) }] });
+    const both = plan(['url', 'urlredir', 'fwd', 'fwdredir', 'thps', 'thp', 'ig']);
+    expect(validatePlan(both)).toEqual({ ok: true });
+    expect(generateProject(expandPlan(both), 'gcp').items.slice(1).map((i) => [i.key, i.name, i.valid])).toEqual([
+      ['service/shop/url_map/-/-/01', 'billing-shop-prod-url-01', true],
+      ['service/shop/url_map/-/redir/01', 'billing-shop-prod-url-redir-01', true],
+      ['service/shop/global_forwarding_rule/-/-/01', 'billing-shop-prod-fwd-01', true],
+      ['service/shop/global_forwarding_rule/-/redir/01', 'billing-shop-prod-fwd-redir-01', true],
+      ['service/shop/target_https_proxy/-/-/01', 'billing-shop-prod-thps-01', true],
+      ['service/shop/target_http_proxy/-/-/01', 'billing-shop-prod-thp-01', true],
+      ['service/shop/instance_group/-/-/01', 'billing-shop-prod-ane3-ig-01', true],
+    ]);
+    for (const id of ['urlredir', 'fwdredir']) {
+      const r = validatePlan(plan([id, id]));
+      expect(r.ok, id).toBe(false);
+      expect(r.ok ? [] : r.errors.map((e) => e.code), id).toContain('wizard.duplicate_pick');
+    }
+    expect(presetOf('urlredir')).toMatchObject({ ruleId: presetOf('url')!.ruleId, tier: 'redir' });
+    expect(presetOf('fwdredir')).toMatchObject({ ruleId: presetOf('fwd')!.ruleId, tier: 'redir' });
+    // 인스턴스 그룹은 존 범위 규칙 — 엔진 규칙 그대로 이름에 지역 토큰이 들어간다
+    expect(RULES[presetOf('ig')!.ruleId]!.scope).toBe('gcp:project_zone');
   });
   it('psa 와 로드 밸런서의 전역 IP(ip)는 같은 규칙이지만 종류 · tier · 자리가 달라 함께 쓴다', () => {
     const r = validatePlan({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' }, projectPicks: [{ preset: 'psa', instances: [{ id: 'a', seq: '01' }] }, { preset: null, ruleId: 'gcp.global_address', instances: [{ id: 'a', seq: '01' }] }], services: [{ purpose: 'shop', picks: [{ preset: 'ip', instances: [{ id: 'a', seq: '01' }] }] }] });

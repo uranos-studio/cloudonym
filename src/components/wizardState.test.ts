@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
-  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, projectPicksFull, type PickRef,
+  showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, projectPicksFull, startPlan, type PickRef,
 } from './wizardState';
 import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
@@ -24,8 +24,19 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
     expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.empty']);
   });
   it('칩 데이터 — 서비스 칩은 level service(로드 밸런서 묶음 포함) · 프로젝트 칩은 network 묶음 (D73)', () => {
-    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'ip', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd']);
+    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir']);
     expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
+  });
+  it('첫 화면에 서비스 칩을 전부 켜도(로드 밸런서 열하나 포함 · pick 상한 안) 이름은 전부 유효하고 축소되는 이름이 없다 (D91)', () => {
+    const plan = SERVICE_PRESETS.reduce((p, x) => togglePreset(p, 0, x.id), startPlan());
+    expect(plan.services[0]!.picks.length).toBe(SERVICE_PRESETS.length);
+    expect(SERVICE_PRESETS.length).toBeGreaterThan(20);
+    expect(SERVICE_PRESETS.length).toBeLessThanOrEqual(MAX_PICKS_PER_SERVICE);
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    const items = generateProject(expandPlan(plan), 'gcp').items;
+    expect(items.filter((i) => !i.valid).map((i) => i.key)).toEqual([]);
+    const shortened = items.filter((i) => i.steps.some((m) => m.code === 'step.token_dropped' || m.code === 'step.budget_shortened'));
+    expect(shortened.map((i) => i.name)).toEqual([]);
   });
 });
 
