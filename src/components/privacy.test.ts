@@ -41,6 +41,8 @@ describe('/privacy', () => {
     const text = pageText();
     expect(text).toContain('expire 366 days');
     expect(text).toContain(axiomRetentionText(PRIVACY_AXIOM_RETENTION_DAYS));
+    expect(PRIVACY_AXIOM_RETENTION_DAYS).toBe(30);   // Axiom 무료 플랜 최대 · 데이터셋 보존 30일 (2026-10-13 화면 실측)
+    expect(text).toContain('Axiom records are kept for 30 days');
     expect(axiomRetentionText(30)).toBe('Axiom records are kept for 30 days, the retention configured on the Axiom dataset.');
     expect(axiomRetentionText(null)).toContain('retention configured on the Axiom dataset');
     expect(axiomRetentionText(null)).not.toMatch(/\d/);   // 정하지 않은 숫자를 지어내지 않는다
