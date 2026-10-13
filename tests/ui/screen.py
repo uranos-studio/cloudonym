@@ -590,7 +590,7 @@ def wizard_scenarios(browser, rules_version, errors):
     fill_project(p38)
     svc(p38, 0).locator('[data-service-name]').fill('shop')
     lb = svc(p38, 0).locator('[data-lb-parts]')
-    expect(lb.locator('[data-purpose-chip]')).to_have_count(11)
+    expect(lb.locator('[data-purpose-chip]')).to_have_count(13)
     one = [{'id': '1', 'seq': '01'}]
     picks, project_picks = [], []
     expect(p38.locator('[data-copy="share-url"]')).to_have_count(0)

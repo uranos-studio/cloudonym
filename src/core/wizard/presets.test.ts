@@ -19,15 +19,15 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 열하나 · 네트워크 여섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
-      'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
+      'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
     expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
     expect(PRESETS.filter((p) => p.group === 'lb').map((p) => p.ruleId)).toEqual([
       'gcp.global_address', 'gcp.instance_group', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
-      'gcp.url_map', 'gcp.target_http_proxy', 'gcp.global_forwarding_rule',
+      'gcp.url_map', 'gcp.target_http_proxy', 'gcp.global_forwarding_rule', 'gcp.region_network_endpoint_group', 'gcp.backend_bucket',
     ]);
     expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp', 'iap', 'lbhc']);
     expect(presetOf('firewall')?.tier).toBe('ssh');
@@ -76,7 +76,7 @@ describe('프리셋 데이터 (D64)', () => {
 
   it('D73 의 새 칩 — 각각 켜면 이름 하나(PASS) · 서비스 계정은 기본 역할 sync', () => {
     const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
-    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'router', 'nat'];
+    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'router', 'nat'];
     const names: Record<string, string> = {};
     for (const id of created) {
       const p = presetOf(id)!;
@@ -96,6 +96,7 @@ describe('프리셋 데이터 (D64)', () => {
       ip: 'billing-shop-prod-ip-01', bs: 'billing-shop-prod-bs-01', hc: 'billing-shop-prod-hc-01', url: 'billing-shop-prod-url-01',
       cert: 'billing-shop-prod-cert-01', thps: 'billing-shop-prod-thps-01', fwd: 'billing-shop-prod-fwd-01',
       ig: 'billing-shop-prod-ane3-ig-01', urlredir: 'billing-shop-prod-url-redir-01', thp: 'billing-shop-prod-thp-01', fwdredir: 'billing-shop-prod-fwd-redir-01',
+      neg: 'billing-shop-prod-ane3-neg-01', bb: 'billing-shop-prod-bb-01',
       router: 'billing-prod-ane3-cr-01', nat: 'billing-prod-nat-01',
     });
   });

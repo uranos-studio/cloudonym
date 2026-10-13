@@ -1,6 +1,6 @@
 // 마법사 프리셋 (D59 · D64) — 데이터. 용도 칩 하나 = 규칙 하나. 마법사 함수(validatePlan · expandPlan)는 프리셋을 따로 알지 않고 이 표를 읽는다.
 // 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」 · 「로드 밸런서」는 화면의 묶음(group)이고 데이터에서는 pick 하나씩이다.
-// 칩은 엮지 않는다 — 로드 밸런서 부품을 한 번에 켜거나 서로 참조하게 하는 묶음은 공개판 범위 밖이다(D73). Cloud NAT 와 Cloud Router 도 따로 켠다(안내 문구만 둔다)
+// 칩 하나는 이름 하나다. 여러 칩을 한 번에 더하는 카드는 따로 둔 표(bundles.ts · D92 · D93)이고, 카드로 더한 pick 은 칩으로 더한 pick 과 같다. Cloud NAT 와 Cloud Router 도 따로 켠다(안내 문구만 둔다)
 import type { Attachments } from '../selection';
 
 export interface Preset {
@@ -59,6 +59,9 @@ export const PRESETS: readonly Preset[] = [
   { id: 'urlredir', label: 'Redirect URL map (HTTP to HTTPS)', ruleId: 'gcp.url_map', tier: 'redir', ha: null, serverless: null, level: 'service', group: 'lb' },
   { id: 'thp', label: 'Target HTTP proxy', ruleId: 'gcp.target_http_proxy', ...NONE, level: 'service', group: 'lb' },
   { id: 'fwdredir', label: 'Forwarding rule (HTTP, port 80)', ruleId: 'gcp.global_forwarding_rule', tier: 'redir', ha: null, serverless: null, level: 'service', group: 'lb' },
+  // D93 — 카드(bundles.ts)의 백엔드 부품. neg: 서버리스 NEG(Cloud Run 을 로드 밸런서에 붙인다 — 종류 기본 SERVERLESS 는 토큰 없음) · bb: 백엔드 버킷(버킷을 붙인다)
+  { id: 'neg', label: 'Serverless NEG', ruleId: 'gcp.region_network_endpoint_group', ...NONE, level: 'service', group: 'lb' },
+  { id: 'bb', label: 'Backend bucket', ruleId: 'gcp.backend_bucket', ...NONE, level: 'service', group: 'lb' },
   { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', ...NONE, level: 'project', group: 'network' },
   { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', ...NONE, level: 'project', group: 'network' },
   // D87 — iap: IAP TCP forwarding 소스 35.235.240.0/20 을 받는 규칙 · lbhc: 로드 밸런서 health check 프로브 대역(35.191.0.0/16 등)을 받는 규칙
