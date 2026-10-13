@@ -59,13 +59,19 @@ export function cardsIn(plan: WizardPlan, service: number): CardMatch[] {
   if (!plan.services[service]) return [];
   const out: CardMatch[] = [];
   if (LB_ANCHORS.some((id) => presentIn(plan, service, id))) {
-    // 빠진 수 — 백엔드가 없는 https-lb 는 「백엔드 하나」를 하나로 센다
-    const score = (m: CardMatch) => m.missing.length + (m.noBackend ? 1 : 0);
+    // 빠진 수가 적은 카드가 이긴다 — 같으면 표 순서
+    const score = (m: CardMatch) => m.missing.length;
+    const fixed = BUNDLES.filter((x) => x.family === 'lb' && x.backends === undefined);
+    // 백엔드가 정해진 카드(website · serverless-web · static-site)는 그 카드에만 드는 앞쪽 밖 서비스 부품(web · ig · hc / run · neg / object · bb) 중 하나가 있어야 후보다 —
+    // 점검표에서 부품을 빼도 같은 카드가 「미완성」으로 남는다. 두 카드 이상에 드는 부품(bs)은 어느 카드인지 말해 주지 않으므로 세지 않는다
+    const sharedCount = new Map<string, number>();
+    for (const b of fixed) for (const k of new Set(b.parts.filter((p) => !partIsProject(p)).map(partKey))) sharedCount.set(k, (sharedCount.get(k) ?? 0) + 1);
+    const own = (b: (typeof BUNDLES)[number]) => b.parts.some((p) => !partIsProject(p) && !LB_FRONT.has(partKey(p)) && sharedCount.get(partKey(p)) === 1 && has(plan, service, p));
+    const candidates = fixed.filter(own);
+    // 그런 카드가 하나라도 있으면 https-lb(백엔드 없음)는 비교하지 않는다 — 부품을 둘 빼도 카드가 바뀌지 않는다
+    const pool = candidates.length > 0 ? candidates : BUNDLES.filter((x) => x.family === 'lb' && x.backends !== undefined);
     let best: CardMatch | undefined;
-    for (const b of BUNDLES.filter((x) => x.family === 'lb')) {
-      // 백엔드가 정해진 카드(website · serverless-web · static-site)는 앞쪽 밖의 서비스 부품(web · ig · hc · bs / run · neg · bs / object · bb) 중 하나가 있어야 후보다 —
-      // 점검표에서 web 하나를 빼도 같은 카드가 「미완성 — web」으로 남는다. 그런 부품이 하나도 없으면 https-lb 만 남아 「백엔드 없음」으로 보인다
-      if (b.backends === undefined && !b.parts.some((p) => !partIsProject(p) && !LB_FRONT.has(partKey(p)) && has(plan, service, p))) continue;
+    for (const b of pool) {
       const m = matchOf(plan, service, b);
       if (!best || score(m) < score(best)) best = m;
     }

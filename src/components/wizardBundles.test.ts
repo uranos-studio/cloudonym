@@ -245,3 +245,33 @@ describe('카드 줄 (D93)', () => {
     expect(open.slice(3, 16)).toEqual([row, ...Array.from({ length: 12 }, (_, j) => `services[0].picks[${j}]`)]);
   });
 });
+
+// D93 독립 리뷰 2차 — 두 카드에 함께 드는 부품(bs)은 카드를 정하지 않는다 · 백엔드 카드가 후보면 https-lb 와 견주지 않는다
+describe('LB 카드 후보 — 공유 부품과 부품 여럿 빼기', () => {
+  it('칩만 web · bs · ip · url · cert · thps · fwd — Website 로 읽고 Serverless web 이 아니다', () => {
+    const p = ['web', 'bs', 'ip', 'url', 'cert', 'thps', 'fwd'].reduce((q, id) => togglePreset(q, 0, id), startPlan());
+    expect(ids(p, 0)).toEqual([['website', false]]);
+  });
+  it('website 에서 ig · hc 를 빼고 공용 lbhc 를 꺼도 Website 미완성이다', () => {
+    let p = addBundle(startPlan(), 0, 'website', { db: false });
+    p = setPart(p, 0, { preset: 'ig' }, false);
+    p = setPart(p, 0, { preset: 'hc' }, false);
+    p = togglePreset(p, null, 'firewall', 'lbhc');
+    expect(ids(p, 0)).toEqual([['website', false]]);
+    expect(cardIn(p, 0, 'serverless-web')).toBeUndefined();
+  });
+  it('website 에서 web · ig 둘을 빼도 카드가 https-lb 로 바뀌지 않는다', () => {
+    let p = addBundle(startPlan(), 0, 'website', { db: false });
+    p = setPart(p, 0, { preset: 'web' }, false);
+    p = setPart(p, 0, { preset: 'ig' }, false);
+    expect(ids(p, 0)).toEqual([['website', false]]);
+  });
+  it('serverless-web 에서 run · neg 둘을 빼면 남은 백엔드 부품이 없어 https-lb(백엔드 없음)다', () => {
+    let p = addBundle(startPlan(), 0, 'serverless-web');
+    p = setPart(p, 0, { preset: 'run' }, false);
+    p = setPart(p, 0, { preset: 'neg' }, false);
+    const m = cardsIn(p, 0);
+    expect(m.map((x) => x.bundle.id)).toEqual(['https-lb']);
+    expect(m[0]!.noBackend).toBe(true);
+  });
+});
