@@ -1,6 +1,6 @@
 // 마법사 카드의 화면 상태 (D93) — 순수 함수. 카드는 pick 에 표시를 남기지 않는다: 더하면 프리셋 pick 이 되고, 화면은 있는 부품에서 카드를 되읽는다.
 // 그래서 hash v4 · POST /v1/wizard · 항목 키 · 중복 키는 카드를 모르고, 링크 · API 로 만든 계획도 같은 카드 줄로 보인다.
-// 되읽기 규칙 — 가족 lb 의 카드는 서비스에 앞쪽(url · thps · fwd) 중 하나와 그 카드의 백엔드(web · run · object)가 있을 때 후보이고(https-lb 는 늘 후보),
+// 되읽기 규칙 — 가족 lb 의 카드는 서비스에 앞쪽(url · thps · fwd) 중 하나와 그 카드의 백엔드 부품(web · ig · hc · bs / run · neg / object · bb) 중 하나가 있을 때 후보이고(https-lb 는 늘 후보),
 // 후보 가운데 빠진 부품이 가장 적은 카드 하나(동률은 표 순서)를 보인다.
 // 가족 밖의 카드(vm-app)는 필수 서비스 부품이 다 있을 때 보인다(web · db 칩만 켠 흔한 서비스에 「미완성 카드」를 띄우지 않는다) — 그때 프로젝트 공용 부품이 빠졌으면 미완성이다.
 // 다만 그 서비스 pick 하나라도 앞의 카드(LB 카드가 먼저)가 차지했으면 보이지 않는다 — 한 pick 은 카드 하나에만 든다.
@@ -11,6 +11,8 @@ import { addPresetPick, findPreset } from './wizardState';
 
 /** 가족 lb 의 앞쪽 — 이 중 하나가 있어야 로드 밸런서 카드가 후보다(주소 · 인증서만 있는 서비스에 「미완성 LB」를 띄우지 않는다) */
 const LB_ANCHORS = ['url', 'thps', 'fwd'];
+/** LB 앞쪽 부품 — https-lb 의 필수 부품이 곧 앞쪽이다(주소 · URL 맵 · 인증서 · 프록시 · 전달 규칙 · 80 → 443) */
+const LB_FRONT = new Set((bundleById('https-lb')?.parts ?? []).map(partKey));
 
 /** 서비스에서 되읽은 카드 하나 */
 export interface CardMatch {
@@ -61,9 +63,9 @@ export function cardsIn(plan: WizardPlan, service: number): CardMatch[] {
     const score = (m: CardMatch) => m.missing.length + (m.noBackend ? 1 : 0);
     let best: CardMatch | undefined;
     for (const b of BUNDLES.filter((x) => x.family === 'lb')) {
-      // 백엔드가 정해진 카드(website · serverless-web · static-site)는 그 백엔드(첫 부품 — web · run · object)가 있어야 후보다.
-      // 백엔드가 없으면 https-lb 만 남아 「백엔드 없음」으로 보인다
-      if (b.backends === undefined && !has(plan, service, b.parts[0]!)) continue;
+      // 백엔드가 정해진 카드(website · serverless-web · static-site)는 앞쪽 밖의 서비스 부품(web · ig · hc · bs / run · neg · bs / object · bb) 중 하나가 있어야 후보다 —
+      // 점검표에서 web 하나를 빼도 같은 카드가 「미완성 — web」으로 남는다. 그런 부품이 하나도 없으면 https-lb 만 남아 「백엔드 없음」으로 보인다
+      if (b.backends === undefined && !b.parts.some((p) => !partIsProject(p) && !LB_FRONT.has(partKey(p)) && has(plan, service, p))) continue;
       const m = matchOf(plan, service, b);
       if (!best || score(m) < score(best)) best = m;
     }

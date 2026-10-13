@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { addBundle, cardBlocked, cardIn, cardsIn, optionOn, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
 import { addPresetPick, addService, findPreset, renameService, startPlan, togglePreset } from './wizardState';
-import { cardRow, parentRow, parseRow, rowExists, rowTitle, visibleRows } from './wizardSelection';
+import { cardRow, parentRow, parseRow, rowExists, rowTitle, selectionAfter, visibleRows } from './wizardSelection';
 import { decodeWizardState, encodeWizardState } from './urlState';
 import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
@@ -76,6 +76,19 @@ describe('되읽기 · 미완성 (D93)', () => {
     // 네트워크의 lbhc 를 지워도 미완성 (D91 — 헬스 체크 대역을 받지 못하면 LB 가 응답하지 않는다)
     const noLbhc = togglePreset(p, null, 'firewall', 'lbhc');
     expect(cardIn(noLbhc, 0, 'website')).toMatchObject({ complete: false, missing: [{ preset: 'firewall', tier: 'lbhc' }] });
+  });
+
+  it('백엔드 부품 하나를 빼도 같은 LB 카드가 미완성으로 남는다 — website 에서 web · serverless-web 에서 run · static-site 에서 object · 선택은 카드 줄에 남는다', () => {
+    const missingOf = (plan: WizardPlan) => cardsIn(plan, 0).map((m) => [m.bundle.id, m.complete, m.noBackend, m.missing.map((x) => x.preset)]);
+    const site = addBundle(startPlan(), 0, 'website', { db: false });
+    const noWeb = setPart(site, 0, { preset: 'web' }, false);
+    expect(missingOf(noWeb)).toEqual([['website', false, false, ['web']]]);
+    expect(selectionAfter({ type: 'keep' }, cardRow(0, 'website'), site, noWeb)).toBe(cardRow(0, 'website'));
+    expect(ids(setPart(noWeb, 0, { preset: 'web' }, true), 0)).toEqual([['website', true]]);
+    const run = addBundle(startPlan(), 0, 'serverless-web');
+    expect(missingOf(setPart(run, 0, { preset: 'run' }, false))).toEqual([['serverless-web', false, false, ['run']]]);
+    const st = addBundle(startPlan(), 0, 'static-site');
+    expect(missingOf(setPart(st, 0, { preset: 'object' }, false))).toEqual([['static-site', false, false, ['object']]]);
   });
 
   it('칩 사용자의 흔한 조합은 카드 줄을 띄우지 않는다 — web · db · was 하나씩 · 주소 · 인증서만 · 앞쪽 하나라도 있으면 LB 카드', () => {
