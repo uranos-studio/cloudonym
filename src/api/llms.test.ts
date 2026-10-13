@@ -203,6 +203,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb']);
     expect(rows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `lbhc`');
     expect(rows[0]).toContain('built and tested on Google Cloud');
+    expect(rows[1]).toContain('built and tested on Google Cloud');
+    expect(rows[2]).toContain('built and tested on Google Cloud');
+    expect(rows[4]).toContain('rules verified, the set not yet applied');
     expect(rows[1]).toContain('`neg`');
     expect(rows[1]).not.toContain('`hc`');
     expect(sec.join('\n')).toContain('Cards are not part of `/v1/wizard`');

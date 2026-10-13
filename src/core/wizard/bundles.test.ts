@@ -88,8 +88,9 @@ describe('카드 데이터 (D93)', () => {
     expect(bundleById('vm-app')!.family).toBeUndefined();
   });
 
-  it('실제로 만들어 본 카드(tested)는 website · vm-app 둘 (D91)', () => {
-    expect(BUNDLES.filter((b) => b.tested).map((b) => b.id)).toEqual(['website', 'vm-app']);
+  it('실제로 만들어 본 카드(tested)는 website · serverless-web · static-site · vm-app 넷 (D91 · D96) — https-lb 는 단독으로 응답하지 않아 빠진다', () => {
+    expect(BUNDLES.filter((b) => b.tested).map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'vm-app']);
+    for (const id of ['serverless-web', 'static-site']) expect(bundleById(id)!.evidence, id).toContain('D96');
   });
 
   it('카드 하나(기본 선택 · 선택 전부 · 선택 없음)를 첫 화면 네트워크 위에 얹으면 validatePlan 을 지나고 이름이 전부 유효 · 축소 없음 · 상한 안', () => {

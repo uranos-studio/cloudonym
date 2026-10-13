@@ -25,7 +25,7 @@ export interface Bundle {
   refs: readonly BundleRef[];
   /** 이 조합이 실제로 동작한 근거 — 실제 배포 시험(D91) · 공식 문서 URL */
   evidence: readonly string[];
-  /** 이 조합 그대로 Google Cloud 에 만들어 동작을 본 카드인가 (D91) — 아니면 「규칙은 확인함 · 묶음 적용은 아직」 */
+  /** 이 조합 그대로 Google Cloud 에 만들어 동작을 본 카드인가 (D91 · D96) — 아니면 「규칙은 확인함 · 묶음 적용은 아직」 */
   tested: boolean;
 }
 
@@ -78,6 +78,9 @@ const BUCKET_BACKEND_REFS: readonly BundleRef[] = [
 const LB_FIREWALLS: readonly BundlePart[] = [P('firewall', 'web'), P('firewall', 'lbhc')];
 const DB_OPTION: BundleOption = { id: 'db', label: 'Database (Cloud SQL)', on: true, parts: [P('db'), P('psa')] };
 const SERVERLESS_NEG_DOC = 'https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts';
+// 이름이 없는 설정의 근거 (D96) — 공개 웹이 되려면 Cloud Run 은 익명 호출을 받아야 하고, 버킷은 공개 읽기와 기본 문서가 있어야 한다. 화면 점검표가 이 URL 을 안내 문장에 단다
+export const RUN_PUBLIC_DOC = 'https://docs.cloud.google.com/run/docs/authenticating/public';
+export const STATIC_SITE_DOC = 'https://docs.cloud.google.com/storage/docs/hosting-static-website';
 
 /** 1차 카드 다섯 (D93) — 순서가 갤러리 순서이고 되읽기의 동률 순서다 */
 export const BUNDLES: readonly Bundle[] = [
@@ -90,20 +93,20 @@ export const BUNDLES: readonly Bundle[] = [
     evidence: ['D91', `${TF}compute_backend_service`],
   },
   {
-    id: 'serverless-web', label: 'Serverless web', family: 'lb', tested: false,
+    id: 'serverless-web', label: 'Serverless web', family: 'lb', tested: true,
     summary: 'A Cloud Run service behind an HTTPS load balancer. No servers to manage.',
     parts: [P('run'), ...RUN_BACKEND, ...LB_FRONT],
     options: [{ ...DB_OPTION, on: false }, { id: 'sa', label: 'Service account', on: false, parts: [P('sa')] }, { id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }],
     refs: [...RUN_BACKEND_REFS, ...LB_FRONT_REFS],
-    evidence: [SERVERLESS_NEG_DOC, `${TF}compute_region_network_endpoint_group`],
+    evidence: ['D96', SERVERLESS_NEG_DOC, `${TF}compute_region_network_endpoint_group`, RUN_PUBLIC_DOC],
   },
   {
-    id: 'static-site', label: 'Static site', family: 'lb', tested: false,
+    id: 'static-site', label: 'Static site', family: 'lb', tested: true,
     summary: 'Files in a bucket, served through a backend bucket over HTTPS.',
     parts: [P('object'), ...BUCKET_BACKEND, ...LB_FRONT],
     options: [],
     refs: [...BUCKET_BACKEND_REFS, ...LB_FRONT_REFS],
-    evidence: [`${TF}compute_backend_bucket`],
+    evidence: ['D96', `${TF}compute_backend_bucket`, STATIC_SITE_DOC],
   },
   {
     id: 'vm-app', label: 'Internal app on VMs', tested: true,
