@@ -1,6 +1,6 @@
 // 이름 짓기 마법사 (D59 · D64 · D67 · D68 · D84 · D89 · D90) — ① 프로젝트 ② 필수 네트워크 ③ 서비스 ④ 용도 칩 ⑤ 선택지(HA · Serverless · 엔진) ⑥ 서버 줄마다 딸린 것 · 번호 없는 공용 추가 리소스 · ⑦ 이름.
 // 화면 상태는 마법사 모델(WizardPlan) 하나이고 URL hash `w` 에 실린다. 결과는 모델에서 매번 다시 만든다 — validatePlan → expandPlan → generateProject (D17 · D69).
-// 넓은 화면은 세 칸이다(D89) — 목록(WizardList) · 고른 줄 하나의 설정(WizardSettings) · 이름(WizardNames). 고른 줄은 화면 상태이고 hash 에 싣지 않는다.
+// 넓은 화면은 세 칸이다(D89) — 목록(WizardList) · 고른 줄 하나의 설정(WizardSettings · 카드는 WizardCards) · 이름(WizardNames). 폰은 같은 셋을 탭으로 바꾼다(D93). 고른 줄은 화면 상태이고 hash 에 싣지 않는다.
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { generateProject, parseContext, parseProjectContext } from '../core/engine';
@@ -14,7 +14,7 @@ import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } fro
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, rowTitle, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
 import { WizardList } from './WizardList';
@@ -71,6 +71,10 @@ function firstSelection(plan: WizardPlan): RowPath {
   const row = firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
   return row === PROJECT_ROW && projectCount === 0 && plan.services.length > 0 ? serviceRow(0) : row;
 }
+
+/** 폰의 탭 셋 (D93) — 목록 · 고른 줄의 설정 · 이름 */
+type View = 'plan' | 'edit' | 'names';
+const VIEWS: readonly View[] = ['plan', 'edit', 'names'];
 
 const FOCUSABLE = 'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
@@ -242,42 +246,44 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   }, [selected]);
   const focusRow = (path: RowPath) => document.querySelector<HTMLElement>(`[data-row-path="${path}"]`)?.focus();
 
-  // 좁은 화면 (D89) — 태블릿은 이름이 드로어, 폰은 설정이 바텀 시트이고 위 탭이 목록 · 이름을 바꾼다. 배치가 바뀌면 열린 창은 닫힌 것으로 본다
+  // 좁은 화면 (D89 · D93) — 태블릿은 이름이 드로어, 폰은 위 탭 셋(Plan · Edit · Names)이 한 칸을 바꾼다. 배치가 바뀌면 열린 드로어는 닫힌 것으로 본다
   const layout = useWizardLayout();
   const [drawer, setDrawer] = useState(false);
-  const [sheet, setSheet] = useState(false);
-  const [view, setView] = useState<'plan' | 'names'>('plan');
+  const [view, setView] = useState<View>('plan');
   const drawerOpen = layout === 'tablet' && drawer;
-  const sheetOpen = layout === 'phone' && sheet;
   // 폭을 바꿨다 돌아오면 저절로 다시 열리지 않게 — 배치가 바뀌는 렌더에서 연 상태를 지운다(effect 가 아니라 렌더 중 조정)
   const [shownLayout, setShownLayout] = useState(layout);
   if (shownLayout !== layout) {
     setShownLayout(layout);
     setDrawer(false);
-    setSheet(false);
   }
   const handleRef = useRef<HTMLButtonElement>(null);
   const closeDrawer = () => {
     setDrawer(false);
     requestAnimationFrame(() => handleRef.current?.focus());
   };
-  /** 시트를 닫으면 포커스는 고른 줄로 — 시트 안에서 고른 줄이 바뀌었을 수 있다(Duplicate · Remove) */
+  /** Plan 탭으로 돌아가면 포커스는 고른 줄로 — Edit 탭에서 고른 줄이 바뀌었을 수 있다(Duplicate · Remove · 카드 부품) */
   const selectedRef = useRef(selected);
   useEffect(() => {
     selectedRef.current = selected;
   }, [selected]);
-  const closeSheet = () => {
-    setSheet(false);
+  const backToPlan = () => {
+    setView('plan');
     requestAnimationFrame(() => focusRow(selectedRef.current));
   };
-  const openSheet = (focusFirst: boolean) => {
-    setSheet(true);
-    if (focusFirst) requestAnimationFrame(focusSettings);
+  /** 폰에서 줄을 누르거나 Add service — Edit 탭을 연다. 칸의 맨 위부터 보이게 페이지를 탭 막대까지 올린다 */
+  const openEdit = (focusFirst: boolean) => {
+    setView('edit');
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0 });
+      if (focusFirst) focusSettings();
+    });
   };
 
   /** 폰 탭 — 고른 탭만 Tab 순서에 두고, 좌우 · Home · End 로 옮기면서 바로 고른다 (WAI-ARIA tabs, 자동 선택) */
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
-    const next = { ArrowLeft: 'plan', ArrowRight: 'names', Home: 'plan', End: 'names' }[e.key] as 'plan' | 'names' | undefined;
+    const at = VIEWS.indexOf(view);
+    const next = ({ ArrowLeft: VIEWS[(at + VIEWS.length - 1) % VIEWS.length], ArrowRight: VIEWS[(at + 1) % VIEWS.length], Home: VIEWS[0], End: VIEWS[VIEWS.length - 1] } as Record<string, View | undefined>)[e.key];
     if (!next) return;
     e.preventDefault();
     setView(next);
@@ -287,7 +293,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const onSettingsKey = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key !== 'Escape' || e.defaultPrevented) return;
     e.preventDefault();
-    if (sheetOpen) closeSheet();
+    if (layout === 'phone') backToPlan();
     else focusRow(selected);
   };
 
@@ -321,8 +327,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const allPass = results !== undefined && passCount === nameCount;
 
   const settingsSection = (
-    <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} onKeyDown={onSettingsKey}
-      className={layout === 'phone' ? 'relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4' : COLUMN}>
+    <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} onKeyDown={onSettingsKey} className={COLUMN}
+      {...(layout === 'phone' ? { id: 'wizard-panel-edit', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-edit', hidden: view !== 'edit' } : {})}>
       {settings}
     </section>
   );
@@ -360,12 +366,12 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           {layout === 'phone' && (
             // 폰의 위 탭 — 목록과 이름을 바꾼다. 탭 막대는 페이지 위에 붙고, 이름 칸 머리는 그 바로 아래에 붙는다(top-12)
             <div role="tablist" aria-label={en.ui.wizard_view_tabs} data-wizard-tabs className="sticky top-0 z-20 -mx-4 flex h-12 items-stretch gap-1 border-b border-zinc-200 bg-zinc-50/95 px-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
-              {(['plan', 'names'] as const).map((v) => (
+              {VIEWS.map((v) => (
                 <button key={v} type="button" role="tab" id={`wizard-tab-${v}`} aria-selected={view === v} aria-controls={`wizard-panel-${v}`} data-wizard-tab={v}
                   tabIndex={view === v ? 0 : -1} onKeyDown={onTabKey}
                   className="min-w-0 flex-1 truncate border-b-2 border-transparent px-2 text-sm font-medium text-zinc-600 aria-selected:border-indigo-600 aria-selected:text-zinc-900 dark:text-zinc-400 dark:aria-selected:border-indigo-400 dark:aria-selected:text-zinc-100"
                   onClick={() => setView(v)}>
-                  {v === 'plan' ? en.ui.wizard_list_label : results ? fillUi(en, 'wizard_names_tab', { names: nameCount, pass: passCount }) : en.ui.wizard_step_names}
+                  {v === 'plan' ? en.ui.wizard_list_label : v === 'edit' ? en.ui.wizard_view_edit : results ? fillUi(en, 'wizard_names_tab', { names: nameCount, pass: passCount }) : en.ui.wizard_step_names}
                 </button>
               ))}
             </div>
@@ -374,17 +380,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
             {...(layout === 'phone' ? { id: 'wizard-panel-plan', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-plan' } : {})}>
             <WizardList plan={plan} envs={envs} selected={selected} onSelect={select} isExpanded={isExpanded} onExpand={onExpand} cardOpen={cardOpen} networkOpen={networkOpen}
               result={results?.[0]?.result} errors={planErrors} serviceErrors={serviceErrors} projectCount={projectCount} flash={flash?.path}
-              onAddService={() => edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }))}
-              onEnter={() => (layout === 'phone' ? openSheet(true) : focusSettings())}
-              {...(layout === 'phone' ? { onActivate: () => openSheet(false) } : {})} />
+              onAddService={() => {
+                edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }));
+                if (layout === 'phone') openEdit(true);
+              }}
+              onEnter={() => (layout === 'phone' ? openEdit(true) : focusSettings())}
+              {...(layout === 'phone' ? { onActivate: () => openEdit(false) } : {})} />
           </nav>
-          {layout === 'phone'
-            ? (
-              <WizardOverlay kind="sheet" data="settings-sheet" open={sheetOpen} onClose={closeSheet} title={rowTitle(plan, selected)} closeLabel={en.ui.wizard_sheet_close}>
-                {settingsSection}
-              </WizardOverlay>
-            )
-            : settingsSection}
+          {settingsSection}
           {layout === 'wide' && <div data-names-column className={COLUMN}>{names}</div>}
           {layout === 'phone' && (
             <div data-names-column id="wizard-panel-names" role="tabpanel" aria-labelledby="wizard-tab-names" className={COLUMN} hidden={view !== 'names'}>{names}</div>

@@ -1,22 +1,20 @@
-// 좁은 화면의 마법사 겹침 창 (D89) — 태블릿의 이름 드로어(오른쪽에서) · 폰의 설정 바텀 시트(아래에서).
+// 좁은 화면의 마법사 겹침 창 (D89) — 태블릿의 이름 드로어(오른쪽에서). 폰의 설정 바텀 시트는 탭 셋으로 바뀌었다(D93).
 // 브라우저의 모달 dialog(showModal)를 쓴다 — 뒤쪽은 inert 가 되고 Esc 는 cancel 로 온다. 닫기는 늘 부모의 상태로 한다(open 이 정본):
 // Esc · 배경 누름 · 닫기 단추는 onClose 를 부르고, 부모가 open 을 내리면 여기서 dialog 를 닫는다. 닫은 뒤 포커스는 부모가 정한다
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
-import { ChevronDown, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ICON_BTN } from './wizardStyles';
 
 const KIND = {
   // 드로어 — 오른쪽 가장자리 · 폭 min(420px, 90vw) · 높이 전체
   drawer: 'fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-[min(420px,90vw)] max-w-none rounded-l-xl',
-  // 시트 — 아래 가장자리 · 폭 전체 · 높이는 내용만큼, 넘으면 70vh 에서 칸 안 스크롤
-  sheet: 'fixed inset-x-0 bottom-0 top-auto m-0 w-full max-w-none max-h-[70vh] rounded-t-xl',
 } as const;
 
 export function WizardOverlay({ kind, open, onClose, title, closeLabel, labelledBy, children, data }: {
   kind: keyof typeof KIND; open: boolean; onClose: () => void;
   /** 머리의 제목과 닫기 단추 — 없으면 내용이 제 머리(제목 · 닫기)를 갖고 labelledBy 가 그 제목을 가리킨다(드로어 — 이름 칸 머리) */
   title?: ReactNode; closeLabel?: string; labelledBy?: string; children: ReactNode;
-  /** 시험이 잡는 속성 이름(data-names-drawer · data-settings-sheet) */
+  /** 시험이 잡는 속성 이름(data-names-drawer) */
   data: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -49,8 +47,7 @@ export function WizardOverlay({ kind, open, onClose, title, closeLabel, labelled
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
           <h2 id={titleId} className="min-w-0 truncate text-base font-semibold">{title}</h2>
           <button type="button" data-overlay-close aria-label={closeLabel} title={closeLabel} className={ICON_BTN} onClick={onClose}>
-            {/* 시트는 아래로 내리는 꺾쇠 — 바로 아래 설정 칸 머리의 ✕(Remove)와 헷갈리지 않게 */}
-            {kind === 'sheet' ? <ChevronDown aria-hidden="true" className="size-5" /> : <X aria-hidden="true" className="size-5" />}
+            <X aria-hidden="true" className="size-5" />
           </button>
         </div>
       )}
