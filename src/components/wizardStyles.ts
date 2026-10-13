@@ -29,7 +29,6 @@ export const CHIP =
   'aria-pressed:border-indigo-600 aria-pressed:bg-indigo-600 aria-pressed:text-white border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-100 ' +
   'dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:aria-pressed:border-indigo-500 dark:aria-pressed:bg-indigo-500';
 export const ERR = 'text-xs text-rose-700 dark:text-rose-300';
-export const STEP_NUM = 'mr-1.5 text-indigo-600 dark:text-indigo-400';
 
 export const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
 /** 규칙 표 — 표시 이름 · 종류 표. 화면 안에서 한 번 만든다 */

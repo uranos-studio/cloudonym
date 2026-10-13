@@ -2,7 +2,7 @@
 // 판정은 전부 엔진 값이다 — 오류는 엔진이 준 path 로 그 자리에 붙인다. 이 칸은 선택 경로로 key 한 컴포넌트 하나이고,
 // 안의 입력칸은 tier · kind 로 key 하지 않는다(글자마다 다시 만들어지면 커서가 빠진다)
 import { useEffect, useRef, useState } from 'react';
-import { Copy, Plus, Server, Trash2, X } from 'lucide-react';
+import { ChevronRight, Copy, Plus, Server, Trash2, X } from 'lucide-react';
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseProjectContext, type NameItem } from '../core/engine';
 import { inputKind } from '../core/tree';
 import { allowedKinds } from '../core/catalog';
@@ -17,8 +17,9 @@ import { ResourceTree } from './ResourceTree';
 import { treeRules, type Picked } from './selection';
 import { SERVERLESS_SHORT } from './urlState';
 import * as S from './wizardState';
-import { selectAdded, type Edit } from './wizardSelection';
-import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, RULES, SMALL_INPUT, STEP_NUM, inline } from './wizardStyles';
+import { selectAdded, type Edit, type RowPath } from './wizardSelection';
+import { CardGallery } from './WizardCards';
+import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, RULES, SMALL_INPUT, inline } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -61,7 +62,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
   };
   return (
     <section aria-labelledby="wizard-project" className="space-y-4">
-      <h2 id="wizard-project" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>1</span>{en.ui.wizard_step_project} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_hint}</span></h2>
+      <h2 id="wizard-project" className="text-base font-semibold">{en.ui.wizard_step_project} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_hint}</span></h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {text('owner', 'Owner', en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
         {text('system', 'System', en.ui.field_system_hint, en.ui.field_system_placeholder)}
@@ -125,7 +126,7 @@ export function NetworkSettings({ plan, errors, edit }: { plan: WizardPlan; erro
   const full = S.projectPicksFull(plan);
   return (
     <section aria-labelledby="wizard-network" className="space-y-3">
-      <h2 id="wizard-network" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
+      <h2 id="wizard-network" className="text-base font-semibold">{en.ui.wizard_project_resources} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_resources_hint}</span></h2>
       <div className="flex flex-wrap items-center gap-2">
         {S.PROJECT_PRESETS.filter((p) => !p.tierChoices).map((p) => (
           // 서브넷 칩 (D86) — 하나 이상이면 눌린 상태 · 끄면 「Add subnet」으로 더한 것까지 전부 뗀다
@@ -192,8 +193,8 @@ export function ExtrasSettings({ plan, onCustom }: { plan: WizardPlan; onCustom:
 }
 
 // ── ③ 서비스 — 이름 · 삭제 · ④ 용도 칩 · 로드 밸런서 부품. 고른 pick 은 목록의 줄이다 (D89) ──
-export function ServiceSettings({ index, plan, errors, contextErrors, edit, onCustom }: {
-  index: number; plan: WizardPlan; errors: PlanError[]; contextErrors: CoreMessage[]; edit: Edit; onCustom: () => void;
+export function ServiceSettings({ index, plan, errors, contextErrors, edit, onCustom, onSelect }: {
+  index: number; plan: WizardPlan; errors: PlanError[]; contextErrors: CoreMessage[]; edit: Edit; onCustom: () => void; onSelect: (path: RowPath) => void;
 }) {
   const svc = plan.services[index]!;
   const id = `wizard-service-${index}`;
@@ -212,22 +213,31 @@ export function ServiceSettings({ index, plan, errors, contextErrors, edit, onCu
       </div>
       <ErrorList id={`${id}-error`} errors={own} />
 
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold"><span aria-hidden="true" className={STEP_NUM}>4</span>{en.ui.wizard_step_purposes} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_purposes_hint}</span></h3>
-        <div className="flex flex-wrap gap-2" role="group" aria-label={en.ui.wizard_step_purposes}>
-          {S.SERVICE_PRESETS.filter((p) => p.group === undefined).map((p) => (
-            <PurposeChip key={p.id} preset={p} pressed={S.findPreset(plan, index, p.id) >= 0} onClick={() => edit((x) => S.togglePreset(x, index, p.id))} />
-          ))}
-          <button type="button" data-purpose-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
+      <CardGallery plan={plan} service={index} edit={edit} onSelect={onSelect} />
+
+      {/* 하나씩 고르기 (D93) — 칩 · 로드 밸런서 부품 · Custom 은 접힌 칸 안이다. 카드가 주 경로이고 칩은 세부 조정이다 */}
+      <details data-add-more className="rounded-lg border border-dashed border-zinc-300 px-3 py-2 dark:border-zinc-700">
+        <summary className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
+          <ChevronRight data-chevron aria-hidden="true" className="size-4 shrink-0 transition-transform" />
+          <span><span className="font-semibold">{en.ui.wizard_add_more}</span> <span className={HINT}>— {en.ui.wizard_add_more_hint}</span></span>
+        </summary>
+        <div className="space-y-2 pb-1 pt-2">
+          <p className={HINT}>{en.ui.wizard_purposes_hint}</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={en.ui.wizard_step_purposes}>
+            {S.SERVICE_PRESETS.filter((p) => p.group === undefined).map((p) => (
+              <PurposeChip key={p.id} preset={p} pressed={S.findPreset(plan, index, p.id) >= 0} onClick={() => edit((x) => S.togglePreset(x, index, p.id))} />
+            ))}
+            <button type="button" data-purpose-chip="custom" className={CHIP} onClick={onCustom}>{en.ui.wizard_custom}</button>
+          </div>
+          {/* 로드 밸런서 부품 — 칩 하나 = 이름 하나. 동작하는 묶음은 위 카드가 더한다 */}
+          <div data-lb-parts className="flex flex-wrap items-center gap-2" role="group" aria-label={en.ui.wizard_lb_parts}>
+            <span className={HINT}>{en.ui.wizard_lb_parts}</span>
+            {S.SERVICE_PRESETS.filter((p) => p.group === 'lb').map((p) => (
+              <PurposeChip key={p.id} preset={p} pressed={S.findPreset(plan, index, p.id) >= 0} onClick={() => edit((x) => S.togglePreset(x, index, p.id))} />
+            ))}
+          </div>
         </div>
-        {/* 로드 밸런서 부품 (D73) — 방화벽 tier 줄과 같은 하위 줄. 칩 하나 = 이름 하나 · 서로 엮지 않는다 */}
-        <div data-lb-parts className="flex flex-wrap items-center gap-2" role="group" aria-label={en.ui.wizard_lb_parts}>
-          <span className={HINT}>{en.ui.wizard_lb_parts}</span>
-          {S.SERVICE_PRESETS.filter((p) => p.group === 'lb').map((p) => (
-            <PurposeChip key={p.id} preset={p} pressed={S.findPreset(plan, index, p.id) >= 0} onClick={() => edit((x) => S.togglePreset(x, index, p.id))} />
-          ))}
-        </div>
-      </div>
+      </details>
       {svc.picks.length === 0 && <p data-service-empty className={HINT}>{en.ui.wizard_service_no_picks}</p>}
     </div>
   );
@@ -236,7 +246,8 @@ export function ServiceSettings({ index, plan, errors, contextErrors, edit, onCu
 function PurposeChip({ preset, pressed, onClick }: { preset: Preset; pressed: boolean; onClick: () => void }) {
   return (
     <button type="button" data-purpose-chip={preset.id} aria-pressed={pressed} className={CHIP} onClick={onClick}>
-      <span className="font-mono">{preset.id}</span><span className="text-xs opacity-80">{preset.label}</span>
+      {/* 뜻이 앞 · 큰 글자, 약어는 뒤 · 작은 글자 (review P3 · P11 — 불투명도 없이 대비를 지킨다) */}
+      <span>{preset.label}</span><span className="font-mono text-[13px] font-normal">{preset.id}</span>
     </button>
   );
 }
@@ -285,7 +296,7 @@ export function PickPanel({ pick, at, errors, edit }: { pick: Pick; at: S.PickRe
       {/* ⑤ 선택지 — 서버형(web · was)만 HA · Serverless, 종류가 있는 규칙(Cloud SQL · GKE · LB 부품)은 종류, tier 를 정하지 않은 pick 은 tier(D74), role 규칙(sa 칩 포함)은 역할 */}
       {(preset?.serverless || preset?.ha || kinds.length > 0 || locations.length > 0 || globalDefault || tierInput || roleInput) && (
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400"><span aria-hidden="true" className={STEP_NUM}>5</span>{en.ui.wizard_step_options}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_step_options}</p>
           <div className="flex flex-wrap items-end gap-4">
             {preset?.serverless && (
               <div>
@@ -422,7 +433,7 @@ function AttachEditor({ attach, at, slot, path, errors, edit, baseId }: {
   return (
     <details data-attached className="mt-2 rounded-md border border-zinc-200 bg-white px-2 py-1 dark:border-zinc-800 dark:bg-zinc-900">
       <summary className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
-        <span className="font-medium"><span aria-hidden="true" className={STEP_NUM}>6</span>{en.ui.wizard_step_attached}</span>
+        <span className="font-medium">{en.ui.wizard_step_attached}</span>
         <span data-attached-summary className={`font-mono ${HINT}`}>{summary.length > 0 ? summary.join(' · ') : en.ui.wizard_attached_none}</span>
       </summary>
       <div className="space-y-3 py-2">

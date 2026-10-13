@@ -18,16 +18,23 @@ interface Props {
   namingHref: string;
   /** Share URL 이 없을 때도 그 자리(단추 · 경고 줄)를 비워 둔다 — 단추가 나타나고 사라질 때 머리 높이가 바뀌지 않게(마법사) */
   reserveShare?: boolean;
+  /** 공유 경고 줄을 머리에 늘 보이는가 — 마법사는 Share 를 누를 때 그 곁에 보인다(D93) */
+  shareWarning?: boolean;
+  /** 제품 이름 옆 배지 — 마법사의 클라우드(Google Cloud · 나머지는 곧) */
+  badge?: ReactNode;
 }
 
-export function AppHeader({ share, screen, otherHref, namingHref, reserveShare = false }: Props) {
+export function AppHeader({ share, screen, otherHref, namingHref, reserveShare = false, shareWarning = true, badge }: Props) {
   return (
     <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex items-center gap-3">
           <span className="rounded-lg bg-indigo-600 p-2 text-white dark:bg-indigo-500"><Cloud aria-hidden="true" className="size-5" /></span>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
+              {badge}
+            </div>
             <p className="text-xs text-zinc-600 dark:text-zinc-400">{en.ui.tagline}</p>
           </div>
         </div>
@@ -44,8 +51,8 @@ export function AppHeader({ share, screen, otherHref, namingHref, reserveShare =
           <a href="/llms.txt" target="_blank" rel="noreferrer" className={NAV_LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
         </nav>
         {/* 공유 URL 경고 — hash 는 버튼을 누르지 않아도 주소창에 쓰이고 Base64 는 암호화가 아니다. nav 밖 전폭 줄이라 좁은 화면에서 버튼 줄을 깨지 않는다 */}
-        {share && <p data-share-warning className="w-full text-xs text-zinc-600 sm:text-right dark:text-zinc-400">{en.ui.share_warning}</p>}
-        {!share && reserveShare && <p aria-hidden="true" className="invisible w-full text-xs sm:text-right">{en.ui.share_warning}</p>}
+        {shareWarning && share && <p data-share-warning className="w-full text-xs text-zinc-600 sm:text-right dark:text-zinc-400">{en.ui.share_warning}</p>}
+        {shareWarning && !share && reserveShare && <p aria-hidden="true" className="invisible w-full text-xs sm:text-right">{en.ui.share_warning}</p>}
       </div>
     </header>
   );

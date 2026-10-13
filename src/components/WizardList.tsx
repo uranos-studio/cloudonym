@@ -7,8 +7,9 @@ import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, type PlanError, type WizardPlan } 
 import { serviceNamespace, type ProjectResult } from '../core/engine';
 import type { CoreMessage } from '../core/types';
 import * as S from './wizardState';
-import { EXTRAS_ROW, NETWORK_ROW, PROJECT_ROW, parseRow, rowErrorCount, rowNames, serviceRow, visibleRows, type RowPath } from './wizardSelection';
-import { BTN, HINT, STEP_NUM } from './wizardStyles';
+import { EXTRAS_ROW, NETWORK_ROW, PROJECT_ROW, cardRow, parseRow, rowErrorCount, rowNames, serviceRow, visibleRows, type RowPath } from './wizardSelection';
+import { serviceLayout } from './wizardBundles';
+import { BTN, HINT } from './wizardStyles';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -19,15 +20,21 @@ const ROW =
   'data-[flash=true]:bg-amber-50 dark:data-[flash=true]:bg-amber-950';
 const BADGE_ERR = 'shrink-0 rounded-full bg-rose-100 px-1.5 text-[11px] font-semibold text-rose-800 dark:bg-rose-950 dark:text-rose-300';
 const BADGE = 'shrink-0 rounded-full bg-zinc-100 px-1.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
+const CARD_STATE = {
+  complete: 'shrink-0 rounded-full bg-emerald-50 px-1.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+  incomplete: 'shrink-0 rounded-full bg-amber-50 px-1.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-200',
+};
 
 /** 줄의 DOM — 키보드로 옮긴 뒤 포커스를 준다 */
 function rowElement(path: RowPath): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[data-row-path="${path}"]`);
 }
 
-export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpand, result, errors, serviceErrors, projectCount, flash, onAddService, onEnter, onActivate }: {
+export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpand, cardOpen, networkOpen, result, errors, serviceErrors, projectCount, flash, onAddService, onEnter, onActivate }: {
   plan: WizardPlan; envs: readonly string[]; selected: RowPath; onSelect: (path: RowPath) => void;
   isExpanded: (service: number) => boolean; onExpand: (service: number, open: boolean) => void;
+  /** 카드 줄 아래 부품 줄을 보이는가 (D93) · 네트워크 pick 줄을 보이는가 */
+  cardOpen: (service: number, card: string) => boolean; networkOpen: boolean;
   /** 첫 env 의 결과 — 줄 이름(D89). 온전하지 않으면 undefined(줄 이름 —) */
   result: ProjectResult | undefined;
   errors: readonly PlanError[]; serviceErrors: readonly (readonly CoreMessage[])[]; projectCount: number;
@@ -41,7 +48,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
     if (flash) rowElement(flash)?.scrollIntoView({ block: 'nearest' });
   }, [flash]);
 
-  const rows = visibleRows(plan, isExpanded);
+  const rows = visibleRows(plan, isExpanded, cardOpen, networkOpen);
   const move = (path: RowPath) => {
     onSelect(path);
     // 선택한 줄이 그려진 뒤 포커스를 옮긴다(펼침 · 접힘으로 줄이 새로 생길 수 있다)
@@ -56,12 +63,23 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
     } else if (e.key === 'Home') move(rows[0]!);
     else if (e.key === 'End') move(rows[rows.length - 1]!);
     else if (e.key === 'ArrowRight') {
+      // 다음 단계 줄 — 서비스는 펴고 첫 자식(카드 줄 · pick), 카드는 첫 부품, 네트워크는 첫 pick
+      const child = rows[at + 1];
       if (r?.kind === 'service' && !isExpanded(r.service)) onExpand(r.service, true);
-      else if (r?.kind === 'service' && (plan.services[r.service]?.picks.length ?? 0) > 0) move(S.pickPath({ service: r.service, pick: 0 }));
+      else if (r?.kind === 'service' && child !== undefined && child.startsWith(`${serviceRow(r.service)}.`)) move(child);
+      else if (r?.kind === 'card') {
+        const first = [...serviceLayout(plan, r.service).owned].filter(([, id]) => id === r.card).map(([j]) => j).sort((a, b) => a - b)[0];
+        if (first === undefined) return;
+        move(S.pickPath({ service: r.service, pick: first }));
+      } else if (r?.kind === 'network' && S.projectPickIndexes(plan, 'network').length > 0) move(S.pickPath({ service: null, pick: S.projectPickIndexes(plan, 'network')[0]! }));
       else return;
     } else if (e.key === 'ArrowLeft') {
       if (r?.kind === 'service' && isExpanded(r.service)) onExpand(r.service, false);
-      else if (r?.kind === 'pick' && r.ref.service !== null) move(serviceRow(r.ref.service));
+      else if (r?.kind === 'card') move(serviceRow(r.service));
+      else if (r?.kind === 'pick' && r.ref.service !== null) {
+        const card = serviceLayout(plan, r.ref.service).owned.get(r.ref.pick);
+        move(card === undefined ? serviceRow(r.ref.service) : cardRow(r.ref.service, card));
+      }
       else if (r?.kind === 'pick') move(plan.projectPicks[r.ref.pick]?.preset === null ? EXTRAS_ROW : NETWORK_ROW);
       else return;
     } else if (e.key === 'Enter') onEnter();
@@ -70,25 +88,25 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   };
 
   const count = (path: RowPath) => rowErrorCount(plan, path, errors, serviceErrors, projectCount);
-  const row = (path: RowPath, level: 1 | 2, body: ReactNode, extra: { key?: string; expanded?: boolean; pick?: string } = {}) => {
+  const row = (path: RowPath, level: 1 | 2 | 3, body: ReactNode, extra: { key?: string; expanded?: boolean; pick?: string; card?: string } = {}) => {
     const n = count(path);
     return (
       <li key={extra.key ?? path} role="treeitem" aria-level={level} aria-selected={path === selected} tabIndex={path === selected ? 0 : -1}
         {...(extra.expanded === undefined ? {} : { 'aria-expanded': extra.expanded })}
-        data-row-path={path} {...(extra.pick === undefined ? {} : { 'data-row-pick': extra.pick })} data-flash={flash === path}
-        className={`${ROW} ${level === 2 ? 'ml-5' : ''}`} onClick={() => { onSelect(path); onActivate?.(path); }}>
+        data-row-path={path} {...(extra.pick === undefined ? {} : { 'data-row-pick': extra.pick })} {...(extra.card === undefined ? {} : { 'data-row-card': extra.card })} data-flash={flash === path}
+        className={`${ROW} ${level === 2 ? 'ml-5' : level === 3 ? 'ml-10' : ''}`} onClick={() => { onSelect(path); onActivate?.(path); }}>
         {body}
         {n > 0 && <span data-row-errors={n} className={BADGE_ERR} title={fillUi(en, 'wizard_row_errors', { n })}>!{n}</span>}
       </li>
     );
   };
-  const pickRow = (ref: S.PickRef) => {
+  const pickRow = (ref: S.PickRef, level: 2 | 3 = 2) => {
     const pick = ref.service === null ? plan.projectPicks[ref.pick]! : plan.services[ref.service]!.picks[ref.pick]!;
     const path = S.pickPath(ref);
     const { title } = S.pickTitle(pick);
     const names = rowNames(plan, ref, result);
     const text = names ? `${names.first}${names.rest > 0 ? ` +${names.rest}` : ''}` : '—';
-    return row(path, 2, (
+    return row(path, level, (
       <span className="flex min-w-0 flex-1 flex-col">
         <span data-row-title className="truncate font-medium">{title}</span>
         <code data-row-name title={names?.first} className={`truncate font-mono text-xs ${HINT}`}>{text}</code>
@@ -97,6 +115,35 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   };
   const p = plan.project;
   const full = S.projectPicksFull(plan);
+  // 네트워크 한 줄 (D93) — 이름 수(그 pick 들의 이름 합) · pick 제목들
+  const networkIdx = S.projectPickIndexes(plan, 'network');
+  const networkNames = result ? networkIdx.reduce((n, k) => { const x = rowNames(plan, { service: null, pick: k }, result); return n + (x ? x.rest + 1 : 0); }, 0) : undefined;
+  const networkSummary = [...new Set(networkIdx.map((k) => S.pickTitle(plan.projectPicks[k]!).title))].join(', ');
+  /** 펼친 서비스의 자식 — 카드 줄(연 카드는 부품 줄까지) · 카드 밖 pick */
+  const serviceChildren = (i: number): ReactNode[] => {
+    const { cards, owned, loose } = serviceLayout(plan, i);
+    const out: ReactNode[] = [];
+    for (const c of cards) {
+      const path = cardRow(i, c.bundle.id);
+      const open = cardOpen(i, c.bundle.id);
+      const mine = [...owned].filter(([, id]) => id === c.bundle.id).map(([j]) => j).sort((a, b) => a - b);
+      const first = mine[0] === undefined ? undefined : rowNames(plan, { service: i, pick: mine[0] }, result)?.first;
+      out.push(row(path, 2, (
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="flex items-center gap-2">
+            <span data-row-title className="truncate font-medium">{c.bundle.label}</span>
+            <span data-card-state={c.complete ? 'complete' : 'incomplete'} className={c.complete ? CARD_STATE.complete : CARD_STATE.incomplete}>
+              {c.complete ? en.ui.wizard_card_state_complete : en.ui.wizard_card_state_incomplete}
+            </span>
+          </span>
+          <span className={`truncate text-xs ${HINT}`}>{fillUi(en, 'wizard_card_parts_count', { n: mine.length })}{first ? ` · ${first}` : ''}</span>
+        </span>
+      ), { expanded: open, card: c.bundle.id }));
+      if (open) for (const j of mine) out.push(pickRow({ service: i, pick: j }, 3));
+    }
+    for (const j of loose) out.push(pickRow({ service: i, pick: j }));
+    return out;
+  };
 
   return (
     <div className="space-y-3">
@@ -104,20 +151,26 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
       <ul role="tree" aria-labelledby="wizard-list-title" data-wizard-list className="space-y-0.5" onKeyDown={onKeyDown}>
         {row(PROJECT_ROW, 1, (
           <span className="flex min-w-0 flex-1 flex-col">
-            <span className="font-semibold"><span aria-hidden="true" className={STEP_NUM}>1</span>{en.ui.wizard_step_project}</span>
+            <span className="font-semibold">{en.ui.wizard_step_project}</span>
             <span className={`truncate text-xs ${HINT}`}>{[p.owner, p.system, envs.join(', '), p.region].filter((x) => x !== '').join(' · ')}</span>
           </span>
         ))}
         {row(NETWORK_ROW, 1, (
           <>
-            <span className="min-w-0 flex-1 truncate font-semibold"><span aria-hidden="true" className={STEP_NUM}>2</span>{en.ui.wizard_project_resources}</span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="flex items-center gap-2">
+                <span className="truncate font-semibold">{en.ui.wizard_project_resources}</span>
+                {networkNames !== undefined && <span data-row-count className={BADGE}>{fillUi(en, 'wizard_row_names', { n: networkNames })}</span>}
+              </span>
+              <span data-network-summary className={`truncate text-xs ${HINT}`}>{networkSummary || en.ui.wizard_project_resources_hint}</span>
+            </span>
             {full && <span data-row-full className={BADGE}>{`${plan.projectPicks.length}/${MAX_PICKS_PER_SERVICE}`}</span>}
-            <Plus aria-hidden="true" className="size-4 shrink-0 text-zinc-500" />
+            <ChevronRight aria-hidden="true" className={`size-4 shrink-0 text-zinc-500 transition-transform ${networkOpen ? 'rotate-90' : ''}`} />
           </>
-        ))}
-        {S.projectPickIndexes(plan, 'network').map((k) => pickRow({ service: null, pick: k }))}
+        ), { expanded: networkOpen })}
+        {networkOpen && S.projectPickIndexes(plan, 'network').map((k) => pickRow({ service: null, pick: k }))}
         <li role="none" className="px-2 pt-2 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
-          <span aria-hidden="true" className={STEP_NUM}>3</span>{en.ui.wizard_step_services}
+          {en.ui.wizard_step_services}
         </li>
         {plan.services.flatMap((svc, i) => {
           const open = isExpanded(i);
@@ -135,7 +188,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
                 {svc.picks.length >= MAX_PICKS_PER_SERVICE && <span className={BADGE}>{`${svc.picks.length}/${MAX_PICKS_PER_SERVICE}`}</span>}
               </>
             ), { expanded: open }),
-            ...(open ? svc.picks.map((_, j) => pickRow({ service: i, pick: j })) : []),
+            ...(open ? serviceChildren(i) : []),
           ];
         })}
         {row(EXTRAS_ROW, 1, (

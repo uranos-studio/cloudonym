@@ -82,6 +82,8 @@ describe('카드 데이터 (D93)', () => {
       const viaLb = new Set([needs, ...lb.parts.map(partKey), ...backend.parts.map(partKey)]);
       expect(new Set(bundleById(id)!.parts.map(partKey)), id).toEqual(viaLb);
       expect(bundleById(id)!.family, id).toBe('lb');
+      // 되읽기는 첫 부품을 그 카드의 백엔드로 본다(wizardBundles.cardsIn)
+      expect(bundleById(id)!.parts[0]!.preset, id).toBe(needs);
     }
     expect(bundleById('vm-app')!.family).toBeUndefined();
   });

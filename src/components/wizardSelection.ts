@@ -9,6 +9,8 @@ import { presetOf } from '../core/wizard/presets';
 import type { PlanError, WizardPlan } from '../core/wizard/plan';
 import type { CoreMessage } from '../core/types';
 import { errorsAt, errorsUnder, pickPath, pickRule, pickTitle, projectPickIndexes, type PickRef } from './wizardState';
+import { cardIn, serviceLayout } from './wizardBundles';
+import { bundleById } from '../core/wizard/bundles';
 import { en } from '../messages/en';
 
 export type RowPath = string;
@@ -16,15 +18,19 @@ export const PROJECT_ROW: RowPath = 'project';
 export const NETWORK_ROW: RowPath = 'network';
 export const EXTRAS_ROW: RowPath = 'extras';
 export const serviceRow = (i: number): RowPath => `services[${i}]`;
+/** 카드 줄 (D93) — 서비스 안에서 되읽은 카드 하나. 화면 상태라 hash 에 싣지 않는다 */
+export const cardRow = (i: number, id: string): RowPath => `services[${i}].card.${id}`;
 
 export type Row =
   | { kind: 'project' } | { kind: 'network' } | { kind: 'extras' }
   | { kind: 'service'; service: number }
+  | { kind: 'card'; service: number; card: string }
   | { kind: 'pick'; ref: PickRef };
 
 const SERVICE_RE = /^services\[(\d+)\]$/;
 const SERVICE_PICK_RE = /^services\[(\d+)\]\.picks\[(\d+)\]$/;
 const PROJECT_PICK_RE = /^projectPicks\[(\d+)\]$/;
+const CARD_RE = /^services\[(\d+)\]\.card\.([a-z][a-z-]*)$/;
 
 /** 경로를 줄로 — 꼴 밖이면 undefined */
 export function parseRow(path: RowPath): Row | undefined {
@@ -35,6 +41,8 @@ export function parseRow(path: RowPath): Row | undefined {
   if (m) return { kind: 'pick', ref: { service: Number(m[1]), pick: Number(m[2]) } };
   m = PROJECT_PICK_RE.exec(path);
   if (m) return { kind: 'pick', ref: { service: null, pick: Number(m[1]) } };
+  m = CARD_RE.exec(path);
+  if (m) return { kind: 'card', service: Number(m[1]), card: m[2]! };
   return undefined;
 }
 
@@ -43,6 +51,7 @@ export function rowExists(plan: WizardPlan, path: RowPath): boolean {
   const r = parseRow(path);
   if (!r) return false;
   if (r.kind === 'service') return r.service < plan.services.length;
+  if (r.kind === 'card') return cardIn(plan, r.service, r.card) !== undefined;
   if (r.kind === 'pick') {
     const { service, pick } = r.ref;
     return service === null ? pick < plan.projectPicks.length : pick < (plan.services[service]?.picks.length ?? 0);
@@ -53,8 +62,13 @@ export function rowExists(plan: WizardPlan, path: RowPath): boolean {
 /** 부모 줄 — 프로젝트 공용 pick 은 프리셋이면 network, custom 이면 extras. 서비스 pick 은 그 서비스. 머리 줄의 부모는 project */
 export function parentRow(plan: WizardPlan, path: RowPath): RowPath {
   const r = parseRow(path);
+  if (r?.kind === 'card') return serviceRow(r.service);
   if (!r || r.kind !== 'pick') return PROJECT_ROW;
-  if (r.ref.service !== null) return serviceRow(r.ref.service);
+  if (r.ref.service !== null) {
+    // 카드가 차지한 pick 의 부모는 그 카드 줄 (D93)
+    const card = serviceLayout(plan, r.ref.service).owned.get(r.ref.pick);
+    return card === undefined ? serviceRow(r.ref.service) : cardRow(r.ref.service, card);
+  }
   return plan.projectPicks[r.ref.pick]?.preset === null ? EXTRAS_ROW : NETWORK_ROW;
 }
 
@@ -63,13 +77,20 @@ export function resolveSelection(plan: WizardPlan, path: RowPath): RowPath {
   return rowExists(plan, path) ? path : PROJECT_ROW;
 }
 
-/** 목록에 보이는 줄의 순서 — project · network · 네트워크 pick · 서비스(펼친 것은 그 pick) · extras · extras pick. 키보드 ↑↓ 가 이 순서를 따른다 */
-export function visibleRows(plan: WizardPlan, expanded: (service: number) => boolean): RowPath[] {
+/** 목록에 보이는 줄의 순서 — project · network · 네트워크 pick(펼쳤을 때) · 서비스(펼친 것은 카드 줄 · 연 카드의 부품 · 카드 밖 pick) · extras · extras pick.
+ *  키보드 ↑↓ 가 이 순서를 따른다 */
+export function visibleRows(plan: WizardPlan, expanded: (service: number) => boolean, cardOpen: (service: number, card: string) => boolean = () => false, networkOpen = true): RowPath[] {
   const out: RowPath[] = [PROJECT_ROW, NETWORK_ROW];
-  for (const k of projectPickIndexes(plan, 'network')) out.push(pickPath({ service: null, pick: k }));
-  plan.services.forEach((s, i) => {
+  if (networkOpen) for (const k of projectPickIndexes(plan, 'network')) out.push(pickPath({ service: null, pick: k }));
+  plan.services.forEach((_, i) => {
     out.push(serviceRow(i));
-    if (expanded(i)) s.picks.forEach((_, j) => out.push(pickPath({ service: i, pick: j })));
+    if (!expanded(i)) return;
+    const { cards, owned, loose } = serviceLayout(plan, i);
+    for (const c of cards) {
+      out.push(cardRow(i, c.bundle.id));
+      if (cardOpen(i, c.bundle.id)) for (const [j, id] of [...owned].sort((a, b) => a[0] - b[0])) if (id === c.bundle.id) out.push(pickPath({ service: i, pick: j }));
+    }
+    for (const j of loose) out.push(pickPath({ service: i, pick: j }));
   });
   out.push(EXTRAS_ROW);
   for (const k of projectPickIndexes(plan, 'extras')) out.push(pickPath({ service: null, pick: k }));
@@ -89,6 +110,10 @@ export function rowErrorCount(plan: WizardPlan, path: RowPath, errors: readonly 
     case 'extras':
       return projectPickIndexes(plan, 'extras').reduce((n, k) => n + errorsUnder(errors, pickPath({ service: null, pick: k })).length, 0);
     case 'service': return errorsUnder(errors, path).length + (serviceErrors[r.service]?.length ?? 0);
+    case 'card': {
+      const { owned } = serviceLayout(plan, r.service);
+      return [...owned].filter(([, id]) => id === r.card).reduce((n, [j]) => n + errorsUnder(errors, pickPath({ service: r.service, pick: j })).length, 0);
+    }
     case 'pick': return errorsUnder(errors, path).length;
   }
 }
@@ -96,13 +121,13 @@ export function rowErrorCount(plan: WizardPlan, path: RowPath, errors: readonly 
 /** 첫 선택 — 오류가 있는 첫 줄(모든 pick 줄을 펼친 순서), 없으면 project */
 export function firstErrorRow(plan: WizardPlan, errors: readonly PlanError[], serviceErrors: readonly (readonly CoreMessage[])[], projectCount = 0): RowPath {
   if (projectCount > 0) return PROJECT_ROW;
-  for (const path of visibleRows(plan, () => true)) {
+  for (const path of visibleRows(plan, () => true, () => true)) {
     if (path === PROJECT_ROW) continue;
     // 머리 줄(network · 서비스)은 자식 오류를 합치므로, 자식 줄이 있으면 그 줄을 고른다
     const r = parseRow(path);
     const own = r?.kind === 'network' ? errorsAt(errors, 'projectPicks').length
       : r?.kind === 'service' ? errorsAt(errors, path).length + (serviceErrors[r.service]?.length ?? 0)
-      : r?.kind === 'extras' ? 0
+      : r?.kind === 'extras' || r?.kind === 'card' ? 0
       : rowErrorCount(plan, path, errors, serviceErrors);
     if (own > 0) return path;
   }
@@ -237,6 +262,7 @@ export function rowTitle(plan: WizardPlan, path: RowPath): string {
   if (r.kind === 'network') return en.ui.wizard_project_resources;
   if (r.kind === 'extras') return en.ui.wizard_shared_extras;
   if (r.kind === 'service') return plan.services[r.service]?.purpose || en.ui.wizard_unnamed_service;
+  if (r.kind === 'card') return bundleById(r.card)?.label ?? r.card;
   const pick = r.ref.service === null ? plan.projectPicks[r.ref.pick] : plan.services[r.ref.service]?.picks[r.ref.pick];
   return pick ? pickTitle(pick).title : en.ui.wizard_step_project;
 }

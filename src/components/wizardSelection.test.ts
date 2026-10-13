@@ -215,7 +215,7 @@ describe('줄 제목 rowTitle — 폰 시트의 머리', () => {
   it('머리 줄 · 서비스 · pick', () => {
     const p = sample();
     expect(rowTitle(p, 'project')).toBe('Project');
-    expect(rowTitle(p, 'network')).toBe('Required network');
+    expect(rowTitle(p, 'network')).toBe('Network');
     expect(rowTitle(p, 'extras')).toBe('Shared extra resources');
     expect(rowTitle(p, 'services[0]')).toBe(p.services[0]!.purpose);
     expect(rowTitle(p, 'projectPicks[0]')).toBe('VPC network');

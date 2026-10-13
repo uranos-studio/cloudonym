@@ -8,20 +8,22 @@ import { inputKind } from '../core/tree';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { CoreMessage, Env } from '../core/types';
 import { AppHeader } from './AppHeader';
-import { CloudPicker } from './CloudPicker';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, rowTitle, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, rowTitle, resolveSelection, selectAdded, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { CardPanel } from './WizardCards';
+import { serviceLayout } from './wizardBundles';
 import { WizardList } from './WizardList';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
-import { PanelRightOpen } from 'lucide-react';
+import { PanelRightOpen, X } from 'lucide-react';
+import { INTRO_KEY, readPref, writePref } from './localPrefs';
 import { NOTICE, PANEL } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi } from '../messages/catalog';
@@ -61,12 +63,13 @@ function serviceErrorsOf(plan: WizardPlan): CoreMessage[][] {
     return r.ok ? [] : r.errors.filter((e) => 'field' in e && e.field === 'purpose');
   });
 }
-/** 첫 선택 — 오류가 있는 첫 줄, 없으면 project (D89) */
+/** 첫 선택 — 오류가 있는 첫 줄, 없으면 첫 서비스 (D93 — 갤러리 「무엇을 만드나」가 첫 화면이다. 서비스가 없으면 project) */
 function firstSelection(plan: WizardPlan): RowPath {
   const check = validatePlan(plan);
   const project = parseProjectContext(plan.project, 'gcp');
   const projectCount = (project.ok ? 0 : project.errors.length) + checkProjectIdSuffix(plan.projectIdSuffix).length;
-  return firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
+  const row = firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
+  return row === PROJECT_ROW && projectCount === 0 && plan.services.length > 0 ? serviceRow(0) : row;
 }
 
 const FOCUSABLE = 'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
@@ -109,8 +112,13 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 
   // 고른 줄이 서비스 안이면 그 서비스를 편다(고른 pick 의 서비스는 늘 펴진다) · 칩으로 더한 줄은 잠깐 강조한다
   const sel = parseRow(selected);
-  const selService = sel?.kind === 'service' ? sel.service : sel?.kind === 'pick' ? sel.ref.service : null;
-  const isExpanded = (i: number) => (sel?.kind === 'pick' && selService === i) || (toggled.get(i) ?? selService === i);
+  const selService = sel?.kind === 'service' || sel?.kind === 'card' ? sel.service : sel?.kind === 'pick' ? sel.ref.service : null;
+  const isExpanded = (i: number) => ((sel?.kind === 'pick' || sel?.kind === 'card') && selService === i) || (toggled.get(i) ?? selService === i);
+  // 카드의 부품 줄은 그 카드의 부품을 골랐을 때만 펴진다 (D93) — 카드 줄 하나로 접힌다
+  const ownedBy = sel?.kind === 'pick' && sel.ref.service !== null ? serviceLayout(plan, sel.ref.service).owned.get(sel.ref.pick) : undefined;
+  const cardOpen = (i: number, card: string) => ownedBy === card && selService === i;
+  // 네트워크 pick 줄은 네트워크 줄이나 그 pick 을 골랐을 때만 펴진다 — 「Network · N names」 한 줄로 접힌다
+  const networkOpen = sel?.kind === 'network' || (sel?.kind === 'pick' && sel.ref.service === null && plan.projectPicks[sel.ref.pick]?.preset !== null);
   const prevPlan = useRef(plan);
   useEffect(() => {
     const added = addedRow(prevPlan.current, plan);
@@ -211,6 +219,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   }, []);
 
   const shareText = stateKey ? `${window.location.origin}${WIZARD_PATH}#${HASH_KEY}=${stateKey}` : undefined;
+  // 첫 방문 안내 한 줄 (D93) — 닫으면 이 브라우저에 기억한다(저장소가 막혀 있으면 이 화면에서만 닫힌다)
+  const [introOpen, setIntroOpen] = useState(() => readPref(INTRO_KEY) !== '1');
+  const closeIntro = () => {
+    setIntroOpen(false);
+    writePref(INTRO_KEY, '1');
+  };
+  // 공유 경고 — Share 를 누르면 그 곁(머리 바로 아래)에 보인다. 링크는 암호화가 아니다
+  const [shared, setShared] = useState(false);
 
   // 키보드 — Enter 는 설정 칸 첫 컨트롤로, 설정 칸의 Esc 는 고른 줄로 되돌린다
   const settingsRef = useRef<HTMLElement>(null);
@@ -285,8 +301,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     if (sel.kind === 'network') return <NetworkSettings plan={plan} errors={planErrors} edit={edit} />;
     if (sel.kind === 'extras') return <ExtrasSettings plan={plan} onCustom={() => setCustom(null)} />;
     if (sel.kind === 'service') {
-      return <ServiceSettings index={sel.service} plan={plan} errors={planErrors} contextErrors={serviceErrors[sel.service] ?? []} edit={edit} onCustom={() => setCustom(sel.service)} />;
+      return <ServiceSettings index={sel.service} plan={plan} errors={planErrors} contextErrors={serviceErrors[sel.service] ?? []} edit={edit} onCustom={() => setCustom(sel.service)} onSelect={select} />;
     }
+    if (sel.kind === 'card') return <CardPanel plan={plan} service={sel.service} card={sel.card} result={results?.[0]?.result} edit={edit} onSelect={select} />;
     const pick = sel.ref.service === null ? plan.projectPicks[sel.ref.pick] : plan.services[sel.ref.service]?.picks[sel.ref.pick];
     return pick ? <PickPanel pick={pick} at={sel.ref} errors={planErrors} edit={edit} /> : null;
   })();
@@ -316,18 +333,28 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   return (
     <div className="min-h-screen">
       <AppHeader
-        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} reserveShare
-        share={shareText && <CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} reserveShare shareWarning={false}
+        share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
+        // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
+        badge={(
+          <span data-wizard-cloud title={en.ui.wizard_cloud_label} className="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
+            {en.ui.wizard_cloud}<span className="font-normal text-indigo-700 dark:text-indigo-300"> · {en.ui.wizard_cloud_soon}</span>
+          </span>
+        )}
       />
       {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
       <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
-        <p className="max-w-4xl text-sm text-zinc-700 dark:text-zinc-300">{en.ui.wizard_intro}</p>
+        {introOpen && (
+          <div data-wizard-intro className={`${NOTICE} flex items-start justify-between gap-2`}>
+            <p>{en.ui.wizard_intro}</p>
+            <button type="button" data-intro-close aria-label={en.ui.wizard_intro_close} title={en.ui.wizard_intro_close}
+              className="-my-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:hover:bg-amber-900"
+              onClick={closeIntro}><X aria-hidden="true" className="size-4" /></button>
+          </div>
+        )}
+        {shared && <p data-share-warning role="status" className={NOTICE}>{en.ui.share_warning}</p>}
         {linkedVersion && <p data-rules-mismatch role="status" className={NOTICE}>{fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}</p>}
         {notices.map((t) => <p key={t} data-wizard-notice role="status" className={NOTICE}>{t}</p>)}
-        {/* CSP — GCP 하나만 켜져 있다. 번호 없는 한 줄 · hash 에 provider 키가 없어 이름 · 링크는 같다 (D75) */}
-        <div data-wizard-cloud className={PANEL}>
-          <CloudPicker value="gcp" onPick={() => {}} numbered={false} />
-        </div>
 
         <div data-wizard-layout={layout} className={GRID}>
           {layout === 'phone' && (
@@ -345,7 +372,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           )}
           <nav data-wizard-list-column aria-label={en.ui.wizard_list_label} className={`${COLUMN} p-2`} hidden={layout === 'phone' && view !== 'plan'}
             {...(layout === 'phone' ? { id: 'wizard-panel-plan', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-plan' } : {})}>
-            <WizardList plan={plan} envs={envs} selected={selected} onSelect={select} isExpanded={isExpanded} onExpand={onExpand}
+            <WizardList plan={plan} envs={envs} selected={selected} onSelect={select} isExpanded={isExpanded} onExpand={onExpand} cardOpen={cardOpen} networkOpen={networkOpen}
               result={results?.[0]?.result} errors={planErrors} serviceErrors={serviceErrors} projectCount={projectCount} flash={flash?.path}
               onAddService={() => edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }))}
               onEnter={() => (layout === 'phone' ? openSheet(true) : focusSettings())}

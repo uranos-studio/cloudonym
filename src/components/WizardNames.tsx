@@ -12,7 +12,7 @@ import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTer
 import { toWizardExport, toWizardExportByEnv } from './wizardExport';
 import { namesSummary, withEnv } from './wizardEnvs';
 import { ErrorList } from './WizardSettings';
-import { ENV_NAMES, ICON_BTN, STEP_NUM } from './wizardStyles';
+import { ENV_NAMES, ICON_BTN } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
@@ -38,7 +38,7 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
           칸의 안쪽 여백(p-4)을 음수 여백 · top -1rem 으로 덮어 칸 위 끝에 딱 붙는다(sticky 의 기준은 여백 안쪽이다). 배경이 있어야 아래로 지나가는 카드가 비치지 않는다 */}
       <div data-names-head className="sticky top-12 z-10 md:-top-4 -mx-4 -mt-4 space-y-2 rounded-t-xl border-b border-zinc-200 bg-white px-4 pb-3 pt-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="wizard-names" className="text-base font-semibold"><span aria-hidden="true" className={STEP_NUM}>7</span>{en.ui.wizard_step_names}</h2>
+          <h2 id="wizard-names" className="text-base font-semibold">{en.ui.wizard_step_names}</h2>
           {results && (
             <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
               ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
