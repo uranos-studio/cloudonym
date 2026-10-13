@@ -271,12 +271,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     setView('plan');
     requestAnimationFrame(() => focusRow(selectedRef.current));
   };
-  /** 폰에서 줄을 누르거나 Add service — Edit 탭을 연다. 칸의 맨 위부터 보이게 페이지를 탭 막대까지 올린다 */
+  /** 폰에서 줄을 누르거나 Add service — Edit 탭을 연다. 칸의 맨 위부터 보이게 페이지를 올린다.
+   *  포커스는 칸으로 옮긴다 — 누른 줄은 숨은 Plan 탭에 있어 거기 남으면 Esc 가 닿지 않는다. focusFirst 면 칸의 첫 컨트롤 */
   const openEdit = (focusFirst: boolean) => {
     setView('edit');
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0 });
       if (focusFirst) focusSettings();
+      else settingsRef.current?.focus({ preventScroll: true });
     });
   };
 
@@ -328,7 +330,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 
   const settingsSection = (
     <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} onKeyDown={onSettingsKey} className={COLUMN}
-      {...(layout === 'phone' ? { id: 'wizard-panel-edit', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-edit', hidden: view !== 'edit' } : {})}>
+      {...(layout === 'phone' ? { id: 'wizard-panel-edit', role: 'tabpanel', 'aria-labelledby': 'wizard-tab-edit', hidden: view !== 'edit', tabIndex: -1 } : {})}>
       {settings}
     </section>
   );

@@ -146,7 +146,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
         </label>
         <code data-card-part-name className={`min-w-0 max-w-full truncate font-mono text-xs ${HINT}`} title={n?.names?.first}>{n?.names ? n.names.first : '—'}</code>
         {n && (
-          <button type="button" data-card-part-edit={partKey(p)} aria-label={fillUi(en, 'wizard_card_edit_label', { part: label(p) })} className="inline-flex min-h-8 items-center gap-0.5 rounded px-1 text-xs font-medium text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-indigo-300"
+          <button type="button" data-card-part-edit={partKey(p)} data-edit-path={n.path} aria-label={fillUi(en, 'wizard_card_edit_label', { part: label(p) })} className="inline-flex min-h-8 items-center gap-0.5 rounded px-1 text-xs font-medium text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-indigo-300"
             onClick={() => onSelect(n.path)}>{en.ui.wizard_card_edit}<ChevronRight aria-hidden="true" className="size-3.5" /></button>
         )}
       </li>
