@@ -143,6 +143,20 @@ describe('가족 · 상한 · 지우기 · 선택 (D93)', () => {
     expect(cardBlocked(w, 0, 'static-site', {})).toBe('family');
   });
 
+  it('Custom 으로 더한 같은 규칙과 이름이 겹치면 duplicate — 더하지 않는다(카드는 완성인데 계획이 wizard.duplicate_pick 이 되지 않게)', () => {
+    const custom = { preset: null, ruleId: 'gcp.global_address', instances: [{ id: '1', seq: '01' }] };
+    const svc: WizardPlan = { ...startPlan(), services: [{ ...startPlan().services[0]!, picks: [custom] }] };
+    expect(cardBlocked(svc, 0, 'website', { db: false })).toBe('duplicate');
+    expect(addBundle(svc, 0, 'website', { db: false })).toBe(svc);
+    // 프로젝트 공용 자리도 — Shared extras 의 custom 방화벽 규칙 tier web
+    const fw = { preset: null, ruleId: 'gcp.firewall_rule', tier: 'web', instances: [{ id: '1', seq: '01' }] };
+    const prj: WizardPlan = { ...startPlan(), projectPicks: [...startPlan().projectPicks, fw] };
+    expect(validatePlan(prj)).toEqual({ ok: true });
+    expect(cardBlocked(prj, 0, 'website', { db: false })).toBe('duplicate');
+    // 겹치지 않으면 그대로 더한다
+    expect(cardBlocked(startPlan(), 0, 'website', { db: false })).toBeUndefined();
+  });
+
   it('상한 — 더하면 40 을 넘는 카드는 full 이고 모델을 그대로 돌려준다(일부만 더하지 않는다)', () => {
     let p = startPlan();
     for (let k = 0; k < MAX_PICKS_PER_SERVICE - 5; k++) p = { ...p, services: [{ ...p.services[0]!, picks: [...p.services[0]!.picks, { preset: null, ruleId: 'gcp.pubsub_topic', tier: `t${k}`, instances: [{ id: '1', seq: '01' }] }] }] };

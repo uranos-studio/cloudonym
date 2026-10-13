@@ -5,7 +5,7 @@
 // 가족 밖의 카드(vm-app)는 필수 서비스 부품이 다 있을 때 보인다(web · db 칩만 켠 흔한 서비스에 「미완성 카드」를 띄우지 않는다) — 그때 프로젝트 공용 부품이 빠졌으면 미완성이다.
 // 다만 그 서비스 pick 하나라도 앞의 카드(LB 카드가 먼저)가 차지했으면 보이지 않는다 — 한 pick 은 카드 하나에만 든다.
 // 완성은 필수 부품(서비스 · 프로젝트 공용)이 다 있을 때다
-import { MAX_PICKS_PER_SERVICE, type WizardPlan } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { BUNDLES, bundleById, partIsProject, partKey, type Bundle, type BundleBackend, type BundlePart } from '../core/wizard/bundles';
 import { addPresetPick, findPreset } from './wizardState';
 
@@ -111,9 +111,28 @@ export function partsToAdd(plan: WizardPlan, service: number, id: string, option
   });
 }
 
-/** 카드를 더할 수 없는 까닭 — 같은 가족의 카드가 이미 있다(lb) · 서비스나 프로젝트 공용의 pick 이 상한을 넘는다 ·
+/** 부품을 더하면 생기는 문제 — full: 서비스나 프로젝트 공용의 pick 이 상한(40)을 넘는다 · duplicate: 새 pick 이 이미 있는 pick 과 중복 키(D86)가 같다.
+ *  중복은 엔진(validatePlan)에 묻는다 — has() 는 프리셋 id 만 보므로 Custom 으로 더한 같은 규칙(gcp.global_address 등)을 모른다. 문제가 없으면 undefined */
+export function addProblem(plan: WizardPlan, service: number, parts: readonly BundlePart[]): 'full' | 'duplicate' | undefined {
+  const svcLen = plan.services[service]?.picks.length ?? 0;
+  const prjLen = plan.projectPicks.length;
+  if (svcLen + parts.filter((p) => !partIsProject(p)).length > MAX_PICKS_PER_SERVICE || prjLen + parts.filter(partIsProject).length > MAX_PICKS_PER_SERVICE) return 'full';
+  if (parts.length === 0) return undefined;
+  const check = validatePlan(applyParts(plan, service, parts));
+  if (check.ok) return undefined;
+  // 새로 붙은 pick 자리에 걸린 중복만 센다 — 원래 있던 오류는 이 동작의 탓이 아니다
+  const fresh = (path: string | undefined): boolean => {
+    const s = /^services\[(\d+)\]\.picks\[(\d+)\]$/.exec(path ?? '');
+    if (s) return Number(s[1]) === service && Number(s[2]) >= svcLen;
+    const p = /^projectPicks\[(\d+)\]$/.exec(path ?? '');
+    return p !== null && Number(p[1]) >= prjLen;
+  };
+  return check.errors.some((e) => e.code === 'wizard.duplicate_pick' && fresh(e.path)) ? 'duplicate' : undefined;
+}
+
+/** 카드를 더할 수 없는 까닭 — 같은 가족의 카드가 이미 있다(lb) · 상한을 넘는다(full) · 이미 있는 pick 과 이름이 겹친다(duplicate) ·
  *  더해도 그 카드로 되읽히지 않는다(overlap — 그 서비스 pick 을 다른 카드가 이미 차지했다). 더할 수 있으면 undefined */
-export function cardBlocked(plan: WizardPlan, service: number, id: string, options: Readonly<Record<string, boolean>>): 'family' | 'full' | 'overlap' | 'present' | undefined {
+export function cardBlocked(plan: WizardPlan, service: number, id: string, options: Readonly<Record<string, boolean>>): 'family' | 'full' | 'duplicate' | 'overlap' | 'present' | undefined {
   const b = bundleById(id);
   if (!b || !plan.services[service]) return 'present';
   const cards = cardsIn(plan, service);
@@ -121,9 +140,8 @@ export function cardBlocked(plan: WizardPlan, service: number, id: string, optio
   // 백엔드가 없는 https-lb 는 막지 않는다 — 그 안내가 「백엔드를 더하라」이고, 백엔드를 더해 줄 카드가 website · serverless-web · static-site 다
   if (b.family !== undefined && cards.some((c) => c.bundle.family === b.family && c.bundle.id !== id && !c.noBackend)) return 'family';
   const add = partsToAdd(plan, service, id, options);
-  const svc = add.filter((p) => !partIsProject(p)).length;
-  const prj = add.filter(partIsProject).length;
-  if (plan.services[service]!.picks.length + svc > MAX_PICKS_PER_SERVICE || plan.projectPicks.length + prj > MAX_PICKS_PER_SERVICE) return 'full';
+  const problem = addProblem(plan, service, add);
+  if (problem !== undefined) return problem;
   // 더한 뒤에도 카드 줄이 없으면 부품만 흩어진다 — 단추를 끄고 까닭을 보인다. LB 카드는 같은 가족의 카드로 되읽히면 된다(https-lb + web → website)
   if (!cardsIn(applyParts(plan, service, add), service).some((c) => c.bundle.id === id || (b.family !== undefined && c.bundle.family === b.family))) return 'overlap';
   return undefined;
