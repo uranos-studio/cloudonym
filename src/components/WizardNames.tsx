@@ -54,7 +54,6 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
         </div>
         {ok && <ExportButtons plan={plan} results={results} projectContext={projectContext} />}
       </div>
-      <p data-pass-meaning className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{en.ui.pass_meaning}</p>
       {!results && (
         <p role="status" data-names-empty className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
           {empty ? en.ui.wizard_names_empty : en.ui.wizard_fix_errors}
@@ -62,6 +61,8 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
       )}
       <ErrorList errors={wide} />
       {ok && <ResultList plan={plan} results={results} projectNames={projectNames} />}
+      {/* PASS 의 뜻 — 이름 목록 아래(D93). 이름이 먼저 보인다 */}
+      <p data-pass-meaning className="border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">{en.ui.pass_meaning}</p>
     </section>
   );
 }
@@ -132,11 +133,11 @@ function EnvNames({ plan, result, scope, projectName }: { plan: WizardPlan; resu
           <h3 data-scope-path className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
             {g.ns === 'project' ? en.ui.wizard_group_project : fillUi(en, 'wizard_group_service', { name: serviceName(g.ns) })}
           </h3>
-          <div className="space-y-2">
+          <div>
             {g.ns === 'project' && projectName && <ProjectNameCard name={projectName} />}
             {g.items.map((r) => (
               <Indented key={r.key} child={r.parent !== undefined}>
-                <ResultCard result={r} parentName={r.parent === undefined ? undefined : byKey.get(r.parent)?.name} {...(scope === undefined ? {} : { scope })} />
+                <ResultCard compact result={r} parentName={r.parent === undefined ? undefined : byKey.get(r.parent)?.name} {...(scope === undefined ? {} : { scope })} />
               </Indented>
             ))}
           </div>

@@ -66,7 +66,7 @@ export const UI_KEYS = [
   'copy_names_json_label', 'copy_names_json_blocked_label', 'conflict_prefix',
   // ResultCard
   'copy_name_label', 'copy_invalid_label', 'shortened', 'transformed', 'originally_chars', 'length_range',
-  'generation_charset', 'official_doc', 'validation',
+  'generation_charset', 'official_doc', 'rule_details', 'rule_details_label', 'validation',
   // LabelsPanel
   'copy_tags_json_label', 'copy_tags_json_blocked_label', 'copy_terraform_label', 'tags_json_blocked',
   'label_transformed_prefix', 'label_violation_prefix',

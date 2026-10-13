@@ -362,6 +362,8 @@ export const en: Catalog = {
     originally_chars: '(originally {n} characters)',
     length_range: 'Length {min}–{max}',
     generation_charset: 'Generation charset',
+    rule_details: 'Rule',
+    rule_details_label: 'Show the rule for {displayName}',
     official_doc: 'Official doc',
     validation: 'Validation',
     copy_tags_json_label: 'Copy tags JSON',

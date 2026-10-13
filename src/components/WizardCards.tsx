@@ -42,6 +42,11 @@ function tags(b: Bundle): string[] {
   ];
 }
 
+/** 카드 자체의 이름 수 — 필수 부품(백엔드를 고르는 카드는 백엔드 없이) + 기본으로 켜진 선택. 같은 부품은 한 번 */
+function cardSize(b: Bundle): number {
+  return new Set([...b.parts, ...b.options.filter((o) => o.on).flatMap((o) => o.parts)].map((p) => `${partIsProject(p)}|${partKey(p)}`)).size;
+}
+
 /** 갤러리 — 서비스 칸 위쪽. 카드마다 선택 체크 상자와 Add. 이미 있는 카드는 Open, 같은 가족이 있으면 꺼진다 */
 export function CardGallery({ plan, service, edit, onSelect }: { plan: WizardPlan; service: number; edit: Edit; onSelect: (path: RowPath) => void }) {
   const name = plan.services[service]?.purpose || en.ui.wizard_unnamed_service;
@@ -71,7 +76,8 @@ function GalleryCard({ plan, service, bundle: b, edit, onSelect }: { plan: Wizar
     <div role="group" aria-labelledby={titleId} data-card={b.id} data-card-present={present ? (present.complete ? 'complete' : 'incomplete') : undefined} className={CARD}>
       <div className="flex items-start justify-between gap-2">
         <h4 id={titleId} className="text-base font-semibold">{b.label}</h4>
-        <span data-card-names className={`shrink-0 ${TAG}`}>{fillUi(en, 'wizard_card_names', { n: present?.complete ? B.requiredParts(plan, service, b).length : adds })}</span>
+        {/* 이름 수 — 지금 더할 수 있으면 Add 가 더할 수(이미 있는 부품은 빼고), 아니면 카드 자체의 수(필수 + 기본 선택) */}
+        <span data-card-names className={`shrink-0 ${TAG}`}>{fillUi(en, 'wizard_card_names', { n: present || blocked !== undefined ? cardSize(b) : adds })}</span>
       </div>
       <p className="text-sm text-zinc-700 dark:text-zinc-300">{b.summary}</p>
       <ul className="flex flex-wrap gap-1" aria-label={en.ui.wizard_card_parts}>

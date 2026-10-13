@@ -113,3 +113,26 @@ describe('ResultCard — 버킷 「Check」 (D83)', () => {
     expect(scoped).toMatch(/id="card-gcp-storage_bucket-stg\//);
   });
 });
+
+describe('ResultCard compact (D93 — 마법사 이름 칸)', () => {
+  const vm = generateMany(ctx, 'gcp', [{ rule: getRule('gcp', 'compute_instance')!, count: 1 }]).items[0]!;
+  const compact = (r: NameResult | NameItem) => renderToStaticMarkup(createElement(ResultCard, { result: r, compact: true }));
+  it('같은 data-key · 제목 · 이름 · 복사 — 규칙(길이 · 공식 문서 · 정규식)은 접힌 칸(details) 안', () => {
+    const m = compact(vm);
+    expect(m).toMatch(/data-compact="(?:true|)"/);
+    expect(m).toContain(`data-key="${vm.key}"`);
+    expect(title(m)).toBe('VM Instance · 01');
+    expect(m).toMatch(/<button[^>]*data-rule-toggle[^>]*aria-expanded="false"/);
+    expect(m).toMatch(/<div[^>]*data-rule-details="[^"]*"[^>]*hidden=""[^>]*>[\s\S]*Official doc/);
+    expect(copyDisabled(m)).toBe(false);
+  });
+  it('무효 이름 — 위반은 접히지 않고 보이고 복사는 꺼진다', () => {
+    const bad = generate(ctx, ['gcp']).gcp!.resource_policy!; // name.kind_required FAIL
+    expect(bad.valid).toBe(false);
+    const m = compact(bad);
+    const details = m.indexOf('data-rule-details');
+    expect(m.indexOf('data-violations')).toBeGreaterThan(-1);
+    expect(m.indexOf('data-violations')).toBeLessThan(details);
+    expect(copyDisabled(m)).toBe(true);
+  });
+});
