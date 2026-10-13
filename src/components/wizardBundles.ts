@@ -116,7 +116,8 @@ export function cardBlocked(plan: WizardPlan, service: number, id: string, optio
   if (!b || !plan.services[service]) return 'present';
   const cards = cardsIn(plan, service);
   if (cards.some((c) => c.bundle.id === id && c.complete)) return 'present';
-  if (b.family !== undefined && cards.some((c) => c.bundle.family === b.family && c.bundle.id !== id)) return 'family';
+  // 백엔드가 없는 https-lb 는 막지 않는다 — 그 안내가 「백엔드를 더하라」이고, 백엔드를 더해 줄 카드가 website · serverless-web · static-site 다
+  if (b.family !== undefined && cards.some((c) => c.bundle.family === b.family && c.bundle.id !== id && !c.noBackend)) return 'family';
   const add = partsToAdd(plan, service, id, options);
   const svc = add.filter((p) => !partIsProject(p)).length;
   const prj = add.filter(partIsProject).length;

@@ -118,6 +118,18 @@ describe('가족 · 상한 · 지우기 · 선택 (D93)', () => {
     expect(validatePlan(p)).toEqual({ ok: true });
   });
 
+  it('백엔드 없는 https-lb 는 다른 LB 카드를 막지 않는다 — 안내(백엔드를 더하라)대로 website · serverless-web · static-site 가 백엔드를 채운다', () => {
+    const none = addBundle(startPlan(), 0, 'https-lb');
+    for (const id of ['website', 'serverless-web', 'static-site']) expect(cardBlocked(none, 0, id, {})).toBeUndefined();
+    const w = addBundle(none, 0, 'website', { db: false });
+    expect(ids(w, 0)).toEqual([['website', true]]);
+    expect(validatePlan(w)).toEqual({ ok: true });
+    expect(ids(addBundle(none, 0, 'serverless-web'), 0)).toEqual([['serverless-web', true]]);
+    expect(ids(addBundle(none, 0, 'static-site'), 0)).toEqual([['static-site', true]]);
+    // 백엔드가 있는 LB 카드는 그대로 막는다
+    expect(cardBlocked(w, 0, 'static-site', {})).toBe('family');
+  });
+
   it('상한 — 더하면 40 을 넘는 카드는 full 이고 모델을 그대로 돌려준다(일부만 더하지 않는다)', () => {
     let p = startPlan();
     for (let k = 0; k < MAX_PICKS_PER_SERVICE - 5; k++) p = { ...p, services: [{ ...p.services[0]!, picks: [...p.services[0]!.picks, { preset: null, ruleId: 'gcp.pubsub_topic', tier: `t${k}`, instances: [{ id: '1', seq: '01' }] }] }] };
