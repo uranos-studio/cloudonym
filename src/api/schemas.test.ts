@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, toWirePath, UI_COPY_TARGETS } from './schemas';
 import { WIZARD_WIRE_SAMPLE } from './test-support';
-import { validatePlan } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, validatePlan } from '../core/wizard/plan';
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -294,11 +294,12 @@ describe('parseWizardBody (D66) — 모양은 API 가, 마법사 검사는 core 
   });
 
   it('pick 상한 — 서비스는 field services[0] · 프로젝트 공용은 project_picks', () => {
-    const picks = Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
+    const picks = Array.from({ length: MAX_PICKS_PER_SERVICE + 1 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
+    expect(MAX_PICKS_PER_SERVICE).toBe(40);
     expect(errorsOf({ ...W, project_picks: [], services: [{ purpose: 'shop', picks }] }))
-      .toContainEqual({ code: 'wizard.too_many_picks', field: 'services[0]', params: { index: 0, max: 20, actual: 21 } });
+      .toContainEqual({ code: 'wizard.too_many_picks', field: 'services[0]', params: { index: 0, max: 40, actual: 41 } });
     expect(errorsOf({ ...W, project_picks: picks, services: [] }))
-      .toContainEqual({ code: 'wizard.too_many_picks', field: 'project_picks', params: { index: -1, max: 20, actual: 21 } });
+      .toContainEqual({ code: 'wizard.too_many_picks', field: 'project_picks', params: { index: -1, max: 40, actual: 41 } });
   });
 
   it('위치 오류 — field 는 toWirePath(모델 경로) · 프로젝트 공용 딸린 것의 두 표기', () => {

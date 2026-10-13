@@ -15,7 +15,7 @@ import { PRESETS, presetOf, type Preset } from './presets';
 
 /** 서비스 수 · 한 서비스(또는 프로젝트 공용)의 pick 수 상한 — hash 길이 상한식이 쓴다 */
 export const MAX_SERVICES = 20;
-export const MAX_PICKS_PER_SERVICE = 20;
+export const MAX_PICKS_PER_SERVICE = 40;
 /** 슬롯 id — 소문자 · 숫자 1~8자 · 한 pick 안에서 고유. hash 가 슬롯을 이 값으로 든다 */
 export const MAX_SLOT_ID_CHARS = 8;
 export const SLOT_ID_PATTERN = /^[a-z0-9]{1,8}$/;

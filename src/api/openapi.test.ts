@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
 import { req, jsonPost, json, collectSamples, WIZARD_WIRE_SAMPLE, type Sample } from './test-support';
-import { MAX_SERVICES } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
 import { PRESETS } from '../core/wizard/presets';
 import { VERSION } from '../version';
 import { en } from '../messages/en';
@@ -187,6 +187,8 @@ describe('public/openapi.json — /wizard (D66)', () => {
     for (const f of ['owner', 'system']) expect(project.properties![f]!.maxLength, f).toBe(MAX_CONTEXT_CHARS);
     for (const f of ['env', 'region']) expect(project.properties![f]!.maxLength, f).toBe(1024);
     expect(r.properties['services']!.maxItems).toBe(MAX_SERVICES);
+    expect(r.properties['project_picks']!.maxItems).toBe(MAX_PICKS_PER_SERVICE);
+    expect((r.properties['services']!.items!.properties!['picks'] as Schema & { maxItems?: number }).maxItems).toBe(MAX_PICKS_PER_SERVICE);
     expect(r.properties['services']!.items!.properties!['purpose']!.maxLength).toBe(MAX_CONTEXT_CHARS);
     expect(r.properties['project_picks']!.items!.$ref).toBe('#/components/schemas/WizardPick');
     const pick = schemas['WizardPick']!.properties!;

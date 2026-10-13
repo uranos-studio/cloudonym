@@ -1942,8 +1942,8 @@
           },
           "project_picks": {
             "type": "array",
-            "maxItems": 20,
-            "description": "Project-level resources (no purpose in the name): rules placed in the project, its global or regional scope, such as vpc, subnet and firewall. At most 20",
+            "maxItems": 40,
+            "description": "Project-level resources (no purpose in the name): rules placed in the project, its global or regional scope, such as vpc, subnet and firewall. At most 40",
             "items": {
               "$ref": "#/components/schemas/WizardPick"
             }
@@ -1967,8 +1967,8 @@
                 },
                 "picks": {
                   "type": "array",
-                  "maxItems": 20,
-                  "description": "At most 20 picks per service",
+                  "maxItems": 40,
+                  "description": "At most 40 picks per service",
                   "items": {
                     "$ref": "#/components/schemas/WizardPick"
                   }

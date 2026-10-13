@@ -533,7 +533,7 @@ describe('POST /v1/wizard (D66)', () => {
     }
     expect((await bad({ preset: 'web', instances: [{ id: 'a', seq: '01', attach: { data: ['00'] } }] })).map((e) => [e.code, e.field]))
       .toEqual([['wizard.invalid_data_seq', 'services[0].picks[0].instances[0].attach.data[0]']]);
-    const picks = Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
+    const picks = Array.from({ length: 41 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] }));
     const { res } = await wizard({ ...W, project_picks: picks, services: [] });
     const tooMany = ((await json(res)).errors as Loose[]).find((e) => e.code === 'wizard.too_many_picks');
     expect(tooMany.field).toBe('project_picks');
