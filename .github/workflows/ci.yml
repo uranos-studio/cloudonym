@@ -6,6 +6,8 @@ on:
     # 태그 push 는 deploy.yml 이 같은 검사를 돌리므로 여기서는 브랜치만 받는다
     branches: ['**']
   pull_request:
+  # 손으로도 돌릴 수 있다 — push 가 실행을 만들지 않는지 확인할 때 쓴다
+  workflow_dispatch:
 
 permissions:
   contents: read
