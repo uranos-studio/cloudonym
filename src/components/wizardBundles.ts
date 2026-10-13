@@ -3,6 +3,7 @@
 // 되읽기 규칙 — 가족 lb 의 카드는 서비스에 앞쪽(url · thps · fwd) 중 하나와 그 카드의 백엔드(web · run · object)가 있을 때 후보이고(https-lb 는 늘 후보),
 // 후보 가운데 빠진 부품이 가장 적은 카드 하나(동률은 표 순서)를 보인다.
 // 가족 밖의 카드(vm-app)는 필수 서비스 부품이 다 있을 때 보인다(web · db 칩만 켠 흔한 서비스에 「미완성 카드」를 띄우지 않는다) — 그때 프로젝트 공용 부품이 빠졌으면 미완성이다.
+// 다만 그 서비스 pick 하나라도 앞의 카드(LB 카드가 먼저)가 차지했으면 보이지 않는다 — 한 pick 은 카드 하나에만 든다.
 // 완성은 필수 부품(서비스 · 프로젝트 공용)이 다 있을 때다
 import { MAX_PICKS_PER_SERVICE, type WizardPlan } from '../core/wizard/plan';
 import { BUNDLES, bundleById, partIsProject, partKey, type Bundle, type BundleBackend, type BundlePart } from '../core/wizard/bundles';
@@ -68,9 +69,14 @@ export function cardsIn(plan: WizardPlan, service: number): CardMatch[] {
     }
     if (best) out.push(best);
   }
+  // 다른 카드가 이미 차지한 서비스 pick 이 든 카드는 후보가 아니다 — LB 카드가 먼저, 나머지는 표 순서로 차지한다.
+  // website + 선택 was · db 에 vm-app 이 함께 뜨면 그 Remove 가 web 은 남기고 Website 의 선택(was · db)을 지운다
+  const taken = new Set(out.flatMap((m) => m.picks));
   for (const b of BUNDLES.filter((x) => x.family === undefined)) {
     const m = matchOf(plan, service, b);
-    if (m.missing.every(partIsProject)) out.push(m);
+    if (!m.missing.every(partIsProject) || m.picks.some((j) => taken.has(j))) continue;
+    out.push(m);
+    for (const j of m.picks) taken.add(j);
   }
   return out.sort((a, b) => BUNDLES.indexOf(a.bundle) - BUNDLES.indexOf(b.bundle));
 }
@@ -103,8 +109,9 @@ export function partsToAdd(plan: WizardPlan, service: number, id: string, option
   });
 }
 
-/** 카드를 더할 수 없는 까닭 — 같은 가족의 카드가 이미 있다(lb) · 서비스나 프로젝트 공용의 pick 이 상한을 넘는다. 더할 수 있으면 undefined */
-export function cardBlocked(plan: WizardPlan, service: number, id: string, options: Readonly<Record<string, boolean>>): 'family' | 'full' | 'present' | undefined {
+/** 카드를 더할 수 없는 까닭 — 같은 가족의 카드가 이미 있다(lb) · 서비스나 프로젝트 공용의 pick 이 상한을 넘는다 ·
+ *  더해도 그 카드로 되읽히지 않는다(overlap — 그 서비스 pick 을 다른 카드가 이미 차지했다). 더할 수 있으면 undefined */
+export function cardBlocked(plan: WizardPlan, service: number, id: string, options: Readonly<Record<string, boolean>>): 'family' | 'full' | 'overlap' | 'present' | undefined {
   const b = bundleById(id);
   if (!b || !plan.services[service]) return 'present';
   const cards = cardsIn(plan, service);
@@ -114,7 +121,13 @@ export function cardBlocked(plan: WizardPlan, service: number, id: string, optio
   const svc = add.filter((p) => !partIsProject(p)).length;
   const prj = add.filter(partIsProject).length;
   if (plan.services[service]!.picks.length + svc > MAX_PICKS_PER_SERVICE || plan.projectPicks.length + prj > MAX_PICKS_PER_SERVICE) return 'full';
+  // 더한 뒤에도 카드 줄이 없으면 부품만 흩어진다 — 단추를 끄고 까닭을 보인다. LB 카드는 같은 가족의 카드로 되읽히면 된다(https-lb + web → website)
+  if (!cardsIn(applyParts(plan, service, add), service).some((c) => c.bundle.id === id || (b.family !== undefined && c.bundle.family === b.family))) return 'overlap';
   return undefined;
+}
+
+function applyParts(plan: WizardPlan, service: number, parts: readonly BundlePart[]): WizardPlan {
+  return parts.reduce((p, part) => addPresetPick(p, partIsProject(part) ? null : service, part.preset, part.tier), plan);
 }
 
 /** 카드를 더한다 (D93) — 부품마다 addPresetPick(칩과 같은 pick) · 이미 있는 것은 건너뛴다 · 프로젝트 공용 부품(방화벽 · PSA)은 projectPicks 로.
@@ -122,7 +135,7 @@ export function cardBlocked(plan: WizardPlan, service: number, id: string, optio
 export function addBundle(plan: WizardPlan, service: number, id: string, options: Readonly<Record<string, boolean>> = {}): WizardPlan {
   // 미완성 카드를 채우는 것(빠진 부품 더하기)도 같은 함수다 — 같은 카드는 가족 검사에 걸리지 않는다
   if (cardBlocked(plan, service, id, options) !== undefined) return plan;
-  return partsToAdd(plan, service, id, options).reduce((p, part) => addPresetPick(p, partIsProject(part) ? null : service, part.preset, part.tier), plan);
+  return applyParts(plan, service, partsToAdd(plan, service, id, options));
 }
 
 /** 카드를 지운다 — 그 카드가 차지한 서비스 pick 만(선택 부품 · 다른 카드가 차지한 pick · 프로젝트 공용 부품은 남긴다 — 방화벽은 다른 서비스가 쓸 수 있다) */

@@ -71,7 +71,7 @@ function GalleryCard({ plan, service, bundle: b, edit, onSelect }: { plan: Wizar
   const svcName = plan.services[service]?.purpose || en.ui.wizard_unnamed_service;
   const titleId = `wizard-card-${service}-${b.id}`;
   const reasonId = `${titleId}-reason`;
-  const reason = blocked === 'family' ? en.ui.wizard_card_family : blocked === 'full' ? fillUi(en, 'wizard_card_full', { max: MAX_PICKS_PER_SERVICE }) : undefined;
+  const reason = blocked === 'family' ? en.ui.wizard_card_family : blocked === 'overlap' ? en.ui.wizard_card_overlap : blocked === 'full' ? fillUi(en, 'wizard_card_full', { max: MAX_PICKS_PER_SERVICE }) : undefined;
   return (
     <div role="group" aria-labelledby={titleId} data-card={b.id} data-card-present={present ? (present.complete ? 'complete' : 'incomplete') : undefined} className={CARD}>
       <div className="flex items-start justify-between gap-2">

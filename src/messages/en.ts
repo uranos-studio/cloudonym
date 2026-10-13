@@ -496,6 +496,7 @@ export const en: Catalog = {
     wizard_card_tested: 'Built and tested on Google Cloud',
     wizard_card_untested: 'Rules verified · not yet applied',
     wizard_card_family: 'This service already has a load balancer. Add another service for a second one.',
+    wizard_card_overlap: 'Its servers already belong to another card in this service. Add another service for this card.',
     wizard_card_full: 'Up to {max} resources per service and {max} project resources — remove some to add this card.',
     wizard_card_complete: 'complete · {have} of {all} parts',
     wizard_card_incomplete: 'incomplete · {have} of {all} parts',

@@ -87,12 +87,20 @@ describe('되읽기 · 미완성 (D93)', () => {
     expect(cardsIn(vm, 0).map((m) => [m.bundle.id, m.complete, m.missing.length])).toEqual([['vm-app', false, 4]]);
   });
 
-  it('website + 선택 was 를 켜도 vm-app 은 방화벽이 없으면 미완성으로만 함께 보인다 · 카드가 차지한 pick 은 앞 카드 아래에', () => {
+  it('다른 카드가 차지한 pick 이 든 카드는 보이지 않는다 — website + 선택 was · db 에 vm-app 이 뜨지 않아, 그 Remove 가 Website 의 선택을 지우지 않는다', () => {
     const p = addBundle(startPlan(), 0, 'website', { db: true, was: true });
-    expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete])).toEqual([['website', true], ['vm-app', false]]);
+    expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete])).toEqual([['website', true]]);
     const { owned, loose } = serviceLayout(p, 0);
-    expect(owned.get(0)).toBe('website'); // web 은 website 가 먼저 차지한다
-    expect(loose).toEqual([]);
+    expect(owned.get(0)).toBe('website');
+    expect(loose).toEqual([12, 13]); // db · was — 선택 부품은 카드 밖 줄
+    expect(removeBundle(p, 0, 'vm-app')).toEqual(p); // 보이지 않는 카드는 지울 것이 없다
+    expect(optionOn(p, 0, bundleById('website')!.options[0]!.parts)).toBe(true);
+    // vm-app 을 먼저 더하고 website 를 더해도 web 은 website(LB 카드)가 차지한다 — vm-app 의 나머지는 카드 밖 줄
+    const both = addBundle(addBundle(startPlan(), 0, 'vm-app'), 0, 'website', { db: false });
+    expect(ids(both, 0)).toEqual([['website', true]]);
+    // 갤러리 — 더해도 vm-app 으로 되읽히지 않으니 단추가 꺼진다(부품만 흩어 놓지 않는다)
+    expect(cardBlocked(p, 0, 'vm-app', {})).toBe('overlap');
+    expect(addBundle(p, 0, 'vm-app')).toBe(p);
   });
 });
 
