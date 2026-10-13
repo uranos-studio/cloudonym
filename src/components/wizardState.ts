@@ -30,16 +30,19 @@ export interface PickRef { service: number | null; pick: number }
 /** 마법사 ① 예시 넷 — 트리 화면의 예시(DEFAULT_FORM)와 같은 값 · 첫 서비스 이름 예시 */
 export const DEFAULT_PROJECT: WizardPlan['project'] = { owner: 'platform', system: 'billing', env: 'prod', region: EXAMPLE_REGION };
 export const EXAMPLE_SERVICE = 'shop';
+/** 처음 온 사람의 프로젝트 값 (D97) — 넷 다 비어 있다. 예시(DEFAULT_PROJECT)는 입력 칸의 placeholder 로만 보인다 */
+export const EMPTY_PROJECT: WizardPlan['project'] = { owner: '', system: '', env: '', region: '' };
 
 /** 첫 화면 — 서비스 하나(이름 예시) · 고른 것 없음. 칩을 켜기 전에는 이름이 하나도 나오지 않는다(숨은 기본값 없음) */
 export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT): WizardPlan {
   return { provider: 'gcp', project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
 }
 
-/** 첫 화면 (D90) — hash 가 없을 때만. initialPlan 위에 네트워크 넷(VPC · 서브넷(PRIVATE) · Cloud Router · Cloud NAT, 각 01)을 얹는다.
- *  화면 초기값일 뿐이다 — expandPlan · API 에 숨은 기본값이 생기지 않고, 링크는 pick 넷을 그대로 싣는다. 링크에서 연 계획(깨진 링크 포함)은 initialPlan 을 쓴다 */
-export function startPlan(): WizardPlan {
-  return ['vpc', 'subnet', 'router', 'nat'].reduce((p, id) => addPresetPick(p, null, id), initialPlan());
+/** 첫 화면 (D90 · D97) — hash 가 없을 때만. 프로젝트 값은 비어 있고(D97 — Project 부터 채운다), initialPlan 위에 네트워크 넷(VPC · 서브넷(PRIVATE) · Cloud Router · Cloud NAT, 각 01)을 얹는다.
+ *  화면 초기값일 뿐이다 — expandPlan · API 에 숨은 기본값이 생기지 않고, 링크는 pick 넷을 그대로 싣는다. 링크에서 연 계획(깨진 링크 포함)은 initialPlan 을 쓴다.
+ *  project 를 주면 그 값으로 시작한다 — 시험이 예시 값(DEFAULT_PROJECT)으로 이름을 볼 때 쓴다 */
+export function startPlan(project: WizardPlan['project'] = EMPTY_PROJECT): WizardPlan {
+  return ['vpc', 'subnet', 'router', 'nat'].reduce((p, id) => addPresetPick(p, null, id), initialPlan(project));
 }
 
 /** 「Clear network」 (D90) — ② 네트워크의 프리셋 pick 을 전부 뗀다. Shared extras(custom pick)는 남긴다 */

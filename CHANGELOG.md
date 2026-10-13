@@ -2,6 +2,13 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Changed
+
+- **Wizard first visit starts with the project values** (D97) — opening `/` with no link now starts with empty owner, system, environment and region; the example values are input placeholders only, and the network prefill (D90) is unchanged. The Project row is selected first (on a phone, the Edit tab), untouched empty fields show no errors, the Names column asks for the project values and offers no Copy all, JSON or Terraform until they are valid, and a **Next: what are you building** button then opens the first service's cards. No hash is written until the project values are valid. Links open exactly as before. Screen only: rules revision `2026-10-13.3`, `POST /v1/wizard` and `/v1/generate` are unchanged.
+- **Intro and tagline** (D97) — the intro is a neutral note saying what Cloudonym does, what you get, what it does not do and the order of the steps, with a Naming guide link; the share-link warning appears only when Share is pressed. The header tagline names Google Cloud only (the badge beside it says AWS and Azure are coming); the page description says AWS and Azure come later. The intro's dismiss key is now `cloudonym:intro_dismissed_v2`, so a browser that closed the earlier note sees the new intro once.
+
 ## [0.1.0] - 2026-10-13
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".

@@ -28,7 +28,7 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
     expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
   });
   it('첫 화면에 서비스 칩을 전부 켜도(로드 밸런서 열하나 포함 · pick 상한 안) 이름은 전부 유효하고 축소되는 이름이 없다 (D91)', () => {
-    const plan = SERVICE_PRESETS.reduce((p, x) => togglePreset(p, 0, x.id), startPlan());
+    const plan = SERVICE_PRESETS.reduce((p, x) => togglePreset(p, 0, x.id), startPlan(DEFAULT_PROJECT));
     expect(plan.services[0]!.picks.length).toBe(SERVICE_PRESETS.length);
     expect(SERVICE_PRESETS.length).toBeGreaterThan(20);
     expect(SERVICE_PRESETS.length).toBeLessThanOrEqual(MAX_PICKS_PER_SERVICE);

@@ -19,7 +19,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('localPrefs', () => {
   it('키 이름 — 앱 머리말(cloudonym:)을 단다', () => {
-    expect([INTRO_KEY, THEME_KEY]).toEqual(['cloudonym:intro_dismissed', 'cloudonym:theme']);
+    expect([INTRO_KEY, THEME_KEY]).toEqual(['cloudonym:intro_dismissed_v2', 'cloudonym:theme']);
   });
   it('읽고 쓰고 지운다', () => {
     const f = fakeStorage(false);

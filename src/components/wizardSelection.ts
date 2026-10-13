@@ -2,11 +2,11 @@
 // 선택 식별자는 경로 문자열이다: project · network · extras · services[i] · services[i].picks[j] · projectPicks[k] (= pickPath).
 // Pick 에 id 를 더하지 않는다 — 더하면 hash v4 와 /v1/wizard 모양이 바뀐다.
 // 기존 selection.ts 는 트리 화면 것이라 이름을 피했다
-import { DEFAULT_ROLE, serviceNamespace, type ProjectResult } from '../core/engine';
+import { DEFAULT_ROLE, parseContext, parseProjectContext, serviceNamespace, type ProjectResult } from '../core/engine';
 import { kindToken } from '../core/catalog';
 import { inputKind } from '../core/tree';
 import { presetOf } from '../core/wizard/presets';
-import type { PlanError, WizardPlan } from '../core/wizard/plan';
+import { checkProjectIdSuffix, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { CoreMessage } from '../core/types';
 import { errorsAt, errorsUnder, pickPath, pickRule, pickTitle, projectPickIndexes, type PickRef } from './wizardState';
 import { cardIn, serviceLayout } from './wizardBundles';
@@ -265,4 +265,21 @@ export function rowTitle(plan: WizardPlan, path: RowPath): string {
   if (r.kind === 'card') return bundleById(r.card)?.label ?? r.card;
   const pick = r.ref.service === null ? plan.projectPicks[r.ref.pick] : plan.services[r.ref.service]?.picks[r.ref.pick];
   return pick ? pickTitle(pick).title : en.ui.wizard_step_project;
+}
+
+/** 서비스 문맥(넷 + purpose) 오류 — validatePlan 이 지난 뒤에도 서비스 이름이 문맥으로 풀리는지 */
+export function serviceErrorsOf(plan: WizardPlan): CoreMessage[][] {
+  return plan.services.map((s) => {
+    const r = parseContext({ ...plan.project, purpose: s.purpose }, 'gcp');
+    return r.ok ? [] : r.errors.filter((e) => 'field' in e && e.field === 'purpose');
+  });
+}
+
+/** 첫 선택 — 오류가 있는 첫 줄, 없으면 첫 서비스 (D93 — 갤러리 「무엇을 만드나」). 프로젝트 값이 비었거나 틀리면 project (D97 — 처음 온 사람은 Project 부터) */
+export function firstSelection(plan: WizardPlan): RowPath {
+  const check = validatePlan(plan);
+  const project = parseProjectContext(plan.project, 'gcp');
+  const projectCount = (project.ok ? 0 : project.errors.length) + checkProjectIdSuffix(plan.projectIdSuffix).length;
+  const row = firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
+  return row === PROJECT_ROW && projectCount === 0 && plan.services.length > 0 ? serviceRow(0) : row;
 }

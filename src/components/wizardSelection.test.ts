@@ -1,14 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { addedRow, expandedAfterRemove, firstErrorRow, rowTitle, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
-import { addCustom, addPresetPick, addService, clearNetwork, duplicatePick, initialPlan, removePick, removeService, renameService, setPickField, startPlan, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS } from './wizardState';
+import { addedRow, expandedAfterRemove, firstErrorRow, firstSelection, rowTitle, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
+import { addCustom, addPresetPick, addService, clearNetwork, DEFAULT_PROJECT, duplicatePick, EMPTY_PROJECT, initialPlan, removePick, removeService, renameService, setPickField, startPlan, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS } from './wizardState';
 import { expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
-import { generateProject } from '../core/engine';
+import { generateProject, parseProjectContext } from '../core/engine';
+import { decodeWizardState, encodeWizardState, HASH_KEY } from './urlState';
+import { RULES_REVISION } from '../core/revision';
 import { presetOf } from '../core/wizard/presets';
 
 const result = (plan: WizardPlan) => generateProject(expandPlan(plan), 'gcp');
 /** 서비스 shop · pay 와 네트워크 넷 · extras 하나 */
 function sample(): WizardPlan {
-  let p = startPlan();
+  let p = startPlan(DEFAULT_PROJECT);
   p = togglePreset(p, 0, 'web');
   p = togglePreset(p, 0, 'db');
   p = togglePreset(p, 0, 'object');
@@ -18,24 +20,45 @@ function sample(): WizardPlan {
   return p;
 }
 
-describe('첫 화면 (D90) — startPlan · Clear network', () => {
-  it('hash 가 없을 때의 계획 — 서비스 shop · 네트워크 넷(VPC · 서브넷 · Router · NAT, 각 01) · 이름 다섯(ID + 넷)', () => {
+describe('첫 화면 (D90 · D97) — startPlan · Clear network', () => {
+  it('hash 가 없을 때의 계획 — 프로젝트 값은 비어 있다(D97) · 서비스 shop · 네트워크 넷(VPC · 서브넷 · Router · NAT, 각 01) · 이름 없음 · hash 없음 · 첫 선택 Project', () => {
     const p = startPlan();
+    expect(p.project).toEqual(EMPTY_PROJECT);
     expect(p.services).toEqual([{ purpose: 'shop', picks: [] }]);
     expect(p.projectPicks.map((x) => x.preset)).toEqual(['vpc', 'subnet', 'router', 'nat']);
     expect(p.projectPicks.every((x) => x.instances?.length === 1 && x.instances[0]!.seq === '01')).toBe(true);
     expect(p.projectPicks.some((x) => x.kind !== undefined || x.tier !== undefined)).toBe(false);
+    // 빈 프로젝트는 문맥이 풀리지 않는다 — 이름도 hash 도 공유 링크도 없다(Share 단추가 없으니 공유 경고도 없다)
+    expect(parseProjectContext(p.project, 'gcp').ok).toBe(false);
+    expect(encodeWizardState(p, RULES_REVISION)).toBeUndefined();
+    expect(firstSelection(p)).toBe('project');
+    // initialPlan 은 그대로 예시 값 · 네트워크 없음 — 링크에서 떨어진 경로(깨진 링크 · 버린 w)가 쓴다
+    expect(initialPlan().project).toEqual(DEFAULT_PROJECT);
+    expect(initialPlan().projectPicks).toEqual([]);
+  });
+  it('프로젝트 값을 채우면 네트워크 이름 다섯(ID + 넷) — 미리 채움(D90)은 그대로 · 첫 선택은 첫 서비스(갤러리)', () => {
+    const p = { ...startPlan(), project: DEFAULT_PROJECT };
+    expect(p).toEqual(startPlan(DEFAULT_PROJECT));
     expect(validatePlan(p)).toEqual({ ok: true });
     expect(result(p).items.map((i) => i.key)).toEqual([
       'project/-/project_id/-/-/-', 'project/-/vpc_network/-/-/01', 'project/-/subnet/-/-/01', 'project/-/router/-/-/01', 'project/-/router_nat/-/-/01',
     ]);
-    // initialPlan 은 그대로 비어 있다 — 링크에서 떨어진 경로(깨진 링크 · 버린 w)가 쓴다
-    expect(initialPlan().projectPicks).toEqual([]);
+    expect(firstSelection(p)).toBe('services[0]');
+  });
+  it('링크로 연 계획은 그대로 — 프로젝트 값 · pick 이 링크대로 · 첫 선택은 첫 서비스', () => {
+    const hash = encodeWizardState(startPlan(DEFAULT_PROJECT), RULES_REVISION)!;
+    const d = decodeWizardState(`#${HASH_KEY}=${hash}`)!;
+    // 지역은 코드로 실린다(asia-northeast3 → ane3) — 값은 그대로 비지 않는다
+    expect({ ...d.plan!, project: { ...d.plan!.project, region: '' } }).toEqual({ ...startPlan(DEFAULT_PROJECT), project: { ...DEFAULT_PROJECT, region: '' } });
+    expect(d.plan!.project.region).not.toBe('');
+    expect(firstSelection(d.plan!)).toBe('services[0]');
+    // 프로젝트 값이 틀린 계획은 Project 부터
+    expect(firstSelection({ ...d.plan!, project: { ...DEFAULT_PROJECT, region: 'nowhere-1' } })).toBe('project');
   });
   it('Clear network 는 네트워크 pick 만 뗀다 — extras 는 남는다', () => {
     const p = clearNetwork(sample());
     expect(p.projectPicks.map((x) => x.preset ?? x.ruleId)).toEqual(['gcp.pubsub_topic']);
-    expect(clearNetwork(startPlan()).projectPicks).toEqual([]);
+    expect(clearNetwork(startPlan(DEFAULT_PROJECT)).projectPicks).toEqual([]);
   });
 });
 
@@ -138,7 +161,7 @@ describe('줄 이름 rowNames — 항목 키 머리 접두 일치 (core 변경 �
   });
   it('모든 프리셋 × 종류 · tier 변형 — 항목마다 정확히 한 pick 에 맞고 pick 마다 하나 이상', () => {
     // 서비스 칩 전부 · 네트워크 칩 전부(방화벽 tier 칩 · 서브넷 종류 셋) · 역할 둘 · 버킷 tier 둘 · custom 하나
-    let p = startPlan();
+    let p = startPlan(DEFAULT_PROJECT);
     for (const pr of SERVICE_PRESETS) p = togglePreset(p, 0, pr.id);
     p = renameService(addService(p), 1, 'pay');
     p = togglePreset(p, 1, 'sa');

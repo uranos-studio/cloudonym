@@ -3,9 +3,9 @@
 // 넓은 화면은 세 칸이다(D89) — 목록(WizardList) · 고른 줄 하나의 설정(WizardSettings · 카드는 WizardCards) · 이름(WizardNames). 폰은 같은 셋을 탭으로 바꾼다(D93). 고른 줄은 화면 상태이고 hash 에 싣지 않는다.
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { generateProject, parseContext, parseProjectContext } from '../core/engine';
+import { generateProject, parseProjectContext } from '../core/engine';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
-import type { CoreMessage, Env } from '../core/types';
+import type { Env } from '../core/types';
 import { AppHeader } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
@@ -13,7 +13,7 @@ import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } fro
 import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstErrorRow, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstSelection, parseRow, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
 import { WizardList } from './WizardList';
@@ -24,14 +24,16 @@ import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
 import { PanelRightOpen, X } from 'lucide-react';
 import { INTRO_KEY, readPref, writePref } from './localPrefs';
+import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 
-// ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 네트워크를 미리 채운 첫 화면(D90), 깨진 링크면 빈 예시 ──
-interface Start { plan: WizardPlan; envs: Env[]; notices?: WizardNotices; broken: boolean; link?: LinkState }
+// ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 빈 프로젝트 · 네트워크를 미리 채운 첫 화면(D90 · D97), 깨진 링크면 빈 예시 ──
+/** firstRun — hash 없이 처음 온 사람(D97). Project 부터 채운다 · 폰은 Edit 탭으로 연다 */
+interface Start { plan: WizardPlan; envs: Env[]; notices?: WizardNotices; broken: boolean; link?: LinkState; firstRun?: boolean }
 function startFrom(hash: string, brokenAtRoot: boolean): Start {
   if (hashKind(hash) === 'wizard') {
     const d = decodeWizardState(hash);
@@ -42,7 +44,8 @@ function startFrom(hash: string, brokenAtRoot: boolean): Start {
     return { plan, envs, notices: d.notices, broken: false, link: { key, hash, ...(d.rulesVersion === undefined ? {} : { rulesVersion: d.rulesVersion }) } };
   }
   // 미리 채움은 hash 가 없을 때만 — 링크에서 떨어진 경로(깨진 링크)는 링크가 누구에게나 같도록 빈 예시로 연다
-  return { plan: brokenAtRoot || hash !== '' ? S.initialPlan() : S.startPlan(), envs: [], broken: brokenAtRoot };
+  const firstRun = !brokenAtRoot && hash === '';
+  return { plan: firstRun ? S.startPlan() : S.initialPlan(), envs: [], broken: brokenAtRoot, firstRun };
 }
 
 function noticeLines(n: WizardNotices | undefined): string[] {
@@ -54,22 +57,6 @@ function noticeLines(n: WizardNotices | undefined): string[] {
     ...(n.serverlessOff > 0 ? [fillUi(en, 'wizard_link_serverless_off', { n: n.serverlessOff })] : []),
     ...(n.trimmed > 0 ? [fillUi(en, 'wizard_link_trimmed', { n: n.trimmed })] : []),
   ];
-}
-
-/** 서비스 문맥(넷 + purpose) 오류 — validatePlan 이 지난 뒤에도 서비스 이름이 문맥으로 풀리는지 */
-function serviceErrorsOf(plan: WizardPlan): CoreMessage[][] {
-  return plan.services.map((s) => {
-    const r = parseContext({ ...plan.project, purpose: s.purpose }, 'gcp');
-    return r.ok ? [] : r.errors.filter((e) => 'field' in e && e.field === 'purpose');
-  });
-}
-/** 첫 선택 — 오류가 있는 첫 줄, 없으면 첫 서비스 (D93 — 갤러리 「무엇을 만드나」가 첫 화면이다. 서비스가 없으면 project) */
-function firstSelection(plan: WizardPlan): RowPath {
-  const check = validatePlan(plan);
-  const project = parseProjectContext(plan.project, 'gcp');
-  const projectCount = (project.ok ? 0 : project.errors.length) + checkProjectIdSuffix(plan.projectIdSuffix).length;
-  const row = firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
-  return row === PROJECT_ROW && projectCount === 0 && plan.services.length > 0 ? serviceRow(0) : row;
 }
 
 /** 폰의 탭 셋 (D93) — 목록 · 고른 줄의 설정 · 이름 */
@@ -115,6 +102,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     refocus.current = false;
     setState((s) => ({ ...s, selected: path }));
   };
+  /** 건드린 Project 칸 (D97) — 화면 상태. 손대지 않은 빈 칸에는 오류를 보이지 않는다. 설정 칸은 고른 줄로 key 되므로 여기에 둔다 */
+  const [touched, setTouched] = useState<ReadonlySet<ProjectField>>(() => new Set());
+  const touch = (f: ProjectField) => setTouched((t) => (t.has(f) ? t : new Set(t).add(f)));
 
   // 고른 줄이 서비스 안이면 그 서비스를 편다(고른 pick 의 서비스는 늘 펴진다) · 칩으로 더한 줄은 잠깐 강조한다
   const sel = parseRow(selected);
@@ -149,6 +139,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const envsKey = envList(plan.project.env, extraEnvs).join(',');
   const envs = useMemo(() => (envsKey === '' ? [] : envsKey.split(',') as Env[]), [envsKey]);
   const onToggleEnv = (env: Env) => {
+    touch('env');
     const next = toggleEnv(envs.length > 0 ? envs : [env], env);
     setLink(undefined);
     setNotices([]);
@@ -169,7 +160,10 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, plan.projectIdSuffix)) : []), [projectParsed, envs, plan.projectIdSuffix]);
   const projectIds = previews.map((x) => x.id);
   const projectNames = previews.map((x) => x.name);
-  const projectCount = (projectParsed.ok ? 0 : projectParsed.errors.length) + suffixErrors.length;
+  // 보일 프로젝트 오류 (D97) — 손대지 않은 빈 칸은 빠진다. 목록의 오류 수 · 설정 칸 · 이름 칸 안내가 같은 값을 본다
+  const projectErrors = useMemo(() => visibleProjectErrors(projectParsed.ok ? [] : projectParsed.errors, plan.project, touched), [projectParsed, plan.project, touched]);
+  const projectCount = projectErrors.length + suffixErrors.length;
+  const gate = projectGate(projectParsed.ok, projectCount);
 
   // hash — 모델이 온전할 때만 쓴다(마지막 온전한 hash 가 남는다). 링크로 연 그대로인 동안은 쓰지 않는다 (D27 ⑵)
   const stateKey = ready ? encodeWizardState(plan, VERSION.rules, envs) ?? '' : '';
@@ -251,7 +245,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   // 좁은 화면 (D89 · D93) — 태블릿은 이름이 드로어, 폰은 위 탭 셋(Plan · Edit · Names)이 한 칸을 바꾼다. 배치가 바뀌면 열린 드로어는 닫힌 것으로 본다
   const layout = useWizardLayout();
   const [drawer, setDrawer] = useState(false);
-  const [view, setView] = useState<View>('plan');
+  const [view, setView] = useState<View>(() => initialView(start.firstRun === true));
   const drawerOpen = layout === 'tablet' && drawer;
   // 폭을 바꿨다 돌아오면 저절로 다시 열리지 않게 — 배치가 바뀌는 렌더에서 연 상태를 지운다(effect 가 아니라 렌더 중 조정)
   const [shownLayout, setShownLayout] = useState(layout);
@@ -301,11 +295,22 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     else focusRow(selected);
   };
 
+  /** Project 의 「Next」 (D97) — 첫 서비스의 카드 갤러리로. 서비스가 없는 링크면 하나 더해 고른다. 설정 칸이 새로 그려지므로 포커스를 그 첫 컨트롤로 옮긴다(폰은 Edit 탭 그대로 · 맨 위부터) */
+  const goNext = () => {
+    if (plan.services.length > 0) select(serviceRow(0));
+    else edit(S.addService, (_b, a) => ({ type: 'select', path: serviceRow(a.services.length - 1) }));
+    requestAnimationFrame(() => {
+      if (layout === 'phone') window.scrollTo({ top: 0 });
+      focusSettings();
+    });
+  };
+
   const settings = (() => {
     if (!sel || sel.kind === 'project') {
       return (
-        <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectParsed.ok ? [] : projectParsed.errors} projectIds={projectIds} projectNames={projectNames}
-          suffixErrors={suffixErrors} onSuffix={(x) => edit((p) => S.setProjectIdSuffix(p, x))} onChange={(project) => edit((p) => S.setProject(p, project))} />
+        <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectErrors} projectIds={projectIds} projectNames={projectNames}
+          suffixErrors={suffixErrors} onSuffix={(x) => edit((p) => S.setProjectIdSuffix(p, x))} onChange={(project) => edit((p) => S.setProject(p, project))}
+          onTouch={touch} {...(showsNext(projectParsed.ok, suffixErrors.length) ? { onNext: goNext } : {})} />
       );
     }
     if (sel.kind === 'network') return <NetworkSettings plan={plan} errors={planErrors} edit={edit} />;
@@ -337,7 +342,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     </section>
   );
   const names = (
-    <WizardNames plan={plan} results={results} errors={planErrors} projectContext={projectParsed.ok ? projectParsed.context : undefined} projectNames={projectNames}
+    <WizardNames plan={plan} results={results} errors={planErrors} projectPending={gate === 'pending'} projectContext={projectParsed.ok ? projectParsed.context : undefined} projectNames={projectNames}
       {...(layout === 'tablet' ? { onClose: closeDrawer } : {})} />
   );
   return (
@@ -354,13 +359,21 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       />
       {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
       <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
+        {/* 짧은 소개 (D97) — 무엇인가 · 무엇을 받나 · 무엇을 안 하나 · 순서. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다) */}
         {introOpen && (
-          <div data-wizard-intro className={`${NOTICE} flex items-start justify-between gap-2`}>
-            <p>{en.ui.wizard_intro}</p>
+          <section data-wizard-intro aria-label={en.ui.wizard_about_label}
+            className="flex items-start justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+            <div className="space-y-1">
+              <p data-wizard-about>{en.ui.wizard_about}</p>
+              <p>
+                {en.ui.wizard_intro}{' '}
+                <a href={withStateHash(NAMING_PATH, addressHash)} data-intro-guide className="font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100">{en.ui.nav_naming_guide}</a>
+              </p>
+            </div>
             <button type="button" data-intro-close aria-label={en.ui.wizard_intro_close} title={en.ui.wizard_intro_close}
-              className="-my-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:hover:bg-amber-900"
+              className="-my-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-indigo-600 dark:hover:bg-zinc-800"
               onClick={closeIntro}><X aria-hidden="true" className="size-4" /></button>
-          </div>
+          </section>
         )}
         {shared && <p data-share-warning role="status" className={NOTICE}>{en.ui.share_warning}</p>}
         {linkedVersion && <p data-rules-mismatch role="status" className={NOTICE}>{fillUi(en, 'rules_version_mismatch', { linked: linkedVersion, current: VERSION.rules })}</p>}

@@ -20,7 +20,9 @@ import { SERVERLESS_SHORT } from './urlState';
 import * as S from './wizardState';
 import { selectAdded, type Edit, type RowPath } from './wizardSelection';
 import { CardGallery } from './WizardCards';
-import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, RULES, SMALL_INPUT, inline } from './wizardStyles';
+import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, PRIMARY, RULES, SMALL_INPUT, inline } from './wizardStyles';
+import { EXAMPLE_REGION } from './formContext';
+import type { ProjectField } from './wizardProjectGate';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -39,9 +41,15 @@ export function ErrorList({ errors, id }: { errors: readonly CoreMessage[]; id?:
 }
 
 // ── ① 프로젝트 ──
-export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames, suffixErrors, onSuffix, onChange }: {
-  plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void; errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; projectNames: readonly ({ name: string } | undefined)[];
+export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames, suffixErrors, onSuffix, onChange, onTouch, onNext }: {
+  plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void;
+  /** 보일 오류만 (D97) — 손대지 않은 빈 칸의 오류는 Wizard 가 빼고 넘긴다(wizardProjectGate.visibleProjectErrors) */
+  errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; projectNames: readonly ({ name: string } | undefined)[];
   suffixErrors: readonly CoreMessage[]; onSuffix: (value: string) => void; onChange: (p: WizardPlan['project']) => void;
+  /** 칸을 건드렸다(blur · 입력) — 그 뒤에만 그 칸의 오류가 보인다 (D97) */
+  onTouch: (field: ProjectField) => void;
+  /** 「Next」 — 프로젝트 값이 맞을 때만 받는다. 누르면 첫 서비스의 카드 갤러리로 간다 (D97) */
+  onNext?: () => void;
 }) {
   const v = plan.project;
   const errorFor = (f: string) => {
@@ -57,7 +65,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
         <label htmlFor={id} className={LABEL}>{label} <span className={`ml-1 font-normal ${HINT}`}>{hint}</span></label>
         <input id={id} type="text" value={v[key]} maxLength={MAX_CONTEXT_CHARS} placeholder={placeholder} autoCapitalize="off" autoCorrect="off" spellCheck={false}
           aria-invalid={err ? true : undefined} aria-describedby={err ? `${id}-error` : undefined}
-          onChange={(e) => onChange({ ...v, [key]: e.target.value })} className={CONTROL} />
+          onBlur={() => onTouch(key)} onChange={(e) => { onTouch(key); onChange({ ...v, [key]: e.target.value }); }} className={CONTROL} />
         {err && <p id={`${id}-error`} className={`mt-1 ${ERR}`}>{err}</p>}
       </div>
     );
@@ -69,7 +77,9 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
         {text('owner', 'Owner', en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
         {text('system', 'System', en.ui.field_system_hint, en.ui.field_system_placeholder)}
         {/* 환경 — 칩 여럿 (D82). 둘 이상 고르면 같은 계획을 env 마다 짓는다 · 마지막 하나는 끌 수 없다 */}
-        <div role="group" aria-labelledby="wizard-envs-label" aria-describedby="wizard-envs-hint" className="sm:col-span-2">
+        {/* 칩 묶음을 키보드로 지나쳐 나가도 건드린 것으로 센다 — 빈 환경의 오류가 그때부터 보인다 (D97) */}
+        <div role="group" aria-labelledby="wizard-envs-label" aria-describedby={errorFor('env') ? 'wizard-envs-hint wizard-envs-error' : 'wizard-envs-hint'} className="sm:col-span-2"
+          onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) onTouch('env'); }}>
           <p id="wizard-envs-label" className={LABEL}>{en.ui.wizard_envs} <span id="wizard-envs-hint" className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_envs_hint}</span></p>
           <div className="mt-1 flex flex-wrap gap-2">
             {ENV_VALUES.map((x) => (
@@ -77,8 +87,10 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
                 onClick={() => onToggleEnv(x)}>{x}</button>
             ))}
           </div>
+          {errorFor('env') && <p id="wizard-envs-error" className={`mt-1 ${ERR}`}>{errorFor('env')}</p>}
         </div>
-        <RegionPicker provider="gcp" value={v.region} onChange={(region) => onChange({ ...v, region })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
+        <RegionPicker provider="gcp" value={v.region} onChange={(region) => { onTouch('region'); onChange({ ...v, region }); }} onBlur={() => onTouch('region')}
+          placeholder={fillUi(en, 'wizard_region_placeholder', { region: EXAMPLE_REGION })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
         {/* 프로젝트 ID 접미사 (D85) — 선택. tier 와 같은 꼴 · 예약어. 빈 칸이면 모델에서 키를 지운다 */}
         <div>
           <label htmlFor="wizard-project-id-suffix" className={LABEL}>{en.ui.wizard_project_id_suffix} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_id_suffix_hint}</span></label>
@@ -107,6 +119,15 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
           ))}
         </dd>
       </dl>
+      {/* 다음 단계 (D97) — 값이 맞으면 단추, 아직이면 무엇을 채울지 한 줄(경고색이 아니다). 타이핑 중에 저절로 옮기지 않는다 */}
+      {onNext
+        ? (
+          <div data-project-next className="flex flex-wrap items-center gap-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+            <button type="button" data-project-next-button className={PRIMARY} onClick={onNext}>{en.ui.wizard_project_next}</button>
+            <span className={HINT}>{en.ui.wizard_project_next_hint}</span>
+          </div>
+        )
+        : <p data-project-pending className={`border-t border-zinc-200 pt-3 dark:border-zinc-800 ${HINT}`}>{en.ui.wizard_project_pending}</p>}
     </section>
   );
 }

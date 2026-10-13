@@ -1,6 +1,6 @@
 // 브라우저에 남기는 화면 설정 (D93 · D94) — localStorage 키 둘. 서버로 보내지 않고 공유 링크(hash)에도 싣지 않는다.
 // 사생활 보호 모드 · 저장소 차단에서는 접근이 던지거나 비어 있다 — 그때도 화면은 기본값(안내 보임 · System)으로 정상이다
-export const INTRO_KEY = 'cloudonym:intro_dismissed';
+export const INTRO_KEY = 'cloudonym:intro_dismissed_v2';
 export const THEME_KEY = 'cloudonym:theme';
 
 /** localStorage 읽기 — 막혔거나 없으면 null */

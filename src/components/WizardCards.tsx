@@ -10,16 +10,12 @@ import { presetOf } from '../core/wizard/presets';
 import * as B from './wizardBundles';
 import { findPreset } from './wizardState';
 import { cardRow, rowNames, serviceRow, type Edit, type RowPath } from './wizardSelection';
-import { BTN, HINT, ICON_BTN } from './wizardStyles';
+import { BTN, HINT, ICON_BTN, PRIMARY } from './wizardStyles';
 import { fillUi, type UiKey } from '../messages/catalog';
 import { en } from '../messages/en';
 
 const CARD = 'flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900';
 const TAG = 'rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
-const PRIMARY =
-  'inline-flex min-h-9 items-center justify-center rounded-md bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 ' +
-  'disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ' +
-  'dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-400';
 const STATE = {
   complete: 'rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
   incomplete: 'rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-200',

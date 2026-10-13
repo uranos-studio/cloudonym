@@ -253,4 +253,24 @@ describe('영어 사전 (D24)', () => {
     expect(fillUi(en, 'version_footer', { engine: '0.1.0', rules: '2026-09-29.1' })).toBe('Engine 0.1.0 · rules 2026-09-29.1');
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');
   });
+  it('첫 화면 문구 (D97) — 켜진 것은 Google Cloud 하나 · AWS · Azure 를 지원한다고 말하지 않는다 · 소개는 무엇 · 받는 것 · 하지 않는 것 · 공유 경고는 소개에 없다', () => {
+    for (const t of [en.ui.tagline, en.ui.meta_description]) {
+      expect(t).toContain('Google Cloud');
+      expect(t).not.toMatch(/AWS · GCP · Azure|each cloud/);
+    }
+    // 부제는 AWS · Azure 를 말하지 않는다(옆 뱃지가 「soon」을 말한다) · meta 는 「나중」으로만
+    expect(en.ui.tagline).not.toMatch(/AWS|Azure/);
+    expect(en.ui.meta_description).toMatch(/AWS and Azure come later/);
+    expect(en.ui.wizard_about).toMatch(/owner, system, environment and region/);
+    expect(en.ui.wizard_about).toMatch(/JSON/);
+    expect(en.ui.wizard_about).toMatch(/Terraform locals/);
+    expect(en.ui.wizard_about).toMatch(/nothing is created/);
+    expect(en.ui.wizard_about).toMatch(/not checked for availability/);
+    // 순서 — Project → 무엇을 만드나 → 이름
+    expect(en.ui.wizard_intro.indexOf('project')).toBeLessThan(en.ui.wizard_intro.indexOf('what you are building'));
+    expect(en.ui.wizard_intro.indexOf('what you are building')).toBeLessThan(en.ui.wizard_intro.indexOf('names'));
+    expect(`${en.ui.wizard_intro} ${en.ui.wizard_about}`).not.toMatch(/share link|unencrypted/i);
+    expect(en.ui.share_warning).toMatch(/not encrypted/);
+    expect(fillUi(en, 'wizard_region_placeholder', { region: 'asia-northeast3' })).toMatch(/^e\.g\. asia-northeast3/);
+  });
 });

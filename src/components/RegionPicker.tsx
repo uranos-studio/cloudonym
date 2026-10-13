@@ -15,11 +15,15 @@ interface Props {
   error?: string;
   labelClass: string;
   controlClass: string;
+  /** 빈 칸에 보일 글 — 없으면 검색 안내. 마법사는 예시 리전을 여기에만 보인다 (D97) */
+  placeholder?: string;
+  /** 포커스를 잃을 때 — 마법사가 「건드린 칸」으로 센다 (D97) */
+  onBlur?: () => void;
 }
 
 const OPTION = 'flex cursor-pointer flex-wrap items-baseline gap-x-1.5 px-3 py-1.5 text-sm text-zinc-800 aria-selected:bg-indigo-50 aria-selected:text-indigo-900 dark:text-zinc-200 dark:aria-selected:bg-indigo-950 dark:aria-selected:text-indigo-100';
 
-export function RegionPicker({ provider, value, onChange, error, labelClass, controlClass }: Props) {
+export function RegionPicker({ provider, value, onChange, error, labelClass, controlClass, placeholder, onBlur }: Props) {
   const options = useMemo(() => regionOptions(provider), [provider]);
   const { region } = splitRegion(value, options);
   // 검색어 — undefined 면 검색 중이 아니고 상자는 고른 리전 이름을 보인다
@@ -76,12 +80,12 @@ export function RegionPicker({ provider, value, onChange, error, labelClass, con
             aria-activedescendant={open && shown[active] ? optionId(active) : undefined}
             aria-invalid={error ? true : undefined} aria-describedby={error ? errorId : undefined}
             value={query ?? region?.value ?? value}
-            placeholder={en.ui.region_search_placeholder}
+            placeholder={placeholder ?? en.ui.region_search_placeholder}
             autoCapitalize="off" autoCorrect="off" spellCheck={false} autoComplete="off"
             onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(0); }}
             onFocus={(e) => e.currentTarget.select()}
             onClick={() => { if (!open) openAt(); }}
-            onBlur={close}
+            onBlur={() => { close(); onBlur?.(); }}
             onKeyDown={onKey}
             className={`${controlClass} font-mono`}
           />

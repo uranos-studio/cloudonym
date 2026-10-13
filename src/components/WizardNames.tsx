@@ -11,6 +11,7 @@ import { allNamesText } from './namesExport';
 import { wizardLabels, wizardTerraform, wizardTerraformByEnv } from './wizardTerraform';
 import { toWizardExport, toWizardExportByEnv } from './wizardExport';
 import { namesSummary, withEnv } from './wizardEnvs';
+import { namesPanel, type NamesNotice } from './wizardProjectGate';
 import { ErrorList } from './WizardSettings';
 import { ENV_NAMES, ICON_BTN } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
@@ -21,8 +22,12 @@ import { VERSION } from '../version';
 export interface EnvResult { env: Env; result: ProjectResult }
 
 // ── ⑦ 이름 ──
-export function WizardNames({ plan, results, errors, projectContext, projectNames, onClose }: {
+const NOTICE_TEXT: Record<NamesNotice, string> = { need_project: en.ui.wizard_names_need_project, empty: en.ui.wizard_names_empty, fix_errors: en.ui.wizard_fix_errors };
+
+export function WizardNames({ plan, results, errors, projectPending = false, projectContext, projectNames, onClose }: {
   plan: WizardPlan; results: EnvResult[] | undefined; errors: PlanError[]; projectContext: Parameters<typeof toWizardExport>[1] | undefined;
+  /** 프로젝트 값을 아직 채우는 중이고 보이는 오류가 없다 (D97) — 이름 · 오류 대신 안내만 */
+  projectPending?: boolean;
   /** env 마다 프로젝트 이름 (D85) — 항목이 아니라 표시 전용 카드 */
   projectNames: readonly (NameResult | undefined)[];
   /** 드로어 안이면 머리에 닫기 단추를 단다(태블릿) */
@@ -31,7 +36,8 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
   const empty = errors.some((e) => e.code === 'wizard.empty');
   const wide = errors.filter((e) => e.path === undefined && e.code !== 'wizard.empty' && !('field' in e));
   const { names, pass } = namesSummary(results);
-  const ok = results !== undefined && projectContext !== undefined;
+  const panel = namesPanel(results !== undefined && projectContext !== undefined, projectPending, empty);
+  const ok = panel.exports && results !== undefined && projectContext !== undefined;
   return (
     <section id="names" aria-labelledby="wizard-names" className="space-y-4">
       {/* 머리(제목 · 요약 · 내보내기)는 이름 칸 위에 붙어 있다 — 이름이 길어 칸을 굴려도 Copy all · JSON · Terraform 이 보인다.
@@ -39,7 +45,7 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
       <div data-names-head className="sticky top-12 z-10 md:-top-4 -mx-4 -mt-4 space-y-2 rounded-t-xl border-b border-zinc-200 bg-white px-4 pb-3 pt-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="wizard-names" className="text-base font-semibold">{en.ui.wizard_step_names}</h2>
-          {results && (
+          {ok && (
             <span data-names-summary className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${pass === names
               ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
               : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300'}`}>
@@ -54,12 +60,12 @@ export function WizardNames({ plan, results, errors, projectContext, projectName
         </div>
         {ok && <ExportButtons plan={plan} results={results} projectContext={projectContext} />}
       </div>
-      {!results && (
-        <p role="status" data-names-empty className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          {empty ? en.ui.wizard_names_empty : en.ui.wizard_fix_errors}
+      {panel.notice && (
+        <p role="status" data-names-empty data-names-notice={panel.notice} className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+          {NOTICE_TEXT[panel.notice]}
         </p>
       )}
-      <ErrorList errors={wide} />
+      {!projectPending && <ErrorList errors={wide} />}
       {ok && <ResultList plan={plan} results={results} projectNames={projectNames} />}
       {/* PASS 의 뜻 — 이름 목록 아래(D93). 이름이 먼저 보인다 */}
       <p data-pass-meaning className="border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">{en.ui.pass_meaning}</p>
