@@ -7,6 +7,7 @@ import { decodeWizardState, encodeWizardState } from './urlState';
 import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
 import { bundleById } from '../core/wizard/bundles';
+import { RULES_REVISION } from '../core/revision';
 
 const ids = (plan: WizardPlan, s: number) => cardsIn(plan, s).map((m) => [m.bundle.id, m.complete]);
 const presets = (plan: WizardPlan, s: number | null) => (s === null ? plan.projectPicks : plan.services[s]!.picks).map((p) => (p.tier ? `${p.preset}:${p.tier}` : p.preset));
@@ -29,8 +30,8 @@ describe('카드 더하기 (D93)', () => {
     for (const id of ['web', 'ig', 'hc', 'bs', 'ip', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir']) viaChips = togglePreset(viaChips, 0, id);
     for (const t of ['web', 'lbhc']) viaChips = togglePreset(viaChips, null, 'firewall', t);
     expect(viaCard).toEqual(viaChips);
-    const hash = encodeWizardState(viaCard, '2026-10-13.2', [])!;
-    expect(hash).toBe(encodeWizardState(viaChips, '2026-10-13.2', []));
+    const hash = encodeWizardState(viaCard, RULES_REVISION, [])!;
+    expect(hash).toBe(encodeWizardState(viaChips, RULES_REVISION, []));
     const reopened = decodeWizardState(`#state=${hash}`)!.plan!;
     expect(ids(reopened, 0)).toEqual([['website', true]]);
   });
