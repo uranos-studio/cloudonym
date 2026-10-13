@@ -201,19 +201,26 @@ if expect_status "${name}" "${code}" 403; then
   else pass "${name} (403 request.same_origin_only)"; fi
 fi
 
-# 10. 요청 제한 — 마지막에 · 같은 공인 IP 에서 POST /v1/validate 90건 → 429 가 한 번이라도 · 70초 뒤 200
+# 10. 요청 제한 — 마지막에 · 같은 공인 IP · 같은 연결에서 POST /v1/validate 90건 → 429 가 한 번이라도 · 70초 뒤 200
 name='rate limit'
 if [ "${skip_ratelimit}" = "1" ]; then
   echo "SKIP  ${name} — --skip-ratelimit (not counted as PASS)"
 elif [ "${failed}" != "0" ]; then
   echo "SKIP  ${name} — earlier checks failed"
 else
+  # 한도는 Cloudflare 위치(colo)마다 따로 센다. 요청마다 curl 을 새로 띄우면 연결이 여러 colo 로 흩어져
+  # 어느 colo 도 60 을 넘지 못한다(2026-10-13 실측: 48 · 29 · 13). 90건을 curl 하나 · 연결 하나(--next)로 보낸다
   n200=0; n429=0; nother=0
+  rl_args=()
   for _ in $(seq 1 90); do
-    code="$(fetch POST /v1/validate -H 'content-type: application/json' --data "${VALIDATE_REQUEST}")"
+    rl_args+=(-X POST -H 'content-type: application/json' --data "${VALIDATE_REQUEST}" -o /dev/null -w '%{http_code}\n' "${base}/v1/validate" --next)
+  done
+  rl_args+=(-o /dev/null "${base}/v1/health")
+  rl_codes="$(curl -sS --max-time 120 "${rl_args[@]}" 2>/dev/null || true)"
+  for code in ${rl_codes}; do
     case "${code}" in 200) n200=$((n200 + 1)) ;; 429) n429=$((n429 + 1)) ;; *) nother=$((nother + 1)) ;; esac
   done
-  info "${name}: 90 × POST /v1/validate → 200: ${n200}, 429: ${n429}, other: ${nother}"
+  info "${name}: 90 × POST /v1/validate on one connection → 200: ${n200}, 429: ${n429}, other: ${nother}"
   if [ "${n429}" = "0" ]; then
     fail "${name}" "no 429 in 90 requests — the limiter did not trigger"
   else
