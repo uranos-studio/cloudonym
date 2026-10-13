@@ -1,6 +1,8 @@
 // 시스템 문구 한글 0 (D24) — ASCII 입력만 쓰는 대표 요청의 응답 JSON 전체를 면제 없이 걷는다.
 // 입력이 ASCII 라 응답에 한글이 있으면 그것은 시스템 문구다. 사용자 값 보존은 user-data.test 가 따로 본다
 import { describe, it, expect, beforeAll, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { app } from './index';
 import { collectSamples, type Sample } from './test-support';
 import { VERSION } from '../version';
@@ -83,9 +85,8 @@ describe('API 응답 — 한글 0 · 모든 실패에 code 와 message', () => {
 
 // 정적 자산도 공개 화면이다 — index.html 은 빌드에 그대로 실려 배포 점검(release-check)의 「GET / Hangul in body」에 걸린다
 describe('정적 index.html — 한글 0', () => {
-  it('주석까지 한글이 없다', async () => {
-    const { readFile } = await import('node:fs/promises');
-    const html = await readFile(new URL('../../index.html', import.meta.url), 'utf8');
+  it('주석까지 한글이 없다', () => {
+    const html = readFileSync(join(import.meta.dirname, '..', '..', 'index.html'), 'utf-8');
     expect(html.split('\n').filter((l) => HANGUL.test(l))).toEqual([]);
   });
 });
