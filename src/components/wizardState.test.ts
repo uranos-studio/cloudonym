@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  addCustom, addDisk, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
+  addCustom, addDisk, PROJECT_NAME_RULE, addService, addSlot, canAttach, DEFAULT_PROJECT, effectiveRuleId, errorsUnder, findPreset, hasGaps, initialPlan, nextSeq, nextSlotId,
   removeDisk, removePick, removeService, removeSlot, renameService, renumber, seqInvalid, setDiskSeq, setFlag, setHa, setServerless, setSlotSeq,
   showsHa, togglePreset, addPresetPick, SERVICE_PRESETS, PROJECT_PRESETS, CUSTOM_TREE, PROJECT_CUSTOM_TREE, duplicatePick, setPickField, singleSlot, tierEditable, projectPickIndexes, setProjectIdSuffix, removePresetPicks, firewallTierProblem, pickTitle, projectPreview, projectPicksFull, startPlan, type PickRef,
 } from './wizardState';
@@ -234,17 +234,25 @@ describe('서비스 · custom', () => {
   });
 });
 
-describe('custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목이라 고를 수 없다', () => {
-  it('gcp.project_id 만 빠지고 나머지 GCP 규칙은 다 있다', () => {
+describe('custom 모달의 트리 — 프로젝트 ID · 프로젝트 이름은 Project 칸이 만들어 고를 수 없다 (D95)', () => {
+  it('gcp.project_id · gcp.project_name 만 빠지고 나머지 GCP 규칙은 다 있다', () => {
     const ids = treeRules(CUSTOM_TREE).map((r) => r.id);
-    expect(treeRules(buildTree('gcp')).map((r) => r.id)).toContain('gcp.project_id');
+    const all = treeRules(buildTree('gcp')).map((r) => r.id);
+    expect(all).toContain('gcp.project_id');
+    expect(all).toContain(PROJECT_NAME_RULE);
     expect(ids).not.toContain('gcp.project_id');
+    expect(ids).not.toContain(PROJECT_NAME_RULE);
+    expect(treeRules(PROJECT_CUSTOM_TREE).map((r) => r.id)).not.toContain(PROJECT_NAME_RULE);
     expect(ids).toContain('gcp.service_account');
-    expect(new Set(ids)).toEqual(new Set(treeRules(buildTree('gcp')).map((r) => r.id).filter((id) => id !== 'gcp.project_id')));
+    expect(new Set(ids)).toEqual(new Set(all.filter((id) => id !== 'gcp.project_id' && id !== PROJECT_NAME_RULE)));
+  });
+  it('엔진은 프로젝트 이름 custom pick 을 그대로 받는다 — 화면 트리에서만 뺐다', () => {
+    const p = addCustom(initialPlan(), null, { ruleId: PROJECT_NAME_RULE, input: 'none' });
+    expect(validatePlan(p).ok).toBe(true);
   });
   it('프로젝트 공용 칸의 트리는 PROJECT_SCOPES 규칙만 (프로젝트 ID 제외) · 어느 것을 골라도 level_not_supported 가 없다 (D74)', () => {
     const all = treeRules(buildTree('gcp'));
-    const want = all.filter((r) => PROJECT_SCOPES.includes(r.scope) && r.id !== PROJECT_ID_RULE).map((r) => r.id);
+    const want = all.filter((r) => PROJECT_SCOPES.includes(r.scope) && r.id !== PROJECT_ID_RULE && r.id !== PROJECT_NAME_RULE).map((r) => r.id);
     const ids = treeRules(PROJECT_CUSTOM_TREE).map((r) => r.id);
     expect(want.length).toBeGreaterThan(5);
     expect(new Set(ids)).toEqual(new Set(want));

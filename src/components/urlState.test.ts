@@ -535,6 +535,15 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
       expect(d.notices.dropped, String(x)).toBe(1);
     }
   });
+  it('custom 프로젝트 ID 는 버리고 센다 · custom 프로젝트 이름은 연다 (D95 — 화면 트리에서만 뺐고 엔진 · API 는 받는다. 배포 전이라 옛 링크 호환은 두지 않는다 — D76)', () => {
+    const base = { provider: 'gcp', project: WP, services: [{ purpose: 'shop', picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01' }] }] }] };
+    const id = decodeW({ ...base, projectPicks: [{ preset: null, ruleId: 'gcp.project_id' }] });
+    expect(id.plan!.projectPicks).toEqual([]);
+    expect(id.notices.dropped).toBe(1);
+    const name = decodeW({ ...base, projectPicks: [{ preset: null, ruleId: 'gcp.project_name' }] });
+    expect(name.plan!.projectPicks).toEqual([{ preset: null, ruleId: 'gcp.project_name' }]);
+    expect(name.notices.dropped).toBe(0);
+  });
   it('pick 의 위치(D78)는 키 l 로 왕복한다', () => {
     const plan = one({ preset: 'object', location: 'us' }, { preset: null, ruleId: 'gcp.bigquery_dataset', location: 'eu' });
     expect(validatePlan(plan)).toEqual({ ok: true });

@@ -14,8 +14,11 @@ import type { NameResult, ProjectContext, ResourceRule } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
 import { TIER_PATTERN } from '../core/types';
 
-/** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다) */
-export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE));
+/** 프로젝트 이름 규칙 — Project 칸이 이미 만든다 (D95). 엔진 · API 는 custom pick 으로 받는다 */
+export const PROJECT_NAME_RULE = 'gcp.project_name';
+/** custom 모달의 트리 — 프로젝트 ID 는 늘 암묵 항목 하나라 고를 수 없어 뺀다(API 는 reserved_pick 으로 한 번 더 막는다).
+ *  프로젝트 이름도 뺀다 — Project 칸이 이미 보이는 이름이라 고르면 같은 이름이 둘이 된다 (D95). 화면에서만 빼고 엔진 · API · 트리 화면은 그대로다 */
+export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE && r.id !== PROJECT_NAME_RULE));
 /** 프로젝트 공용 칸의 custom 트리 — 프로젝트 수준을 받는 범위(PROJECT_SCOPES)의 규칙만. 거르지 않으면 고른 뒤 level_not_supported 가 뜬다 */
 export const PROJECT_CUSTOM_TREE = buildTree('gcp', treeRules(CUSTOM_TREE).filter((r) => PROJECT_SCOPES.includes(r.scope)));
 /** GCP 규칙 — 칩의 입력 종류(count · role · none)를 본다 */
@@ -376,12 +379,12 @@ export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: n
 }
 
 // ── ① 미리보기 (D85) ──
-const PROJECT_NAME_RULE = GCP_RULES.get('gcp.project_name');
+const PROJECT_NAME = GCP_RULES.get(PROJECT_NAME_RULE);
 /** 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥이 풀리면 보인다. 이름은 암묵 항목이 아니라 이 미리보기에만 나온다(마법사 내보내기 · 키는 그대로).
  *  ID 는 generateProject 의 첫 항목과 같다. 접미사가 꼴 · 예약어 검사(checkProjectIdSuffix)에 걸리면 ID 를 내지 않는다 —
  *  접미사 없는 ID 를 보이면 칸의 값과 다른 ID 를 믿게 된다(링크 hash 는 마지막 온전한 계획에 머문다) */
 export function projectPreview(context: ProjectContext, suffix: string | undefined): { name: NameResult | undefined; id: NameItem | undefined } {
-  const name = PROJECT_NAME_RULE ? generateItem(context, PROJECT_NAME_RULE, { level: 'project' }) : undefined;
+  const name = PROJECT_NAME ? generateItem(context, PROJECT_NAME, { level: 'project' }) : undefined;
   if (checkProjectIdSuffix(suffix).length > 0) return { name, id: undefined };
   const id = generateProject({ project: context, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) }, 'gcp').items[0];
   return { name, id };
