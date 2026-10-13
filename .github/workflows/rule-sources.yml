@@ -30,7 +30,10 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # 검사기를 먼저 시험한다 — 고정 표본에서 lock 한 글자 변경이 exit 1 이 되는지. 의존성이 없어 npm ci 가 필요 없다
+      # 시험이 쓰는 개발 의존성(ajv — scripts/catalog/build-catalog.mjs)을 받는다. 외부 원문을 받기 전이라 lockfile 그대로만 깐다
+      - run: npm ci --ignore-scripts
+
+      # 검사기를 먼저 시험한다 — 고정 표본에서 lock 한 글자 변경이 exit 1 이 되는지
       - run: npm run test:rules
 
       - name: fetch sources
