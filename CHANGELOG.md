@@ -6,6 +6,8 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **Unknown paths are 404** (D106) — a path that is not a page or a file used to return the home page with 200; it now answers 404 with a Not found page and `noindex`.
+- **Home page description** — rewritten for people: "Generate and validate Google Cloud resource names that pass the official naming rules — web tool and API. AWS and Azure coming."
 - **Phone header: everything in the More menu** (D105) — below 768 px the header keeps only the logo, the product name, the cloud badges and **More**; the tagline is not shown. **Share URL**, **Save plan** (wizard) and the screen mode move into the menu: Share URL and Save plan first, then the D104 items, then a **Screen mode** group of three items that shows the current mode. Share URL from the menu copies the same link and reports the result in a status line under the header; on a phone the share warning appears after Share URL is pressed, on `/pick` as well as in the wizard. At 360 px the wizard header is 107 px (was 189) and the `/pick` header 61 px (was 223); 768 px and wider are unchanged. Screen only: rules revision and every API response are unchanged.
 
 ### Fixed
@@ -15,6 +17,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Added
 
+- **Search engine pages** (D106) — each page has its own title, description, canonical link and Open Graph tags (WebApplication JSON-LD on the home page) and a short text summary readable without JavaScript; `/robots.txt` and `/sitemap.xml` are served. Absolute URLs come from the request's own origin. Screen and API responses are otherwise unchanged; rules revision unchanged.
 - **DCO check** — a `dco` workflow fails a pull request when any of its commits lacks a `Signed-off-by:` line matching the commit's author email.
 - **Community files** — issue forms for bugs and feature requests (blank issues off, vulnerabilities pointed to private security advisories), a pull request checklist and a Code of Conduct (Contributor Covenant 2.1).
 
