@@ -7,6 +7,8 @@
 	"name": "cloudonym",
 	"main": "src/api/index.ts",
 	"compatibility_date": "2026-09-25",
+	// workers.dev 주소는 끈다 (D106) — 켜 두면 같은 화면이 두 주소에서 열리고 각자 자기를 canonical 로 내세운다. 커스텀 도메인은 이 설정과 무관하다
+	"workers_dev": false,
 	"assets": {
 		// 화면 경로의 HTML 은 Worker 가 만든다 (D106) — 경로마다 head, 모르는 경로는 404. 정적 파일이 없는 경로는 Worker 로 가고(not_found_handling none),
 		// 파일이 있는 뿌리 `/`(index.html)와 Worker 경로는 run_worker_first 로 먼저 받는다. Worker 는 ASSETS 바인딩으로 index.html 을 읽는다
