@@ -114,7 +114,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -157,7 +157,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -204,7 +204,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -235,7 +235,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -373,7 +373,7 @@ Cloudonym does **not** replace the provider's final verdict. Decision numbers (D
 
 ## Telemetry and privacy
 
-The site and the API count usage without collecting what you type. Generated names, the five context values, the URL hash, the raw User-Agent, cookies and identifiers are never collected; each event records only its name, the time, a client class (`ai_agent`, `browser`, `cli` or `other`) and a few fixed fields such as which copy button was used. The client IP is read only as the key of Cloudflare's rate-limiting binding and is not stored. KV day counters are approximate (Cloudflare KV accepts about one write per second to a key, so a burst is under-counted) and expire after 366 days; the closer count comes from the Axiom records (one per event; a record that fails to send is lost), which are kept for 30 days. Requests from the operator's own release checks carry a secret value in the `x-cloudonym-telemetry-skip` header and are not counted (D99). The full list, retention and hosting details are on the site's `/privacy` page ([source](src/components/Privacy.tsx)); the decision is D56 in [docs/decisions.md](docs/decisions.md).
+The site and the API count usage without collecting what you type. Generated names, the five context values, the URL hash, the raw User-Agent, cookies and identifiers are never collected; each event records only its name, the time, a client class (`ai_agent`, `browser`, `cli` or `other`) and a few fixed fields such as which copy button was used. The client IP is read only as the key of Cloudflare's rate-limiting binding and is not stored. KV day counters are approximate (Cloudflare KV accepts about one write per second to a key, so a burst is under-counted) and expire after 366 days; the closer count comes from the Axiom records (one per event; a record that fails to send is lost), which are kept for 30 days; the operator keeps a copy of each record for two years. Requests from the operator's own release checks carry a secret value in the `x-cloudonym-telemetry-skip` header and are not counted (D99). The full list, retention and hosting details are on the site's `/privacy` page ([source](src/components/Privacy.tsx)); the decision is D56 in [docs/decisions.md](docs/decisions.md).
 
 ## Terraform example
 
@@ -550,7 +550,7 @@ Cloudonym 의 판정은 **CSP 의 최종 판정을 대신하지 않는다.** 결
 
 ### 계측 · 개인정보
 
-화면과 API 는 입력한 값을 모으지 않고 사용량만 센다. 생성한 이름 · 다섯 문맥값 · URL hash · User-Agent 원문 · 쿠키 · 식별자는 모으지 않고, 이벤트마다 이름 · 시각 · 클라이언트 구분(`ai_agent` · `browser` · `cli` · `other`) · 정해진 몇 필드(어느 복사 버튼인가 등)만 남긴다. 클라이언트 IP 는 Cloudflare 요청 제한 바인딩의 키로만 읽고 저장하지 않는다. KV 일자 카운터는 근사치이고(Cloudflare KV 는 같은 키에 초당 약 1회만 쓸 수 있어 몰리면 적게 센다) 366일 뒤 만료된다. 정확한 수는 Axiom 기록이 기준이고 30일 보존한다. 운영자의 배포 점검 요청은 `x-cloudonym-telemetry-skip` 헤더에 비밀값을 실어 세지 않는다(D99). 전체 목록 · 보존 · 호스팅은 사이트의 `/privacy` 쪽에 있다([소스](src/components/Privacy.tsx)) — 결정은 [docs/decisions.md](docs/decisions.md) 의 D56.
+화면과 API 는 입력한 값을 모으지 않고 사용량만 센다. 생성한 이름 · 다섯 문맥값 · URL hash · User-Agent 원문 · 쿠키 · 식별자는 모으지 않고, 이벤트마다 이름 · 시각 · 클라이언트 구분(`ai_agent` · `browser` · `cli` · `other`) · 정해진 몇 필드(어느 복사 버튼인가 등)만 남긴다. 클라이언트 IP 는 Cloudflare 요청 제한 바인딩의 키로만 읽고 저장하지 않는다. KV 일자 카운터는 근사치이고(Cloudflare KV 는 같은 키에 초당 약 1회만 쓸 수 있어 몰리면 적게 센다) 366일 뒤 만료된다. 정확한 수는 Axiom 기록이 기준이고 30일 보존하며, 운영자는 그 기록의 사본을 2년 보관한다. 운영자의 배포 점검 요청은 `x-cloudonym-telemetry-skip` 헤더에 비밀값을 실어 세지 않는다(D99). 전체 목록 · 보존 · 호스팅은 사이트의 `/privacy` 쪽에 있다([소스](src/components/Privacy.tsx)) — 결정은 [docs/decisions.md](docs/decisions.md) 의 D56.
 
 ### Terraform 예제
 
