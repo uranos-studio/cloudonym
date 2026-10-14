@@ -283,11 +283,28 @@ One request is one project. `project` holds four values (no `purpose`), `project
 
 Items come in order: the project ID, the project-level items, then each service, each server followed by its attached resources. `key` is a structured path (`service/shop/compute_instance/-/web/01/data/01`) that does not change when other items are added or removed; `parent` and `attach` mark an attached resource, and project-level items carry `"level": "project"`. Two items of the same uniqueness class with the same name anywhere in the project are both `valid: false` with `name.conflict`. A 400 names the offending element in `field` with the request names, for example `services[0].picks[0].instances[0].attach.data[1]`. `/v1/generate`, `/v1/names` and `/v1/validate` are unchanged.
 
+## Command-line tool (CLI)
+
+The repository has a small command-line tool, `cli/cloudonym.mjs` (Node 22, no dependencies). It is not published to npm; run it from a clone with `node cli/cloudonym.mjs …`, `npm run cli -- …` or, after `npm link`, `cloudonym …`. It holds no naming rules: it edits a plan file (the [Plan file](#plan-file--save-plan-and-open-plan) the wizard saves) and asks the API for every name and verdict, so the web, the API and the CLI give the same names for the same rules revision. What it needs to know about presets, rules, numbered resources and limits comes from `/catalog.json`.
+
+```sh
+export CLOUDONYM_SERVER=https://<your-deployment>     # or --server; there is no default
+node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # or: init --owner … --system … --env prod --region asia-northeast3
+node cli/cloudonym.mjs names                          # every name; kept in cloudonym.plan.names.json
+node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
+node cli/cloudonym.mjs validate                       # exit 0 when every name is valid and matches the names file
+```
+
+- **`add`** appends a pick to a service (`--service <purpose>`) or the project (`--project`); the first argument is a preset (`db`), a rule id (`gcp.cloud_sql_instance`) or a resource name (`cloud_sql_instance`). If the same pick is already there and the resource is numbered, it appends servers with the next free number instead (`01 03` → `04`). It sends the plan before and after, **in every environment of the plan** (`--env` only narrows what it prints), and **writes the file only if every existing name and verdict stays the same** and every new name passes; otherwise it prints what would change and exits 1 with the file untouched. It prints only the new names. A pick counts as the same when the rule, the kind token, the tier and the role match — the server's rule; a different `--location` alone is refused (exit 2), and `--ha` is ignored when servers are added to an existing pick. `--pick '<json>'` adds one pick in the request form; `--dry-run` checks without writing.
+- **`names`** prints `name  key` per line (`--json` for machines: per environment, the same name fields as the wizard's JSON export), `--new` only keys not in the names file. With `environments` in the plan, it sends one request per environment.
+- **Exit codes** — `0` ok · `1` a name fails or `add` would change existing names or verdicts · `2` the plan, the names file or the arguments are rejected (400, 413), a file cannot be read or written, or the plan changed while the command ran · `3` the plan's `rules_version` differs from the server's (409; `names --repin` checks every environment, shows what changes and updates the plan) · `4` the server is unreachable, 429, 5xx, or a 2xx answer that is not JSON or has no `data.<provider>.items` (when every environment is unreachable, `names` shows the stored names and says they are not fresh) · `64` usage · `70` internal error. On 429 it prints `Retry-After`; `--wait` waits that long (at most 120 s; 60 s when the header is missing or unreadable) and retries **once per command**, so the longest wait of a many-environment `add` is one 120 s wait plus `--timeout` per request (at most 2147483647 ms).
+- Each request carries `User-Agent: cloudonym-cli/<version>` and is counted as client class `cli` ([Privacy](#telemetry-and-privacy)). The CLI has no Terraform output: read the JSON with `jsondecode(file(...))`.
+
 ## AI-agent integration
 
 - **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, the region codes and the zones they accept, kind tokens, the tier token, attached resources and wizard presets, abbreviations with their sources, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, and the API summary. It is built from the rule table and the catalog, so it never drifts from the engine.
 - **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate`, `/v1/events`, `/v1/health` and `/catalog.json`, including every error status. The test suite validates real responses against it.
-- **`GET /catalog.json`** — the resource catalog and region table of the enabled providers as JSON: one row per screen row with its rule ids, abbreviation, kinds and tokens, region-token kind, description, where the name is entered and search aliases, plus `version: { engine, rules }`. The source is `catalog/*.json` in this repository (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+- **`GET /catalog.json`** — the resource catalog and region table of the enabled providers as JSON: one row per screen row with its rule ids, abbreviation, kinds and tokens, region-token kind, description, where the name is entered and search aliases, plus `version: { engine, rules }`; each rule also says what a wizard pick of it takes (`input`, `tier`, `locations`), and each provider lists the wizard `presets`, the `attachments` of a server slot and the request `limits` — what the CLI reads instead of keeping its own copy. The source is `catalog/*.json` in this repository (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - **`/docs/naming`** — the same data as a page for people: formulas, tokens, the region table, how names are shortened, abbreviations, kind tokens, tiers, attached resources and the wizard presets.
 
 Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relative to the host that served it.
@@ -490,11 +507,28 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 - 프로젝트 어디서든 같은 고유성 부류의 같은 이름 둘은 둘 다 `valid: false` · `name.conflict` 다
 - `400` 은 잘못된 자리를 요청의 이름으로 `field` 에 적는다(`services[0].picks[0].instances[0].attach.data[1]` 등). `/v1/generate` · `/v1/names` · `/v1/validate` 는 바뀌지 않았다
 
+### 명령줄 도구 (CLI)
+
+저장소에 작은 명령줄 도구 `cli/cloudonym.mjs` 가 있다(Node 22 · 의존성 없음). npm 에 내지 않는다 — clone 한 저장소에서 `node cli/cloudonym.mjs …` · `npm run cli -- …` · `npm link` 뒤 `cloudonym …` 로 돈다. 이름 규칙을 들고 있지 않다 — 계획 파일(마법사의 Save plan 이 내려주는 파일)을 고치고 이름과 판정은 전부 API 에 묻는다. 그래서 같은 규칙 버전이면 웹 · API · CLI 가 같은 이름을 낸다. 프리셋 · 규칙 · 번호 붙는 리소스 · 상한은 `/catalog.json` 에서 읽는다.
+
+```sh
+export CLOUDONYM_SERVER=https://<your-deployment>     # 또는 --server. 기본값은 없다
+node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # 또는 init --owner … --system … --env prod --region asia-northeast3
+node cli/cloudonym.mjs names                          # 이름 전부 — cloudonym.plan.names.json 에 보관
+node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
+node cli/cloudonym.mjs validate                       # 이름이 전부 유효하고 보관 파일과 같으면 0
+```
+
+- **`add`** 는 서비스(`--service <purpose>`)나 프로젝트(`--project`)에 pick 하나를 덧붙인다. 첫 인자는 프리셋(`db`) · 규칙 id(`gcp.cloud_sql_instance`) · 리소스 이름(`cloud_sql_instance`). 같은 pick 이 이미 있고 번호 붙는 리소스면 그 pick 에 다음 빈 번호로 서버를 더한다(`01 03` → `04`). 고치기 전과 뒤를 **계획의 모든 환경에서** 보내(`--env` 는 출력만 거른다) **기존 이름 · 판정이 하나도 바뀌지 않고** 새 이름이 모두 PASS 일 때만 파일을 쓴다. 아니면 바뀔 것을 보이고 파일을 그대로 둔 채 exit 1. 출력은 새 이름뿐이다. 같은 pick 은 규칙 · 종류 토큰 · tier · role 이 같은 것이다(서버의 판정). 위치만 다른 `--location` 은 거부하고(exit 2), 기존 pick 에 서버를 더할 때 `--ha` 는 쓰지 않는다. `--pick '<json>'` 은 요청 꼴 pick 하나, `--dry-run` 은 쓰지 않고 확인만
+- **`names`** 는 한 줄에 `이름  키`(`--json` 은 환경마다 마법사 JSON 내보내기와 같은 칸), `--new` 는 보관 파일에 없는 키만. 계획에 `environments` 가 있으면 환경마다 한 번씩 보낸다
+- **종료 코드** — `0` 성공 · `1` FAIL 이 있거나 `add` 가 기존 이름 · 판정을 바꾼다 · `2` 계획 · 보관 파일 · 인자 거부(400 · 413), 파일을 못 읽거나 못 씀, 명령 도중 계획 파일이 바뀜 · `3` 계획의 `rules_version` 이 서버와 다르다(409 — `names --repin` 이 모든 환경을 확인해 바뀌는 것을 보이고 계획을 고친다) · `4` 못 닿음 · 429 · 5xx · JSON 이 아니거나 `data.<provider>.items` 가 없는 2xx 응답(모든 환경이 못 닿을 때만 `names` 가 보관 파일을 「새 값이 아님」이라 밝히고 보인다) · `64` 사용법 · `70` 내부 오류. 429 면 `Retry-After` 를 알리고, `--wait` 는 그만큼(상한 120초 · 헤더가 없거나 못 읽으면 60초) 기다려 **명령 전체에서 한 번** 다시 보낸다 — 환경이 여럿인 `add` 의 최악 대기는 120초 한 번에 요청마다 `--timeout`(상한 2147483647 ms)이다
+- 요청마다 `User-Agent: cloudonym-cli/<버전>` 을 달고 client class `cli` 로 센다. Terraform 출력은 없다 — JSON 을 `jsondecode(file(...))` 로 읽는다
+
 ### AI 에이전트 연동
 
 - **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 리전 코드와 받는 존 · 종류 토큰 · 용도 토큰 tier · 딸린 리소스 · 마법사 프리셋 · 약어와 그 출처 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약. 규칙 표와 catalog 에서 만들므로 엔진과 어긋나지 않는다
 - **`GET /openapi.json`** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/events` · `/v1/health` · `/catalog.json` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
-- **`GET /catalog.json`** — 켜진 CSP 의 리소스 catalog 와 지역 표(JSON). 화면 행마다 규칙 id · 약어 · 종류와 토큰 · 지역 토큰 종류 · 설명 · 이름 넣는 자리 · 검색 별칭과 `version: { engine, rules }`. 정본은 이 저장소의 `catalog/*.json` 이다([CONTRIBUTING.md](CONTRIBUTING.md))
+- **`GET /catalog.json`** — 켜진 CSP 의 리소스 catalog 와 지역 표(JSON). 화면 행마다 규칙 id · 약어 · 종류와 토큰 · 지역 토큰 종류 · 설명 · 이름 넣는 자리 · 검색 별칭과 `version: { engine, rules }`. 규칙마다 마법사 pick 이 받는 것(`input` · `tier` · `locations`), CSP 마다 마법사 `presets` · 서버 슬롯의 `attachments` · 요청 `limits` 도 싣는다 — CLI 가 규칙을 복제하지 않고 이것을 읽는다. 정본은 이 저장소의 `catalog/*.json` 이다([CONTRIBUTING.md](CONTRIBUTING.md))
 - **`/docs/naming`** — 같은 데이터를 사람이 읽는 쪽으로 — 이름 공식 · 토큰 · 지역 표 · 축소 방법 · 약어 · 종류 토큰 · tier · 딸린 리소스 · 마법사 프리셋
 
 ### 지원 리소스

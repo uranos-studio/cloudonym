@@ -32,6 +32,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+      # 저장소 CLI (D102) — 단위 · 경계 시험. 엔진 실답의 계약 시험은 npm test(src/api/cli-contract.test.ts)가 돈다
+      - run: npm run test:cli
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build

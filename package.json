@@ -4,6 +4,9 @@
   "license": "Apache-2.0",
   "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "cloudonym": "cli/cloudonym.mjs"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/check-bundle.mjs",
@@ -13,6 +16,8 @@
     "cf-typegen": "wrangler types",
     "test": "vitest run",
     "test:rules": "node --test scripts/rules/*.test.mjs scripts/catalog/*.test.mjs",
+    "test:cli": "node --test cli/*.test.mjs",
+    "cli": "node cli/cloudonym.mjs",
     "catalog": "node scripts/catalog/build-catalog.mjs",
     "typecheck": "tsc -b --noEmit"
   },

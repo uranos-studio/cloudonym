@@ -307,7 +307,10 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     const body = await json(res);
     expect(body.version).toEqual(VERSION);
     expect(Object.keys(body.providers)).toEqual([...ENABLED_PROVIDERS]);
-    expect(body.providers.gcp.rows).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
+    // 규칙마다 더한 칸(D101 — input · tier · locations)을 떼면 catalog 행 그대로다. 더한 칸은 catalog-client.test 가 센다
+    const bare = body.providers.gcp.rows.map((row: Loose) => ({ ...row, rules: Object.fromEntries(Object.entries(row.rules as Record<string, Loose>)
+      .map(([id, { input: _i, tier: _t, locations: _l, ...spec }]) => [id, spec])) }));
+    expect(bare).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
     expect(body.providers.gcp.rows).toHaveLength(115);
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));

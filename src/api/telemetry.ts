@@ -20,8 +20,8 @@ export function isAiAgent(userAgent: string): boolean {
 
 /** UA 원문은 싣지 않는다 (D56) — UA 에는 아무 글자나 넣을 수 있다. 대신 네 값 중 하나 */
 export type ClientClass = 'ai_agent' | 'browser' | 'cli' | 'other';
-/** 앞머리에 도구 이름이 오고 바로 / 또는 끝 — 「my curl/8」 · 「nodejs-x」 는 cli 가 아니다 */
-const CLI_UA = /^(?:curl|wget|python-requests|go-http-client|node)(?:\/|$)/i;
+/** 앞머리에 도구 이름이 오고 바로 / 또는 끝 — 「my curl/8」 · 「nodejs-x」 는 cli 가 아니다. cloudonym-cli 는 저장소의 CLI 다 (D102) */
+const CLI_UA = /^(?:cloudonym-cli|curl|wget|python-requests|go-http-client|node)(?:\/|$)/i;
 /** ai_agent 를 먼저 본다 — GPTBot 처럼 Mozilla/ 로 시작하는 에이전트가 browser 로 가지 않게 */
 export function classifyClient(userAgent: string | undefined): ClientClass {
   const ua = userAgent ?? '';

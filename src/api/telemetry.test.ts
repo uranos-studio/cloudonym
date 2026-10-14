@@ -172,8 +172,8 @@ describe('classifyClient — UA 원문 대신 네 값 중 하나 (D56)', () => {
   });
   it('browser · cli · other', () => {
     expect(classifyClient('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/130')).toBe('browser');
-    for (const ua of ['curl/8', 'curl/8.7.1', 'Wget/1.21', 'python-requests/2.32', 'Go-http-client/2.0', 'node']) expect(classifyClient(ua), ua).toBe('cli');
-    for (const ua of ['', undefined, 'terraform-provider-http/3.4', 'nodejs-thing/1', 'my curl/8', 'Mozilla']) expect(classifyClient(ua), String(ua)).toBe('other');
+    for (const ua of ['curl/8', 'curl/8.7.1', 'Wget/1.21', 'python-requests/2.32', 'Go-http-client/2.0', 'node', 'cloudonym-cli/0.1.0']) expect(classifyClient(ua), ua).toBe('cli');
+    for (const ua of ['', undefined, 'terraform-provider-http/3.4', 'nodejs-thing/1', 'my curl/8', 'Mozilla', 'my cloudonym-cli/1', 'cloudonym-cli-x/1']) expect(classifyClient(ua), String(ua)).toBe('other');
   });
 });
 

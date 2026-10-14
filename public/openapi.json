@@ -20,9 +20,9 @@
         }
       ],
       "get": {
-        "summary": "Resource catalog and region table",
+        "summary": "Resource catalog, region table and wizard client data (presets, rule inputs, limits)",
         "operationId": "catalog",
-        "description": "The resource catalog and region table of the enabled providers, with version { engine, rules }. Cache-Control: public, max-age=86400 and Access-Control-Allow-Origin: *. GET counts toward the per-IP rate limit; HEAD does not.",
+        "description": "The resource catalog and region table of the enabled providers, with version { engine, rules }, and what a client needs to build a wizard plan (input kind, tier slot and locations per rule, presets, attachments, limits) — the repository's command-line tool reads it instead of keeping its own copy of the rules. Cache-Control: public, max-age=86400 and Access-Control-Allow-Origin: *. GET counts toward the per-IP rate limit; HEAD does not.",
         "responses": {
           "200": {
             "description": "Catalog",
@@ -1634,7 +1634,7 @@
           "version",
           "providers"
         ],
-        "description": "The resource catalog and region table of the enabled providers. Generated from catalog/*.json in the repository, the same data the engine and /llms.txt use.",
+        "description": "The resource catalog and region table of the enabled providers, with what a client needs to build a wizard plan: each rule's input kind, tier slot and locations, the wizard presets, the attachment table and the request limits. Generated from catalog/*.json and the engine's tables in the repository, the same data the engine and /llms.txt use.",
         "properties": {
           "version": {
             "$ref": "#/components/schemas/Version"
@@ -1648,7 +1648,10 @@
               "required": [
                 "meta",
                 "rows",
-                "regions"
+                "regions",
+                "presets",
+                "attachments",
+                "limits"
               ],
               "properties": {
                 "meta": {
@@ -1689,12 +1692,14 @@
                       },
                       "rules": {
                         "type": "object",
-                        "description": "Rule id -> { scope, regionToken (none or region), kinds? { default, allowed } }. A row with several rules asks for the scope; each rule is one resource_type of /v1/names",
+                        "description": "Rule id -> { scope, regionToken (none or region), kinds? { default, allowed }, input, tier, locations? }. A row with several rules asks for the scope; each rule is one resource_type of /v1/names and one rule of a wizard pick",
                         "additionalProperties": {
                           "type": "object",
                           "required": [
                             "scope",
-                            "regionToken"
+                            "regionToken",
+                            "input",
+                            "tier"
                           ],
                           "properties": {
                             "scope": {
@@ -1721,6 +1726,26 @@
                                   }
                                 }
                               }
+                            },
+                            "input": {
+                              "type": "string",
+                              "enum": [
+                                "count",
+                                "role",
+                                "none"
+                              ],
+                              "description": "What a pick of this rule takes: count (numbered servers, instances[] in /v1/wizard), role (one role value) or none"
+                            },
+                            "tier": {
+                              "type": "boolean",
+                              "description": "Whether the name has a tier slot (a pick may send tier)"
+                            },
+                            "locations": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              },
+                              "description": "Values a wizard pick may send as location (multi-region and dual-region names, or regional for a secret). Absent when the rule takes no location"
                             }
                           }
                         }
@@ -1875,6 +1900,182 @@
                           }
                         }
                       }
+                    }
+                  }
+                },
+                "presets": {
+                  "type": "array",
+                  "description": "Wizard presets (POST /v1/wizard pick.preset). Empty for a provider without the wizard",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "label",
+                      "rule",
+                      "tier",
+                      "ha",
+                      "serverless",
+                      "level"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "db"
+                      },
+                      "label": {
+                        "type": "string",
+                        "example": "Database (Cloud SQL)"
+                      },
+                      "rule": {
+                        "type": "string",
+                        "example": "gcp.cloud_sql_instance",
+                        "description": "The rule the preset names"
+                      },
+                      "tier": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "The tier used when the pick sends none"
+                      },
+                      "tier_choices": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Tiers offered on the screen; the first is the default"
+                      },
+                      "kind": {
+                        "type": "string",
+                        "description": "Fixed kind; another kind is wizard.preset_kind_fixed"
+                      },
+                      "ha": {
+                        "type": "object",
+                        "nullable": true,
+                        "required": [
+                          "min_instances"
+                        ],
+                        "properties": {
+                          "min_instances": {
+                            "type": "integer"
+                          }
+                        },
+                        "description": "The pick may send ha: true with at least min_instances servers"
+                      },
+                      "serverless": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Rules the pick may send as serverless"
+                      },
+                      "default_attach": {
+                        "type": "object",
+                        "description": "Attachments the screen turns on for a new server (not added by the API)"
+                      },
+                      "level": {
+                        "type": "string",
+                        "enum": [
+                          "project",
+                          "service"
+                        ],
+                        "description": "project_picks or a service's picks"
+                      },
+                      "group": {
+                        "type": "string",
+                        "description": "Screen group (network, lb)"
+                      }
+                    }
+                  }
+                },
+                "attachments": {
+                  "type": "array",
+                  "description": "Resources attached to a server slot (instances[].attach): parent rule, attach key, child rule and whether the child is numbered (data disks)",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "parent",
+                      "attach",
+                      "child",
+                      "seq"
+                    ],
+                    "properties": {
+                      "parent": {
+                        "type": "string",
+                        "example": "gcp.compute_instance"
+                      },
+                      "attach": {
+                        "type": "string",
+                        "enum": [
+                          "boot",
+                          "data",
+                          "ip",
+                          "ipi"
+                        ]
+                      },
+                      "child": {
+                        "type": "string",
+                        "example": "gcp.disk"
+                      },
+                      "seq": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Request limits and value patterns, for a client to check before sending. The API's answer is the verdict",
+                  "required": [
+                    "max_services",
+                    "max_picks_per_service",
+                    "max_names",
+                    "max_count",
+                    "max_data_disks",
+                    "max_body_bytes",
+                    "seq_pattern",
+                    "slot_id_pattern",
+                    "tier_pattern",
+                    "role_pattern"
+                  ],
+                  "properties": {
+                    "max_services": {
+                      "type": "integer",
+                      "example": 20
+                    },
+                    "max_picks_per_service": {
+                      "type": "integer",
+                      "example": 40
+                    },
+                    "max_names": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "max_count": {
+                      "type": "integer",
+                      "example": 99
+                    },
+                    "max_data_disks": {
+                      "type": "integer",
+                      "example": 9
+                    },
+                    "max_body_bytes": {
+                      "type": "integer",
+                      "example": 32768
+                    },
+                    "seq_pattern": {
+                      "type": "string"
+                    },
+                    "slot_id_pattern": {
+                      "type": "string"
+                    },
+                    "tier_pattern": {
+                      "type": "string"
+                    },
+                    "role_pattern": {
+                      "type": "string"
                     }
                   }
                 }
