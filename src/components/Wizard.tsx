@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEve
 import { generateProject, parseProjectContext } from '../core/engine';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { Env } from '../core/types';
-import { AppHeader } from './AppHeader';
+import { AppHeader, PLAN_FILE_BUTTON, PLAN_FILE_TEXT } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
@@ -22,7 +22,7 @@ import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, 
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
-import { Check, PanelRightOpen, X } from 'lucide-react';
+import { Check, FileDown, FileUp, PanelRightOpen, X } from 'lucide-react';
 import { INTRO_KEY, readPref, writePref } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
@@ -30,6 +30,8 @@ import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENE
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
+import { readPlanFile, savePlan } from './planFile';
+import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 
 // ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 빈 프로젝트 · 네트워크를 미리 채운 첫 화면(D90 · D97), 깨진 링크면 빈 예시 ──
 /** firstRun — hash 없이 처음 온 사람(D97). Project 부터 채운다 · 폰은 Edit 탭으로 연다 */
@@ -48,9 +50,10 @@ function startFrom(hash: string, brokenAtRoot: boolean): Start {
   return { plan: firstRun ? S.startPlan() : S.initialPlan(), envs: [], broken: brokenAtRoot, firstRun };
 }
 
-function noticeLines(n: WizardNotices | undefined): string[] {
+/** 링크 · 계획 파일(D100)을 열며 고친 것의 안내 — 둘은 같은 복구를 지나 같은 문장을 쓰고, 계획을 통째로 버린 경우만 문장이 다르다 */
+function noticeLines(n: WizardNotices | undefined, source: 'link' | 'file' = 'link'): string[] {
   if (!n) return [];
-  if (n.discarded) return [en.ui.wizard_link_discarded];
+  if (n.discarded) return [source === 'file' ? en.ui.plan_file_discarded : en.ui.wizard_link_discarded];
   return [
     ...(n.dropped > 0 ? [fillUi(en, 'wizard_link_dropped', { n: n.dropped })] : []),
     ...(n.haOff > 0 ? [fillUi(en, 'wizard_link_ha_off', { n: n.haOff })] : []),
@@ -228,6 +231,44 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   // 공유 경고 — Share 를 누르면 그 곁(머리 바로 아래)에 보인다. 링크는 암호화가 아니다
   const [shared, setShared] = useState(false);
 
+  // 계획 파일 (D100) — Save plan 은 지금 hash 와 같은 상태를 POST /v1/wizard 본문 꼴로 내려준다(Share 와 같은 조건 · 같은 공유 경고).
+  // Open plan 은 링크를 열 때와 같은 복구 · 안내를 지나 계획을 바꾼다. 묻지 않는다 — 링크를 열 때도 묻지 않는다
+  const fileInput = useRef<HTMLInputElement>(null);
+  const onSavePlan = () => {
+    const saved = savePlan(stateKey, VERSION.rules);
+    if (!saved) return;
+    const url = URL.createObjectURL(new Blob([saved.text], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = saved.fileName;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setShared(true);
+    if (saved.overApiLimit) setNotices([fillUi(en, 'plan_file_over_api_limit', { bytes: saved.apiBytes, max: PLAN_MAX_BODY_BYTES })]);
+    sendBeacon('ui_copy', { target: 'plan-json' });
+  };
+  const onOpenPlan = async (file: File) => {
+    // 상한 · 읽기 실패(file.text() 거부) · 열리지 않는 파일은 모두 같은 한 줄 — 지금 계획은 그대로다
+    const opened = await readPlanFile(file, VERSION.rules);
+    if (!opened) { setNotices([en.ui.plan_file_unreadable]); return; }
+    const { opened: d, plan: next } = opened;
+    // 파일을 연 것은 결과를 만든 것이 아니다 — 링크를 열 때(hashchange)처럼 그 상태의 키를 보낸 것으로 둔다(ui_generate 를 보내지 않는다)
+    lastSent.current = opened.key;
+    refocus.current = false;
+    setState((st) => ({ plan: next, selected: resolveSelection(next, st.selected) }));
+    setToggled(new Map());
+    setExtraEnvs(opened.envs);
+    // 링크 상태가 아니다 — 지금 규칙 버전으로 hash 를 새로 쓴다. 파일의 버전이 다르면 그 사실만 한 줄 알린다
+    setLink(undefined);
+    setNotices([
+      ...noticeLines(d.notices, 'file'),
+      ...(d.ignoredKeys > 0 ? [fillUi(en, 'plan_file_ignored_keys', { n: d.ignoredKeys })] : []),
+      ...(d.rulesVersion !== undefined && d.rulesVersion !== VERSION.rules ? [fillUi(en, 'plan_file_version_mismatch', { saved: d.rulesVersion, current: VERSION.rules })] : []),
+    ]);
+  };
+
   // 키보드 — Enter 는 설정 칸 첫 컨트롤로, 설정 칸의 Esc 는 고른 줄로 되돌린다
   const settingsRef = useRef<HTMLElement>(null);
   const focusSettings = () => settingsRef.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
@@ -350,6 +391,28 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       <AppHeader
         screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} reserveShare shareWarning={false}
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
+        planFile={{
+          ...(stateKey ? {
+            save: (
+              <button type="button" data-plan-save aria-label={en.ui.plan_save_label} title={en.ui.plan_save_label} className={PLAN_FILE_BUTTON} onClick={onSavePlan}>
+                <FileDown aria-hidden="true" className="size-4" /><span className={PLAN_FILE_TEXT}>{en.ui.plan_save}</span>
+              </button>
+            ),
+          } : {}),
+          open: (
+            <>
+              <button type="button" data-plan-open aria-label={en.ui.plan_open_label} title={en.ui.plan_open_label} className={PLAN_FILE_BUTTON} onClick={() => fileInput.current?.click()}>
+                <FileUp aria-hidden="true" className="size-4" /><span className={PLAN_FILE_TEXT}>{en.ui.plan_open}</span>
+              </button>
+              <input ref={fileInput} type="file" accept=".json,application/json" data-plan-file-input hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  if (f) void onOpenPlan(f);
+                }} />
+            </>
+          ),
+        }}
         // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
         badge={(
           // 지금 쓰는 것(진한 배지 · 체크)과 예정인 것(점선 · 흐림)을 두 배지로 나눈다 — 한 배지에 붙여 쓰면 셋 다 되는 것처럼 읽힌다

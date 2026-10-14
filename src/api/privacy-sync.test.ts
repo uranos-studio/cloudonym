@@ -14,8 +14,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('화면 · 안내 ↔ API 상수', () => {
-  it('복사 버튼 target 여섯 — beacon.ts 와 schemas.ts', () => {
+  it('복사 버튼 target 일곱(Save plan 의 plan-json 포함 · D100) — beacon.ts 와 schemas.ts', () => {
     expect(COPY_TARGETS).toEqual(UI_COPY_TARGETS);
+    expect(COPY_TARGETS).toContain('plan-json');
   });
   it('안내의 계측 표 = telemetry 의 허용 표 (이벤트 · 필드 · 순서)', () => {
     expect(Object.fromEntries(PRIVACY_EVENTS.map((e) => [e.event, e.fields]))).toEqual(META_KEYS);

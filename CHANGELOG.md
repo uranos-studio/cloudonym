@@ -6,11 +6,15 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Added
 
+- **Plan file** (D100) — the wizard's header has **Save plan**, which downloads the plan as the `POST /v1/wizard` request body plus `rules_version` and, with two or more environments, `environments` (`cloudonym-plan-<system>-<env>.json`), and **Open plan**, which loads such a file with the same repairs and notices as a share link. Unknown fields are ignored as the API ignores them (one notice line counts them), so a file gives the same names on the web and from the API; files over 176,548 bytes are not read. The file's JSON Schema is `/plan.schema.json`. `WizardRequest` gains an optional `environments` field that the API ignores, and `ui_copy` gains the target `plan-json` (Save plan; the file's content is not sent).
 - **Release checks are not counted** (D99) — a request whose `x-cloudonym-telemetry-skip` header equals the new Worker secret `TELEMETRY_SKIP_TOKEN` is not written to KV or Axiom (constant-time comparison; with no secret set, the header is ignored). Rate limits and responses do not change. `scripts/release-check.sh` sends the header on every request when `CLOUDONYM_TELEMETRY_SKIP_TOKEN` is set, and warns when it is not.
 - **API guide at `/docs/api`** (D98) — a page for people: every endpoint with what it does and whether it is rate limited, a curl example for each public endpoint built from the request example in `/openapi.json` (the host is the page's own address), the top level of each response, the rate limit with `429` and `Retry-After`, the failure shape, `version` and `rules_version` (`409`), what PASS means, the Terraform example and what is counted (with a Privacy link). The header has a new **API** link. `POST /v1/events` is listed as internal. Screen only: rules revision `2026-10-13.3` and every API response are unchanged.
 
 ### Changed
 
+- **Oversized links are not repaired** (D100) — a share link or plan file with more than 400 picks, or more than 400 servers and data disks, keeps only its project values instead of being repaired; repairs now fix independent places in one pass (a hand-made link with 200 broken picks took 1.2 s to open, now under 50 ms).
+- **Request body limit 32 KB** (D100) — `POST /v1/*` accepts bodies up to 32,768 bytes (was 16,384), so a plan file saved from the wizard is accepted as it is; larger bodies are still 413 `request.body_too_large`.
+- **Link and file notices** — "{n} invalid item(s) in this link were left out" now says "in this link or file".
 - **Counts come from Axiom** (D99, revises D16) — KV daily counters are an approximate one-year trend; `/privacy`, `/docs/api` and the README say so.
 - **README API section** — it no longer says there is no public domain; it says to use the deployed site's URL or your own Worker's, and points to `/docs/api`.
 - **Cloud badges** — the header shows two badges instead of one: **Google Cloud** (solid, with a check — supported now) and **AWS · Azure coming soon** (dashed, muted). A screen reader hears "Supported now: Google Cloud. Coming soon: AWS and Azure."

@@ -12,6 +12,7 @@ import type { ApiMessage } from './codes';
 import type { WireMessage } from './serialize';
 import type { Message } from '../messages/catalog';
 import { clipForDisplay } from '../core/display';
+import { WIRE_PATH_NAMES, toModelPick } from '../plan/wire';
 
 /** 거부 — 상태 코드와 메시지 코드. 응답 본문은 라우터가 fail() 로 만든다 (D25) */
 export interface Rejection { status: 400 | 409; errors: Message[]; supported?: string[] }
@@ -30,8 +31,8 @@ export interface WizardInput {
 export interface ValidateInput { provider: Provider; resourceType: string; name: string }
 export const UI_EVENTS = ['ui_visit', 'ui_generate', 'ui_copy'] as const;
 export type UiEvent = (typeof UI_EVENTS)[number];
-/** ui_copy 의 target — 어느 복사 버튼인가 (D56). 항목 키 · 리소스 종류는 싣지 않는다. 화면 쪽 같은 목록은 beacon.ts 의 COPY_TARGETS(beacon.test 가 둘을 대어 본다) */
-export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json'] as const;
+/** ui_copy 의 target — 어느 복사 버튼인가 (D56) · plan-json 은 Save plan 내려받기(D100). 항목 키 · 리소스 종류는 싣지 않는다. 화면 쪽 같은 목록은 beacon.ts 의 COPY_TARGETS(beacon.test 가 둘을 대어 본다) */
+export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json', 'plan-json'] as const;
 export type UiCopyTarget = (typeof UI_COPY_TARGETS)[number];
 /** 비콘 한 건 — target 은 ui_copy 에만 있다. 다른 이벤트에 온 target 은 버린다 */
 /** chip_rules · custom_rules 는 ui_generate 에서만 그대로 넘긴다 — 거르기는 telemetry.ts 의 ruleIdList 한 곳이 한다 (D71) */
@@ -232,8 +233,8 @@ export function parseNamesBody(body: unknown): Parsed<NamesInput> {
   return { ok: true, value: { provider, context: parsed.context, transformed: parsed.transformed, items: selection.items } };
 }
 
-/** 모델 경로의 이름 → 요청 본문의 이름 (§5-5 표) — 표에 없는 글자는 같다 */
-export const WIRE_PATH_NAMES: Readonly<Record<string, string>> = { projectPicks: 'project_picks', ruleId: 'rule', projectIdSuffix: 'project_id_suffix' };
+/** 모델 경로의 이름 → 요청 본문의 이름 — 표는 계획 파일과 같이 쓴다(src/plan/wire.ts · D100) */
+export { WIRE_PATH_NAMES };
 
 /** validatePlan 의 path(모델 표기)를 응답 field(요청 본문 표기)로 — `projectPicks[0].instances[0]` → `project_picks[0].instances[0]` */
 export function toWirePath(path: string): string {
@@ -251,15 +252,6 @@ function pickTooLong(p: unknown, base: string): ApiMessage[] {
     const data = isRecord(s.attach) && Array.isArray(s.attach.data) ? (s.attach.data as unknown[]) : [];
     return [...tooLong({ [`${at}.id`]: s.id, [`${at}.seq`]: s.seq }), ...data.flatMap((d, i) => tooLong({ [`${at}.attach.data[${i}]`]: d }))];
   })];
-}
-
-/** 요청 본문 pick → 모델 Pick — 아는 칸만 옮긴다(rule → ruleId). preset 이 없으면 custom(null). 객체가 아니면 그대로 넘겨 validatePlan 이 거부한다 */
-function toModelPick(p: unknown): unknown {
-  if (!isRecord(p)) return p;
-  const out: Record<string, unknown> = { preset: p.preset === undefined ? null : p.preset };
-  if (p.rule !== undefined) out.ruleId = p.rule;
-  for (const k of ['tier', 'role', 'kind', 'ha', 'serverless', 'instances', 'location']) if (p[k] !== undefined) out[k] = p[k];
-  return out;
 }
 
 /** 목록 칸 — 없으면 빈 목록, 배열이면 칸마다 바꾸고, 배열이 아니면 그대로(validatePlan 의 selection.not_array) */
@@ -349,7 +341,8 @@ export function wizardPickedRules(plan: WizardPlan): { chip: string[]; custom: s
   return { chip: [...chip].sort(), custom: [...custom].sort() };
 }
 
-/** POST /v1/wizard (D66) — 모양 · 길이는 여기, 마법사 검사는 core validatePlan 하나, 서비스마다 문맥(purpose 포함)은 parseContext */
+/** POST /v1/wizard (D66) — 모양 · 길이는 여기, 마법사 검사는 core validatePlan 하나, 서비스마다 문맥(purpose 포함)은 parseContext.
+ *  아는 최상위 키만 읽는다 — 계획 파일의 environments(D100) 같은 모르는 키는 무시한다(limits.test · plan-file.test 가 실제 요청으로 본다) */
 export function parseWizardBody(body: unknown): Parsed<WizardInput> {
   if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
   const pin = checkRulesVersion(body);

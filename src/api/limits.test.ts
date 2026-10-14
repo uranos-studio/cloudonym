@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, beaconPost, json } from './test-support';
+import { req, jsonPost, beaconPost, json, WIZARD_WIRE_SAMPLE } from './test-support';
+import { MAX_BODY_BYTES } from './v1';
+import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 
 // 본문 · 필드 상한과 500 도 ErrorResponse 꼴
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'asia-northeast3-a' };
@@ -8,19 +10,44 @@ const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', 
 /** 본문 크기를 content-length 헤더로 알린다 — bodyLimit 의 헤더 분기. jsonPost 는 헤더가 없어 스트림 분기로 간다 */
 function sizedPost(body: unknown): RequestInit {
   const text = JSON.stringify(body);
+  return sizedText(text);
+}
+function sizedText(text: string): RequestInit {
   return { method: 'POST', headers: { 'content-type': 'application/json', 'content-length': String(new TextEncoder().encode(text).length) }, body: text };
 }
+/** 정확히 bytes 바이트인 /v1/wizard 본문 — 모르는 최상위 키 pad 로 채운다(parseWizardBody 는 모르는 최상위 키를 읽지 않는다 · D100) */
+function wizardBodyOf(bytes: number): string {
+  const base = JSON.stringify({ ...WIZARD_WIRE_SAMPLE, pad: '' });
+  const text = JSON.stringify({ ...WIZARD_WIRE_SAMPLE, pad: 'x'.repeat(bytes - base.length) });
+  expect(new TextEncoder().encode(text).length).toBe(bytes);
+  return text;
+}
+const TOO_LARGE = { success: false, errors: [{ code: 'request.body_too_large', params: { max_bytes: 32768 }, message: 'Request body is larger than 32768 bytes' }] };
 
-describe('본문 16KB 상한 — 413 · ErrorResponse 꼴', () => {
-  it('20KB 본문 (content-length 있음) → 413 { success:false, errors }', async () => {
-    const { res } = await req(app, '/v1/generate', sizedPost({ context: { ...ctx, owner: 'a'.repeat(20 * 1024) } }));
-    expect(res.status).toBe(413);
-    expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.body_too_large', params: { max_bytes: 16384 }, message: 'Request body is larger than 16384 bytes' }] });
+describe('본문 32 KiB 상한 (D100) — 413 · ErrorResponse 꼴', () => {
+  it('상한 = 32 KiB · 계획 파일 쪽 상수와 같다', () => {
+    expect(MAX_BODY_BYTES).toBe(32 * 1024);
+    expect(PLAN_MAX_BODY_BYTES).toBe(MAX_BODY_BYTES);
   });
-  it('20KB 본문 (content-length 없음 · 스트림을 읽다가 넘음) → 역시 413 — 400 「JSON 아님」으로 나뉘지 않는다', async () => {
-    const { res } = await req(app, '/v1/events', beaconPost({ event: 'ui_visit', pad: 'x'.repeat(20 * 1024) }));
+  it('경계 — 32768 바이트 /v1/wizard 본문은 200 · 32769 바이트는 413 (content-length 있음 · 없음 둘 다)', async () => {
+    for (const post of [sizedText, (t: string): RequestInit => ({ method: 'POST', headers: { 'content-type': 'application/json' }, body: t })]) {
+      const at = await req(app, '/v1/wizard', post(wizardBodyOf(MAX_BODY_BYTES)));
+      expect(at.res.status).toBe(200);
+      expect((await json(at.res)).data.gcp.items).toHaveLength(14);
+      const over = await req(app, '/v1/wizard', post(wizardBodyOf(MAX_BODY_BYTES + 1)));
+      expect(over.res.status).toBe(413);
+      expect(await json(over.res)).toEqual(TOO_LARGE);
+    }
+  });
+  it('40KB 본문 (content-length 있음) → 413 { success:false, errors }', async () => {
+    const { res } = await req(app, '/v1/generate', sizedPost({ context: { ...ctx, owner: 'a'.repeat(40 * 1024) } }));
     expect(res.status).toBe(413);
-    expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.body_too_large', params: { max_bytes: 16384 }, message: 'Request body is larger than 16384 bytes' }] });
+    expect(await json(res)).toEqual(TOO_LARGE);
+  });
+  it('40KB 본문 (content-length 없음 · 스트림을 읽다가 넘음) → 역시 413 — 400 「JSON 아님」으로 나뉘지 않는다', async () => {
+    const { res } = await req(app, '/v1/events', beaconPost({ event: 'ui_visit', pad: 'x'.repeat(40 * 1024) }));
+    expect(res.status).toBe(413);
+    expect(await json(res)).toEqual(TOO_LARGE);
   });
   it('validate name 100KB → 413 이 빨리 나온다 (500 ms 안 · 전에는 제곱 루프로 9 초)', async () => {
     const t0 = performance.now();

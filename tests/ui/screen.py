@@ -1,5 +1,6 @@
 """화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90 · D93)의 ㉚~㊼ ·
-화면 모드(D94)의 ㊽ 을 재고 스크린샷을 남긴다.
+화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52) 를 재고 스크린샷을 남긴다.
+링크 없는 첫 화면은 프로젝트 값이 빈칸이다(D97) — 예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -294,6 +295,34 @@ def fill_project(page):
     s.locator('#wizard-system').fill(W_PROJECT['system'])
 
 
+# 첫 방문 (D97) — 소개 두 문단 · 프로젝트 값 예시(placeholder) · 갈 곳
+ABOUT = 'Names every resource of a Google Cloud project from owner, system, environment and region, checked against the official naming rules. You get names, JSON and Terraform locals — nothing is created, and apart from the optional bucket Check, names are not checked for availability.'
+INTRO_ORDER = 'Fill in the project, pick what you are building, copy the names. Naming guide'
+NEED_PROJECT = 'Enter the project values first — owner, system, environment and region. The names appear here once they are valid.'
+PENDING = 'Fill in owner, system, environment and region to continue.'
+INTRO_KEY = 'cloudonym:intro_dismissed_v2'
+
+
+def fill_example_project(page):
+    """Project 설정의 네 값을 손으로 채운다 — 예시 값(DEFAULT · placeholder 와 같은 값). 첫 선택이 Project 라 설정 칸이 이미 열려 있다"""
+    s = select(page, 'project')
+    s.locator('#wizard-owner').fill(DEFAULT['owner'])
+    s.locator('#wizard-system').fill(DEFAULT['system'])
+    s.locator(f'[data-env-chip="{DEFAULT["env"]}"]').click()
+    pick_region(page, REGION_FORM[DEFAULT['region']])
+
+
+def start_example(page, query=''):
+    """D97 전의 첫 화면을 만든다 — 링크 없이 열고(빈칸) 예시 값 넷을 채운 뒤 「Next」 → 첫 서비스(shop)의 카드 갤러리.
+    네트워크 넷 미리 채움(D90)은 그대로라 이름 다섯 · 선택은 services[0] 이다. 첫 화면을 전제한 시나리오가 이것으로 시작한다"""
+    goto_ready(page, BASE + '/' + query)
+    expect(settings(page)).to_have_attribute('data-pick-path', 'project')
+    fill_example_project(page)
+    page.click('[data-project-next-button]')
+    expect(settings(page)).to_have_attribute('data-pick-path', 'services[0]')
+    expect(page.locator('[data-names-summary]')).to_have_text('5 names · 5/5 PASS')
+
+
 def wizard_shot(page, name, full_page=False):
     """마법사 스크린샷 — 두 번 찍어도 같은 바이트가 나오게 움직이는 것을 멈춘다(새 줄 강조 1.2초 · hover · 포커스 고리 · 커서 · 전환)"""
     expect(page.locator('[data-flash="true"]')).to_have_count(0, timeout=3000)
@@ -320,16 +349,20 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-wizard]')).to_be_visible()
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
-    # 첫 방문 안내 한 줄 (D93) — 공유 링크 경고를 함께 말한다 · 닫으면 이 브라우저에 기억한다(새 창에서도 닫힌 채 — 아래 ㊺)
-    expect(page.locator('[data-wizard-intro] p')).to_have_text('Pick what you are building, then adjust the project values. Names update as you go. The share link holds your input unencrypted — avoid internal names.')
+    # 첫 방문 소개 (D97) — 무엇인가 · 순서 두 문단(경고색이 아니다) · 공유 링크 경고는 소개에서 빠졌다 · 닫으면 이 브라우저에 기억한다(새 창에서도 닫힌 채 — 아래 ㊻)
+    expect(page.locator('[data-wizard-intro] p')).to_have_text([ABOUT, INTRO_ORDER])
+    expect(page.locator('[data-wizard-intro]')).not_to_contain_text('share link')
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     # 머리의 공유 경고 줄은 마법사에서 Share 를 누를 때 보인다 (D93) — 누르기 전에는 없다
     expect(page.locator('[data-share-warning]')).to_have_count(0)
-    # 세 칸 (D89) — 목록 · 설정 · 이름이 왼쪽부터 · 첫 선택은 Project · 목록은 tree
+    # 세 칸 (D89) — 목록 · 설정 · 이름이 왼쪽부터 · 목록은 tree
     boxes = [page.locator(s).bounding_box() for s in ('[data-wizard-list-column]', '[data-settings]', '[data-names-column]')]
     assert boxes[0]['x'] < boxes[1]['x'] < boxes[2]['x'] and abs(boxes[0]['y'] - boxes[2]['y']) < 2, boxes
     expect(page.locator('[data-wizard-list]')).to_have_attribute('role', 'tree')
-    # 첫 선택은 첫 서비스다 (D93 — 「무엇을 만드나」 카드 갤러리가 첫 화면) · 고른 서비스는 펴진다(아직 고른 것이 없어 자식 줄은 없다)
+    # 첫 선택은 Project 다 (D97) — 값 넷을 채우고 「Next」 를 누르면 첫 서비스(D93 「무엇을 만드나」 카드 갤러리) · 고른 서비스는 펴진다(아직 고른 것이 없어 자식 줄은 없다)
+    expect(settings(page)).to_have_attribute('data-pick-path', 'project')
+    fill_example_project(page)
+    page.click('[data-project-next-button]')
     expect(settings(page)).to_have_attribute('data-pick-path', 'services[0]')
     expect(page.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-selected', 'true')
     expect(page.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-expanded', 'true')
@@ -644,7 +677,7 @@ def wizard_scenarios(browser, rules_version, errors):
     bad_hash = '#state=' + base64.urlsafe_b64encode(raw.encode()).rstrip(b'=').decode()
     goto_ready(p36, BASE + '/?c' + bad_hash)
     goto_ready(p36, BASE + '/' + bad_hash)
-    expect(p36.locator('[data-wizard-notice]')).to_have_text(['1 invalid item(s) in this link were left out.'])
+    expect(p36.locator('[data-wizard-notice]')).to_have_text(['1 invalid item(s) in this link or file were left out.'])
     expect(slot(p36, 'services[0].picks[0]', 0).locator('[data-attached-summary]')).to_have_text('boot')
     # 같은 탭 hash 이동이 계획을 통째로 바꾸면 사라진 줄의 선택은 Project 로 (D89)
     select(p36, 'services[1].picks[0]')
@@ -658,7 +691,7 @@ def wizard_scenarios(browser, rules_version, errors):
     ctx38 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p38 = ctx38.new_page()
     p38.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(p38, BASE + '/')
+    start_example(p38)
     clear_network(p38)
     fill_project(p38)
     svc(p38, 0).locator('[data-service-name]').fill('shop')
@@ -724,11 +757,18 @@ def wizard_scenarios(browser, rules_version, errors):
     ctx39 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p39 = ctx39.new_page()
     p39.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(p39, BASE + '/')
-    # 클라우드는 머리의 배지 하나 (D93) — 켜진 것이 GCP 하나라 고르는 줄을 두지 않는다. 단계 번호(①~⑦)는 뗐다
+    start_example(p39)
+    # 클라우드는 머리의 배지다 (D93) — 켜진 것이 GCP 하나라 고르는 줄을 두지 않는다. 단계 번호(①~⑦)는 뗐다
+    # 배지 둘 (83b0829) — 지금 쓰는 것(Google Cloud · 체크)과 예정인 것(점선)을 나눠 셋 다 되는 것처럼 읽히지 않게 한다 · 묶음의 이름이 둘을 함께 말한다
     cloud = p39.locator('header [data-wizard-cloud]')
-    expect(cloud).to_have_text('Google Cloud · AWS, Azure soon')
-    expect(cloud).to_have_attribute('title', 'Cloud: Google Cloud. AWS and Azure are coming soon.')
+    soon = p39.locator('header [data-wizard-cloud-soon]')
+    expect(cloud).to_have_text('Google Cloud')
+    expect(cloud.locator('svg')).to_have_count(1)
+    expect(soon).to_have_text('AWS · Azure coming soon')
+    assert soon.evaluate('e => getComputedStyle(e).borderTopStyle') == 'dashed'
+    assert cloud.evaluate('e => getComputedStyle(e).borderTopStyle') == 'solid'
+    expect(p39.locator('header [role="group"]:has([data-wizard-cloud])')).to_have_attribute('aria-label', 'Supported now: Google Cloud. Coming soon: AWS and Azure.')
+    expect(p39.locator('header [role="group"]:has([data-wizard-cloud]) [data-wizard-cloud-soon]')).to_have_count(1)
     expect(p39.locator('[data-wizard] [data-cloud]')).to_have_count(0)
     expect(select(p39, 'project').locator('#wizard-project')).to_have_text(re.compile(r'^Project\b'))
     clear_network(p39)
@@ -850,7 +890,7 @@ def wizard_scenarios(browser, rules_version, errors):
     ctx42 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p42 = ctx42.new_page()
     p42.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(p42, BASE + '/')
+    start_example(p42)
     # 순서 — 클라우드 배지가 세 칸 위 · 목록의 머리 줄은 Project → 네트워크 → 서비스 → 공용 추가 리소스 · 이름은 오른쪽 칸(번호 없음 — D93)
     assert p42.locator('[data-wizard-cloud]').bounding_box()['y'] < p42.locator('[data-wizard-layout]').bounding_box()['y']
     heads = p42.locator('[data-row-path][aria-level="1"]').evaluate_all('els => els.map(e => e.dataset.rowPath)')
@@ -942,7 +982,7 @@ def wizard_scenarios(browser, rules_version, errors):
     p42.keyboard.press('ArrowUp')
     expect(settings(p42)).to_have_attribute('data-pick-path', 'network')
     p42.keyboard.press('Enter')
-    assert p42.evaluate("!!document.activeElement.closest('[data-settings]')")
+    p42.wait_for_function("!!document.activeElement.closest('[data-settings]')")
     p42.keyboard.press('Escape')
     p42.wait_for_function(f"{focused} === 'network'")
     p42.locator('[data-row-path="services[0]"]').click()
@@ -1033,7 +1073,10 @@ def wizard_scenarios(browser, rules_version, errors):
     wizard_narrow(browser, errors)
     wizard_cards(browser, errors)
     theme_modes(browser, errors)
-    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ 통과')
+    wizard_first_visit(browser, rules_version, errors)
+    api_doc(browser, errors)
+    plan_file(browser, rules_version, errors)
+    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) 통과')
 
 
 def wizard_selection_focus(browser, errors):
@@ -1041,7 +1084,7 @@ def wizard_selection_focus(browser, errors):
     ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page()
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pg, BASE + '/')
+    start_example(pg)
     # 서비스 셋(A · B · C) — B 만 손으로 펴고 A 를 지우면 B 가 펴진 채 · C 는 접힌 채다(펼침이 자리 번호로 옮겨 붙지 않는다)
     pg.click('[data-add-service]')
     pg.click('[data-add-service]')
@@ -1100,7 +1143,7 @@ def wizard_cards(browser, errors):
     ctx.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     pg = ctx.new_page()
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pg, BASE + '/')
+    start_example(pg)
     clicks = 0
     # 과제 ⑴ — 첫 화면은 서비스(shop)가 골라져 있고 갤러리가 보인다. 입력 셋(서비스 이름 · owner · system) + 클릭: Website Add · Project 줄 · Terraform
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0]')
@@ -1249,10 +1292,14 @@ def wizard_cards(browser, errors):
     c46 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p46 = c46.new_page()
     p46.on('pageerror', lambda e: errors.append(str(e)))
+    # 옛 소개를 닫은 브라우저(옛 키 cloudonym:intro_dismissed)도 새 소개를 한 번 본다 — 키가 _v2 로 바뀌었다 (D97)
+    goto_ready(p46, BASE + '/privacy')
+    p46.evaluate("localStorage.setItem('cloudonym:intro_dismissed', '1')")
     goto_ready(p46, BASE + '/')
+    expect(p46.locator('[data-wizard-intro]')).to_have_count(1)
     p46.click('[data-intro-close]')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(0)
-    assert p46.evaluate("localStorage.getItem('cloudonym:intro_dismissed')") == '1'
+    assert p46.evaluate(f"localStorage.getItem('{INTRO_KEY}')") == '1'
     goto_ready(p46, BASE + '/?again')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(0)
     c46.close()
@@ -1264,6 +1311,9 @@ def wizard_cards(browser, errors):
     expect(p46b.locator('[data-wizard-intro]')).to_have_count(1)
     p46b.click('[data-intro-close]')
     expect(p46b.locator('[data-wizard-intro]')).to_have_count(0)
+    # 저장소가 막혀도 화면은 그대로 돈다 — 값을 채우면 이름 다섯 (D97 — 첫 화면은 빈칸이라 채운 뒤에 센다)
+    expect(p46b.locator('[data-names-notice="need_project"]')).to_have_text(NEED_PROJECT)
+    fill_example_project(p46b)
     expect(p46b.locator('[data-names-summary]')).to_have_text('5 names · 5/5 PASS')
     c46b.close()
 
@@ -1303,8 +1353,7 @@ def theme_modes(browser, errors):
         goto_ready(pg, BASE + path)
         assert pg.evaluate(dark) is True, path
         expect(pg.locator('[data-theme-toggle] [data-theme-mode="dark"]')).to_have_attribute('aria-checked', 'true')
-    wizard_dark = BASE + '/'
-    goto_ready(pg, wizard_dark)
+    start_example(pg)
     pg.locator('[data-card-add="website"]').click()
     wizard_shot(pg, '10-wizard-dark.png')
     # 키보드 — 화살표로 옮기면서 고른다
@@ -1367,7 +1416,7 @@ def wizard_narrow(browser, errors):
     ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page()
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pg, BASE + '/')
+    start_example(pg)
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'wide')
     expect(pg.locator('[data-names-handle]')).to_have_count(0)
     expect(pg.locator('[data-wizard-tabs]')).to_have_count(0)
@@ -1431,6 +1480,9 @@ def wizard_narrow(browser, errors):
     expect(pg.locator('[data-settings-sheet]')).to_have_count(0)
     tabs = pg.locator('[data-wizard-tab]')
     expect(tabs).to_have_text(['Plan', 'Edit', f'Names {ok}/{n}'])
+    # 이 창은 링크 없이 열려(첫 방문) 탭이 Edit 로 시작한다 (D97 — 폭을 줄여도 그 상태 그대로) · 링크로 연 창의 Plan 첫 탭은 wizard_first_visit 의 폰 쪽이 잰다
+    expect(pg.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
+    pg.click('[data-wizard-tab="plan"]')
     expect(pg.locator('[data-wizard-tab="plan"]')).to_have_attribute('aria-selected', 'true')
     expect(pg.locator('[data-wizard-list-column]')).to_be_visible()
     expect(settings(pg)).to_be_hidden()
@@ -1535,7 +1587,7 @@ def narrow_plan(browser, errors, width, height):
     ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page()
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(pg, BASE + '/')
+    start_example(pg)
     fill_project(pg)
     svc(pg, 0).locator('[data-purpose-chip="web"]').click()
     pg.click('[data-add-service]')
@@ -1544,6 +1596,204 @@ def narrow_plan(browser, errors, width, height):
     select(pg, 'services[0].picks[0]')
     pg.set_viewport_size({'width': width, 'height': height})
     return ctx, pg
+
+
+def wizard_first_visit(browser, rules_version, errors):
+    """㊾ 첫 방문 (D97) — 링크 없이 열면 프로젝트 값이 빈칸(예시는 placeholder) · 첫 선택 Project · 손대지 않은 칸에는 오류가 없다 ·
+    칸을 떠나면 그 칸의 오류 · 환경 칩 묶음을 Tab 으로 지나치면 환경 오류 · 값이 맞기 전에는 이름 칸에 안내 한 줄뿐(내보내기 없음) · hash 를 쓰지 않는다 ·
+    값이 맞아도 저절로 옮기지 않고 「Next」 → 첫 서비스의 카드 갤러리(포커스도) · 공유 경고는 Share 를 누를 때.
+    ㊿ 폰 360 — 링크 없이 열면 첫 탭이 Edit(= Project 설정) · 링크로 열면 Plan"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    ctx.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(pg, BASE + '/')
+    s = settings(pg)
+    # 빈칸 — 예시 값은 placeholder 로만 보인다 · 환경 칩은 하나도 눌려 있지 않다
+    expect(s).to_have_attribute('data-pick-path', 'project')
+    expect(pg.locator('[data-row-path="project"]')).to_have_attribute('aria-selected', 'true')
+    for key, ph in (('owner', 'e.g. platform'), ('system', 'e.g. billing')):
+        expect(s.locator(f'#wizard-{key}')).to_have_value('')
+        expect(s.locator(f'#wizard-{key}')).to_have_attribute('placeholder', ph)
+    expect(s.locator('#field-region')).to_have_value('')
+    expect(s.locator('#field-region')).to_have_attribute('placeholder', 'e.g. asia-northeast3')
+    expect(s.locator('[data-env-chip]')).to_have_count(9)
+    expect(s.locator('[data-env-chip][aria-pressed="true"]')).to_have_count(0)
+    # 손대지 않은 칸에는 빨간 오류가 없다 · Project 줄의 오류 수도 없다
+    expect(s.locator('[aria-invalid="true"]')).to_have_count(0)
+    expect(s.locator('#wizard-owner-error, #wizard-system-error, #wizard-envs-error')).to_have_count(0)
+    expect(pg.locator('[data-row-path="project"] [data-row-errors]')).to_have_count(0)
+    # 이름 칸 — 안내 한 줄만 · 이름 · 요약 · 내보내기(Copy all · JSON · Terraform)가 없다 · Next 대신 중립 안내
+    expect(pg.locator('[data-names-notice]')).to_have_count(1)
+    expect(pg.locator('[data-names-notice="need_project"]')).to_have_text(NEED_PROJECT)
+    expect(pg.locator('#names article[data-key]')).to_have_count(0)
+    expect(pg.locator('[data-names-summary]')).to_have_count(0)
+    expect(pg.locator('[data-copy="all-names"], [data-copy="names-json"], [data-copy="terraform"]')).to_have_count(0)
+    expect(s.locator('[data-project-pending]')).to_have_text(PENDING)
+    expect(s.locator('[data-project-next-button]')).to_have_count(0)
+    # hash 를 쓰지 않는다 — Share URL · Save plan 도 없다(공유 경고도 없다) · Open plan 은 늘 있다 (D100)
+    assert pg.evaluate('location.hash') == '', pg.url
+    expect(pg.locator('[data-copy="share-url"]')).to_have_count(0)
+    expect(pg.locator('[data-plan-save]')).to_have_count(0)
+    expect(pg.locator('[data-plan-open]')).to_have_count(1)
+    expect(pg.locator('[data-share-warning]')).to_have_count(0)
+    # 칸을 떠나면(blur) 그 칸만 오류 — 옆 칸(system)은 아직 조용하다 · Project 줄에 오류 수
+    s.locator('#wizard-owner').focus()
+    pg.keyboard.press('Tab')
+    expect(s.locator('#wizard-owner-error')).to_have_count(1)
+    expect(s.locator('#wizard-owner')).to_have_attribute('aria-invalid', 'true')
+    expect(s.locator('#wizard-system-error')).to_have_count(0)
+    expect(pg.locator('[data-row-path="project"] [data-row-errors]')).to_have_text('!1')
+    expect(pg.locator('[data-names-notice="fix_errors"]')).to_have_count(1)
+    # 환경 칩 묶음 — 칩 사이를 옮겨 다니는 동안은 조용하고, 묶음을 Tab 으로 빠져나가면 환경 오류 (아무 칩도 누르지 않았다)
+    s.locator('[data-env-chip]').first.focus()
+    for _ in range(8):
+        pg.keyboard.press('Tab')
+        expect(s.locator('#wizard-envs-error')).to_have_count(0)
+    pg.keyboard.press('Tab')
+    expect(s.locator('#field-region')).to_be_focused()
+    expect(s.locator('#wizard-envs-error')).to_have_count(1)
+    expect(s.locator('[data-env-chip][aria-pressed="true"]')).to_have_count(0)
+    assert pg.evaluate('location.hash') == '', pg.url  # 건드리기만 해서는 hash 가 생기지 않는다
+    # 값을 다 채우면 오류가 걷히고 이름이 나온다 — 그래도 선택은 Project 그대로(저절로 옮기지 않는다) · 이제 hash · Share URL · Save plan
+    fill_example_project(pg)
+    expect(s.locator('[aria-invalid="true"]')).to_have_count(0)
+    expect(pg.locator('[data-row-path="project"] [data-row-errors]')).to_have_count(0)
+    expect(pg.locator('[data-names-notice]')).to_have_count(0)
+    expect(pg.locator('[data-names-summary]')).to_have_text('5 names · 5/5 PASS')
+    expect(s).to_have_attribute('data-pick-path', 'project')
+    expect(s.locator('[data-project-pending]')).to_have_count(0)
+    expect(s.locator('[data-project-next] [data-project-next-button]')).to_have_text('Next: what are you building')
+    pg.wait_for_function("() => location.hash.startsWith('#state=')")
+    assert {k: hash_state(pg.url)[k] for k in ('owner', 'system', 'env', 'region')} == {k: DEFAULT[k] for k in ('owner', 'system', 'env', 'region')}, hash_state(pg.url)
+    expect(pg.locator('[data-copy="share-url"]')).to_have_count(1)
+    expect(pg.locator('[data-plan-save]')).to_have_count(1)
+    expect(pg.locator('[data-share-warning]')).to_have_count(0)
+    # Next → 첫 서비스(shop)의 카드 갤러리 · 포커스가 설정 칸으로 옮겨 간다
+    s.locator('[data-project-next-button]').click()
+    expect(s).to_have_attribute('data-pick-path', 'services[0]')
+    expect(s.locator('[data-card-gallery] [data-card]')).to_have_count(5)
+    pg.wait_for_function("!!document.activeElement.closest('[data-settings]')")
+    # 공유 경고는 Share 를 누를 때 (D93 · D97)
+    pg.click('[data-copy="share-url"]')
+    expect(pg.locator('[data-share-warning]')).to_have_count(1)
+    linked = pg.url
+    no_hangul(pg)
+    ctx.close()
+
+    # ㊿ 폰 360 — 링크 없이 열면 Edit 탭(Project 설정) · 링크로 열면 Plan 탭
+    c50 = browser.new_context(viewport={'width': 360, 'height': 800})
+    p50 = c50.new_page()
+    p50.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p50, BASE + '/')
+    expect(p50.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
+    expect(p50.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
+    expect(settings(p50)).to_be_visible()
+    expect(settings(p50)).to_have_attribute('data-pick-path', 'project')
+    expect(settings(p50).locator('#wizard-owner')).to_be_visible()
+    expect(p50.locator('[data-wizard-list-column]')).to_be_hidden()
+    no_hscroll(p50, 360, '첫 방문 Edit 탭')
+    goto_ready(p50, linked.replace('#', '?link#', 1))
+    expect(p50.locator('[data-wizard-tab="plan"]')).to_have_attribute('aria-selected', 'true')
+    expect(p50.locator('[data-wizard-list-column]')).to_be_visible()
+    expect(settings(p50)).to_be_hidden()
+    c50.close()
+
+
+def api_doc(browser, errors):
+    """(51) /docs/api (D98) — 200 · 끝점 표가 /openapi.json 의 operation 전부 + 명세 밖 둘(내부용 POST /v1/events 표시) · curl 의 호스트는 이 화면의 출처 ·
+    머리의 API 링크가 마법사 · 트리 둘 다에서 /docs/api 로 간다(hash 를 실어 간다) · 휴대폰 폭 가로 스크롤 없음"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    res = pg.goto(BASE + '/docs/api', wait_until='networkidle')
+    assert res is not None and res.status == 200, res
+    expect(pg.locator('h1')).to_have_text('API')
+    spec = pg.request.get(BASE + '/openapi.json').json()
+    ops = [(m.upper(), path) for path, item in spec['paths'].items() for m in item if m in ('get', 'post', 'put', 'patch', 'delete')]
+    # 표 = 명세의 operation 전부 + 명세 밖 둘(/llms.txt 는 Worker 가 만들고 /openapi.json 은 명세 자신이다)
+    rows = pg.locator('[data-api-endpoints] tbody tr')
+    expect(rows).to_have_count(len(ops) + 2)
+    for path_ in [p_ for _, p_ in ops] + ['/llms.txt', '/openapi.json']:
+        assert rows.filter(has_text=path_).count() >= 1, path_
+    expect(pg.locator('[data-api-endpoints] [data-internal]')).to_have_count(1)
+    expect(pg.locator('[data-api-endpoints] tr:has([data-internal])')).to_contain_text('/v1/events')
+    expect(pg.locator('[data-api-pending]')).to_have_count(0)
+    curls = pg.locator('[data-api-example] [data-curl]').all_inner_texts()
+    assert curls and all(BASE in c for c in curls), curls
+    assert not any('/v1/events' in c for c in curls), curls
+    expect(pg.locator('[data-api-409]')).to_contain_text('409')
+    no_hangul(pg)
+    # 머리 링크 — 마법사(첫 방문 · hash 없음)에서 눌러 간다 · 트리에서는 hash 를 실어 간다
+    goto_ready(pg, BASE + '/')
+    expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api')
+    pg.click('header [data-nav-api]')
+    pg.wait_for_url(BASE + '/docs/api')
+    expect(rows).to_have_count(len(ops) + 2)
+    tree_link = BASE + TREE + state_hash(INPUT)
+    goto_ready(pg, tree_link)
+    expect(pg.locator('[data-tree]')).to_have_count(1)
+    expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api' + state_hash(INPUT))
+    pg.click('header [data-nav-api]')
+    pg.wait_for_url(re.compile(re.escape(BASE + '/docs/api') + r'(#.*)?$'))
+    expect(pg.locator('h1')).to_have_text('API')
+    pg.set_viewport_size({'width': 360, 'height': 800})
+    no_hscroll(pg, 360, '/docs/api')
+    ctx.close()
+
+
+def plan_file(browser, rules_version, errors):
+    """(52) 계획 파일 (D100) — Save plan → 새 창(빈 저장소)에서 Open plan → 같은 이름 · 같은 hash · 안내 없음.
+    파일은 POST /v1/wizard 본문 그대로라 API 에 보내면 화면과 같은 이름이 온다 · 내려받을 때 공유 경고"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900}, accept_downloads=True)
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    start_example(pg)
+    pg.locator('[data-card-add="website"]').click()
+    fill_project(pg)
+    pg.wait_for_function("() => location.hash.startsWith('#state=')")
+    names = screen_names(pg)
+    assert len(names) > 5 and all(v for _, _, v in names), names
+    src_hash = pg.evaluate('location.hash')
+    expect(pg.locator('[data-share-warning]')).to_have_count(0)
+    with pg.expect_download() as dl:
+        pg.click('[data-plan-save]')
+    d = dl.value
+    assert d.suggested_filename == 'cloudonym-plan-payments-prod.json', d.suggested_filename
+    path = OUT / d.suggested_filename
+    d.save_as(str(path))
+    expect(pg.locator('[data-share-warning]')).to_have_count(1)
+    text = path.read_text()
+    body = json.loads(text)
+    assert text.startswith('{\n  "'), text[:20]  # 두 칸 들여쓰기
+    assert body['provider'] == 'gcp' and body['rules_version'] == rules_version, body
+    assert body['project'] == {'owner': 'devops', 'system': 'payments', 'env': 'prod', 'region': 'ane3'}, body['project']  # 링크와 같은 꼴 — 지역은 코드
+    assert 'environments' not in body, body  # 환경 하나면 요청 본문 그대로
+    # 파일 = POST /v1/wizard 요청 본문 — 화면과 같은 이름
+    res = post_api(pg, '/v1/wizard', body)
+    assert res.status == 200, res.text()
+    api = [(i['key'], i['name'], i['valid']) for i in res.json()['data']['gcp']['items']]
+    assert api == names, (api, names)
+    ctx.close()
+    # 새 창 — Open plan 으로 연다(빈 첫 화면에서) → 같은 계획 · 같은 hash · 안내 없음
+    c2 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p2 = c2.new_page()
+    p2.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p2, BASE + '/')
+    expect(p2.locator('[data-names-notice="need_project"]')).to_have_count(1)
+    p2.set_input_files('[data-plan-file-input]', str(path))
+    expect(p2.locator('#names article[data-key]')).to_have_count(len(names))
+    assert screen_names(p2) == names, (screen_names(p2), names)
+    p2.wait_for_function('h => location.hash === h', arg=src_hash)
+    expect(p2.locator('[data-wizard-notice]')).to_have_count(0)
+    expect(p2.locator('[data-rules-mismatch]')).to_have_count(0)
+    # 다른 규칙 버전으로 저장된 파일 — 지금 규칙으로 열고 한 줄로 말한다
+    old = OUT / 'cloudonym-plan-old-rules.json'
+    old.write_text(json.dumps({**body, 'rules_version': OLD_RULES}, indent=2))
+    p2.set_input_files('[data-plan-file-input]', str(old))
+    expect(p2.locator('[data-wizard-notice]')).to_have_text([f'This file was saved with rules {OLD_RULES}; the current rules are {rules_version}. Names may differ.'])
+    assert screen_names(p2) == names
+    c2.close()
 
 
 def wizard_narrow_shots(browser, errors):
@@ -1556,6 +1806,7 @@ def wizard_narrow_shots(browser, errors):
     ctx.close()
     ctx, pg = narrow_plan(browser, errors, 360, 800)
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
+    pg.click('[data-wizard-tab="plan"]')  # 링크 없이 연 창이라 Edit 탭에서 시작한다 (D97) — 목록의 줄을 누르려면 Plan 탭으로
     pg.locator('[data-row-path="services[0].picks[0]"]').click()
     expect(pg.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
     open_attached(settings(pg).locator('li[data-slot]').nth(0))

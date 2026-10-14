@@ -1,6 +1,6 @@
 // 머리글 — 트리 화면 · 마법사가 같이 쓴다. 제품 이름 · Share URL(있을 때만) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · API 안내(D98) · llms.txt
 import type { ReactNode } from 'react';
-import { BookOpen, Cloud, Copy, FileText, ListTree, Terminal, Wand2 } from 'lucide-react';
+import { BookOpen, Cloud, Copy, FileDown, FileText, ListTree, Terminal, Wand2 } from 'lucide-react';
 import { COPY_BUTTON } from './CopyButton';
 import { ThemeToggle } from './ThemeToggle';
 import { en } from '../messages/en';
@@ -25,9 +25,15 @@ interface Props {
   shareWarning?: boolean;
   /** 제품 이름 옆 배지 — 마법사의 클라우드(Google Cloud · 나머지는 곧) */
   badge?: ReactNode;
+  /** 계획 파일 단추 (D100 · 마법사) — save 는 Share 와 같은 조건(없으면 reserveShare 일 때 자리만 비운다), open 은 늘 */
+  planFile?: { save?: ReactNode; open: ReactNode };
 }
 
-export function AppHeader({ share, screen, otherHref, namingHref, apiHref, reserveShare = false, shareWarning = true, badge }: Props) {
+/** 계획 파일 단추의 꼴 — 폰 폭(sm 아래)에서는 그림만 보여 머리 높이를 늘리지 않는다. 글은 aria-label · title 이 말한다 */
+export const PLAN_FILE_BUTTON = `${NAV_LINK} shrink-0`;
+export const PLAN_FILE_TEXT = 'hidden sm:inline';
+
+export function AppHeader({ share, screen, otherHref, namingHref, apiHref, reserveShare = false, shareWarning = true, badge, planFile }: Props) {
   return (
     <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -47,6 +53,10 @@ export function AppHeader({ share, screen, otherHref, namingHref, apiHref, reser
               <span className={COPY_BUTTON}><Copy className="size-4" />{en.ui.share_button}</span>
             </span>
           ))}
+          {planFile && (planFile.save ?? (reserveShare && (
+            <span aria-hidden="true" data-plan-save-reserve className={`invisible ${PLAN_FILE_BUTTON}`}><FileDown className="size-4" /><span className={PLAN_FILE_TEXT}>{en.ui.plan_save}</span></span>
+          )))}
+          {planFile?.open}
           {screen === 'tree'
             ? <a href={otherHref} data-nav-wizard title={en.ui.nav_wizard_label} className={NAV_LINK}><Wand2 aria-hidden="true" className="size-4" />{en.ui.nav_wizard}</a>
             : <a href={otherHref} data-nav-pick title={en.ui.nav_pick_label} className={NAV_LINK}><ListTree aria-hidden="true" className="size-4" />{en.ui.nav_pick}</a>}

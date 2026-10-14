@@ -121,8 +121,8 @@ describe('sessionStore', () => {
 });
 
 describe('ui_copy — 어느 복사 버튼인가만 보낸다 (D56)', () => {
-  it('여섯 — API 가 받는 목록과 같은지는 src/api/privacy-sync.test.ts 가 본다', () => {
-    expect(COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json']);
+  it('일곱 — API 가 받는 목록과 같은지는 src/api/privacy-sync.test.ts 가 본다', () => {
+    expect(COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json', 'plan-json']);
   });
   it('copyKey → target — name:<항목 키> 는 name 으로(항목 키 · 리소스 종류를 싣지 않는다) · 모르는 키는 undefined', () => {
     expect(copyTarget('share-url')).toBe('share-url');

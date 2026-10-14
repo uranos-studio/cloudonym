@@ -19,6 +19,7 @@ const ALLOWED = [
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
   /^\.\.?\/version$/,                               // 결과에 싣는 버전 (D26)
+  /^\.\.\/plan\/wire$/,                             // 계획 파일 wire ↔ 모델 (D100) — core · api 를 들여오지 않는 순수 모듈
 ];
 const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict|__fixtures__)/;
 /** src/dev 를 들이는 자리는 `import.meta.env.DEV` 가 앞선 같은 식의 동적 import 뿐이다 */

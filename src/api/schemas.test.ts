@@ -90,8 +90,8 @@ describe('parseEventBody', () => {
     expect(parseEventBody({ event: null }))
       .toMatchObject({ rejection: { errors: [{ code: 'request.value_unsupported', field: 'event', params: { value: 'null' } }] } });
   });
-  it('ui_copy 의 target — 여섯 중 하나만 · 없거나 모르면 400 + supported 여섯 · 다른 이벤트의 target 은 버린다 (D56)', () => {
-    expect(UI_COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json']);
+  it('ui_copy 의 target — 일곱 중 하나만 · 없거나 모르면 400 + supported 일곱 · 다른 이벤트의 target 은 버린다 (D56)', () => {
+    expect(UI_COPY_TARGETS).toEqual(['share-url', 'name', 'all-names', 'names-json', 'terraform', 'tags-json', 'plan-json']);
     for (const target of UI_COPY_TARGETS) expect(parseEventBody({ event: 'ui_copy', target })).toEqual({ ok: true, value: { event: 'ui_copy', target } });
     expect(parseEventBody({ event: 'ui_copy' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'target' }], supported: [...UI_COPY_TARGETS] } });

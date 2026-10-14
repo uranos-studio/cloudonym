@@ -11,7 +11,7 @@ import { en } from '../messages/en';
 import { SCOPES } from '../core/scopes';
 import { rulesFor } from '../core/constraints';
 import { MESSAGE_CODES } from '../core/messages';
-import { MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
+import { ENV_VALUES, MAX_CONTEXT_CHARS, parseContext } from '../core/engine';
 import { SCOPE_MEANING, UNIQUENESS_MEANING } from './llms';
 import { ENABLED_PROVIDERS } from '../core/types';
 import { MAX_KIND_CHARS, catalogFor } from '../core/catalog';
@@ -117,7 +117,7 @@ describe('public/openapi.json — 형식', () => {
     expect(spec.info.description).toContain('/catalog.json');
     expect(spec.info.description).toContain('/llms.txt');
   });
-  it('EventRequest.target — ui_copy 의 여섯 값 그대로 · 설명이 ui_copy 에만 필요하다고 말한다 (D56)', () => {
+  it('EventRequest.target — ui_copy 의 일곱 값 그대로(plan-json · D100) · 설명이 ui_copy 에만 필요하다고 말한다 (D56)', () => {
     const t = schemas['EventRequest']!.properties!['target']!;
     expect(t.enum).toEqual([...UI_COPY_TARGETS]);
     expect(t.description).toMatch(/ui_copy/);
@@ -195,6 +195,9 @@ describe('public/openapi.json — /wizard (D66)', () => {
     expect(keys(pick)).toEqual(['ha', 'instances', 'kind', 'location', 'preset', 'role', 'rule', 'serverless', 'tier']);
     expect(pick['preset']!.description).toContain(PRESETS.map((x) => x.id).join(', '));
     expect(r.properties['rules_version']!.maxLength).toBe(1024);
+    // 계획 파일의 환경 목록 (D100 · D82) — 표준값 순서 그대로 · API 는 읽지 않는다고 말한다
+    expect(r.properties['environments']!.items!.enum).toEqual([...ENV_VALUES]);
+    expect(r.properties['environments']!.description).toMatch(/^Ignored by the API/);
   });
   it('WizardItem — NameItem 의 키 전부(key 설명만 구조 키) + namespace · level · tier · parent · attach · NameItem 은 그대로', () => {
     // 다른 시험이 scope enum 을 제자리 정렬하므로 파일을 새로 읽어 비교한다
@@ -286,10 +289,14 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     // custom pick(preset null + rule) · ha null · serverless null 도 요청 스키마에 맞는다
     expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, services: [{ purpose: 'shop', picks: [{ preset: null, rule: 'gcp.cloud_function', ha: null, serverless: null, instances: [{ id: 'a', seq: '01' }] }] }] })).toBe(true);
     expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, extra: 1 })).toBe(false);
+    // 계획 파일 (D100) — environments 는 무시되는 선택 칸이라 파일(본문 + environments)도 요청 스키마에 맞는다 · 표준 env 만 · 중복 없음
+    expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, rules_version: VERSION.rules, environments: ['prod', 'stg'] })).toBe(true);
+    expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, environments: ['prod', 'prod'] })).toBe(false);
+    expect(validatorFor('WizardRequest')({ ...WIZARD_WIRE_SAMPLE, environments: ['preprod'] })).toBe(false);
     expect(validatorFor('WizardResponse')({ ...samples.find((x) => x.id === 'wizard-ok')!.body, extra: 1 })).toBe(false);
   });
 
-  it('events 표본 — ui_copy 여섯 target 은 200 · target 이 없거나 모르는 값이면 400 · 요청 본문은 EventRequest 에 맞는다 (D56)', () => {
+  it('events 표본 — ui_copy 일곱 target 은 200 · target 이 없거나 모르는 값이면 400 · 요청 본문은 EventRequest 에 맞는다 (D56)', () => {
     for (const t of UI_COPY_TARGETS) {
       const x = samples.find((s) => s.id === `events-ui-copy-${t}`);
       expect(x?.status, t).toBe(200);

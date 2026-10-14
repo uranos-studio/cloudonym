@@ -6,7 +6,7 @@ import { inputKind } from '../core/tree';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { ENABLED_PROVIDERS, type Provider } from '../core/types';
 
-// 응답 증폭 상한 — 작은 요청(16KB 본문 상한 안)이 수 MB 응답을 만들지 못하게 한다 (docs/decisions.md · 2026-10-06 응답 증폭).
+// 응답 증폭 상한 — 작은 요청(32KB 본문 상한 안)이 수 MB 응답을 만들지 못하게 한다 (docs/decisions.md · 2026-10-06 응답 증폭).
 // 수치는 상한이지 목표가 아니다: 최악 입력의 실제 응답이 이 안이어야 한다.
 // HTTP 로 닿는 것은 켜진 CSP 뿐이다 (D45) — 켜는 CSP 가 늘면 이 시험이 그것도 돈다.
 // 이름 200개 응답은 입력이 짧아도 규칙(rule)을 항목마다 실어 azure 가 약 270KB 다 — 상한은 그 바닥의 2.4배쯤이다

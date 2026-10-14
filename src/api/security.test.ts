@@ -119,7 +119,7 @@ describe('Worker 응답 보안 헤더 — secureHeaders', () => {
     hasSecure((await req(app, '/v1/generate', jsonPost({}))).res, '400');
     hasSecure((await req(app, '/v1/events', jsonPost({ event: 'ui_visit' }))).res, '403');
     hasSecure((await req(app, '/v1/nope')).res, '404');
-    hasSecure((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(20 * 1024) } }))).res, '413');
+    hasSecure((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(40 * 1024) } }))).res, '413');
     hasSecure((await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: fakeLimiter('deny').limiter })).res, '429');
   });
   it('500(onError) 에도 싣는다 · HSTS 는 Worker 가 내지 않는다(존 설정에서 한 곳으로 켠다)', async () => {

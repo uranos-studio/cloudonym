@@ -101,7 +101,7 @@ export const WIZARD_WIRE_SAMPLE = {
 } as const;
 
 /**
- * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 16KB · 403 · 429(v1 · /llms.txt) ·
+ * ASCII 입력만 쓰는 대표 요청 집합의 응답 — HTTP 로 닿는 것은 켜진 CSP 뿐이라(D45) 정상 표본은 gcp, 꺼진 CSP 는 400 표본으로만 — 정상 · 예약어 · 길이 초과 · 별칭 · 파싱 실패 · 모양 오류 · 32KB · 403 · 429(v1 · /llms.txt) ·
  * rules_version 409 · 400 · 500 · validate 무효/유효 · names(정상 · 항목 FAIL · Name 태그 · 충돌 · 종류 · selection.* 400 · 409) · health. 입력이 ASCII 라 응답의 한글은 전부 시스템 문구다(면제가 필요 없다)
  */
 export async function collectSamples(app: Requestable, rulesVersion: string): Promise<Sample[]> {
@@ -131,7 +131,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await gen('400-body-not-object', [1, 2]);
   await gen('400-field-too-long', { context: { ...SAMPLE_CTX, owner: 'a'.repeat(1025) } });
   await add('400-not-json', 'POST', '/v1/generate', { method: 'POST', body: 'not json' });
-  await add('413-body-too-large', 'POST', '/v1/generate', jsonPost({ context: { ...SAMPLE_CTX, owner: 'a'.repeat(20 * 1024) } }));
+  await add('413-body-too-large', 'POST', '/v1/generate', jsonPost({ context: { ...SAMPLE_CTX, owner: 'a'.repeat(40 * 1024) } }));
   await gen('409-rules-version', { context: SAMPLE_CTX, rules_version: '2026-01-01.1' });
   await gen('409-rules-version-empty', { context: SAMPLE_CTX, rules_version: '' });
   await gen('400-rules-version-null', { context: SAMPLE_CTX, rules_version: null });

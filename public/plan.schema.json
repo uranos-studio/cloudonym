@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cloudonym plan file",
+  "description": "A wizard plan saved with Save plan (D100): the POST /v1/wizard request body, plus environments when the plan has two or more. Generated from WizardRequest in /openapi.json. project_picks and services may each be empty or omitted, but not both (wizard.empty).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provider",
+    "project"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional. The URL of this JSON Schema, for editors. Ignored by the API and the web app."
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "gcp"
+      ],
+      "maxLength": 1024
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "owner",
+        "system",
+        "env",
+        "region"
+      ],
+      "description": "The project context: the four values without purpose. Each service adds its purpose",
+      "properties": {
+        "owner": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "system": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "env": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Canonical: prod, stg, dev, sbx, qa, uat, test, perf, dr. Common aliases are accepted and normalised (prd, production, live -> prod; staging -> stg; development -> dev; sandbox -> sbx; quality -> qa; acceptance -> uat; testing, tst -> test; performance, load -> perf; disaster, recovery -> dr)."
+        },
+        "region": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt. The project region is a single region: a multi-region or dual-region location here is 400 context.location_unsupported; give it per pick in location instead."
+        }
+      }
+    },
+    "project_id_suffix": {
+      "type": "string",
+      "pattern": "^[a-z0-9]{2,16}$",
+      "maxLength": 1024,
+      "description": "Optional suffix appended to the project ID (platform-billing-prod-team1), so a predictable ID can still be unique. Same rules as a tier: 2-16 lowercase letters or digits, not a reserved word (400 wizard.invalid_project_id_suffix, wizard.project_id_suffix_reserved). It is never shortened; the item key stays project/-/project_id/-/-/-. Project IDs are unique across Google Cloud and cannot be reused; Cloudonym does not check whether an ID is free."
+    },
+    "project_picks": {
+      "type": "array",
+      "maxItems": 40,
+      "description": "Project-level resources (no purpose in the name): rules placed in the project, its global or regional scope, such as vpc, subnet and firewall. At most 40",
+      "items": {
+        "$ref": "#/definitions/WizardPick"
+      }
+    },
+    "services": {
+      "type": "array",
+      "maxItems": 20,
+      "description": "At most 20 services. purpose is the service name and namespace; after cleaning it must be non-empty, unique and not project",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "purpose",
+          "picks"
+        ],
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "picks": {
+            "type": "array",
+            "maxItems": 40,
+            "description": "At most 40 picks per service",
+            "items": {
+              "$ref": "#/definitions/WizardPick"
+            }
+          }
+        }
+      }
+    },
+    "rules_version": {
+      "type": "string",
+      "maxLength": 1024,
+      "description": "Optional pin to a rules revision (YYYY-MM-DD.N). If it differs from the current revision the API answers 409 instead of returning names that may differ. Not a string -> 400."
+    },
+    "environments": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "prod",
+          "stg",
+          "dev",
+          "sbx",
+          "qa",
+          "uat",
+          "test",
+          "perf",
+          "dr"
+        ]
+      },
+      "description": "Ignored by the API. A plan file saved from the wizard (Save plan, D100) is this request body plus this list when the plan has two or more environments; project.env is the first. The API names project.env only, so send one request per environment with project.env set to each value."
+    }
+  },
+  "definitions": {
+    "WizardPick": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One resource line: a preset or a rule. The same (rule, tier, role) may appear once per service (wizard.duplicate_pick)",
+      "properties": {
+        "preset": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 1024,
+          "description": "A preset id: web, was, bastion, file, db, object, run, sa, secret, gke, wip, ip, ig, bs, hc, url, cert, thps, fwd, urlredir, thp, fwdredir, neg, bb, vpc, subnet, firewall, router, nat, psa. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets"
+        },
+        "rule": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "A rule id (gcp.run_service) when preset is null. gcp.project_id is always included and cannot be picked (wizard.reserved_pick)"
+        },
+        "tier": {
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^[a-z0-9]{2,16}$",
+          "description": "The tier token placed after the abbreviation and kind token, before the sequence (billing-shop-prod-ane3-gce-web-01). On rules with a sequence number, and on Google Cloud rules with neither a sequence number nor a role, where it goes right after the abbreviation (platform-billing-shop-prod-ane3-gcs-uploads); never on role rules. Overrides the preset tier. Abbreviations, kind tokens, environment values and region codes are reserved (wizard.tier_reserved)"
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Only on role rules, as on /names"
+        },
+        "kind": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "A kind value name, as on /names"
+        },
+        "ha": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "High availability: only on the web and was presets as virtual machines; needs at least 2 servers (wizard.count_below_min)"
+        },
+        "serverless": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 1024,
+          "description": "Run the web or was preset on a serverless rule instead of a virtual machine: gcp.cloud_function or gcp.run_service"
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "A multi-region or dual-region location for this pick, by name or code (US, us, ASIA1). Only on rules that take one: storage_bucket (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4) and bigquery_dataset (US, EU). The name carries its code in the region slot (…-prod-us-gcs). Omitted: the project region. On secret picks the only value is regional (D79): omitted, the secret is global and its name has no region token; regional puts the project region in its name (…-prod-ane3-secret-01), and is 400 wizard.location_needs_region when the project region is global. Anything else is 400 wizard.invalid_location with the accepted locations in params.supported."
+        },
+        "instances": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 99,
+          "description": "One slot per server (rules with a sequence number only). Required on those rules",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "seq"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 1024,
+                "pattern": "^[a-z0-9]{1,8}$",
+                "description": "Slot id, unique within the pick (used by share links)"
+              },
+              "seq": {
+                "type": "string",
+                "maxLength": 1024,
+                "pattern": "^(0[1-9]|[1-9][0-9])$",
+                "description": "The sequence number in the name, unique within the pick"
+              },
+              "attach": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Attached resources (virtual machines only): boot disk, data disks, static external (ip) and internal (ipi) address",
+                "properties": {
+                  "boot": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  },
+                  "data": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 9,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 1024,
+                      "pattern": "^(0[1-9]|[1-9][0-9])$"
+                    }
+                  },
+                  "ip": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  },
+                  "ipi": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

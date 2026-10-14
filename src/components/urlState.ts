@@ -483,9 +483,67 @@ function serviceContextError(plan: WizardPlan): PlanError | undefined {
   return undefined;
 }
 
-/** 모델을 고쳐 validatePlan 을 지나게 한다 — 오류 하나씩(지울 때 index 가 밀리지 않게). 모델 전체 오류 · 고칠 수 없는 오류면 undefined.
- *  매 회 모델이 줄거나 플래그 하나가 꺼지므로 끝난다 */
-export function recoverPlan(plan: WizardPlan, n: WizardNotices): WizardPlan | undefined {
+const DUP_PICK = 'wizard.duplicate_pick';
+const DUP_SLOT_ID = 'wizard.duplicate_slot_id';
+const DUP_SEQ = 'wizard.duplicate_seq';
+const SERVERLESS = 'wizard.serverless_not_supported';
+
+/** 한 번에 고칠 오류들 — 하나씩 고친 것과 결과가 같은 것만 고른다(recoverPlan.test 가 무작위 모델 600개로 대어 본다). 뒤 자리부터 돌려준다 — 지워도 아직 고치지 않은 자리가 밀리지 않는다.
+ *  · 오류 목록을 앞에서부터 본다. pick 밖 오류(서비스 자리 · pick 수 상한)를 만나면 멈춘다 — 서비스를 지우거나 자르면 자리가 밀린다
+ *  · pick 마다 첫 오류 하나. 그 첫 오류가 슬롯 자리면 pick 자리 오류를 만나기 전까지 슬롯마다 첫 오류 하나 — 슬롯 오류는 그 슬롯만 본다
+ *  · 목록(pick 중복을 보는 단위 — checkPicks 의 seen) · pick(슬롯 중복을 보는 단위)을 얼린다: 얼린 뒤의 오류는 다음 회로 미룬다. 다른 목록은 서로의 판정을 바꾸지 않는다
+ *    - 서버리스를 끄면 그 pick 의 규칙이 바뀌어 뒤 pick 이 중복이 될 수 있다 → 그 목록을 얼린다
+ *    - pick 중복은 앞의 것이 지워지면 사라질 수 있다 → 그 목록에서 이번 회에 중복 아닌 고침을 고른 pick 이 앞에 있으면 얼린다
+ *      (하나씩 고치면 앞 pick 의 오류를 끝까지 고친 뒤에 중복을 본다 — 플래그만 끈 pick 도 뒤 오류로 지워질 수 있다). 중복으로 지우는 것은 괜찮다(같은 값이 앞에 남는다)
+ *    - 슬롯 중복은 키가 둘(id · seq)이다 → id 중복으로 지운 슬롯은 seq 를, seq 중복으로 지운 슬롯은 id 를, 그 밖의 이유로 지운 슬롯은 둘 다를 막는다 */
+function batchOf(errors: readonly PlanError[]): PlanError[] {
+  interface Group { list: number; pick: number; closed: boolean; fixes: { e: PlanError; slot: number }[] }
+  const groups = new Map<string, Group>();
+  const frozenLists = new Set<number>();
+  const frozenPicks = new Set<string>();
+  /** 이번 회에 중복 아닌 고침을 고른 목록 — 그 pick 은 다음 회에 지워질 수 있다(플래그를 끈 pick 도 뒤 오류로 지워진다) */
+  const touched = new Set<number>();
+  /** pick 마다 막힌 슬롯 중복 키 */
+  const slotBlocked = new Map<string, { id: boolean; seq: boolean }>();
+  for (const e of errors) {
+    const segs = segments(e.path!);
+    const [a, b] = segs ?? [];
+    let list: number;
+    let pick: number;
+    let rest: Seg[];
+    if (a?.key === 'projectPicks' && a.index !== undefined) { list = -1; pick = a.index; rest = segs!.slice(1); }
+    else if (a?.key === 'services' && a.index !== undefined && b?.key === 'picks' && b.index !== undefined) { list = a.index; pick = b.index; rest = segs!.slice(2); }
+    else break;
+    const key = `${list}:${pick}`;
+    if (frozenLists.has(list) || frozenPicks.has(key)) continue;
+    const slot = rest[0]?.key === 'instances' && rest[0].index !== undefined ? rest[0].index : undefined;
+    const slotLevel = slot !== undefined && rest.length === 1;
+    const blocked = slotBlocked.get(key) ?? { id: false, seq: false };
+    if (e.code === DUP_PICK && rest.length === 0 && touched.has(list)) { frozenLists.add(list); continue; }
+    if (slotLevel && ((e.code === DUP_SLOT_ID && blocked.id) || (e.code === DUP_SEQ && blocked.seq))) { frozenPicks.add(key); continue; }
+    const g = groups.get(key);
+    if (!g) groups.set(key, { list, pick, closed: slot === undefined, fixes: [{ e, slot: slot ?? -1 }] });
+    else if (g.closed) continue;
+    else if (slot === undefined) { g.closed = true; continue; }
+    else if (g.fixes.some((f) => f.slot === slot)) continue;
+    else g.fixes.push({ e, slot });
+    // 고른 고침이 바꾸는 것
+    if (e.code === SERVERLESS && rest.length === 0) frozenLists.add(list);
+    if (e.code !== DUP_PICK) touched.add(list);
+    if (slotLevel) {
+      // 슬롯을 지운다(슬롯 자리 오류는 모두 그 슬롯을 지운다)
+      slotBlocked.set(key, { id: blocked.id || e.code !== DUP_SLOT_ID, seq: blocked.seq || e.code !== DUP_SEQ });
+    }
+  }
+  const all = [...groups.values()].flatMap((g) => g.fixes.map((f) => ({ ...f, list: g.list, pick: g.pick })));
+  all.sort((x, y) => y.list - x.list || y.pick - x.pick || y.slot - x.slot);
+  return all.map((f) => f.e);
+}
+
+/** 모델을 고쳐 validatePlan 을 지나게 한다. 모델 전체 오류 · 고칠 수 없는 오류면 undefined. 매 회 모델이 줄거나 플래그가 꺼지므로 끝난다.
+ *  batch(기본) — 서로 판정을 바꾸지 않는 자리들을 한 번에 고친다(batchOf). single — 오류 하나씩(시험이 batch 와 대어 보는 기준).
+ *  하나씩만 고치면 틀린 자리 n 개에 검사를 n 번 돌려 n² 이 된다 — 틀린 pick 200개짜리 링크가 1.2 s 걸렸다 */
+export function recoverPlan(plan: WizardPlan, n: WizardNotices, mode: 'batch' | 'single' = 'batch'): WizardPlan | undefined {
   for (;;) {
     const res = validatePlan(plan);
     const errors: PlanError[] = res.ok ? [] : res.errors;
@@ -494,9 +552,36 @@ export function recoverPlan(plan: WizardPlan, n: WizardNotices): WizardPlan | un
       if (!svcErr) return plan;
       errors.push(svcErr);
     }
-    const pathed = errors.find((e) => e.path !== undefined);
-    if (!pathed || !repair(plan, pathed, n)) return undefined;
+    const pathed = errors.filter((e) => e.path !== undefined);
+    if (pathed.length === 0) return undefined;
+    const batch = mode === 'batch' ? batchOf(pathed) : [];
+    if (batch.length > 1) {
+      for (const e of batch) if (!repair(plan, e, n)) return undefined;
+      continue;
+    }
+    if (!repair(plan, pathed[0]!, n)) return undefined;
   }
+}
+
+/** 복구 전에 보는 크기 상한 — pick 수 · 슬롯과 딸린 data 수. 검사를 지나는 모델은 이름이 MAX_NAMES 이하이고 pick 마다 이름이 하나 이상이라
+ *  (count 규칙은 슬롯이 하나 이상이어야 한다) 둘 다 MAX_NAMES 를 넘을 수 없다. 그 두 배를 넘으면 화면이 만든 입력이 아니라고 보고 고치지 않고 버린다(discarded) —
+ *  고치는 시간은 입력 크기에 따라 늘므로 크기를 먼저 닫는다. 링크 · 계획 파일 모두 이 길을 지난다 (D100 · recoverPlan.test) */
+export const MAX_RECOVER_PICKS = 2 * MAX_NAMES;
+export const MAX_RECOVER_NAMES = 2 * MAX_NAMES;
+
+/** 짧은 꼴 w 의 pick 수와 슬롯 · data 수 — 꼴을 믿지 않는다(배열이 아니면 0) */
+function rawSize(pp: unknown[], ss: unknown[]): { picks: number; names: number } {
+  const arr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+  const picks = [...pp, ...ss.flatMap((s) => (isObj(s) ? arr(s.p) : []))];
+  let names = 0;
+  for (const p of picks) {
+    if (!isObj(p)) continue;
+    for (const s of arr(p.i)) {
+      names++;
+      if (isObj(s) && isObj(s.a)) names += arr(s.a.d).length;
+    }
+  }
+  return { picks: picks.length, names };
 }
 
 /** 마법사 hash 의 길이 상한 (D67 · 이름 수로 닫힌 식) — 인코더는 validatePlan 을 지난 모델만 싣고, 그 모델의 슬롯 · 딸린 것은 하나하나가 이름이라
@@ -513,7 +598,8 @@ const NAME_JSON_BYTES = Math.max(
   JSON.stringify({ id: 'i'.repeat(MAX_SLOT_ID_CHARS), q: '99', a: { d: [] } }).length + 1,
   '"ipi":1,'.length, '"b":1,'.length, '"99",'.length,
 );
-const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, x: 'x'.repeat(16), w: { pp: [], s: [] } }).length
+/** 마법사 hash 를 푼 JSON 의 최악 바이트 — 계획 파일의 읽기 상한(planFile.ts)도 이 값이다 */
+export const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, x: 'x'.repeat(16), w: { pp: [], s: [] } }).length
   + 2 * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_SERVICES * (JSON.stringify({ n: '', p: [] }).length + 1 + MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES)
   + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES
@@ -553,7 +639,12 @@ export function hashKind(hash: string): HashKind {
  *  w 의 꼴이 틀리거나 모델 전체 오류면 w 를 버리고(notices.discarded) 문맥만 돌려준다 */
 export function decodeWizardState(hash: string): DecodedWizard | undefined {
   const raw = hashJson(hash, MAX_WIZARD_HASH_CHARS);
-  if (!raw || !('w' in raw) || 'r' in raw) return undefined;
+  return raw ? decodeWizardObject(raw) : undefined;
+}
+
+/** hash 의 JSON(짧은 꼴) → 마법사 상태. 계획 파일(D100 · planFile.ts)도 짧은 꼴로 옮겨 이 길을 지난다 — 복구 · 안내가 링크와 같다 */
+export function decodeWizardObject(raw: Record<string, unknown>): DecodedWizard | undefined {
+  if (!('w' in raw) || 'r' in raw) return undefined;
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   if ((['owner', 'system'] as const).some((f) => typeof raw[f] === 'string' && (raw[f] as string).length > MAX_CONTEXT_CHARS)) return undefined;
   const ctx = parseProjectContext(raw as RawContext, 'gcp');
@@ -584,6 +675,8 @@ export function decodeWizardState(hash: string): DecodedWizard | undefined {
   const pp = w.pp === undefined ? [] : w.pp;
   const ss = w.s === undefined ? [] : w.s;
   if (!Array.isArray(pp) || !Array.isArray(ss)) return discard();
+  const size = rawSize(pp as unknown[], ss as unknown[]);
+  if (size.picks > MAX_RECOVER_PICKS || size.names > MAX_RECOVER_NAMES) return discard();
   const services: WizardPlan['services'] = [];
   for (const s of ss as unknown[]) {
     if (!isObj(s) || Object.keys(s).some((k) => !SERVICE_KEYS.has(k))) { n.dropped++; continue; }

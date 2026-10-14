@@ -113,7 +113,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'selection.kind_required': { code: 'selection.kind_required', params: { index: 3, type: 'BBB', supported: ['CCC', 'DDD'] } },
   'request.body_not_json': { code: 'request.body_not_json' },
   'request.body_not_object': { code: 'request.body_not_object' },
-  'request.body_too_large': { code: 'request.body_too_large', params: { max_bytes: 16384 } },
+  'request.body_too_large': { code: 'request.body_too_large', params: { max_bytes: 32768 } },
   'request.context_not_object': { code: 'request.context_not_object' },
   'request.field_too_long': { code: 'request.field_too_long', field: 'owner', params: { max: 1024 } },
   'request.providers_not_array': { code: 'request.providers_not_array' },
@@ -240,7 +240,8 @@ describe('영어 사전 (D24)', () => {
     expect(en.ui.nav_pick).toBe('Pick resources');
     expect(UI_KEYS.filter((k) => k.startsWith('wizard_link_'))).toEqual(['wizard_link_broken', 'wizard_link_discarded', 'wizard_link_dropped', 'wizard_link_ha_off', 'wizard_link_serverless_off', 'wizard_link_trimmed']);
     expect(en.ui.wizard_link_broken).toMatch(/could not be opened/);
-    expect(fillUi(en, 'wizard_link_dropped', { n: 2 })).toBe('2 invalid item(s) in this link were left out.');
+    expect(fillUi(en, 'wizard_link_dropped', { n: 2 })).toBe('2 invalid item(s) in this link or file were left out.');
+    expect(fillUi(en, 'plan_file_ignored_keys', { n: 3 })).toBe('3 unknown field(s) in this file were ignored — POST /v1/wizard ignores them too.');
     expect(en.ui.wizard_ha_hint).toMatch(/different zones/);
     for (const k of UI_KEYS.filter((x) => x.startsWith('wizard_'))) expect(HANGUL.test(en.ui[k]), k).toBe(false);
   });

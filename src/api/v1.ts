@@ -13,9 +13,10 @@ import { fail, internalError } from './errors';
 import { VERSION } from '../version';
 import { rateLimit } from './ratelimit';
 
-/** 본문 상한 — 정상 본문은 1KB 안이다. 넘으면 파싱 전에 413.
+/** 본문 상한 — 32 KiB (D100). 마법사 계획 파일을 그대로 보내도 들어가야 한다 — 이름 200개 최악 계획의 압축 본문이 약 26 KB 다.
+ *  넘으면 파싱 전에 413. 계획 파일 쪽 같은 값은 src/plan/wire.ts 의 PLAN_MAX_BODY_BYTES(limits.test 가 둘을 대어 본다).
  *  content-length 가 있으면 헤더로, 없으면(chunked) 스트림을 읽다가 넘는 순간 onError — 어느 쪽이든 413 이다 */
-export const MAX_BODY_BYTES = 16 * 1024;
+export const MAX_BODY_BYTES = 32 * 1024;
 
 export const v1 = new Hono<App>();
 // every 로 한 번에 건다 — use 를 둘로 나누면 라우트 목록에 ALL /v1/* 가 둘 생긴다. cors 가 preflight 에 204 를 내면 제한 · bodyLimit 은 돌지 않는다.

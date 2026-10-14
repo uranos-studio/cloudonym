@@ -125,7 +125,7 @@
             }
           },
           "413": {
-            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
             "content": {
               "application/json": {
                 "schema": {
@@ -245,7 +245,7 @@
             }
           },
           "413": {
-            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
             "content": {
               "application/json": {
                 "schema": {
@@ -338,7 +338,7 @@
             }
           },
           "413": {
-            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
             "content": {
               "application/json": {
                 "schema": {
@@ -429,7 +429,7 @@
             }
           },
           "413": {
-            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
             "content": {
               "application/json": {
                 "schema": {
@@ -668,7 +668,7 @@
             }
           },
           "413": {
-            "description": "Request body is larger than 16 KB (request.body_too_large)",
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1514,9 +1514,10 @@
               "all-names",
               "names-json",
               "terraform",
-              "tags-json"
+              "tags-json",
+              "plan-json"
             ],
-            "description": "Which copy button succeeded. Required when event is ui_copy (missing is 400 request.field_missing, unknown is 400 request.value_unsupported, both with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
+            "description": "Which copy button succeeded (plan-json: the wizard's Save plan download, D100). Required when event is ui_copy (missing is 400 request.field_missing, unknown is 400 request.value_unsupported, both with field target); ignored for the other events. The copied text, the item key and the resource type are never sent.",
             "example": "names-json"
           },
           "chip_rules": {
@@ -1981,6 +1982,29 @@
             "maxLength": 1024,
             "description": "Optional pin to a rules revision (YYYY-MM-DD.N). If it differs from the current revision the API answers 409 instead of returning names that may differ. Not a string -> 400.",
             "example": "2026-09-29.2"
+          },
+          "environments": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "prod",
+                "stg",
+                "dev",
+                "sbx",
+                "qa",
+                "uat",
+                "test",
+                "perf",
+                "dr"
+              ]
+            },
+            "description": "Ignored by the API. A plan file saved from the wizard (Save plan, D100) is this request body plus this list when the plan has two or more environments; project.env is the first. The API names project.env only, so send one request per environment with project.env set to each value.",
+            "example": [
+              "prod",
+              "stg"
+            ]
           }
         }
       },

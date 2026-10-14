@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
 import { en } from '../messages/en';
 
-const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '../version.ts', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.tsx', '../version.ts', '../plan/*.ts', '!./*.test.ts', '!../plan/*.test.ts'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const html = import.meta.glob('../../index.html', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 const HANGUL = /\p{Script=Hangul}/u;
