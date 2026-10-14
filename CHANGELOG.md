@@ -2,6 +2,22 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Changed
+
+- **Phone header: everything in the More menu** (D105) — below 768 px the header keeps only the logo, the product name, the cloud badges and **More**; the tagline is not shown. **Share URL**, **Save plan** (wizard) and the screen mode move into the menu: Share URL and Save plan first, then the D104 items, then a **Screen mode** group of three items that shows the current mode. Share URL from the menu copies the same link and reports the result in a status line under the header; on a phone the share warning appears after Share URL is pressed, on `/pick` as well as in the wizard. At 360 px the wizard header is 107 px (was 189) and the `/pick` header 61 px (was 223); 768 px and wider are unchanged. Screen only: rules revision and every API response are unchanged.
+
+### Fixed
+
+- **Terraform example key** — `examples/terraform/README.md` now uses the item key `service/shop/compute_instance/-/web/01/data/01` (with the empty kind slot `-`), the key `POST /v1/wizard` actually returns for `wizard.json`; the old key without `-` matched nothing in `gcp_names`.
+- **Documentation** — CONTRIBUTING lists `npm run test:cli` with the other local checks (six, as CI runs them) and names where rules live (`src/core/rules/`); SECURITY lists every endpoint (`/v1/names`, `/v1/wizard`, `/v1/health`, `/catalog.json`) and the repository CLI; `/openapi.json` states the license (Apache-2.0); `docs/rule-verification.md` and `docs/decisions.md` describe what they cover accurately.
+
+### Added
+
+- **DCO check** — a `dco` workflow fails a pull request when any of its commits lacks a `Signed-off-by:` line matching the commit's author email.
+- **Community files** — issue forms for bugs and feature requests (blank issues off, vulnerabilities pointed to private security advisories), a pull request checklist and a Code of Conduct (Contributor Covenant 2.1).
+
 ## [0.1.2] - 2026-10-14
 
 The wizard starts with the project values, saves and opens plan files, and gains a header menu; the API gains a guide page, capped error lists and a repository CLI. Google Cloud only, as in 0.1.0.
@@ -106,3 +122,8 @@ These changes were made before any public deployment, so no released name depend
 ### History
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
+
+[Unreleased]: https://github.com/uranos-studio/cloudonym/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/uranos-studio/cloudonym/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/uranos-studio/cloudonym/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/uranos-studio/cloudonym/releases/tag/v0.1.0

@@ -1,0 +1,44 @@
+# PR 의 commit 마다 작성자 이메일과 같은 Signed-off-by 줄이 있는지 본다 (DCO). 하나라도 없으면 non-zero 로 끝난다
+name: dco
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dco-${{ github.ref }}
+  cancel-in-progress: true
+
+# 액션은 커밋 SHA 로 고정한다 — ci.yml 과 같은 버전이다
+jobs:
+  signoff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: check Signed-off-by
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          missing=0
+          # merge commit 은 서명 대상이 아니다 — 브랜치에서 만든 commit 만 본다
+          for sha in $(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}"); do
+            email=$(git log -1 --format='%ae' "${sha}")
+            if git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "${sha}" | grep -qiF "<${email}>"; then
+              echo "ok      ${sha} ${email}"
+            else
+              echo "::error::${sha} has no 'Signed-off-by:' line for its author <${email}>. Use 'git commit -s' (see CONTRIBUTING.md)."
+              missing=$((missing + 1))
+            fi
+          done
+          if [ "${missing}" -ne 0 ]; then
+            echo "${missing} commit(s) without a matching sign-off"
+            exit 1
+          fi

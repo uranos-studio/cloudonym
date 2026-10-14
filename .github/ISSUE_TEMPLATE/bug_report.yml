@@ -1,0 +1,49 @@
+name: Bug report
+description: A wrong name or verdict, an API error, or a problem in the web UI.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Do not include internal company or project names — the issue is public.
+        A name that Cloudonym marks `valid: true` but the provider rejects is the engine's critical bug class; you may also report it privately (see SECURITY.md).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - Engine (a name, verdict or label)
+        - API (/v1/*, /llms.txt, /catalog.json, /openapi.json)
+        - Web UI
+        - Repository CLI (cli/)
+        - Terraform example
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact request body or input, or the screen steps.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: The response, name or screen you got. For a naming rule, add the provider's error message.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: For a naming rule, link the provider's official document that states the limit.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`version.engine` and `version.rules` from a response, or the commit you tested."

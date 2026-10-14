@@ -20,13 +20,14 @@ npm run typecheck  # tsc -b --noEmit
 npm run lint       # oxlint
 npm run build      # tsc -b && vite build && node scripts/check-bundle.mjs
 npm run test:rules # node --test scripts/rules/*.test.mjs scripts/catalog/*.test.mjs (rule and catalog generators, source checks)
+npm run test:cli   # node --test cli/*.test.mjs (repository CLI)
 ```
 
-All five must pass before you open a pull request. Add or update tests for any behaviour you change.
+All six must pass before you open a pull request. Add or update tests for any behaviour you change.
 
 ## Rules the code must follow
 
-- **Every naming limit cites the provider's official documentation.** A length, pattern or forbidden word in `src/core/constraints.ts` needs a `docUrl` pointing to the official AWS, Google Cloud or Microsoft Azure document that states it. Rules without an official source are not accepted. Where a document is ambiguous, the limit is set conservatively and recorded in [docs/decisions.md](docs/decisions.md) — see the existing D numbers there.
+- **Every naming limit cites the provider's official documentation.** A length, pattern or forbidden word in a rule (`src/core/rules/*.ts`, merged into `RULES` by `src/core/constraints.ts`) or in `LABEL_LIMITS` (`src/core/constraints.ts`) needs a `docUrl` pointing to the official AWS, Google Cloud or Microsoft Azure document that states it. Rules without an official source are not accepted. Where a document is ambiguous, the limit is set conservatively and recorded in [docs/decisions.md](docs/decisions.md) — see the existing D numbers there.
 - **Never mark an invalid name valid.** If a name cannot be shortened to fit, the engine returns `valid: false` with a reason instead of truncating it into something the provider would reject. When a document is ambiguous, choose the stricter limit.
 - **Rule changes bump the rules revision.** Any change that can give a different name, verdict, suggestion or label for the same input needs a new `RULES_REVISION` in `src/core/revision.ts` (`YYYY-MM-DD.N`) and a rewritten `src/core/rules-fingerprint.json` (`UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts`). CI compares the fingerprint with `main` and fails if one changes without the other.
 - **The engine version lives in two places.** When you change `version` in `package.json`, change `ENGINE_VERSION` in `src/version.ts` too — a test fails if they differ. The build fails if a devDependency name appears in `dist/` (`scripts/check-bundle.mjs`).
@@ -104,7 +105,7 @@ Sign off **every commit** with `git commit -s`, which adds a line like this usin
 Signed-off-by: Your Name <you@example.com>
 ```
 
-Use your real name. To sign off commits you already made: `git commit --amend -s` for the last one, or `git rebase --signoff main` for a branch. Pull requests with unsigned commits cannot be merged.
+Use your real name. To sign off commits you already made: `git commit --amend -s` for the last one, or `git rebase --signoff main` for a branch. Sign-off is required: the `dco` workflow checks every commit of a pull request for a `Signed-off-by:` line that matches the commit's author email, and fails the check if one is missing.
 
 ## License of contributions
 
@@ -115,7 +116,7 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 ## 한국어 요약
 
 - **issue · PR 모두 환영한다.** 큰 변경(새 provider · 새 리소스 · API 변경)은 issue 로 먼저 방향을 맞춘다. 보안 문제는 [SECURITY.md](SECURITY.md) 를 따른다
-- **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run test:rules` 다섯을 통과시킨 뒤 PR 을 연다
+- **로컬 확인** — `.nvmrc` 의 Node 로 `npm test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run test:rules` · `npm run test:cli` 여섯을 통과시킨 뒤 PR 을 연다
 - **catalog 고치기** — GCP 의 약어 · 고유성 부류 · 지역 토큰 종류 · 종류와 토큰 · 설명 · 별칭과 세 CSP 의 리전 · 존 코드는 `catalog/*.json` 이 정본이다. JSON 을 고치고 **`npm run catalog`** 로 생성 파일(`src/core/rules/gcp-catalog.ts` · `src/core/regions-data.ts`)을 다시 쓴 뒤 `npm test`(`catalog.test.ts` · `catalog-collision.test.ts`)를 돌린다. 이름이 바뀌므로 규칙 버전도 올린다
 - **규칙 더하기** — 공식 문장을 찾아 `docUrl` · `entity` · `scope` 를 정한다 → 생성 행은 `scripts/rules/build-<provider>-rules.mjs` 를 다시 돌리고(`*-intake.ts` 는 손으로 고치지 않는다), 손 행은 `src/core/rules/<provider>-manual.ts` 에 원문을 인용해 넣는다 → 규칙마다 허용 · 거부 예가 있어야 `rule-cases.test.ts` 가 통과한다 → 출처를 새로 받았으면 `check-sources.mjs … --write` 로 `docs/rule-sources.lock.json` 을 고친다 → `RULES_REVISION` 을 올리고 `UPDATE_FINGERPRINT=1 npx vitest run src/core/revision.test.ts` (기준선이 바뀌었으면 `UPDATE_BASELINE=1 npx vitest run src/core/baseline.test.ts`) 로 지문을 다시 쓴다
 - **마법사 프리셋 더하기** — 코드가 아니라 데이터다(D59 · D64). `src/core/wizard/presets.ts` 의 `PRESETS` 에 한 행(`id` · `label` · `ruleId` · `tier` · `ha` · `serverless`, 필요하면 `tierChoices` · `defaultAttach` · `group`)을 더하면 화면 · `/llms.txt` · `/docs/naming` 이 같은 배열을 읽는다. tier 는 `^[a-z0-9]{2,16}$` 이고 예약어(약어 · 종류 토큰 · 환경 값과 별칭 · 리전 · 존 코드)가 아니어야 한다 — `presets.test.ts` 가 본다. 딸린 리소스는 `attachments.ts` 의 호환표에서 온다. 지금 목록을 고정한 기대값(`presets.test.ts` · `llms.test.ts` 의 `## Wizard presets` · `namingDoc.test.ts`)을 같이 고친다
@@ -123,5 +124,5 @@ Cloudonym is licensed under the [Apache License, Version 2.0](LICENSE). As state
 - **규칙을 바꾸면 규칙 버전을 올린다** — 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경은 `src/core/revision.ts` 의 `RULES_REVISION` 을 올리고 `src/core/rules-fingerprint.json` 을 다시 쓴다. CI 가 `main` 과 대어 본다
 - **엔진 버전은 두 곳에 있다** — `package.json` 의 `version` 을 바꾸면 `src/version.ts` 의 `ENGINE_VERSION` 도 같이 바꾼다(다르면 시험이 실패한다). `dist/` 에 devDependency 이름이 있으면 빌드가 실패한다
 - **시스템 문구는 사전에서 나온다** — API 메시지와 화면 문구는 `src/messages/en.ts` 의 영어 문장이고 엔진은 코드만 돌려준다
-- **모든 commit 에 `git commit -s` 로 서명한다** — CLA 대신 [DCO](DCO) 를 쓴다
+- **모든 commit 에 `git commit -s` 로 서명한다** — CLA 대신 [DCO](DCO) 를 쓴다. PR 의 `dco` 검사가 commit 마다 작성자 이메일과 같은 `Signed-off-by:` 줄이 있는지 본다
 - **기여물은 Apache License 2.0 §5 에 따라 같은 조건으로 제공된다**(inbound = outbound)
