@@ -22,7 +22,7 @@ import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, 
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
-import { PanelRightOpen, X } from 'lucide-react';
+import { Check, PanelRightOpen, X } from 'lucide-react';
 import { INTRO_KEY, readPref, writePref } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
@@ -352,8 +352,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
         // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
         badge={(
-          <span data-wizard-cloud title={en.ui.wizard_cloud_label} className="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
-            {en.ui.wizard_cloud}<span className="font-normal text-indigo-700 dark:text-indigo-300"> · {en.ui.wizard_cloud_soon}</span>
+          // 지금 쓰는 것(진한 배지 · 체크)과 예정인 것(점선 · 흐림)을 두 배지로 나눈다 — 한 배지에 붙여 쓰면 셋 다 되는 것처럼 읽힌다
+          <span role="group" aria-label={en.ui.wizard_cloud_label} className="inline-flex flex-wrap items-center gap-1.5">
+            <span data-wizard-cloud className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
+              <Check aria-hidden="true" className="size-3" />{en.ui.wizard_cloud}
+            </span>
+            <span data-wizard-cloud-soon className="rounded-full border border-dashed border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+              {en.ui.wizard_cloud_soon}
+            </span>
           </span>
         )}
       />
