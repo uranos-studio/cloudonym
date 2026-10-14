@@ -2,6 +2,14 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [0.1.1] - 2026-10-14
+
+Rules revision for this release: 2026-10-13.3 (unchanged).
+
+### Changed
+
+- **Privacy: Axiom record copies** — `/privacy` states that the operator copies the Axiom records regularly to its own storage and keeps each copy for two years, in addition to the 30-day retention of the Axiom dataset. A copy holds the same fields as the record. No code path, name or rule changes.
+
 ## [0.1.0] - 2026-10-13
 
 The first public release. It opens **Google Cloud** only; the AWS and Azure rule data stays in the engine and its tests and is shown as "Coming soon".

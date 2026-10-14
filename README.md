@@ -96,7 +96,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -139,7 +139,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -186,7 +186,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -217,7 +217,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.0", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.1", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
