@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } from './route';
+import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } from './route';
 
 describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를 고른다 (D57)', () => {
   it.each([
     ['/', 'app'], ['', 'app'], ['/index.html', 'app'], ['/docs', 'app'], ['/docs/naming/extra', 'app'], ['/privacy-policy', 'app'],
     [PICK_PATH, 'pick'], ['/pick/', 'pick'], ['/pick/x', 'app'], ['/picks', 'app'],
     [NAMING_PATH, 'naming'], ['/docs/naming/', 'naming'], [PRIVACY_PATH, 'privacy'], ['/privacy/', 'privacy'],
+    [API_PATH, 'api'], ['/docs/api/', 'api'], ['/docs/api/x', 'app'], ['/docs/apis', 'app'],
   ])('%s → %s', (path, route) => {
     expect(routeOf(path)).toBe(route);
   });
@@ -19,6 +20,7 @@ describe('withStateHash — 앱 ↔ 문서 링크가 상태 hash 를 실어 간�
     expect(withStateHash('/', '#state=ab-_c+/d=')).toBe('/#state=ab-_c+/d=');
     expect(withStateHash(PRIVACY_PATH, '')).toBe('/privacy');
     expect(withStateHash(PICK_PATH, '#state=abc')).toBe('/pick#state=abc');
+    expect(withStateHash(API_PATH, '#state=abc')).toBe('/docs/api#state=abc');
     expect(withStateHash('/', '#other')).toBe('/');
     expect(withStateHash('/', '#state=')).toBe('/');
     expect(withStateHash('/', '#state=a"><script>')).toBe('/');

@@ -32,6 +32,12 @@ describe('README.md — 지원 리소스 · 규칙 버전 · 예시', () => {
     expect(inJson.length).toBeGreaterThan(0);
     for (const v of inJson) expect(v).toBe(RULES_REVISION);
   });
+  it('API 절은 배포돼 있다는 사실과 맞다 — 「공개 도메인이 없다」 문장이 없고 /docs/api 를 가리킨다 (D98)', () => {
+    expect(readme).not.toMatch(/no public domain yet/i);
+    expect(readme).not.toContain('아직 공개 도메인이 없다');
+    expect(readme).toMatch(/## API in three lines\n\n[^\n]*`\/docs\/api`/);
+    expect(readme).toMatch(/### API 세 줄\n\n[^\n]*`\/docs\/api`/);
+  });
   it('옛 이름 체계의 값이 예시에 남지 않는다 — 나라 지역 값 · prd 이름 · 꺼진 CSP 요청', () => {
     expect(readme).not.toMatch(/"region":\s*"(kr|us|jp|eu)"/);
     expect(readme).not.toMatch(/-(kr|prd)-/);

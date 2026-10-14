@@ -4,8 +4,13 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Added
+
+- **API guide at `/docs/api`** (D98) — a page for people: every endpoint with what it does and whether it is rate limited, a curl example for each public endpoint built from the request example in `/openapi.json` (the host is the page's own address), the top level of each response, the rate limit with `429` and `Retry-After`, the failure shape, `version` and `rules_version` (`409`), what PASS means, the Terraform example and what is counted (with a Privacy link). The header has a new **API** link. `POST /v1/events` is listed as internal. Screen only: rules revision `2026-10-13.3` and every API response are unchanged.
+
 ### Changed
 
+- **README API section** — it no longer says there is no public domain; it says to use the deployed site's URL or your own Worker's, and points to `/docs/api`.
 - **Cloud badges** — the header shows two badges instead of one: **Google Cloud** (solid, with a check — supported now) and **AWS · Azure coming soon** (dashed, muted). A screen reader hears "Supported now: Google Cloud. Coming soon: AWS and Azure."
 - **Wizard first visit starts with the project values** (D97) — opening `/` with no link now starts with empty owner, system, environment and region; the example values are input placeholders only, and the network prefill (D90) is unchanged. The Project row is selected first (on a phone, the Edit tab), untouched empty fields show no errors, the Names column asks for the project values and offers no Copy all, JSON or Terraform until they are valid, and a **Next: what are you building** button then opens the first service's cards. No hash is written until the project values are valid. Links open exactly as before. Screen only: rules revision `2026-10-13.3`, `POST /v1/wizard` and `/v1/generate` are unchanged.
 - **Intro and tagline** (D97) — the intro is a neutral note saying what Cloudonym does, what you get, what it does not do and the order of the steps, with a Naming guide link; the share-link warning appears only when Share is pressed. The header tagline names Google Cloud only (the badge beside it says AWS and Azure are coming); the page description says AWS and Azure come later. The intro's dismiss key is now `cloudonym:intro_dismissed_v2`, so a browser that closed the earlier note sees the new intro once.

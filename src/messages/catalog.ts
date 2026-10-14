@@ -34,6 +34,12 @@ export const UI_KEYS = [
   'info_toggle', 'enter_name_at', 'badge_api_only', 'badge_api_only_title', 'badge_preview', 'badge_preview_title', 'api_only_filter',
   // 헤더 · 푸터의 문서 경로 링크 (D57)
   'nav_naming_guide', 'footer_privacy', 'back_to_app',
+  // ApiDoc — /docs/api (D98)
+  'nav_api', 'api_title', 'api_intro', 'api_endpoints_title', 'api_col_method', 'api_col_path', 'api_col_what', 'api_col_limited',
+  'api_yes', 'api_no', 'api_llms_summary', 'api_openapi_summary', 'api_internal', 'api_examples_title', 'api_examples_body',
+  'api_request', 'api_response', 'api_loading', 'api_spec_failed', 'api_auth_title', 'api_auth_body', 'api_limits_title',
+  'api_limits_body', 'api_errors_title', 'api_errors_body', 'api_version_title', 'api_version_body', 'api_terraform_title',
+  'api_terraform_body', 'api_telemetry_title', 'api_telemetry_body',
   // NamingDoc — /docs/naming (D57)
   'doc_title',
   'doc_intro', 'doc_formula_title', 'doc_formula_body', 'doc_formula_caption', 'doc_col_formula', 'doc_col_optional',

@@ -9,6 +9,7 @@ import type { WizardPlan } from '../core/wizard/plan';
 import { PRESETS } from '../core/wizard/presets';
 import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from '../components/privacyModel';
 import { AVAILABILITY_ORIGIN } from '../components/availabilityOrigin';
+import { API_DOC_RATE_LIMIT } from '../components/apiDocModel';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -32,6 +33,8 @@ describe('화면 · 안내 ↔ API 상수', () => {
   it('KV 보존 일수 × 86400 = expirationTtl · 요청 제한 숫자 = RATE_LIMIT', () => {
     expect(PRIVACY_KV_RETENTION_DAYS * 86400).toBe(KV_TTL_SECONDS);
     expect(PRIVACY_RATE_LIMIT).toEqual(RATE_LIMIT);
+    // /docs/api 안내(D98)도 같은 숫자를 보인다
+    expect(API_DOC_RATE_LIMIT).toEqual(RATE_LIMIT);
   });
 });
 

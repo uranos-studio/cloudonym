@@ -10,7 +10,7 @@ import { AppHeader } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
-import { NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
+import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
 import { addedRow, expandedAfterRemove, firstSelection, parseRow, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
@@ -348,7 +348,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   return (
     <div className="min-h-screen">
       <AppHeader
-        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} reserveShare shareWarning={false}
+        screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} reserveShare shareWarning={false}
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
         // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
         badge={(

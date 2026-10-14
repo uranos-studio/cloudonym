@@ -1,6 +1,6 @@
-// 머리글 — 트리 화면 · 마법사가 같이 쓴다. 제품 이름 · Share URL(있을 때만) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · llms.txt
+// 머리글 — 트리 화면 · 마법사가 같이 쓴다. 제품 이름 · Share URL(있을 때만) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · API 안내(D98) · llms.txt
 import type { ReactNode } from 'react';
-import { BookOpen, Cloud, Copy, FileText, ListTree, Wand2 } from 'lucide-react';
+import { BookOpen, Cloud, Copy, FileText, ListTree, Terminal, Wand2 } from 'lucide-react';
 import { COPY_BUTTON } from './CopyButton';
 import { ThemeToggle } from './ThemeToggle';
 import { en } from '../messages/en';
@@ -17,6 +17,8 @@ interface Props {
   /** 다른 화면의 경로 */
   otherHref: string;
   namingHref: string;
+  /** /docs/api — 상태 hash 를 실어 간다 */
+  apiHref: string;
   /** Share URL 이 없을 때도 그 자리(단추 · 경고 줄)를 비워 둔다 — 단추가 나타나고 사라질 때 머리 높이가 바뀌지 않게(마법사) */
   reserveShare?: boolean;
   /** 공유 경고 줄을 머리에 늘 보이는가 — 마법사는 Share 를 누를 때 그 곁에 보인다(D93) */
@@ -25,7 +27,7 @@ interface Props {
   badge?: ReactNode;
 }
 
-export function AppHeader({ share, screen, otherHref, namingHref, reserveShare = false, shareWarning = true, badge }: Props) {
+export function AppHeader({ share, screen, otherHref, namingHref, apiHref, reserveShare = false, shareWarning = true, badge }: Props) {
   return (
     <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -49,6 +51,7 @@ export function AppHeader({ share, screen, otherHref, namingHref, reserveShare =
             ? <a href={otherHref} data-nav-wizard title={en.ui.nav_wizard_label} className={NAV_LINK}><Wand2 aria-hidden="true" className="size-4" />{en.ui.nav_wizard}</a>
             : <a href={otherHref} data-nav-pick title={en.ui.nav_pick_label} className={NAV_LINK}><ListTree aria-hidden="true" className="size-4" />{en.ui.nav_pick}</a>}
           <a href={namingHref} data-nav-naming className={NAV_LINK}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
+          <a href={apiHref} data-nav-api className={NAV_LINK}><Terminal aria-hidden="true" className="size-4" />{en.ui.nav_api}</a>
           <a href="/llms.txt" target="_blank" rel="noreferrer" className={NAV_LINK}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
           <ThemeToggle />
         </nav>

@@ -6,7 +6,9 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { Message } from '../messages/catalog';
 import { toWireMessage, type WireMessage } from './serialize';
 
-export type FailStatus = 400 | 403 | 404 | 409 | 413 | 429 | 500;
+/** 실패 상태 코드 전부 — /docs/api 안내(D98)가 같은 목록을 보이는지 src/api/apidoc-sync.test.ts 가 본다 */
+export const FAIL_STATUSES = [400, 403, 404, 409, 413, 429, 500] as const;
+export type FailStatus = (typeof FAIL_STATUSES)[number];
 
 /** rewrite — 라우트가 문장을 요청 본문의 이름으로 고칠 때(/v1/wizard). 꼴은 그대로다 */
 export function fail(c: Context, status: FailStatus, messages: Message[], extra: { supported?: string[]; rewrite?: (w: WireMessage) => WireMessage } = {}, headers: Record<string, string> = {}): Response {

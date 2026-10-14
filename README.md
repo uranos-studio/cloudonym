@@ -81,7 +81,7 @@ Both screens keep their state in the URL hash — the wizard its project values,
 
 ## API in three lines
 
-There is no public domain yet — replace `https://<your-deployment>` with your Worker URL (or the URL `npm run dev` prints).
+Replace `https://<your-deployment>` with the URL of the deployed site, or of a Worker you deployed yourself (or the URL `npm run dev` prints). The site's `/docs/api` page has the same guide, with every endpoint, a curl example built from `/openapi.json` and the rate limit.
 
 ```sh
 curl -s -X POST https://<your-deployment>/v1/generate -H 'content-type: application/json' \
@@ -435,7 +435,7 @@ See the LICENSE file for details.
 
 ### API 세 줄
 
-아직 공개 도메인이 없다. `https://<your-deployment>` 를 배포한 Worker 의 URL(또는 `npm run dev` 가 찍는 URL)로 바꾼다. 요청 · 응답 예시는 위 [API in three lines](#api-in-three-lines) 와 같다.
+`https://<your-deployment>` 를 배포된 사이트의 URL, 또는 직접 배포한 Worker 의 URL(또는 `npm run dev` 가 찍는 URL)로 바꾼다. 사이트의 `/docs/api` 쪽에 같은 안내가 있다 — 엔드포인트 전부 · `/openapi.json` 에서 만든 curl 예제 · 요청 제한. 요청 · 응답 예시는 위 [API in three lines](#api-in-three-lines) 와 같다.
 
 ```sh
 curl -s -X POST https://<your-deployment>/v1/generate -H 'content-type: application/json' \

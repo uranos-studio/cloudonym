@@ -1,7 +1,9 @@
-// 경로 분기 (D57 · D68) — `/pick` · `/docs/naming` · `/privacy` 는 SPA 경로다(wrangler 의 not_found_handling 이 index.html 을 준다). 라우터 의존성 없이 pathname 하나로 고른다
-export type Route = 'app' | 'pick' | 'naming' | 'privacy';
+// 경로 분기 (D57 · D68 · D98) — `/pick` · `/docs/naming` · `/docs/api` · `/privacy` 는 SPA 경로다(wrangler 의 not_found_handling 이 index.html 을 준다). 라우터 의존성 없이 pathname 하나로 고른다
+export type Route = 'app' | 'pick' | 'naming' | 'api' | 'privacy';
 
 export const NAMING_PATH = '/docs/naming';
+/** 사람이 읽는 API 안내 (D98) */
+export const API_PATH = '/docs/api';
 export const PRIVACY_PATH = '/privacy';
 /** 트리 화면(리소스 고르기) — 트리 Share URL 의 자리 (D68). 뿌리 `/` 는 늘 마법사다 — 트리 꼴 hash 는 이 경로로 옮긴다 (D76) */
 export const PICK_PATH = '/pick';
@@ -11,6 +13,7 @@ export const WIZARD_PATH = '/';
 export function routeOf(pathname: string): Route {
   const p = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
   if (p === NAMING_PATH) return 'naming';
+  if (p === API_PATH) return 'api';
   if (p === PRIVACY_PATH) return 'privacy';
   if (p === PICK_PATH) return 'pick';
   return 'app';

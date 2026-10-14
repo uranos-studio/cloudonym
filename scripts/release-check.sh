@@ -129,14 +129,14 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (provider enums [\"gcp\"] in generate, names, validate)"; fi
 fi
 
-# 5. 화면 경로 — /docs/naming · /privacy 는 클라이언트 라우팅(React)이라 서버는 어느 경로에나 같은 index.html 을 준다
+# 5. 화면 경로 — /docs/naming · /docs/api · /privacy 는 클라이언트 라우팅(React)이라 서버는 어느 경로에나 같은 index.html 을 준다
 #    (wrangler.jsonc assets.not_found_handling: "single-page-application"). 그래서 서버 응답으로는 그 쪽이 있는지 가릴 수 없다 —
 #    없는 경로 /does-not-exist-<랜덤> 과 본문이 같은지만 보고 「SPA 로 서빙됨」만 확인한다. 쪽의 내용은 화면 시험이 본다
 control="/does-not-exist-${RANDOM}${RANDOM}"
 code="$(fetch GET "${control}")"
 if expect_status "GET ${control} (control)" "${code}" 200; then
   cp "${body}" "${work}/control.html"
-  for route in /docs/naming /privacy; do
+  for route in /docs/naming /docs/api /privacy; do
     name="GET ${route} served by the SPA"
     code="$(fetch GET "${route}")"
     if expect_status "${name}" "${code}" 200; then
