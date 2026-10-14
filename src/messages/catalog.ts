@@ -15,7 +15,7 @@ export const UI_KEYS = [
   // RegionPicker (D49 · D50)
   'region_search_placeholder', 'region_no_match', 'region_options_label',
   // App — 네 단계 (D42)
-  'tagline', 'nav_label', 'share_button', 'share_button_label', 'share_warning', 'results_title',
+  'tagline', 'nav_label', 'nav_more', 'nav_more_label', 'share_button', 'share_button_label', 'share_warning', 'results_title',
   'empty_state', 'pass_meaning', 'version_footer', 'rules_version_mismatch',
   'step_cloud', 'step_context', 'step_resources', 'step_names', 'selection_dropped', 'switch_cloud_confirm',
   'sticky_summary', 'sticky_jump',

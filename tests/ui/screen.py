@@ -1,5 +1,6 @@
 """화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90 · D93)의 ㉚~㊼ ·
-화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52) 를 재고 스크린샷을 남긴다.
+화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104)의 (53) 를 재고 스크린샷을 남긴다.
+머리 밖에는 Share URL · Save plan · More · 화면 모드만 있다 — Open plan · 화면 전환 · Naming guide · API · llms.txt 는 More 메뉴 안이라 누르기 전에 open_more 로 연다(D104).
 링크 없는 첫 화면은 프로젝트 값이 빈칸이다(D97) — 예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
@@ -1076,7 +1077,8 @@ def wizard_scenarios(browser, rules_version, errors):
     wizard_first_visit(browser, rules_version, errors)
     api_doc(browser, errors)
     plan_file(browser, rules_version, errors)
-    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) 통과')
+    header_menu(browser, errors)
+    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) 통과')
 
 
 def wizard_selection_focus(browser, errors):
@@ -1410,6 +1412,22 @@ def no_hscroll(page, width, what):
     assert page.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), f'{what} — {width}px 에서 가로 스크롤이 생긴다'
 
 
+def open_more(page):
+    """머리의 More 메뉴를 연다 (D104) — 메뉴 안의 항목(data-nav-* · data-plan-open)을 누르기 전에 부른다"""
+    page.click('header [data-nav-more]')
+    expect(page.locator('header [data-nav-menu]')).to_be_visible()
+
+
+def header_rows(page):
+    """머리의 줄 — (머리 높이, 단추 줄이 로고 줄과 같은 줄인가, 단추 줄이 한 줄인가)"""
+    hb = page.locator('header').bounding_box()
+    nav = page.locator('header nav').bounding_box()
+    brand = page.locator('header h1').bounding_box()
+    # 단추마다 높이가 달라(화면 모드 묶음이 더 크다) 위끝이 다르다 — 모든 단추의 세로 범위가 겹치면 한 줄이다
+    spans = page.eval_on_selector_all('header nav > *', 'els => els.filter(e => e.checkVisibility()).map(e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; })')
+    return hb['height'], nav['y'] < brand['y'] + brand['height'], max(t for t, _ in spans) < min(b for _, b in spans)
+
+
 def wizard_narrow(browser, errors):
     """㊹ 좁은 화면 (D89 · D93) — 태블릿(768–1279)은 목록 · 설정 두 칸 + 이름 드로어, 폰(<768)은 한 칸 + 위 탭 셋(Plan · Edit · Names). 1280 은 세 칸 그대로.
     값은 중립 예시(devops · payments · shop · pay)다. 스크린샷 07 · 08 은 wizard_narrow_shots 가 새 창에서 찍는다"""
@@ -1727,6 +1745,7 @@ def api_doc(browser, errors):
     # 머리 링크 — 마법사(첫 방문 · hash 없음)에서 눌러 간다 · 트리에서는 hash 를 실어 간다
     goto_ready(pg, BASE + '/')
     expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api')
+    open_more(pg)
     pg.click('header [data-nav-api]')
     pg.wait_for_url(BASE + '/docs/api')
     expect(rows).to_have_count(len(ops) + 2)
@@ -1734,6 +1753,7 @@ def api_doc(browser, errors):
     goto_ready(pg, tree_link)
     expect(pg.locator('[data-tree]')).to_have_count(1)
     expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api' + state_hash(INPUT))
+    open_more(pg)
     pg.click('header [data-nav-api]')
     pg.wait_for_url(re.compile(re.escape(BASE + '/docs/api') + r'(#.*)?$'))
     expect(pg.locator('h1')).to_have_text('API')
@@ -1794,6 +1814,146 @@ def plan_file(browser, rules_version, errors):
     expect(p2.locator('[data-wizard-notice]')).to_have_text([f'This file was saved with rules {OLD_RULES}; the current rules are {rules_version}. Names may differ.'])
     assert screen_names(p2) == names
     c2.close()
+
+
+def header_menu(browser, errors):
+    """(53) 머리 More 메뉴 (D104) — 밖에는 Share URL · Save plan · More · 화면 모드만 · 나머지 다섯(Open plan · Pick resources · Naming guide · API · llms.txt)은 메뉴 안.
+    WAI-ARIA menu button — Enter · Space · ↓ 는 열고 첫 항목 · ↑ 는 열고 끝 항목 · ↑↓ 순환 · Home · End · Esc 는 닫고 단추로 · Tab 은 닫기만 · 바깥을 누르면 닫힌다.
+    메뉴의 Open plan 이 파일 고르기 창을 연다(브라우저가 막지 않는다 — 고른 파일이 열린다) · 1280 에서 머리 한 줄 · 360 에서 두 줄 · 메뉴를 열어도 가로 스크롤 없음 · /pick 도 같은 원칙"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    start_example(pg)
+    pg.wait_for_function("() => location.hash.startsWith('#state=')")
+    linked = pg.url
+    more, menu = pg.locator('header [data-nav-more]'), pg.locator('header [data-nav-menu]')
+    items = menu.locator('[role="menuitem"]')
+    # 밖의 단추 넷 · 메뉴 안 다섯(닫힌 채로 숨어 있다)
+    for sel in ('[data-copy="share-url"]', '[data-plan-save]', '[data-nav-more]', '[data-theme-toggle]'):
+        expect(pg.locator(f'header {sel}')).to_be_visible()
+    for sel in ('[data-plan-open]', '[data-nav-pick]', '[data-nav-naming]', '[data-nav-api]', '[data-nav-llms]'):
+        expect(menu.locator(sel)).to_be_hidden()
+    expect(more).to_have_text('More')
+    expect(more).to_have_attribute('aria-haspopup', 'menu')
+    expect(more).to_have_attribute('aria-expanded', 'false')
+    expect(more).to_have_attribute('aria-controls', menu.get_attribute('id'))
+    expect(menu).to_have_attribute('role', 'menu')
+    expect(menu).to_have_attribute('aria-labelledby', more.get_attribute('id'))
+    expect(items).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt'])
+    for i in range(5):
+        expect(items.nth(i)).to_have_attribute('tabindex', '-1')
+    # 1280 — 머리 한 줄(단추 줄이 로고 줄 안에 · 단추 줄도 한 줄)
+    h1280, same_row, one_row = header_rows(pg)
+    assert same_row and one_row, ('1280 머리가 한 줄이 아니다', h1280, same_row, one_row)
+    # 키보드 — Enter 로 열고 첫 항목 · ↓ · End · ↓(처음으로) · ↑(끝으로) · Home · Esc 는 닫고 단추로
+    more.focus()
+    pg.keyboard.press('Enter')
+    expect(more).to_have_attribute('aria-expanded', 'true')
+    expect(menu).to_be_visible()
+    expect(items.nth(0)).to_be_focused()
+    for key, at in (('ArrowDown', 1), ('End', 4), ('ArrowDown', 0), ('ArrowUp', 4), ('Home', 0), ('ArrowUp', 4)):
+        pg.keyboard.press(key)
+        expect(items.nth(at)).to_be_focused()
+    pg.keyboard.press('Escape')
+    expect(menu).to_be_hidden()
+    expect(more).to_have_attribute('aria-expanded', 'false')
+    expect(more).to_be_focused()
+    # ↑ 는 열고 끝 항목 · Space · ↓ 는 첫 항목
+    pg.keyboard.press('ArrowUp')
+    expect(items.nth(4)).to_be_focused()
+    pg.keyboard.press('Escape')
+    for key in (' ', 'ArrowDown'):
+        pg.keyboard.press(key)
+        expect(items.nth(0)).to_be_focused()
+        pg.keyboard.press('Escape')
+        expect(more).to_be_focused()
+    # Tab 은 닫기만 — 포커스는 메뉴 밖 다음 칸으로
+    pg.keyboard.press('Enter')
+    expect(items.nth(0)).to_be_focused()
+    pg.keyboard.press('Tab')
+    expect(menu).to_be_hidden()
+    expect(more).to_have_attribute('aria-expanded', 'false')
+    assert not pg.evaluate("!!document.activeElement.closest('[data-nav-menu]')")
+    # 마우스 — 단추를 눌러 열고 다시 눌러 닫는다 · 바깥(제품 이름)을 누르면 닫힌다
+    more.click()
+    expect(menu).to_be_visible()
+    more.click()
+    expect(menu).to_be_hidden()
+    more.click()
+    expect(menu).to_be_visible()
+    pg.click('header h1')
+    expect(menu).to_be_hidden()
+    # 메뉴를 열어도 머리 높이가 그대로다(메뉴는 위에 뜬다)
+    more.click()
+    assert header_rows(pg)[0] == h1280, (header_rows(pg), h1280)
+    pg.keyboard.press('Escape')
+    # 링크 항목 — 고르면 그 화면으로(상태 hash 를 실어 간다)
+    open_more(pg)
+    menu.locator('[data-nav-naming]').click()
+    pg.wait_for_url(re.compile(re.escape(BASE + '/docs/naming') + r'#state=.+$'))
+    ctx.close()
+
+    # 메뉴의 Open plan — 같은 click 안에서 파일 고르기 창이 열리고(브라우저가 막지 않는다) 고른 파일이 열린다 · 메뉴는 닫히고 포커스는 단추로
+    plan = OUT / 'cloudonym-plan-payments-prod.json'  # (52) 가 남긴 파일
+    assert plan.exists(), plan
+    c2 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p2 = c2.new_page()
+    p2.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p2, BASE + '/')
+    expect(p2.locator('#names article[data-key]')).to_have_count(0)
+    open_more(p2)
+    with p2.expect_file_chooser() as fc:
+        p2.locator('header [data-plan-open]').click()
+    expect(p2.locator('header [data-nav-menu]')).to_be_hidden()
+    expect(p2.locator('header [data-nav-more]')).to_be_focused()
+    fc.value.set_files(str(plan))
+    p2.wait_for_function("() => location.hash.startsWith('#state=')")
+    assert p2.locator('#names article[data-key]').count() > 5
+    c2.close()
+
+    # 폰 360 — More 는 그림만(이름은 aria-label) · 머리 두 줄(로고 줄 · 단추 줄) · 메뉴가 화면 안에 · 가로 스크롤 없음 · 바깥을 누르면 닫힌다
+    c3 = browser.new_context(viewport={'width': 360, 'height': 800})
+    p3 = c3.new_page()
+    p3.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p3, linked)
+    more3, menu3 = p3.locator('header [data-nav-more]'), p3.locator('header [data-nav-menu]')
+    expect(more3.locator('span')).to_be_hidden()
+    expect(more3).to_have_attribute('aria-label', 'More')
+    expect(p3.locator('header [data-copy="share-url"]')).to_be_visible()
+    expect(p3.locator('header [data-plan-save]')).to_be_visible()
+    h360, same_row, one_row = header_rows(p3)
+    assert not same_row and one_row, ('360 머리가 두 줄이 아니다', h360, same_row, one_row)
+    more3.click()
+    expect(menu3).to_be_visible()
+    box = menu3.bounding_box()
+    assert box['x'] >= 0 and box['x'] + box['width'] <= 360, box
+    no_hscroll(p3, 360, 'More 메뉴를 연 머리')
+    p3.mouse.click(180, 700)
+    expect(menu3).to_be_hidden()
+    goto_ready(p3, BASE + '/')
+    h360_first = header_rows(p3)[0]
+    c3.close()
+
+    # /pick — 밖에는 Share URL · More · 화면 모드 · 메뉴는 Wizard · Naming guide · API · llms.txt (Open plan 은 마법사에만)
+    c4 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p4 = c4.new_page()
+    p4.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p4, BASE + TREE + state_hash(INPUT))
+    expect(p4.locator('header [data-copy="share-url"]')).to_be_visible()
+    expect(p4.locator('header [data-plan-save], header [data-plan-open]')).to_have_count(0)
+    expect(p4.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Wizard', 'Naming guide', 'API', 'llms.txt'])
+    expect(p4.locator('header [data-nav-menu]')).to_be_hidden()
+    pick1280, same_row, one_row = header_rows(p4)
+    assert same_row and one_row, ('/pick 1280 단추 줄이 로고 줄에 없다', pick1280)
+    open_more(p4)
+    p4.locator('header [data-nav-wizard]').click()
+    p4.wait_for_url(BASE + '/')  # 트리 hash 는 마법사로 실어 가지 않는다(href 가 / 이다)
+    expect(p4.locator('[data-wizard]')).to_be_visible()
+    p4.set_viewport_size({'width': 360, 'height': 800})
+    goto_ready(p4, BASE + TREE + state_hash(INPUT))
+    pick360 = header_rows(p4)[0]
+    c4.close()
+    print(f'(53) 머리 높이 — 마법사 1280: {h1280}px · 360(링크): {h360}px · 360(첫 방문): {h360_first}px · /pick 1280: {pick1280}px · /pick 360: {pick360}px')
 
 
 def wizard_narrow_shots(browser, errors):

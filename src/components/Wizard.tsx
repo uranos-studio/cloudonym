@@ -22,7 +22,7 @@ import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, 
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
-import { Check, FileDown, FileUp, PanelRightOpen, X } from 'lucide-react';
+import { Check, FileDown, PanelRightOpen, X } from 'lucide-react';
 import { INTRO_KEY, readPref, writePref } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
@@ -399,19 +399,8 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
               </button>
             ),
           } : {}),
-          open: (
-            <>
-              <button type="button" data-plan-open aria-label={en.ui.plan_open_label} title={en.ui.plan_open_label} className={PLAN_FILE_BUTTON} onClick={() => fileInput.current?.click()}>
-                <FileUp aria-hidden="true" className="size-4" /><span className={PLAN_FILE_TEXT}>{en.ui.plan_open}</span>
-              </button>
-              <input ref={fileInput} type="file" accept=".json,application/json" data-plan-file-input hidden
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  e.target.value = '';
-                  if (f) void onOpenPlan(f);
-                }} />
-            </>
-          ),
+          // Open plan 은 More 메뉴의 항목이다 (D104) — 같은 click 안에서 숨은 input 을 눌러 파일 고르기 창을 연다
+          open: () => fileInput.current?.click(),
         }}
         // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
         badge={(
@@ -426,6 +415,13 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           </span>
         )}
       />
+      {/* Open plan 의 파일 고르기 — 메뉴 밖에 늘 둔다(메뉴가 닫혀도 고른 파일을 받는다) */}
+      <input ref={fileInput} type="file" accept=".json,application/json" data-plan-file-input hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          e.target.value = '';
+          if (f) void onOpenPlan(f);
+        }} />
       {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
       <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
         {/* 짧은 소개 (D97) — 무엇인가 · 무엇을 받나 · 무엇을 안 하나 · 순서. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다) */}

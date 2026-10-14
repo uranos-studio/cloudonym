@@ -151,6 +151,8 @@ export const en: Catalog = {
     region_options_label: 'Regions',
     tagline: 'Google Cloud resource names, generated and checked against the official rules',
     nav_label: 'Share and docs',
+    nav_more: 'More',
+    nav_more_label: 'More: other screens, guides and files',
     theme_label: 'Screen mode',
     theme_light: 'Light',
     theme_dark: 'Dark',
