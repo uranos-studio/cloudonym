@@ -1,5 +1,5 @@
 """화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90 · D93)의 ㉚~㊼ ·
-화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104)의 (53) 를 재고 스크린샷을 남긴다.
+화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104 · 폰은 D105)의 (53) 를 재고 스크린샷을 남긴다.
 머리 밖에는 Share URL · Save plan · More · 화면 모드만 있다 — Open plan · 화면 전환 · Naming guide · API · llms.txt 는 More 메뉴 안이라 누르기 전에 open_more 로 연다(D104).
 링크 없는 첫 화면은 프로젝트 값이 빈칸이다(D97) — 예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
@@ -1819,7 +1819,8 @@ def plan_file(browser, rules_version, errors):
 def header_menu(browser, errors):
     """(53) 머리 More 메뉴 (D104) — 밖에는 Share URL · Save plan · More · 화면 모드만 · 나머지 다섯(Open plan · Pick resources · Naming guide · API · llms.txt)은 메뉴 안.
     WAI-ARIA menu button — Enter · Space · ↓ 는 열고 첫 항목 · ↑ 는 열고 끝 항목 · ↑↓ 순환 · Home · End · Esc 는 닫고 단추로 · Tab 은 닫기만 · 바깥을 누르면 닫힌다.
-    메뉴의 Open plan 이 파일 고르기 창을 연다(브라우저가 막지 않는다 — 고른 파일이 열린다) · 1280 에서 머리 한 줄 · 360 에서 두 줄 · 메뉴를 열어도 가로 스크롤 없음 · /pick 도 같은 원칙"""
+    메뉴의 Open plan 이 파일 고르기 창을 연다(브라우저가 막지 않는다 — 고른 파일이 열린다) · 1280 에서 머리 한 줄 · 메뉴를 열어도 가로 스크롤 없음 · /pick 도 같은 원칙.
+    폰(<768 · D105)은 밖의 단추를 전부 메뉴로 접는다 — Share URL · Save plan · 화면 모드(menuitemradio)도 메뉴 안 · 머리는 로고 줄 하나"""
     ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page()
     pg.on('pageerror', lambda e: errors.append(str(e)))
@@ -1911,27 +1912,70 @@ def header_menu(browser, errors):
     assert p2.locator('#names article[data-key]').count() > 5
     c2.close()
 
-    # 폰 360 — More 는 그림만(이름은 aria-label) · 머리 두 줄(로고 줄 · 단추 줄) · 메뉴가 화면 안에 · 가로 스크롤 없음 · 바깥을 누르면 닫힌다
-    c3 = browser.new_context(viewport={'width': 360, 'height': 800})
+    # 폰 360 (D105) — 밖에는 More 하나(그림만 · 이름은 aria-label) · 소개 문구 없음 · 단추 줄이 로고 줄 안에.
+    # 메뉴 = Share URL · Save plan · (D104 의 다섯) · 화면 모드 셋(menuitemradio) · 메뉴가 화면 안에 · 가로 스크롤 없음 · 바깥을 누르면 닫힌다
+    c3 = browser.new_context(viewport={'width': 360, 'height': 800}, accept_downloads=True)
+    c3.grant_permissions(['clipboard-read', 'clipboard-write'], origin=BASE)
     p3 = c3.new_page()
     p3.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(p3, linked)
     more3, menu3 = p3.locator('header [data-nav-more]'), p3.locator('header [data-nav-menu]')
     expect(more3.locator('span')).to_be_hidden()
     expect(more3).to_have_attribute('aria-label', 'More')
-    expect(p3.locator('header [data-copy="share-url"]')).to_be_visible()
-    expect(p3.locator('header [data-plan-save]')).to_be_visible()
+    expect(p3.locator('header [data-copy="share-url"], header [data-plan-save], header [data-theme-toggle], header [data-share-reserve], header [data-plan-save-reserve]')).to_have_count(0)
+    expect(p3.locator('header p', has_text='Google Cloud resource names')).to_have_count(0)
     h360, same_row, one_row = header_rows(p3)
-    assert not same_row and one_row, ('360 머리가 두 줄이 아니다', h360, same_row, one_row)
+    assert same_row and one_row and h360 <= 110, ('360 머리가 로고 줄 하나가 아니다', h360, same_row, one_row)
+    items3 = menu3.locator('[role="menuitem"], [role="menuitemradio"]')
+    expect(items3).to_have_text(['Share URL', 'Save plan', 'Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'Light', 'Dark', 'System — follow the device setting'])
+    expect(menu3.locator('[data-theme-menu]')).to_have_attribute('role', 'group')
+    expect(menu3.locator('[data-theme-menu]')).to_have_attribute('aria-label', 'Screen mode')
+    expect(menu3.locator('[data-theme-mode="system"]')).to_have_attribute('aria-checked', 'true')
     more3.click()
     expect(menu3).to_be_visible()
+    expect(items3.nth(0)).to_be_focused()
+    p3.keyboard.press('End')
+    expect(items3.nth(9)).to_be_focused()
+    p3.keyboard.press('ArrowDown')
+    expect(items3.nth(0)).to_be_focused()
     box = menu3.bounding_box()
-    assert box['x'] >= 0 and box['x'] + box['width'] <= 360, box
+    assert box['x'] >= 0 and box['x'] + box['width'] <= 360 and box['y'] + box['height'] <= 800, box
     no_hscroll(p3, 360, 'More 메뉴를 연 머리')
     p3.mouse.click(180, 700)
     expect(menu3).to_be_hidden()
+    # Share URL — 메뉴가 닫히고 복사 · 결과 줄 · 마법사의 공유 경고(D93) · 머리 높이는 결과 줄 하나만큼만
+    expect(p3.locator('[data-share-warning]')).to_have_count(0)
+    open_more(p3)
+    menu3.locator('[data-menu-share]').click()
+    expect(menu3).to_be_hidden()
+    expect(more3).to_be_focused()
+    assert p3.evaluate('navigator.clipboard.readText()') == linked, p3.evaluate('navigator.clipboard.readText()')
+    expect(p3.locator('header [data-share-menu-status]')).to_have_text('Copied')
+    expect(p3.locator('[data-share-warning]')).to_have_count(1)
+    # Save plan — 같은 파일이 내려받아진다
+    open_more(p3)
+    with p3.expect_download() as dl3:
+        menu3.locator('[data-menu-plan-save]').click()
+    assert dl3.value.suggested_filename == 'cloudonym-plan-billing-prod.json', dl3.value.suggested_filename  # start_example 의 값
+    # 화면 모드 — 고르면 바뀌고 메뉴가 닫힌다 · 체크가 옮겨 간다
+    open_more(p3)
+    menu3.locator('[data-theme-mode="dark"]').click()
+    expect(menu3).to_be_hidden()
+    assert p3.evaluate("document.documentElement.classList.contains('dark')") is True
+    expect(menu3.locator('[data-theme-mode="dark"]')).to_have_attribute('aria-checked', 'true')
+    expect(menu3.locator('[data-theme-mode="system"]')).to_have_attribute('aria-checked', 'false')
+    open_more(p3)
+    menu3.locator('[data-theme-mode="system"]').click()
+    # 메뉴를 연 채 768 을 넘으면 항목이 바뀐다 — 메뉴는 닫히고 포커스는 More 단추로 (넓은 쪽 · 다시 폰 쪽 둘 다)
+    for w in (768, 360):
+        more3.click()
+        p3.keyboard.press('End')
+        p3.set_viewport_size({'width': w, 'height': 800})
+        expect(menu3).to_be_hidden()
+        expect(more3).to_be_focused()
     goto_ready(p3, BASE + '/')
     h360_first = header_rows(p3)[0]
+    expect(p3.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt'])  # 링크 없는 첫 화면 — 공유 · 저장할 것이 없다
     c3.close()
 
     # /pick — 밖에는 Share URL · More · 화면 모드 · 메뉴는 Wizard · Naming guide · API · llms.txt (Open plan 은 마법사에만)
@@ -1949,9 +1993,17 @@ def header_menu(browser, errors):
     p4.locator('header [data-nav-wizard]').click()
     p4.wait_for_url(BASE + '/')  # 트리 hash 는 마법사로 실어 가지 않는다(href 가 / 이다)
     expect(p4.locator('[data-wizard]')).to_be_visible()
+    # /pick 360 — 밖에는 More 하나 · 공유 경고는 메뉴의 Share URL 을 누른 뒤(마법사와 같은 규칙 · D105) · 메뉴에 Open plan 없음
     p4.set_viewport_size({'width': 360, 'height': 800})
     goto_ready(p4, BASE + TREE + state_hash(INPUT))
-    pick360 = header_rows(p4)[0]
+    pick360, same_row, one_row = header_rows(p4)
+    assert same_row and one_row and pick360 <= 70, ('/pick 360 머리가 한 줄이 아니다', pick360)
+    expect(p4.locator('[data-share-warning]')).to_have_count(0)
+    expect(p4.locator('header [data-nav-menu] [role="menuitem"], header [data-nav-menu] [role="menuitemradio"]')).to_have_text(['Share URL', 'Wizard', 'Naming guide', 'API', 'llms.txt', 'Light', 'Dark', 'System — follow the device setting'])
+    open_more(p4)
+    p4.locator('header [data-menu-share]').click()
+    expect(p4.locator('[data-share-warning]')).to_be_visible()
+    no_hscroll(p4, 360, '/pick 공유 경고')
     c4.close()
     print(f'(53) 머리 높이 — 마법사 1280: {h1280}px · 360(링크): {h360}px · 360(첫 방문): {h360_first}px · /pick 1280: {pick1280}px · /pick 360: {pick360}px')
 
@@ -2381,7 +2433,12 @@ with sync_playwright() as p:
     page.wait_for_timeout(300)
     assert page.evaluate('document.documentElement.scrollWidth') <= 360, page.evaluate('document.documentElement.scrollWidth')
     assert_selects_fit(page, 360)
-    expect(page.locator('[data-share-warning]')).to_be_visible()  # 좁은 화면에서도 경고가 보이고 가로 스크롤을 만들지 않는다(위 scrollWidth)
+    # 폰은 공유 경고를 메뉴의 Share URL 을 누른 뒤 보인다(D105) — 보여도 가로 스크롤을 만들지 않는다
+    expect(page.locator('[data-share-warning]')).to_have_count(0)
+    open_more(page)
+    page.click('header [data-menu-share]')
+    expect(page.locator('[data-share-warning]')).to_be_visible()
+    assert page.evaluate('document.documentElement.scrollWidth') <= 360, page.evaluate('document.documentElement.scrollWidth')
     bar = page.locator('[data-sticky-bar]')
     expect(bar).to_be_visible()
     expect(bar).to_contain_text('4 resources · 5 names')

@@ -10,15 +10,20 @@ export const MENU_ITEM =
   'flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-none ' +
   'dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800';
 
+/** 메뉴 항목 — menuitem 과 폰의 화면 모드(menuitemradio · D105) */
+const ITEM = '[role="menuitem"], [role="menuitemradio"]';
+
 interface Props {
   buttonClassName: string;
   /** 단추 글자를 감싸는 꼴 — 폰 폭에서는 그림만 보인다 */
   textClassName: string;
-  /** 메뉴 항목 — 각각 role="menuitem" · tabIndex=-1 을 단 a 또는 button 이다 */
+  /** 메뉴 항목 — 각각 role="menuitem"(폰의 화면 모드는 menuitemradio) · tabIndex=-1 을 단 a 또는 button 이다 */
   children: ReactNode;
+  /** 이 값이 바뀌면 열린 메뉴를 닫고 단추로 포커스를 돌린다 — 폰 ↔ 넓은 폭을 넘으면 항목이 바뀌어 포커스가 있던 항목이 사라진다 (D105) */
+  closeOn?: unknown;
 }
 
-export function MoreMenu({ buttonClassName, textClassName, children }: Props) {
+export function MoreMenu({ buttonClassName, textClassName, children, closeOn }: Props) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -29,7 +34,7 @@ export function MoreMenu({ buttonClassName, textClassName, children }: Props) {
   // 열 때 포커스를 둘 항목 — 열린 뒤(hidden 이 걷힌 뒤)에 옮긴다
   const pending = useRef<'first' | 'last' | null>(null);
 
-  const items = () => Array.from(menu.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+  const items = () => Array.from(menu.current?.querySelectorAll<HTMLElement>(ITEM) ?? []);
 
   useEffect(() => {
     if (!open) return;
@@ -46,7 +51,22 @@ export function MoreMenu({ buttonClassName, textClassName, children }: Props) {
     return () => document.removeEventListener('pointerdown', onDown);
   }, [open]);
 
+  // 그리는 중에 바뀜을 본다(Wizard 의 shownLayout 과 같은 꼴) — 포커스는 그린 뒤 옮긴다
+  const [seen, setSeen] = useState(closeOn);
+  const [refocus, setRefocus] = useState(false);
+  if (!Object.is(seen, closeOn)) {
+    setSeen(closeOn);
+    if (open) {
+      setOpen(false);
+      setRefocus(true);
+    }
+  }
+  useEffect(() => {
+    if (refocus) button.current?.focus();
+  }, [refocus]);
+
   const openAt = (at: 'first' | 'last') => {
+    setRefocus(false); // 다음 경계 넘기에서 다시 true 로 바뀌어야 포커스를 옮긴다
     pending.current = at;
     setOpen(true);
   };
@@ -91,7 +111,7 @@ export function MoreMenu({ buttonClassName, textClassName, children }: Props) {
       </button>
       {/* 항목을 고르면 닫는다 — 링크는 그 화면으로 가고, Open plan 은 같은 click 안에서 파일 고르기 창을 연다(사용자 동작이 이어진다) */}
       <div ref={menu} id={menuId} role="menu" aria-labelledby={buttonId} data-nav-menu hidden={!open} onKeyDown={onMenuKey}
-        onClick={(e) => { if ((e.target as HTMLElement).closest('[role="menuitem"]')) { setOpen(false); button.current?.focus(); } }}
+        onClick={(e) => { if ((e.target as HTMLElement).closest(ITEM)) { setOpen(false); button.current?.focus(); } }}
         className="absolute right-0 top-full z-40 mt-1 w-56 rounded-md border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
         {children}
       </div>

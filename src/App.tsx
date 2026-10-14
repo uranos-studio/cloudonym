@@ -150,13 +150,16 @@ function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
   }, [rules]);
 
   const nameCount = totalNames(picked);
+  // Share URL — 머리의 단추와 폰 메뉴(D105)가 같은 글을 복사한다
+  const treeShare = ctx ? shareUrl(ctx, window.location.origin + PICK_PATH, VERSION.rules, { provider, selection: items }) : undefined;
 
   return (
     <div className="min-h-screen">
       {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵). 새 트리 링크의 자리는 /pick 이다 (D68) */}
       <AppHeader
         screen="tree" otherHref={WIZARD_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)}
-        share={ctx && <CopyButton text={shareUrl(ctx, window.location.origin + PICK_PATH, VERSION.rules, { provider, selection: items })} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+        share={treeShare && <CopyButton text={treeShare} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
+        {...(treeShare ? { shareText: treeShare } : {})}
       />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">

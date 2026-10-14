@@ -391,8 +391,11 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       <AppHeader
         screen="wizard" otherHref={PICK_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} reserveShare shareWarning={false}
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
+        // 폰은 Share URL 이 More 메뉴 안이다 (D105) — 누르면 같은 공유 경고를 띄운다
+        {...(shareText ? { shareText, onShare: () => setShared(true) } : {})}
         planFile={{
           ...(stateKey ? {
+            onSave: onSavePlan,
             save: (
               <button type="button" data-plan-save aria-label={en.ui.plan_save_label} title={en.ui.plan_save_label} className={PLAN_FILE_BUTTON} onClick={onSavePlan}>
                 <FileDown aria-hidden="true" className="size-4" /><span className={PLAN_FILE_TEXT}>{en.ui.plan_save}</span>
