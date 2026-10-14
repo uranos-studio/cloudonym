@@ -105,7 +105,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), providers is not a non-empty array of supported providers or names a provider that is not enabled yet (request.provider_not_enabled), or rules_version is not a string",
+            "description": "Body is not JSON or not an object, context is invalid (including an owner, system or purpose longer than 64 characters, or an env or region longer than 1024), providers is not a non-empty array of supported providers or names a provider that is not enabled yet (request.provider_not_enabled), or rules_version is not a string. At most the first 50 errors are listed; when there are more, the last entry is request.errors_truncated with params.shown (50) and params.total (the number of errors found)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1582,7 +1582,7 @@
           "success",
           "errors"
         ],
-        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape. A /wizard 400 lists at most the first 50 errors; when there are more, a last entry with code request.errors_truncated and params { shown, total } says how many were left out",
+        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape. A /wizard or /generate 400 lists at most the first 50 errors; when there are more, a last entry with code request.errors_truncated and params { shown, total } says how many were left out. Other routes list every error",
         "properties": {
           "success": {
             "type": "boolean",

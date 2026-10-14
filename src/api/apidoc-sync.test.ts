@@ -3,12 +3,12 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
-import { FAIL_STATUSES, MAX_WIZARD_ERRORS } from './errors';
+import { FAIL_STATUSES, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { META_KEYS, logTelemetry } from './telemetry';
 import { beaconPost, fakeKv, fakeLimiter, jsonPost, req } from './test-support';
 import { VERSION } from '../version';
 import {
-  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_MAX_WIZARD_ERRORS, API_DOC_LIMITED_ROOT, API_DOC_SKIP_HEADER, API_DOC_UNLIMITED,
+  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_MAX_ERRORS, API_DOC_LIMITED_ROOT, API_DOC_SKIP_HEADER, API_DOC_UNLIMITED,
   apiEndpoints, requestExample, type ApiSpec,
 } from '../components/apiDocModel';
 
@@ -75,8 +75,9 @@ describe('/docs/api ↔ Worker — 실패 · 계측', () => {
     for (const c of codes) if (c !== '200') expect(API_DOC_FAIL_STATUSES, c).toContain(Number(c));
   });
 
-  it('/v1/wizard 400 오류 수 상한 = MAX_WIZARD_ERRORS (D103)', () => {
-    expect(API_DOC_MAX_WIZARD_ERRORS).toBe(MAX_WIZARD_ERRORS);
+  it('/v1/wizard · /v1/generate 400 오류 수 상한 = MAX_WIZARD_ERRORS = MAX_GENERATE_ERRORS (D103)', () => {
+    expect(API_DOC_MAX_ERRORS).toBe(MAX_WIZARD_ERRORS);
+    expect(API_DOC_MAX_ERRORS).toBe(MAX_GENERATE_ERRORS);
   });
 
   it('세는 요청 — 각 요청이 실제로 그 이벤트 하나를 KV 에 센다 · 목록 = 화면 이벤트(ui_*) 밖의 META_KEYS', async () => {

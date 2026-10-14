@@ -99,17 +99,12 @@ describe('fail() — maxErrors 는 고른 경로에만', () => {
   });
 });
 
-describe('다른 경로는 잘리지 않는다 (D103)', () => {
+// /v1/generate 는 오류 50개 상한 · /v1/validate · /v1/events 는 오류가 많아야 셋 — error-response-cap.test.ts 가 경로마다 최악 응답을 잰다
+describe('/v1/names 는 잘리지 않는다 (D103)', () => {
   it('/v1/names · 모르는 type 200개 → 오류 200개 그대로', async () => {
     const { res } = await req(app, '/v1/names', jsonPost({ provider: 'gcp', context: { owner: 'o', system: 's', purpose: 'p', env: 'prod', region: 'asia-northeast3-a' }, resources: Array.from({ length: 200 }, () => ({ type: 1 })) }));
     const body = await json(res);
     expect(body.errors).toHaveLength(200);
-    expect(body.errors.some((e: { code: string }) => e.code === 'request.errors_truncated')).toBe(false);
-  });
-  it('/v1/generate · 모르는 providers 120개 → 오류 120개 그대로', async () => {
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: { owner: 'o', system: 's', purpose: 'p', env: 'prod', region: 'x' }, providers: Array.from({ length: 120 }, () => 'nope') }));
-    const body = await json(res);
-    expect(body.errors).toHaveLength(120);
     expect(body.errors.some((e: { code: string }) => e.code === 'request.errors_truncated')).toBe(false);
   });
 });

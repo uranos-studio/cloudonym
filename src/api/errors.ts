@@ -10,10 +10,15 @@ import { toWireMessage, type WireMessage } from './serialize';
 export const FAIL_STATUSES = [400, 403, 404, 409, 413, 429, 500] as const;
 export type FailStatus = (typeof FAIL_STATUSES)[number];
 
-/** /v1/wizard 400 의 오류 개수 상한 (D103). 오류 한 건은 잰 것 중 가장 큰 것이 1,042 B(모르는 preset · 값이 UTF-8 3바이트 글자 80자)이고
- *  supported(gcp 규칙 id 전부) 가 약 3.3 KB 라 50건 + 잘림 항목이 64 KB 안이다 — src/api/wizard-errors-cap.test.ts 가 최악 입력으로 잰다.
- *  다른 경로에는 걸지 않는다: /v1/names 는 모르는 type 200개를 200건 그대로 돌려준다(오류 한 건 약 0.1 KB) */
+/** 400 오류 개수 상한 (D103) — 경로마다 「정상 요청이 낼 수 있는 오류 수보다 크고, 32 KiB 본문의 최악 응답이 64 KB 안」인 값.
+ *  넘으면 앞에서부터 그 수까지 싣고 request.errors_truncated(shown · total) 한 항목을 더한다. 잰 값은 src/api/*-cap.test.ts 가 최악 입력으로 다시 잰다.
+ *  /v1/wizard — 오류 한 건이 가장 큰 것은 1,042 B(모르는 preset · 값이 UTF-8 3바이트 글자 80자), supported(gcp 규칙 id 전부)가 약 3.3 KB 라 50건 + 잘림 항목이 64 KB 안이다 */
 export const MAX_WIZARD_ERRORS = 50;
+/** /v1/generate — 정상 요청의 오류는 문맥 다섯 칸 · provider 몇 개라 열 건을 넘지 않는다. 오류 한 건이 가장 큰 것은 605 B(모르는 provider · 한글 80자)라
+ *  50건 + 잘림 항목이 약 30 KB 다. 상한 전에는 `providers: [0, 0, …]` 32 KiB 가 오류 16,330건 · 2.1 MB 응답을 만들었다 */
+export const MAX_GENERATE_ERRORS = 50;
+/* /v1/names 에는 걸지 않는다 — 항목 200개(MAX_ITEMS)마다 오류가 나는 요청도 정상 범위라 그 응답을 바꾸지 않는다.
+ * 그 대가로 이 경로의 최악 400 은 64 KB 를 넘는다(약 111 KB — 값을 80자씩 되돌려 싣는 오류 200건). /v1/validate · /v1/events 는 오류가 많아야 셋이다 */
 
 /** rewrite — 라우트가 문장을 요청 본문의 이름으로 고칠 때(/v1/wizard). 꼴은 그대로다.
  *  maxErrors — 오류를 앞에서부터 그 수까지만 싣고, 넘으면 마지막에 request.errors_truncated(shown · total) 한 항목을 더한다. 없으면 자르지 않는다 */

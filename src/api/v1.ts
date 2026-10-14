@@ -9,7 +9,7 @@ import { labelsFor } from '../core/labels';
 import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, wizardSentence } from './schemas';
 import { toWireGenerate, toWireNames, toWireValidate, toWireWizard, type ProviderResult } from './serialize';
 import { logTelemetry } from './telemetry';
-import { fail, internalError, MAX_WIZARD_ERRORS } from './errors';
+import { fail, internalError, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { VERSION } from '../version';
 import { rateLimit } from './ratelimit';
 
@@ -50,7 +50,7 @@ v1.post('/generate', async (c) => {
   const read = await readJson(c);
   if (!read.ok) return notJson(c);
   const parsed = parseGenerateBody(read.body);
-  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
+  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported, maxErrors: MAX_GENERATE_ERRORS });
   const { contexts, providers, transformed } = parsed.value;
   // provider 마다 그 CSP 로 푼 문맥으로 부른다 (D49)
   const results: ProviderResult[] = providers.map((p) => {

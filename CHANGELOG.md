@@ -14,7 +14,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
-- **Wizard error responses are capped** (D103) — a `POST /v1/wizard` 400 lists at most the first 50 errors; when there are more, the last entry is `request.errors_truncated` with `params: { shown, total }` (a 32 KB plan with broken slots made an 8 MB response, now 13 KB). Responses with 50 errors or fewer, and every other route, are unchanged.
+- **Wizard and generate error responses are capped** (D103) — a `POST /v1/wizard` or `POST /v1/generate` 400 lists at most the first 50 errors; when there are more, the last entry is `request.errors_truncated` with `params: { shown, total }` (a 32 KB plan with broken slots made an 8 MB response, now 13 KB; a 32 KB `/v1/generate` body of unknown providers made 2.1 MB, now 6.5 KB). Responses with 50 errors or fewer, and `/v1/names`, `/v1/validate` and `/v1/events`, are unchanged.
 - **Oversized links are not repaired** (D100) — a share link or plan file with more than 400 picks, or more than 400 servers and data disks, keeps only its project values instead of being repaired; repairs now fix independent places in one pass (a hand-made link with 200 broken picks took 1.2 s to open, now under 50 ms).
 - **Request body limit 32 KB** (D100) — `POST /v1/*` accepts bodies up to 32,768 bytes (was 16,384), so a plan file saved from the wizard is accepted as it is; larger bodies are still 413 `request.body_too_large`.
 - **Link and file notices** — "{n} invalid item(s) in this link were left out" now says "in this link or file".

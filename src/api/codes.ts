@@ -28,7 +28,7 @@ export type ApiMessage =
   | { code: 'request.rules_version_mismatch'; params: { requested: string; current: string } }
   /** /v1 아래 없는 경로 · 메서드. 경로를 되돌려 싣지 않는다 */
   | { code: 'request.not_found' }
-  /** 오류 목록을 앞에서 shown 개로 잘랐다 — total 은 잘리기 전 오류 수. 목록의 마지막 항목이다 (D103 · /v1/wizard) */
+  /** 오류 목록을 앞에서 shown 개로 잘랐다 — total 은 잘리기 전 오류 수. 목록의 마지막 항목이다 (D103 · /v1/wizard · /v1/generate) */
   | { code: 'request.errors_truncated'; params: { shown: number; total: number } }
   | { code: 'server.internal_error' };
 
