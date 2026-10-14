@@ -14,6 +14,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **Header More menu** (D104) — the header keeps **Share URL**, **Save plan** and the screen mode switch outside and moves **Open plan**, **Pick resources** (or **Wizard** on `/pick`), **Naming guide**, **API** and **llms.txt** into a **More** menu (icon only on a phone). The menu follows the WAI-ARIA menu button pattern (arrow keys, Home, End, Esc, Tab, a press outside closes it). The wizard header is one line at 1280 px and two at 360 px. Screen only: rules revision `2026-10-13.3` and every API response are unchanged.
 - **Oversized links are not repaired** (D100) — a share link or plan file with more than 400 picks, or more than 400 servers and data disks, keeps only its project values instead of being repaired; repairs now fix independent places in one pass (a hand-made link with 200 broken picks took 1.2 s to open, now under 50 ms).
 - **Request body limit 32 KB** (D100) — `POST /v1/*` accepts bodies up to 32,768 bytes (was 16,384), so a plan file saved from the wizard is accepted as it is; larger bodies are still 413 `request.body_too_large`.
 - **Link and file notices** — "{n} invalid item(s) in this link were left out" now says "in this link or file".
