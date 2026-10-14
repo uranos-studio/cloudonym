@@ -89,8 +89,9 @@ export const UI_KEYS = [
   'wizard_intro_close', 'wizard_about_label', 'wizard_about', 'wizard_project_next', 'wizard_project_next_hint', 'wizard_project_pending', 'wizard_region_placeholder', 'wizard_names_need_project', 'wizard_cloud', 'wizard_cloud_soon', 'wizard_cloud_label', 'wizard_gallery_title', 'wizard_gallery_hint', 'wizard_card_names', 'wizard_card_add', 'wizard_card_add_label', 'wizard_card_open', 'wizard_card_open_label', 'wizard_card_tested', 'wizard_card_untested', 'wizard_card_family', 'wizard_card_overlap', 'wizard_card_duplicate', 'wizard_card_full', 'wizard_card_complete', 'wizard_card_incomplete', 'wizard_card_missing', 'wizard_card_missing_lb', 'wizard_card_missing_other', 'wizard_card_no_backend', 'wizard_card_turn_on_full', 'wizard_card_turn_on_duplicate', 'wizard_card_fill', 'wizard_card_remove', 'wizard_card_remove_hint', 'wizard_card_options', 'wizard_card_parts', 'wizard_card_network', 'wizard_card_network_hint', 'wizard_card_edit', 'wizard_card_edit_label', 'wizard_card_back', 'wizard_card_sources', 'wizard_card_setup', 'wizard_card_setup_run', 'wizard_card_setup_static', 'wizard_card_setup_doc', 'wizard_card_tag_lb', 'wizard_card_tag_redirect', 'wizard_card_tag_network', 'wizard_card_parts_count', 'wizard_card_state_complete', 'wizard_card_state_incomplete', 'wizard_add_more', 'wizard_add_more_hint', 'wizard_view_edit', 'theme_label', 'theme_light', 'theme_dark', 'theme_system',
   // ResultCard — 버킷 이름 확인 (D83)
   'bucket_check', 'bucket_check_label', 'bucket_checking', 'bucket_check_note', 'bucket_available', 'bucket_taken', 'bucket_unknown',
-  // index.html
+  // index.html · 경로마다 제목 · 설명 (D106 — src/site/copy 가 짝짓는다)
   'meta_description',
+  'page_app_title', 'page_pick_title', 'page_pick_description', 'page_naming_title', 'page_naming_description', 'page_api_title', 'page_api_description', 'page_privacy_title', 'page_privacy_description', 'page_not_found_title', 'page_not_found_description', 'page_not_found_body',
 ] as const;
 export type UiKey = (typeof UI_KEYS)[number];
 

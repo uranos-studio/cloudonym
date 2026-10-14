@@ -409,10 +409,10 @@ describe('GET /llms.txt — Worker 라우트 (D17)', () => {
     const cfg = readFileSync(join(import.meta.dirname, '../../wrangler.jsonc'), 'utf-8');
     expect(cfg).toMatch(/"run_worker_first"\s*:\s*\[[^\]]*"\/llms\.txt"/);
   });
-  it('app.routes 는 정확히 여덟 경로 + secureHeaders 의 ALL /* · cors 의 ALL /v1/* 하나씩 · /v1/v1 없음', () => {
+  it('app.routes 는 정확히 열 경로 + 화면 HTML · secureHeaders 의 ALL /* 둘 · cors 의 ALL /v1/* 하나 · /v1/v1 없음', () => {
     const routes = app.routes.map((r) => `${r.method} ${r.path}`);
-    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /catalog.json', 'GET /llms.txt', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/names', 'POST /v1/validate', 'POST /v1/wizard']);
-    expect(routes.filter((r) => r.startsWith('ALL ')).sort()).toEqual(['ALL /*', 'ALL /v1/*']);
+    expect(routes.filter((r) => !r.startsWith('ALL ')).sort()).toEqual(['GET /catalog.json', 'GET /llms.txt', 'GET /robots.txt', 'GET /sitemap.xml', 'GET /v1/health', 'POST /v1/events', 'POST /v1/generate', 'POST /v1/names', 'POST /v1/validate', 'POST /v1/wizard']);
+    expect(routes.filter((r) => r.startsWith('ALL ')).sort()).toEqual(['ALL /*', 'ALL /*', 'ALL /v1/*']);
     expect(routes.some((r) => r.includes('/v1/v1'))).toBe(false);
   });
 });

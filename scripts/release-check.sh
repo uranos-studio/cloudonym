@@ -87,7 +87,7 @@ else
   info "/v1/health returned ${code}"
 fi
 
-# 1. 화면 — 200 · text/html · 한글 0 · 보안 헤더(_headers 는 정적 자산에만 붙는다)
+# 1. 화면 — 200 · text/html · 한글 0 · 보안 헤더(화면 HTML 은 Worker 가 만들고 _headers 의 /* 줄을 그대로 단다 — D106)
 name='GET /'
 code="$(fetch GET /)"
 if expect_status "${name}" "${code}" 200; then
@@ -144,22 +144,50 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (provider enums [\"gcp\"] in generate, names, validate)"; fi
 fi
 
-# 5. 화면 경로 — /docs/naming · /docs/api · /privacy 는 클라이언트 라우팅(React)이라 서버는 어느 경로에나 같은 index.html 을 준다
-#    (wrangler.jsonc assets.not_found_handling: "single-page-application"). 그래서 서버 응답으로는 그 쪽이 있는지 가릴 수 없다 —
-#    없는 경로 /does-not-exist-<랜덤> 과 본문이 같은지만 보고 「SPA 로 서빙됨」만 확인한다. 쪽의 내용은 화면 시험이 본다
+# 5. 화면 경로 (D106) — Worker 가 경로마다 head 를 넣는다: 200 · 제 <title> · canonical 은 그 경로 · 보안 헤더(CSP · DENY).
+#    없는 경로 /does-not-exist-<랜덤> 은 404 · noindex · canonical 없음. 쪽의 내용(React 가 그리는 것)은 화면 시험이 본다
+for route in / /pick /docs/naming /docs/api /privacy; do
+  name="GET ${route} head"
+  code="$(fetch GET "${route}")"
+  if expect_status "${name}" "${code}" 200; then
+    title="$(grep -o '<title>[^<]*</title>' "${body}" | head -1)"
+    canonical="$(grep -o '<link rel="canonical" href="[^"]*">' "${body}" | head -1)"
+    if [[ "${title}" != '<title>Cloudonym — '* ]]; then fail "${name}" "title '${title}'"
+    elif [ "${canonical}" != "<link rel=\"canonical\" href=\"${base}${route}\">" ]; then fail "${name}" "canonical '${canonical}'"
+    elif grep -q 'noindex' "${body}"; then fail "${name}" "noindex on an indexed page"
+    elif [ "$(header content-security-policy)" != "${CSP}" ]; then fail "${name}" "Content-Security-Policy is '$(header content-security-policy)'"
+    elif [ "$(header x-frame-options)" != "DENY" ]; then fail "${name}" "X-Frame-Options is '$(header x-frame-options)'"
+    else pass "${name} (200, ${title}, canonical ${base}${route}, CSP, DENY)"; fi
+  fi
+done
 control="/does-not-exist-${RANDOM}${RANDOM}"
+name="GET ${control} (unknown path)"
 code="$(fetch GET "${control}")"
-if expect_status "GET ${control} (control)" "${code}" 200; then
-  cp "${body}" "${work}/control.html"
-  for route in /docs/naming /docs/api /privacy; do
-    name="GET ${route} served by the SPA"
-    code="$(fetch GET "${route}")"
-    if expect_status "${name}" "${code}" 200; then
-      if [ ! -f "${work}/root.html" ] || ! cmp -s "${body}" "${work}/root.html"; then fail "${name}" "body differs from /"
-      elif ! cmp -s "${body}" "${work}/control.html"; then fail "${name}" "body differs from ${control}"
-      else pass "${name} (200, same index.html as / and ${control}; the route itself is not verifiable from the server)"; fi
-    fi
-  done
+if expect_status "${name}" "${code}" 404; then
+  if ! grep -q '<meta name="robots" content="noindex">' "${body}"; then fail "${name}" "no noindex"
+  elif grep -q 'rel="canonical"' "${body}"; then fail "${name}" "canonical on a 404 page"
+  elif ! grep -q 'id="root"' "${body}"; then fail "${name}" "no id=\"root\" mount point"
+  elif [ "$(header content-security-policy)" != "${CSP}" ]; then fail "${name}" "Content-Security-Policy is '$(header content-security-policy)'"
+  else pass "${name} (404, noindex, no canonical, CSP)"; fi
+fi
+
+# 5b. /robots.txt · /sitemap.xml (D106) — 절대 URL 은 요청 origin(= base)
+name='GET /robots.txt'
+code="$(fetch GET /robots.txt)"
+if expect_status "${name}" "${code}" 200; then
+  if [[ "$(header content-type)" != text/plain* ]]; then fail "${name}" "content-type '$(header content-type)'"
+  elif ! grep -qx "Sitemap: ${base}/sitemap.xml" "${body}"; then fail "${name}" "no 'Sitemap: ${base}/sitemap.xml'"
+  elif ! grep -qx 'Disallow: /v1/' "${body}"; then fail "${name}" "no 'Disallow: /v1/'"
+  else pass "${name} (text/plain, Sitemap ${base}/sitemap.xml, Disallow /v1/)"; fi
+fi
+name='GET /sitemap.xml'
+code="$(fetch GET /sitemap.xml)"
+if expect_status "${name}" "${code}" 200; then
+  locs="$(grep -o '<loc>[^<]*</loc>' "${body}" | sed -e 's#<loc>##' -e 's#</loc>##' | tr '\n' ' ')"
+  want="${base}/ ${base}/pick ${base}/docs/naming ${base}/docs/api ${base}/privacy "
+  if [[ "$(header content-type)" != application/xml* ]]; then fail "${name}" "content-type '$(header content-type)'"
+  elif [ "${locs}" != "${want}" ]; then fail "${name}" "locs '${locs}', expected '${want}'"
+  else pass "${name} (application/xml, 5 URLs)"; fi
 fi
 
 # 6. POST /v1/names — 이름 셋 글자 그대로

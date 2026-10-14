@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } from './route';
 
-describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를 고른다 (D57)', () => {
+describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를 고르고, 표에 없는 경로는 notFound (D57 · D106)', () => {
   it.each([
-    ['/', 'app'], ['', 'app'], ['/index.html', 'app'], ['/docs', 'app'], ['/docs/naming/extra', 'app'], ['/privacy-policy', 'app'],
-    [PICK_PATH, 'pick'], ['/pick/', 'pick'], ['/pick/x', 'app'], ['/picks', 'app'],
+    ['/', 'app'], ['', 'app'], ['//', 'app'], ['/index.html', 'notFound'], ['/docs', 'notFound'], ['/docs/naming/extra', 'notFound'], ['/privacy-policy', 'notFound'],
+    [PICK_PATH, 'pick'], ['/pick/', 'pick'], ['/pick/x', 'notFound'], ['/picks', 'notFound'], ['/PICK', 'notFound'],
     [NAMING_PATH, 'naming'], ['/docs/naming/', 'naming'], [PRIVACY_PATH, 'privacy'], ['/privacy/', 'privacy'],
-    [API_PATH, 'api'], ['/docs/api/', 'api'], ['/docs/api/x', 'app'], ['/docs/apis', 'app'],
+    [API_PATH, 'api'], ['/docs/api/', 'api'], ['/docs/api/x', 'notFound'], ['/docs/apis', 'notFound'], ['/robots.txt', 'notFound'],
   ])('%s → %s', (path, route) => {
     expect(routeOf(path)).toBe(route);
   });

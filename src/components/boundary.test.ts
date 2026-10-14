@@ -19,6 +19,7 @@ const ALLOWED = [
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
   /^\.\.?\/version$/,                               // 결과에 싣는 버전 (D26)
+  /^\.\.?\/site\/(?:pages|copy)$/,                 // 경로 표 · 쪽 문구 (D106) — Worker 와 같이 쓰는 순수 모듈
   /^\.\.\/plan\/wire$/,                             // 계획 파일 wire ↔ 모델 (D100) — core · api 를 들여오지 않는 순수 모듈
 ];
 const INTERNAL = /core\/(?:normalize|compose|truncate|validate|shorten|constraints|dict|__fixtures__)/;
@@ -76,7 +77,7 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
   });
   it('main.tsx 가 경로 셋을 그린다 — App · NamingDoc · Privacy (D57) · 문서 페이지도 같은 허용 목록 안이다', () => {
     const main = specifiers(sources['../main.tsx'] ?? '');
-    for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/route']) expect(main, m).toContain(m);
+    for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/NotFound', './components/route']) expect(main, m).toContain(m);
     for (const f of ['./NamingDoc.tsx', './Privacy.tsx', './DocPage.tsx', './route.ts']) expect(files, f).toContain(f);
   });
   it('화면은 api 를 들여오지 않는다 — 마법사도 엔진을 직접 부른다 (D17)', () => {

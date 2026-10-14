@@ -1,23 +1,6 @@
-// 경로 분기 (D57 · D68 · D98) — `/pick` · `/docs/naming` · `/docs/api` · `/privacy` 는 SPA 경로다(wrangler 의 not_found_handling 이 index.html 을 준다). 라우터 의존성 없이 pathname 하나로 고른다
-export type Route = 'app' | 'pick' | 'naming' | 'api' | 'privacy';
-
-export const NAMING_PATH = '/docs/naming';
-/** 사람이 읽는 API 안내 (D98) */
-export const API_PATH = '/docs/api';
-export const PRIVACY_PATH = '/privacy';
-/** 트리 화면(리소스 고르기) — 트리 Share URL 의 자리 (D68). 뿌리 `/` 는 늘 마법사다 — 트리 꼴 hash 는 이 경로로 옮긴다 (D76) */
-export const PICK_PATH = '/pick';
-export const WIZARD_PATH = '/';
-
-/** 끝의 `/` 는 떼고 대어 본다 — 모르는 경로는 화면(app)이다 */
-export function routeOf(pathname: string): Route {
-  const p = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
-  if (p === NAMING_PATH) return 'naming';
-  if (p === API_PATH) return 'api';
-  if (p === PRIVACY_PATH) return 'privacy';
-  if (p === PICK_PATH) return 'pick';
-  return 'app';
-}
+// 경로 분기 (D57 · D68 · D98 · D106) — 경로 표와 routeOf 는 Worker 와 같이 쓰는 src/site/pages 가 정본이다. 화면은 여기서 다시 내보낸 것을 쓴다.
+// 라우터 의존성 없이 pathname 하나로 고른다 — 모르는 경로는 notFound(서버도 같은 표로 404 를 준다)
+export { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, routeOf, type Route } from '../site/pages';
 
 /** 앱 상태 hash 꼴 — `#state=` 뒤 Base64(url) 글자만. 다른 hash 는 싣지 않는다 */
 const STATE_HASH_RE = /^#state=[A-Za-z0-9_\-+/=]+$/;

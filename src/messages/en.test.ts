@@ -262,7 +262,7 @@ describe('영어 사전 (D24)', () => {
     }
     // 부제는 AWS · Azure 를 말하지 않는다(옆 뱃지가 「soon」을 말한다) · meta 는 「나중」으로만
     expect(en.ui.tagline).not.toMatch(/AWS|Azure/);
-    expect(en.ui.meta_description).toMatch(/AWS and Azure come later/);
+    expect(en.ui.meta_description).toMatch(/AWS and Azure coming\./);
     expect(en.ui.wizard_about).toMatch(/owner, system, environment and region/);
     expect(en.ui.wizard_about).toMatch(/JSON/);
     expect(en.ui.wizard_about).toMatch(/Terraform locals/);
@@ -274,5 +274,17 @@ describe('영어 사전 (D24)', () => {
     expect(`${en.ui.wizard_intro} ${en.ui.wizard_about}`).not.toMatch(/share link|unencrypted/i);
     expect(en.ui.share_warning).toMatch(/not encrypted/);
     expect(fillUi(en, 'wizard_region_placeholder', { region: 'asia-northeast3' })).toMatch(/^e\.g\. asia-northeast3/);
+  });
+});
+
+describe('경로마다 제목 · 설명 (D106)', () => {
+  it('설명은 160자 안 · 비어 있지 않다 · 제목은 60자 안 — 검색 결과에 잘리지 않는 길이', () => {
+    const descs = UI_KEYS.filter((k) => k === 'meta_description' || /^page_.*_description$/.test(k));
+    expect(descs.length).toBe(6);
+    for (const k of descs) {
+      expect(en.ui[k].length, k).toBeGreaterThan(20);
+      expect(en.ui[k].length, k).toBeLessThanOrEqual(160);
+    }
+    for (const k of UI_KEYS.filter((x) => /^page_.*_title$/.test(x))) expect(`Cloudonym — ${en.ui[k]}`.length, k).toBeLessThanOrEqual(60);
   });
 });

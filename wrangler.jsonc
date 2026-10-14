@@ -8,9 +8,11 @@
 	"main": "src/api/index.ts",
 	"compatibility_date": "2026-09-25",
 	"assets": {
-		"not_found_handling": "single-page-application",
-		// /v1/* · /llms.txt · /catalog.json 은 탐색 요청이어도 Worker(Hono)가 먼저 받는다
-		"run_worker_first": ["/v1/*", "/llms.txt", "/catalog.json"]
+		// 화면 경로의 HTML 은 Worker 가 만든다 (D106) — 경로마다 head, 모르는 경로는 404. 정적 파일이 없는 경로는 Worker 로 가고(not_found_handling none),
+		// 파일이 있는 뿌리 `/`(index.html)와 Worker 경로는 run_worker_first 로 먼저 받는다. Worker 는 ASSETS 바인딩으로 index.html 을 읽는다
+		"binding": "ASSETS",
+		"not_found_handling": "none",
+		"run_worker_first": ["/", "/v1/*", "/llms.txt", "/catalog.json", "/robots.txt", "/sitemap.xml"]
 	},
 	"observability": {
 		"enabled": true
