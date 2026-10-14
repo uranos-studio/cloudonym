@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 import { MAX_BODY_BYTES } from './v1';
-import { fail, MAX_WIZARD_ERRORS } from './errors';
+import { clipEchoes, fail, MAX_WIZARD_ERRORS } from './errors';
 import { parseWizardBody, wizardSentence } from './schemas';
 import { toWireMessage } from './serialize';
 import type { Message } from '../messages/catalog';
@@ -26,15 +26,14 @@ function fit(mk: (n: number) => unknown): unknown {
 }
 const plan = (services: unknown[], extra: Record<string, unknown> = {}) => ({ provider: 'gcp', project: P, services, ...extra });
 const gce = (instances: unknown[]) => ({ preset: null, rule: 'gcp.compute_instance', instances });
-/** 오류 한 건이 가장 큰 값 — 되돌려 싣는 값은 80자에서 잘린다. 잰 것 중 가장 큰 것은 UTF-8 3바이트 글자다
- *  (모르는 preset 한 건: 한글 1,042 B · 따옴표 · 역슬래시 · 이모지 882 B · 보이지 않는 문자 750 B) */
+/** 오류 한 건이 가장 큰 값 — 되돌려 싣는 값은 MAX_ECHO_CHARS(40)자에서 잘린다(schemas 의 describe 가 80자로 만든 것을 fail() 이 다시 자른다). 잰 것 중 가장 큰 것은 UTF-8 3바이트 글자다 */
 const WIDE = String.fromCodePoint(0xac00).repeat(1000);
 
 /** 상한 없이 낼 오류 — 라우트가 하는 변환(wizardSentence)까지 */
 function uncapped(body: unknown): { errors: ReturnType<typeof wizardSentence>[]; supported?: string[] } {
   const parsed = parseWizardBody(body);
   if (parsed.ok) throw new Error('400 이 아니다');
-  return { errors: parsed.rejection.errors.map((m) => wizardSentence(toWireMessage(m))), ...(parsed.rejection.supported ? { supported: parsed.rejection.supported } : {}) };
+  return { errors: parsed.rejection.errors.map((m) => wizardSentence(toWireMessage(clipEchoes(m)))), ...(parsed.rejection.supported ? { supported: parsed.rejection.supported } : {}) };
 }
 
 const WORST: [string, (n: number) => unknown][] = [

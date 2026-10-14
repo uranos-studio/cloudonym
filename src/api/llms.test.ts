@@ -24,6 +24,16 @@ import { TIER_PATTERN } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
 import { PRESETS, PRESET_TIERS } from '../core/wizard/presets';
 import { ATTACHMENTS } from '../core/wizard/attachments';
+import { MAX_BODY_BYTES } from './v1';
+import { RATE_LIMIT } from './ratelimit';
+import { MAX_ECHO_CHARS, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
+import { MAX_FIELD_CHARS } from './schemas';
+import { MAX_CONTEXT_CHARS } from '../core/engine';
+import { MAX_ITEMS, MAX_NAMES } from '../core/selection';
+import { CATALOG_LIMITS, catalogAttachments, catalogPresets } from './catalog';
+import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
+import { API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED } from '../components/apiDocModel';
+import { main as cliMain, EXIT } from '../../cli/lib/main.mjs';
 
 const rules = Object.values(RULES);
 // 공개 본문 — 켜진 CSP 만 (D45)
@@ -168,7 +178,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('절 목록 — 마법사 절 셋(Tiers · Attached resources · Wizard presets)이 Kind tokens 뒤에 있다', () => {
     expect(lines.filter((l) => l.startsWith('## '))).toEqual([
       '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets', '## Wizard cards',
-      '## Provider Constraints', '## Resource tree', '## What PASS means', '## API',
+      '## Provider Constraints', '## Resource tree', '## What PASS means', '## API', '## Limits', '## Plan file', '## catalog.json fields', '## CLI',
     ]);
   });
   it('「## Tiers」 — 꼴 문법 한 줄 · 예약어 전부 · 프리셋 토큰 · 예시 이름', () => {
@@ -294,6 +304,75 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(text).toContain("does not replace the provider's final verdict");
     expect(text).not.toMatch(/cloudnaming|cloudonym\.(dev|io|ai|com)/);
     expect(text).toContain('`POST /v1/generate`');
+  });
+});
+
+describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · catalog 칸 · CLI (D100 · D101 · D102 · D103)', () => {
+  it('머리말에 사람용 안내 /docs/api 한 줄', () => {
+    expect(lines.slice(0, 12).find((l) => l.includes('`/docs/api`'))).toBeDefined();
+  });
+  it('「## Limits」 — 본문 상한 · 요청 제한(받는 경로 · 받지 않는 경로) · 429 + Retry-After · 413 · 필드 · 항목 · 오류 수 · 되돌린 값 길이가 상수와 같다', () => {
+    const sec = section('## Limits').join('\n');
+    expect(sec).toContain(`${MAX_BODY_BYTES} bytes`);
+    expect(sec).toContain('413 `request.body_too_large`');
+    expect(sec).toContain(`${RATE_LIMIT.limit} requests per ${RATE_LIMIT.period} seconds per client IP`);
+    expect(sec).toContain('429 `request.rate_limited`');
+    expect(sec).toContain(`\`Retry-After: ${RATE_LIMIT.period}\``);
+    for (const p of API_DOC_LIMITED_ROOT) expect(sec, p).toContain(`\`GET ${p}\``);
+    for (const p of API_DOC_UNLIMITED) expect(sec, p).toContain(`\`GET ${p}\``);
+    expect(sec).toContain(`at most ${MAX_CONTEXT_CHARS} characters`);
+    expect(sec).toContain(`at most ${MAX_FIELD_CHARS}`);
+    expect(sec).toContain(`At most ${MAX_ITEMS} resources and ${MAX_NAMES} names`);
+    expect(MAX_WIZARD_ERRORS).toBe(MAX_GENERATE_ERRORS);
+    expect(sec).toContain(`at most the first ${MAX_WIZARD_ERRORS} errors`);
+    expect(sec).toContain('`request.errors_truncated`');
+    expect(sec).toContain(`cut to ${MAX_ECHO_CHARS} characters`);
+    // 오류 수 상한 문장은 한 곳(Limits)에만 — API 절의 경로 줄에서 옮겼다
+    expect(section('## API').join('\n')).not.toContain('errors_truncated');
+  });
+  it('「## Plan file」 — 칸은 plan.schema.json 과 같다 · environments 는 API 가 무시 · 환경마다 한 번 · Save plan · Open plan · 파일 상한 · /plan.schema.json', () => {
+    const sec = section('## Plan file').join('\n');
+    const schema = JSON.parse(readFileSync(join(import.meta.dirname, '../../public/plan.schema.json'), 'utf-8')) as { properties: Record<string, unknown> };
+    for (const k of Object.keys(schema.properties).filter((k) => k !== '$schema')) expect(sec, k).toContain(`\`${k}\``);
+    expect(sec).toContain('`GET /plan.schema.json`');
+    expect(sec).toMatch(/API ignores `environments`/);
+    expect(sec).toMatch(/one request per environment/);
+    expect(sec).toContain('**Save plan**');
+    expect(sec).toContain('**Open plan**');
+    expect(sec).toContain(`${PLAN_FILE_MAX_BYTES.toLocaleString('en-US')} bytes`);
+    expect(sec).toContain(`${MAX_BODY_BYTES} bytes`);
+  });
+  it('「## catalog.json fields」 — 규칙 칸 셋 · 프리셋 · 딸린 것 · limits 의 키가 /catalog.json 과 같다', () => {
+    const sec = section('## catalog.json fields').join('\n');
+    for (const k of ['input', 'tier', 'locations', 'presets', 'attachments', 'limits']) expect(sec, k).toContain(`\`${k}\``);
+    for (const v of ['count', 'role', 'none']) expect(sec, v).toContain(`\`${v}\``);
+    for (const k of Object.keys(CATALOG_LIMITS)) expect(sec, k).toContain(`\`${k}\``);
+    const presetKeys = new Set(catalogPresets('gcp').flatMap((p) => Object.keys(p)));
+    for (const k of presetKeys) expect(sec, k).toContain(`\`${k}\``);
+    for (const k of Object.keys(catalogAttachments('gcp')[0]!)) expect(sec, k).toContain(`\`${k}\``);
+  });
+  it('「## CLI」 — 저장소에서 node cli/cloudonym.mjs · npm 공개 없음 · 서버 주소 · 명령 넷(--help 와 같다) · 파일 둘 · add 는 덧붙이기만', async () => {
+    const sec = section('## CLI');
+    const body = sec.join('\n');
+    expect(body).toContain('`node cli/cloudonym.mjs');
+    expect(body).toMatch(/not published to npm/);
+    expect(body).toContain('`--server <origin>`');
+    expect(body).toContain('`CLOUDONYM_SERVER`');
+    const out: string[] = [];
+    await cliMain(['--help'], { stdout: (x: string) => { out.push(x); } });
+    const help = out.join('\n').split('\n');
+    const commands = [...new Set(help.slice(help.indexOf('Commands') + 1, help.indexOf('Options')).map((l) => /^ {2}([a-z]+) /.exec(l)?.[1]).filter((c): c is string => c !== undefined))];
+    expect(commands).toEqual(['init', 'add', 'names', 'validate']);
+    for (const c of commands) expect(sec.some((l) => l.startsWith(`- \`${c}\``)), c).toBe(true);
+    expect(body).toContain('`cloudonym.plan.json`');
+    expect(body).toContain('`cloudonym.plan.names.json`');
+    expect(help.join('\n')).toContain('default cloudonym.plan.json');
+    expect(body).toMatch(/writes the file only if every existing name and verdict stays the same/);
+    // 종료 코드 — --help 의 줄과 글자까지 같고(그 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다), 번호는 EXIT 와 같다
+    const exitLine = sec.find((l) => l.startsWith('- Exit codes: '))!;
+    expect(exitLine).toBe(`- ${help.find((l) => l.startsWith('Exit codes: '))}`);
+    const nums = [...exitLine.matchAll(/(?:: | · )(\d+) /g)].map((m) => Number(m[1]));
+    expect(nums).toEqual(Object.values(EXIT).sort((a, b) => a - b));
   });
 });
 

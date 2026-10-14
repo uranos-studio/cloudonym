@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { app } from './index';
 import { req, jsonPost } from './test-support';
 import { MAX_BODY_BYTES } from './v1';
-import { MAX_GENERATE_ERRORS } from './errors';
-import { parseGenerateBody } from './schemas';
+import { MAX_GENERATE_ERRORS, MAX_ECHO_CHARS, clipEchoes } from './errors';
+import { parseGenerateBody, parseNamesBody } from './schemas';
 import { toWireMessage } from './serialize';
 import { rulesFor } from '../core/constraints';
 import { MAX_ITEMS } from '../core/selection';
 
 // POST 경로마다 32 KiB 본문으로 만들 수 있는 최악 400 의 응답 크기 (D103). /v1/wizard 는 wizard-errors-cap.test.ts 가 본다.
-// 오류 한 건이 가장 커지는 값은 되돌려 싣는 80자가 UTF-8 3바이트 글자일 때(/v1/generate 605 B · /v1/names 658 B),
+// 오류 한 건이 가장 커지는 값은 되돌려 싣는 값이 UTF-8 3바이트 글자일 때다 — 80자를 보내도 fail() 이 MAX_ECHO_CHARS 자에서 자른다.
 // 본문 한 바이트당 오류가 가장 많은 값은 `0`(2 B) · `{}` · 따옴표 40개를 담은 배열(describe 가 JSON 으로 80자를 만든다)이다
 const MAX_ERROR_RESPONSE_BYTES = 64 * 1024;
 const enc = (s: string) => new TextEncoder().encode(s).length;
@@ -52,7 +52,7 @@ describe(`POST /v1/generate 400 — 오류 ${MAX_GENERATE_ERRORS}개 상한 + �
       const body = fit(mk);
       const parsed = parseGenerateBody(body);
       if (parsed.ok) throw new Error('400 이 아니다');
-      const full = parsed.rejection.errors.map((m) => toWireMessage(m));
+      const full = parsed.rejection.errors.map((m) => toWireMessage(clipEchoes(m)));
       expect(full.length).toBeGreaterThan(MAX_GENERATE_ERRORS);
       const r = await post('/v1/generate', body);
       expect(r.status).toBe(400);
@@ -84,20 +84,28 @@ describe(`POST /v1/generate 400 — 오류 ${MAX_GENERATE_ERRORS}개 상한 + �
   });
 });
 
-// /v1/names 는 자르지 않는다 — 항목 200개(MAX_ITEMS)마다 오류가 나는 요청이 정상 범위이고 그 응답을 바꾸지 않는다.
-// 그런데 그 200건이 값을 80자씩 되돌려 실으면 64 KB 를 넘는다(따옴표를 담은 배열 200건 98,989 B · 섞은 최악 약 111 KB) —
-// 64 KB 안에 넣으려면 상한이 약 90 이어야 해서 200건 응답을 자른다. 그래서 이 경로의 시험 상한은 잰 최악 위의 128 KiB 다 (docs/decisions.md D103)
-const NAMES_ERROR_RESPONSE_CEILING = 128 * 1024;
-describe('POST /v1/names 400 — 자르지 않는다 · 잰 최악이 상한 안 (D103)', () => {
+// /v1/names 는 오류 수를 자르지 않는다 — 항목 200개(MAX_ITEMS)마다 오류가 나는 요청이 정상 범위이고 그 응답을 바꾸지 않는다.
+// 되돌려 싣는 사용자 값은 MAX_ECHO_CHARS 자에서 자른다(2026-10-14) — 80자일 때 잰 최악 111,469 B(값 200건)가 아래 표처럼 줄었다.
+// 64 KB 안에는 들지 않는다: 규칙 136개마다 count · role · kind 오류 + 모르는 type 64개(값은 한 글자)가 오류 472건 77,312 B 이고, 이것은
+// 되돌린 값이 아니라 오류 수가 만든 크기라 어느 길이로 잘라도 그대로다. 64 KB 를 지키려면 오류 수 상한이 필요하다 (docs/decisions.md D103)
+const NAMES_ERROR_RESPONSE_CEILING = 96 * 1024;
+describe(`POST /v1/names 400 — 오류 수는 자르지 않는다 · 되돌린 값 ${MAX_ECHO_CHARS}자 · 잰 최악이 상한 안 (D103)`, () => {
   const types = rulesFor('gcp');
   const kindTypes = types.filter((t) => t.kinds).map((t) => t.resourceType);
   const resources = (mk: (i: number) => unknown, n = MAX_ITEMS) => ({ provider: 'gcp', context: C, resources: Array.from({ length: n }, (_, i) => mk(i)) });
+  /** 규칙마다 count · role · kind 오류 셋 + 모르는 type — 되돌릴 값 v 가 짧을수록 본문에 많이 들어간다 */
+  const everyRule = (v: unknown, n = types.length) => ({ provider: 'gcp', context: C, resources: [...types.slice(0, n).map((t) => ({ type: t.resourceType, count: 0, role: v, kind: v })), ...Array.from({ length: MAX_ITEMS - Math.min(n, types.length) }, () => ({ type: v }))] });
+  /** 잘리는 가장 짧은 값 — 이보다 길면 본문만 커지고 응답은 같다 */
+  const OVER = MAX_ECHO_CHARS + 1;
   const WORST: [string, unknown][] = [
     ['모르는 type 200개 · 따옴표를 담은 배열', resources(() => ({ type: NESTED_QUOTES }))],
     ['모르는 type · 한글 80자(본문이 허락하는 만큼)', fit((n) => resources(() => ({ type: WIDE }), Math.min(n, MAX_ITEMS)))],
     ['모르는 type 200개 · 한글 80자와 따옴표 배열을 섞음', resources((i) => ({ type: i < 80 ? WIDE : NESTED_QUOTES }))],
     ['종류 있는 규칙마다 오류 셋(count · role · kind) + 모르는 type', resources((i) => (i < kindTypes.length ? { type: kindTypes[i], count: 0, role: NESTED_QUOTES, kind: NESTED_QUOTES } : { type: NESTED_QUOTES }))],
-    ['규칙 136개마다 오류 셋 + 모르는 type 64개', { provider: 'gcp', context: C, resources: [...types.map((t) => ({ type: t.resourceType, count: 0, role: 'a', kind: 'a' })), ...Array.from({ length: MAX_ITEMS - types.length }, () => ({ type: 'x' }))] }],
+    ['규칙 136개마다 오류 셋 + 모르는 type 64개 · 값 한 글자', everyRule('a')],
+    [`규칙 136개마다 오류 셋 + 모르는 type 64개 · 따옴표 ${OVER}자`, fit((n) => everyRule('"'.repeat(OVER), n))],
+    [`규칙 136개마다 오류 셋 + 모르는 type 64개 · 역슬래시 ${OVER}자`, fit((n) => everyRule('\\'.repeat(OVER), n))],
+    [`규칙 136개마다 오류 셋 + 모르는 type 64개 · 한글 ${OVER}자`, fit((n) => everyRule(WIDE.slice(0, OVER), n))],
   ];
   for (const [label, body] of WORST) {
     it(`${label} → 잘리지 않고 응답 ${NAMES_ERROR_RESPONSE_CEILING / 1024}KB 안`, async () => {
@@ -108,6 +116,62 @@ describe('POST /v1/names 400 — 자르지 않는다 · 잰 최악이 상한 안
       expect(r.bytes).toBeLessThan(NAMES_ERROR_RESPONSE_CEILING);
     });
   }
+  it('되돌린 값 때문이 아닌 최악(값 한 글자)이 64 KB 를 넘는다 — 상한을 내리려면 오류 수 상한이 필요하다는 사실을 시험으로 남긴다', async () => {
+    const r = await post('/v1/names', everyRule('a'));
+    expect(r.body.errors.length).toBeGreaterThan(400);
+    expect(r.bytes).toBeGreaterThan(MAX_ERROR_RESPONSE_BYTES);
+  });
+});
+
+// 되돌려 싣는 사용자 값 (2026-10-14 · D103) — 모든 실패 응답의 params.value · params.requested 와 그것으로 만든 message 를 fail() 한 곳에서 자른다
+describe(`실패 응답에 되돌려 싣는 사용자 값은 ${MAX_ECHO_CHARS}자 + … (D103)`, () => {
+  const at = (n: number) => 'x'.repeat(n);
+  /** 경로 · 본문 · 되돌린 값을 꺼내는 자리 */
+  const CASES: [string, string, (v: string) => unknown, string][] = [
+    ['/v1/generate', 'providers[0]', (v) => ({ context: C, providers: [v] }), 'value'],
+    ['/v1/names', 'resources[0].type', (v) => ({ provider: 'gcp', context: C, resources: [{ type: v }] }), 'value'],
+    ['/v1/names', 'resources[0].kind', (v) => ({ provider: 'gcp', context: C, resources: [{ type: 'subnet', kind: v }] }), 'value'],
+    ['/v1/wizard', 'preset', (v) => ({ provider: 'gcp', project: { owner: 'o', system: 's', env: 'prod', region: 'ane3' }, services: [{ purpose: 'a', picks: [{ preset: v }] }] }), 'value'],
+    ['/v1/validate', 'resource_type', (v) => ({ provider: 'gcp', resource_type: v, name: 'x' }), 'value'],
+    ['/v1/events', 'event', (v) => ({ event: v }), 'value'],
+    ['/v1/generate', 'rules_version (409)', (v) => ({ context: C, rules_version: v }), 'requested'],
+  ];
+  for (const [path, label, mk, key] of CASES) {
+    it(`${path} · ${label} — ${MAX_ECHO_CHARS}자는 그대로 · ${MAX_ECHO_CHARS + 1}자는 ${MAX_ECHO_CHARS}자 + … · message 도 같다 · supported 는 바뀌지 않는다`, async () => {
+      const same = await post(path, mk(at(MAX_ECHO_CHARS)));
+      const cut = await post(path, mk(at(MAX_ECHO_CHARS + 1)));
+      const e0 = same.body.errors[0] as unknown as { params: Record<string, unknown>; message: string };
+      const e1 = cut.body.errors[0] as unknown as { params: Record<string, unknown>; message: string };
+      expect(e0.params[key]).toBe(at(MAX_ECHO_CHARS));
+      expect(e1.params[key]).toBe(`${at(MAX_ECHO_CHARS)}…`);
+      expect(e1.message).toBe(e0.message.replace(at(MAX_ECHO_CHARS), `${at(MAX_ECHO_CHARS)}…`));
+      expect(cut.body.supported).toEqual(same.body.supported);
+      expect(e1.params.supported).toEqual(e0.params.supported);
+    });
+  }
+  it(`${MAX_ECHO_CHARS}자 이하 값의 응답은 바이트까지 자르기 전과 같다 — /v1/names 오류 여럿(supported 포함)`, async () => {
+    const body = { provider: 'gcp', context: C, resources: [{ type: at(MAX_ECHO_CHARS) }, { type: 'subnet', kind: at(MAX_ECHO_CHARS) }, { type: 'compute_instance', role: at(MAX_ECHO_CHARS), count: 0 }] };
+    const parsed = parseNamesBody(body);
+    if (parsed.ok) throw new Error('400 이 아니다');
+    const { res } = await req(app, '/v1/names', jsonPost(body));
+    expect(await res.text()).toBe(JSON.stringify({ success: false, errors: parsed.rejection.errors.map((m) => toWireMessage(m)), supported: parsed.rejection.supported }));
+  });
+  it('clipEchoes — value · requested 만 자르고 문자열이 아니거나 짧으면 같은 객체, 다른 params(supported · pattern · type)는 손대지 않는다', () => {
+    const long = at(MAX_ECHO_CHARS + 5);
+    const m = { code: 'selection.unknown_kind', params: { index: 0, type: long, value: long, supported: [long] } } as const;
+    expect(clipEchoes(m as never)).toEqual({ ...m, params: { ...m.params, value: `${at(MAX_ECHO_CHARS)}…` } });
+    const short = { code: 'request.value_unsupported', field: 'x', params: { value: 'ok' } } as const;
+    expect(clipEchoes(short as never)).toBe(short);
+    const none = { code: 'request.body_not_json' } as const;
+    expect(clipEchoes(none as never)).toBe(none);
+  });
+  it('서버가 만든 식별자(wizard.duplicate_pick 의 type/kind/tier/role 키)는 40자를 넘어도 자르지 않는다', async () => {
+    const pick = { preset: null, rule: 'gcp.iam_principal_access_boundary_policy', tier: 'abcdefghij' };
+    const r = await post('/v1/wizard', { provider: 'gcp', project: { owner: 'o', system: 's', env: 'prod', region: 'ane3' }, services: [{ purpose: 'a', picks: [pick, pick] }] });
+    const dup = r.body.errors.find((e) => e.code === 'wizard.duplicate_pick')!;
+    expect(String(dup.params!.value).length).toBeGreaterThan(MAX_ECHO_CHARS);
+    expect(String(dup.params!.value)).not.toContain('…');
+  });
 });
 
 describe(`POST /v1/validate · /v1/events 400 — 오류가 많아야 셋이라 상한 없이 ${MAX_ERROR_RESPONSE_BYTES / 1024}KB 안 (D103)`, () => {

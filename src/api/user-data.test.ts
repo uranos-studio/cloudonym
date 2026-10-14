@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
+import { MAX_ECHO_CHARS } from './errors';
 import { req, jsonPost, json, beaconPost, fakeKv } from './test-support';
 import { BASELINE_CONTEXTS, baselineRaw } from '../core/baseline-inputs';
 import { ENABLED_PROVIDERS, type Provider } from '../core/types';
@@ -65,9 +66,9 @@ describe('사용자 값은 params · 이름 · 라벨에 있고 code · field �
     expect(t.params.from).toBe(owner.trim());
     expect(t.message).toContain(owner.trim());
   });
-  it('요청 오류의 value 는 표시용 문자열 — 비문자열은 JSON 문자열로, 80자에서 자른다 (D23)', async () => {
+  it(`요청 오류의 value 는 표시용 문자열 — 비문자열은 JSON 문자열로, ${MAX_ECHO_CHARS}자에서 자른다 (D23 · D103)`, async () => {
     const body = await json((await req(app, '/v1/generate', jsonPost({ context: { owner: 'a', system: 'b', purpose: 'c', env: 'prod', region: 'asia-northeast3-a' }, providers: [{ x: 1 }, 'q'.repeat(100)] }))).res);
-    expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual(['{"x":1}', `${'q'.repeat(80)}…`]);
+    expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual(['{"x":1}', `${'q'.repeat(MAX_ECHO_CHARS)}…`]);
   });
 });
 

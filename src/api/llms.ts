@@ -13,6 +13,13 @@ import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { catalogFor } from '../core/catalog';
 import { GCP_KIND_CHECKED, type CatalogRow } from '../core/rules/gcp-catalog';
 import { MAX_FIELD_CHARS } from './schemas';
+import { MAX_BODY_BYTES } from './v1';
+import { RATE_LIMIT } from './ratelimit';
+import { MAX_ECHO_CHARS, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
+import { CATALOG_LIMITS, catalogAttachments, catalogPresets } from './catalog';
+import { MAX_ITEMS, MAX_NAMES } from '../core/selection';
+import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
+import { API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED } from '../components/apiDocModel';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -205,6 +212,73 @@ function constraintLine(rule: ResourceRule, catalog: Catalog): string {
   return `- \`${rule.id}\` (${rule.displayName}): ${bits.join(' · ')}`;
 }
 
+
+/** 세 자리마다 쉼표 — 176,548. Number.toLocale* 은 kst-guard 가 막는 이름이라 쓰지 않는다 */
+const grouped = (n: number): string => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+/** 백틱으로 감싼 목록 — `a`, `b` and `c` */
+const codes = (xs: readonly string[]): string => joinNames(xs.map((x) => `\`${x}\``));
+
+/** 「## Limits」 절 — 본문 · 요청 제한 · 필드 · 항목 · 오류 수 · 되돌린 값. 숫자는 전부 서버 상수에서 (D100 · D103).
+ *  요청 제한을 받는 · 받지 않는 GET 목록은 /docs/api 와 같은 상수(apiDocModel)다 — 서버 동작과 같은지는 apidoc-sync.test 가 본다 */
+function limitLines(): string[] {
+  const gets = (xs: readonly string[]) => joinNames(xs.map((x) => `\`GET ${x}\``));
+  return [
+    '', '## Limits', '',
+    `- Request body: at most ${MAX_BODY_BYTES} bytes on \`POST /v1/*\`. A larger body is 413 \`request.body_too_large\` with \`params: { max_bytes }\`, before the body is read. A saved plan file fits (see \`## Plan file\`).`,
+    `- Rate limit: ${RATE_LIMIT.limit} requests per ${RATE_LIMIT.period} seconds per client IP, counted together across ${joinNames(['every `POST /v1/*`', ...API_DOC_LIMITED_ROOT.map((x) => `\`GET ${x}\``)])}. ${gets(API_DOC_UNLIMITED)} are not counted. Over the limit the answer is 429 \`request.rate_limited\` with \`Retry-After: ${RATE_LIMIT.period}\` (seconds) — wait that long, then send again.`,
+    `- Fields: \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\`.`,
+    `- \`/v1/names\`: At most ${MAX_ITEMS} resources and ${MAX_NAMES} names per request. \`/v1/wizard\`: at most ${MAX_NAMES} names including the project ID.`,
+    `- Errors: ${MAX_WIZARD_ERRORS === MAX_GENERATE_ERRORS ? `a \`POST /v1/wizard\` or \`POST /v1/generate\` 400 lists at most the first ${MAX_WIZARD_ERRORS} errors` : `a \`POST /v1/wizard\` 400 lists at most the first ${MAX_WIZARD_ERRORS} errors and a \`POST /v1/generate\` 400 at most the first ${MAX_GENERATE_ERRORS}`}; when there are more, the last entry is \`request.errors_truncated\` with \`params: { shown, total }\` — fix those and send again to see the rest. \`/v1/names\`, \`/v1/validate\` and \`/v1/events\` list every error.`,
+    `- Echoed values: a user value echoed in an error (\`params.value\`, \`params.requested\` and the \`message\` built from them) is cut to ${MAX_ECHO_CHARS} characters followed by \`…\`; control, bidirectional and zero-width characters appear as \`\\uXXXX\`. Lists such as \`supported\` are never cut.`,
+  ];
+}
+
+/** 「## Plan file」 절 (D100) — 웹이 내려주고 · 열고 · API 와 CLI 가 받는 파일. 칸 이름은 public/plan.schema.json 과 같다(llms.test 가 본다) */
+function planFileLines(): string[] {
+  return [
+    '', '## Plan file', '',
+    'A plan file is the `POST /v1/wizard` request body plus two fields. Its fields: `provider`, `project`, `project_id_suffix` (optional), `project_picks`, `services` (as in the request), `rules_version` and `environments` (optional). `rules_version` is always there (the rules revision when it was saved); `environments` is there only when the plan has two or more environments, and `project.env` is the first of them.',
+    '- The API ignores `environments` and names one environment, `project.env`: to name every environment, send one request per environment with `project.env` changed. With one environment the file is a request body as it stands (`curl -d @file`). `rules_version` pins the request: a 409 means the rules changed since the file was saved.',
+    `- Requests carry at most ${MAX_BODY_BYTES} bytes; a saved file is indented, so send a large plan compacted (\`jq -c .\`).`,
+    '- Fields the API does not know are ignored, so the same file gives the same names on the web and from the API; an unknown field inside `attach` is the exception (400).',
+    '- JSON Schema: `GET /plan.schema.json`.',
+    `- On the web, **Save plan** downloads the current plan as \`cloudonym-plan-<system>-<env>.json\`, and **Open plan** loads such a file the way a share link opens (invalid picks are left out and counted). Open plan does not read files over ${grouped(PLAN_FILE_MAX_BYTES)} bytes, the most a share link can hold.`,
+  ];
+}
+
+/** 「## catalog.json fields」 절 (D101) — 클라이언트가 계획을 만들 때 읽는 칸. 키는 catalog.ts 가 만드는 것에서 꺼낸다 */
+function catalogFieldLines(order: readonly Provider[]): string[] {
+  const presetKeys = [...new Set(order.flatMap((p) => catalogPresets(p).flatMap((x) => Object.keys(x))))];
+  const attachKeys = [...new Set(order.flatMap((p) => catalogAttachments(p).flatMap((x) => Object.keys(x))))];
+  return [
+    '', '## catalog.json fields', '',
+    '`GET /catalog.json` is what a client reads to build a `/v1/wizard` pick or a plan file without keeping its own copy of the rules. The limits are guidance before sending — the API\'s answer is the verdict.',
+    '- per rule (`providers.<provider>.rows[].rules.<rule id>`): `input` — what a pick of it takes: `count` (numbered servers in `instances[]`), `role` (a `role`) or `none`; `tier` — `true` when the name has a tier slot (see `## Tiers`); `locations` — the values a pick may send as `location`, only on rules that take one',
+    `- \`presets\` (per provider): the wizard presets in request names — ${codes(presetKeys)}; send \`id\` as \`preset\``,
+    `- \`attachments\` (per provider): what a server slot can carry — ${codes(attachKeys)} (see \`## Attached resources\`)`,
+    `- \`limits\` (per provider): ${codes(Object.keys(CATALOG_LIMITS))}`,
+  ];
+}
+
+/** 「## CLI」 절 (D102) — 저장소의 명령줄 도구. Worker 는 cli/ 를 들여오지 않는다(src → cli 는 시험만) — 종료 코드 줄은 cli 의 --help 줄과 글자까지 같아야 하고,
+ *  llms.test 가 그 줄과 EXIT 를 대어 본다(--help 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다) */
+export const CLI_EXIT_LINE = 'Exit codes: 0 ok · 1 a name FAILs or add would change existing names or verdicts · 2 plan, names file or arguments rejected (400, 413), a file cannot be read or written, or it changed while the command ran · 3 rules_version differs (409) · 4 server unreachable, 429, 5xx or an answer that cannot be interpreted · 64 usage · 70 internal error';
+function cliLines(): string[] {
+  return [
+    '', '## CLI', '',
+    'The source repository has a command-line tool. It is not published to npm: run it from a clone with `node cli/cloudonym.mjs <command>` (Node 22, no dependencies). It holds no naming rules — it edits a plan file and asks `POST /v1/wizard` for every name and verdict, and reads presets, rule inputs and limits from `/catalog.json`, so it gives the same names as the web and the API for the same rules revision.',
+    '- Server: `--server <origin>` or `CLOUDONYM_SERVER`; there is no default.',
+    '- Files: the plan file (default `cloudonym.plan.json`, `-f` to choose) and the names kept next to it (`cloudonym.plan.names.json`).',
+    '- `init` — a new plan file (`--owner --system --env E[,E2] --region`, `rules_version` from the server) or `--from <file>` to copy a file saved with Save plan',
+    '- `add` — appends a pick (a preset, a rule id or a resource name) to a service (`--service <purpose>`) or the project (`--project`), or numbered servers to the same pick; it writes the file only if every existing name and verdict stays the same in every environment and every new name passes, otherwise it exits 1 and leaves the file as it was. It never edits an existing pick. `--dry-run` checks without writing',
+    '- `names` — every name, one request per environment; `--new` only names not yet kept, `--repin` re-pins `rules_version` after a 409',
+    '- `validate` — exit 0 when every name is valid and matches the kept names',
+    '- On 429 it prints `Retry-After`; `--wait` waits that long and retries once per command.',
+    `- ${CLI_EXIT_LINE}`,
+  ];
+}
+
 /** providers — 실을 CSP. 기본은 켜진 CSP(D45). 시험은 셋을 넘겨 꺼진 CSP 의 줄 꼴도 본다 */
 export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: Catalog = en, providers: readonly Provider[] = ENABLED_PROVIDERS): string {
   const byProvider = (p: Provider): ResourceRule[] => rules.filter((r) => r.provider === p);
@@ -220,6 +294,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     ...(planned.length > 0 ? [`> ${joinNames(planned)}: planned — not enabled yet. The API answers 400 \`request.provider_not_enabled\` for them.`] : []),
     '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/wizard` · `POST /v1/validate` · `GET /openapi.json`).',
     "> Cloudonym does not replace the provider's final verdict — it checks only the reserved words and patterns that the official documents state.",
+    '> People: the API guide is the page `/docs/api` (curl examples, limits, failures); the naming guide is `/docs/naming`.',
     '',
     '## Naming Formulas',
     '',
@@ -254,22 +329,21 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '',
     '## API',
     '',
-    `- \`POST /v1/generate\` — body \`{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: [${order.map((p) => `"${p}"`).join(', ')}], "rules_version"?: string }\` — a 400 lists at most the first 50 errors, then \`request.errors_truncated\` with \`params: { shown, total }\``,
-    '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string, "kind"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `kind` and `kind_token` when a kind was picked (`kind_token` only when the name carries one), `scope`, `uniqueness` and the same fields as a `/v1/generate` name. At most 200 resources and 200 names per request',
-    `- \`owner\`, \`system\` and \`purpose\` are at most ${MAX_CONTEXT_CHARS} characters; \`env\`, \`region\` and the other strings at most ${MAX_FIELD_CHARS}. A longer value is 400 \`request.field_too_long\``,
-    '- `POST /v1/wizard` — body `{ "provider", "project": { "owner", "system", "env", "region" }, "project_id_suffix"?: string, "project_picks"?: [pick], "services"?: [{ "purpose", "picks": [pick] }], "rules_version"?: string }` with pick `{ "preset": id | null, "rule"?: rule id, "tier"?, "role"?, "kind"?, "ha"?: boolean, "serverless"?: rule id, "instances"?: [{ "id", "seq", "attach"?: { "boot"?: true, "data"?: [seq], "ip"?: true, "ipi"?: true } }] }` — one project: the project ID first (with `project_id_suffix` appended as a protected token when given — same pattern and reserved words as a tier; project IDs are global and permanent, and Cloudonym cannot check whether one is free), then project-level items, then each service; each parent is followed by its attached resources. `data.<provider>` is `{ valid, items[], conflicts[] }`; items carry a structured `key` (`service/shop/compute_instance/-/web/01/data/01`), `namespace` (`project` or the service), `level`, `tier`, `parent` and `attach` when they apply, and the `/v1/names` item fields. `metadata.generated_labels.<provider>` maps each namespace to its labels (the `project` labels have no `purpose`). A 400 names the offending element in `field` with the request names (`project_picks[0].instances[0].attach.data[1]`); errors about the whole plan have no `field`; at most the first 50 errors are listed, and when there are more the last entry is `request.errors_truncated` with `params: { shown, total }`. At most 200 names including the project ID',
+    `- \`POST /v1/generate\` — body \`{ "context": { "owner", "system", "purpose", "env", "region" }, "providers"?: [${order.map((p) => `"${p}"`).join(', ')}], "rules_version"?: string }\``,
+    '- `POST /v1/names` — body `{ "provider", "context": { … }, "resources": [{ "type", "count"?: 1-99, "role"?: string, "kind"?: string }], "rules_version"?: string }` — only the resources you pick; `data.<provider>` is `{ valid, items[], conflicts[] }`. Each item carries `key`, `resource_type`, `seq` or `role`, `kind` and `kind_token` when a kind was picked (`kind_token` only when the name carries one), `scope`, `uniqueness` and the same fields as a `/v1/generate` name (limits: see `## Limits`)',
+    '- `POST /v1/wizard` — body `{ "provider", "project": { "owner", "system", "env", "region" }, "project_id_suffix"?: string, "project_picks"?: [pick], "services"?: [{ "purpose", "picks": [pick] }], "rules_version"?: string }` with pick `{ "preset": id | null, "rule"?: rule id, "tier"?, "role"?, "kind"?, "ha"?: boolean, "serverless"?: rule id, "instances"?: [{ "id", "seq", "attach"?: { "boot"?: true, "data"?: [seq], "ip"?: true, "ipi"?: true } }] }` — one project: the project ID first (with `project_id_suffix` appended as a protected token when given — same pattern and reserved words as a tier; project IDs are global and permanent, and Cloudonym cannot check whether one is free), then project-level items, then each service; each parent is followed by its attached resources. `data.<provider>` is `{ valid, items[], conflicts[] }`; items carry a structured `key` (`service/shop/compute_instance/-/web/01/data/01`), `namespace` (`project` or the service), `level`, `tier`, `parent` and `attach` when they apply, and the `/v1/names` item fields. `metadata.generated_labels.<provider>` maps each namespace to its labels (the `project` labels have no `purpose`). A 400 names the offending element in `field` with the request names (`project_picks[0].instances[0].attach.data[1]`); errors about the whole plan have no `field`. A plan file (see `## Plan file`) is this body',
     'The wizard response is not reproduced through `/v1/names`: the wizard response is reproduced by repeating the same wizard request with its `rules_version`; `/v1/names` is a separate, flat endpoint.',
     '- `POST /v1/validate` — body `{ "provider", "resource_type", "name", "rules_version"?: string }`',
     '- `GET /v1/health` — `{ "ok": true, "version": { "engine", "rules" } }`',
     '- `GET /openapi.json` — OpenAPI 3.0.3',
-    '- `GET /catalog.json` — the resource catalog of the enabled providers as JSON: one row per resource with its rule ids, abbreviation, kinds and kind tokens, region-token kind (`none` or `region`), description and search aliases, the region and zone codes, and `version: { engine, rules }`; each rule also says what a wizard pick of it takes (`input`: `count`, `role` or `none`; `tier`; `locations`), and each provider lists the wizard `presets`, the `attachments` of a server slot and the request `limits`',
+    '- `GET /catalog.json` — the resource catalog of the enabled providers as JSON: one row per resource with its rule ids, abbreviation, kinds and kind tokens, region-token kind (`none` or `region`), description and search aliases, the region and zone codes, and `version: { engine, rules }`; each rule also says what a wizard pick of it takes (`input`: `count`, `role` or `none`; `tier`; `locations`), and each provider lists the wizard `presets`, the `attachments` of a server slot and the request `limits` (see `## catalog.json fields`)',
     '',
     '`/v1/generate` is the catalogue (every rule of the providers, sequence `01`, no kind); `/v1/names` is the selection. Rules that need a kind come back `valid: false` there (`name.kind_required`) — use `/v1/names` with `kind` for them. One `/v1/names` request stands for one instance of each parent scope (one resource group, one project, one VPC): names that collide inside the request (same kind of resource, same name; Azure and AWS compare case-insensitively) are each marked `valid: false` with `name.conflict`, and `conflicts` lists each collision once. Two resource groups are two requests.',
     'Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `violations`, `steps`, `errors`, `rule.notes` and the label lists are arrays of `{ code, field?, params?, message }` — branch on `code`, show `message` to people.',
     '`rules_version` pins a request to a rules revision: if it differs from the current one the API answers 409 `request.rules_version_mismatch` instead of returning names that may differ. The API never serves an old rules revision — store the names you created and keep using them.',
     'Every failure (400, 403, 404, 409, 413, 429, 500) has the same shape: `{ "success": false, "errors": [{ code, field?, params?, message }], "supported"?: [...] }`. An unknown `/v1` path or method is 404 `request.not_found`.',
-    '',
-    'Paths are relative to the host that served this file.',
   );
+  lines.push(...limitLines(), ...planFileLines(), ...catalogFieldLines(order), ...cliLines());
+  lines.push('', 'Paths are relative to the host that served this file.');
   return `${lines.join('\n')}\n`;
 }

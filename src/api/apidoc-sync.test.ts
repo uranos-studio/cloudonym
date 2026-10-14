@@ -3,12 +3,12 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
-import { FAIL_STATUSES, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
+import { FAIL_STATUSES, MAX_ECHO_CHARS, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { META_KEYS, logTelemetry } from './telemetry';
 import { beaconPost, fakeKv, fakeLimiter, jsonPost, req } from './test-support';
 import { VERSION } from '../version';
 import {
-  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_MAX_ERRORS, API_DOC_LIMITED_ROOT, API_DOC_SKIP_HEADER, API_DOC_UNLIMITED,
+  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_ECHO_CHARS, API_DOC_FAIL_STATUSES, API_DOC_MAX_ERRORS, API_DOC_LIMITED_ROOT, API_DOC_SKIP_HEADER, API_DOC_UNLIMITED,
   apiEndpoints, requestExample, type ApiSpec,
 } from '../components/apiDocModel';
 
@@ -78,6 +78,15 @@ describe('/docs/api ↔ Worker — 실패 · 계측', () => {
   it('/v1/wizard · /v1/generate 400 오류 수 상한 = MAX_WIZARD_ERRORS = MAX_GENERATE_ERRORS (D103)', () => {
     expect(API_DOC_MAX_ERRORS).toBe(MAX_WIZARD_ERRORS);
     expect(API_DOC_MAX_ERRORS).toBe(MAX_GENERATE_ERRORS);
+  });
+
+  it('되돌려 싣는 사용자 값의 길이 = MAX_ECHO_CHARS (D103)', () => {
+    expect(API_DOC_ECHO_CHARS).toBe(MAX_ECHO_CHARS);
+    // 명세(openapi.json)의 손글 숫자도 같다 — ErrorResponse 설명 · Message.params 설명
+    const text = JSON.stringify(spec);
+    expect(text.match(/cut to (\d+) characters/g)?.length).toBeGreaterThanOrEqual(2);
+    for (const m of text.matchAll(/cut to (\d+) characters/g)) expect(Number(m[1])).toBe(MAX_ECHO_CHARS);
+    expect(text).not.toMatch(/trimmed to 80/);
   });
 
   it('세는 요청 — 각 요청이 실제로 그 이벤트 하나를 KV 에 센다 · 목록 = 화면 이벤트(ui_*) 밖의 META_KEYS', async () => {

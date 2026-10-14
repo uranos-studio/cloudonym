@@ -1364,7 +1364,7 @@
           },
           "params": {
             "type": "object",
-            "description": "Values used in message. User values (from, to, value) are display strings: trimmed to 80 characters in request errors, non-strings shown as JSON; control, bidirectional and zero-width characters are shown as \\uXXXX text in params and message",
+            "description": "Values used in message. User values (from, to, value) are display strings: cut to 40 characters followed by … in failure responses (params.value, params.requested and the message built from them), non-strings shown as JSON; control, bidirectional and zero-width characters are shown as \\uXXXX text in params and message",
             "additionalProperties": {
               "oneOf": [
                 {
@@ -1582,7 +1582,7 @@
           "success",
           "errors"
         ],
-        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape. A /wizard or /generate 400 lists at most the first 50 errors; when there are more, a last entry with code request.errors_truncated and params { shown, total } says how many were left out. Other routes list every error",
+        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape. A /wizard or /generate 400 lists at most the first 50 errors; when there are more, a last entry with code request.errors_truncated and params { shown, total } says how many were left out. Other routes list every error. User values echoed in params.value and params.requested (and the message) are cut to 40 characters followed by …; supported is never cut",
         "properties": {
           "success": {
             "type": "boolean",

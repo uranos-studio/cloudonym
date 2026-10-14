@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
+import { MAX_ECHO_CHARS } from './errors';
 import { req, jsonPost, json, fakeKv, fakeLimiter, WIZARD_WIRE_SAMPLE, type Loose } from './test-support';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -241,10 +242,11 @@ describe('POST /v1/names (D39)', () => {
     const pin = await names({ provider: 'gcp', context: base, resources: [{ type: 'project_id' }], rules_version: '2026-01-01.1' });
     expect(pin.res.status).toBe(409);
   });
-  it('되돌려 싣는 type 은 80자로 자르고 보이지 않는 문자를 \\uXXXX 로 — params · message 둘 다', async () => {
+  it(`되돌려 싣는 type 은 ${MAX_ECHO_CHARS}자로 자르고 보이지 않는 문자를 \\uXXXX 로 — params · message 둘 다`, async () => {
     const rlo = String.fromCodePoint(0x202e);
     const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: `${'x'.repeat(100)}${rlo}` }, { type: `a${rlo}b` }] })).res);
-    expect(body.errors[0].params.value).toBe(`${'x'.repeat(80)}…`);
+    expect(body.errors[0].params.value).toBe(`${'x'.repeat(MAX_ECHO_CHARS)}…`);
+    expect(body.errors[0].message).toContain(`'${'x'.repeat(MAX_ECHO_CHARS)}…'`);
     expect(body.errors[1].params.value).toBe('a\\u202Eb');
     expect(JSON.stringify(body)).not.toContain(rlo);
   });
@@ -272,10 +274,10 @@ describe('POST /v1/names (D39)', () => {
       { code: 'selection.kind_not_supported', params: { index: 2, type: 'vpc_network' }, message: "resources[2]: 'vpc_network' takes no kind" },
     ] });
   });
-  it('종류 (D52) — 되돌려 싣는 kind 는 80자로 자르고 보이지 않는 문자를 \\uXXXX 로 · 비문자열은 JSON', async () => {
+  it(`종류 (D52) — 되돌려 싣는 kind 는 ${MAX_ECHO_CHARS}자로 자르고 보이지 않는 문자를 \\uXXXX 로 · 비문자열은 JSON`, async () => {
     const rlo = String.fromCodePoint(0x202e);
     const body = await json((await names({ provider: 'gcp', context: base, resources: [{ type: 'cloud_sql_instance', kind: `${'x'.repeat(100)}${rlo}` }, { type: 'snapshot', kind: { a: 1 } }] })).res);
-    expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual([`${'x'.repeat(80)}…`, '{"a":1}']);
+    expect(body.errors.map((e: { params: { value: string } }) => e.params.value)).toEqual([`${'x'.repeat(MAX_ECHO_CHARS)}…`, '{"a":1}']);
     expect(JSON.stringify(body)).not.toContain(rlo);
   });
   it('/v1/generate — 리소스 정책은 종류를 받을 길이 없어 늘 valid:false + name.kind_required (D52)', async () => {
@@ -631,7 +633,7 @@ describe('POST /v1/wizard — 되돌려 싣는 값 · 문장 (고침 1)', () => 
     expect(seq.find((e) => e.code === 'wizard.invalid_seq')!.params.value).toBe('7');
     expect(seq.find((e) => e.code === 'wizard.invalid_data_seq')!.params.value).toBe('{"d":1}');
     const long = await errs(one({ preset: 'x'.repeat(500) }));
-    expect(long[0].params.value).toBe(`${'x'.repeat(80)}…`);
+    expect(long[0].params.value).toBe(`${'x'.repeat(MAX_ECHO_CHARS)}…`);
   });
 
   it('문장의 위치는 요청 본문의 이름 — field 와 같다 (resources[0] · picks[0] 아님)', async () => {

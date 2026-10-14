@@ -95,7 +95,7 @@ export function ApiDocBody({ spec, origin }: { spec: SpecState; origin: string }
         {loaded ? rows.filter((r) => r.curl).map((r) => <Example key={r.id} row={r} />) : pending}
       </Section>
       <Section id="errors" title={ui.api_errors_title}>
-        <p data-api-errors>{fillUi(en, 'api_errors_body', { statuses: vars.statuses, max_errors: vars.max_errors })}</p>
+        <p data-api-errors>{fillUi(en, 'api_errors_body', { statuses: vars.statuses, max_errors: vars.max_errors, echo_chars: vars.echo_chars })}</p>
         {loaded && <pre data-api-error className={PRE}>{errorExample(loaded)}</pre>}
       </Section>
       <Section id="version" title={ui.api_version_title}>

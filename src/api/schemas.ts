@@ -96,7 +96,7 @@ function checkRulesVersion(body: Record<string, unknown>): { ok: false; rejectio
   return undefined;
 }
 
-/** 오류 params 에 넣을 표시용 값 — 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 80자까지. String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다 */
+/** 오류 params 에 넣을 표시용 값 — 보이지 않는 문자를 \uXXXX 로 바꾼 뒤 80자까지(응답으로 나갈 때 fail() 이 MAX_ECHO_CHARS 자로 한 번 더 자른다 · errors.ts). String() 은 호출 불가능한 toString 을 가진 객체({"toString":1})에서 던진다 */
 function describe(v: unknown): string {
   let text: string;
   if (typeof v === 'string') text = v;

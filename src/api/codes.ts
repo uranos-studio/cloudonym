@@ -16,7 +16,7 @@ export type ApiMessage =
   | { code: 'request.field_too_long'; field: string; params: { max: number } }
   | { code: 'request.providers_not_array' }
   | { code: 'request.providers_empty' }
-  /** field 는 providers[i] · provider · resource_type · event. value 는 표시용 문자열(80자 자름 · 비문자열은 JSON 문자열화) */
+  /** field 는 providers[i] · provider · resource_type · event. value 는 표시용 문자열(비문자열은 JSON 문자열화 · 응답에서는 fail() 이 MAX_ECHO_CHARS 자로 자른다) */
   | { code: 'request.value_unsupported'; field: string; params: { value: string } }
   | { code: 'request.field_not_string'; field: string }
   /** 반드시 있어야 할 필드가 본문에 없다 — field 는 provider · resource_type · event · target. 값이 없으니 params 도 없다 */
