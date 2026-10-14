@@ -1,12 +1,18 @@
 // check-sources.mjs 시험 — 검사기를 먼저 시험한다: 같으면 0, 한 글자만 달라도 1.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, cpSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, cpSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildLock, AWS_NAMESPACES, awsDigest, kstNow } from './check-sources.mjs';
+
+/** 시험이 만든 임시 폴더 — 끝나면 지운다(시스템 임시 폴더에 남기지 않는다) @type {string[]} */
+const madeDirs = [];
+/** @param {string} prefix */
+const tmpDir = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); madeDirs.push(d); return d; };
+after(() => { for (const d of madeDirs) rmSync(d, { recursive: true, force: true }); });
 
 const here = dirname(fileURLToPath(import.meta.url));
 const script = join(here, 'check-sources.mjs');
@@ -23,7 +29,7 @@ function inputs(dir) {
 }
 
 function setup() {
-  const dir = mkdtempSync(join(tmpdir(), 'check-sources-'));
+  const dir = tmpDir('check-sources-');
   cpSync(fx('azure-sample.md'), join(dir, 'azure.md'));
   cpSync(fx('gcp-sample.json'), join(dir, 'gcp.json'));
   cpSync(fx('kms-sample.json'), join(dir, 'kms.json'));
@@ -117,7 +123,7 @@ test('입력이 빠지면 exit 2 — --azure-html 도 필수다', () => {
 });
 
 test('buildLock 은 네 출처를 모두 담는다', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'check-sources-b-'));
+  const dir = tmpDir('check-sources-b-');
   cpSync(fx('azure-sample.md'), join(dir, 'azure.md'));
   cpSync(fx('gcp-sample.json'), join(dir, 'gcp.json'));
   cpSync(fx('kms-sample.json'), join(dir, 'kms.json'));

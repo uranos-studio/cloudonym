@@ -1,13 +1,18 @@
 // @ts-check
 // CLI 단위 시험 (D102) — 서버 없이 가짜 fetchFn 으로. 엔진의 실답은 src/api/cli-contract.test.ts 가 본다
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync, unlinkSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync, unlinkSync, closeSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main, EXIT, resolveTarget, USER_AGENT } from './lib/main.mjs';
-import { nextSeq, nextSlotId, appendSlots, environmentsOf, bodyFor, namesPathFor, kstTime } from './lib/plan.mjs';
+import { nextSeq, nextSlotId, appendSlots, environmentsOf, bodyFor, namesPathFor, kstTime, writeJson, readPlan, PlanError } from './lib/plan.mjs';
 import { serverOf, MAX_WAIT_SECONDS } from './lib/http.mjs';
+
+/** 시험이 만든 임시 폴더 — 끝나면 지운다(시스템 임시 폴더에 남기지 않는다) @type {string[]} */
+const made = [];
+const tmpDir = () => { const d = mkdtempSync(join(tmpdir(), 'cloudonym-cli-unit-')); made.push(d); return d; };
+after(() => { for (const d of made) rmSync(d, { recursive: true, force: true }); });
 
 const fx = JSON.parse(readFileSync(new URL('./fixtures/next-seq.json', import.meta.url), 'utf-8'));
 const ALL = Array.from({ length: 99 }, (_, i) => String(i + 1).padStart(2, '0'));
@@ -101,7 +106,7 @@ const CATALOG_BODY = { version: { engine: '0.1.0', rules: 'v1' }, providers: { g
 const wizard = (items) => ({ success: true, version: { engine: '0.1.0', rules: 'v1' }, data: { gcp: { valid: items.every((i) => i.valid), items: items.map((i) => ({ namespace: 'shop', resource_type: 'x', violations: i.valid ? [] : [{ code: 'name.conflict', message: 'same name' }], ...i })), conflicts: [] } } });
 
 function tmpPlan() {
-  const dir = mkdtempSync(join(tmpdir(), 'cloudonym-cli-unit-'));
+  const dir = tmpDir();
   writeFileSync(join(dir, 'cloudonym.plan.json'), `${JSON.stringify(PLAN, null, 2)}\n`);
   return dir;
 }
@@ -155,7 +160,7 @@ test('429 --wait — Retry-After 가 상한보다 크면 기다리지 않는다 
 });
 
 test('계획 파일이 아니면 exit 2 — JSON 아님 · project 없음 · 파일 없음', async () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cloudonym-cli-unit-'));
+  const dir = tmpDir();
   const { fetchFn, calls } = fake(() => ({ status: 200, body: {} }));
   assert.equal((await run(['names'], fetchFn, dir)).code, EXIT.INPUT);
   writeFileSync(join(dir, 'cloudonym.plan.json'), 'not json');
@@ -243,7 +248,7 @@ test('[3] 본문 읽기 실패(시간 초과 · 연결 끊김)는 exit 4 와 한
 });
 
 test('[3] 파일을 못 쓰면 exit 2 · 임시 파일이 남지 않는다 · 뜻밖의 예외는 exit 70 과 한 줄', async () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cloudonym-cli-unit-'));
+  const dir = tmpDir();
   mkdirSync(join(dir, 'taken'));
   writeFileSync(join(dir, 'taken', 'x'), '');
   const src = join(dir, 'web.json');
@@ -426,28 +431,89 @@ test('[14] 저장 잠금 — <계획>.lock 이 있으면 쓰지 않고 exit 2 ·
   assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
 });
 
-test('[14] 동시 저장 — 같은 원본을 읽은 프로세스 여럿이 함께 저장해도 하나만 쓰고 나머지는 exit 2(먼저 저장한 변경을 덮지 않는다)', async () => {
+/** 계획 하나를 쓰고 읽은 digest 를 돌려준다 @returns {{ dir: string, file: string, digest: string }} */
+function planOnDisk() {
   const dir = tmpPlan();
   const file = join(dir, 'cloudonym.plan.json');
-  const planMod = new URL('./lib/plan.mjs', import.meta.url).href;
-  const start = Date.now() + 700;
-  // 자식마다: 읽고 → 같은 시각까지 기다렸다 → 저장 (자기 번호를 owner 에 적는다)
-  const script = `import { readPlan, writeJson, PlanError } from ${JSON.stringify(planMod)};
-const [file, id, at] = process.argv.slice(1);
-const { plan, digest } = readPlan(file);
-while (Date.now() < Number(at)) {}
-try { writeJson(file, { ...plan, project: { ...plan.project, owner: 'w' + id } }, digest); process.stdout.write('ok'); }
-catch (e) { if (!(e instanceof PlanError)) throw e; process.stdout.write('refused'); }`;
-  const { execFile } = await import('node:child_process');
-  const N = 8;
-  const outs = await Promise.all(Array.from({ length: N }, (_, i) => new Promise((res, rej) => {
-    execFile(process.execPath, ['--input-type=module', '-e', script, file, String(i), String(start)], (err, stdout) => (err ? rej(err) : res(stdout)));
-  })));
-  assert.equal(outs.filter((o) => o === 'ok').length, 1, outs.join(','));
-  assert.equal(outs.filter((o) => o === 'refused').length, N - 1, outs.join(','));
-  const winner = outs.indexOf('ok');
-  assert.equal(JSON.parse(planBytes(dir)).project.owner, `w${winner}`);
-  assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
+  return { dir, file, digest: readPlan(file).digest };
+}
+/** @param {string} owner */
+const owned = (owner) => ({ ...PLAN, project: { ...PLAN.project, owner } });
+/** @param {string} dir */
+const leftovers = (dir) => readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-'));
+
+test('[14] 동시 저장(결정적) — 첫 저장이 재검사를 마친 뒤 · 임시 파일을 만들기 전에 같은 원본을 읽은 둘째가 저장하면 둘째는 잠금으로 멈춘다', () => {
+  const { dir, file, digest } = planOnDisk();
+  /** @type {unknown} */
+  let second;
+  // 첫째가 「재검사 통과 → 옮기기」 사이에 멈춘 순간 — 잠금이 없으면 둘째의 재검사도 통과해 먼저 쓰고, 첫째가 그것을 덮는다
+  writeJson(file, owned('first'), digest, { afterCheck: () => {
+    try { writeJson(file, owned('second'), digest); second = 'written'; } catch (e) { second = e; }
+  } });
+  assert.ok(second instanceof PlanError, `second save was not refused: ${String(second)}`);
+  assert.match(second.message, /is locked by another cloudonym command/);
+  assert.equal(JSON.parse(planBytes(dir)).project.owner, 'first');
+  assert.deepEqual(leftovers(dir), []);
+});
+
+test('[14] 주입점은 기본에서 꺼져 있다 — 운영 호출은 네 번째 인자를 넘기지 않고 plan.mjs 는 환경변수를 읽지 않는다 · 인자 없이도 쓴다', () => {
+  const mainSrc = readFileSync(new URL('./lib/main.mjs', import.meta.url), 'utf-8');
+  const calls = [...mainSrc.matchAll(/writeJson\(([^;]*)\);/g)].map((m) => m[1] ?? '');
+  assert.ok(calls.length >= 4, `calls: ${calls.length}`);
+  /** 괄호 · 중괄호 · 대괄호 밖의 쉼표 수 @param {string} a */
+  const topCommas = (a) => { let depth = 0; let n = 0; for (const c of a) { if ('([{'.includes(c)) depth++; else if (')]}'.includes(c)) depth--; else if (c === ',' && depth === 0) n++; } return n; };
+  for (const c of calls) assert.ok(topCommas(c) <= 2, `writeJson(${c}) passes hooks`);
+  const planSrc = readFileSync(new URL('./lib/plan.mjs', import.meta.url), 'utf-8');
+  assert.equal(/process\.env/.test(planSrc), false);
+  const { dir, file, digest } = planOnDisk();
+  writeJson(file, owned('plain'), digest);
+  assert.equal(JSON.parse(planBytes(dir)).project.owner, 'plain');
+  assert.deepEqual(leftovers(dir), []);
+});
+
+test('[14] 잠금을 만든 뒤 닫기가 실패(EIO)해도 잠금을 지운다 — exit 2 문장 · 계획 그대로 · 다음 저장은 된다', () => {
+  const { dir, file, digest } = planOnDisk();
+  const before = planBytes(dir);
+  let calls = 0;
+  /** @param {number} fd */
+  const closeOnceFails = (fd) => { closeSync(fd); if (++calls === 1) throw Object.assign(new Error('EIO: i/o error, close'), { code: 'EIO' }); };
+  assert.throws(() => writeJson(file, owned('x'), digest, { fs: { closeSync: closeOnceFails } }), (e) => e instanceof PlanError && /cannot close the lock .*cloudonym\.plan\.json\.lock: EIO/.test(e.message));
+  assert.equal(calls, 1);
+  assert.equal(planBytes(dir), before);
+  assert.deepEqual(leftovers(dir), []);
+  writeJson(file, owned('next'), digest);
+  assert.equal(JSON.parse(planBytes(dir)).project.owner, 'next');
+});
+
+test('[14] 저장 뒤 잠금 삭제가 실패(EACCES)하면 성공으로 숨기지 않는다 — 「저장됨」과 지울 잠금 경로를 알리고 exit 2', async () => {
+  const { dir, file, digest } = planOnDisk();
+  const lock = `${file}.lock`;
+  /** @param {import('node:fs').PathLike} p */
+  const lockStays = (p) => { if (String(p) === lock) throw Object.assign(new Error('EACCES: permission denied, unlink'), { code: 'EACCES' }); unlinkSync(p); };
+  /** @type {unknown} */
+  let err;
+  try { writeJson(file, owned('saved'), digest, { fs: { unlinkSync: lockStays } }); } catch (e) { err = e; }
+  assert.ok(err instanceof PlanError, String(err));
+  assert.match(err.message, /cloudonym\.plan\.json is written, but its lock \S*cloudonym\.plan\.json\.lock could not be removed: EACCES/);
+  assert.match(err.message, /Delete \S*cloudonym\.plan\.json\.lock before the next cloudonym command/);
+  assert.equal(JSON.parse(planBytes(dir)).project.owner, 'saved');
+  assert.equal(existsSync(lock), true);
+  // main 은 PlanError 를 exit 2 와 그 문장으로 낸다 — 남은 잠금 때문에 다음 명령도 exit 2 로 경로를 알린다
+  const r = await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir);
+  assert.equal(r.code, EXIT.INPUT);
+  assert.match(r.err, /is locked by another cloudonym command/);
+  unlinkSync(lock);
+  assert.deepEqual(leftovers(dir), []);
+});
+
+test('[14] 저장 전 실패에 잠금 삭제까지 실패하면 원래 오류를 덮지 않고 잠금 경로를 덧붙인다', () => {
+  const { dir, file } = planOnDisk();
+  const lock = `${file}.lock`;
+  /** @param {import('node:fs').PathLike} p */
+  const lockStays = (p) => { if (String(p) === lock) throw Object.assign(new Error('EACCES: permission denied, unlink'), { code: 'EACCES' }); unlinkSync(p); };
+  assert.throws(() => writeJson(file, owned('x'), 'stale-digest', { fs: { unlinkSync: lockStays } }), (e) => e instanceof PlanError && /changed since it was read/.test(e.message) && /lock \S*\.lock could not be removed either/.test(e.message));
+  unlinkSync(lock);
+  assert.deepEqual(leftovers(dir), []);
 });
 
 test('[15] add — picks 를 생략한 서비스는 API 처럼 빈 목록 · services/project_picks 생략도 같다', async () => {
@@ -509,6 +575,12 @@ test('[16] --no-write 설명 — --help · README(영어 · 한국어) · D102 �
     assert.match(text, /`--no-write` writes neither the plan nor the names file/, where);
     assert.match(text, /`<plan>\.lock`/, where);
   }
+  // 저장은 됐는데 잠금을 못 지운 경우 — 성공(0)으로 숨기지 않고 exit 2 로 알린다
+  for (const [where, text] of /** @type {[string, string][]} */ ([['help', help], ['README', readme], ['D102', d102], ['llms', llms]])) {
+    assert.match(text, /saved but its lock cannot be removed/, where);
+    assert.match(text, /or its lock could not be removed after saving/, where);
+  }
+  assert.match(readme, /저장 뒤 잠금을 못 지움/);
   assert.match(readme, /`--no-write` 는 계획 파일도 보관 파일도 쓰지 않는다/);
   assert.match(readme, /`<계획>\.lock`/);
 });

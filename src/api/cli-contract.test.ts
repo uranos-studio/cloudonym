@@ -1,7 +1,7 @@
 // 저장소 CLI 의 계약 시험 (D102) — Worker 앱을 in-process 로 띄워(test-support 의 req) CLI 를 실제로 부른다. 네트워크 없이 진짜 엔진의 답이다.
 // 방향은 src 시험 → cli 뿐이다 — cli/ 는 src/ 를 들여오지 않는다(cli/boundary.test.mjs)
-import { describe, it, expect, beforeEach } from 'vitest';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { app } from './index';
@@ -33,6 +33,10 @@ let file: string;
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'cloudonym-cli-'));
   file = join(dir, 'cloudonym.plan.json');
+});
+// 시험마다 만든 임시 폴더를 지운다 — 시스템 임시 폴더에 남기지 않는다
+afterEach(() => {
+  rmSync(dir, { recursive: true, force: true });
 });
 
 async function run(argv: string[], o: { fetchFn?: FetchFn; env?: Record<string, string | undefined>; sleep?: (ms: number) => Promise<void> } = {}) {

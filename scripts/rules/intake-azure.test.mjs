@@ -1,14 +1,20 @@
 // intake-azure.mjs 시험 — 고정 표본(fixtures/azure-sample.md)으로 표 해석 · 판정 · 앵커를 본다.
 // 실제 원문의 수(402 · 85)는 check-sources 가 lock 의 counts 로 지킨다.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { parseAzureRules, anchorOf, splitCells, h2IdsOf, judge, AZURE_RULES_URL } from './intake-azure.mjs';
+
+/** 시험이 만든 임시 폴더 — 끝나면 지운다(시스템 임시 폴더에 남기지 않는다) @type {string[]} */
+const madeDirs = [];
+/** @param {string} prefix */
+const tmpDir = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); madeDirs.push(d); return d; };
+after(() => { for (const d of madeDirs) rmSync(d, { recursive: true, force: true }); });
 
 const here = dirname(fileURLToPath(import.meta.url));
 const md = readFileSync(join(here, 'fixtures/azure-sample.md'), 'utf-8');
@@ -130,7 +136,7 @@ test('게시 쪽 h2 id 와 대어 없는 앵커는 anchorMissing', () => {
 });
 
 test('CLI — 후보 JSON 을 쓴다', () => {
-  const out = join(mkdtempSync(join(tmpdir(), 'intake-azure-')), 'azure.json');
+  const out = join(tmpDir('intake-azure-'), 'azure.json');
   const p = spawnSync(process.execPath, [join(here, 'intake-azure.mjs'), join(here, 'fixtures/azure-sample.md'), '--html', join(here, 'fixtures/azure-sample.html'), '--out', out], { encoding: 'utf-8' });
   assert.equal(p.status, 0, p.stderr);
   const j = JSON.parse(readFileSync(out, 'utf-8'));

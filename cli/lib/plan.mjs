@@ -58,15 +58,28 @@ export function planText(doc) {
 export const lockPathFor = (target) => `${target}.lock`;
 
 /**
+ * 시험 전용 주입점 — 운영 호출(main.mjs)은 넘기지 않으므로 기본에서 꺼져 있다. 환경변수는 읽지 않는다.
+ * fs: 잠금 · 임시 파일에 쓰는 함수 일부를 바꿔 끼운다(오류 주입) · afterCheck: 지금 내용 재검사 직후, 임시 파일을 만들기 전에 부른다(끼어들기 순서 시험)
+ * @typedef {{ fs?: Partial<FsLike>, afterCheck?: () => void }} WriteHooks
+ */
+/** @typedef {{ openSync: typeof openSync, closeSync: typeof closeSync, writeSync: typeof writeSync, fsyncSync: typeof fsyncSync, chmodSync: typeof chmodSync, renameSync: typeof renameSync, unlinkSync: typeof unlinkSync, readFileSync: typeof readFileSync }} FsLike */
+/** @type {Readonly<FsLike>} */
+const FS = Object.freeze({ openSync, closeSync, writeSync, fsyncSync, chmodSync, renameSync, unlinkSync, readFileSync });
+
+/**
  * 파일을 통째로 바꾼다 — 같은 폴더의 임시 파일에 쓰고 fsync 한 뒤 옮긴다(쓰다 끊겨도 반쪽 파일이 남지 않는다).
  * 심볼릭 링크면 링크를 두고 대상 파일을 바꾼다 · 있던 파일의 권한을 그대로 둔다 · 실패하면 이번 호출이 만든 임시 파일만 지운다.
  * 잠금: 지금 내용 확인부터 옮기기까지 `<대상>.lock` 을 배타적으로(O_EXCL) 만들어 쥐고 끝나면 지운다 — 두 명령이 같은 원본을 읽고
- * 함께 저장해도 뒤의 것은 「바뀌었다」로 멈춘다. 잠금이 이미 있으면 기다리지 않고 PlanError(2). 오래된 잠금(명령이 죽어 남은 것)은
- * 저절로 지우지 않는다 — 살아 있는 명령의 잠금과 구별할 수 없으므로, 도는 명령이 없음을 확인한 사람이 지운다(문장이 그 경로를 알린다)
+ * 함께 저장해도 뒤의 것은 「잠겨 있다」로 멈춘다. 잠금이 이미 있으면 기다리지 않고 PlanError(2). 오래된 잠금(명령이 죽어 남은 것)은
+ * 저절로 지우지 않는다 — 살아 있는 명령의 잠금과 구별할 수 없으므로, 도는 명령이 없음을 확인한 사람이 지운다(문장이 그 경로를 알린다).
+ * 잠금을 만든 순간부터 「쥐었다」로 치고, 그 뒤의 실패(잠금 닫기 포함)에도 잠금을 지운다. 저장은 됐는데 잠금을 못 지우면
+ * PlanError(2) — 저장됐다는 것과 지울 잠금 경로를 함께 알린다(그대로 두면 다음 저장이 전부 exit 2 다)
  * expect: 문자열이면 지금 파일 내용의 해시가 그것이어야 한다 · null 이면 파일이 없어야 한다 · undefined 면 보지 않는다
- * @param {string} path @param {unknown} doc @param {string | null} [expect]
+ * @param {string} path @param {unknown} doc @param {string | null} [expect] @param {WriteHooks} [hooks]
  */
-export function writeJson(path, doc, expect) {
+export function writeJson(path, doc, expect, hooks) {
+  /** @type {FsLike} */
+  const fs = { ...FS, ...hooks?.fs };
   let target = path;
   /** @type {number | undefined} */
   let mode;
@@ -77,57 +90,78 @@ export function writeJson(path, doc, expect) {
     if (!isMissing(e)) throw new PlanError(`Cannot write ${path}: ${errMessage(e)}`);
   }
   const lock = lockPathFor(target);
+  let lockFd;
   try {
-    closeSync(openSync(lock, 'wx', 0o600));
+    lockFd = fs.openSync(lock, 'wx', 0o600);
   } catch (e) {
     if (isRecord(e) && e.code === 'EEXIST') {
       throw new PlanError(`Not written: ${path} is locked by another cloudonym command (${lock}). Run the command again when it has finished; if no cloudonym command is running, the lock was left by one that stopped — delete ${lock} and run again.`);
     }
     throw new PlanError(`Cannot write ${path}: cannot create the lock ${lock}: ${errMessage(e)}`);
   }
+  // 여기서부터 잠금은 이번 호출의 것이다 — 아래 어디서 실패해도 잠금을 지운 뒤에 그 오류를 던진다
   try {
-    replaceLocked(path, target, mode, doc, expect);
-  } finally {
-    try { unlinkSync(lock); } catch { /* 지울 수 없으면 다음 명령이 경로를 알린다 */ }
+    try {
+      fs.closeSync(lockFd);
+    } catch (e) {
+      throw new PlanError(`Cannot write ${path}: cannot close the lock ${lock}: ${errMessage(e)}`);
+    }
+    replaceLocked(path, target, mode, doc, expect, fs, hooks?.afterCheck);
+  } catch (e) {
+    // 저장 전 실패 — 원래 오류를 던진다. 잠금도 못 지웠으면 그 경로를 덧붙인다(원래 오류를 덮지 않는다)
+    try {
+      fs.unlinkSync(lock);
+    } catch (u) {
+      if (e instanceof PlanError && !isMissing(u)) throw new PlanError(`${e.message} The lock ${lock} could not be removed either (${errMessage(u)}): delete it before the next cloudonym command.`);
+    }
+    throw e;
+  }
+  // 저장은 됐다 — 잠금을 못 지우면 알린다(이미 없으면 지울 것도 없다)
+  try {
+    fs.unlinkSync(lock);
+  } catch (e) {
+    if (!isMissing(e)) throw new PlanError(`${path} is written, but its lock ${lock} could not be removed: ${errMessage(e)}. Delete ${lock} before the next cloudonym command; until then every save of ${path} stops with exit 2.`);
   }
 }
 
 /**
  * 잠금을 쥔 채 — 지금 내용을 대어 보고 임시 파일을 써서 옮긴다
  * @param {string} path @param {string} target @param {number | undefined} mode @param {unknown} doc @param {string | null | undefined} expect
+ * @param {FsLike} io @param {(() => void) | undefined} afterCheck
  */
-function replaceLocked(path, target, mode, doc, expect) {
+function replaceLocked(path, target, mode, doc, expect, io, afterCheck) {
   if (expect !== undefined) {
     /** @type {string | null} */
     let now = null;
     try {
-      now = digestOf(readFileSync(target, 'utf-8'));
+      now = digestOf(io.readFileSync(target, 'utf-8'));
     } catch (e) {
       if (!isMissing(e)) throw new PlanError(`Cannot write ${path}: ${errMessage(e)}`);
     }
     if (now !== expect) throw new PlanError(`Not written: ${path} changed since it was read (another program or session wrote it). Run the command again.`);
   }
+  afterCheck?.();
   const tmp = `${target}.tmp-${process.pid}`;
   // 이번 호출이 만든 임시 파일만 지운다 — 배타적 열기가 EEXIST 로 실패했으면 그 파일은 남의 것이다
   let created = false;
   let moved = false;
   try {
-    const fd = openSync(tmp, 'wx', mode ?? 0o666);
+    const fd = io.openSync(tmp, 'wx', mode ?? 0o666);
     created = true;
     try {
-      writeSync(fd, planText(doc));
-      fsyncSync(fd);
+      io.writeSync(fd, planText(doc));
+      io.fsyncSync(fd);
     } finally {
-      closeSync(fd);
+      io.closeSync(fd);
     }
     // umask 가 깎은 권한을 되돌린다 — 있던 파일과 같게
-    if (mode !== undefined) chmodSync(tmp, mode);
-    renameSync(tmp, target);
+    if (mode !== undefined) io.chmodSync(tmp, mode);
+    io.renameSync(tmp, target);
     moved = true;
     // 옮긴 것(디렉터리 항목)도 디스크에 — 지원하지 않는 파일 시스템이면 넘어간다
     try {
-      const dfd = openSync(dirname(target), 'r');
-      try { fsyncSync(dfd); } finally { closeSync(dfd); }
+      const dfd = io.openSync(dirname(target), 'r');
+      try { io.fsyncSync(dfd); } finally { io.closeSync(dfd); }
     } catch {
       // 디렉터리 fsync 는 최선만 한다
     }
@@ -135,7 +169,7 @@ function replaceLocked(path, target, mode, doc, expect) {
     throw new PlanError(`Cannot write ${path}: ${errMessage(e)}`);
   } finally {
     if (created && !moved) {
-      try { unlinkSync(tmp); } catch { /* 이미 없으면 지울 것도 없다 */ }
+      try { io.unlinkSync(tmp); } catch { /* 이미 없으면 지울 것도 없다 */ }
     }
   }
 }

@@ -2,14 +2,20 @@
 // 반례 둘(readOnly 인 LicenseCode.name · 참조값 pattern 인 FirewallPolicyRuleSecureTag.name)을
 // 일부러 insert 요청 스키마에 묶어 둔다 — 실제 문서에서는 둘 다 insert 요청이 아니라서
 // 「후보에 없다」만 보면 시험이 아무것도 재지 않고 통과한다.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, mkdtempSync } from 'node:fs';
+import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { parseComputeDiscovery, RFC1035_PATTERN } from './intake-gcp-discovery.mjs';
+
+/** 시험이 만든 임시 폴더 — 끝나면 지운다(시스템 임시 폴더에 남기지 않는다) @type {string[]} */
+const madeDirs = [];
+/** @param {string} prefix */
+const tmpDir = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); madeDirs.push(d); return d; };
+after(() => { for (const d of madeDirs) rmSync(d, { recursive: true, force: true }); });
 
 const here = dirname(fileURLToPath(import.meta.url));
 const doc = JSON.parse(readFileSync(join(here, 'fixtures/gcp-sample.json'), 'utf-8'));
@@ -54,7 +60,7 @@ test('pattern 이 없거나 깨진 것은 손 확인 · name 이 없으면 제�
 });
 
 test('CLI — 후보 JSON 을 쓴다', () => {
-  const out = join(mkdtempSync(join(tmpdir(), 'intake-gcp-')), 'gcp.json');
+  const out = join(tmpDir('intake-gcp-'), 'gcp.json');
   const p = spawnSync(process.execPath, [join(here, 'intake-gcp-discovery.mjs'), join(here, 'fixtures/gcp-sample.json'), '--out', out], { encoding: 'utf-8' });
   assert.equal(p.status, 0, p.stderr);
   const j = JSON.parse(readFileSync(out, 'utf-8'));

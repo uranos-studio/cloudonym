@@ -263,7 +263,7 @@ function catalogFieldLines(order: readonly Provider[]): string[] {
 
 /** 「## CLI」 절 (D102) — 저장소의 명령줄 도구. Worker 는 cli/ 를 들여오지 않는다(src → cli 는 시험만) — 종료 코드 줄은 cli 의 --help 줄과 글자까지 같아야 하고,
  *  llms.test 가 그 줄과 EXIT 를 대어 본다(--help 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다) */
-export const CLI_EXIT_LINE = 'Exit codes: 0 ok · 1 a name FAILs or add would change existing names or verdicts · 2 plan, names file or arguments rejected (400, 413), a file cannot be read or written, or it changed while the command ran · 3 rules_version differs (409) · 4 server unreachable, 429, 5xx or an answer that cannot be interpreted · 64 usage · 70 internal error';
+export const CLI_EXIT_LINE = 'Exit codes: 0 ok · 1 a name FAILs or add would change existing names or verdicts · 2 plan, names file or arguments rejected (400, 413), a file cannot be read or written, it changed while the command ran, or its lock could not be removed after saving · 3 rules_version differs (409) · 4 server unreachable, 429, 5xx or an answer that cannot be interpreted · 64 usage · 70 internal error';
 function cliLines(): string[] {
   return [
     '', '## CLI', '',
@@ -275,7 +275,7 @@ function cliLines(): string[] {
     '- `names` — every name, one request per environment; `--new` only names not yet kept, `--repin` re-pins `rules_version` after a 409; `--no-write` writes neither the plan nor the names file',
     '- `validate` — exit 0 when every name is valid and matches the kept names',
     '- On 429 it prints `Retry-After`; `--wait` waits that long and retries once per command.',
-    '- Saving holds `<plan>.lock` next to the file from the last check to the replace; while it exists another command does not write (exit 2). If no command is running, a left-over lock is from one that stopped: delete it.',
+    '- Saving holds `<plan>.lock` next to the file from the last check to the replace; while it exists another command does not write (exit 2). If no command is running, a left-over lock is from one that stopped: delete it. If the file is saved but its lock cannot be removed, the command says so, names the lock and exits 2.',
     `- ${CLI_EXIT_LINE}`,
   ];
 }
