@@ -54,9 +54,15 @@ export function planText(doc) {
   return `${JSON.stringify(doc, null, 2)}\n`;
 }
 
+/** 잠금 파일의 자리 — 대상 파일(심볼릭 링크면 그 대상) 옆 `<대상>.lock` @param {string} target */
+export const lockPathFor = (target) => `${target}.lock`;
+
 /**
  * 파일을 통째로 바꾼다 — 같은 폴더의 임시 파일에 쓰고 fsync 한 뒤 옮긴다(쓰다 끊겨도 반쪽 파일이 남지 않는다).
- * 심볼릭 링크면 링크를 두고 대상 파일을 바꾼다 · 있던 파일의 권한을 그대로 둔다 · 실패하면 임시 파일을 지운다.
+ * 심볼릭 링크면 링크를 두고 대상 파일을 바꾼다 · 있던 파일의 권한을 그대로 둔다 · 실패하면 이번 호출이 만든 임시 파일만 지운다.
+ * 잠금: 지금 내용 확인부터 옮기기까지 `<대상>.lock` 을 배타적으로(O_EXCL) 만들어 쥐고 끝나면 지운다 — 두 명령이 같은 원본을 읽고
+ * 함께 저장해도 뒤의 것은 「바뀌었다」로 멈춘다. 잠금이 이미 있으면 기다리지 않고 PlanError(2). 오래된 잠금(명령이 죽어 남은 것)은
+ * 저절로 지우지 않는다 — 살아 있는 명령의 잠금과 구별할 수 없으므로, 도는 명령이 없음을 확인한 사람이 지운다(문장이 그 경로를 알린다)
  * expect: 문자열이면 지금 파일 내용의 해시가 그것이어야 한다 · null 이면 파일이 없어야 한다 · undefined 면 보지 않는다
  * @param {string} path @param {unknown} doc @param {string | null} [expect]
  */
@@ -70,6 +76,27 @@ export function writeJson(path, doc, expect) {
   } catch (e) {
     if (!isMissing(e)) throw new PlanError(`Cannot write ${path}: ${errMessage(e)}`);
   }
+  const lock = lockPathFor(target);
+  try {
+    closeSync(openSync(lock, 'wx', 0o600));
+  } catch (e) {
+    if (isRecord(e) && e.code === 'EEXIST') {
+      throw new PlanError(`Not written: ${path} is locked by another cloudonym command (${lock}). Run the command again when it has finished; if no cloudonym command is running, the lock was left by one that stopped — delete ${lock} and run again.`);
+    }
+    throw new PlanError(`Cannot write ${path}: cannot create the lock ${lock}: ${errMessage(e)}`);
+  }
+  try {
+    replaceLocked(path, target, mode, doc, expect);
+  } finally {
+    try { unlinkSync(lock); } catch { /* 지울 수 없으면 다음 명령이 경로를 알린다 */ }
+  }
+}
+
+/**
+ * 잠금을 쥔 채 — 지금 내용을 대어 보고 임시 파일을 써서 옮긴다
+ * @param {string} path @param {string} target @param {number | undefined} mode @param {unknown} doc @param {string | null | undefined} expect
+ */
+function replaceLocked(path, target, mode, doc, expect) {
   if (expect !== undefined) {
     /** @type {string | null} */
     let now = null;
@@ -81,9 +108,12 @@ export function writeJson(path, doc, expect) {
     if (now !== expect) throw new PlanError(`Not written: ${path} changed since it was read (another program or session wrote it). Run the command again.`);
   }
   const tmp = `${target}.tmp-${process.pid}`;
+  // 이번 호출이 만든 임시 파일만 지운다 — 배타적 열기가 EEXIST 로 실패했으면 그 파일은 남의 것이다
+  let created = false;
   let moved = false;
   try {
     const fd = openSync(tmp, 'wx', mode ?? 0o666);
+    created = true;
     try {
       writeSync(fd, planText(doc));
       fsyncSync(fd);
@@ -104,10 +134,38 @@ export function writeJson(path, doc, expect) {
   } catch (e) {
     throw new PlanError(`Cannot write ${path}: ${errMessage(e)}`);
   } finally {
-    if (!moved) {
-      try { unlinkSync(tmp); } catch { /* 만들지 못했으면 지울 것도 없다 */ }
+    if (created && !moved) {
+      try { unlinkSync(tmp); } catch { /* 이미 없으면 지울 것도 없다 */ }
     }
   }
+}
+
+/** 목록 칸 — 없으면 빈 목록(API 의 schemas.ts listOf 와 같다) · 배열이 아니면 PlanError @param {unknown} v @param {string} field @returns {unknown[]} */
+function listField(v, field) {
+  if (v === undefined) return [];
+  if (!Array.isArray(v)) throw new PlanError(`The plan file is not valid: '${field}' must be an array. Fix it before adding.`);
+  return v;
+}
+
+/**
+ * 편집할 목록 — project_picks · services · 서비스마다 picks 를 API 파서와 같은 규칙으로 편다: 생략은 빈 목록,
+ * 배열이 아닌 목록 · 객체가 아닌 서비스 · pick · 배열이 아닌 instances 는 고치기 전에 PlanError(2)
+ * @param {PlanFile} plan
+ * @returns {{ project_picks: Pick[], services: { purpose: string, picks: Pick[] }[] }}
+ */
+export function planLists(plan) {
+  /** @param {unknown} p @param {string} at @returns {Pick} */
+  const pickOf = (p, at) => {
+    if (!isRecord(p)) throw new PlanError(`The plan file is not valid: '${at}' must be an object. Fix it before adding.`);
+    if (p.instances !== undefined && (!Array.isArray(p.instances) || !p.instances.every(isRecord))) throw new PlanError(`The plan file is not valid: '${at}.instances' must be an array of objects. Fix it before adding.`);
+    return /** @type {Pick} */ (/** @type {unknown} */ (p));
+  };
+  const project_picks = listField(plan.project_picks, 'project_picks').map((p, j) => pickOf(p, `project_picks[${j}]`));
+  const services = listField(plan.services, 'services').map((s, i) => {
+    if (!isRecord(s)) throw new PlanError(`The plan file is not valid: 'services[${i}]' must be an object. Fix it before adding.`);
+    return { ...s, purpose: /** @type {string} */ (s.purpose), picks: listField(s.picks, `services[${i}].picks`).map((p, j) => pickOf(p, `services[${i}].picks[${j}]`)) };
+  });
+  return { project_picks, services };
 }
 
 /**

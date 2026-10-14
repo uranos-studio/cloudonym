@@ -2,7 +2,7 @@
 // CLI 단위 시험 (D102) — 서버 없이 가짜 fetchFn 으로. 엔진의 실답은 src/api/cli-contract.test.ts 가 본다
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main, EXIT, resolveTarget, USER_AGENT } from './lib/main.mjs';
@@ -406,4 +406,140 @@ test('[9] 서버가 duplicate_pick(400)으로 막으면 무엇을 세는지 밝�
   assert.equal(r.code, EXIT.INPUT, r.err);
   assert.match(r.err, /the server counts the resource type, the kind token, the tier and the role/);
   assert.equal(planBytes(dir), before);
+});
+
+// ── 독립 리뷰 반영 2차 (D102) ──
+
+test('[14] 저장 잠금 — <계획>.lock 이 있으면 쓰지 않고 exit 2 · 잠금 파일은 그대로 · 끝나면 잠금이 남지 않는다', async () => {
+  const dir = tmpPlan();
+  const before = planBytes(dir);
+  const lock = join(dir, 'cloudonym.plan.json.lock');
+  writeFileSync(lock, '');
+  const r = await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir);
+  assert.equal(r.code, EXIT.INPUT, r.err);
+  assert.match(r.err, /cloudonym\.plan\.json\.lock/);
+  assert.match(r.err, /delete/i);
+  assert.equal(planBytes(dir), before);
+  assert.equal(existsSync(lock), true);
+  unlinkSync(lock);
+  assert.equal((await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir)).code, EXIT.OK);
+  assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
+});
+
+test('[14] 동시 저장 — 같은 원본을 읽은 프로세스 여럿이 함께 저장해도 하나만 쓰고 나머지는 exit 2(먼저 저장한 변경을 덮지 않는다)', async () => {
+  const dir = tmpPlan();
+  const file = join(dir, 'cloudonym.plan.json');
+  const planMod = new URL('./lib/plan.mjs', import.meta.url).href;
+  const start = Date.now() + 700;
+  // 자식마다: 읽고 → 같은 시각까지 기다렸다 → 저장 (자기 번호를 owner 에 적는다)
+  const script = `import { readPlan, writeJson, PlanError } from ${JSON.stringify(planMod)};
+const [file, id, at] = process.argv.slice(1);
+const { plan, digest } = readPlan(file);
+while (Date.now() < Number(at)) {}
+try { writeJson(file, { ...plan, project: { ...plan.project, owner: 'w' + id } }, digest); process.stdout.write('ok'); }
+catch (e) { if (!(e instanceof PlanError)) throw e; process.stdout.write('refused'); }`;
+  const { execFile } = await import('node:child_process');
+  const N = 8;
+  const outs = await Promise.all(Array.from({ length: N }, (_, i) => new Promise((res, rej) => {
+    execFile(process.execPath, ['--input-type=module', '-e', script, file, String(i), String(start)], (err, stdout) => (err ? rej(err) : res(stdout)));
+  })));
+  assert.equal(outs.filter((o) => o === 'ok').length, 1, outs.join(','));
+  assert.equal(outs.filter((o) => o === 'refused').length, N - 1, outs.join(','));
+  const winner = outs.indexOf('ok');
+  assert.equal(JSON.parse(planBytes(dir)).project.owner, `w${winner}`);
+  assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
+});
+
+test('[15] add — picks 를 생략한 서비스는 API 처럼 빈 목록 · services/project_picks 생략도 같다', async () => {
+  const dir = tmpPlan();
+  putPlan(dir, { provider: 'gcp', project: PLAN.project, services: [{ purpose: 'shop' }], rules_version: 'v1' });
+  const r = await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir);
+  assert.equal(r.code, EXIT.OK, r.err);
+  const saved = JSON.parse(planBytes(dir));
+  assert.deepEqual(saved.services, [{ purpose: 'shop', picks: [{ preset: 'db', instances: [{ id: '1', seq: '01' }] }] }]);
+  assert.deepEqual(saved.project_picks, []);
+  putPlan(dir, { provider: 'gcp', project: PLAN.project, rules_version: 'v1' });
+  assert.equal((await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir)).code, EXIT.OK);
+});
+
+test('[15] add — 틀린 구조는 편집 전에 exit 2 (70 이 아니다) · 서버에 보내지 않는다 · 파일 그대로', async () => {
+  const dir = tmpPlan();
+  const bad = [
+    { services: {} }, { project_picks: {} }, { services: ['shop'] }, { services: [null] },
+    { services: [{ purpose: 'shop', picks: {} }] }, { services: [{ purpose: 'shop', picks: [null] }] },
+    { services: [{ purpose: 'shop', picks: [{ preset: 'db', instances: {} }] }] },
+  ];
+  for (const b of bad) {
+    putPlan(dir, { ...PLAN, ...b });
+    const before = planBytes(dir);
+    const s = fake((path) => (path === '/catalog.json' ? { status: 200, body: CATALOG_BODY } : { status: 200, body: wizard([{ key: 'k1', name: 'a-01', valid: true }]) }));
+    const r = await run(['add', 'db', '--service', 'shop'], s.fetchFn, dir);
+    assert.equal(r.code, EXIT.INPUT, `${JSON.stringify(b)} ${r.err}`);
+    assert.equal(r.err.includes('Internal error'), false, r.err);
+    assert.equal(s.calls.filter((c) => c.path === '/v1/wizard').length, 0, JSON.stringify(b));
+    assert.equal(planBytes(dir), before);
+  }
+});
+
+test('[16] names --repin --no-write — 계획의 rules_version 도 보관 파일도 쓰지 않는다', async () => {
+  const dir = tmpPlan();
+  const before = planBytes(dir);
+  const s = fake((_path, body) => (body.rules_version === 'v1'
+    ? { status: 409, body: { success: false, errors: [{ code: 'request.rules_version_mismatch', params: { requested: 'v1', current: 'v2' } }] } }
+    : { status: 200, body: wizard([{ key: 'k1', name: 'a-01', valid: true }]) }));
+  const r = await run(['names', '--repin', '--no-write'], s.fetchFn, dir);
+  assert.equal(r.code, EXIT.OK, r.err);
+  assert.equal(planBytes(dir), before);
+  assert.equal(existsSync(join(dir, 'cloudonym.plan.names.json')), false);
+  assert.match(r.err, /--no-write/);
+});
+
+test('[16] --no-write 설명 — --help · README(영어 · 한국어) · D102 · llms 가 「두 파일 모두」를 말한다', async () => {
+  const root = new URL('../', import.meta.url);
+  const readme = readFileSync(new URL('README.md', root), 'utf-8');
+  const decisions = readFileSync(new URL('docs/decisions.md', root), 'utf-8');
+  const llms = readFileSync(new URL('src/api/llms.ts', root), 'utf-8');
+  /** @type {string[]} */ const out = [];
+  await main(['--help'], { stdout: (s) => { out.push(s); } });
+  const help = out.join('\n');
+  assert.match(help, /--no-write\s+names: write neither the plan nor the names file/);
+  assert.match(help, /\.lock/);
+  const d102 = decisions.split('\n').find((l) => l.startsWith('| D102 |')) ?? '';
+  for (const [where, text] of /** @type {[string, string][]} */ ([['README', readme], ['D102', d102], ['llms', llms]])) {
+    assert.match(text, /`--no-write` writes neither the plan nor the names file/, where);
+    assert.match(text, /`<plan>\.lock`/, where);
+  }
+  assert.match(readme, /`--no-write` 는 계획 파일도 보관 파일도 쓰지 않는다/);
+  assert.match(readme, /`<계획>\.lock`/);
+});
+
+test('[17] 서버 URL 거부 문장에 원문을 넣지 않는다 — 쿼리 토큰 · 호스트가 틀린 user:pass@ URL', async () => {
+  const bads = ['http://h/?token=SECRET-TOKEN', 'http://h/#SECRET-TOKEN', 'http://u:SECRET-TOKEN@[bad/', 'ftp://u:SECRET-TOKEN@h/', 'SECRET-TOKEN://x', 'not a url SECRET-TOKEN'];
+  const dir = tmpPlan();
+  for (const bad of bads) {
+    const e = serverOf(bad, {});
+    assert.ok('error' in e, bad);
+    assert.equal(JSON.stringify(e).includes('SECRET'), false, `${bad}: ${JSON.stringify(e)}`);
+    for (const env of [{ CLOUDONYM_SERVER: bad }, {}]) {
+      const s = fake(() => ({ status: 200, body: {} }));
+      const argv = 'CLOUDONYM_SERVER' in env ? ['validate'] : ['validate', '--server', bad];
+      const r = await run(argv, s.fetchFn, dir, async () => {}, env);
+      assert.equal(r.code, EXIT.USAGE, bad);
+      assert.equal(`${r.out}${r.err}`.includes('SECRET'), false, `${bad}: ${r.err}`);
+      assert.equal(s.calls.length, 0);
+    }
+  }
+});
+
+test('[18] 임시 파일 <대상>.tmp-<PID> 가 이미 있으면 exit 2 이고 그 파일은 지우지 않는다(이번 호출이 만든 것만 지운다)', async () => {
+  const dir = tmpPlan();
+  const before = planBytes(dir);
+  const tmp = join(dir, `cloudonym.plan.json.tmp-${process.pid}`);
+  writeFileSync(tmp, 'someone else');
+  const r = await run(['add', 'db', '--service', 'shop'], slotsServer().fetchFn, dir);
+  assert.equal(r.code, EXIT.INPUT, r.err);
+  assert.equal(readFileSync(tmp, 'utf-8'), 'someone else');
+  assert.equal(planBytes(dir), before);
+  unlinkSync(tmp);
+  assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
 });

@@ -272,9 +272,10 @@ function cliLines(): string[] {
     '- Files: the plan file (default `cloudonym.plan.json`, `-f` to choose) and the names kept next to it (`cloudonym.plan.names.json`).',
     '- `init` — a new plan file (`--owner --system --env E[,E2] --region`, `rules_version` from the server) or `--from <file>` to copy a file saved with Save plan',
     '- `add` — appends a pick (a preset, a rule id or a resource name) to a service (`--service <purpose>`) or the project (`--project`), or numbered servers to the same pick; it writes the file only if every existing name and verdict stays the same in every environment and every new name passes, otherwise it exits 1 and leaves the file as it was. It never edits an existing pick. `--dry-run` checks without writing',
-    '- `names` — every name, one request per environment; `--new` only names not yet kept, `--repin` re-pins `rules_version` after a 409',
+    '- `names` — every name, one request per environment; `--new` only names not yet kept, `--repin` re-pins `rules_version` after a 409; `--no-write` writes neither the plan nor the names file',
     '- `validate` — exit 0 when every name is valid and matches the kept names',
     '- On 429 it prints `Retry-After`; `--wait` waits that long and retries once per command.',
+    '- Saving holds `<plan>.lock` next to the file from the last check to the replace; while it exists another command does not write (exit 2). If no command is running, a left-over lock is from one that stopped: delete it.',
     `- ${CLI_EXIT_LINE}`,
   ];
 }

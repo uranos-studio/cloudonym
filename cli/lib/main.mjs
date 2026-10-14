@@ -7,7 +7,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createClient, serverOf, USER_AGENT, CLI_VERSION, MAX_TIMEOUT_MS, MAX_WAIT_SECONDS } from './http.mjs';
 import {
-  PlanError, readPlan, writeJson, environmentsOf, bodyFor, appendSlots, namesPathFor, readNamesFile, kstTime, isRecord, nextSeq, nextSlotId,
+  PlanError, readPlan, writeJson, environmentsOf, bodyFor, appendSlots, namesPathFor, readNamesFile, kstTime, isRecord, nextSeq, nextSlotId, planLists,
 } from './plan.mjs';
 
 export { nextSeq, nextSlotId, USER_AGENT, CLI_VERSION };
@@ -47,8 +47,11 @@ Options
   --json               machine output
   --wait               on 429, wait Retry-After (at most ${MAX_WAIT_SECONDS} s) and retry; once per command
   --timeout <ms>       per request (default 15000, at most ${MAX_TIMEOUT_MS})
+  --no-write           names: write neither the plan nor the names file (with --repin, rules_version is not updated)
 
 add checks every environment of the plan; --env only narrows what it prints.
+Saving holds <plan>.lock (next to the file) from the last check to the replace; while it exists another command does not write (exit 2).
+If no cloudonym command is running, a left-over lock is from one that stopped: delete it.
 
 Exit codes: 0 ok · 1 a name FAILs or add would change existing names or verdicts · 2 plan, names file or arguments rejected (400, 413), a file cannot be read or written, or it changed while the command ran · 3 rules_version differs (409) · 4 server unreachable, 429, 5xx or an answer that cannot be interpreted · 64 usage · 70 internal error`;
 
@@ -332,7 +335,9 @@ async function names(ctx, rest) {
 
   if (okCount > 0) printNames(ctx, fresh, shownEnvs, v.new ? stored : undefined, ver);
   const allOk = okCount === envs.length;
-  if (allOk && repinned) { writeJson(ctx.file, plan, read.digest); d.stderr(`Updated rules_version in ${ctx.shown} to ${plan.rules_version}.`); }
+  // --no-write 는 두 파일 모두 막는다 — 계획의 rules_version 도 보관 파일도 쓰지 않는다
+  if (allOk && repinned && v['no-write']) d.stderr(`Not written (--no-write): ${ctx.shown} keeps rules_version ${read.plan.rules_version}; the server has ${plan.rules_version}.`);
+  if (allOk && repinned && !v['no-write']) { writeJson(ctx.file, plan, read.digest); d.stderr(`Updated rules_version in ${ctx.shown} to ${plan.rules_version}.`); }
   if (allOk && !v['no-write']) {
     const prev = stored && stored.rules_version === ver?.rules ? stored.environments : {};
     writeJson(namesPath, { received_at: kstTime(d.now()), rules_version: ver?.rules, environments: { ...prev, ...fresh } }, storedDigest);
@@ -471,6 +476,8 @@ async function add(ctx, rest) {
   if (v.pick === undefined && rest.length !== 1) throw new UsageError('add takes one preset, rule id or resource name (or --pick \'<json>\').');
   if (v.pick !== undefined && rest.length > 0) throw new UsageError('Pass either a resource name or --pick, not both.');
   const { plan, digest } = readPlan(ctx.file);
+  // 편집할 목록 — 생략은 빈 목록(API 와 같다) · 틀린 구조는 여기서 2 (고치다 예외로 70 이 되지 않게)
+  const lists = planLists(plan);
   // 확인은 늘 계획의 모든 환경으로 한다 — 파일은 모든 환경에 쓰이므로. --env 는 출력만 거른다(목록에 없으면 2)
   const shownEnvs = environmentsOf(plan, v.env);
   const envs = environmentsOf(plan);
@@ -484,8 +491,8 @@ async function add(ctx, rest) {
   if (plan.rules_version !== undefined && catRules !== undefined && catRules !== plan.rules_version) d.stderr(`Note: the plan was made with rules ${plan.rules_version}; the server has ${catRules}.`);
 
   // 덧붙일 자리 — 없는 서비스면 끝에 새로 만든다
-  const services = (plan.services ?? []).map((s) => ({ ...s, picks: [...s.picks] }));
-  const target = v.project ? [...(plan.project_picks ?? [])] : undefined;
+  const services = lists.services.map((s) => ({ ...s, picks: [...s.picks] }));
+  const target = v.project ? [...lists.project_picks] : undefined;
   let svc = v.service === undefined ? undefined : services.find((s) => s.purpose === v.service);
   if (v.service !== undefined && !svc) { svc = { purpose: v.service, picks: [] }; services.push(svc); }
   const list = target ?? /** @type {{ picks: Pick[] }} */ (svc).picks;
@@ -540,11 +547,11 @@ async function add(ctx, rest) {
     }
   }
   /** @type {PlanFile} */
-  const next = { ...plan, project_picks: target ?? [...(plan.project_picks ?? [])], services };
+  const next = { ...plan, project_picks: target ?? [...lists.project_picks], services };
   const where = v.project ? 'the project' : `service ${v.service}`;
 
   // 확인 — 지금 파일 그대로(기준)와 덧붙인 뒤를 환경마다 보낸다. 기존 키의 이름 · 판정(위반 코드 포함)이 하나라도 바뀌면 쓰지 않는다
-  const hadPicks = (plan.project_picks ?? []).length > 0 || (plan.services ?? []).some((s) => s.picks.length > 0);
+  const hadPicks = lists.project_picks.length > 0 || lists.services.some((s) => s.picks.length > 0);
   const codes = [];
   /** @type {Record<string, any[]>} */
   const added = {};
