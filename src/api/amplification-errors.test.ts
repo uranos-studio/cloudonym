@@ -24,8 +24,8 @@ describe('POST /v1/names 400 오류 증폭', () => {
   }
 });
 
-// 본문 상한이 32 KiB 로 오른 뒤(D100) — 본문을 상한까지 채운 최악 요청의 응답 크기. /v1/wizard 의 400 은 여기 없다:
-// 오류마다 한 줄이라 32 KiB 본문이 1.2 MB 응답을 만든다(16 KiB 본문에서도 0.6 MB — 상한을 올리기 전부터). 그 상한은 아직 없다 — 잰 값은 docs/decisions.md D100
+// 본문 상한이 32 KiB 로 오른 뒤(D100) — 본문을 상한까지 채운 최악 요청의 응답 크기. /v1/wizard 의 400 은 wizard-errors-cap.test.ts 에 있다
+// (오류 수 상한 + 잘린 수 · D103 — 상한 전에는 32 KiB 본문이 틀린 slot 으로 8 MB, 틀린 preset 으로 1.2 MB 응답을 만들었다)
 describe('32 KiB 본문 — 경로마다 최악 응답', () => {
   const P = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' };
   /** n 을 늘려 압축 본문이 상한 안인 가장 큰 요청 */

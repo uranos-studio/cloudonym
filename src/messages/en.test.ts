@@ -126,6 +126,7 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'request.rate_limited': { code: 'request.rate_limited', params: { retry_after: 42 } },
   'request.rules_version_mismatch': { code: 'request.rules_version_mismatch', params: { requested: 'AAA', current: 'BBB' } },
   'request.not_found': { code: 'request.not_found' },
+  'request.errors_truncated': { code: 'request.errors_truncated', params: { shown: 50, total: 120 } },
   'server.internal_error': { code: 'server.internal_error' },
 };
 
@@ -137,7 +138,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(116);
+    expect(codes).toHaveLength(117);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

@@ -12,6 +12,8 @@ export const API_DOC_SKIP_HEADER = PRIVACY_SKIP_HEADER;
 export const API_DOC_LIMITED_ROOT: readonly string[] = ['/llms.txt', '/catalog.json'];
 /** 요청 제한을 받지 않는 GET */
 export const API_DOC_UNLIMITED: readonly string[] = ['/v1/health', '/openapi.json'];
+/** /v1/wizard 400 이 싣는 오류 수 상한 — api 의 MAX_WIZARD_ERRORS (D103) */
+export const API_DOC_MAX_WIZARD_ERRORS = 50;
 /** 실패 상태 코드 — api 의 FAIL_STATUSES */
 export const API_DOC_FAIL_STATUSES: readonly number[] = [400, 403, 404, 409, 413, 429, 500];
 /** 세는 요청과 그 이벤트 — 성공한 요청 하나가 이벤트 하나다 */
@@ -46,6 +48,7 @@ export function apiDocVars() {
     limited: listText(API_DOC_LIMITED_ROOT),
     unlimited: listText(API_DOC_UNLIMITED),
     statuses: listText(API_DOC_FAIL_STATUSES),
+    max_errors: API_DOC_MAX_WIZARD_ERRORS,
     requests: listText(API_DOC_COUNTED.map((c) => c.request), 'or'),
     common: listText(API_DOC_COMMON_FIELDS),
     fields: listText(countedFields()),

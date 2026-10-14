@@ -133,6 +133,7 @@ export const en: Catalog = {
     'request.rate_limited': (m) => `Too many requests; retry after ${m.params.retry_after} seconds`,
     'request.rules_version_mismatch': (m) => `The requested rules_version does not match the current rules revision '${m.params.current}'. Re-run without rules_version to use the current rules, or keep using the names you already created (see the Terraform example's pinned mode).`,
     'request.not_found': () => 'No such endpoint or method; see /openapi.json for the API',
+    'request.errors_truncated': (m) => `Showing the first ${m.params.shown} of ${m.params.total} errors; fix these and send the request again to see the rest`,
     'server.internal_error': () => 'Internal error',
   },
   ui: {
@@ -246,7 +247,7 @@ export const en: Catalog = {
     api_limits_title: 'Rate limit',
     api_limits_body: 'Each client IP may make {limit} requests per {period} seconds, counted together across every POST request to /v1/ and GET requests for {limited}. GET requests for {unlimited} are not counted. Over the limit the answer is 429 with the code request.rate_limited and a Retry-After header: the number of seconds to wait ({period}).',
     api_errors_title: 'Errors',
-    api_errors_body: 'Every failure ({statuses}) has one shape: success is false and errors lists { code, field?, params?, message }. Branch on code, which does not change; show message, which is English text and may be reworded. When present, supported lists the accepted values. An example:',
+    api_errors_body: 'Every failure ({statuses}) has one shape: success is false and errors lists { code, field?, params?, message }. Branch on code, which does not change; show message, which is English text and may be reworded. When present, supported lists the accepted values. A POST /v1/wizard 400 lists at most the first {max_errors} errors; when there are more, the last entry is request.errors_truncated with params.shown and params.total. Fix those and send again to see the rest. An example:',
     api_version_title: 'Versions and rules_version',
     api_version_body: 'Every successful response of {versioned} carries version: { engine, rules }. rules (YYYY-MM-DD.N) changes whenever the same input could give a different name, verdict, suggestion or label. Put "rules_version" in a request body to be told when the rules have changed: the API answers 409 instead of returning different names.',
     api_terraform_title: 'Terraform',

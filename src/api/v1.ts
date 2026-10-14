@@ -9,7 +9,7 @@ import { labelsFor } from '../core/labels';
 import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, wizardSentence } from './schemas';
 import { toWireGenerate, toWireNames, toWireValidate, toWireWizard, type ProviderResult } from './serialize';
 import { logTelemetry } from './telemetry';
-import { fail, internalError } from './errors';
+import { fail, internalError, MAX_WIZARD_ERRORS } from './errors';
 import { VERSION } from '../version';
 import { rateLimit } from './ratelimit';
 
@@ -80,7 +80,7 @@ v1.post('/wizard', async (c) => {
   const read = await readJson(c);
   if (!read.ok) return notJson(c);
   const parsed = parseWizardBody(read.body);
-  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported, rewrite: wizardSentence });
+  if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported, rewrite: wizardSentence, maxErrors: MAX_WIZARD_ERRORS });
   const { provider, selection, transformed, labelContexts, pickCount, pickedRules } = parsed.value;
   const out = generateProject(selection, provider);
   const labels = labelContexts.map(({ namespace, context }) => ({ namespace, labels: labelsFor(context, provider) }));

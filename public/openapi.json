@@ -633,7 +633,7 @@
             }
           },
           "400": {
-            "description": "Body is not JSON or not an object, provider is unknown or not enabled yet, project is not an object, a context value or purpose is invalid or too long (field project.owner, services[1].purpose ...), or the wizard plan is invalid (wizard.* and selection.* codes). field is the request path of the offending element, in request names: services[1].picks[0].instances[1].attach.data[0], project_picks[2], services[1]. Errors about the whole plan (wizard.empty, wizard.too_many_services, wizard.too_many_names, selection.not_array for services or project_picks) have no field",
+            "description": "Body is not JSON or not an object, provider is unknown or not enabled yet, project is not an object, a context value or purpose is invalid or too long (field project.owner, services[1].purpose ...), or the wizard plan is invalid (wizard.* and selection.* codes). field is the request path of the offending element, in request names: services[1].picks[0].instances[1].attach.data[0], project_picks[2], services[1]. Errors about the whole plan (wizard.empty, wizard.too_many_services, wizard.too_many_names, selection.not_array for services or project_picks) have no field. At most the first 50 errors are listed; when there are more, the last entry is request.errors_truncated with params.shown (50) and params.total (the number of errors found)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1582,7 +1582,7 @@
           "success",
           "errors"
         ],
-        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape",
+        "description": "Every failure (400, 403, 409, 413, 429, 500) has this shape. A /wizard 400 lists at most the first 50 errors; when there are more, a last entry with code request.errors_truncated and params { shown, total } says how many were left out",
         "properties": {
           "success": {
             "type": "boolean",
