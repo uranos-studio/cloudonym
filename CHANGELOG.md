@@ -2,7 +2,11 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.1.2] - 2026-10-14
+
+The wizard starts with the project values, saves and opens plan files, and gains a header menu; the API gains a guide page, capped error lists and a repository CLI. Google Cloud only, as in 0.1.0.
+
+Rules revision for this release: 2026-10-13.3 (unchanged — the same input gives the same names and verdicts).
 
 ### Added
 
