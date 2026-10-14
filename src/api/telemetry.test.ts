@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { classifyClient, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, META_KEYS, MAX_RULE_IDS, ruleIdList, type FetchLike, type TelemetrySource } from './telemetry';
+import { classifyClient, constantTimeEqual, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, TELEMETRY_SKIP_HEADER, META_KEYS, MAX_RULE_IDS, ruleIdList, type FetchLike, type TelemetrySource } from './telemetry';
 import { fakeKv } from './test-support';
 
 // 고정 시각 — 실제 시계를 쓰지 않는다. UTC 09-28 15:30 = KST 09-29 00:30 (자정 경계)
@@ -282,5 +282,44 @@ describe('chip_rules · custom_rules — 받은 값을 믿지 않는다 (D71)', 
     expect(r).toMatchObject({ _time: '2026-09-29T00:30:00+09:00', kst_day: '2026-09-29', event: 'ui_generate', client_class: 'cli', is_ai_agent: false, chip_rules: ['gcp.subnet'] });
     const v = await row('api_validate', { provider: 'gcp', chip_rules: ['gcp.subnet'] });
     expect('chip_rules' in v).toBe(false);
+  });
+});
+
+describe('점검 요청은 세지 않는다 (D99) — 비밀과 같은 값의 헤더가 있으면 KV · Axiom 둘 다 건너뛴다', () => {
+  const SECRET = 'test-skip-secret-0123456789';
+  /** user-agent 밖의 헤더도 싣는 요청 */
+  const withHeaders = (env: TelemetrySource['env'], headers: Record<string, string>): TelemetrySource =>
+    ({ env, req: { header: (n) => (n === 'user-agent' ? 'curl/8.7' : headers[n.toLowerCase()]) } });
+  async function run(env: Partial<TelemetrySource['env']>, headers: Record<string, string>): Promise<{ kvKeys: string[]; axiomCalls: number }> {
+    const { kv, store } = fakeKv();
+    const { fetchFn, calls } = fakeFetch();
+    await logTelemetry(withHeaders({ CLOUDONYM_KV: kv, AXIOM_API_KEY: 'k', AXIOM_DATASET: 'ds', ...env }, headers), 'api_validate', { provider: 'gcp' }, { now: NOW, fetchFn });
+    return { kvKeys: [...store.keys()], axiomCalls: calls.length };
+  }
+
+  it('헤더 이름은 소문자 상수 하나', () => {
+    expect(TELEMETRY_SKIP_HEADER).toBe('x-cloudonym-telemetry-skip');
+  });
+  it('맞는 값 → KV 쓰기 0 · Axiom 호출 0', async () => {
+    expect(await run({ TELEMETRY_SKIP_TOKEN: SECRET }, { [TELEMETRY_SKIP_HEADER]: SECRET })).toEqual({ kvKeys: [], axiomCalls: 0 });
+  });
+  it('틀린 값 · 길이가 다른 값 · 빈 값 · 헤더 없음 → 센다', async () => {
+    for (const value of [`${SECRET.slice(0, -1)}x`, SECRET.slice(0, -1), `${SECRET}x`, '', ' ']) {
+      expect(await run({ TELEMETRY_SKIP_TOKEN: SECRET }, { [TELEMETRY_SKIP_HEADER]: value }), JSON.stringify(value)).toEqual({ kvKeys: ['stats:api_validate:2026-09-29'], axiomCalls: 1 });
+    }
+    expect(await run({ TELEMETRY_SKIP_TOKEN: SECRET }, {})).toEqual({ kvKeys: ['stats:api_validate:2026-09-29'], axiomCalls: 1 });
+  });
+  it('비밀이 없거나 빈 값이면 헤더가 있어도 센다 — 설정 누락으로 계측이 꺼지지 않는다', async () => {
+    expect(await run({}, { [TELEMETRY_SKIP_HEADER]: SECRET })).toEqual({ kvKeys: ['stats:api_validate:2026-09-29'], axiomCalls: 1 });
+    expect(await run({ TELEMETRY_SKIP_TOKEN: '' }, { [TELEMETRY_SKIP_HEADER]: '' })).toEqual({ kvKeys: ['stats:api_validate:2026-09-29'], axiomCalls: 1 });
+  });
+  it('constantTimeEqual — 같은 값만 true · 길이가 달라도 던지지 않는다 · 한글 같은 여러 바이트 글자도', () => {
+    expect(constantTimeEqual('abc', 'abc')).toBe(true);
+    expect(constantTimeEqual('', '')).toBe(true);
+    for (const [a, b] of [['abc', 'abd'], ['abc', 'ab'], ['ab', 'abc'], ['', 'a'], ['a', ''], ['é', 'e'], ['\u0000', ''], ['abc', 'abc\u0000']]) {
+      expect(() => constantTimeEqual(a!, b!)).not.toThrow();
+      expect(constantTimeEqual(a!, b!), `${a} vs ${b}`).toBe(false);
+    }
+    expect(constantTimeEqual('x'.repeat(10_000), 'x'.repeat(10_000))).toBe(true);
   });
 });

@@ -6,7 +6,7 @@ import { fillUi } from '../messages/catalog';
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from './privacyModel';
 
 const CODE = 'rounded bg-zinc-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-zinc-800';
 
@@ -32,7 +32,7 @@ export function Privacy() {
           <p data-privacy-bucket-check>{fillUi(en, 'privacy_bucket_check', { origin: PRIVACY_BUCKET_CHECK_ORIGIN })}</p>
         </Section>
         <Section id="privacy-api" title={ui.privacy_api_title}>
-          <p>{ui.privacy_api_intro}</p>
+          <p data-privacy-api-intro>{fillUi(en, 'privacy_api_intro', { header: PRIVACY_SKIP_HEADER })}</p>
           <p>{ui.privacy_api_common}</p>
           <div className="overflow-x-auto">
             <table data-privacy-events className="w-full border-collapse text-left text-xs">

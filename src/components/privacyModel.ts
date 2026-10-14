@@ -10,6 +10,8 @@ export const PRIVACY_KV_RETENTION_DAYS = 366;
 export const PRIVACY_AXIOM_RETENTION_DAYS: number | null = 30;
 /** 버킷 이름 「Check」가 브라우저에서 직접 묻는 곳 (D83) — availability.ts 의 값 · public/_headers 의 connect-src 와 같다(privacy-sync.test) */
 export const PRIVACY_BUCKET_CHECK_ORIGIN = AVAILABILITY_ORIGIN;
+/** 운영자 점검 요청이 싣는 헤더 이름 (D99) — telemetry.ts 의 TELEMETRY_SKIP_HEADER 와 같다(privacy-sync.test). 값(비밀)은 화면에 없다 */
+export const PRIVACY_SKIP_HEADER = 'x-cloudonym-telemetry-skip';
 /** ratelimit.ts 의 RATE_LIMIT 과 같다 */
 export const PRIVACY_RATE_LIMIT = { limit: 60, period: 60 } as const;
 

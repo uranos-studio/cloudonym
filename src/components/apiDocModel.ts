@@ -1,9 +1,11 @@
 // /docs/api 모델 — 엔드포인트 표 · curl 예제 · 응답 일부 · 실패 꼴을 public/openapi.json(명세) 하나에서 만든다. 손으로 쓴 요청 본문이 없다.
 // 호스트는 화면이 실행 시점에 넘기는 origin 이다 — 도메인을 소스에 두지 않는다. 명세는 화면이 같은 출처의 /openapi.json 에서 받는다(번들에 싣지 않는다)
-import { PRIVACY_EVENTS, PRIVACY_RATE_LIMIT } from './privacyModel';
+import { PRIVACY_EVENTS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from './privacyModel';
 
 /** 요청 제한 — /privacy 와 같은 상수. api 의 RATE_LIMIT 과 같은지는 src/api/privacy-sync.test.ts 가 본다 */
 export const API_DOC_RATE_LIMIT = PRIVACY_RATE_LIMIT;
+/** 세지 않는 점검 요청의 헤더 (D99) — /privacy 와 같은 상수. 실제로 세지 않는지는 src/api/apidoc-sync.test.ts 가 본다 */
+export const API_DOC_SKIP_HEADER = PRIVACY_SKIP_HEADER;
 
 // 안내 문장 속 목록 — components 는 api 를 들여오지 않아 값을 여기 둔다. 서버(미들웨어 · 라우트 · FAIL_STATUSES · 텔레메트리)와 같은지는 src/api/apidoc-sync.test.ts 가 본다
 /** 요청 제한을 받는 사이트 뿌리의 GET — /v1/ 의 POST 는 전부 받는다 */

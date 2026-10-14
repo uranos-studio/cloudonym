@@ -1,15 +1,15 @@
 // 화면 쪽 값(beacon · /privacy 안내)이 API 가 실제로 하는 일과 같은가 (D56). components 는 api 를 들여오지 않아 값을 따로 들고 있다 — 둘을 여기서 묶는다
 import { describe, it, expect } from 'vitest';
-import { KV_TTL_SECONDS, META_KEYS } from './telemetry';
+import { KV_TTL_SECONDS, META_KEYS, TELEMETRY_SKIP_HEADER } from './telemetry';
 import { RATE_LIMIT } from './ratelimit';
 import { UI_COPY_TARGETS, wizardPickedRules } from './schemas';
 import { COPY_TARGETS } from '../components/copyTargets';
 import { pickedRuleIds } from '../components/pickedRules';
 import type { WizardPlan } from '../core/wizard/plan';
 import { PRESETS } from '../core/wizard/presets';
-import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from '../components/privacyModel';
+import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from '../components/privacyModel';
 import { AVAILABILITY_ORIGIN } from '../components/availabilityOrigin';
-import { API_DOC_RATE_LIMIT } from '../components/apiDocModel';
+import { API_DOC_RATE_LIMIT, API_DOC_SKIP_HEADER } from '../components/apiDocModel';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -35,6 +35,10 @@ describe('화면 · 안내 ↔ API 상수', () => {
     expect(PRIVACY_RATE_LIMIT).toEqual(RATE_LIMIT);
     // /docs/api 안내(D98)도 같은 숫자를 보인다
     expect(API_DOC_RATE_LIMIT).toEqual(RATE_LIMIT);
+  });
+  it('점검 헤더 이름 (D99) — /privacy · /docs/api 가 적는 이름 = telemetry 가 읽는 이름', () => {
+    expect(PRIVACY_SKIP_HEADER).toBe(TELEMETRY_SKIP_HEADER);
+    expect(API_DOC_SKIP_HEADER).toBe(TELEMETRY_SKIP_HEADER);
   });
 });
 

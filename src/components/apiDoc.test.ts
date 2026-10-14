@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 import { PRIVACY_RATE_LIMIT } from './privacyModel';
-import { API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_RATE_LIMIT, API_DOC_VERSIONED, apiDocVars, apiEndpoints, countedFields, errorExample, isApiSpec, listText, loadSpec, requestExample, rulesVersionConflict, shellQuote, type ApiSpec } from './apiDocModel';
+import { API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_RATE_LIMIT, API_DOC_SKIP_HEADER, API_DOC_VERSIONED, apiDocVars, apiEndpoints, countedFields, errorExample, isApiSpec, listText, loadSpec, requestExample, rulesVersionConflict, shellQuote, type ApiSpec } from './apiDocModel';
 import { ApiDocBody } from './ApiDoc';
 import { AppHeader } from './AppHeader';
 
@@ -168,6 +168,9 @@ describe('/docs/api 화면', () => {
     expect(t).toContain(`Every successful response of ${listText(API_DOC_VERSIONED)} carries`);
     expect(t).toContain(`Each successful ${listText(API_DOC_COUNTED.map((c) => c.request), 'or')} is counted`);
     expect(t).toContain(v.fields);
+    // D99 — 점검 요청은 세지 않는다 · KV 는 근사치
+    expect(t).toContain(`Requests whose ${API_DOC_SKIP_HEADER} header carries the operator's secret value are not counted`);
+    expect(t).toContain('The daily KV counters are approximate');
     expect(t).not.toMatch(/\{[a-z]\w*\}/);
     const h = html();
     for (const href of ['/openapi.json', '/llms.txt', '/catalog.json', '/privacy']) expect(h, href).toContain(`href="${href}"`);

@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Privacy } from './Privacy';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from './privacyModel';
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
@@ -57,6 +57,14 @@ describe('/privacy', () => {
     expect(text).toContain(VISIT_KEY);
     expect(text).toContain(INTRO_KEY);
     expect(text).toContain(THEME_KEY);
+  });
+  it('KV 는 근사치 · 정확한 수는 Axiom · 운영자 점검 요청은 세지 않는다 (D99)', () => {
+    const text = pageText();
+    expect(text).toContain('The KV counters are approximate');
+    expect(text).toContain('the Axiom records are the closer count (one record per event and no per-key write limit; a record that fails to send is lost)');
+    expect(text).toContain(`${PRIVACY_SKIP_HEADER} header`);
+    expect(text).toContain('neither counted nor sent to Axiom');
+    expect(text).not.toMatch(/\{[a-z]\w*\}/);
   });
   it('모으지 않는 것 — 이름 · 다섯 값 · hash · UA 원문 · 쿠키 · 식별자 · never collected', () => {
     const text = pageText();

@@ -1,4 +1,4 @@
-// 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17 · D56). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
+// 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17 · D56 · D99). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
 import type { Bindings } from './env';
 import { RULES } from '../core/constraints';
 
@@ -83,6 +83,7 @@ export function kstStamp(now: Date, formatParts: FormatParts = (d) => KST.format
 }
 
 /** read-modify-write — 동시 요청은 한 건을 잃을 수 있고 같은 키 초당 1회 쓰기 제한에 걸리면 그 건은 버려진다. 근사치로 받아들인다 (D16).
+ *  정확한 집계는 이벤트마다 한 줄인 Axiom 이 기준이고, KV 는 1년치 추세다 (D99)
  *  값이 숫자가 아니면 0 에서 다시 센다 — 'NaN' 을 저장하면 그날 카운터가 죽는다 */
 async function bump(kv: KVNamespace, key: string): Promise<void> {
   const n = Number.parseInt((await kv.get(key)) ?? '0', 10);
@@ -97,6 +98,29 @@ async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean)
   } catch (e) {
     console.error('KV 카운터 실패:', e);
   }
+}
+
+/** 운영자 점검 요청(scripts/release-check.sh)이 싣는 헤더 (D99) — 값이 비밀 TELEMETRY_SKIP_TOKEN 과 같으면 KV · Axiom 어디에도 쓰지 않는다 */
+export const TELEMETRY_SKIP_HEADER = 'x-cloudonym-telemetry-skip';
+
+/** 상수 시간 비교 — 앞에서 다른 글자가 나와도 끝까지 본다. 길이가 다르면 짧은 쪽을 0 으로 채워 긴 쪽 길이만큼 돌고 길이 차이를 결과에 섞는다.
+ *  crypto.subtle.timingSafeEqual 은 workerd 에만 있고 시험이 도는 Node 에는 없어 직접 쓴다. 길이는 감추지 않는다(비밀의 길이는 비밀이 아니다) */
+export function constantTimeEqual(a: string, b: string): boolean {
+  const x = new TextEncoder().encode(a);
+  const y = new TextEncoder().encode(b);
+  const n = Math.max(x.length, y.length);
+  let diff = x.length ^ y.length;
+  for (let i = 0; i < n; i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diff === 0;
+}
+
+/** 비밀이 설정돼 있고 헤더 값이 그것과 같을 때만 true. 비밀이 없거나 빈 값이면 헤더가 있어도 센다 — 설정 누락으로 계측이 꺼지지 않게 */
+function isSkipped(c: TelemetrySource): boolean {
+  // 앞뒤 공백은 뗀다 — 헤더 값은 fetch 가 이미 다듬어 오므로 비밀 쪽 끝의 개행 하나로 영영 맞지 않는 일을 막는다
+  const secret = c.env.TELEMETRY_SKIP_TOKEN?.trim();
+  if (!secret) return false;
+  const value = c.req.header(TELEMETRY_SKIP_HEADER);
+  return value !== undefined && constantTimeEqual(value, secret);
 }
 
 /** Axiom 응답 본문 { ingested, failed, failures[] } 에서 failed 만 본다. 본문이 비었거나 JSON 이 아니면 0 으로 친다 */
@@ -132,6 +156,8 @@ async function sendAxiom(fetchFn: FetchLike, apiKey: string, dataset: string, pa
 export async function logTelemetry(c: TelemetrySource, event: string, meta: Record<string, unknown> = {}, deps: TelemetryDeps = {}): Promise<void> {
   // 몸통 전체를 try 로 감싼다 — waitUntil 로 넘긴 Promise 가 reject 하지 않는다
   try {
+    // 점검 요청은 아무것도 쓰지 않는다 (D99). 요청 제한 · 응답은 이 함수 밖이라 영향이 없다
+    if (isSkipped(c)) return;
     const now = deps.now ?? new Date();
     const fetchFn: FetchLike = deps.fetchFn ?? ((url, init) => fetch(url, init));
     const clientClass = classifyClient(c.req.header('user-agent'));

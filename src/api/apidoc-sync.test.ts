@@ -8,7 +8,7 @@ import { META_KEYS, logTelemetry } from './telemetry';
 import { beaconPost, fakeKv, fakeLimiter, jsonPost, req } from './test-support';
 import { VERSION } from '../version';
 import {
-  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED,
+  API_DOC_COMMON_FIELDS, API_DOC_COUNTED, API_DOC_FAIL_STATUSES, API_DOC_LIMITED_ROOT, API_DOC_SKIP_HEADER, API_DOC_UNLIMITED,
   apiEndpoints, requestExample, type ApiSpec,
 } from '../components/apiDocModel';
 
@@ -84,6 +84,18 @@ describe('/docs/api ↔ Worker — 실패 · 계측', () => {
       await Promise.all(promises);
       expect(res.status, c.request).toBe(200);
       expect([...store.keys()].map((k) => k.split(':')[1]), c.request).toEqual([c.event]);
+    }
+  });
+
+  it('세지 않는 요청 (D99) — 안내가 적은 헤더에 비밀과 같은 값을 실으면 세는 요청 전부가 KV 에 아무것도 쓰지 않고 응답은 200', async () => {
+    const secret = 'apidoc-sync-secret';
+    for (const c of API_DOC_COUNTED) {
+      const [method, path] = c.request.split(' ') as [string, string];
+      const { kv, store } = fakeKv();
+      const { res, promises } = await req(app, path, init(method, path, { [API_DOC_SKIP_HEADER]: secret }), { CLOUDONYM_KV: kv, TELEMETRY_SKIP_TOKEN: secret });
+      await Promise.all(promises);
+      expect(res.status, c.request).toBe(200);
+      expect(store.size, c.request).toBe(0);
     }
   });
 

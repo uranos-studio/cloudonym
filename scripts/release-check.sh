@@ -6,6 +6,9 @@
 # https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/#accuracy
 # --skip-ratelimit 은 로컬용이다. 건너뛴 단계는 SKIPPED 로 적고 통과로 세지 않는다.
 # 필요한 것: curl · jq · perl
+# 환경변수 CLOUDONYM_TELEMETRY_SKIP_TOKEN 이 있으면 모든 요청에 x-cloudonym-telemetry-skip 헤더를 달아 계측에서 뺀다 (D99) —
+# 값은 Worker 비밀 TELEMETRY_SKIP_TOKEN 과 같아야 한다. 없으면 경고만 하고 계속한다(이 점검의 요청이 사용량에 섞여 세어진다).
+# 값은 어디에도 찍지 않는다
 set -u -o pipefail
 
 usage() { echo "usage: $0 [--skip-ratelimit] <base-url>" >&2; exit 2; }
@@ -42,6 +45,13 @@ trap 'rm -f "${work}"/*; rmdir "${work}"' EXIT
 hdr="${work}/headers"
 body="${work}/body"
 
+# 점검 헤더 — 값을 명령줄에 올리지 않도록(ps 에 보인다) 0600 파일에 쓰고 curl -H @파일 로 읽힌다. 파일은 끝날 때 trap 이 지운다
+skip_args=()
+if [ -n "${CLOUDONYM_TELEMETRY_SKIP_TOKEN:-}" ]; then
+  (umask 077 && printf 'x-cloudonym-telemetry-skip: %s\n' "${CLOUDONYM_TELEMETRY_SKIP_TOKEN:-}" > "${work}/skip-header")
+  skip_args=(-H "@${work}/skip-header")
+fi
+
 passed=0
 failed=0
 pass() { passed=$((passed + 1)); echo "PASS  $1"; }
@@ -53,7 +63,7 @@ fetch() {
   local method="$1" route="$2"
   shift 2
   : > "${hdr}"; : > "${body}"
-  curl -sS --max-time 20 -X "${method}" -D "${hdr}" -o "${body}" -w '%{http_code}' "$@" "${base}${route}" 2>/dev/null || true
+  curl -sS --max-time 20 -X "${method}" -D "${hdr}" -o "${body}" -w '%{http_code}' ${skip_args[@]+"${skip_args[@]}"} "$@" "${base}${route}" 2>/dev/null || true
 }
 # header <이름> — 마지막 응답의 그 헤더 값(대소문자 무시, CR 제거)
 header() { grep -i "^$1:" "${hdr}" | tail -1 | cut -d: -f2- | sed 's/^ *//' | tr -d '\r'; }
@@ -65,6 +75,11 @@ expect_status() {
 }
 
 echo "release-check ${base}"
+if [ "${#skip_args[@]}" -gt 0 ]; then
+  echo "INFO  telemetry skip header sent — not counted only if it matches the Worker secret TELEMETRY_SKIP_TOKEN"
+else
+  echo "WARN  CLOUDONYM_TELEMETRY_SKIP_TOKEN is not set — these requests will be counted as usage"
+fi
 code="$(fetch GET /v1/health)"
 if [ "${code}" = "200" ]; then
   info "version $(jq -c '.version' "${body}" 2>/dev/null)"
@@ -213,9 +228,10 @@ else
   n200=0; n429=0; nother=0
   rl_args=()
   for _ in $(seq 1 90); do
-    rl_args+=(-X POST -H 'content-type: application/json' --data "${VALIDATE_REQUEST}" -o /dev/null -w '%{http_code}\n' "${base}/v1/validate" --next)
+    # curl 은 --next 마다 헤더를 비운다 — 점검 헤더를 묶음 하나하나에 단다
+    rl_args+=(-X POST -H 'content-type: application/json' ${skip_args[@]+"${skip_args[@]}"} --data "${VALIDATE_REQUEST}" -o /dev/null -w '%{http_code}\n' "${base}/v1/validate" --next)
   done
-  rl_args+=(-o /dev/null "${base}/v1/health")
+  rl_args+=(${skip_args[@]+"${skip_args[@]}"} -o /dev/null "${base}/v1/health")
   rl_codes="$(curl -sS --max-time 120 "${rl_args[@]}" 2>/dev/null || true)"
   for code in ${rl_codes}; do
     case "${code}" in 200) n200=$((n200 + 1)) ;; 429) n429=$((n429 + 1)) ;; *) nother=$((nother + 1)) ;; esac

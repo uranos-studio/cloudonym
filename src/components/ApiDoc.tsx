@@ -6,7 +6,7 @@ import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VERSION } from '../version';
 import { PRIVACY_PATH, withStateHash } from './route';
-import { API_DOC_RATE_LIMIT, apiDocVars, apiEndpoints, errorExample, loadSpec, rulesVersionConflict, type ApiEndpointRow, type ApiSpec } from './apiDocModel';
+import { API_DOC_RATE_LIMIT, API_DOC_SKIP_HEADER, apiDocVars, apiEndpoints, errorExample, loadSpec, rulesVersionConflict, type ApiEndpointRow, type ApiSpec } from './apiDocModel';
 
 const CODE = 'rounded bg-zinc-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-zinc-800';
 /** 긴 본문(curl 의 -d)은 상자 안에서 줄을 바꾼다 — 360px 에서 페이지 가로 스크롤이 생기지 않는다 */
@@ -109,7 +109,7 @@ export function ApiDocBody({ spec, origin }: { spec: SpecState; origin: string }
         <p>{ui.api_terraform_body}</p>
       </Section>
       <Section id="telemetry" title={ui.api_telemetry_title}>
-        <p data-api-telemetry>{fillUi(en, 'api_telemetry_body', { requests: vars.requests, common: vars.common, fields: vars.fields })} <a href={withStateHash(PRIVACY_PATH, window.location.hash)} data-api-privacy className={LINK}>{ui.footer_privacy}</a></p>
+        <p data-api-telemetry>{fillUi(en, 'api_telemetry_body', { requests: vars.requests, common: vars.common, fields: vars.fields, header: API_DOC_SKIP_HEADER })} <a href={withStateHash(PRIVACY_PATH, window.location.hash)} data-api-privacy className={LINK}>{ui.footer_privacy}</a></p>
       </Section>
     </div>
   );
