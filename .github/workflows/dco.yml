@@ -28,10 +28,14 @@ jobs:
         run: |
           set -euo pipefail
           missing=0
+          # 목록 조회가 실패하면 여기서 끝난다 — $(…) 를 for 안에 두면 실패해도 빈 목록으로 통과한다
           # merge commit 은 서명 대상이 아니다 — 브랜치에서 만든 commit 만 본다
-          for sha in $(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}"); do
+          shas=$(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}")
+          for sha in ${shas}; do
             email=$(git log -1 --format='%ae' "${sha}")
-            if git log -1 --format='%(trailers:key=Signed-off-by,valueonly)' "${sha}" | grep -qiF "<${email}>"; then
+            # trailer 값 전체가 「이름 <이메일>」 꼴이고 그 이메일이 작성자와 같아야 한다 — 부분 문자열로 보면 꼬리에 붙인 주소가 통과한다
+            signers=$(git log -1 --format='%(trailers:key=Signed-off-by,valueonly,unfold)' "${sha}" | sed -nE 's/^[^<>]+ <([^<>[:space:]]+)>$/\1/p')
+            if printf '%s\n' "${signers}" | grep -qixF -- "${email}"; then
               echo "ok      ${sha} ${email}"
             else
               echo "::error::${sha} has no 'Signed-off-by:' line for its author <${email}>. Use 'git commit -s' (see CONTRIBUTING.md)."
