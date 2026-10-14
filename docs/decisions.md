@@ -1,6 +1,6 @@
 # Design decisions
 
-This is the public record of Cloudonym's design decisions. Code comments and the README refer to them by number (`D1`–`D29`, then `D30'`, `D31` and `D37`–`D43` for the four-step screen and `POST /v1/names`, `D45`–`D58` for the 0.1.0 release, and `D59`–`D70` for the naming wizard). Later decisions — mostly corrections made after checking a rule against the official provider documentation — are listed by date below the numbered table.
+This is the public record of Cloudonym's design decisions. Code comments and the README refer to them by number (`D1`–`D29`, then `D30'`, `D31` and `D37`–`D43` for the four-step screen and `POST /v1/names`, `D45`–`D58` for the 0.1.0 release, `D59`–`D76` for the naming wizard, `D77`–`D79` for region tokens, `D80` for evidence kinds, and `D81`–`D105` for the wizard, API, plan file, CLI and header changes that followed, up to the 0.1.2 release and after). Later decisions — mostly corrections made after checking a rule against the official provider documentation — are listed by date below the numbered table.
 
 The engine has one fatal bug class: **reporting an invalid name as valid**. Where a document is ambiguous, the decision always goes the conservative way — the engine may reject a name the provider would accept, but it must not accept a name the provider would reject.
 
@@ -78,7 +78,7 @@ The first public release opens Google Cloud only. The AWS and Azure rule data st
 | D57 | `/docs/naming` and `/privacy` | Single-page-app paths (`not_found_handling: single-page-application`); `main.tsx` picks the page by `location.pathname`, no router dependency. The naming guide is rendered from a pure model built from the generated catalog, region table, dictionary and version — no hand-written numbers or tables. | Static HTML generation would need more work on the style policy and asset routing; the SPA path is already in use. |
 | D58 | Changelog and version | `CHANGELOG.md` in Keep a Changelog form, one `## [0.1.0]` entry with a short history paragraph and the rules revision of the release (`2026-10-07.11`); `version.test.ts` checks that the entry for the engine version exists and names the current rules revision. The version stays `0.1.0` and the release is tagged `v0.1.0`; further features are planned for a later release. | One release entry for the first public version. |
 
-## Naming wizard (D59–D76) · region tokens (D77–D79) · evidence kinds (D80)
+## Naming wizard (D59–D76) · region tokens (D77–D79) · evidence kinds (D80) · later wizard, API and screen decisions (D81–D105)
 
 The next stage adds a **naming wizard**: project values once, then several services inside the project, each with a purpose (`web`, `was`, `db`, file server, object storage and so on) mapped to a Google Cloud service, a minimum quantity (serverless or high availability), and the disks and IP addresses attached to each server, whose names continue the server's name. The existing four-step screen stays for picking any catalog row. These decisions were made before the code and are now implemented in the engine, `POST /v1/wizard`, the screen at `/` and `/pick`, `/llms.txt`, `/openapi.json` and `/docs/naming`; each row names what it changes. Before any engine change, the outputs of the time were frozen as a compatibility oracle (D70).
 

@@ -1,6 +1,6 @@
 # Rule verification against official documentation
 
-This document records how each naming rule in `src/core/constraints.ts` was checked against the cloud provider's official documentation: the 36 entries of `RULES` (24 checked on 2026-09-28, plus 11 added on 2026-10-06 — see "Rules added on 2026-10-06" below — plus `gcp.project_name` added on 2026-10-12) and the 3 entries of `LABEL_LIMITS`. On 2026-09-28 each `docUrl` was fetched with `curl -sL`, the HTML tags were stripped, the relevant paragraph was located, and each anchor was confirmed against an `id` in the fetched HTML.
+This document records how the hand-written naming rules were checked against the cloud provider's official documentation: the 36 hand-written core rules (`AWS_HAND_RULES`, `GCP_HAND_RULES` and `AZURE_HAND_RULES` in `src/core/rules/{aws,gcp,azure}.ts` — 11 AWS, 10 Google Cloud and 15 Azure; 24 checked on 2026-09-28, plus 11 added on 2026-10-06 — see "Rules added on 2026-10-06" below — plus `gcp.project_name` added on 2026-10-12), the Google Cloud rules added by hand later (the dated sections below), and the 3 entries of `LABEL_LIMITS` in `src/core/constraints.ts`. `RULES` in `src/core/constraints.ts` is the merged table of every provider: these hand-written rules plus the generated `*-intake.ts` rows and the hand-added `*-manual.ts` rows of `src/core/rules/`. On 2026-09-28 each `docUrl` was fetched with `curl -sL`, the HTML tags were stripped, the relevant paragraph was located, and each anchor was confirmed against an `id` in the fetched HTML.
 
 ## How to read the tables
 

@@ -89,7 +89,7 @@ locals {
 }
 ```
 
-`local.gcp_names["service/shop/compute_instance/web/01/data/01"]` is then `"billing-shop-prod-ane3-gce-web-01-data-01"`
+`local.gcp_names["service/shop/compute_instance/-/web/01/data/01"]` is then `"billing-shop-prod-ane3-gce-web-01-data-01"`
 and `local.gcp_labels_by_namespace["shop"]` the labels of service `shop`. The wizard's **Terraform** button copies the
 same two maps as a `locals` block, with invalid items as `# INVALID:` comments. The name-stability advice above
 applies here too: keep `ignore_changes = [name]` on the resources and send `rules_version`.
@@ -136,7 +136,7 @@ locals {
 }
 ```
 
-`data "http" "wizard"` 블록은 위 영어 절과 같다. `local.gcp_names["service/shop/compute_instance/web/01/data/01"]` 은
+`data "http" "wizard"` 블록은 위 영어 절과 같다. `local.gcp_names["service/shop/compute_instance/-/web/01/data/01"]` 은
 `"billing-shop-prod-ane3-gce-web-01-data-01"` 이다. 마법사의 **Terraform** 버튼은 같은 두 맵을 `locals` 블록으로 복사하고, 무효 항목은 `# INVALID:` 주석으로 남긴다.
 이름 안정성 권고(`ignore_changes = [name]` · `rules_version`)는 여기에도 그대로다.
 

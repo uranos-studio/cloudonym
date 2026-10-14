@@ -1,7 +1,7 @@
 The Hono-based Worker API (`/v1/*`), `/llms.txt` and telemetry — the Worker entry is `src/api/index.ts`. `/openapi.json` is a static asset in `public/`.
 
 - Every message in a response is `{ code, field?, params?, message }` (`toWireMessage` in `serialize.ts`) — sentences come from the `src/messages/` dictionary
-- **Every failure response goes through the single `fail()` in `errors.ts`** (400 · 403 · 409 · 413 · 429 · 500). New failure paths use `fail()` too — `no-hangul.test` and `openapi.test` validate sample responses against the spec
+- **Every failure response goes through the single `fail()` in `errors.ts`** (400 · 403 · 404 · 409 · 413 · 429 · 500). New failure paths use `fail()` too — `no-hangul.test` and `openapi.test` validate sample responses against the spec
 - Responses carry `version` (`src/version.ts`). When a request's `rules_version` differs from the current rules revision, the answer is 409 (`schemas.ts`)
 - Routes — `POST /v1/generate` (catalog: every rule of the provider · sequence `01`) · `POST /v1/names` (picked resources and counts · D39) · `POST /v1/wizard` (a whole project: project-level items and services · D66) · `POST /v1/validate` · `GET /v1/health` · `POST /v1/events` (UI beacon) · `GET /llms.txt`
 - A required field that is absent is 400 `request.field_missing` (no `params`); a value outside the list is `request.value_unsupported` with the value echoed back
@@ -18,7 +18,7 @@ The Hono-based Worker API (`/v1/*`), `/llms.txt` and telemetry — the Worker en
 Hono 기반 Worker API(`/v1/*`)와 `/llms.txt`, 텔레메트리 — Worker 엔트리는 `src/api/index.ts` 다. `/openapi.json` 은 `public/` 의 정적 자산이다.
 
 - 응답의 메시지는 전부 `{ code, field?, params?, message }`(`serialize.ts` 의 `toWireMessage`) — 문장은 `src/messages/` 사전이 만든다
-- **모든 실패 응답은 `errors.ts` 의 `fail()` 하나를 지난다** (400 · 403 · 409 · 413 · 429 · 500). 새 실패 경로도 `fail()` 로 낸다 — `no-hangul.test` · `openapi.test` 가 표본 응답을 명세로 검증한다
+- **모든 실패 응답은 `errors.ts` 의 `fail()` 하나를 지난다** (400 · 403 · 404 · 409 · 413 · 429 · 500). 새 실패 경로도 `fail()` 로 낸다 — `no-hangul.test` · `openapi.test` 가 표본 응답을 명세로 검증한다
 - 응답에 `version`(`src/version.ts`)을 싣는다. 요청의 `rules_version` 이 지금 규칙 버전과 다르면 409 (`schemas.ts`)
 - 라우트 — `POST /v1/generate`(카탈로그: provider 의 규칙 전부 · 순번 `01`) · `POST /v1/names`(고른 리소스와 개수 · D39) · `POST /v1/wizard`(프로젝트 한 번 — 프로젝트 공용 항목과 서비스 · D66) · `POST /v1/validate` · `GET /v1/health` · `POST /v1/events`(화면 비콘) · `GET /llms.txt`
 - 반드시 있어야 할 필드가 없으면 400 `request.field_missing`(`params` 없음), 목록 밖 값이면 `request.value_unsupported` 가 그 값을 되돌려 싣는다

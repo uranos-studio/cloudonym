@@ -15,7 +15,7 @@ Cloudonym is pre-1.0. Only the latest commit on the `main` branch is supported; 
 
 Please include:
 
-- What is affected — the endpoint (`/v1/generate`, `/v1/validate`, `/v1/events`, `/llms.txt`, `/openapi.json`), the web UI, or the engine itself (`src/core/`).
+- What is affected — the endpoint (`POST /v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate`, `/v1/events`, `GET /v1/health`, `/llms.txt`, `/catalog.json`, `/openapi.json`), the web UI, the repository CLI (`cli/`), or the engine itself (`src/core/`).
 - Steps to reproduce: the exact request body or input, the response you got, and the response you expected.
 - For a naming-rule report: the provider, `resource_type`, the name, the provider's error message, and a link to the official document if you have one.
 - The commit or deployment you tested against, and the impact as you see it.
@@ -47,6 +47,6 @@ Cloudonym is maintained by one person on a best-effort basis. I aim to acknowled
 
 - **지원 버전** — 1.0 전이다. `main` 의 최신 commit 만 지원한다
 - **신고** — 공개 issue 를 열지 않는다. 저장소 **Security** 탭의 **Report a vulnerability**(GitHub 비공개 취약점 신고)로 보낸다
-- **적을 것** — 대상(endpoint · 화면 · 엔진), 재현 절차(요청 본문 · 받은 응답 · 기대한 응답), 이름 규칙 건이면 provider · `resource_type` · 이름 · CSP 오류 메시지
+- **적을 것** — 대상(endpoint — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/events` · `/v1/health` · `/llms.txt` · `/catalog.json` · `/openapi.json` · 화면 · 저장소 CLI(`cli/`) · 엔진), 재현 절차(요청 본문 · 받은 응답 · 기대한 응답), 이름 규칙 건이면 provider · `resource_type` · 이름 · CSP 오류 메시지
 - **응답** — 관리자 한 사람이 할 수 있는 만큼 한다. 약 일주일 안에 받았음을 알리려 하지만 기한을 약속하지 않는다
 - **범위** — CSP 가 거부하는 이름을 `valid: true` 로 표시하는 것은 **범위 안이다**(이 엔진의 치명적 버그다). 제3자가 호출 제한 없이 띄운 배포는 범위 밖이다
