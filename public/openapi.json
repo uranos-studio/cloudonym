@@ -3,7 +3,7 @@
   "info": {
     "title": "Cloudonym API",
     "description": "Multi-cloud resource naming engine. This release enables Google Cloud (gcp) only; AWS and Azure are in the rule table but not enabled, and a request for them is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names, one by one or for a whole project with the naming wizard (/wizard), against each provider's physical constraints. Names from /wizard may carry a tier token (web, was) after the abbreviation and kind token, and attached resources (boot and data disks, reserved addresses) are named after their server; /generate and /names never put a tier in a name. Formulas, region codes, the zones they accept, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /wizard, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -1408,7 +1408,7 @@
         "properties": {
           "engine": {
             "type": "string",
-            "example": "0.1.2"
+            "example": "0.1.3"
           },
           "rules": {
             "type": "string",
