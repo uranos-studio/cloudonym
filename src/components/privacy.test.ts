@@ -2,6 +2,9 @@
 // 안내의 숫자 · 표가 api 상수(META_KEYS · KV_TTL_SECONDS · RATE_LIMIT)와 같은지는 src/api/privacy-sync.test.ts 가 본다 — 이 폴더의 tsconfig 에는 Workers 타입이 없다
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { createElement } from 'react';
+import { en } from '../messages/en';
+import { fillUi } from '../messages/catalog';
+import { VERSION } from '../version';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Privacy } from './Privacy';
 import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER, PRIVACY_WEB_ANALYTICS_DOCS, PRIVACY_WEB_ANALYTICS_ORIGIN } from './privacyModel';
@@ -129,9 +132,12 @@ describe('/privacy', () => {
     expect(PRIVACY_LAST_UPDATED).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     const text = pageText();
     expect(text).toContain(`Last updated: ${PRIVACY_LAST_UPDATED}`);
-    const body = text.replace(`Last updated: ${PRIVACY_LAST_UPDATED}`, '');
+    // 버전 푸터는 뺀다 — 릴리스마다 바뀌지만 안내 본문이 아니다
+    const footer = fillUi(en, 'version_footer', VERSION);
+    expect(text).toContain(footer);
+    const body = text.replace(`Last updated: ${PRIVACY_LAST_UPDATED}`, '').replace(footer, '');
     const fingerprint = fnv1a(body);
-    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-15 bd411c3b');
+    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-15 f5f93a8b');
     // 검사기 — 한 글자만 바뀌어도 지문이 달라진다
     expect(fnv1a(`${body}.`)).not.toBe(fingerprint);
   });
