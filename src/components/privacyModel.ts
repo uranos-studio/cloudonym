@@ -3,6 +3,7 @@
 import { en } from '../messages/en';
 import { fillUi, type UiKey } from '../messages/catalog';
 import { AVAILABILITY_ORIGIN } from './availabilityOrigin';
+import { SOURCE_REPOSITORY_URL } from './aboutModel';
 
 /** KV 일자 카운터의 수명(일) — telemetry.ts 의 KV_TTL_SECONDS / 86400 */
 export const PRIVACY_KV_RETENTION_DAYS = 366;
@@ -40,3 +41,11 @@ export const PRIVACY_EVENTS: readonly { event: string; when: UiKey; fields: read
 export function axiomRetentionText(days: number | null): string {
   return days === null ? en.ui.privacy_retention_axiom_unset : fillUi(en, 'privacy_retention_axiom', { days });
 }
+
+/** 안내를 마지막으로 고친 날(KST). 본문이 바뀌면 privacy.test 의 지문 시험이 깨진다 — 이 날짜와 지문을 같이 고친다 */
+export const PRIVACY_LAST_UPDATED = '2026-10-15';
+/** 연락 경로 — 질문은 공개 이슈, 보안 문제는 GitHub 비공개 취약점 신고(SECURITY.md 와 같은 창구). 이메일은 적지 않는다 */
+export const PRIVACY_CONTACT = {
+  issues: `${SOURCE_REPOSITORY_URL}/issues`,
+  security: `${SOURCE_REPOSITORY_URL}/security/advisories/new`,
+} as const;

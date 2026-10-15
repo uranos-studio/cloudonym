@@ -68,6 +68,7 @@ export const UI_KEYS = [
   'privacy_when_llms_txt_accessed', 'privacy_when_catalog_json_accessed', 'privacy_target_note', 'privacy_rules_note', 'privacy_never_title',
   'privacy_never_body', 'privacy_retention_title', 'privacy_retention_kv', 'privacy_retention_axiom',
   'privacy_retention_axiom_unset', 'privacy_hosting_title', 'privacy_ip', 'privacy_hosting',
+  'privacy_contact_title', 'privacy_contact_issues', 'privacy_contact_security', 'privacy_contact_changes', 'privacy_last_updated',
   // About — /about (D109)
   'about_what_title', 'about_what_body', 'about_example_title', 'about_checks_title', 'about_source_title', 'about_source_repo', 'about_license',
   'about_license_notice', 'about_trademark', 'about_status_title', 'about_status', 'about_versions_title', 'about_versions_body', 'about_links_title', 'about_intro_again',

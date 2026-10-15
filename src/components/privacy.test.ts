@@ -8,11 +8,19 @@ import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
+import { PRIVACY_CONTACT, PRIVACY_LAST_UPDATED } from './privacyModel';
+import { SOURCE_REPOSITORY_URL } from './aboutModel';
 
 /** 태그를 벗긴 본문 — 문장 검사는 사람이 읽는 글자로 한다 */
 function pageText(): string {
   const html = renderToStaticMarkup(createElement(Privacy));
   return html.replace(/<[^>]+>/g, ' ').replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+}
+/** 본문 지문 — FNV-1a 32비트. 이 폴더 tsconfig 에는 node 타입이 없어 node:crypto 를 쓰지 않는다 */
+function fnv1a(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, '0');
 }
 const sentences = (text: string): string[] => text.split(/(?<=\.)\s+/);
 
@@ -108,5 +116,23 @@ describe('/privacy', () => {
   });
   it('AI 에이전트 요청은 ai_agent 일자 카운터에도 하나 더한다(telemetry.ts bump stats:ai_agent_hits)', () => {
     expect(pageText()).toContain('when the client class is ai_agent, one to a daily AI-agent counter as well');
+  });
+  it('연락 경로 — 질문은 공개 이슈 · 보안은 비공개 취약점 신고 · 이메일 없음', () => {
+    const html = renderToStaticMarkup(createElement(Privacy));
+    expect(PRIVACY_CONTACT.issues).toBe(`${SOURCE_REPOSITORY_URL}/issues`);
+    expect(PRIVACY_CONTACT.security).toBe(`${SOURCE_REPOSITORY_URL}/security/advisories/new`);
+    expect(html).toContain(`href="${PRIVACY_CONTACT.issues}"`);
+    expect(html).toContain(`href="${PRIVACY_CONTACT.security}"`);
+    expect(html).not.toMatch(/mailto:|@[a-z0-9-]+\.[a-z]{2,}/i);
+  });
+  it('마지막 수정일 — 본문이 바뀌면 지문이 깨진다. 날짜(PRIVACY_LAST_UPDATED)와 아래 지문을 같이 고친다', () => {
+    expect(PRIVACY_LAST_UPDATED).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const text = pageText();
+    expect(text).toContain(`Last updated: ${PRIVACY_LAST_UPDATED}`);
+    const body = text.replace(`Last updated: ${PRIVACY_LAST_UPDATED}`, '');
+    const fingerprint = fnv1a(body);
+    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-15 bd411c3b');
+    // 검사기 — 한 글자만 바뀌어도 지문이 달라진다
+    expect(fnv1a(`${body}.`)).not.toBe(fingerprint);
   });
 });

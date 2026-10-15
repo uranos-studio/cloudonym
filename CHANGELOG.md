@@ -2,6 +2,12 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Changed
+
+- **Privacy page: contact and last-updated date** — `/privacy` ends with a *Contact and changes* section: questions go to GitHub issues, security problems to GitHub private vulnerability reporting (the same channel as SECURITY.md; no email address), and the page shows the date it was last changed. A test fingerprints the page text, so a change to the text fails until the date is updated with it.
+
 ## [0.1.5] - 2026-10-15
 
 Cloudflare Web Analytics, which Cloudflare adds to every page, is now allowed by the page CSP instead of failing with a console error, and the Privacy page says what it collects.

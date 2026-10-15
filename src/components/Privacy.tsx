@@ -6,7 +6,8 @@ import { fillUi } from '../messages/catalog';
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER, PRIVACY_WEB_ANALYTICS_DOCS, PRIVACY_WEB_ANALYTICS_ORIGIN } from './privacyModel';
+import { repositoryLabel } from './aboutModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_CONTACT, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_LAST_UPDATED, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER, PRIVACY_WEB_ANALYTICS_DOCS, PRIVACY_WEB_ANALYTICS_ORIGIN } from './privacyModel';
 
 const LINK = 'font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100';
 const CODE = 'rounded bg-zinc-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-zinc-800';
@@ -77,6 +78,14 @@ export function Privacy() {
         <Section id="privacy-hosting" title={ui.privacy_hosting_title}>
           <p data-privacy-ip>{fillUi(en, 'privacy_ip', PRIVACY_RATE_LIMIT)}</p>
           <p>{ui.privacy_hosting}</p>
+        </Section>
+        <Section id="privacy-contact" title={ui.privacy_contact_title}>
+          <ul data-privacy-contact className="list-disc space-y-1 pl-5">
+            <li>{ui.privacy_contact_issues}: <a href={PRIVACY_CONTACT.issues} rel="noopener noreferrer" className={LINK}>{repositoryLabel(PRIVACY_CONTACT.issues)}</a></li>
+            <li>{ui.privacy_contact_security}: <a href={PRIVACY_CONTACT.security} rel="noopener noreferrer" className={LINK}>{repositoryLabel(PRIVACY_CONTACT.security)}</a></li>
+          </ul>
+          <p>{ui.privacy_contact_changes}</p>
+          <p data-privacy-updated className="text-zinc-600 dark:text-zinc-400"><time dateTime={PRIVACY_LAST_UPDATED}>{fillUi(en, 'privacy_last_updated', { date: PRIVACY_LAST_UPDATED })}</time></p>
         </Section>
       </div>
     </DocPage>
