@@ -1,7 +1,8 @@
 """화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90 · D93)의 ㉚~㊼ ·
-화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104 · 폰은 D105)의 (53) 를 재고 스크린샷을 남긴다.
+화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104 · 폰은 D105)의 (53), 첫 방문 예시 · 이름 막대(D108)의 (54) 를 재고 스크린샷을 남긴다.
 머리 밖에는 Share URL · Save plan · More · 화면 모드만 있다 — Open plan · 화면 전환 · Naming guide · API · llms.txt 는 More 메뉴 안이라 누르기 전에 open_more 로 연다(D104).
-링크 없는 첫 화면은 프로젝트 값이 빈칸이다(D97) — 예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
+링크 없는 첫 화면은 예시 계획이다(D108) — goto_ready 가 「Clear」 를 눌러 D97 의 빈 첫 화면으로 시작하고(예시를 보는 시나리오만 sample=True),
+예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
 
 화면 문구는 영어 사전(src/messages/en.ts)이 정본이다 — 아래 기대 문자열은 그 사전의 문장이다.
@@ -94,23 +95,25 @@ def assert_selects_fit(page, width):
     assert clipped == [], f'폭 {width}px 에서 select 글자가 잘린다: {clipped}'
 
 
-def bypass_csp(browser):
-    """이 브라우저의 새 창은 CSP 를 건너뛴다 — 아래 실행부의 주석(D106 dev 서버의 CSP 가 Vite preamble 을 막는다)"""
-    make = browser.new_context
-    browser.new_context = lambda **kw: make(**{'bypass_csp': True, **kw})
-
-
-def goto_ready(page, url):
-    """dev 서버는 포트가 열린 뒤에도 잠깐 연결을 끊는다 — 60초 안에서 다시 시도한다"""
+def goto_ready(page, url, sample=False):
+    """dev 서버는 포트가 열린 뒤에도 잠깐 연결을 끊는다 — 60초 안에서 다시 시도한다.
+    링크 없이 뿌리를 열면 첫 화면은 예시 계획이다(D108) — 빈 첫 화면(D97)을 전제한 시나리오가 그대로 돌도록 「Clear」 를 눌러 빈 상태로 시작한다.
+    예시 그대로를 보는 시나리오(D108 첫 방문 · 스크린샷)만 sample=True 로 연다"""
     deadline = time.time() + 60
     while True:
         try:
             page.goto(url, wait_until='networkidle')
-            return
+            break
         except Error:
             if time.time() > deadline:
                 raise
             time.sleep(1)
+    if sample or '#' in url or url.split('?', 1)[0] != BASE + '/':
+        return
+    clear = page.locator('[data-sample-clear]')
+    clear.click()
+    expect(clear).to_have_count(0)
+    expect(page.locator('#wizard-project')).to_be_focused()
 
 
 def events_of(page):
@@ -303,7 +306,10 @@ def fill_project(page):
 
 
 # 첫 방문 (D97) — 소개 두 문단 · 프로젝트 값 예시(placeholder) · 갈 곳
-INTRO_EXAMPLE = ['devops-payments-prod', 'payments-shop-prod-ane3-gce-web-01', 'payments-shop-prod-ane3-gce-web-01-boot']
+INTRO_EXAMPLE = ['demo-payment-prod', 'payment-shop-prod-ane3-run-01', 'payment-shop-prod-fwd-01']
+# 첫 방문 예시 계획 (D108) — 입력 넷 · 서비스 shop 의 serverless-web 카드 · 네트워크 미리 채움 넷. 이름 열여섯이 전부 PASS (엔진 실측 · wizardSample.test)
+SAMPLE = {'owner': 'demo', 'system': 'payment', 'env': 'prod', 'region': 'asia-northeast3'}
+SAMPLE_NAMES = 16
 INTRO_ORDER = 'Fill in your four values below and pick what you are building — you get names, JSON and Terraform locals. Naming guide'
 NEED_PROJECT = 'Enter the project values first — owner, system, environment and region. The names appear here once they are valid.'
 PENDING = 'Fill in owner, system, environment and region to continue.'
@@ -352,14 +358,14 @@ def wizard_scenarios(browser, rules_version, errors):
 
     # ── ㉚ 뿌리 · hash 없음 → 마법사. 첫 화면은 네트워크 넷이 미리 채워져 이름 다섯(D90) · Clear network 뒤에는 이름이 없다.
     #    서비스 둘 · 서버 1 은 boot + data 1 · 서버 2 는 boot 만 → 여섯 이름 ──
-    goto_ready(page, BASE + '/')
+    goto_ready(page, BASE + '/', sample=True)
     expect(page.locator('[data-wizard]')).to_be_visible()
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
     # 첫 방문 소개 (D97) — 무엇인가 · 순서 두 문단(경고색이 아니다) · 공유 링크 경고는 소개에서 빠졌다 · 닫으면 이 브라우저에 기억한다(새 창에서도 닫힌 채 — 아래 ㊻)
     # 예시 한 줄이 먼저 (D107) — 엔진이 빌드 때 만든 이름 셋 · 전부 PASS
     expect(page.locator('[data-intro-example]')).to_be_visible()
-    expect(page.locator('[data-intro-example-input]')).to_have_text('devops · payments · prod · asia-northeast3')
+    expect(page.locator('[data-intro-example-input]')).to_have_text('demo · payment · prod · asia-northeast3')
     expect(page.locator('[data-intro-example-name]')).to_have_text(INTRO_EXAMPLE)
     expect(page.locator('[data-intro-example-pass]')).to_have_count(3)
     expect(page.locator('[data-intro-text]')).to_have_text(INTRO_ORDER)
@@ -367,6 +373,8 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     # 머리의 공유 경고 줄은 마법사에서 Share 를 누를 때 보인다 (D93) — 누르기 전에는 없다
     expect(page.locator('[data-share-warning]')).to_have_count(0)
+    # 예시를 걷고(D108 — Clear) 빈 첫 화면(D97)에서 이어 간다
+    page.click('[data-sample-clear]')
     # 세 칸 (D89) — 목록 · 설정 · 이름이 왼쪽부터 · 목록은 tree
     boxes = [page.locator(s).bounding_box() for s in ('[data-wizard-list-column]', '[data-settings]', '[data-names-column]')]
     assert boxes[0]['x'] < boxes[1]['x'] < boxes[2]['x'] and abs(boxes[0]['y'] - boxes[2]['y']) < 2, boxes
@@ -1085,11 +1093,12 @@ def wizard_scenarios(browser, rules_version, errors):
     wizard_narrow(browser, errors)
     wizard_cards(browser, errors)
     theme_modes(browser, errors)
+    wizard_sample(browser, errors)
     wizard_first_visit(browser, rules_version, errors)
     api_doc(browser, errors)
     plan_file(browser, rules_version, errors)
     header_menu(browser, errors)
-    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) 통과')
+    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) · 첫 방문 예시 (54) 통과')
 
 
 def wizard_selection_focus(browser, errors):
@@ -1460,7 +1469,7 @@ def wizard_narrow(browser, errors):
     pg.on('pageerror', lambda e: errors.append(str(e)))
     start_example(pg)
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'wide')
-    expect(pg.locator('[data-names-handle]')).to_have_count(0)
+    expect(pg.locator('[data-names-bar]')).to_have_count(0)  # 넓은 화면은 이름 칸이 늘 보인다 — 막대가 없다 (D108)
     expect(pg.locator('[data-wizard-tabs]')).to_have_count(0)
     fill_project(pg)
     svc(pg, 0).locator('[data-purpose-chip="web"]').click()
@@ -1469,31 +1478,41 @@ def wizard_narrow(browser, errors):
     more(settings(pg)).locator('[data-purpose-chip="db"]').click()
     select(pg, 'services[0].picks[0]')
 
-    # ── 태블릿 768 — 두 칸(목록 왼쪽 · 설정 오른쪽) · 이름은 닫힌 드로어 · 손잡이의 수는 머리 요약과 같다 ──
+    # ── 태블릿 768 — 두 칸(목록 왼쪽 · 설정 오른쪽) · 이름은 닫힌 드로어 · 아래 고정 막대(D108)의 수는 머리 요약과 같다 ──
     pg.set_viewport_size({'width': 768, 'height': 1024})
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
     lst, st = pg.locator('[data-wizard-list-column]').bounding_box(), settings(pg).bounding_box()
     assert lst['x'] < st['x'] and abs(lst['y'] - st['y']) < 2, (lst, st)
     assert not dialog_open(pg, '[data-names-drawer]')
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[0].picks[0]')  # 고른 줄은 배치가 바뀌어도 그대로
-    handle = pg.locator('[data-names-handle]')
+    handle = pg.locator('[data-names-bar]')
     expect(handle).to_be_visible()
+    expect(handle).to_have_attribute('data-names-bar', 'names')
     expect(handle).to_have_attribute('aria-expanded', 'false')
     n, ok = names_counts(pg)
-    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n} · {ok}/{n}')
-    # 손잡이는 설정 칸을 가리지 않는다(내용이 손잡이 왼쪽에서 끝난다)
-    assert st['x'] + st['width'] <= handle.bounding_box()['x'], (st, handle.bounding_box())
+    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n} generated names (Terraform / JSON)')
+    expect(pg.locator('[data-names-bar-summary]')).to_have_text(f'{ok}/{n} PASS')
+    # 막대는 칸을 가리지 않는다 — 페이지를 끝까지 내리면 두 칸이 막대 위에서 끝난다 · 오른쪽 손잡이 몫의 여백(pr-14)이 없어 설정 칸이 오른쪽 여백 16px 에서 끝난다
+    assert abs(st['x'] + st['width'] - (768 - 16)) <= 1, st
+    pg.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)')
+    hb = handle.bounding_box()
+    for col in ('[data-wizard-list-column]', '[data-settings]'):
+        b = pg.locator(col).bounding_box()
+        assert b['y'] + b['height'] <= hb['y'], (col, b, hb)
+    pg.evaluate('window.scrollTo(0, 0)')
+    assert hb['height'] >= 44 and abs((hb['x'] + hb['width'] / 2) - 384) <= 1, hb  # 눌리기 쉬운 높이 · 가운데
     no_hscroll(pg, 768, '드로어 닫힘')
-    # 손잡이를 누르면 오른쪽 가장자리에 폭 min(420px, 90vw) 드로어 · 포커스는 닫기 단추 · 머리 요약 · 내보내기가 보인다
+    # 막대를 누르면 오른쪽 가장자리에 폭 min(420px, 90vw) 드로어 · 포커스는 닫기 단추 · 머리 요약 · 내보내기가 보인다 · 막대는 숨는다
     handle.click()
     assert dialog_open(pg, '[data-names-drawer]')
     box = pg.locator('[data-names-drawer]').bounding_box()
     assert box['width'] == 420 and box['x'] + box['width'] == 768 and box['height'] == 1024, box
     expect(pg.locator('[data-names-close]')).to_be_focused()
+    expect(handle).to_be_hidden()
     expect(pg.locator('[data-names-drawer] [data-names-summary]')).to_have_text(f'{n} names · {ok}/{n} PASS')
     expect(pg.locator('[data-names-drawer] [data-copy="terraform"]')).to_be_visible()
     no_hscroll(pg, 768, '드로어 열림')
-    # Esc 로 닫히고 포커스는 손잡이로
+    # Esc 로 닫히고 막대가 다시 보이며 포커스는 막대로
     pg.keyboard.press('Escape')
     pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
     expect(handle).to_be_focused()
@@ -1505,20 +1524,20 @@ def wizard_narrow(browser, errors):
     handle.click()
     pg.mouse.click(40, 500)  # 드로어 밖(배경)
     pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
-    # 손잡이의 수는 계획을 바꾸면 따라 바뀐다
+    # 막대의 수는 계획을 바꾸면 따라 바뀐다
     svc(pg, 1).locator('[data-purpose-chip="object"]').click()
     n2, ok2 = names_counts(pg)
     assert n2 == n + 1, (n, n2)
-    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n2} · {ok2}/{n2}')
+    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n2} generated names (Terraform / JSON)')
+    expect(pg.locator('[data-names-bar-summary]')).to_have_text(f'{ok2}/{n2} PASS')
     svc(pg, 1).locator('[data-purpose-chip="object"]').click()
-    expect(pg.locator('[data-names-handle-summary]')).to_have_text(f'{n} · {ok}/{n}')
+    expect(pg.locator('[data-names-bar-summary]')).to_have_text(f'{ok}/{n} PASS')
     select(pg, 'services[0].picks[0]')  # shop 을 펴 둔다(폰에서 그 줄을 누른다)
 
     # ── 폰 360 — 한 칸 · 위 탭 셋 [Plan] [Edit] [Names p/n] (D93 — 설정 바텀 시트를 걷어냈다: 카드 갤러리 · 점검표가 시트 70vh 보다 길다) ──
     #    줄을 누르면 Edit 탭이 그 줄의 설정을 연다 · Esc 는 Plan 탭의 그 줄로 · Add service 는 한 번에 새 서비스의 Edit 탭
     pg.set_viewport_size({'width': 360, 'height': 800})
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
-    expect(pg.locator('[data-names-handle]')).to_have_count(0)
     expect(pg.locator('[data-settings-sheet]')).to_have_count(0)
     tabs = pg.locator('[data-wizard-tab]')
     expect(tabs).to_have_text(['Plan', 'Edit', f'Names {ok}/{n}'])
@@ -1566,6 +1585,22 @@ def wizard_narrow(browser, errors):
     no_hscroll(pg, 360, 'Edit 탭 · 카드 갤러리')
     settings(pg).locator('[data-remove-service]').click()
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[1]')
+    # 아래 고정 막대 (D108) — Edit · Plan 탭에서 보이고, 누르면 Names 탭으로(포커스는 Names 탭 단추) · Names 탭에서는 숨는다 · 페이지 끝을 가리지 않는다(아래 여백)
+    bar = pg.locator('[data-names-bar]')
+    expect(bar).to_be_visible()
+    expect(bar).to_have_attribute('aria-controls', 'wizard-panel-names')
+    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n} generated names (Terraform / JSON)')
+    pg.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)')
+    last = pg.locator('[data-settings]').bounding_box()
+    hb = bar.bounding_box()
+    assert last['y'] + last['height'] <= hb['y'], ('막대가 설정 칸의 끝을 가린다', last, hb)
+    bar.click()
+    expect(pg.locator('[data-wizard-tab="names"]')).to_have_attribute('aria-selected', 'true')
+    expect(pg.locator('[data-wizard-tab="names"]')).to_be_focused()
+    expect(pg.locator('[data-names-column]')).to_be_visible()
+    expect(bar).to_be_hidden()
+    pg.click('[data-wizard-tab="plan"]')
+    expect(bar).to_be_visible()
     # 탭 — Names 를 누르면 이름 칸 · 목록은 숨는다 · 머리 요약은 탭과 같다
     pg.click('[data-wizard-tab="names"]')
     expect(pg.locator('[data-wizard-tab="names"]')).to_have_attribute('aria-selected', 'true')
@@ -1596,14 +1631,14 @@ def wizard_narrow(browser, errors):
     expect(pg.locator('[data-wizard-list-column]')).to_be_visible()
     # 연 드로어는 폭을 바꿨다 돌아와도 저절로 다시 열리지 않는다 (D89 독립 리뷰)
     pg.set_viewport_size({'width': 768, 'height': 1024})
-    pg.locator('[data-names-handle]').click()
+    pg.locator('[data-names-bar]').click()
     assert dialog_open(pg, '[data-names-drawer]')
     pg.set_viewport_size({'width': 360, 'height': 800})
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'phone')
     pg.set_viewport_size({'width': 768, 'height': 1024})
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
     assert not dialog_open(pg, '[data-names-drawer]')
-    expect(pg.locator('[data-names-handle]')).to_have_attribute('aria-expanded', 'false')
+    expect(pg.locator('[data-names-bar]')).to_have_attribute('aria-expanded', 'false')
     # 390 에서도 Edit 탭 · 가로 스크롤 없음
     pg.set_viewport_size({'width': 390, 'height': 844})
     pg.click('[data-wizard-tab="plan"]')
@@ -1638,6 +1673,112 @@ def narrow_plan(browser, errors, width, height):
     select(pg, 'services[0].picks[0]')
     pg.set_viewport_size({'width': width, 'height': height})
     return ctx, pg
+
+
+def wizard_sample(browser, errors):
+    """(54) 첫 방문 예시 (D108) — 링크 없이 열면 예시 계획(demo · payment · prod · asia-northeast3 · shop 의 serverless-web 카드 · 네트워크 넷)이고
+    이름 열여섯이 전부 PASS · Copy all · JSON · Terraform 이 바로 보인다 · Project 칸에 「Example」 표시와 Clear · 손대기 전에는 hash · Share · Save plan · 공유 경고가 없다 ·
+    무엇이든 바꾸면 표시가 사라지고 hash 가 생긴다 · Clear 는 D97 의 빈 첫 화면 · 첫 방문 스크린샷 360 · 1024(태블릿 막대) · 1280"""
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    sent = events_of(pg)
+    goto_ready(pg, BASE + '/', sample=True)
+    s = settings(pg)
+    expect(s).to_have_attribute('data-pick-path', 'project')
+    expect(s.locator('[data-sample-marker]')).to_be_visible()
+    expect(s.locator('[data-sample-badge]')).to_have_text('Example')
+    expect(s.locator('[data-sample-clear]')).to_have_text('Clear')
+    for key in ('owner', 'system'):
+        expect(s.locator(f'#wizard-{key}')).to_have_value(SAMPLE[key])
+    expect(s.locator('#field-region')).to_have_value(SAMPLE['region'])
+    expect(s.locator('[data-env-chip][aria-pressed="true"]')).to_have_text([SAMPLE['env']])
+    # 이름 — 전부 PASS · 내보내기 셋이 바로 보인다 · 소개의 세 이름이 화면 이름에 있다(소개와 화면이 같은 계획)
+    expect(pg.locator('#names article[data-key]')).to_have_count(SAMPLE_NAMES)
+    expect(pg.locator('[data-names-summary]')).to_have_text(f'{SAMPLE_NAMES} names · {SAMPLE_NAMES}/{SAMPLE_NAMES} PASS')
+    names = screen_names(pg)
+    assert all(v for _, _, v in names), [x for x in names if not x[2]]
+    assert set(INTRO_EXAMPLE) <= {n for _, n, _ in names}, (INTRO_EXAMPLE, names)
+    expect(pg.locator('#names article[data-valid="false"]')).to_have_count(0)
+    for sel in ('[data-copy="all-names"]', '[data-copy="names-json"]', '[data-copy="terraform"]'):
+        expect(pg.locator(sel)).to_be_visible()
+    expect(pg.locator('[data-pass-meaning]')).to_be_visible()
+    # 카드는 사용자가 더한 것과 같은 보통 pick — 목록에 serverless-web 카드 줄 하나
+    expect(pg.locator('[data-row-path="services[0]"] [data-row-count]')).to_have_text('11 names')
+    # 손대기 전에는 hash · Share URL · Save plan · 공유 경고가 없다(D97 의 문 그대로) · Project ID 요약 앞 정보 아이콘
+    assert pg.evaluate('location.hash') == '', pg.url
+    expect(pg.locator('[data-copy="share-url"], [data-plan-save]')).to_have_count(0)
+    expect(pg.locator('[data-share-warning]')).to_have_count(0)
+    expect(s.locator('[data-project-id-notice] summary svg[data-project-id-notice-icon]')).to_have_attribute('aria-hidden', 'true')
+    # 넓은 화면에는 이름 막대가 없다
+    expect(pg.locator('[data-names-bar]')).to_have_count(0)
+    no_hangul(pg)
+    shot_dir = OUT
+    pg.mouse.move(0, 0)
+    pg.screenshot(path=str(shot_dir / 'first-visit-1280.png'), animations='disabled', caret='hide')
+    # 1024 — 태블릿: 아래 막대가 드로어를 연다 · 수가 머리 요약과 같다
+    pg.set_viewport_size({'width': 1024, 'height': 768})
+    expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
+    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {SAMPLE_NAMES} generated names (Terraform / JSON)')
+    pg.mouse.move(0, 0)
+    pg.screenshot(path=str(shot_dir / 'first-visit-1024.png'), animations='disabled', caret='hide')
+    pg.click('[data-names-bar]')
+    assert dialog_open(pg, '[data-names-drawer]')
+    expect(pg.locator('[data-names-drawer] [data-names-summary]')).to_have_text(f'{SAMPLE_NAMES} names · {SAMPLE_NAMES}/{SAMPLE_NAMES} PASS')
+    pg.keyboard.press('Escape')
+    pg.wait_for_function("() => !document.querySelector('[data-names-drawer]').open")
+    pg.set_viewport_size({'width': 1280, 'height': 900})
+    # 무엇이든 바꾸면 사용자의 계획이다 — 표시 · Clear 가 사라지고 hash · Share URL 이 생긴다
+    s.locator('#wizard-owner').fill('acme')
+    expect(s.locator('[data-sample-marker]')).to_have_count(0)
+    pg.wait_for_function("() => location.hash.startsWith('#state=')")
+    assert hash_state(pg.url)['owner'] == 'acme', hash_state(pg.url)
+    expect(pg.locator('[data-copy="share-url"]')).to_have_count(1)
+    pg.wait_for_timeout(1500)
+    assert sent.count('ui_generate') == 1, sent  # 첫 화면은 세지 않고 첫 수정 뒤에 한 번
+    # 새로 열면 다시 예시 — Clear 는 D97 의 빈 첫 화면: 빈 값 · 카드 없음 · 이름 대신 안내 · hash · Share 없음 · 오류 없음 · 포커스는 Project 제목
+    goto_ready(pg, BASE + '/', sample=True)
+    expect(s.locator('[data-sample-marker]')).to_be_visible()
+    s.locator('[data-sample-clear]').click()
+    expect(s.locator('[data-sample-marker]')).to_have_count(0)
+    expect(pg.locator('#wizard-project')).to_be_focused()
+    for key in ('owner', 'system'):
+        expect(s.locator(f'#wizard-{key}')).to_have_value('')
+    expect(s.locator('#field-region')).to_have_value('')
+    expect(s.locator('[data-env-chip][aria-pressed="true"]')).to_have_count(0)
+    expect(s.locator('[aria-invalid="true"]')).to_have_count(0)
+    expect(pg.locator('[data-names-notice="need_project"]')).to_have_text(NEED_PROJECT)
+    expect(pg.locator('#names article[data-key]')).to_have_count(0)
+    expect(pg.locator('[data-copy="all-names"], [data-copy="names-json"], [data-copy="terraform"]')).to_have_count(0)
+    expect(pg.locator('[data-row-path^="services[0].picks"]')).to_have_count(0)  # 카드 · pick 없는 서비스 shop
+    expect(pg.locator('[data-row-path="network"] [data-network-summary]')).to_have_text('VPC network, Subnet, Cloud Router, Cloud NAT')  # 네트워크 미리 채움(D90)은 남는다
+    assert pg.evaluate('location.hash') == '', pg.url
+    expect(pg.locator('[data-copy="share-url"], [data-plan-save]')).to_have_count(0)
+    # 링크는 예전처럼 연다 — 예시 표시 없이 링크의 값
+    goto_ready(pg, BASE + '/' + bucket_link(RULES_OF(pg), 'files'))
+    expect(s.locator('[data-sample-marker]')).to_have_count(0)
+    ctx.close()
+    # 360 — 첫 탭은 Edit(Project · 「Example」) · 아래 막대가 Names 탭으로 간다
+    c = browser.new_context(viewport={'width': 360, 'height': 800})
+    p360 = c.new_page()
+    p360.on('pageerror', lambda e: errors.append(str(e)))
+    goto_ready(p360, BASE + '/', sample=True)
+    expect(p360.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
+    expect(settings(p360).locator('[data-sample-marker]')).to_be_visible()
+    expect(p360.locator('[data-names-bar-text]')).to_have_text(f'View {SAMPLE_NAMES} generated names (Terraform / JSON)')
+    no_hscroll(p360, 360, '첫 방문 예시')
+    p360.mouse.move(0, 0)
+    p360.screenshot(path=str(shot_dir / 'first-visit-360.png'), animations='disabled', caret='hide')
+    p360.click('[data-names-bar]')
+    expect(p360.locator('[data-wizard-tab="names"]')).to_have_attribute('aria-selected', 'true')
+    expect(p360.locator('[data-names-bar]')).to_be_hidden()
+    expect(p360.locator('[data-names-summary]')).to_have_text(f'{SAMPLE_NAMES} names · {SAMPLE_NAMES}/{SAMPLE_NAMES} PASS')
+    c.close()
+
+
+def RULES_OF(page):
+    """지금 규칙 버전 — /v1/health"""
+    return page.request.get(BASE + '/v1/health').json()['version']['rules']
 
 
 def wizard_first_visit(browser, rules_version, errors):
@@ -1999,7 +2140,7 @@ def header_menu(browser, errors):
         expect(more3).to_be_focused()
     goto_ready(p3, BASE + '/')
     h360_first = header_rows(p3)[0]
-    # 폰의 예시는 VM 한 줄 (D107)
+    # 폰의 예시는 Cloud Run 한 줄 (D107 · D108)
     expect(p3.locator('[data-intro-example]')).to_be_visible()
     expect(p3.locator('[data-intro-example-name]')).to_have_text([INTRO_EXAMPLE[1]])
     expect(p3.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # 링크 없는 첫 화면 — 공유 · 저장할 것이 없다
@@ -2039,7 +2180,7 @@ def wizard_narrow_shots(browser, errors):
     """07 태블릿 768 — 이름 드로어 열림 · 08 폰 360 — Edit 탭의 Web server 설정(딸린 것 펼침 — D93)"""
     ctx, pg = narrow_plan(browser, errors, 768, 1024)
     expect(pg.locator('[data-wizard-layout]')).to_have_attribute('data-wizard-layout', 'tablet')
-    pg.click('[data-names-handle]')
+    pg.click('[data-names-bar]')
     pg.wait_for_function("() => document.querySelector('[data-names-drawer]').open")
     wizard_shot(pg, '07-wizard-tablet.png')
     ctx.close()
@@ -2056,9 +2197,7 @@ def wizard_narrow_shots(browser, errors):
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
-    # dev 서버의 화면 HTML 은 Worker 가 만들며 _headers 의 CSP(script-src 'self')를 단다(D106) — Vite dev 의 인라인 preamble 이 막혀 React 가 그려지지 않는다.
-    # 운영 빌드에는 인라인 스크립트가 없다(_headers 주석 · site.test). 이 시험은 화면 동작을 보는 것이라 창마다 CSP 를 건너뛴다
-    bypass_csp(browser)
+    # 개발 서버는 화면 HTML 에 CSP 를 달지 않는다(D108 — Vite 의 인라인 preamble). 운영 응답의 CSP 는 src/api/site.test 가 잰다
     errors = []
 
     # ── ⑴ 첫 방문 — 버튼 셋 중 둘(AWS · Azure)은 꺼진 「Coming soon」 · 켜진 GCP 가 자동 선택 · 다섯 입력 · SA 를 골라 축약 안내 · 비콘 수 ──
@@ -2906,7 +3045,6 @@ with sync_playwright() as p:
     # 07 · 08 — 반투명 배경(::backdrop) 아래의 둥근 테두리가 프로세스마다 가끔 다르게 그려진다(25회 중 2회, 실측).
     # 합성 단계를 그리기 전에 모두 돌리고 스크롤 스레드를 끈 브라우저에서 찍으면 같은 바이트다(25회 중 25회)
     shots = p.chromium.launch(headless=True, args=['--run-all-compositor-stages-before-draw', '--disable-threaded-scrolling'])
-    bypass_csp(shots)
     wizard_narrow_shots(shots, errors)
     shots.close()
 

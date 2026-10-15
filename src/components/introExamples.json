@@ -1,8 +1,8 @@
 {
   "rules": "2026-10-13.3",
   "input": [
-    "devops",
-    "payments",
+    "demo",
+    "payment",
     "prod",
     "asia-northeast3"
   ],
@@ -11,21 +11,21 @@
       "id": "project",
       "label": "Project ID",
       "key": "project/-/project_id/-/-/-",
-      "name": "devops-payments-prod",
+      "name": "demo-payment-prod",
       "valid": true
     },
     {
-      "id": "vm",
-      "label": "VM instance",
-      "key": "service/shop/compute_instance/-/web/01",
-      "name": "payments-shop-prod-ane3-gce-web-01",
+      "id": "run",
+      "label": "Cloud Run service",
+      "key": "service/shop/run_service/-/-/01",
+      "name": "payment-shop-prod-ane3-run-01",
       "valid": true
     },
     {
-      "id": "boot",
-      "label": "Persistent disk (boot)",
-      "key": "service/shop/compute_instance/-/web/01/boot/-",
-      "name": "payments-shop-prod-ane3-gce-web-01-boot",
+      "id": "fwd",
+      "label": "HTTPS forwarding rule",
+      "key": "service/shop/global_forwarding_rule/-/-/01",
+      "name": "payment-shop-prod-fwd-01",
       "valid": true
     }
   ]

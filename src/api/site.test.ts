@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
 import { req, fakeLimiter } from './test-support';
-import { headersRule, PAGE_HEADERS, renderPage, robotsText, sitemapXml } from './site';
+import { headersRule, PAGE_HEADERS, pageHeaders, renderPage, robotsText, sitemapXml } from './site';
 import { PAGES } from '../site/pages';
 import { pageText } from '../site/copy';
 import { en } from '../messages/en';
@@ -115,6 +115,18 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
       expect(res.headers.get('content-length')).toBeNull();
       expect(res.headers.get('cache-control')).toBe('public, max-age=0, must-revalidate');
     }
+  });
+
+  it('개발 서버만 CSP 를 뺀다 (D108) — 운영 헤더는 _headers 그대로 · 나머지 다섯은 개발 서버도 같다', () => {
+    const rule = headersRule(HEADERS_TEXT, '/*');
+    expect(pageHeaders(false)).toEqual(rule);
+    expect(pageHeaders(true)).toEqual(rule.filter(([k]) => k !== 'Content-Security-Policy'));
+    expect(pageHeaders(true)).toHaveLength(rule.length - 1);
+    // 판정은 MODE === 'development' 하나다 — vite build 는 'production', vitest 는 'test' 라 여기 응답에는 CSP 가 붙는다(위 시험)
+    const src = readFileSync(join(root, 'src/api/site.ts'), 'utf-8');
+    expect(src).toContain("const DEV_SERVER = import.meta.env.MODE === 'development';");
+    expect(src).toContain('pageHeaders(DEV_SERVER)');
+    expect(import.meta.env.MODE).not.toBe('development');
   });
 
   it('검사기 자체 — headersRule 은 그 규칙 아래 줄만 · 주석은 건너뛴다', () => {

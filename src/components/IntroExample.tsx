@@ -1,6 +1,6 @@
 // 소개 상자의 예시 한 줄 (D107) — 입력 넷 → 이름 셋. 읽기 전용이다: 누를 수 없고 상태 · hash 에 아무것도 넣지 않는다.
 // 이름은 빌드 때 엔진이 만든 introExamples.json 에서만 온다(scripts/gen-intro-examples.mjs) — 이 파일은 이름을 짓지 않는다.
-// PASS 는 그 줄이 valid:true 일 때만 붙는다. 폰(<768)은 이름이 길어 줄이 바뀌므로 VM 한 줄만 보인다.
+// PASS 는 그 줄이 valid:true 일 때만 붙는다. 폰(<768)은 이름이 길어 줄이 바뀌므로 Cloud Run 한 줄만 보인다.
 // 색 — 페이지 · 소개 상자와 다른 어두운 단말 꼴. 밝은 화면은 zinc-900, 어두운 화면은 검정 + 테두리로 zinc-950 페이지와 나뉜다(글자 대비는 AA 를 넘는다)
 import { Fragment } from 'react';
 import { CircleCheck, CircleX } from 'lucide-react';
@@ -12,7 +12,7 @@ export interface IntroExampleData { rules: string; input: string[]; rows: { id: 
 export const INTRO_EXAMPLE: IntroExampleData = data;
 
 export function IntroExample({ phone, example = INTRO_EXAMPLE }: { phone: boolean; example?: IntroExampleData }) {
-  const rows = phone ? example.rows.filter((r) => r.id === 'vm') : example.rows;
+  const rows = phone ? example.rows.filter((r) => r.id === 'run') : example.rows;
   return (
     <figure data-intro-example aria-label={en.ui.intro_example_label}
       className="overflow-x-auto rounded-md border border-zinc-900 bg-zinc-900 px-3 py-2 font-mono text-[11px] leading-relaxed sm:text-xs text-zinc-100 dark:border-zinc-700 dark:bg-black">

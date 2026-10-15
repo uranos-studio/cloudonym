@@ -25,6 +25,15 @@ export function headersRule(text: string, rule: string): [string, string][] {
 /** 화면 HTML 에 다는 보안 헤더 — 정적 index.html 과 같은 값(CSP · nosniff · DENY …) */
 export const PAGE_HEADERS: readonly [string, string][] = headersRule(HEADERS_FILE, '/*');
 
+/** Vite 개발 서버(npm run dev)에서 도는가 (D108) — `vite build` 는 MODE 를 'production' 으로, vitest 는 'test' 로 둔다. 운영 번들에서는 상수 false 다 */
+const DEV_SERVER = import.meta.env.MODE === 'development';
+
+/** 화면 HTML 에 실제로 다는 헤더 (D108) — 운영은 PAGE_HEADERS 그대로. 개발 서버만 CSP 를 뺀다:
+ *  Vite 가 index.html 에 넣는 인라인 React preamble · HMR 클라이언트를 script-src 'self' 가 막아 화면이 그려지지 않는다. 나머지 헤더는 같다 */
+export function pageHeaders(devServer: boolean): readonly [string, string][] {
+  return devServer ? PAGE_HEADERS.filter(([k]) => k.toLowerCase() !== 'content-security-policy') : PAGE_HEADERS;
+}
+
 /** 하루 캐시 — /llms.txt 와 같다 */
 const DAY_CACHE = 'public, max-age=86400';
 
@@ -109,7 +118,7 @@ export async function servePage(c: Context<App>, assets: Fetcher): Promise<Respo
   headers.delete('content-length');
   headers.delete('etag');
   headers.set('Content-Type', 'text/html; charset=utf-8');
-  for (const [k, v] of PAGE_HEADERS) headers.set(k, v);
+  for (const [k, v] of pageHeaders(DEV_SERVER)) headers.set(k, v);
   return new Response(c.req.method === 'HEAD' ? null : html, { status: route === 'notFound' ? 404 : 200, headers });
 }
 

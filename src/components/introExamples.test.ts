@@ -12,6 +12,7 @@ import { introDismissed, rememberIntroDismissed } from './localPrefs';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { expandPlan } from '../core/wizard/plan';
 import * as S from './wizardState';
+import { samplePlan, SAMPLE_PROJECT } from './wizardSample';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
 
@@ -20,22 +21,27 @@ describe('소개 상자의 예시 (D107) — 엔진이 만든 값만 · PASS 는
     expect(committed).toEqual(buildIntroExample());
     expect(committed.rules).toBe(VERSION.rules);
   });
-  it('세 줄 — 프로젝트 ID · VM · 부트 디스크, 전부 valid:true', () => {
-    expect(committed.input).toEqual(['devops', 'payments', 'prod', 'asia-northeast3']);
-    expect(committed.rows.map((r) => r.id)).toEqual(['project', 'vm', 'boot']);
+  it('세 줄 — 프로젝트 ID · Cloud Run · HTTPS 전달 규칙, 전부 valid:true · 입력은 첫 방문 예시와 같다 (D108)', () => {
+    expect(committed.input).toEqual(['demo', 'payment', 'prod', 'asia-northeast3']);
+    expect(committed.input).toEqual([SAMPLE_PROJECT.owner, SAMPLE_PROJECT.system, SAMPLE_PROJECT.env, SAMPLE_PROJECT.region]);
+    expect(committed.rows.map((r) => r.id)).toEqual(['project', 'run', 'fwd']);
     for (const r of committed.rows) expect(r.valid, r.name).toBe(true);
-    // 검사기 — 값은 06-wizard 스크린샷(rules 2026-10-13.3)에 찍힌 이름과 같다
-    expect(committed.rows.map((r) => r.name)).toEqual(['devops-payments-prod', 'payments-shop-prod-ane3-gce-web-01', 'payments-shop-prod-ane3-gce-web-01-boot']);
+    // 검사기 — rules 2026-10-13.3 에서 엔진이 낸 값(전달 규칙은 리다이렉트(redir)가 아니라 HTTPS 쪽)
+    expect(committed.rows.map((r) => r.name)).toEqual(['demo-payment-prod', 'payment-shop-prod-ane3-run-01', 'payment-shop-prod-fwd-01']);
   });
-  it('넓은 화면은 세 줄 모두 PASS · 폰은 VM 한 줄만', () => {
+  it('세 줄은 첫 방문 화면(samplePlan)의 이름에 그대로 있다 — 소개와 화면이 갈라지지 않는다', () => {
+    const items = generateProject(expandPlan(samplePlan()), 'gcp').items;
+    for (const r of committed.rows) expect(items.find((i) => i.key === r.key)?.name, r.key).toBe(r.name);
+  });
+  it('넓은 화면은 세 줄 모두 PASS · 폰은 Cloud Run 한 줄만', () => {
     const wide = renderToStaticMarkup(createElement(IntroExample, { phone: false }));
-    expect(wide.replace(/<[^>]+>/g, '')).toContain('devops · payments · prod · asia-northeast3');
+    expect(wide.replace(/<[^>]+>/g, '')).toContain('demo · payment · prod · asia-northeast3');
     expect(wide.match(/data-intro-example-row=/g)).toHaveLength(3);
     expect(wide.match(/data-intro-example-pass/g)).toHaveLength(3);
     const phone = renderToStaticMarkup(createElement(IntroExample, { phone: true }));
-    expect(phone.match(/data-intro-example-row="([^"]+)"/g)).toEqual(['data-intro-example-row="vm"']);
-    expect(phone).toContain('payments-shop-prod-ane3-gce-web-01');
-    expect(phone).not.toContain('devops-payments-prod<');
+    expect(phone.match(/data-intro-example-row="([^"]+)"/g)).toEqual(['data-intro-example-row="run"']);
+    expect(phone).toContain('payment-shop-prod-ane3-run-01');
+    expect(phone).not.toContain('demo-payment-prod<');
   });
   it('valid:false 줄은 PASS 를 달지 않는다(FAIL) — 화면이 판정을 짓지 않는다', () => {
     const bad: IntroExampleData = { ...INTRO_EXAMPLE, rows: INTRO_EXAMPLE.rows.map((r, i) => (i === 1 ? { ...r, valid: false } : r)) };
@@ -91,6 +97,10 @@ describe('Project ID 경고 접기 (D107)', () => {
     expect(summary).toContain(en.ui.wizard_project_id_notice_more);
     expect(details).toContain(en.ui.wizard_project_id_notice);
     expect(m).toMatch(/aria-describedby="wizard-project-id-notice"/);
+    // 정보 아이콘 (D108) — summary 글 앞 · 읽지 않는다(aria-hidden)
+    const icon = /<svg[^>]*data-project-id-notice-icon[^>]*>/.exec(summary)?.[0];
+    expect(icon).toMatch(/aria-hidden="true"/);
+    expect(summary.indexOf('data-project-id-notice-icon')).toBeLessThan(summary.indexOf('id="wizard-project-id-notice"'));
   });
 });
 

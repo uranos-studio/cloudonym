@@ -4,6 +4,8 @@ React UI components (`.tsx`) — Tailwind CSS and lucide-react. They call the en
 - **Share hash v3** (D55 · `urlState.ts`) — the region code (a zone input is stored as its region code — D50 revised) · an `r` value of `n` or `"n:kindName"`. The cap `MAX_HASH_CHARS` is a fixed formula measured by `urlState.test`. A link for a provider that is not enabled keeps the three free fields and `env`, drops the region and the selection, and says so in one line
 - **A tree row is a catalog row** (D53 · `selection.ts` · `ResourceTree.tsx`) — a row with more than one rule picks the scope first, and kinds are filtered again by that scope's `allowed`.
 - **Intro example** (D107) — the wizard's intro shows names read from `introExamples.json`, which `scripts/gen-intro-examples.mjs` writes before every build by calling the engine through `introExampleModel.ts` (the same path as the wizard); `introExamples.test.ts` fails when the committed file differs from the engine's output or any name is not `valid: true`. The UI never names anything itself
+- **First-visit example** (D108 · `wizardSample.ts`) — with no hash the wizard starts from `samplePlan()` (four example values, the network prefill and the `serverless-web` card added with `addBundle`); the intro example is built from the same plan. `Wizard.tsx` keeps a `sample` flag: while it is set the hash, Share URL and Save plan stay off and the Project panel shows **Example** and **Clear** (back to `startPlan()`, D97). Every change clears it. `wizardSample.test.ts` asserts every name is `valid: true`
+- **Names bar** (D108) — tablet and phone only: a bar fixed at the bottom opens the Names drawer (tablet) or the Names tab (phone) and hides while they are shown
 - UI text comes only from `src/messages/en.ts` — `no-hangul.test.ts` counts literals and JSX text
 
 ## 한국어
@@ -14,4 +16,6 @@ React UI 컴포넌트(`.tsx`) — Tailwind CSS · lucide-react 를 쓴다. 엔�
 - **공유 hash v3** (D55 · `urlState.ts`) — 지역 입력 코드(존이면 존 코드) · `r` 값 `n` 또는 `"n:값이름"`. 상한 `MAX_HASH_CHARS` 는 고정식이고 `urlState.test` 가 잰다. 꺼진 CSP 의 링크는 자유 입력 셋과 `env` 만 살리고 지역 · 선택을 버린 뒤 한 줄로 알린다
 - **트리 행 = catalog 행** (D53 · `selection.ts` · `ResourceTree.tsx`) — 규칙이 둘 이상인 행은 범위를 먼저 고르고, 종류는 범위의 `allowed` 로 다시 거른다. 존이 없으면 존 행은 새로 체크할 수 없다(이미 고른 행은 남기고 FAIL 카드로 이유를 보인다)
 - **소개 예시** (D107) — 마법사 소개 상자의 이름은 `introExamples.json` 에서 읽는다. 그 파일은 빌드마다 `scripts/gen-intro-examples.mjs` 가 `introExampleModel.ts`(마법사와 같은 길)로 엔진을 불러 쓴다. 커밋된 파일이 엔진 결과와 다르거나 하나라도 `valid: true` 가 아니면 `introExamples.test.ts` 가 실패한다. 화면은 스스로 이름을 짓지 않는다
+- **첫 방문 예시** (D108 · `wizardSample.ts`) — hash 가 없으면 `samplePlan()`(예시 값 넷 · 네트워크 미리 채움 · `addBundle` 로 더한 `serverless-web` 카드)으로 시작하고, 소개 예시도 같은 계획에서 뽑는다. `Wizard.tsx` 의 `sample` 상태가 켜진 동안은 hash · Share URL · Save plan 이 없고 Project 칸에 **Example** 과 **Clear**(D97 의 `startPlan()` 으로)가 보인다. 무엇이든 바꾸면 꺼진다. `wizardSample.test.ts` 가 이름 전부 `valid: true` 를 본다
+- **이름 막대** (D108) — 태블릿 · 폰만. 아래 고정 막대가 이름 드로어(태블릿) · Names 탭(폰)을 열고, 그것이 보이는 동안은 숨는다
 - 화면 문구는 `src/messages/en.ts` 에서만 온다 — `no-hangul.test.ts` 가 리터럴 · JSX 글자를 센다

@@ -6,10 +6,19 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **First visit opens on an example plan** (D108) — with no link the wizard starts with `demo · payment · prod · asia-northeast3` and the `serverless-web` card on the `shop` service: 16 names, all PASS, with Copy all, JSON and Terraform ready. The Project panel marks the values as an **Example** and offers **Clear**, which returns to the empty start of 0.1.2 (D97). The example is not written to the address bar, and Share URL and Save plan appear only after the first change. Links open as before.
+- **The intro example uses the same plan** (D108) — `demo · payment · prod · asia-northeast3` → the Project ID, the Cloud Run service and the HTTPS forwarding rule (below 768 px, the Cloud Run service).
+- **Names bar** (D108) — on tablets (768–1279 px) the thin handle on the right edge is replaced by a bar at the bottom of the screen, *View N generated names (Terraform / JSON)*, that opens the names drawer; on phones the same bar switches to the Names tab.
+- **Project ID note** — an info icon before the one-line summary.
+
 - **First screen says what goes in and what comes out** (D107) — the intro box starts with a read-only example: `devops · payments · prod · asia-northeast3` → the Project ID, a VM instance and its boot disk, each marked PASS (below 768 px, the VM instance only). The names are produced by the engine at build time and checked by a test, not written by hand. The intro text is one sentence; "nothing is created" and "names are not checked for availability" moved next to the PASS paragraph under the names.
 - **Tagline and page description** — the header tagline now reads "Enter owner, system, environment and region → Google Cloud resource names that pass the official rules"; the home page description follows it.
 - **Project ID warning** — one line ("Project IDs are global and can never be reused.") with a **Why?** disclosure holding the full explanation.
 - **PASS paragraph** — shown under the names only once at least one name is generated; the empty names column shows only its one-line prompt.
+
+### Fixed
+
+- **`npm run dev` shows the page again** (D108) — the dev server no longer sends the page CSP, which blocked Vite's inline script so only the header was drawn. Production pages keep the same CSP.
 
 ### Added
 

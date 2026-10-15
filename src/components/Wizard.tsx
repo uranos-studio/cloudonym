@@ -13,9 +13,10 @@ import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } fro
 import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
-import { addedRow, expandedAfterRemove, firstSelection, parseRow, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
+import { addedRow, expandedAfterRemove, firstSelection, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
+import { samplePlan } from './wizardSample';
 import { WizardList } from './WizardList';
 import { lastAddedPath, selectionAfterCustomRemove } from './wizardCustom';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
@@ -23,7 +24,7 @@ import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
 import { IntroExample } from './IntroExample';
-import { Check, FileDown, PanelRightOpen, X } from 'lucide-react';
+import { Check, FileDown, ListChecks, X } from 'lucide-react';
 import { introDismissed, rememberIntroDismissed } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
@@ -34,8 +35,8 @@ import { VERSION } from '../version';
 import { readPlanFile, savePlan } from './planFile';
 import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 
-// ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 빈 프로젝트 · 네트워크를 미리 채운 첫 화면(D90 · D97), 깨진 링크면 빈 예시 ──
-/** firstRun — hash 없이 처음 온 사람(D97). Project 부터 채운다 · 폰은 Edit 탭으로 연다 */
+// ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 예시 계획(D108 — 예시 값 넷 · 네트워크 미리 채움(D90) · serverless-web 카드), 깨진 링크면 빈 예시 ──
+/** firstRun — hash 없이 처음 온 사람(D97 · D108). Project(「Example」 표시 · Clear)를 먼저 고른다 · 폰은 Edit 탭으로 연다 */
 interface Start { plan: WizardPlan; envs: Env[]; notices?: WizardNotices; broken: boolean; link?: LinkState; firstRun?: boolean }
 function startFrom(hash: string, brokenAtRoot: boolean): Start {
   if (hashKind(hash) === 'wizard') {
@@ -48,7 +49,7 @@ function startFrom(hash: string, brokenAtRoot: boolean): Start {
   }
   // 미리 채움은 hash 가 없을 때만 — 링크에서 떨어진 경로(깨진 링크)는 링크가 누구에게나 같도록 빈 예시로 연다
   const firstRun = !brokenAtRoot && hash === '';
-  return { plan: firstRun ? S.startPlan() : S.initialPlan(), envs: [], broken: brokenAtRoot, firstRun };
+  return { plan: firstRun ? samplePlan() : S.initialPlan(), envs: [], broken: brokenAtRoot, firstRun };
 }
 
 /** 링크 · 계획 파일(D100)을 열며 고친 것의 안내 — 둘은 같은 복구를 지나 같은 문장을 쓰고, 계획을 통째로 버린 경우만 문장이 다르다 */
@@ -73,7 +74,8 @@ const FOCUSABLE = 'input:not([disabled]), select:not([disabled]), textarea:not([
 export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [start] = useState(() => startFrom(window.location.hash, brokenLink));
   // 모델과 고른 줄은 한 상태다 — 바꾸는 함수 하나가 둘을 함께 정한다(선택 규칙은 wizardSelection.selectionAfter)
-  const [state, setState] = useState<{ plan: WizardPlan; selected: RowPath }>(() => ({ plan: start.plan, selected: firstSelection(start.plan) }));
+  // 첫 방문은 Project 를 고른다 (D108) — 예시 값이 맞아 첫 오류 규칙은 첫 서비스를 고르겠지만, 「Example」 표시와 Clear 가 Project 칸에 있다
+  const [state, setState] = useState<{ plan: WizardPlan; selected: RowPath }>(() => ({ plan: start.plan, selected: start.firstRun ? PROJECT_ROW : firstSelection(start.plan) }));
   const { plan } = state;
   const selected = resolveSelection(plan, state.selected);
   /** 고른 환경(D82) — 모델의 env 와 합친 목록이 화면의 환경이다. 첫째(표준값 순서)가 모델의 env 다 */
@@ -83,6 +85,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const [custom, setCustom] = useState<number | null | undefined>(undefined);
   /** Custom 창에서 더한 규칙 id — 창을 닫을 때 고를 줄을 정한다 */
   const customAdded = useRef<string[]>([]);
+  /** 손대지 않은 예시 (D108) — 처음 온 사람의 예시 계획을 아직 아무도 바꾸지 않았다. 그동안 hash 를 쓰지 않고 Share · Save plan 이 없다(D97 의 첫 화면과 같다).
+   *  계획을 바꾸는 모든 길(edit · 환경 칩 · Open plan · 링크 이동 · Clear)이 내린다. 줄 고르기 · 펼치기는 바꾸는 것이 아니다 */
+  const [sample, setSample] = useState(start.firstRun === true);
   /** 사용자가 펴고 접은 서비스 줄 — 화면 상태. 손대지 않은 서비스는 고른 줄이 그 안일 때만 펴진다 */
   const [toggled, setToggled] = useState<ReadonlyMap<number, boolean>>(() => new Map());
   /** 칩 · 단발 추가로 막 더한 줄 — 더할 때마다 새 객체라 같은 줄을 다시 더해도 타이머가 다시 돈다 */
@@ -92,6 +97,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   /** 사용자가 바꾸면 링크 상태 · 링크 안내를 버린다. op 는 고른 줄을 어떻게 옮길지(없으면 그대로) */
   const edit: Edit = (fn, op: EditOp = { type: 'keep' }) => {
     refocus.current = true;
+    setSample(false);
     setLink(undefined);
     setNotices([]);
     // 서비스를 지우면 펼침 상태의 자리 번호도 당긴다 — 지운 서비스의 펼침이 다음 서비스에 붙지 않게
@@ -145,6 +151,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const onToggleEnv = (env: Env) => {
     touch('env');
     const next = toggleEnv(envs.length > 0 ? envs : [env], env);
+    setSample(false);
     setLink(undefined);
     setNotices([]);
     setExtraEnvs(next);
@@ -169,8 +176,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   const projectCount = projectErrors.length + suffixErrors.length;
   const gate = projectGate(projectParsed.ok, projectCount);
 
-  // hash — 모델이 온전할 때만 쓴다(마지막 온전한 hash 가 남는다). 링크로 연 그대로인 동안은 쓰지 않는다 (D27 ⑵)
-  const stateKey = ready ? encodeWizardState(plan, VERSION.rules, envs) ?? '' : '';
+  // hash — 모델이 온전할 때만 쓴다(마지막 온전한 hash 가 남는다). 링크로 연 그대로인 동안은 쓰지 않는다 (D27 ⑵).
+  // 손대지 않은 예시도 쓰지 않는다 (D108) — 첫 화면은 hash · Share · Save plan · 공유 경고가 없고(D97 과 같다), 첫 ui_generate 는 첫 수정 뒤다
+  const stateKey = ready && !sample ? encodeWizardState(plan, VERSION.rules, envs) ?? '' : '';
   const linkedVersion = mismatchedLinkVersion(stateKey, link, VERSION.rules);
   useEffect(() => {
     const hash = hashToWrite(stateKey, link);
@@ -207,6 +215,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         if (!s.broken) {
           lastSent.current = s.link?.key ?? '';
           refocus.current = false;
+          setSample(false);
           // 계획이 통째로 바뀐다 — 고른 줄이 새 계획에 없으면 project (resolveSelection)
           setState((st) => ({ plan: s.plan, selected: resolveSelection(s.plan, st.selected) }));
           setToggled(new Map());
@@ -267,6 +276,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     // 파일을 연 것은 결과를 만든 것이 아니다 — 링크를 열 때(hashchange)처럼 그 상태의 키를 보낸 것으로 둔다(ui_generate 를 보내지 않는다)
     lastSent.current = opened.key;
     refocus.current = false;
+    setSample(false);
     setState((st) => ({ plan: next, selected: resolveSelection(next, st.selected) }));
     setToggled(new Map());
     setExtraEnvs(opened.envs);
@@ -356,12 +366,27 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     });
   };
 
+  /** 「Clear」 (D108) — 예시를 걷고 D97 의 빈 첫 화면으로: 빈 프로젝트 값 · 네트워크 미리 채움(D90) · 카드 없는 서비스 shop · 건드린 칸 없음.
+   *  빈 값은 hash 에 실리지 않으므로 주소창 · Share 는 그대로 비어 있다. 누른 단추가 사라지므로 포커스는 Project 제목으로 —
+   *  Owner 칸으로 옮기면 거기서 떠나는 순간 「건드린 칸」이 되어 빈 칸 오류가 뜬다(D97 의 조용한 첫 화면이 아니다) */
+  const clearSample = () => {
+    refocus.current = false;
+    setSample(false);
+    setLink(undefined);
+    setNotices([]);
+    setExtraEnvs([]);
+    setTouched(new Set());
+    setToggled(new Map());
+    setState({ plan: S.startPlan(), selected: PROJECT_ROW });
+    requestAnimationFrame(() => document.getElementById('wizard-project')?.focus());
+  };
+
   const settings = (() => {
     if (!sel || sel.kind === 'project') {
       return (
         <ProjectForm plan={plan} envs={envs} onToggleEnv={onToggleEnv} errors={projectErrors} projectIds={projectIds} projectNames={projectNames}
           suffixErrors={suffixErrors} onSuffix={(x) => edit((p) => S.setProjectIdSuffix(p, x))} onChange={(project) => edit((p) => S.setProject(p, project))}
-          onTouch={touch} {...(showsNext(projectParsed.ok, suffixErrors.length) ? { onNext: goNext } : {})} />
+          onTouch={touch} {...(showsNext(projectParsed.ok, suffixErrors.length) ? { onNext: goNext } : {})} {...(sample ? { onClearSample: clearSample } : {})} />
       );
     }
     if (sel.kind === 'network') return <NetworkSettings plan={plan} errors={planErrors} edit={edit} />;
@@ -385,6 +410,29 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   }[layout];
   const { names: nameCount, pass: passCount } = namesSummary(results);
   const allPass = results !== undefined && passCount === nameCount;
+  // 이름 막대 (D108) — 태블릿은 드로어를, 폰은 Names 탭을 연다. 이름이 없으면(프로젝트 값을 채우는 중 · 고친 것이 남음) 흐린 꼴로 남긴다 —
+  // 태블릿에서는 이 막대가 이름 칸(안내 · 오류 포함)으로 가는 유일한 길이라 숨기지 않는다
+  const hasNames = results !== undefined && nameCount > 0;
+  const barText = !hasNames ? en.ui.wizard_names_bar_none : nameCount === 1 ? en.ui.wizard_names_bar_one : fillUi(en, 'wizard_names_bar', { names: nameCount });
+  const namesBar = (onOpen: () => void, hide: boolean, extra: Record<string, string | boolean>) => (
+    <div data-names-bar-wrap className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4" hidden={hide}>
+      <button ref={handleRef} type="button" data-names-bar={hasNames ? 'names' : 'none'} {...extra} onClick={onOpen}
+        className={`pointer-events-auto inline-flex min-h-12 max-w-full min-w-0 items-center gap-2 rounded-3xl px-5 py-1.5 text-sm font-semibold shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${hasNames
+          ? 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:text-zinc-950'
+          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'}`}>
+        <ListChecks aria-hidden="true" className="size-5 shrink-0" />
+        {/* 폰(360)에서는 한 줄에 다 들어가지 않는다 — 자르지 않고 두 줄로 */}
+        <span data-names-bar-text className="min-w-0 text-left leading-snug">{barText}</span>
+        {hasNames && (
+          <span data-names-bar-summary className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${allPass
+            ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+            : 'bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300'}`}>
+            {fillUi(en, 'wizard_names_bar_pass', { names: nameCount, pass: passCount })}
+          </span>
+        )}
+      </button>
+    </div>
+  );
 
   const settingsSection = (
     <section key={selected} ref={settingsRef} data-settings data-pick-path={selected} aria-label={en.ui.wizard_settings_label} onKeyDown={onSettingsKey} className={COLUMN}
@@ -436,8 +484,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           e.target.value = '';
           if (f) void onOpenPlan(f);
         }} />
-      {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
-      <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
+      {/* 아래 고정 이름 막대(D108 — 높이 3rem + 아래 1rem)가 페이지 끝을 가리지 않게 아래를 비운다. 태블릿 칸은 높이가 고정이라 페이지를 끝까지 내리면
+          칸의 아래 끝이 막대 위에 온다(머리 몫만큼 페이지가 구른다 — 손잡이 때와 같다). 넓은 화면은 막대가 없다 */}
+      <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 px-4 pt-4 ${layout === 'phone' ? 'pb-24' : layout === 'tablet' ? 'pb-20' : 'pb-4'}`}>
         {/* 짧은 소개 (D97 · D107) — 예시 한 줄(입력 넷 → 이름 셋, 엔진이 빌드 때 만든 값)이 먼저, 그 아래 순서 한 문장. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다).
             「무엇을 안 하나」는 이름 칸 아래 PASS 문단 곁에 있다 — 이름을 본 사람에게 필요한 말이다 */}
         {introOpen && (
@@ -490,22 +539,18 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
             <div data-names-column id="wizard-panel-names" role="tabpanel" aria-labelledby="wizard-tab-names" className={COLUMN} hidden={view !== 'names'}>{names}</div>
           )}
         </div>
+        {/* 폰 — 같은 막대가 Names 탭으로 간다(D108). Names 탭에 있는 동안은 숨는다. 포커스는 Names 탭 단추로(탭 막대의 키보드 흐름이 이어진다) */}
+        {layout === 'phone' && namesBar(() => {
+          setView('names');
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: 0 });
+            document.getElementById('wizard-tab-names')?.focus();
+          });
+        }, view === 'names', { 'aria-controls': 'wizard-panel-names' })}
         {layout === 'tablet' && (
           <>
-            {/* 태블릿 — 오른쪽 가장자리의 손잡이가 이름 드로어를 연다. 손잡이의 수 · PASS 는 늘 지금 값이다 */}
-            <button ref={handleRef} type="button" data-names-handle aria-expanded={drawerOpen} aria-label={en.ui.wizard_names_open} title={en.ui.wizard_names_open}
-              className="fixed right-0 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-lg border border-r-0 border-zinc-300 bg-white px-1.5 py-3 text-xs font-semibold text-zinc-800 shadow-md hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              onClick={() => { setDrawer(true); requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-names-close]')?.focus()); }}>
-              <PanelRightOpen aria-hidden="true" className="size-4" />
-              <span className="[writing-mode:vertical-rl]">{en.ui.wizard_step_names}</span>
-              {results && (
-                <span data-names-handle-summary className={`rounded-full px-1 py-1.5 text-[11px] font-medium [writing-mode:vertical-rl] ${allPass
-                  ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300'}`}>
-                  {fillUi(en, 'wizard_names_handle', { names: nameCount, pass: passCount })}
-                </span>
-              )}
-            </button>
+            {/* 태블릿 — 아래 고정 막대가 이름 드로어를 연다(D108 — 오른쪽 세로 손잡이를 바꿨다). 막대의 수 · PASS 는 늘 지금 값이다 · 드로어가 열리면 숨는다 */}
+            {namesBar(() => { setDrawer(true); requestAnimationFrame(() => document.querySelector<HTMLElement>('[data-names-close]')?.focus()); }, drawerOpen, { 'aria-expanded': drawerOpen, 'aria-haspopup': 'dialog' })}
             <WizardOverlay kind="drawer" data="names-drawer" open={drawerOpen} onClose={closeDrawer} labelledBy="wizard-names">
               <div data-names-column className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{names}</div>
             </WizardOverlay>

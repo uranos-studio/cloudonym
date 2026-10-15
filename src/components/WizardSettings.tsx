@@ -2,7 +2,7 @@
 // 판정은 전부 엔진 값이다 — 오류는 엔진이 준 path 로 그 자리에 붙인다. 이 칸은 선택 경로로 key 한 컴포넌트 하나이고,
 // 안의 입력칸은 tier · kind 로 key 하지 않는다(글자마다 다시 만들어지면 커서가 빠진다)
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Copy, Plus, Server, Trash2, X } from 'lucide-react';
+import { ChevronRight, Copy, Info, Plus, Server, Trash2, X } from 'lucide-react';
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseProjectContext, type NameItem } from '../core/engine';
 import { inputKind } from '../core/tree';
 import { allowedKinds } from '../core/catalog';
@@ -41,7 +41,7 @@ export function ErrorList({ errors, id }: { errors: readonly CoreMessage[]; id?:
 }
 
 // ── ① 프로젝트 ──
-export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames, suffixErrors, onSuffix, onChange, onTouch, onNext }: {
+export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, projectNames, suffixErrors, onSuffix, onChange, onTouch, onNext, onClearSample }: {
   plan: WizardPlan; envs: readonly Env[]; onToggleEnv: (env: Env) => void;
   /** 보일 오류만 (D97) — 손대지 않은 빈 칸의 오류는 Wizard 가 빼고 넘긴다(wizardProjectGate.visibleProjectErrors) */
   errors: CoreMessage[]; projectIds: readonly (NameItem | undefined)[]; projectNames: readonly ({ name: string } | undefined)[];
@@ -50,6 +50,8 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
   onTouch: (field: ProjectField) => void;
   /** 「Next」 — 프로젝트 값이 맞을 때만 받는다. 누르면 첫 서비스의 카드 갤러리로 간다 (D97) */
   onNext?: () => void;
+  /** 손대지 않은 첫 방문 예시(D108) — 받으면 「Example」 표시와 Clear 단추를 단다. 누르면 D97 의 빈 첫 화면으로 */
+  onClearSample?: () => void;
 }) {
   const v = plan.project;
   const errorFor = (f: string) => {
@@ -72,7 +74,18 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
   };
   return (
     <section aria-labelledby="wizard-project" className="space-y-4">
-      <h2 id="wizard-project" className="text-base font-semibold">{en.ui.wizard_step_project} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_hint}</span></h2>
+      <h2 id="wizard-project" tabIndex={-1} className="text-base font-semibold focus:outline-none">{en.ui.wizard_step_project} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_hint}</span></h2>
+      {/* 첫 방문 예시 (D108) — 값이 사용자의 것이 아니라는 표시. 무엇이든 바꾸면(또는 Clear) 사라진다 */}
+      {onClearSample && (
+        <div data-sample-marker className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
+          <span data-sample-badge className="rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-950 dark:bg-amber-800 dark:text-amber-50">{en.ui.wizard_sample_badge}</span>
+          <span className="min-w-0 flex-1">{en.ui.wizard_sample_note}</span>
+          <button type="button" data-sample-clear aria-label={en.ui.wizard_sample_clear_label} title={en.ui.wizard_sample_clear_label} onClick={onClearSample}
+            className="inline-flex h-8 items-center gap-1 rounded-md border border-amber-400 bg-white px-3 text-sm font-medium text-amber-950 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-amber-700 dark:bg-zinc-900 dark:text-amber-100 dark:hover:bg-zinc-800">
+            <X aria-hidden="true" className="size-4" />{en.ui.wizard_sample_clear}
+          </button>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         {text('owner', 'Owner', en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
         {text('system', 'System', en.ui.field_system_hint, en.ui.field_system_placeholder)}
@@ -103,6 +116,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
       {/* Project ID 경고 (D107) — 한 줄 요약 + 「Why?」 펼치기. 요약 줄이 접미사 칸의 aria-describedby 다 */}
       <details data-project-id-notice className={`group ${HINT}`}>
         <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <Info aria-hidden="true" data-project-id-notice-icon className="mr-1 inline size-3.5 -translate-y-px align-middle text-zinc-500 dark:text-zinc-400" />
           <span id="wizard-project-id-notice" className="font-medium text-zinc-700 dark:text-zinc-300">{en.ui.wizard_project_id_notice_summary}</span>{' '}
           <span className="inline-flex items-center gap-0.5 text-indigo-700 underline dark:text-indigo-300">{en.ui.wizard_project_id_notice_more}<ChevronRight aria-hidden="true" className="size-3 transition-transform group-open:rotate-90" /></span>
         </summary>
