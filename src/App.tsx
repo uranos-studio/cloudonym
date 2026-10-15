@@ -17,7 +17,7 @@ import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } fr
 import { encodeState, hashKind, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
-import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './components/route';
+import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './components/route';
 import { AppHeader } from './components/AppHeader';
 import { Wizard } from './components/Wizard';
 import { DEFAULT_FORM, type FormContext } from './components/formContext';
@@ -157,7 +157,7 @@ function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
     <div className="min-h-screen">
       {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵). 새 트리 링크의 자리는 /pick 이다 (D68) */}
       <AppHeader
-        screen="tree" otherHref={WIZARD_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)}
+        screen="tree" otherHref={WIZARD_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} aboutHref={withStateHash(ABOUT_PATH, addressHash)}
         share={treeShare && <CopyButton text={treeShare} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
         {...(treeShare ? { shareText: treeShare } : {})}
       />
@@ -221,6 +221,7 @@ function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
           <a href={withStateHash(PRIVACY_PATH, addressHash)} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+          <a href={withStateHash(ABOUT_PATH, addressHash)} data-footer-about className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.nav_about}</a>
         </p>
       </footer>
     </div>

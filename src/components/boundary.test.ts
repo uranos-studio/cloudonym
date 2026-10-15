@@ -78,8 +78,8 @@ describe('src/components · App.tsx 경계 — 엔진 공개 API 밖의 core 모
   });
   it('main.tsx 가 경로 셋을 그린다 — App · NamingDoc · Privacy (D57) · 문서 페이지도 같은 허용 목록 안이다', () => {
     const main = specifiers(sources['../main.tsx'] ?? '');
-    for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/NotFound', './components/route']) expect(main, m).toContain(m);
-    for (const f of ['./NamingDoc.tsx', './Privacy.tsx', './DocPage.tsx', './route.ts']) expect(files, f).toContain(f);
+    for (const m of ['./App.tsx', './components/NamingDoc', './components/Privacy', './components/About', './components/NotFound', './components/route']) expect(main, m).toContain(m);
+    for (const f of ['./NamingDoc.tsx', './Privacy.tsx', './About.tsx', './aboutModel.ts', './DocPage.tsx', './route.ts']) expect(files, f).toContain(f);
   });
   it('화면은 api 를 들여오지 않는다 — 마법사도 엔진을 직접 부른다 (D17)', () => {
     expect(specifiers("import { toWirePath } from '../api/schemas';").filter((s) => ALLOWED.some((re) => re.test(s)))).toEqual([]);

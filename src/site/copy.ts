@@ -24,6 +24,7 @@ export function pageText(route: Route, c: Catalog = en): PageText {
     case 'naming': return pick(ui.page_naming_title, ui.page_naming_description);
     case 'api': return pick(ui.page_api_title, ui.page_api_description);
     case 'privacy': return pick(ui.page_privacy_title, ui.page_privacy_description);
+    case 'about': return pick(ui.page_about_title, ui.page_about_description);
     case 'notFound': return pick(ui.page_not_found_title, ui.page_not_found_description);
   }
 }

@@ -32,7 +32,7 @@ describe('robots.txt · sitemap.xml (D106) — 요청 origin 으로 절대 URL',
     // 상수 본문 — 요청 제한 · 카운터를 걸지 않는다
     expect(promises).toEqual([]);
   });
-  it('sitemap — 경로 표 다섯이 순서대로 · lastmod 없음 · application/xml', async () => {
+  it('sitemap — 경로 표 여섯이 순서대로 · lastmod 없음 · application/xml', async () => {
     const { res, promises } = await req(app, 'https://x.example/sitemap.xml', undefined, { API_LIMITER: fakeLimiter('deny').limiter });
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toMatch(/^application\/xml/);

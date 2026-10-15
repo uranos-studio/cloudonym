@@ -1,11 +1,10 @@
-// 첫 화면 이해 (D107) — 소개 상자의 예시 · More 메뉴의 About · Project ID 경고 접기 · 빈 이름 칸의 PASS 문단. 브라우저 없이 정적 마크업으로 본다
+// 첫 화면 이해 (D107) — 소개 상자의 예시 · 닫힘 기억(About 은 D109 에서 /about 쪽이 됐다 — about.test) · Project ID 경고 접기 · 빈 이름 칸의 PASS 문단. 브라우저 없이 정적 마크업으로 본다
 import { afterEach, describe, it, expect, vi } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import committed from './introExamples.json';
 import { buildIntroExample } from './introExampleModel';
 import { IntroExample, INTRO_EXAMPLE, type IntroExampleData } from './IntroExample';
-import { AppHeader } from './AppHeader';
 import { WizardNames } from './WizardNames';
 import { ProjectForm } from './WizardSettings';
 import { introDismissed, rememberIntroDismissed } from './localPrefs';
@@ -55,21 +54,9 @@ describe('소개 상자의 예시 (D107) — 엔진이 만든 값만 · PASS 는
   });
 });
 
-describe('More 메뉴의 About (D107)', () => {
-  const header = (onAbout?: () => void) => renderToStaticMarkup(createElement(AppHeader, {
-    screen: 'wizard', otherHref: '/pick', namingHref: '/docs/naming', apiHref: '/docs/api', ...(onAbout ? { onAbout } : {}),
-  }));
-  it('onAbout 를 넘기면 메뉴 항목이 하나 생긴다 · 안 넘기면(트리 화면) 없다', () => {
-    const m = header(() => {});
-    const item = /<button[^>]*data-nav-about[^>]*>/.exec(m)?.[0];
-    expect(item).toMatch(/role="menuitem"/);
-    expect(item).toMatch(/tabindex="-1"/);
-    expect(m).toContain(`${en.ui.nav_about}</button>`);
-    expect(header()).not.toContain('data-nav-about');
-  });
-
+describe('소개 상자의 닫힘 기억 (D93 · D109)', () => {
   afterEach(() => vi.unstubAllGlobals());
-  it('닫으면 기억하고, About 은 그 기억을 지운다 — 새로 열어도 보인다', () => {
+  it('닫으면 기억하고, /about 의 「Show the intro on the home page again」 은 그 기억을 지운다 — 새로 열어도 보인다', () => {
     const map = new Map<string, string>();
     vi.stubGlobal('localStorage', { getItem: (k: string) => map.get(k) ?? null, setItem: (k: string, v: string) => void map.set(k, v), removeItem: (k: string) => void map.delete(k) });
     expect(introDismissed()).toBe(false);

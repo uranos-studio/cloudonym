@@ -1,4 +1,4 @@
-// 화면 경로 표 (D57 · D68 · D98 · D106) — 화면(src/components)과 Worker(src/api)가 같이 쓴다. 들여오는 것이 없는 순수 모듈이다.
+// 화면 경로 표 (D57 · D68 · D98 · D106 · D109) — 화면(src/components)과 Worker(src/api)가 같이 쓴다. 들여오는 것이 없는 순수 모듈이다.
 // Worker 는 이 표로 경로마다 head · 상태 코드(모르는 경로는 404)를 고르고 /sitemap.xml 을 만든다. 화면은 같은 routeOf 로 그릴 쪽을 고른다
 
 export const WIZARD_PATH = '/';
@@ -8,9 +8,11 @@ export const NAMING_PATH = '/docs/naming';
 /** 사람이 읽는 API 안내 (D98) */
 export const API_PATH = '/docs/api';
 export const PRIVACY_PATH = '/privacy';
+/** 무엇인가 · 소스 · 라이선스 · 버전 (D109) */
+export const ABOUT_PATH = '/about';
 
 /** 'notFound' 는 표에 없는 경로 — 서버는 404 로, 화면은 「찾을 수 없음」으로 답한다 (D106) */
-export type Route = 'app' | 'pick' | 'naming' | 'api' | 'privacy' | 'notFound';
+export type Route = 'app' | 'pick' | 'naming' | 'api' | 'privacy' | 'about' | 'notFound';
 export type PageRoute = Exclude<Route, 'notFound'>;
 
 /** 검색 엔진에 내보이는 경로 — /sitemap.xml 의 순서이기도 하다. 경로마다 쪽 하나(canonical) */
@@ -20,6 +22,7 @@ export const PAGES: readonly { route: PageRoute; path: string }[] = [
   { route: 'naming', path: NAMING_PATH },
   { route: 'api', path: API_PATH },
   { route: 'privacy', path: PRIVACY_PATH },
+  { route: 'about', path: ABOUT_PATH },
 ];
 
 /** 끝의 `/` 는 떼고 대어 본다(`/pick/` 은 `/pick`) — 표에 없는 경로는 notFound */

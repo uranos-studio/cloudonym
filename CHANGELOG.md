@@ -8,7 +8,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 - **First visit opens on an example plan** (D108) — with no link the wizard starts with `demo · payment · prod · asia-northeast3` and the `serverless-web` card on the `shop` service: 16 names, all PASS, with Copy all, JSON and Terraform ready. The Project panel marks the values as an **Example** and offers **Clear**, which returns to the empty start of 0.1.2 (D97). The example is not written to the address bar, and Share URL and Save plan appear only after the first change. Links open as before.
 - **The intro example uses the same plan** (D108) — `demo · payment · prod · asia-northeast3` → the Project ID, the Cloud Run service and the HTTPS forwarding rule (below 768 px, the Cloud Run service).
-- **Names bar** (D108) — on tablets (768–1279 px) the thin handle on the right edge is replaced by a bar at the bottom of the screen, *View N generated names (Terraform / JSON)*, that opens the names drawer; on phones the same bar switches to the Names tab.
+- **Names bar** (D108) — on tablets (768–1279 px) the thin handle on the right edge is replaced by a bar at the bottom of the screen, *View N generated names (Terraform / JSON)*, that opens the names drawer; on phones the same bar switches to the Names tab and reads *View N names*, so it fits on one line at 360 px (D109).
 - **Project ID note** — an info icon before the one-line summary.
 
 - **First screen says what goes in and what comes out** (D107) — the intro box starts with a read-only example: `devops · payments · prod · asia-northeast3` → the Project ID, a VM instance and its boot disk, each marked PASS (below 768 px, the VM instance only). The names are produced by the engine at build time and checked by a test, not written by hand. The intro text is one sentence; "nothing is created" and "names are not checked for availability" moved next to the PASS paragraph under the names.
@@ -22,7 +22,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Added
 
-- **About** in the **More** menu (wizard, phone included) shows the intro again after it was dismissed (D107).
+- **About page at `/about`** (D109) — what Cloudonym is, the intro's example, what PASS checks and what it does not, a link to the source repository, the Apache License 2.0 and NOTICE terms, the trademark note, the project status and the engine and rules versions. **About** in the **More** menu (wizard and `/pick`, phone included) opens it, and every page's footer links to it next to Privacy. The page can show the dismissed intro on the home page again. It is in `/sitemap.xml` with its own title and canonical URL.
 
 Screen only: rules revision and every API response are unchanged.
 

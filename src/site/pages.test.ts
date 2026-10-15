@@ -4,8 +4,8 @@ import { pageText, SITE_NAME } from './copy';
 import { en } from '../messages/en';
 
 describe('경로 표 (D106) — 화면 · Worker · sitemap 이 같은 표를 쓴다', () => {
-  it('다섯 경로 · 순서 · 경로마다 routeOf 가 제자리로 돌아온다', () => {
-    expect(PAGES.map((p) => p.path)).toEqual(['/', '/pick', '/docs/naming', '/docs/api', '/privacy']);
+  it('여섯 경로 · 순서 · 경로마다 routeOf 가 제자리로 돌아온다', () => {
+    expect(PAGES.map((p) => p.path)).toEqual(['/', '/pick', '/docs/naming', '/docs/api', '/privacy', '/about']);
     for (const p of PAGES) {
       expect(routeOf(p.path)).toBe(p.route);
       expect(pathOf(p.route)).toBe(p.path);

@@ -1,10 +1,10 @@
-// 문서 경로(/docs/naming · /privacy)의 틀 — 제목 · 화면으로 돌아가는 링크 · 본문 · 버전 푸터. 본문은 각 페이지가 채운다
+// 문서 경로(/docs/naming · /docs/api · /privacy · /about)의 틀 — 제목 · 화면으로 돌아가는 링크 · 본문 · 버전 푸터. 본문은 각 페이지가 채운다
 import type { ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VERSION } from '../version';
-import { PRIVACY_PATH, withStateHash } from './route';
+import { ABOUT_PATH, PRIVACY_PATH, withStateHash } from './route';
 import { ThemeToggle } from './ThemeToggle';
 
 export function DocPage({ title, children }: { title: string; children?: ReactNode }) {
@@ -27,6 +27,8 @@ export function DocPage({ title, children }: { title: string; children?: ReactNo
           <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
           {/* 앱 푸터와 같은 꼴 — 상태 hash 를 실어 간다 */}
           <a href={withStateHash(PRIVACY_PATH, window.location.hash)} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+          {/* 문서 쪽에는 More 메뉴가 없다 — About 은 푸터에서 간다 (D109) */}
+          <a href={withStateHash(ABOUT_PATH, window.location.hash)} data-footer-about className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.nav_about}</a>
         </p>
       </footer>
     </div>

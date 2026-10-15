@@ -10,7 +10,7 @@ import { AppHeader, PLAN_FILE_BUTTON, PLAN_FILE_TEXT } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
-import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
+import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
 import { addedRow, expandedAfterRemove, firstSelection, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
@@ -238,15 +238,6 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     setIntroOpen(false);
     rememberIntroDismissed(true);
   };
-  // More 메뉴의 About (D107) — 닫은 소개를 다시 연다. 닫은 기억도 지운다(다시 닫을 때까지 보인다 — 닫기와 짝). 포커스는 소개의 닫기 단추로
-  const reopenIntro = () => {
-    setIntroOpen(true);
-    rememberIntroDismissed(false);
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0 });
-      document.querySelector<HTMLElement>('[data-intro-close]')?.focus();
-    });
-  };
   // 공유 경고 — Share 를 누르면 그 곁(머리 바로 아래)에 보인다. 링크는 암호화가 아니다
   const [shared, setShared] = useState(false);
 
@@ -413,15 +404,20 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   // 이름 막대 (D108) — 태블릿은 드로어를, 폰은 Names 탭을 연다. 이름이 없으면(프로젝트 값을 채우는 중 · 고친 것이 남음) 흐린 꼴로 남긴다 —
   // 태블릿에서는 이 막대가 이름 칸(안내 · 오류 포함)으로 가는 유일한 길이라 숨기지 않는다
   const hasNames = results !== undefined && nameCount > 0;
-  const barText = !hasNames ? en.ui.wizard_names_bar_none : nameCount === 1 ? en.ui.wizard_names_bar_one : fillUi(en, 'wizard_names_bar', { names: nameCount });
+  // 폰(<768)은 짧은 글(View 16 names)이라 360 에서도 PASS 칩과 한 줄이다. 태블릿은 긴 글 (D109). 읽어 주는 이름(aria-label)은 둘 다 긴 글 + PASS 수다
+  const barLong = nameCount === 1 ? en.ui.wizard_names_bar_one : fillUi(en, 'wizard_names_bar', { names: nameCount });
+  const barShort = nameCount === 1 ? en.ui.wizard_names_bar_short_one : fillUi(en, 'wizard_names_bar_short', { names: nameCount });
+  const barText = !hasNames ? en.ui.wizard_names_bar_none : layout === 'phone' ? barShort : barLong;
+  // 읽어 주는 이름은 보이는 글로 시작한다(WCAG 2.5.3 Label in Name) — 폰은 짧은 글 뒤에 긴 설명을 붙인다
+  const barLabel = hasNames ? `${layout === 'phone' ? `${barShort} — ${barLong}` : barLong} · ${fillUi(en, 'wizard_names_bar_pass', { names: nameCount, pass: passCount })}` : en.ui.wizard_names_bar_none;
   const namesBar = (onOpen: () => void, hide: boolean, extra: Record<string, string | boolean>) => (
     <div data-names-bar-wrap className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4" hidden={hide}>
-      <button ref={handleRef} type="button" data-names-bar={hasNames ? 'names' : 'none'} {...extra} onClick={onOpen}
+      <button ref={handleRef} type="button" data-names-bar={hasNames ? 'names' : 'none'} aria-label={barLabel} {...extra} onClick={onOpen}
         className={`pointer-events-auto inline-flex min-h-12 max-w-full min-w-0 items-center gap-2 rounded-3xl px-5 py-1.5 text-sm font-semibold shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${hasNames
           ? 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:text-zinc-950'
           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'}`}>
         <ListChecks aria-hidden="true" className="size-5 shrink-0" />
-        {/* 폰(360)에서는 한 줄에 다 들어가지 않는다 — 자르지 않고 두 줄로 */}
+        {/* 줄이 모자라면 자르지 않고 두 줄로 — 폰의 짧은 글은 360 에서 한 줄이다 (D109) */}
         <span data-names-bar-text className="min-w-0 text-left leading-snug">{barText}</span>
         {hasNames && (
           <span data-names-bar-summary className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${allPass
@@ -451,7 +447,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
         // 폰은 Share URL 이 More 메뉴 안이다 (D105) — 누르면 같은 공유 경고를 띄운다
         {...(shareText ? { shareText, onShare: () => setShared(true) } : {})}
-        onAbout={reopenIntro}
+        aboutHref={withStateHash(ABOUT_PATH, addressHash)}
         planFile={{
           ...(stateKey ? {
             onSave: onSavePlan,
@@ -577,6 +573,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span data-version>{fillUi(en, 'version_footer', VERSION)}</span>
           <a href={withStateHash(PRIVACY_PATH, addressHash)} data-footer-privacy className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.footer_privacy}</a>
+          <a href={withStateHash(ABOUT_PATH, addressHash)} data-footer-about className="underline hover:text-zinc-900 dark:hover:text-zinc-100">{en.ui.nav_about}</a>
         </p>
       </footer>
     </div>

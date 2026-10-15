@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } from './route';
+import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } from './route';
 
 describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를 고르고, 표에 없는 경로는 notFound (D57 · D106)', () => {
   it.each([
@@ -7,6 +7,7 @@ describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를
     [PICK_PATH, 'pick'], ['/pick/', 'pick'], ['/pick/x', 'notFound'], ['/picks', 'notFound'], ['/PICK', 'notFound'],
     [NAMING_PATH, 'naming'], ['/docs/naming/', 'naming'], [PRIVACY_PATH, 'privacy'], ['/privacy/', 'privacy'],
     [API_PATH, 'api'], ['/docs/api/', 'api'], ['/docs/api/x', 'notFound'], ['/docs/apis', 'notFound'], ['/robots.txt', 'notFound'],
+    [ABOUT_PATH, 'about'], ['/about/', 'about'], ['/about/x', 'notFound'], ['/abouts', 'notFound'], ['/About', 'notFound'],
   ])('%s → %s', (path, route) => {
     expect(routeOf(path)).toBe(route);
   });
@@ -21,6 +22,7 @@ describe('withStateHash — 앱 ↔ 문서 링크가 상태 hash 를 실어 간�
     expect(withStateHash(PRIVACY_PATH, '')).toBe('/privacy');
     expect(withStateHash(PICK_PATH, '#state=abc')).toBe('/pick#state=abc');
     expect(withStateHash(API_PATH, '#state=abc')).toBe('/docs/api#state=abc');
+    expect(withStateHash(ABOUT_PATH, '#state=abc')).toBe('/about#state=abc');
     expect(withStateHash('/', '#other')).toBe('/');
     expect(withStateHash('/', '#state=')).toBe('/');
     expect(withStateHash('/', '#state=a"><script>')).toBe('/');

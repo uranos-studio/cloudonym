@@ -1,6 +1,6 @@
 """화면 시험 — Playwright(Python) 로 네 단계 트리 화면(D42)의 시나리오 ⑴~⒆ · ⒇~㉙ 와 마법사(D59 · D67 · D68 · D73 · D74 · D75 · D82 · D83 · D84~D90 · D93)의 ㉚~㊼ ·
-화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104 · 폰은 D105)의 (53), 첫 방문 예시 · 이름 막대(D108)의 (54) 를 재고 스크린샷을 남긴다.
-머리 밖에는 Share URL · Save plan · More · 화면 모드만 있다 — Open plan · 화면 전환 · Naming guide · API · llms.txt 는 More 메뉴 안이라 누르기 전에 open_more 로 연다(D104).
+화면 모드(D94)의 ㊽, 첫 방문(D97)의 ㊾ ㊿, API 안내 화면(D98)의 (51), 계획 파일(D100)의 (52), 머리 More 메뉴(D104 · 폰은 D105)의 (53), 첫 방문 예시 · 이름 막대(D108)의 (54), /about 쪽 · 폰 막대의 짧은 글(D109)의 (55) 를 재고 스크린샷을 남긴다.
+머리 밖에는 Share URL · Save plan · More · 화면 모드만 있다 — Open plan · 화면 전환 · Naming guide · API · llms.txt · About 은 More 메뉴 안이라 누르기 전에 open_more 로 연다(D104).
 링크 없는 첫 화면은 예시 계획이다(D108) — goto_ready 가 「Clear」 를 눌러 D97 의 빈 첫 화면으로 시작하고(예시를 보는 시나리오만 sample=True),
 예시 값으로 채운 첫 화면을 전제한 시나리오는 start_example 로 값 넷을 채우고 「Next」 를 눌러 시작한다.
 켜진 CSP 는 GCP 하나다(D45) — AWS · Azure 버튼은 「Coming soon」 으로 꺼져 있고 GCP 가 자동으로 골라진다. 시나리오는 GCP 위에서 돈다.
@@ -1098,7 +1098,61 @@ def wizard_scenarios(browser, rules_version, errors):
     api_doc(browser, errors)
     plan_file(browser, rules_version, errors)
     header_menu(browser, errors)
-    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) · 첫 방문 예시 (54) 통과')
+    about_page(browser, errors)
+    print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) · 첫 방문 예시 (54) · About (55) 통과')
+
+
+def about_page(browser, errors):
+    """(55) /about (D109) — 200 · 제목 · 절 머리 일곱 · 예시 세 줄 · 저장소 링크(평범한 a · github.com 요청 없음) · 1280 · 360 스크린샷 · 가로 스크롤 없음 ·
+    /pick 의 More → About 이 상태 hash 를 싣고 간다 · 문서 쪽(More 메뉴 없음)은 푸터의 About · 모르는 하위 경로는 404"""
+    for width, height, shot_name in ((1280, 900, 'about-1280.png'), (360, 800, 'about-360.png')):
+        ctx = browser.new_context(viewport={'width': width, 'height': height})
+        pg = ctx.new_page()
+        pg.on('pageerror', lambda e: errors.append(str(e)))
+        outside = []
+        pg.on('request', lambda r: outside.append(r.url) if 'github.com' in r.url else None)
+        resp = pg.goto(BASE + '/about', wait_until='networkidle')
+        assert resp is not None and resp.status == 200, resp and resp.status
+        assert pg.title() == 'Cloudonym — About', pg.title()
+        expect(pg.locator('h1')).to_have_text('About')
+        expect(pg.locator('[data-about] h2')).to_have_text(['What it is', 'What goes in and what comes out', 'What it checks and what it does not',
+                                                           'Source and license', 'Project status', 'Versions', 'More pages'])
+        expect(pg.locator('[data-about] [data-intro-example-row]')).to_have_count(3)
+        expect(pg.locator('[data-about] [data-intro-example-pass]')).to_have_count(3)
+        expect(pg.locator('[data-about-repo]')).to_have_attribute('href', 'https://github.com/uranos-studio/cloudonym')
+        expect(pg.locator('[data-about-repo]')).to_have_text('github.com/uranos-studio/cloudonym')
+        expect(pg.locator('[data-about-license]')).to_have_text('Cloudonym is licensed under the Apache License 2.0.')
+        expect(pg.locator('[data-about-notice]')).to_contain_text('NOTICE file (Apache License 2.0, section 4)')
+        expect(pg.locator('[data-about-status]')).to_contain_text('independent open-source project created and maintained by Sungjae Yun')
+        expect(pg.locator('[data-about] [data-pass-meaning]')).to_contain_text('PASS / `valid: true` means')
+        expect(pg.locator('[data-about] [data-nothing-created]')).to_contain_text('nothing is created in Google Cloud')
+        expect(pg.locator('[data-about-version]')).to_contain_text(f'rules revision {RULES_OF(pg)}')
+        expect(pg.locator('[data-about-links] a')).to_have_text(['Privacy', 'Naming guide', 'API', 'llms.txt'])
+        expect(pg.locator('[data-footer-about]')).to_have_attribute('href', '/about')
+        assert outside == [], outside  # 쪽을 여는 동안 github.com 에 요청이 없다
+        no_hangul(pg)
+        no_hscroll(pg, width, '/about')
+        pg.mouse.move(0, 0)
+        pg.screenshot(path=str(OUT / shot_name), full_page=True, animations='disabled', caret='hide')
+        ctx.close()
+    ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
+    pg = ctx.new_page()
+    pg.on('pageerror', lambda e: errors.append(str(e)))
+    link = state_hash(INPUT)
+    goto_ready(pg, BASE + TREE + link)
+    expect(pg.locator('header [data-nav-about]')).to_have_attribute('href', '/about' + link)
+    open_more(pg)
+    pg.locator('header [data-nav-about]').click()
+    pg.wait_for_url(BASE + '/about' + link)
+    expect(pg.locator('h1')).to_have_text('About')
+    expect(pg.locator('[data-back-to-app]')).to_have_attribute('href', '/' + link)
+    goto_ready(pg, BASE + '/privacy')
+    expect(pg.locator('header [data-nav-more]')).to_have_count(0)
+    pg.locator('[data-footer-about]').click()
+    pg.wait_for_url(BASE + '/about')
+    resp = pg.goto(BASE + '/about/x', wait_until='networkidle')
+    assert resp is not None and resp.status == 404, resp and resp.status
+    ctx.close()
 
 
 def wizard_selection_focus(browser, errors):
@@ -1324,12 +1378,15 @@ def wizard_cards(browser, errors):
     assert p46.evaluate(f"localStorage.getItem('{INTRO_KEY}')") == '1'
     goto_ready(p46, BASE + '/?again')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(0)
-    # More → About (D107) — 닫은 소개가 다시 보이고 닫힘 기억이 지워진다(새로 열어도 보인다) · 포커스는 소개의 닫기 단추
+    # More → About (D109) — /about 쪽으로 간다 · 「Show the intro on the home page again」 이 닫힘 기억을 지우고 첫 화면으로 데려간다(소개가 보인다)
     open_more(p46)
     p46.locator('header [data-nav-about]').click()
+    p46.wait_for_url(BASE + '/about')
+    expect(p46.locator('h1')).to_have_text('About')
+    p46.locator('[data-about-intro-again]').click()
+    p46.wait_for_url(BASE + '/')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(1)
     expect(p46.locator('[data-intro-example]')).to_be_visible()
-    expect(p46.locator('[data-intro-close]')).to_be_focused()
     assert p46.evaluate(f"localStorage.getItem('{INTRO_KEY}')") is None
     goto_ready(p46, BASE + '/?after-about')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(1)
@@ -1492,6 +1549,7 @@ def wizard_narrow(browser, errors):
     n, ok = names_counts(pg)
     expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n} generated names (Terraform / JSON)')
     expect(pg.locator('[data-names-bar-summary]')).to_have_text(f'{ok}/{n} PASS')
+    expect(handle).to_have_attribute('aria-label', f'View {n} generated names (Terraform / JSON) · {ok}/{n} PASS')  # 읽는 이름은 긴 글 + PASS 수 (D109)
     # 막대는 칸을 가리지 않는다 — 페이지를 끝까지 내리면 두 칸이 막대 위에서 끝난다 · 오른쪽 손잡이 몫의 여백(pr-14)이 없어 설정 칸이 오른쪽 여백 16px 에서 끝난다
     assert abs(st['x'] + st['width'] - (768 - 16)) <= 1, st
     pg.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)')
@@ -1589,7 +1647,8 @@ def wizard_narrow(browser, errors):
     bar = pg.locator('[data-names-bar]')
     expect(bar).to_be_visible()
     expect(bar).to_have_attribute('aria-controls', 'wizard-panel-names')
-    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n} generated names (Terraform / JSON)')
+    expect(pg.locator('[data-names-bar-text]')).to_have_text(f'View {n} names')  # 폰은 짧은 글 (D109)
+    expect(bar).to_have_attribute('aria-label', f'View {n} names — View {n} generated names (Terraform / JSON) · {ok}/{n} PASS')  # 폰 — 보이는 글로 시작한다(WCAG 2.5.3)
     pg.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)')
     last = pg.locator('[data-settings]').bounding_box()
     hb = bar.bounding_box()
@@ -1765,7 +1824,14 @@ def wizard_sample(browser, errors):
     goto_ready(p360, BASE + '/', sample=True)
     expect(p360.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
     expect(settings(p360).locator('[data-sample-marker]')).to_be_visible()
-    expect(p360.locator('[data-names-bar-text]')).to_have_text(f'View {SAMPLE_NAMES} generated names (Terraform / JSON)')
+    # 폰은 짧은 글 + PASS 칩이 한 줄 (D109) — 글 줄 상자가 하나 · 막대 높이가 최소 높이(48px) 그대로 · 칩과 글의 세로 자리가 겹친다
+    expect(p360.locator('[data-names-bar-text]')).to_have_text(f'View {SAMPLE_NAMES} names')
+    expect(p360.locator('[data-names-bar]')).to_have_attribute('aria-label', f'View {SAMPLE_NAMES} names — View {SAMPLE_NAMES} generated names (Terraform / JSON) · {SAMPLE_NAMES}/{SAMPLE_NAMES} PASS')  # 보이는 글로 시작한다(WCAG 2.5.3)
+    assert p360.evaluate("document.querySelector('[data-names-bar-text]').getClientRects().length") == 1
+    bar_box = p360.locator('[data-names-bar]').bounding_box()
+    assert bar_box['height'] <= 48.5, bar_box
+    tb, cb = p360.locator('[data-names-bar-text]').bounding_box(), p360.locator('[data-names-bar-summary]').bounding_box()
+    assert cb['y'] < tb['y'] + tb['height'] and tb['y'] < cb['y'] + cb['height'], (tb, cb)
     no_hscroll(p360, 360, '첫 방문 예시')
     p360.mouse.move(0, 0)
     p360.screenshot(path=str(shot_dir / 'first-visit-360.png'), animations='disabled', caret='hide')
@@ -2005,7 +2071,7 @@ def header_menu(browser, errors):
     expect(more).to_have_attribute('aria-controls', menu.get_attribute('id'))
     expect(menu).to_have_attribute('role', 'menu')
     expect(menu).to_have_attribute('aria-labelledby', more.get_attribute('id'))
-    expect(items).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # About 은 D107
+    expect(items).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # About 은 /about 링크 (D109)
     for i in range(6):
         expect(items.nth(i)).to_have_attribute('tabindex', '-1')
     # 1280 — 머리 한 줄(단추 줄이 로고 줄 안에 · 단추 줄도 한 줄)
@@ -2146,14 +2212,14 @@ def header_menu(browser, errors):
     expect(p3.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # 링크 없는 첫 화면 — 공유 · 저장할 것이 없다
     c3.close()
 
-    # /pick — 밖에는 Share URL · More · 화면 모드 · 메뉴는 Wizard · Naming guide · API · llms.txt (Open plan 은 마법사에만)
+    # /pick — 밖에는 Share URL · More · 화면 모드 · 메뉴는 Wizard · Naming guide · API · llms.txt · About (Open plan 은 마법사에만)
     c4 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p4 = c4.new_page()
     p4.on('pageerror', lambda e: errors.append(str(e)))
     goto_ready(p4, BASE + TREE + state_hash(INPUT))
     expect(p4.locator('header [data-copy="share-url"]')).to_be_visible()
     expect(p4.locator('header [data-plan-save], header [data-plan-open]')).to_have_count(0)
-    expect(p4.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Wizard', 'Naming guide', 'API', 'llms.txt'])
+    expect(p4.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Wizard', 'Naming guide', 'API', 'llms.txt', 'About'])  # About 은 /pick 에도 (D109)
     expect(p4.locator('header [data-nav-menu]')).to_be_hidden()
     pick1280, same_row, one_row = header_rows(p4)
     assert same_row and one_row, ('/pick 1280 단추 줄이 로고 줄에 없다', pick1280)
@@ -2167,7 +2233,7 @@ def header_menu(browser, errors):
     pick360, same_row, one_row = header_rows(p4)
     assert same_row and one_row and pick360 <= 70, ('/pick 360 머리가 한 줄이 아니다', pick360)
     expect(p4.locator('[data-share-warning]')).to_have_count(0)
-    expect(p4.locator('header [data-nav-menu] [role="menuitem"], header [data-nav-menu] [role="menuitemradio"]')).to_have_text(['Share URL', 'Wizard', 'Naming guide', 'API', 'llms.txt', 'Light', 'Dark', 'System — follow the device setting'])
+    expect(p4.locator('header [data-nav-menu] [role="menuitem"], header [data-nav-menu] [role="menuitemradio"]')).to_have_text(['Share URL', 'Wizard', 'Naming guide', 'API', 'llms.txt', 'About', 'Light', 'Dark', 'System — follow the device setting'])
     open_more(p4)
     p4.locator('header [data-menu-share]').click()
     expect(p4.locator('[data-share-warning]')).to_be_visible()

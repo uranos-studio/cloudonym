@@ -212,7 +212,7 @@ describe('머리글 — API 링크', () => {
   afterAll(() => { vi.unstubAllGlobals(); });
   it('넘긴 apiHref 로 data-nav-api 링크를 그린다 — 마법사 · 트리 모두', () => {
     for (const screen of ['wizard', 'tree'] as const) {
-      const h = renderToStaticMarkup(createElement(AppHeader, { screen, otherHref: '/x', namingHref: '/docs/naming', apiHref: '/docs/api#state=abc' }));
+      const h = renderToStaticMarkup(createElement(AppHeader, { screen, otherHref: '/x', namingHref: '/docs/naming', apiHref: '/docs/api#state=abc', aboutHref: '/about' }));
       expect(h, screen).toMatch(/<a href="\/docs\/api#state=abc" data-nav-api[^>]*>.*?API<\/a>/);
     }
   });
