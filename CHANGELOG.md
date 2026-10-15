@@ -6,6 +6,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **Share preview image** (D111) — pages carry `og:image` and `twitter:card` `summary_large_image`: a 1200×630 picture of the example inputs `demo · payment · prod · asia-northeast3` and three of the names they give, each PASS. The picture is drawn from the engine's intro example, and a test fails if the two drift apart.
 - **Privacy page: contact and last-updated date** — `/privacy` ends with a *Contact and changes* section: questions go to GitHub issues, security problems to GitHub private vulnerability reporting (the same channel as SECURITY.md; no email address), and the page shows the date it was last changed. A test fingerprints the page text, so a change to the text fails until the date is updated with it.
 
 ## [0.1.5] - 2026-10-15

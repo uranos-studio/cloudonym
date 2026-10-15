@@ -47,6 +47,9 @@ export function sitemapXml(origin: string): string {
   return ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', ...urls, '</urlset>', ''].join('\n');
 }
 
+/** 공유 미리보기 그림 — 크기는 og-image.test 가 PNG 머리에서 읽어 대어 본다 */
+export const OG_IMAGE = { path: '/og-image.png', width: 1200, height: 630 } as const;
+
 export function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -63,7 +66,15 @@ export function headTags(route: Route, origin: string): string {
     `<meta property="og:title" content="${escapeHtml(t.title)}">`,
     `<meta property="og:description" content="${escapeHtml(t.description)}">`,
     `<meta property="og:url" content="${escapeHtml(url)}">`,
-    '<meta name="twitter:card" content="summary">',
+    // 공유 미리보기 그림 — public/og-image.png(scripts/og-image.py 가 찍는다). 크롤러가 절대 URL 을 요구한다
+    `<meta property="og:image" content="${escapeHtml(origin + OG_IMAGE.path)}">`,
+    `<meta property="og:image:type" content="image/png">`,
+    `<meta property="og:image:width" content="${OG_IMAGE.width}">`,
+    `<meta property="og:image:height" content="${OG_IMAGE.height}">`,
+    `<meta property="og:image:alt" content="${escapeHtml(en.ui.og_image_alt)}">`,
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:image" content="${escapeHtml(origin + OG_IMAGE.path)}">`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(en.ui.og_image_alt)}">`,
   ];
   if (route === 'app') {
     const ld = {

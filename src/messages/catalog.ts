@@ -96,7 +96,7 @@ export const UI_KEYS = [
   'bucket_check', 'bucket_check_label', 'bucket_checking', 'bucket_check_note', 'bucket_available', 'bucket_taken', 'bucket_unknown',
   // index.html · 경로마다 제목 · 설명 (D106 — src/site/copy 가 짝짓는다)
   'meta_description',
-  'page_app_title', 'page_pick_title', 'page_pick_description', 'page_naming_title', 'page_naming_description', 'page_api_title', 'page_api_description', 'page_privacy_title', 'page_privacy_description', 'page_about_title', 'page_about_description', 'page_not_found_title', 'page_not_found_description', 'page_not_found_body',
+  'og_image_alt', 'page_app_title', 'page_pick_title', 'page_pick_description', 'page_naming_title', 'page_naming_description', 'page_api_title', 'page_api_description', 'page_privacy_title', 'page_privacy_description', 'page_about_title', 'page_about_description', 'page_not_found_title', 'page_not_found_description', 'page_not_found_body',
 ] as const;
 export type UiKey = (typeof UI_KEYS)[number];
 

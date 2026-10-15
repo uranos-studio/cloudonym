@@ -66,7 +66,8 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
     expect(html).toContain(`<meta property="og:title" content="${t.title}">`);
     expect(html).toContain('<meta property="og:type" content="website">');
     expect(html).toContain('<meta property="og:site_name" content="Cloudonym">');
-    expect(html).toContain('<meta name="twitter:card" content="summary">');
+    expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(html).toContain('<meta property="og:image" content="https://example.org/og-image.png">');
     expect(html).not.toContain('noindex');
     expect(html.match(/<title>/g)).toHaveLength(1);
     expect(html.match(/<meta name="description"/g)).toHaveLength(1);

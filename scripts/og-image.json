@@ -1,0 +1,13 @@
+{
+  "input": [
+    "demo",
+    "payment",
+    "prod",
+    "asia-northeast3"
+  ],
+  "names": [
+    "demo-payment-prod",
+    "payment-shop-prod-ane3-run-01",
+    "payment-shop-prod-fwd-01"
+  ]
+}

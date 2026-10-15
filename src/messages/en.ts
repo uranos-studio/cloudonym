@@ -656,6 +656,7 @@ export const en: Catalog = {
     page_api_title: 'API',
     page_api_description: 'A public JSON API for Google Cloud resource names — generate, validate and plan names with the same rules as the web tool. No key needed.',
     page_privacy_title: 'Privacy',
+    og_image_alt: 'Cloudonym: the inputs demo, payment, prod and asia-northeast3 give three Google Cloud names, each marked PASS.',
     page_privacy_description: 'Cloudonym has no accounts. What the site and the API record, how long it is kept, and why the values you type stay in your browser.',
     page_about_title: 'About',
     page_about_description: 'What Cloudonym is, what its PASS checks and does not check, where the source code is, the Apache License 2.0 terms and the current versions.',
