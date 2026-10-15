@@ -1,8 +1,8 @@
 // 머리글 — 트리 화면 · 마법사가 같이 쓴다. 밖에는 제품 이름 · Share URL(있을 때만) · Save plan(마법사) · 화면 모드만 두고,
-// Open plan(마법사) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · API 안내(D98) · llms.txt 는 「More」 메뉴 하나에 둔다 (D104 — 1280 에서 한 줄).
+// Open plan(마법사) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · API 안내(D98) · llms.txt · About(마법사 · D107) 은 「More」 메뉴 하나에 둔다 (D104 — 1280 에서 한 줄).
 // 폰(<768 · 마법사의 phone 배치와 같은 경계)에서는 밖의 단추도 전부 메뉴로 접고 소개 문구를 숨긴다 — 머리는 로고 줄 하나와 배지 줄이다 (D105)
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { BookOpen, Check, Cloud, Copy, FileDown, FileText, FileUp, ListTree, Monitor, Moon, Sun, Terminal, Wand2 } from 'lucide-react';
+import { BookOpen, Check, Cloud, Copy, FileDown, FileText, FileUp, Info, ListTree, Monitor, Moon, Sun, Terminal, Wand2 } from 'lucide-react';
 import { COPY_BUTTON } from './CopyButton';
 import { MENU_ITEM, MoreMenu } from './MoreMenu';
 import { ThemeToggle } from './ThemeToggle';
@@ -38,6 +38,8 @@ interface Props {
   badge?: ReactNode;
   /** 계획 파일 (D100 · 마법사) — save 는 머리의 단추로 Share 와 같은 조건(없으면 reserveShare 일 때 자리만 비운다).
    *  open 은 More 메뉴의 항목이다(D104) — 눌린 click 안에서 동기로 파일 고르기 창을 연다(숨은 input 은 부르는 쪽이 메뉴 밖에 둔다) */
+  /** More 메뉴의 About (D107 · 마법사) — 닫은 소개 상자를 다시 연다. 없으면 항목을 그리지 않는다(트리 화면) */
+  onAbout?: () => void;
   planFile?: { save?: ReactNode; open: () => void; /** 폰 메뉴의 Save plan (D105) — save 와 같은 조건으로 넘긴다 */ onSave?: () => void };
 }
 
@@ -48,7 +50,7 @@ export const PLAN_FILE_TEXT = 'hidden sm:inline';
 const THEME_ICON = { light: Sun, dark: Moon, system: Monitor } as const;
 const THEME_LABEL: Record<ThemeMode, string> = { light: en.ui.theme_light, dark: en.ui.theme_dark, system: en.ui.theme_system };
 
-export function AppHeader({ share, shareText, onShare, screen, otherHref, namingHref, apiHref, reserveShare = false, shareWarning = true, badge, planFile }: Props) {
+export function AppHeader({ share, shareText, onShare, screen, otherHref, namingHref, apiHref, reserveShare = false, shareWarning = true, badge, onAbout, planFile }: Props) {
   const phone = useWizardLayout() === 'phone';
   const mode = useThemeMode();
   // 폰 메뉴의 Share URL 결과 — 메뉴는 누르면 닫히므로 결과는 메뉴 밖 상태 줄이 말한다. sharedPhone 은 트리 화면의 공유 경고를 그 뒤에 보인다
@@ -72,7 +74,8 @@ export function AppHeader({ share, shareText, onShare, screen, otherHref, naming
   };
 
   return (
-    <header className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
+    // relative z-30 — backdrop-blur 가 머리를 쌓임 맥락으로 만든다. z 가 없으면 아래 칸(relative · sticky)이 More 메뉴 위에 그려져 아래쪽 항목을 누를 수 없다
+    <header className="relative z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <span className="rounded-lg bg-indigo-600 p-2 text-white dark:bg-indigo-500"><Cloud aria-hidden="true" className="size-5" /></span>
@@ -117,6 +120,12 @@ export function AppHeader({ share, shareText, onShare, screen, otherHref, naming
             <a href={namingHref} data-nav-naming role="menuitem" tabIndex={-1} className={MENU_ITEM}><BookOpen aria-hidden="true" className="size-4" />{en.ui.nav_naming_guide}</a>
             <a href={apiHref} data-nav-api role="menuitem" tabIndex={-1} className={MENU_ITEM}><Terminal aria-hidden="true" className="size-4" />{en.ui.nav_api}</a>
             <a href="/llms.txt" data-nav-llms role="menuitem" tabIndex={-1} target="_blank" rel="noreferrer" className={MENU_ITEM}><FileText aria-hidden="true" className="size-4" />llms.txt</a>
+            {/* 소개 상자를 다시 연다 (D107) — 폰도 같은 메뉴라 그대로 보인다 */}
+            {onAbout && (
+              <button type="button" role="menuitem" tabIndex={-1} data-nav-about title={en.ui.nav_about_label} className={MENU_ITEM} onClick={onAbout}>
+                <Info aria-hidden="true" className="size-4" />{en.ui.nav_about}
+              </button>
+            )}
             {/* 폰에서만 — 화면 모드 셋을 menuitemradio 로 (D105). 고르면 메뉴가 닫힌다 */}
             {phone && (
               <div role="group" aria-label={en.ui.theme_label} data-theme-menu className="mt-1 border-t border-zinc-200 pt-1 dark:border-zinc-700">

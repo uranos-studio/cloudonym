@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/gen-intro-examples.mjs",
     "build": "tsc -b && vite build && node scripts/check-bundle.mjs",
     "lint": "oxlint",
     "preview": "npm run build && vite preview",
@@ -19,6 +20,7 @@
     "test:cli": "node --test cli/*.test.mjs",
     "cli": "node cli/cloudonym.mjs",
     "catalog": "node scripts/catalog/build-catalog.mjs",
+    "intro-examples": "node scripts/gen-intro-examples.mjs",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {

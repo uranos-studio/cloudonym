@@ -100,7 +100,14 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
           <ErrorList id="wizard-project-id-suffix-error" errors={suffixErrors} />
         </div>
       </div>
-      <p id="wizard-project-id-notice" data-project-id-notice className={HINT}>{en.ui.wizard_project_id_notice}</p>
+      {/* Project ID 경고 (D107) — 한 줄 요약 + 「Why?」 펼치기. 요약 줄이 접미사 칸의 aria-describedby 다 */}
+      <details data-project-id-notice className={`group ${HINT}`}>
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span id="wizard-project-id-notice" className="font-medium text-zinc-700 dark:text-zinc-300">{en.ui.wizard_project_id_notice_summary}</span>{' '}
+          <span className="inline-flex items-center gap-0.5 text-indigo-700 underline dark:text-indigo-300">{en.ui.wizard_project_id_notice_more}<ChevronRight aria-hidden="true" className="size-3 transition-transform group-open:rotate-90" /></span>
+        </summary>
+        <p data-project-id-notice-body className="mt-1">{en.ui.wizard_project_id_notice}</p>
+      </details>
       <dl data-project-preview className="grid gap-2 rounded-lg bg-zinc-50 p-3 text-sm sm:grid-cols-[auto_minmax(0,1fr)] dark:bg-zinc-950">
         <dt className={HINT}>{en.ui.wizard_project_name}</dt>
         <dd className="flex flex-col gap-0.5">

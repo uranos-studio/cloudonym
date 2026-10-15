@@ -22,8 +22,9 @@ import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, 
 import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
+import { IntroExample } from './IntroExample';
 import { Check, FileDown, PanelRightOpen, X } from 'lucide-react';
-import { INTRO_KEY, readPref, writePref } from './localPrefs';
+import { introDismissed, rememberIntroDismissed } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
 import { NOTICE, PANEL } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
@@ -223,10 +224,19 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
 
   const shareText = stateKey ? `${window.location.origin}${WIZARD_PATH}#${HASH_KEY}=${stateKey}` : undefined;
   // 첫 방문 안내 한 줄 (D93) — 닫으면 이 브라우저에 기억한다(저장소가 막혀 있으면 이 화면에서만 닫힌다)
-  const [introOpen, setIntroOpen] = useState(() => readPref(INTRO_KEY) !== '1');
+  const [introOpen, setIntroOpen] = useState(() => !introDismissed());
   const closeIntro = () => {
     setIntroOpen(false);
-    writePref(INTRO_KEY, '1');
+    rememberIntroDismissed(true);
+  };
+  // More 메뉴의 About (D107) — 닫은 소개를 다시 연다. 닫은 기억도 지운다(다시 닫을 때까지 보인다 — 닫기와 짝). 포커스는 소개의 닫기 단추로
+  const reopenIntro = () => {
+    setIntroOpen(true);
+    rememberIntroDismissed(false);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0 });
+      document.querySelector<HTMLElement>('[data-intro-close]')?.focus();
+    });
   };
   // 공유 경고 — Share 를 누르면 그 곁(머리 바로 아래)에 보인다. 링크는 암호화가 아니다
   const [shared, setShared] = useState(false);
@@ -393,6 +403,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         share={shareText && <span className="contents" onClickCapture={() => setShared(true)}><CopyButton text={shareText} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton></span>}
         // 폰은 Share URL 이 More 메뉴 안이다 (D105) — 누르면 같은 공유 경고를 띄운다
         {...(shareText ? { shareText, onShare: () => setShared(true) } : {})}
+        onAbout={reopenIntro}
         planFile={{
           ...(stateKey ? {
             onSave: onSavePlan,
@@ -427,13 +438,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
         }} />
       {/* 태블릿은 오른쪽 가장자리의 이름 손잡이가 내용을 가리지 않게 오른쪽을 비운다 */}
       <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 py-4 ${layout === 'tablet' ? 'pl-4 pr-14' : 'px-4'}`}>
-        {/* 짧은 소개 (D97) — 무엇인가 · 무엇을 받나 · 무엇을 안 하나 · 순서. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다) */}
+        {/* 짧은 소개 (D97 · D107) — 예시 한 줄(입력 넷 → 이름 셋, 엔진이 빌드 때 만든 값)이 먼저, 그 아래 순서 한 문장. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다).
+            「무엇을 안 하나」는 이름 칸 아래 PASS 문단 곁에 있다 — 이름을 본 사람에게 필요한 말이다 */}
         {introOpen && (
           <section data-wizard-intro aria-label={en.ui.wizard_about_label}
             className="flex items-start justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-            <div className="space-y-1">
-              <p data-wizard-about>{en.ui.wizard_about}</p>
-              <p>
+            <div className="min-w-0 flex-1 space-y-2">
+              <IntroExample phone={layout === 'phone'} />
+              <p data-intro-text>
                 {en.ui.wizard_intro}{' '}
                 <a href={withStateHash(NAMING_PATH, addressHash)} data-intro-guide className="font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100">{en.ui.nav_naming_guide}</a>
               </p>

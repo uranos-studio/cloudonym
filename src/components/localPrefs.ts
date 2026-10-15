@@ -22,3 +22,13 @@ export function writePref(key: string, value: string | null): void {
     // 저장소가 막힌 브라우저 — 설정은 이 탭에서만 산다
   }
 }
+
+/** 소개 상자를 닫았는가 (D93) — 첫 화면의 열림을 정한다 */
+export function introDismissed(): boolean {
+  return readPref(INTRO_KEY) === '1';
+}
+
+/** 소개 상자의 닫힘을 기억하거나(닫기) 지운다(More 메뉴의 About · D107 — 다시 닫을 때까지 보인다) */
+export function rememberIntroDismissed(dismissed: boolean): void {
+  writePref(INTRO_KEY, dismissed ? '1' : null);
+}

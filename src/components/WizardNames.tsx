@@ -67,8 +67,14 @@ export function WizardNames({ plan, results, errors, projectPending = false, pro
       )}
       {!projectPending && <ErrorList errors={wide} />}
       {ok && <ResultList plan={plan} results={results} projectNames={projectNames} />}
-      {/* PASS 의 뜻 — 이름 목록 아래(D93). 이름이 먼저 보인다 */}
-      <p data-pass-meaning className="border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">{en.ui.pass_meaning}</p>
+      {/* PASS 의 뜻 — 이름 목록 아래(D93). 이름이 먼저 보인다. 이름이 하나라도 나왔을 때만(D107) — 빈 칸에는 안내 한 줄만 둔다.
+          「아무것도 만들지 않는다」 문장은 소개 상자에서 옮겨 왔다(D107) */}
+      {ok && names > 0 && (
+        <div data-pass-meaning className="space-y-1 border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+          <p>{en.ui.pass_meaning}</p>
+          <p data-nothing-created>{en.ui.wizard_nothing_created}</p>
+        </div>
+      )}
     </section>
   );
 }

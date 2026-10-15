@@ -2,6 +2,21 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Changed
+
+- **First screen says what goes in and what comes out** (D107) — the intro box starts with a read-only example: `devops · payments · prod · asia-northeast3` → the Project ID, a VM instance and its boot disk, each marked PASS (below 768 px, the VM instance only). The names are produced by the engine at build time and checked by a test, not written by hand. The intro text is one sentence; "nothing is created" and "names are not checked for availability" moved next to the PASS paragraph under the names.
+- **Tagline and page description** — the header tagline now reads "Enter owner, system, environment and region → Google Cloud resource names that pass the official rules"; the home page description follows it.
+- **Project ID warning** — one line ("Project IDs are global and can never be reused.") with a **Why?** disclosure holding the full explanation.
+- **PASS paragraph** — shown under the names only once at least one name is generated; the empty names column shows only its one-line prompt.
+
+### Added
+
+- **About** in the **More** menu (wizard, phone included) shows the intro again after it was dismissed (D107).
+
+Screen only: rules revision and every API response are unchanged.
+
 ## [0.1.3] - 2026-10-15
 
 Search engines can read every page: each page has its own title, description and canonical link, unknown paths are 404, and `/robots.txt` and `/sitemap.xml` are served. The documentation is corrected and pull requests are checked for sign-off. Google Cloud only, as in 0.1.0.

@@ -17,6 +17,7 @@ const ALLOWED = [
   /^(?:\.\.?\/)+core\/wizard\/(?:plan|presets|attachments|bundles)$/, // 마법사 모델 검사 · 펼치기 · 프리셋 · 호환표 · 카드 데이터 (D64 · D67 · D93)
   /^\.\/index\.css$/, /^\.\/App\.tsx$/,              // main.tsx 의 진입
   /^\.\/(?:components\/)?[A-Za-z]+$/,               // 같은 폴더의 모듈 · App 의 ./components/X
+  /^\.\/introExamples\.json$/,                    // 소개 상자의 예시 (D107) — 빌드 때 엔진이 만든 데이터(scripts/gen-intro-examples.mjs)
   /^\.\.?\/messages\/(?:en|catalog)$/,              // 표현 계층 — 문장은 사전이 만든다 (D23)
   /^\.\.?\/version$/,                               // 결과에 싣는 버전 (D26)
   /^\.\.?\/site\/(?:pages|copy)$/,                 // 경로 표 · 쪽 문구 (D106) — Worker 와 같이 쓰는 순수 모듈

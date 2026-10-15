@@ -94,6 +94,12 @@ def assert_selects_fit(page, width):
     assert clipped == [], f'폭 {width}px 에서 select 글자가 잘린다: {clipped}'
 
 
+def bypass_csp(browser):
+    """이 브라우저의 새 창은 CSP 를 건너뛴다 — 아래 실행부의 주석(D106 dev 서버의 CSP 가 Vite preamble 을 막는다)"""
+    make = browser.new_context
+    browser.new_context = lambda **kw: make(**{'bypass_csp': True, **kw})
+
+
 def goto_ready(page, url):
     """dev 서버는 포트가 열린 뒤에도 잠깐 연결을 끊는다 — 60초 안에서 다시 시도한다"""
     deadline = time.time() + 60
@@ -297,8 +303,8 @@ def fill_project(page):
 
 
 # 첫 방문 (D97) — 소개 두 문단 · 프로젝트 값 예시(placeholder) · 갈 곳
-ABOUT = 'Names every resource of a Google Cloud project from owner, system, environment and region, checked against the official naming rules. You get names, JSON and Terraform locals — nothing is created, and apart from the optional bucket Check, names are not checked for availability.'
-INTRO_ORDER = 'Fill in the project, pick what you are building, copy the names. Naming guide'
+INTRO_EXAMPLE = ['devops-payments-prod', 'payments-shop-prod-ane3-gce-web-01', 'payments-shop-prod-ane3-gce-web-01-boot']
+INTRO_ORDER = 'Fill in your four values below and pick what you are building — you get names, JSON and Terraform locals. Naming guide'
 NEED_PROJECT = 'Enter the project values first — owner, system, environment and region. The names appear here once they are valid.'
 PENDING = 'Fill in owner, system, environment and region to continue.'
 INTRO_KEY = 'cloudonym:intro_dismissed_v2'
@@ -351,7 +357,12 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(page.locator('[data-tree]')).to_have_count(0)
     expect(page.locator('[data-nav-pick]')).to_have_attribute('href', '/pick')
     # 첫 방문 소개 (D97) — 무엇인가 · 순서 두 문단(경고색이 아니다) · 공유 링크 경고는 소개에서 빠졌다 · 닫으면 이 브라우저에 기억한다(새 창에서도 닫힌 채 — 아래 ㊻)
-    expect(page.locator('[data-wizard-intro] p')).to_have_text([ABOUT, INTRO_ORDER])
+    # 예시 한 줄이 먼저 (D107) — 엔진이 빌드 때 만든 이름 셋 · 전부 PASS
+    expect(page.locator('[data-intro-example]')).to_be_visible()
+    expect(page.locator('[data-intro-example-input]')).to_have_text('devops · payments · prod · asia-northeast3')
+    expect(page.locator('[data-intro-example-name]')).to_have_text(INTRO_EXAMPLE)
+    expect(page.locator('[data-intro-example-pass]')).to_have_count(3)
+    expect(page.locator('[data-intro-text]')).to_have_text(INTRO_ORDER)
     expect(page.locator('[data-wizard-intro]')).not_to_contain_text('share link')
     expect(page.locator('[data-wizard-notice]')).to_have_count(0)
     # 머리의 공유 경고 줄은 마법사에서 Share 를 누를 때 보인다 (D93) — 누르기 전에는 없다
@@ -1304,6 +1315,15 @@ def wizard_cards(browser, errors):
     assert p46.evaluate(f"localStorage.getItem('{INTRO_KEY}')") == '1'
     goto_ready(p46, BASE + '/?again')
     expect(p46.locator('[data-wizard-intro]')).to_have_count(0)
+    # More → About (D107) — 닫은 소개가 다시 보이고 닫힘 기억이 지워진다(새로 열어도 보인다) · 포커스는 소개의 닫기 단추
+    open_more(p46)
+    p46.locator('header [data-nav-about]').click()
+    expect(p46.locator('[data-wizard-intro]')).to_have_count(1)
+    expect(p46.locator('[data-intro-example]')).to_be_visible()
+    expect(p46.locator('[data-intro-close]')).to_be_focused()
+    assert p46.evaluate(f"localStorage.getItem('{INTRO_KEY}')") is None
+    goto_ready(p46, BASE + '/?after-about')
+    expect(p46.locator('[data-wizard-intro]')).to_have_count(1)
     c46.close()
     c46b = browser.new_context(viewport={'width': 1280, 'height': 900})
     c46b.add_init_script("Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } })")
@@ -1315,8 +1335,12 @@ def wizard_cards(browser, errors):
     expect(p46b.locator('[data-wizard-intro]')).to_have_count(0)
     # 저장소가 막혀도 화면은 그대로 돈다 — 값을 채우면 이름 다섯 (D97 — 첫 화면은 빈칸이라 채운 뒤에 센다)
     expect(p46b.locator('[data-names-notice="need_project"]')).to_have_text(NEED_PROJECT)
+    # PASS 문단은 이름이 나온 뒤에만 (D107) — 빈 이름 칸에는 없다
+    expect(p46b.locator('[data-pass-meaning]')).to_have_count(0)
     fill_example_project(p46b)
     expect(p46b.locator('[data-names-summary]')).to_have_text('5 names · 5/5 PASS')
+    expect(p46b.locator('[data-pass-meaning]')).to_be_visible()
+    expect(p46b.locator('[data-nothing-created]')).to_contain_text('nothing is created')
     c46b.close()
 
 
@@ -1832,7 +1856,7 @@ def header_menu(browser, errors):
     # 밖의 단추 넷 · 메뉴 안 다섯(닫힌 채로 숨어 있다)
     for sel in ('[data-copy="share-url"]', '[data-plan-save]', '[data-nav-more]', '[data-theme-toggle]'):
         expect(pg.locator(f'header {sel}')).to_be_visible()
-    for sel in ('[data-plan-open]', '[data-nav-pick]', '[data-nav-naming]', '[data-nav-api]', '[data-nav-llms]'):
+    for sel in ('[data-plan-open]', '[data-nav-pick]', '[data-nav-naming]', '[data-nav-api]', '[data-nav-llms]', '[data-nav-about]'):
         expect(menu.locator(sel)).to_be_hidden()
     expect(more).to_have_text('More')
     expect(more).to_have_attribute('aria-haspopup', 'menu')
@@ -1840,8 +1864,8 @@ def header_menu(browser, errors):
     expect(more).to_have_attribute('aria-controls', menu.get_attribute('id'))
     expect(menu).to_have_attribute('role', 'menu')
     expect(menu).to_have_attribute('aria-labelledby', more.get_attribute('id'))
-    expect(items).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt'])
-    for i in range(5):
+    expect(items).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # About 은 D107
+    for i in range(6):
         expect(items.nth(i)).to_have_attribute('tabindex', '-1')
     # 1280 — 머리 한 줄(단추 줄이 로고 줄 안에 · 단추 줄도 한 줄)
     h1280, same_row, one_row = header_rows(pg)
@@ -1852,7 +1876,7 @@ def header_menu(browser, errors):
     expect(more).to_have_attribute('aria-expanded', 'true')
     expect(menu).to_be_visible()
     expect(items.nth(0)).to_be_focused()
-    for key, at in (('ArrowDown', 1), ('End', 4), ('ArrowDown', 0), ('ArrowUp', 4), ('Home', 0), ('ArrowUp', 4)):
+    for key, at in (('ArrowDown', 1), ('End', 5), ('ArrowDown', 0), ('ArrowUp', 5), ('Home', 0), ('ArrowUp', 5)):
         pg.keyboard.press(key)
         expect(items.nth(at)).to_be_focused()
     pg.keyboard.press('Escape')
@@ -1861,7 +1885,7 @@ def header_menu(browser, errors):
     expect(more).to_be_focused()
     # ↑ 는 열고 끝 항목 · Space · ↓ 는 첫 항목
     pg.keyboard.press('ArrowUp')
-    expect(items.nth(4)).to_be_focused()
+    expect(items.nth(5)).to_be_focused()
     pg.keyboard.press('Escape')
     for key in (' ', 'ArrowDown'):
         pg.keyboard.press(key)
@@ -1927,7 +1951,7 @@ def header_menu(browser, errors):
     h360, same_row, one_row = header_rows(p3)
     assert same_row and one_row and h360 <= 110, ('360 머리가 로고 줄 하나가 아니다', h360, same_row, one_row)
     items3 = menu3.locator('[role="menuitem"], [role="menuitemradio"]')
-    expect(items3).to_have_text(['Share URL', 'Save plan', 'Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'Light', 'Dark', 'System — follow the device setting'])
+    expect(items3).to_have_text(['Share URL', 'Save plan', 'Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About', 'Light', 'Dark', 'System — follow the device setting'])
     expect(menu3.locator('[data-theme-menu]')).to_have_attribute('role', 'group')
     expect(menu3.locator('[data-theme-menu]')).to_have_attribute('aria-label', 'Screen mode')
     expect(menu3.locator('[data-theme-mode="system"]')).to_have_attribute('aria-checked', 'true')
@@ -1935,7 +1959,7 @@ def header_menu(browser, errors):
     expect(menu3).to_be_visible()
     expect(items3.nth(0)).to_be_focused()
     p3.keyboard.press('End')
-    expect(items3.nth(9)).to_be_focused()
+    expect(items3.nth(10)).to_be_focused()
     p3.keyboard.press('ArrowDown')
     expect(items3.nth(0)).to_be_focused()
     box = menu3.bounding_box()
@@ -1975,7 +1999,10 @@ def header_menu(browser, errors):
         expect(more3).to_be_focused()
     goto_ready(p3, BASE + '/')
     h360_first = header_rows(p3)[0]
-    expect(p3.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt'])  # 링크 없는 첫 화면 — 공유 · 저장할 것이 없다
+    # 폰의 예시는 VM 한 줄 (D107)
+    expect(p3.locator('[data-intro-example]')).to_be_visible()
+    expect(p3.locator('[data-intro-example-name]')).to_have_text([INTRO_EXAMPLE[1]])
+    expect(p3.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Open plan', 'Pick resources', 'Naming guide', 'API', 'llms.txt', 'About'])  # 링크 없는 첫 화면 — 공유 · 저장할 것이 없다
     c3.close()
 
     # /pick — 밖에는 Share URL · More · 화면 모드 · 메뉴는 Wizard · Naming guide · API · llms.txt (Open plan 은 마법사에만)
@@ -2029,6 +2056,9 @@ def wizard_narrow_shots(browser, errors):
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
+    # dev 서버의 화면 HTML 은 Worker 가 만들며 _headers 의 CSP(script-src 'self')를 단다(D106) — Vite dev 의 인라인 preamble 이 막혀 React 가 그려지지 않는다.
+    # 운영 빌드에는 인라인 스크립트가 없다(_headers 주석 · site.test). 이 시험은 화면 동작을 보는 것이라 창마다 CSP 를 건너뛴다
+    bypass_csp(browser)
     errors = []
 
     # ── ⑴ 첫 방문 — 버튼 셋 중 둘(AWS · Azure)은 꺼진 「Coming soon」 · 켜진 GCP 가 자동 선택 · 다섯 입력 · SA 를 골라 축약 안내 · 비콘 수 ──
@@ -2876,6 +2906,7 @@ with sync_playwright() as p:
     # 07 · 08 — 반투명 배경(::backdrop) 아래의 둥근 테두리가 프로세스마다 가끔 다르게 그려진다(25회 중 2회, 실측).
     # 합성 단계를 그리기 전에 모두 돌리고 스크롤 스레드를 끈 브라우저에서 찍으면 같은 바이트다(25회 중 25회)
     shots = p.chromium.launch(headless=True, args=['--run-all-compositor-stages-before-draw', '--disable-threaded-scrolling'])
+    bypass_csp(shots)
     wizard_narrow_shots(shots, errors)
     shots.close()
 
