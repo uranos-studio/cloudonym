@@ -2,7 +2,7 @@
 // Open plan(마법사) · 화면 전환 링크(Wizard ↔ Pick resources · D68) · 이름 안내 · API 안내(D98) · llms.txt · About(/about · D109) 은 「More」 메뉴 하나에 둔다 (D104 — 1280 에서 한 줄).
 // 폰(<768 · 마법사의 phone 배치와 같은 경계)에서는 밖의 단추도 전부 메뉴로 접고 소개 문구를 숨긴다 — 머리는 로고 줄 하나와 배지 줄이다 (D105)
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { BookOpen, Check, Cloud, Copy, FileDown, FileText, FileUp, Info, ListTree, Monitor, Moon, Sun, Terminal, Wand2 } from 'lucide-react';
+import { BookOpen, Check, Copy, FileDown, FileText, FileUp, Info, ListTree, Monitor, Moon, Sun, Terminal, Wand2 } from 'lucide-react';
 import { COPY_BUTTON } from './CopyButton';
 import { MENU_ITEM, MoreMenu } from './MoreMenu';
 import { ThemeToggle } from './ThemeToggle';
@@ -78,7 +78,8 @@ export function AppHeader({ share, shareText, onShare, screen, otherHref, naming
     <header className="relative z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="rounded-lg bg-indigo-600 p-2 text-white dark:bg-indigo-500"><Cloud aria-hidden="true" className="size-5" /></span>
+          {/* 제품 표시 — 파비콘과 같은 파일이다(public/favicon.svg). 이름은 옆 h1 이 읽히므로 그림은 alt 를 비운다 */}
+          <img src="/favicon.svg" alt="" width={36} height={36} className="size-9 shrink-0" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
