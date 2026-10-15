@@ -9,7 +9,7 @@ const sources = import.meta.glob(['./*.ts', './*.tsx', '../App.tsx', '../main.ts
 const STATIC_RE = /(?:import|export)(?:[^'"]*from)?\s+['"]([^'"]+)['"]/g;
 const CALL_RE = /\b(?:import|require)\s*\(\s*['"]([^'"]+)['"]/g;
 const ALLOWED = [
-  /^react$/, /^react-dom\/client$/,
+  /^react$/, /^react-dom(?:\/client)?$/,                 // react-dom 은 flushSync(폰 탭 전환의 동기 포커스) · client(진입)
   /^lucide-react$/,
   /^(?:\.\.?\/)+core\/(?:engine|labels|types|tree|selection|scopes|catalog)$/,   // 엔진 공개 API — 트리 · 선택 검증 · 범위 · catalog 조회 (D37 · D40 · D54)
   /^(?:\.\.?\/)+core\/(?:regions|regions-data)$/,     // 지역 표 · 지역 입력 풀이 — 지역 고르기 · 공유 hash 상한 (D49 · D50)

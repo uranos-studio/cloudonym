@@ -3,6 +3,7 @@
 // 넓은 화면은 세 칸이다(D89) — 목록(WizardList) · 고른 줄 하나의 설정(WizardSettings · 카드는 WizardCards) · 이름(WizardNames). 폰은 같은 셋을 탭으로 바꾼다(D93). 고른 줄은 화면 상태이고 hash 에 싣지 않는다.
 // 판정은 전부 엔진 값이다 — 이 파일은 이름 규칙을 모른다. 오류는 엔진이 준 path 로 그 자리(서비스 · pick · 서버 줄 · 디스크)에 붙인다
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { flushSync } from 'react-dom';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import type { Env } from '../core/types';
@@ -315,19 +316,19 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   useEffect(() => {
     selectedRef.current = selected;
   }, [selected]);
+  // 탭을 바꾸는 렌더를 동기로 끝내고 그 자리에서 포커스를 옮긴다 — requestAnimationFrame 으로 미루면 다음 프레임 전에 온 키(Esc · Enter)가
+  // 숨은 칸을 떠나 body 에 떨어진 포커스로 가서 아무 일도 하지 않는다(화면 시험 ㊹ 이 가끔 그렇게 실패했다)
   const backToPlan = () => {
-    setView('plan');
-    requestAnimationFrame(() => focusRow(selectedRef.current));
+    flushSync(() => setView('plan'));
+    focusRow(selectedRef.current);
   };
   /** 폰에서 줄을 누르거나 Add service — Edit 탭을 연다. 칸의 맨 위부터 보이게 페이지를 올린다.
    *  포커스는 칸으로 옮긴다 — 누른 줄은 숨은 Plan 탭에 있어 거기 남으면 Esc 가 닿지 않는다. focusFirst 면 칸의 첫 컨트롤 */
   const openEdit = (focusFirst: boolean) => {
-    setView('edit');
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0 });
-      if (focusFirst) focusSettings();
-      else settingsRef.current?.focus({ preventScroll: true });
-    });
+    flushSync(() => setView('edit'));
+    window.scrollTo({ top: 0 });
+    if (focusFirst) focusSettings();
+    else settingsRef.current?.focus({ preventScroll: true });
   };
 
   /** 폰 탭 — 고른 탭만 Tab 순서에 두고, 좌우 · Home · End 로 옮기면서 바로 고른다 (WAI-ARIA tabs, 자동 선택) */
