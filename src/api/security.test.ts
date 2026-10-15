@@ -162,6 +162,8 @@ describe('정적 UI 보안 헤더 — public/_headers', () => {
     const csp = header('Content-Security-Policy') ?? '';
     for (const d of ["default-src 'self'", "script-src 'self'", "style-src 'self'", "connect-src 'self'", "object-src 'none'", "base-uri 'none'", "frame-ancestors 'none'"]) expect(csp, d).toContain(d);
     expect(csp).not.toMatch(/unsafe-inline|unsafe-eval|\*/);
+    // self 밖의 스크립트는 Cloudflare Web Analytics 하나 (D110)
+    expect(/script-src ([^;]+);/.exec(csp)?.[1]).toBe("'self' https://static.cloudflareinsights.com");
     expect(header('X-Content-Type-Options')).toBe('nosniff');
     expect(header('X-Frame-Options')).toBe('DENY');
     expect(header('Referrer-Policy')).toBe('strict-origin-when-cross-origin');

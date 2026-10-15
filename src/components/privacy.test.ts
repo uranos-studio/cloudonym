@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Privacy } from './Privacy';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER, PRIVACY_WEB_ANALYTICS_DOCS, PRIVACY_WEB_ANALYTICS_ORIGIN } from './privacyModel';
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
@@ -93,6 +93,18 @@ describe('/privacy', () => {
     expect(s).toBeDefined();
     for (const w of ['when you click it, and only then', 'sends that bucket name directly to Google Cloud Storage', PRIVACY_BUCKET_CHECK_ORIGIN]) expect(s, w).toContain(w);
     expect(pageText()).toContain('The request does not pass through Cloudonym');
+  });
+  it('Cloudflare Web Analytics (D110) — 모든 쪽에 스크립트가 붙고 /cdn-cgi/rum 으로 Cloudflare 에 간다 · Cloudflare 문서가 적은 것만 말한다', () => {
+    const text = pageText();
+    for (const w of ['Web Analytics script', PRIVACY_WEB_ANALYTICS_ORIGIN, 'to every page', '/cdn-cgi/rum', 'does not reach Cloudonym', 'does not collect visitors\' personal data', 'cookies or localStorage', 'does not log query strings', '7 days']) expect(text, w).toContain(w);
+    // 링크는 Cloudflare 공식 문서만
+    const html = renderToStaticMarkup(createElement(Privacy));
+    for (const d of PRIVACY_WEB_ANALYTICS_DOCS) {
+      expect(d.href.startsWith('https://developers.cloudflare.com/web-analytics/'), d.href).toBe(true);
+      expect(html).toContain(`href="${d.href}"`);
+    }
+    // 버킷 「Check」 문장은 그대로 남는다 — 브라우저가 Cloudflare 밖의 곳에 직접 묻는 것은 그것 하나다
+    expect(text).toContain('The Check button next to a bucket name is the one exception');
   });
   it('AI 에이전트 요청은 ai_agent 일자 카운터에도 하나 더한다(telemetry.ts bump stats:ai_agent_hits)', () => {
     expect(pageText()).toContain('when the client class is ai_agent, one to a daily AI-agent counter as well');

@@ -2,6 +2,12 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Changed
+
+- **Cloudflare Web Analytics is allowed** (D110) — Cloudflare adds its Web Analytics script to every page, and the page CSP blocked it with a console error. `script-src` now allows `https://static.cloudflareinsights.com` (the host only: the injected script path carries a version); the script sends to the site's own `/cdn-cgi/rum`, which `connect-src 'self'` already covers. `/privacy` gains a paragraph on what the script sends to Cloudflare and what Cloudflare states it does not collect, with links to Cloudflare's documentation; the README says the same in one sentence.
+
 ## [0.1.4] - 2026-10-15
 
 The first screen says what the tool gives you: a read-only example of inputs and names at the top, and a first visit that opens on an example plan with its names already shown (Clear empties it). Tablets and phones open the names with a bar at the bottom. A new About page covers what the tool checks, the source, the license and the versions. The local dev server renders again; production headers are unchanged.
@@ -159,6 +165,7 @@ These changes were made before any public deployment, so no released name depend
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
 
+[Unreleased]: https://github.com/uranos-studio/cloudonym/compare/v0.1.4...HEAD
 [0.1.4]: https://github.com/uranos-studio/cloudonym/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/uranos-studio/cloudonym/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/uranos-studio/cloudonym/compare/v0.1.1...v0.1.2

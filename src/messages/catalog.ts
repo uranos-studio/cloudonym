@@ -60,7 +60,8 @@ export const UI_KEYS = [
   'doc_pass_title', 'doc_none', 'doc_no_token',
   // Privacy — /privacy (D56)
   'privacy_title',
-  'privacy_intro', 'privacy_browser_title', 'privacy_browser_session', 'privacy_browser_local', 'privacy_browser_hash', 'privacy_bucket_check',
+  'privacy_intro', 'privacy_browser_title', 'privacy_browser_session', 'privacy_browser_local', 'privacy_browser_hash', 'privacy_bucket_check', 'privacy_web_analytics', 'privacy_web_analytics_links',
+  'privacy_web_analytics_link_about', 'privacy_web_analytics_link_collected', 'privacy_web_analytics_link_faq',
   'privacy_api_title', 'privacy_api_intro', 'privacy_api_common', 'privacy_col_event',
   'privacy_col_when', 'privacy_col_fields', 'privacy_when_ui_visit', 'privacy_when_ui_generate',
   'privacy_when_ui_copy', 'privacy_when_api_generate', 'privacy_when_api_names', 'privacy_when_api_validate', 'privacy_when_api_wizard',

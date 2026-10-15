@@ -2,12 +2,14 @@
 # 화면 경로의 HTML 은 Worker 가 만든다(D106) — src/api/site.ts 가 이 파일의 /* 줄을 읽어 같은 값을 단다. 여기를 고치면 화면 HTML 에도 그대로 간다
 # https://developers.cloudflare.com/workers/static-assets/headers/
 #
-# 보안 헤더 — 빌드 산출물(dist/client/index.html)에 인라인 스크립트 · 스타일이 없어 'self' 만으로 된다.
+# 보안 헤더 — 빌드 산출물(dist/client/index.html)에 인라인 스크립트 · 스타일이 없어 'self' 만으로 된다(script-src 는 D110 의 Cloudflare 호스트 하나를 더한다).
 # React 의 style prop 은 CSSOM 이라 style-src 에 막히지 않는다. connect-src 'self' 는 /v1/events 비콘용, storage.googleapis.com 은 버킷 이름 「Check」(D83 — 누를 때만 브라우저가 직접 묻는다).
+# script-src 의 static.cloudflareinsights.com 은 Cloudflare 가 HTML 응답에 넣는 Web Analytics 스크립트다(D110). 경로까지 적지 않고 호스트만 적는다 —
+# 주입되는 URL 이 beacon.min.js/v<버전> 이라 문서의 「…/beacon.min.js」 형태로는 막힌다. 측정값을 보내는 곳은 이 사이트의 /cdn-cgi/rum 이라 connect-src 'self' 로 된다
 # 클립보드는 막지 않는다 — 복사(writeText)는 화면 기능이고, clipboard-read=() 는 화면 시험(tests/ui/screen.py)이 복사된 값을 readText 로 대어 보는 길을 막는다.
 # 읽기는 어차피 브라우저가 사용자 허락을 묻는다. HSTS 는 커스텀 도메인을 붙일 때 존 설정에서 켠다
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://storage.googleapis.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://storage.googleapis.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

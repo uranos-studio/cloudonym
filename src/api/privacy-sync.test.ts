@@ -7,7 +7,7 @@ import { COPY_TARGETS } from '../components/copyTargets';
 import { pickedRuleIds } from '../components/pickedRules';
 import type { WizardPlan } from '../core/wizard/plan';
 import { PRESETS } from '../core/wizard/presets';
-import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from '../components/privacyModel';
+import { PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_WEB_ANALYTICS_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from '../components/privacyModel';
 import { AVAILABILITY_ORIGIN } from '../components/availabilityOrigin';
 import { API_DOC_RATE_LIMIT, API_DOC_SKIP_HEADER } from '../components/apiDocModel';
 import { readFileSync } from 'node:fs';
@@ -30,6 +30,14 @@ describe('화면 · 안내 ↔ API 상수', () => {
     expect(connect).toEqual(["'self'", AVAILABILITY_ORIGIN]);
     const release = readFileSync(join(import.meta.dirname, '../../scripts/release-check.sh'), 'utf-8').split('\n').filter((l) => l.startsWith('CSP=')).join('\n');
     expect(/connect-src ([^;]+);/.exec(release)?.[1]?.trim().split(/\s+/)).toEqual(connect);
+  });
+  it('Cloudflare Web Analytics (D110) — 안내가 적은 출처 = CSP script-src 의 self 밖 유일한 출처 (_headers · release-check 둘 다)', () => {
+    const headers = readFileSync(join(import.meta.dirname, '../../public/_headers'), 'utf-8').split('\n').filter((l) => l.includes('Content-Security-Policy:')).join('\n');
+    const script = /script-src ([^;]+);/.exec(headers)?.[1]?.trim().split(/\s+/);
+    // 호스트만 — 주입되는 주소가 beacon.min.js/v<버전> 이라 경로를 적으면 막힌다
+    expect(script).toEqual(["'self'", PRIVACY_WEB_ANALYTICS_ORIGIN]);
+    const release = readFileSync(join(import.meta.dirname, '../../scripts/release-check.sh'), 'utf-8').split('\n').filter((l) => l.startsWith('CSP=')).join('\n');
+    expect(/script-src ([^;]+);/.exec(release)?.[1]?.trim().split(/\s+/)).toEqual(script);
   });
   it('KV 보존 일수 × 86400 = expirationTtl · 요청 제한 숫자 = RATE_LIMIT', () => {
     expect(PRIVACY_KV_RETENTION_DAYS * 86400).toBe(KV_TTL_SECONDS);

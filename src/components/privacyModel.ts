@@ -10,6 +10,14 @@ export const PRIVACY_KV_RETENTION_DAYS = 366;
 export const PRIVACY_AXIOM_RETENTION_DAYS: number | null = 30;
 /** 버킷 이름 「Check」가 브라우저에서 직접 묻는 곳 (D83) — availability.ts 의 값 · public/_headers 의 connect-src 와 같다(privacy-sync.test) */
 export const PRIVACY_BUCKET_CHECK_ORIGIN = AVAILABILITY_ORIGIN;
+/** Cloudflare Web Analytics 스크립트의 출처 (D110) — Cloudflare 가 HTML 응답에 넣는다. public/_headers 의 script-src 가 self 밖에 허용하는 유일한 출처(privacy-sync.test) */
+export const PRIVACY_WEB_ANALYTICS_ORIGIN = 'https://static.cloudflareinsights.com';
+/** Web Analytics 가 무엇을 모으는지 Cloudflare 가 적은 문서 — 안내가 링크로 건다 */
+export const PRIVACY_WEB_ANALYTICS_DOCS: readonly { href: string; label: UiKey }[] = [
+  { href: 'https://developers.cloudflare.com/web-analytics/about/', label: 'privacy_web_analytics_link_about' },
+  { href: 'https://developers.cloudflare.com/web-analytics/data-metrics/core-web-vitals/#information-collected', label: 'privacy_web_analytics_link_collected' },
+  { href: 'https://developers.cloudflare.com/web-analytics/faq/', label: 'privacy_web_analytics_link_faq' },
+];
 /** 운영자 점검 요청이 싣는 헤더 이름 (D99) — telemetry.ts 의 TELEMETRY_SKIP_HEADER 와 같다(privacy-sync.test). 값(비밀)은 화면에 없다 */
 export const PRIVACY_SKIP_HEADER = 'x-cloudonym-telemetry-skip';
 /** ratelimit.ts 의 RATE_LIMIT 과 같다 */

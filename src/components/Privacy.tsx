@@ -6,8 +6,9 @@ import { fillUi } from '../messages/catalog';
 import { VISIT_KEY } from './beacon';
 import { INTRO_KEY, THEME_KEY } from './localPrefs';
 import { COPY_TARGETS } from './copyTargets';
-import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER } from './privacyModel';
+import { axiomRetentionText, PRIVACY_AXIOM_RETENTION_DAYS, PRIVACY_BUCKET_CHECK_ORIGIN, PRIVACY_EVENTS, PRIVACY_KV_RETENTION_DAYS, PRIVACY_RATE_LIMIT, PRIVACY_SKIP_HEADER, PRIVACY_WEB_ANALYTICS_DOCS, PRIVACY_WEB_ANALYTICS_ORIGIN } from './privacyModel';
 
+const LINK = 'font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100';
 const CODE = 'rounded bg-zinc-100 px-1 py-0.5 font-mono text-[0.85em] dark:bg-zinc-800';
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
@@ -30,6 +31,13 @@ export function Privacy() {
           <p data-privacy-local>{fillUi(en, 'privacy_browser_local', { intro: INTRO_KEY, theme: THEME_KEY })}</p>
           <p>{ui.privacy_browser_hash}</p>
           <p data-privacy-bucket-check>{fillUi(en, 'privacy_bucket_check', { origin: PRIVACY_BUCKET_CHECK_ORIGIN })}</p>
+          <p data-privacy-web-analytics>{fillUi(en, 'privacy_web_analytics', { origin: PRIVACY_WEB_ANALYTICS_ORIGIN })}</p>
+          <p data-privacy-web-analytics-links>
+            {ui.privacy_web_analytics_links}{' '}
+            {PRIVACY_WEB_ANALYTICS_DOCS.map((d, i) => (
+              <span key={d.href}>{i > 0 && ' · '}<a href={d.href} rel="noopener noreferrer" className={LINK}>{ui[d.label]}</a></span>
+            ))}
+          </p>
         </Section>
         <Section id="privacy-api" title={ui.privacy_api_title}>
           <p data-privacy-api-intro>{fillUi(en, 'privacy_api_intro', { header: PRIVACY_SKIP_HEADER })}</p>
