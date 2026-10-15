@@ -84,7 +84,7 @@ Send the file as it is: `curl -s -X POST https://<your-deployment>/v1/wizard -H 
 
 | | |
 |---|---|
-| [Wizard, first visit](docs/screenshots/11-wizard-first-visit.png) | 1280 px with no link, as of D97: the intro, the project form with empty fields and example placeholders, and the names column asking for the project values first. Since D108 this empty state is what **Clear** gives; a first visit opens on the example plan |
+| [Wizard, first visit](docs/screenshots/11-wizard-first-visit.png) | 1280 px with no link (D107, D108): the intro's read-only example on top, the example plan marked **Example** with **Clear** in the Project panel, and the names column with 16 names, all PASS. **Clear** gives the empty Project form of D97 |
 | [Wizard, card](docs/screenshots/09-wizard-card.png) | 1280 px: the Website card added in one click — its checklist with every part's name, the firewall rules it added to the network, and 21 names |
 | [Wizard, dark](docs/screenshots/10-wizard-dark.png) | The same card in Dark mode, chosen with the header switch |
 | [Naming wizard](docs/screenshots/06-wizard.png) | 1280 px: the plan list, the settings of the selected row — the `shop` web server with a boot disk and data disk 01 — and the names of both services (`shop`, `pay`) |
@@ -114,7 +114,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.3", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.4", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -157,7 +157,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.3", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.4", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,
@@ -204,7 +204,7 @@ Response of `/v1/validate`:
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.3", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.4", "rules": "2026-10-13.3" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -235,7 +235,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.3", "rules": "2026-10-13.3" },
+  "version": { "engine": "0.1.4", "rules": "2026-10-13.3" },
   "data": {
     "gcp": {
       "valid": true,

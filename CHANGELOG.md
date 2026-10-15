@@ -2,7 +2,11 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.1.4] - 2026-10-15
+
+The first screen says what the tool gives you: a read-only example of inputs and names at the top, and a first visit that opens on an example plan with its names already shown (Clear empties it). Tablets and phones open the names with a bar at the bottom. A new About page covers what the tool checks, the source, the license and the versions. The local dev server renders again; production headers are unchanged.
+
+Rules revision for this release: 2026-10-13.3 (unchanged — the same input gives the same names and verdicts).
 
 ### Changed
 
@@ -11,7 +15,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 - **Names bar** (D108) — on tablets (768–1279 px) the thin handle on the right edge is replaced by a bar at the bottom of the screen, *View N generated names (Terraform / JSON)*, that opens the names drawer; on phones the same bar switches to the Names tab and reads *View N names*, so it fits on one line at 360 px (D109).
 - **Project ID note** — an info icon before the one-line summary.
 
-- **First screen says what goes in and what comes out** (D107) — the intro box starts with a read-only example: `devops · payments · prod · asia-northeast3` → the Project ID, a VM instance and its boot disk, each marked PASS (below 768 px, the VM instance only). The names are produced by the engine at build time and checked by a test, not written by hand. The intro text is one sentence; "nothing is created" and "names are not checked for availability" moved next to the PASS paragraph under the names.
+- **First screen says what goes in and what comes out** (D107) — the intro box starts with a read-only example: `demo · payment · prod · asia-northeast3` → the Project ID, a Cloud Run service and an HTTPS forwarding rule, each marked PASS (below 768 px, the Cloud Run service only) — the same values as the example plan (D108). The names are produced by the engine at build time and checked by a test, not written by hand. The intro text is one sentence; "nothing is created" and "names are not checked for availability" moved next to the PASS paragraph under the names.
 - **Tagline and page description** — the header tagline now reads "Enter owner, system, environment and region → Google Cloud resource names that pass the official rules"; the home page description follows it.
 - **Project ID warning** — one line ("Project IDs are global and can never be reused.") with a **Why?** disclosure holding the full explanation.
 - **PASS paragraph** — shown under the names only once at least one name is generated; the empty names column shows only its one-line prompt.
@@ -155,6 +159,7 @@ These changes were made before any public deployment, so no released name depend
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
 
+[0.1.4]: https://github.com/uranos-studio/cloudonym/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/uranos-studio/cloudonym/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/uranos-studio/cloudonym/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/uranos-studio/cloudonym/compare/v0.1.0...v0.1.1
