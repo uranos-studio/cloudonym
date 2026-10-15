@@ -2,7 +2,7 @@
 // CLI 단위 시험 (D102) — 서버 없이 가짜 fetchFn 으로. 엔진의 실답은 src/api/cli-contract.test.ts 가 본다
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync, unlinkSync, closeSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, chmodSync, statSync, symlinkSync, lstatSync, unlinkSync, closeSync, rmSync, writeSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main, EXIT, resolveTarget, USER_AGENT } from './lib/main.mjs';
@@ -275,6 +275,22 @@ test('[4] 보관 파일이 있는데 못 읽으면 exit 2 — validate 가 비�
   assert.equal(readFileSync(namesFile, 'utf-8'), '{ broken');
   writeFileSync(namesFile, '{"environments": []}');
   assert.equal((await run(['validate'], ok(), dir)).code, EXIT.INPUT);
+  // 환경 안의 꼴도 본다 — names 가 배열이 아니면 빈 목록과 비교해 「같다」고 말하게 된다
+  for (const bad of [
+    '{"environments": {"prod": {"names": null}}}',
+    '{"environments": {"prod": null}}',
+    '{"environments": {"prod": {"names": [{"key": "k1"}]}}}',
+    '{"environments": {"prod": {"names": [{"key": 1, "name": "a-01"}]}}}',
+    '{"environments": {"prod": {"names": [], "invalid": {}}}}',
+  ]) {
+    writeFileSync(namesFile, bad);
+    const r = await run(['validate'], ok(), dir);
+    assert.equal(r.code, EXIT.INPUT, `${bad}\n${r.out}\n${r.err}`);
+    assert.equal(r.out.includes('same as the names file'), false, bad);
+  }
+  // 검사기 — 맞는 꼴은 그대로 받는다
+  writeFileSync(namesFile, '{"environments": {"prod": {"valid": true, "names": [{"key": "k1", "name": "a-01"}], "invalid": []}}}');
+  assert.equal((await run(['validate'], ok(), dir)).code, EXIT.OK);
 });
 
 test('[5] 서버 URL — 쿼리 · fragment · 자격이 든 URL 은 거부하고, 자격을 출력에 내지 않는다', async () => {
@@ -454,6 +470,29 @@ test('[14] 동시 저장(결정적) — 첫 저장이 재검사를 마친 뒤 ·
   assert.match(second.message, /is locked by another cloudonym command/);
   assert.equal(JSON.parse(planBytes(dir)).project.owner, 'first');
   assert.deepEqual(leftovers(dir), []);
+});
+
+test('[14] 부분 쓰기 — writeSync 가 일부만 쓰면 이어 쓰고, 더 못 쓰면 원본을 바꾸지 않는다', () => {
+  {
+    // 한 번에 5바이트씩만 쓰는 파일 시스템 — 끝까지 이어 써서 온전한 JSON 이 된다
+    const { dir, file, digest } = planOnDisk();
+    /** @type {typeof writeSync} */
+    const fiveAtATime = /** @type {any} */ ((/** @type {number} */ fd, /** @type {Buffer} */ buf, /** @type {number} */ off, /** @type {number} */ len) => writeSync(fd, buf, off, Math.min(5, len)));
+    writeJson(file, owned('chunked'), digest, { fs: { writeSync: fiveAtATime } });
+    assert.equal(JSON.parse(planBytes(dir)).project.owner, 'chunked');
+    assert.deepEqual(leftovers(dir), []);
+  }
+  {
+    // 5바이트 뒤 0 을 돌려주는 파일 시스템(디스크 가득) — 원본 그대로 · 임시 파일 없음
+    const { dir, file, digest } = planOnDisk();
+    const before = planBytes(dir);
+    let first = true;
+    /** @type {typeof writeSync} */
+    const fullAfterFive = /** @type {any} */ ((/** @type {number} */ fd, /** @type {Buffer} */ buf, /** @type {number} */ off) => { if (!first) return 0; first = false; return writeSync(fd, buf, off, 5); });
+    assert.throws(() => writeJson(file, owned('torn'), digest, { fs: { writeSync: fullAfterFive } }), (e) => e instanceof PlanError && /wrote 5 of \d+ bytes/.test(e.message));
+    assert.equal(planBytes(dir), before);
+    assert.deepEqual(leftovers(dir), []);
+  }
 });
 
 test('[14] 주입점은 기본에서 꺼져 있다 — 운영 호출은 네 번째 인자를 넘기지 않고 plan.mjs 는 환경변수를 읽지 않는다 · 인자 없이도 쓴다', () => {

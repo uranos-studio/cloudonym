@@ -9,6 +9,11 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 - **Share preview image** (D111) — pages carry `og:image` and `twitter:card` `summary_large_image`: a 1200×630 picture of the example inputs `demo · payment · prod · asia-northeast3` and three of the names they give, each PASS. The picture is drawn from the engine's intro example, and a test fails if the two drift apart.
 - **Privacy page: contact and last-updated date** — `/privacy` ends with a *Contact and changes* section: questions go to GitHub issues, security problems to GitHub private vulnerability reporting (the same channel as SECURITY.md; no email address), and the page shows the date it was last changed. A test fingerprints the page text, so a change to the text fails until the date is updated with it.
 
+### Fixed
+
+- **CLI: a partial write no longer replaces the plan or names file** — when the disk accepts only part of the bytes, the CLI keeps writing until all are written and, if it cannot, leaves the original file untouched instead of replacing it with a truncated one.
+- **CLI: a malformed names file is refused** — an environment whose `names` is not a list of `{ key, name }` (for example `"names": null`) made `validate` compare against nothing and report *same as the names file*; it now exits 2 like any other unreadable names file.
+
 ## [0.1.5] - 2026-10-15
 
 Cloudflare Web Analytics, which Cloudflare adds to every page, is now allowed by the page CSP instead of failing with a console error, and the Privacy page says what it collects.

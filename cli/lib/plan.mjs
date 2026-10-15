@@ -149,7 +149,13 @@ function replaceLocked(path, target, mode, doc, expect, io, afterCheck) {
     const fd = io.openSync(tmp, 'wx', mode ?? 0o666);
     created = true;
     try {
-      io.writeSync(fd, planText(doc));
+      // writeSync 는 일부만 쓰고 돌아올 수 있다(디스크 가득 등) — 다 쓸 때까지 잇고, 더 못 쓰면 원본을 바꾸지 않는다
+      const buf = Buffer.from(planText(doc), 'utf-8');
+      for (let off = 0; off < buf.length;) {
+        const n = io.writeSync(fd, buf, off, buf.length - off);
+        if (!(n > 0)) throw new Error(`wrote ${off} of ${buf.length} bytes`);
+        off += n;
+      }
       io.fsyncSync(fd);
     } finally {
       io.closeSync(fd);
@@ -280,6 +286,17 @@ export function namesPathFor(planPath) {
 }
 
 /**
+ * 보관 파일의 환경 하나 — names 는 { key, name } 문자열 쌍의 배열, invalid 는 있으면 { key } 의 배열.
+ * 꼴이 틀린 환경을 받아들이면 validate 가 빈 목록과 비교해 「같다」고 말한다
+ * @param {unknown} env
+ */
+function isStoredEnv(env) {
+  const entries = (/** @type {unknown} */ list, /** @type {boolean} */ needName) => Array.isArray(list)
+    && list.every((n) => isRecord(n) && typeof n.key === 'string' && (!needName || typeof n.name === 'string'));
+  return isRecord(env) && entries(env.names, true) && (env.invalid === undefined || entries(env.invalid, false));
+}
+
+/**
  * 이름 보관 파일 — 없으면 doc 이 undefined · digest 가 null. 있는데 못 읽거나 꼴이 틀리면 PlanError(2):
  * 조용히 없는 것으로 치면 validate 가 비교를 건너뛰고 names 가 덮어쓴다
  * @param {string} path @param {string} shown 문장에 쓰는 이름
@@ -300,8 +317,8 @@ export function readNamesFile(path, shown = path) {
   } catch {
     doc = undefined;
   }
-  if (!isRecord(doc) || !isRecord(doc.environments)) {
-    throw new PlanError(`The names file ${shown} is not a names file (JSON with an "environments" object). Move or delete it, then run "cloudonym names" to write it again.`);
+  if (!isRecord(doc) || !isRecord(doc.environments) || !Object.values(doc.environments).every(isStoredEnv)) {
+    throw new PlanError(`The names file ${shown} is not a names file (JSON with an "environments" object of { names: [{ key, name }] }). Move or delete it, then run "cloudonym names" to write it again.`);
   }
   return { doc, digest: digestOf(text) };
 }
