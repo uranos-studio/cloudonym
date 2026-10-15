@@ -2,7 +2,11 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.1.5] - 2026-10-15
+
+Cloudflare Web Analytics, which Cloudflare adds to every page, is now allowed by the page CSP instead of failing with a console error, and the Privacy page says what it collects.
+
+Rules revision for this release: 2026-10-13.3 (unchanged — the same input gives the same names and verdicts).
 
 ### Changed
 
@@ -165,7 +169,7 @@ These changes were made before any public deployment, so no released name depend
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
 
-[Unreleased]: https://github.com/uranos-studio/cloudonym/compare/v0.1.4...HEAD
+[0.1.5]: https://github.com/uranos-studio/cloudonym/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/uranos-studio/cloudonym/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/uranos-studio/cloudonym/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/uranos-studio/cloudonym/compare/v0.1.1...v0.1.2
