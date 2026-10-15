@@ -8,6 +8,7 @@
   uv run --python 3.12 --with "playwright==1.63.0" python scripts/og-image.py
 """
 
+import base64
 import html
 import json
 from pathlib import Path
@@ -18,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLE = ROOT / "src/components/introExamples.json"
 OUT_PNG = ROOT / "public/og-image.png"
 OUT_STAMP = ROOT / "scripts/og-image.json"
+MARK = ROOT / "public/favicon.svg"  # 제품 표시 — 파비콘 · 머리글과 같은 파일
 
 TAGLINE = "Google Cloud resource names that pass the official naming rules"
 FOOT = "Web tool · JSON API · llms.txt · Apache-2.0"
@@ -30,11 +32,14 @@ def page(example: dict) -> str:
         f'<code>{html.escape(r["name"])}</code><span class="pass">PASS</span></div>'
         for r in example["rows"]
     )
+    mark = base64.b64encode(MARK.read_bytes()).decode()
     return f"""<!doctype html><html><head><meta charset="utf-8"><style>
 * {{ box-sizing: border-box; margin: 0; }}
 body {{ width: 1200px; height: 630px; font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
   background: linear-gradient(135deg, #eef2ff 0%, #ffffff 55%, #f4f4f5 100%); color: #18181b;
   padding: 64px 72px; display: flex; flex-direction: column; }}
+.brand {{ display: flex; align-items: center; gap: 24px; }}
+.brand img {{ width: 88px; height: 88px; }}
 h1 {{ font-size: 76px; font-weight: 800; letter-spacing: -2px; color: #312e81; }}
 .tag {{ margin-top: 12px; font-size: 32px; color: #3f3f46; }}
 .card {{ margin-top: 40px; background: #fff; border: 1px solid #e4e4e7; border-radius: 20px;
@@ -49,7 +54,7 @@ code {{ font-family: ui-monospace, Menlo, monospace; font-size: 26px; color: #18
 .pass {{ font-size: 18px; font-weight: 700; color: #166534; background: #dcfce7; border-radius: 999px; padding: 4px 14px; }}
 .foot {{ margin-top: auto; font-size: 22px; color: #71717a; }}
 </style></head><body>
-<h1>Cloudonym</h1>
+<div class="brand"><img src="data:image/svg+xml;base64,{mark}" alt=""><h1>Cloudonym</h1></div>
 <p class="tag">{html.escape(TAGLINE)}</p>
 <div class="card"><div class="in">{chips}<span class="arrow">→</span></div>{rows}</div>
 <p class="foot">{html.escape(FOOT)}</p>
