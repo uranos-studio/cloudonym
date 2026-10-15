@@ -3,7 +3,7 @@
 // 두 값이 같은지는 src/api/version.test.ts 가 본다 — package.json 의 version 을 올리면 여기도 같이 올린다
 import { RULES_REVISION } from './core/revision';
 
-export const ENGINE_VERSION = '0.1.5';
+export const ENGINE_VERSION = '0.1.6';
 
 export const VERSION = { engine: ENGINE_VERSION, rules: RULES_REVISION } as const;
 export type Version = { engine: string; rules: string };
