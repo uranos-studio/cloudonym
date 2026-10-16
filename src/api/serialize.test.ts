@@ -38,6 +38,14 @@ describe('toWireName (D15 · D25)', () => {
     expect(w.steps).toEqual([]);
     expect(w.rule.notes).toEqual([{ code: 'note.s3_an_suffix', message: 'The -an suffix is reserved for account-regional namespace buckets' }]);
   });
+  it('warnings 는 있을 때만 — violations 바로 뒤 · 없으면 키도 없다 (D112)', () => {
+    expect(toWireName(base)).not.toHaveProperty('warnings');
+    const w = toWireName({ ...base, warnings: [{ code: 'warning.arn_suffix_lookalike' }] });
+    expect(Object.keys(w)).toEqual(['name', 'valid', 'is_truncated', 'is_transformed', 'original', 'violations', 'warnings', 'steps', 'rule']);
+    expect(w.warnings?.map((m) => m.code)).toEqual(['warning.arn_suffix_lookalike']);
+    expect(w.warnings?.[0]?.message).toMatch(/^Ends with a hyphen and six characters/);
+    expect(w.valid).toBe(true);
+  });
 });
 
 describe('toWireGenerate', () => {
@@ -68,5 +76,10 @@ describe('toWireValidate', () => {
     expect(toWireValidate({ valid: false, violations: [{ code: 'name.empty' }], suggestedName: 'y' }, version))
       .toEqual({ valid: false, version, violations: [{ code: 'name.empty', message: 'The name is empty' }], suggested_name: 'y' });
     expect(toWireValidate({ valid: true, violations: [] }, version)).toEqual({ valid: true, version, violations: [] });
+  });
+  it('warnings 는 있을 때만 — valid 를 바꾸지 않는다 (D112)', () => {
+    const w = toWireValidate({ valid: true, violations: [], warnings: [{ code: 'warning.arn_suffix_lookalike' }] }, version);
+    expect(w.valid).toBe(true);
+    expect(w.warnings?.map((m) => m.code)).toEqual(['warning.arn_suffix_lookalike']);
   });
 });

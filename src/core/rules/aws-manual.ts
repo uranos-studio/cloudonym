@@ -8,7 +8,7 @@ import type { ScopeDef } from '../scopes';
 import { NO_INVISIBLE } from '../invisible.mjs';
 
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
-const ADVISORY: CoreMessage = { code: 'note.advisory_rule_enforced' };
+const ADVISORY_WARNED: CoreMessage = { code: 'note.advisory_rule_warned' };
 const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
 
 const PLACED: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
@@ -28,7 +28,7 @@ const LOGS_NAME = new RegExp(`${NO_INVISIBLE}^[^:*]{1,512}$`, 'u');
 const RDS_IDENT = /^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*$/;
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
-  & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl'>>;
+  & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl' | 'advice'>>;
 
 /** 기본 — 영숫자 · 하이픈 · 밑줄로 생성, 대소문자 허용, 시작 · 끝 규칙 없음 */
 function rule(s: Spec): ResourceRule {
@@ -198,9 +198,10 @@ const RULES: ResourceRule[] = [
 
   // ── Secrets Manager ──
   // "The secret name can contain ASCII letters, numbers, and the following characters: /_+=.@- Do not end your secret name with a hyphen followed by six characters. … Length Constraints: Minimum length of 1. Maximum length of 512."
-  // 끝 규칙은 원문이 권고다 — 거부한다
-  rule({ id: 'aws.secretsmanager_secret', displayName: 'SecretsManager Secret', slug: 'secret', minLength: 1, maxLength: 512, pattern: /^(?!.*-[A-Za-z0-9/_+=.@-]{6}$)[A-Za-z0-9/_+=.@-]{1,512}$/,
-    scope: 'aws:region', entity: 'AWS::SecretsManager::Secret', category: 'security', docUrl: 'https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_CreateSecret.html', notes: [ADVISORY, SCOPE] }),
+  // 끝 규칙은 원문이 권고다("If you do so, you risk confusion and unexpected results when searching for a secret by partial ARN") — 거부하지 않고 경고한다 (D112)
+  rule({ id: 'aws.secretsmanager_secret', displayName: 'SecretsManager Secret', slug: 'secret', minLength: 1, maxLength: 512, pattern: /^[A-Za-z0-9/_+=.@-]{1,512}$/,
+    advice: [{ pattern: /-[A-Za-z0-9/_+=.@-]{6}$/, warning: { code: 'warning.arn_suffix_lookalike' } }],
+    scope: 'aws:region', entity: 'AWS::SecretsManager::Secret', category: 'security', docUrl: 'https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_CreateSecret.html', notes: [ADVISORY_WARNED, SCOPE] }),
 
   // ── CloudWatch Logs ──
   // "Log stream names must be unique within the log group. … Length Constraints: Minimum length of 1. Maximum length of 512. Pattern: [^:*]*"

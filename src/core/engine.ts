@@ -8,7 +8,7 @@ import { findConflicts } from './conflict';
 import type { InstanceSlot, SelectionItem } from './selection';
 import { inputKind } from './tree';
 import { fit } from './truncate';
-import { checkName } from './validate';
+import { checkAdvice, checkName } from './validate';
 import type { CoreMessage, ContextField } from './messages';
 import { clipForDisplay } from './display';
 import { attachmentRow, type AttachKind } from './wizard/attachments';
@@ -17,6 +17,13 @@ import { attachmentRow, type AttachKind } from './wizard/attachments';
 function ruleInfo(rule: ResourceRule): NameResult['rule'] {
   return { minLength: rule.minLength, maxLength: rule.maxLength, pattern: rule.pattern.source, patternFlags: rule.pattern.flags, allowed: rule.allowed, docUrl: rule.docUrl,
            notes: (rule.notes ?? []).map((m) => structuredClone(m)) };
+}
+
+/** 권고 경고 (D112) — 있을 때만 warnings 키를 싣는다(없으면 결과 모양이 그대로다) */
+function adviceOf(name: string, rule: ResourceRule): { warnings?: CoreMessage[] } {
+  if (name.length === 0) return {};
+  const warnings = checkAdvice(name, rule);
+  return warnings.length > 0 ? { warnings } : {};
 }
 
 function generateOne(given: NamingContext | ProjectContext, rule: ResourceRule, extra: ItemExtra = {}): NameResult {
@@ -62,7 +69,7 @@ function generateOne(given: NamingContext | ProjectContext, rule: ResourceRule, 
   // 멀티 · 이중 리전 위치를 받지 않는 규칙이다 (D78) — 이름은 만든 그대로 두고 판정만 FAIL 로 한다(그 위치에 둘 수 없는 리소스다)
   const loc = locationMismatch(ctx.region, rule);
   if (loc) violations.unshift({ code: 'name.location_unsupported', params: { location: loc.location, supported: locationRuleTypes(loc) } });
-  return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, steps };
+  return { ...base, name: f.name, valid: violations.length === 0, isTruncated: f.truncated, violations, ...adviceOf(f.name, rule), steps };
 }
 
 /** 항목 하나의 이름 — 용도 토큰 · 프로젝트 수준을 받는 진입점 (D60 · D63). 충돌 검사는 하지 않는다(부르는 쪽이 요청 전체로 한다).
@@ -203,7 +210,7 @@ export function attachName(parent: NameItem, child: { attach: AttachKind; seq?: 
     else violations.push(v);
   }
   if (tooLong) violations.push({ code: 'name.parent_name', params: { parent: parent.name, suffix } });
-  return { ...base, ...meta, name, original: name, valid: violations.length === 0, violations };
+  return { ...base, ...meta, name, original: name, valid: violations.length === 0, violations, ...adviceOf(name, rule) };
 }
 
 /** 프로젝트 한 번에 (D69) — 마감 순서가 계약이다:
@@ -288,16 +295,18 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
 }
 
 export function validateName(provider: Provider, resourceType: string, name: string):
-  { valid: boolean; violations: CoreMessage[]; suggestedName?: string } {
+  { valid: boolean; violations: CoreMessage[]; warnings?: CoreMessage[]; suggestedName?: string } {
   const rule = getRule(provider, resourceType);
   if (!rule) return { valid: false, violations: [{ code: 'rule.unknown_resource_type', params: { provider, supported: rulesFor(provider).map((r) => r.resourceType) } }] };
 
+  // 권고 경고는 판정과 따로 — 유효여도 무효여도 싣는다 (D112)
   const violations = checkName(name, rule);
-  if (violations.length === 0) return { valid: true, violations };
+  const advice = adviceOf(name, rule);
+  if (violations.length === 0) return { valid: true, violations, ...advice };
 
   // ⑴ 정제만으로 되는가
   const normalized = normalizeToken(name, rule.allowed).value;
-  if (checkName(normalized, rule).length === 0) return { valid: false, violations, suggestedName: normalized };
+  if (checkName(normalized, rule).length === 0) return { valid: false, violations, ...advice, suggestedName: normalized };
 
   // ⑵ 길이 초과면 정제한 값을 쪼개 앞 토큰부터 뗀다.
   // 생성의 축소 1단계(template 순서대로 optional 을 뗀다)와 다른 까닭: 검증은 이름이 어떤 template 으로 만들어졌는지 모른다
@@ -306,10 +315,10 @@ export function validateName(provider: Provider, resourceType: string, name: str
     const parts = normalized.split(rule.separator);
     for (let i = 1; i < parts.length; i++) {
       const candidate = parts.slice(i).join(rule.separator);
-      if (checkName(candidate, rule).length === 0) return { valid: false, violations, suggestedName: candidate };
+      if (checkName(candidate, rule).length === 0) return { valid: false, violations, ...advice, suggestedName: candidate };
     }
   }
-  return { valid: false, violations };
+  return { valid: false, violations, ...advice };
 }
 
 /** env 표준값 — 화면의 env 고르기가 쓰는 공개 API (D48). 정본은 normalize.ts 의 별칭 표다 */

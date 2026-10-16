@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkName } from './validate';
+import { checkAdvice, checkName } from './validate';
 import { getRule, RULES } from './constraints';
 const sa = getRule('gcp', 'service_account')!;
 const st = getRule('azure', 'storage_account')!;
@@ -208,5 +208,26 @@ describe('Cloud Run 서비스 경계 (D65)', () => {
   });
   it.each(['a-', 'A', 'a_b', '1a', '-a'])('%s 거부', (bad) => {
     expect(checkName(bad, r)).not.toEqual([]);
+  });
+});
+
+describe('checkAdvice — 문서가 권고만 하는 꼴은 경고이고 거부가 아니다 (D112)', () => {
+  const secret = getRule('aws', 'secretsmanager_secret')!;
+  it.each(['x-abcdef', 'prod/db-A1b2C3', 'mobile-app-backend-cache-qa-eu-west-1', 'app-secret'])('%s — 하이픈 + 여섯 글자로 끝난다: 유효 · 경고 하나', (name) => {
+    expect(checkName(name, secret)).toEqual([]);
+    expect(checkAdvice(name, secret)).toEqual([{ code: 'warning.arn_suffix_lookalike' }]);
+  });
+  it.each(['x-abcde', 'x-abcdefg', 'app-secret-01', 'prod/db/password', 'abcdef'])('%s — 경고 없음', (name) => {
+    expect(checkName(name, secret)).toEqual([]);
+    expect(checkAdvice(name, secret)).toEqual([]);
+  });
+  it('advice 가 없는 규칙은 늘 빈 배열 · advice 를 가진 규칙은 이것 하나뿐', () => {
+    expect(checkAdvice('x-abcdef', sa)).toEqual([]);
+    expect(Object.values(RULES).filter((r) => r.advice).map((r) => r.id)).toEqual(['aws.secretsmanager_secret']);
+  });
+  it('돌려준 경고를 고쳐도 규칙 표는 그대로다', () => {
+    const [w] = checkAdvice('x-abcdef', secret);
+    (w as { code: string }).code = 'x';
+    expect(secret.advice![0]!.warning.code).toBe('warning.arn_suffix_lookalike');
   });
 });

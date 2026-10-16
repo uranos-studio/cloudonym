@@ -2,6 +2,14 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+Rules revision for this release: 2026-10-16.1.
+
+### Changed
+
+- **Secrets Manager: the "hyphen and six characters" ending is a warning, not a failure** (D112) — the AWS API reference says not to end a secret name with a hyphen followed by six characters because a search by partial ARN can then give unexpected results; it does not forbid it. Such names (`…-eu-west-1`, `…-A1b2C3`) were `valid: false` with `name.pattern_mismatch`; they are now `valid: true` with `warning.arn_suffix_lookalike` in a new `warnings` list. `warnings` appears on `/v1/validate` and on name items only when there is one; it never changes `valid`. AWS is not enabled yet, so no response changes today.
+
 ## [0.1.6] - 2026-10-15
 
 Pages get a share preview image and the Privacy page a contact section and a last-updated date. The CLI no longer replaces a file with a partly written one and refuses a malformed names file. On phones, Esc right after opening a row is no longer lost.

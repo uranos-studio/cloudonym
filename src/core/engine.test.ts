@@ -81,6 +81,15 @@ describe('parseContext', () => {
 });
 
 describe('validateName', () => {
+  it('권고 경고 (D112) — Secrets Manager 이름이 하이픈 + 여섯 글자로 끝나면 valid 는 true 그대로 · warnings 하나 · 없으면 warnings 키가 없다', () => {
+    expect(validateName('aws', 'secretsmanager_secret', 'mobile-app-backend-cache-qa-eu-west-1')).toEqual({ valid: true, violations: [], warnings: [{ code: 'warning.arn_suffix_lookalike' }] });
+    expect(validateName('aws', 'secretsmanager_secret', 'billing-trade-prod-apne2-secret-01')).toEqual({ valid: true, violations: [] });
+    // 무효여도 경고는 따로 싣는다 — 공백은 거부, 끝 꼴은 경고
+    const bad = validateName('aws', 'secretsmanager_secret', 'my secret-abcdef');
+    expect(bad.valid).toBe(false);
+    expect(bad.warnings).toEqual([{ code: 'warning.arn_suffix_lookalike' }]);
+    expect(validateName('gcp', 'service_account', 'billing-trade-prod-sa-sync')).not.toHaveProperty('warnings');
+  });
   it('이유와 제안을 준다 (앞 토큰부터 뗀다)', () => {
     expect(validateName('gcp', 'service_account', 'infra-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: [{ code: 'name.too_long', params: { actual: 34, max: 30 } }], suggestedName: 'billing-trade-prd-kr-sa-sync' });
   });

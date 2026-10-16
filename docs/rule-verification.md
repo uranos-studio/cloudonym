@@ -171,6 +171,16 @@ The wizard's firewall chips, the private services access chip and the project ID
 | A project ID cannot be reused | https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects | "It cannot be in use or previously used; this includes deleted projects." · "After project creation, the project ID is permanent." No sentence says what the console does when a taken ID is entered, so the notice does not say it | Project ID notice and suffix (D85) |
 | No anonymous project lookup | https://docs.cloud.google.com/resource-manager/reference/rest/v1/projects/get | "The caller must have read permissions for this Project." · "Authorization requires the following IAM permission on the specified resource `projectId`:" `resourcemanager.projects.get` | Cloudonym does not check whether a project ID is free (D85) |
 
+## Advice that is no longer enforced (2026-10-16)
+
+Re-read on 2026-10-16. The quoted sentence is advice — it says what goes wrong, not that the request is refused — so the name is accepted and the result carries a warning instead (D112). The API was not called to see whether it refuses such a name; the rule follows the document.
+
+| ruleId | `docUrl` | Quoted text | Before | Now |
+|---|---|---|---|---|
+| `aws.secretsmanager_secret` | https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_CreateSecret.html | `Name`: "The secret name can contain ASCII letters, numbers, and the following characters: /_+=.@-" · "Do not end your secret name with a hyphen followed by six characters. If you do so, you risk confusion and unexpected results when searching for a secret by partial ARN. Secrets Manager automatically adds a hyphen and six random characters after the secret name at the end of the ARN." · "Length Constraints: Minimum length of 1. Maximum length of 512." | Pattern `^(?!.*-[A-Za-z0-9/_+=.@-]{6}$)[A-Za-z0-9/_+=.@-]{1,512}$` — a name such as `app-eu-west-1` or `prod/db-A1b2C3` was `valid: false` (`name.pattern_mismatch`), with `note.advisory_rule_enforced` | Pattern `^[A-Za-z0-9/_+=.@-]{1,512}$`; a name matching `-[A-Za-z0-9/_+=.@-]{6}$` stays valid and carries `warning.arn_suffix_lookalike` in `warnings`; the rule note is `note.advisory_rule_warned` |
+
+The two Google Cloud rules that still carry `note.advisory_rule_enforced` (`gcp.iam_wip_managed_identity`, `gcp.iam_wip_namespace`) were not part of this re-check.
+
 ## Azure reserved words (added 2026-09-29)
 
 Source: https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words or trademarks in the name." The naming rules page (`resource-name-rules`) also says: "Resources with a public endpoint can't include reserved words or trademarks in the name." The ⑷ verdicts in the RULES table above were made before this document was consulted; for the rules listed below, this section supersedes ⑷.

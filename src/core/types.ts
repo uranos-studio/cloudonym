@@ -69,6 +69,13 @@ export interface RuleEvidence {
   quote: string;    // 정규식 · 오류 메시지 · 관측 결과 원문
 }
 
+/** 문서가 권고만 하는 꼴 (D112) — 이름이 pattern 에 맞으면 warning 을 싣는다. 판정(valid)은 바꾸지 않는다.
+ *  금지가 아니라 「하지 마라 · 그러면 위험하다」로 적힌 문장만 여기에 둔다. 거부 조건은 pattern · forbidden 이다 */
+export interface RuleAdvice {
+  pattern: RegExp;
+  warning: CoreMessage;
+}
+
 export interface ResourceRule {
   id: string;                 // 'gcp.service_account'
   provider: Provider;
@@ -95,6 +102,7 @@ export interface ResourceRule {
   docUrl: string;             // 공식 문서 URL — 숫자의 근거 (evidence 가 있으면 안내서)
   evidence?: readonly RuleEvidence[]; // 안내서가 적지 않은 숫자 · 문자의 근거 (D80)
   notes?: CoreMessage[];      // 보수적 한도 등 설명 (D20) — 코드로 싣고 문장은 src/messages/ 가 만든다
+  advice?: readonly RuleAdvice[]; // 문서가 권고만 하는 꼴 — 맞으면 warnings (D112)
   regionToken?: RegionToken;  // catalog 가 덮은 규칙(GCP)만 있다 — 없으면 템플릿에 region 이 있는지로 정한다(compose.ts regionTokenOfRule)
   defaultLocation?: 'global'; // 지역 자리의 기본값이 문맥 지역이 아니라 global(토큰 없음)인 규칙 — Secret (D79). 마법사 pick 의 location 'regional' 일 때만 문맥 지역을 쓴다
   kinds?: RuleKinds;          // catalog 에 종류 표가 있는 규칙만
@@ -110,6 +118,7 @@ export interface NameResult {
   isTransformed: boolean;     // 정제에서 문자가 바뀌었거나 구분자가 빠졌다 (D15)
   original: string;           // 정제 전 · 축소 전 조립 이름
   violations: CoreMessage[];  // valid:false 일 때 이유 (D23)
+  warnings?: CoreMessage[];   // 있을 때만 — 문서가 권고하지 않는 꼴이지만 거부 조건은 아니다(valid 를 바꾸지 않는다 · D112)
   steps: CoreMessage[];       // 축소 · 변환 기록 (step.token_dropped · step.abbreviated · step.budget_shortened · step.separator_removed · step.normalized)
   // pattern 은 RegExp.source, patternFlags 는 RegExp.flags — 소비자는 new RegExp(pattern, patternFlags) 로 다시 만든다 (리소스 그룹의 \p{L} 은 'u' 가 없으면 리터럴 p 가 된다)
   rule: { minLength: number; maxLength: number; pattern: string; patternFlags: string; allowed: Allowed; docUrl: string; notes: CoreMessage[] };

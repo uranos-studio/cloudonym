@@ -228,6 +228,12 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(text).toContain('the wizard response is reproduced by repeating the same wizard request with its `rules_version`; `/v1/names` is a separate, flat endpoint');
     expect(lines.find((l) => l.startsWith('> For humans'))).toContain('`POST /v1/wizard`');
   });
+  it('API 절 — /v1/validate 의 응답 칸 · warnings 는 valid 를 바꾸지 않는다 (D112)', () => {
+    const v = section('## API').find((l) => l.startsWith('- `POST /v1/validate`'))!;
+    expect(v).toContain('`{ valid, version, violations, warnings?, suggested_name? }`');
+    expect(v).toContain('it never changes `valid`');
+    expect(text).toContain('`violations`, `warnings`, `steps`, `errors`, `rule.notes` and the label lists are arrays of');
+  });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
     const rg = allLines.find((l) => l.startsWith('- `azure.resource_group` ('))!;
     expect(rg).toContain('(flags: u)');

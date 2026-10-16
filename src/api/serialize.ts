@@ -13,7 +13,7 @@ export interface WireMessage { code: MessageCode; field?: string; params?: Recor
 export interface WireRule { min_length: number; max_length: number; pattern: string; pattern_flags: string; allowed: string; doc_url: string; notes: WireMessage[] }
 export interface WireName {
   name: string; valid: boolean; is_truncated: boolean; is_transformed: boolean; original: string;
-  violations: WireMessage[]; steps: WireMessage[]; rule: WireRule;
+  violations: WireMessage[]; warnings?: WireMessage[]; steps: WireMessage[]; rule: WireRule;
 }
 export interface WireGenerate {
   success: true;
@@ -33,7 +33,8 @@ export interface WireNameItem extends WireName {
 }
 export interface WireNamesProvider { valid: boolean; items: WireNameItem[]; conflicts: WireMessage[] }
 export interface WireNames extends Omit<WireGenerate, 'data'> { data: Partial<Record<Provider, WireNamesProvider>> }
-export interface WireValidate { valid: boolean; version: Version; violations: WireMessage[]; suggested_name?: string }
+/** warnings 는 있을 때만 — 문서가 권고하지 않는 꼴. valid 를 바꾸지 않는다 (D112) */
+export interface WireValidate { valid: boolean; version: Version; violations: WireMessage[]; warnings?: WireMessage[]; suggested_name?: string }
 
 /** provider 하나의 결과 — 라우터가 요청 providers 순서대로 만든다. data 와 metadata 셋의 provider 집합이 같아지는 자리다 */
 export interface ProviderResult { provider: Provider; names: Record<string, NameResult>; labels: LabelSet }
@@ -56,7 +57,7 @@ export function toWireName(r: NameResult, catalog: Catalog = en): WireName {
   const { minLength, maxLength, pattern, patternFlags, allowed, docUrl, notes } = r.rule;
   return {
     name: r.name, valid: r.valid, is_truncated: r.isTruncated, is_transformed: r.isTransformed, original: r.original,
-    violations: wire(r.violations, catalog), steps: wire(r.steps, catalog),
+    violations: wire(r.violations, catalog), ...(r.warnings !== undefined ? { warnings: wire(r.warnings, catalog) } : {}), steps: wire(r.steps, catalog),
     rule: { min_length: minLength, max_length: maxLength, pattern, pattern_flags: patternFlags, allowed, doc_url: docUrl, notes: wire(notes, catalog) },
   };
 }
@@ -75,9 +76,10 @@ export function toWireGenerate(results: ProviderResult[], transformed: readonly 
   return w;
 }
 
-export function toWireValidate(r: { valid: boolean; violations: readonly Message[]; suggestedName?: string }, version: Version, catalog: Catalog = en): WireValidate {
+export function toWireValidate(r: { valid: boolean; violations: readonly Message[]; warnings?: readonly Message[]; suggestedName?: string }, version: Version, catalog: Catalog = en): WireValidate {
   return {
     valid: r.valid, version: { ...version }, violations: wire(r.violations, catalog),
+    ...(r.warnings !== undefined ? { warnings: wire(r.warnings, catalog) } : {}),
     ...(r.suggestedName !== undefined ? { suggested_name: r.suggestedName } : {}),
   };
 }

@@ -96,6 +96,8 @@ const SAMPLES: { [K in MessageCode]: Extract<Message, { code: K }> } = {
   'note.observed_server_rule': { code: 'note.observed_server_rule' },
   'note.obsolete_source_applied': { code: 'note.obsolete_source_applied' },
   'note.advisory_rule_enforced': { code: 'note.advisory_rule_enforced' },
+  'note.advisory_rule_warned': { code: 'note.advisory_rule_warned' },
+  'warning.arn_suffix_lookalike': { code: 'warning.arn_suffix_lookalike' },
   'name.conflict': { code: 'name.conflict', params: { name: 'AAA', keys: ['CCC', 'DDD'] } },
   'selection.not_array': { code: 'selection.not_array' },
   'selection.empty': { code: 'selection.empty' },
@@ -138,7 +140,7 @@ describe('영어 사전 (D24)', () => {
 
   it('엔진 · API 코드 전부에 문장 함수가 있다 (런타임) · 표본도 코드 전부를 덮는다', () => {
     const codes = [...MESSAGE_CODES, ...API_CODES];
-    expect(codes).toHaveLength(117);
+    expect(codes).toHaveLength(119);
     expect(Object.keys(en.messages).sort()).toEqual([...codes].sort());
     expect(Object.keys(SAMPLES).sort()).toEqual([...codes].sort());
   });

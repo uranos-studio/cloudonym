@@ -19,6 +19,8 @@ export const en: Catalog = {
     'name.forbidden_exact': (m) => `'${m.params.value}' is a reserved name`,
     'name.forbidden_word': (m) => `Contains the reserved word '${m.params.value}'`,
     'name.ipv4_form': () => 'Must not look like an IPv4 address',
+    // 권고 경고 (checkAdvice · D112) — 판정은 유효 그대로다
+    'warning.arn_suffix_lookalike': () => 'Ends with a hyphen and six characters, like the random suffix Secrets Manager adds to the ARN; AWS advises against it because a search by partial ARN can then give unexpected results. The name is accepted',
     // 생성 (engine)
     'step.normalized': (m) => `'${m.field}' normalised from '${m.params.from}' to '${m.params.to}'`,
     'step.separator_removed': () => 'Removed hyphens (this rule allows no separator)',
@@ -62,6 +64,7 @@ export const en: Catalog = {
     'note.secondary_source': () => 'The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)',
     'note.obsolete_source_applied': () => 'Part of this rule comes from a page the provider marks as retired; it is still enforced (conservative, D20)',
     'note.advisory_rule_enforced': () => 'The documentation recommends against this form rather than forbidding it; it is rejected here (conservative, D20)',
+    'note.advisory_rule_warned': () => 'The documentation recommends against one form of name rather than forbidding it; a name in that form passes with a warning (D112)',
     // 같은 요청 안 충돌 (conflict)
     'name.conflict': (m) => `Name '${m.params.name}' is used by more than one resource of the same kind in this request (${list(m.params.keys)}); the provider rejects the second one`,
     // 선택 (selection)

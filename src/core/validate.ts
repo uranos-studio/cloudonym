@@ -44,3 +44,8 @@ export function checkName(name: string, rule: ResourceRule): CoreMessage[] {
   }
   return reasons;
 }
+
+/** 문서가 권고만 하는 꼴 (D112) — 맞는 advice 마다 warning 하나. valid 를 바꾸지 않으므로 checkName 과 따로 둔다 */
+export function checkAdvice(name: string, rule: ResourceRule): CoreMessage[] {
+  return (rule.advice ?? []).filter((a) => a.pattern.test(name)).map((a) => structuredClone(a.warning));
+}
