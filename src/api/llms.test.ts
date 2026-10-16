@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { buildLlmsText, formulaOf, kindLines } from './llms';
+import { buildLlmsText, formulaOf, kindLines, PROBES, SHORT_NAME_LIMIT } from './llms';
+import { SHORT_WORDS } from '../core/shorten';
+import { MIN_TOKEN, PROTECTED } from '../core/types';
 import { RULES } from '../core/constraints';
 import { app } from './index';
 import { req, fakeKv } from './test-support';
@@ -50,6 +52,70 @@ const enabledRules = rules.filter((r) => ENABLED_PROVIDERS.includes(r.provider))
 // 형식 시험용 — 세 CSP 를 모두 펼친 본문. 꺼진 CSP 의 규칙 줄 꼴(플래그 · 금지형 · note)이 켜질 때 그대로 나오는지 본다
 const allText = buildLlmsText(rules, VERSION, en, PROVIDERS);
 const allLines = allText.split('\n');
+
+describe('「## For AI coding agents」 — 직접 짓지 말고 API 를 부른다 · 축소 순서 · 약어 · 규약을 그대로 쓰면 깨지는 규칙', () => {
+  // 수집 단계라 section() 의 expect 를 쓰지 않는다 — 절이 없으면 아래 「머리말 바로 뒤」 시험이 실패한다
+  const at = lines.indexOf('## For AI coding agents');
+  const sec = at < 0 ? [] : lines.slice(at, lines.findIndex((l, i) => i > at && l.startsWith('## ')));
+  const body = sec.join('\n');
+  it('머리말 바로 뒤 · 공식 절 앞에 있다', () => {
+    expect(at).toBeGreaterThan(0);
+    expect(at).toBeLessThan(lines.indexOf('## Naming Formulas'));
+    expect(lines.slice(0, lines.indexOf('## For AI coding agents')).filter((l) => l.startsWith('## '))).toEqual([]);
+  });
+  it('이름을 직접 짓지 말고 /v1/generate · /v1/names 를 부르고 · 이미 있는 이름은 /v1/validate → suggested_name', () => {
+    expect(body).toContain('Do not compose resource names yourself');
+    expect(body).toContain('`POST /v1/generate`');
+    expect(body).toContain('`POST /v1/names`');
+    expect(body).toContain('`POST /v1/validate`');
+    expect(body).toContain('use `suggested_name` if there is one');
+    expect(body).toContain('`warnings` never makes a name invalid');
+  });
+  it('축소 순서 넷 — 보호 토큰 · 최소 길이는 엔진 상수 그대로', () => {
+    const steps = sec.filter((l) => /^\d\. /.test(l));
+    expect(steps).toHaveLength(4);
+    for (const t of PROTECTED) expect(steps[1]).toContain(`\`${t}\``);
+    expect(steps[2]).toContain(`never below ${MIN_TOKEN} characters`);
+    expect(steps[3]).toContain('`name.cannot_fit`');
+  });
+  it('약어 줄은 SHORT_WORDS 그대로 — 손으로 쓴 약어가 없다', () => {
+    const abbr = sec.filter((l) => /^- `[a-z]+` → `[a-z]+`$/.test(l));
+    expect(abbr).toEqual(Object.entries(SHORT_WORDS).map(([w, a]) => `- \`${w}\` → \`${a}\``));
+  });
+  it('지역은 코드로 — 켜진 CSP 마다 지역 표의 첫 행을 예로 든다', () => {
+    const r = REGIONS.gcp[0]!;
+    expect(body).toContain(`\`${r.region}\` → \`${r.code}\``);
+    expect(body).toContain('never the region name');
+  });
+  it('깨지는 규칙 목록은 규칙 표에서 — 구분자 · 짧은 최대 길이 · 전역 고유', () => {
+    const gcp = rulesFor('gcp');
+    const noHyphen = sec.find((l) => l.startsWith('- GCP, no hyphen between tokens: '))!;
+    for (const r of gcp) expect(noHyphen.includes(`\`${r.id}\` (`), r.id).toBe(r.separator !== '-');
+    const short = sec.find((l) => l.startsWith(`- GCP, at most ${SHORT_NAME_LIMIT} characters`))!;
+    for (const r of gcp) expect(short.includes(`\`${r.id}\` ${r.maxLength}`), r.id).toBe(r.maxLength <= SHORT_NAME_LIMIT);
+    expect(short).toContain('`gcp.project_id` 30');
+    const global = sec.find((l) => l.startsWith('- GCP, unique across every customer'))!;
+    expect(global).toContain('`gcp.project_id`');
+    expect(global).toContain('`gcp.storage_bucket`');
+    expect(global).not.toContain('`gcp.project_name`'); // 이름은 고유하지 않다(uniqueness none)
+  });
+  it('문자 줄의 수는 탐침으로 센 값 — 같은 길이의 소문자 이름을 받는 규칙 가운데', () => {
+    const gcp = rulesFor('gcp');
+    const plain = gcp.filter((r) => r.pattern.test(PROBES.control));
+    const n = (probe: string) => plain.filter((r) => !r.pattern.test(probe)).length;
+    expect(plain.length).toBeGreaterThan(gcp.length / 2);
+    const chars = sec.find((l) => l.startsWith('- GCP, characters: '))!;
+    expect(chars).toContain(`of the ${plain.length} rules that accept a plain lower-case name, \`_\` is rejected by ${n(PROBES.underscore)}, \`.\` by ${n(PROBES.dot)} and capital letters by ${n(PROBES.upper)}`);
+    // 탐침은 control 과 길이가 같다 — 길이 때문에 세어지는 규칙이 없다
+    for (const p of [PROBES.underscore, PROBES.dot, PROBES.upper]) expect(p).toHaveLength(PROBES.control.length);
+  });
+  it('세 CSP 를 펼치면 CSP 마다 넷씩 — 꺼진 CSP 도 같은 꼴', () => {
+    const at = allLines.indexOf('## For AI coding agents');
+    const all = allLines.slice(at, allLines.findIndex((l, i) => i > at && l.startsWith('## ')));
+    for (const label of ['GCP', 'AWS', 'Azure']) expect(all.filter((l) => l.startsWith(`- ${label}, `)), label).toHaveLength(4);
+    expect(all.join('\n')).toContain('`azure.storage_account` (joined with nothing)');
+  });
+});
 
 describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('첫 줄은 # Cloudonym', () => expect(lines[0]).toBe('# Cloudonym'));
@@ -177,7 +243,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   });
   it('절 목록 — 마법사 절 셋(Tiers · Attached resources · Wizard presets)이 Kind tokens 뒤에 있다', () => {
     expect(lines.filter((l) => l.startsWith('## '))).toEqual([
-      '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets', '## Wizard cards',
+      '## For AI coding agents', '## Naming Formulas', '## Canonical Allowed Values', '## Regions', '## Kind tokens', '## Tiers', '## Attached resources', '## Wizard presets', '## Wizard cards',
       '## Provider Constraints', '## Resource tree', '## What PASS means', '## API', '## Limits', '## Plan file', '## catalog.json fields', '## CLI',
     ]);
   });

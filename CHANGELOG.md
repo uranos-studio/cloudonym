@@ -8,6 +8,7 @@ Rules revision for this release: 2026-10-16.1.
 
 ### Changed
 
+- **`/llms.txt` opens with guidance for AI coding agents** — a new first section, *For AI coding agents*, tells an agent not to compose names itself but to call `POST /v1/generate` or `POST /v1/names` and use the names as they come, and to check an existing name with `POST /v1/validate` and take `suggested_name`. It spells out how the engine shortens a name (the four steps, the abbreviation list, region codes) and lists, per enabled provider, the rules a naming convention breaks when applied word for word: no hyphen between tokens, characters most rules reject, maximums of 32 characters or less, and names unique across all customers. Every list is built from the rule table.
 - **Secrets Manager: the "hyphen and six characters" ending is a warning, not a failure** (D112) — the AWS API reference says not to end a secret name with a hyphen followed by six characters because a search by partial ARN can then give unexpected results; it does not forbid it. Such names (`…-eu-west-1`, `…-A1b2C3`) were `valid: false` with `name.pattern_mismatch`; they are now `valid: true` with `warning.arn_suffix_lookalike` in a new `warnings` list. `warnings` appears on `/v1/validate` and on name items only when there is one; it never changes `valid`. AWS is not enabled yet, so no response changes today.
 
 ## [0.1.6] - 2026-10-15

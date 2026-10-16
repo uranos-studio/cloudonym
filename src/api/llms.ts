@@ -1,5 +1,5 @@
 // /llms.txt 본문 — 규칙 표(RULES)에서 만든다. 손으로 쓴 공식 · 숫자를 두지 않는다 (D9 · D17)
-import { ENABLED_PROVIDERS, PROVIDERS, TIER_PATTERN, type Provider, type ResourceRule, type Token } from '../core/types';
+import { ENABLED_PROVIDERS, MIN_TOKEN, PROTECTED, PROVIDERS, TIER_PATTERN, type Provider, type ResourceRule, type Token } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
 import { PRESETS, PRESET_TIERS, type Preset } from '../core/wizard/presets';
@@ -7,6 +7,8 @@ import { BUNDLES, partIsProject, partKey } from '../core/wizard/bundles';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
+import { SHORT_WORDS } from '../core/shorten';
+import { SCOPES } from '../core/scopes';
 import { ENV_ALIASES } from '../core/normalize';
 import { LOCATIONS, REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
@@ -53,6 +55,55 @@ function treeLines(node: TreeNode, depth = 0): string[] {
 export function formulaOf(rule: ResourceRule): string {
   const part = (t: Token): string => (t === 'slug' ? rule.slug : `<${t}>`);
   return rule.template.reduce((out, t, i) => (t === 'tier' ? `${out}[${rule.separator}<tier>]` : `${out}${i === 0 ? '' : rule.separator}${part(t)}`), '');
+}
+
+/** 「짧은 이름」 표시 기준 — 이 길이 이하인 규칙을 「규약 그대로면 넘치기 쉽다」로 묶는다. CSP 숫자가 아니라 표시 기준이다:
+ *  다섯 문맥값을 보통 낱말로 채우고 구분자 넷을 더하면 이 길이를 넘는다. 목록의 숫자는 규칙 표(maxLength)에서 온다 */
+export const SHORT_NAME_LIMIT = 32;
+
+/** 탐침 — 같은 길이의 소문자 이름(control)은 받는데 이 꼴은 받지 않는 규칙을 센다. 길이 · 고정 접두 때문에 control 부터 받지 않는 규칙은 세지 않는다 */
+export const PROBES = { control: 'abcdefghijkl', underscore: 'abcdef_ghijk', dot: 'abcdef.ghijk', upper: 'Abcdefghijkl' } as const;
+
+/** 「## For AI coding agents」 절 — 직접 짓지 말고 API 를 부르라는 안내 · 축소 순서 · 약어 표 · 규약을 그대로 쓰면 깨지는 규칙.
+ *  축소 순서는 truncate.ts fit() 의 단계, 약어는 SHORT_WORDS, 목록은 켜진 규칙의 separator · maxLength · pattern · 범위에서 만든다 */
+export function agentLines(rules: readonly ResourceRule[], order: readonly Provider[]): string[] {
+  const listOr = (xs: readonly string[]): string => (xs.length === 0 ? 'none' : xs.join(', '));
+  const withMax = (rs: readonly ResourceRule[]): string => listOr(rs.map((r) => `\`${r.id}\` ${r.maxLength}`));
+  const lines = [
+    '', '## For AI coding agents', '',
+    'Do not compose resource names yourself, and do not apply a naming convention to them by hand. Send the five context values to `POST /v1/generate` (every rule of a provider) or `POST /v1/names` (only the resources you need) and use each item\'s `name` as it is. The same request on the same rules revision always gives the same name; a name composed by hand comes out differently from one model or session to the next, is shortened differently, and many resources cannot be renamed after they are created.',
+    '- A name you already have: send it to `POST /v1/validate`. When `valid` is false, use `suggested_name` if there is one, otherwise generate the name. `warnings` never makes a name invalid.',
+    '- Use only names with `valid: true`. A name that cannot fit is `valid: false` with the reason in `violations` — the engine never cuts a name just to pass.',
+    '- Keep the names you created and send `rules_version` with later requests (see the API section below).',
+    '',
+    'How the engine shortens a name that is too long — in this order, stopping as soon as the name fits:',
+    '1. It drops the rule\'s `optional` tokens in the order given in its formula line below.',
+    `2. It replaces a token that equals a word in the abbreviation list below. Only ${codes(['owner', 'system', 'purpose'].filter((t) => !PROTECTED.includes(t as Token)))} are replaced; ${codes(PROTECTED)} are never changed in this step or the next.`,
+    `3. It cuts each of those tokens to the same length, ⌊(maximum − length of the unchanged tokens − separators) / number of cut tokens⌋, and never below ${MIN_TOKEN} characters.`,
+    '4. If the name still does not fit, the item is `valid: false` with `name.cannot_fit`.',
+    '',
+    'Abbreviations (step 2):',
+    ...Object.entries(SHORT_WORDS).map(([w, a]) => `- \`${w}\` → \`${a}\``),
+    '',
+    `Regions: names carry the short region code from \`## Regions\`, never the region name (${order.map((p) => { const r = REGIONS[p][0]!; return `\`${r.region}\` → \`${r.code}\``; }).join(', ')}). Use the codes listed there; do not make up your own.`,
+    '',
+    'Rules a naming convention breaks when it is applied word for word (from `## Provider Constraints`):',
+  ];
+  for (const p of order) {
+    const rs = rules.filter((r) => r.provider === p);
+    const plain = rs.filter((r) => r.pattern.test(PROBES.control));
+    const rejects = (probe: string) => plain.filter((r) => !r.pattern.test(probe)).length;
+    const scopeNote = (r: ResourceRule) => (r.notes ?? []).some((n) => n.code === 'note.scope_unconfirmed') ? ' (scope not confirmed)' : '';
+    const label = LABEL[p];
+    const noHyphen = rs.filter((r) => r.separator !== '-');
+    lines.push(
+      `- ${label}, no hyphen between tokens: ${listOr(noHyphen.map((r) => `\`${r.id}\` (joined with ${r.separator === '' ? 'nothing' : `\`${r.separator}\``})`))}`,
+      `- ${label}, characters: of the ${plain.length} rules that accept a plain lower-case name, \`_\` is rejected by ${rejects(PROBES.underscore)}, \`.\` by ${rejects(PROBES.dot)} and capital letters by ${rejects(PROBES.upper)} — a convention that uses them fails those rules`,
+      `- ${label}, at most ${SHORT_NAME_LIMIT} characters — names of five context words are usually too long and get shortened: ${withMax(rs.filter((r) => r.maxLength <= SHORT_NAME_LIMIT))}`,
+      `- ${label}, unique across every customer of the provider (global namespace) — a name that passes can still be taken: ${listOr(rs.filter((r) => r.uniqueness === 'csp' && SCOPES[r.scope].parent === undefined).map((r) => `\`${r.id}\`${scopeNote(r)}`))}`,
+    );
+  }
+  return lines;
 }
 
 /** 「## Tiers」 절 (D60) — 꼴 · 예약어 · 프리셋 토큰. 예약어는 tier.ts 의 목록 그대로(규칙 · 별칭 · 지역 표에서 만든다) */
@@ -296,6 +347,7 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '> For humans (web UI) and for AI coding agents / IaC (`POST /v1/generate` · `POST /v1/names` · `POST /v1/wizard` · `POST /v1/validate` · `GET /openapi.json`).',
     "> Cloudonym does not replace the provider's final verdict — it checks only the reserved words and patterns that the official documents state.",
     '> People: the API guide is the page `/docs/api` (curl examples, limits, failures); the naming guide is `/docs/naming`.',
+    ...agentLines(rules, order),
     '',
     '## Naming Formulas',
     '',
