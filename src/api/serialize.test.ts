@@ -82,4 +82,9 @@ describe('toWireValidate', () => {
     expect(w.valid).toBe(true);
     expect(w.warnings?.map((m) => m.code)).toEqual(['warning.arn_suffix_lookalike']);
   });
+  it('suggested_warnings 는 suggested_name 의 경고 — 보낸 이름의 warnings 와 따로 (D112)', () => {
+    const w = toWireValidate({ valid: false, violations: [{ code: 'name.empty' }], suggestedName: 'x-abcdef', suggestedWarnings: [{ code: 'warning.arn_suffix_lookalike' }] }, version);
+    expect(Object.keys(w)).toEqual(['valid', 'version', 'violations', 'suggested_name', 'suggested_warnings']);
+    expect(w.suggested_warnings?.map((m) => m.code)).toEqual(['warning.arn_suffix_lookalike']);
+  });
 });

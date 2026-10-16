@@ -90,6 +90,21 @@ describe('validateName', () => {
     expect(bad.warnings).toEqual([{ code: 'warning.arn_suffix_lookalike' }]);
     expect(validateName('gcp', 'service_account', 'billing-trade-prod-sa-sync')).not.toHaveProperty('warnings');
   });
+  it('권고 경고 (D112) — 제안한 이름의 경고는 suggestedWarnings 에 따로 · 보낸 이름의 경고는 warnings', () => {
+    // 정제로 고친 제안 — 보낸 이름은 「!」 로 끝나 꼴이 아니고, 제안 x-abcdef 는 꼴이다
+    const fixed = validateName('aws', 'secretsmanager_secret', 'x-abcdef!');
+    expect(fixed).toEqual({ valid: false, violations: expect.any(Array), suggestedName: 'x-abcdef', suggestedWarnings: [{ code: 'warning.arn_suffix_lookalike' }] });
+    // 길이 초과 제안 — 앞 토큰을 뗀 후보가 꼴이다
+    const long = `${'a'.repeat(510)}-abcdef`;
+    const cut = validateName('aws', 'secretsmanager_secret', long);
+    expect(cut.valid).toBe(false);
+    expect(cut.warnings).toEqual([{ code: 'warning.arn_suffix_lookalike' }]);
+    expect(cut.suggestedName).toBe('abcdef');
+    expect(cut).not.toHaveProperty('suggestedWarnings'); // abcdef 는 하이픈이 없다
+    // 공백이 하이픈이 된 제안도 본다 — my-secret 은 「하이픈 + 여섯 글자」 · a-b 는 아니다(키가 없다)
+    expect(validateName('aws', 'secretsmanager_secret', 'my secret')).toMatchObject({ suggestedName: 'my-secret', suggestedWarnings: [{ code: 'warning.arn_suffix_lookalike' }] });
+    expect(validateName('aws', 'secretsmanager_secret', 'a b')).not.toHaveProperty('suggestedWarnings');
+  });
   it('이유와 제안을 준다 (앞 토큰부터 뗀다)', () => {
     expect(validateName('gcp', 'service_account', 'infra-billing-trade-prd-kr-sa-sync')).toEqual({ valid: false, violations: [{ code: 'name.too_long', params: { actual: 34, max: 30 } }], suggestedName: 'billing-trade-prd-kr-sa-sync' });
   });

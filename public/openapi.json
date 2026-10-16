@@ -1517,7 +1517,7 @@
             "items": {
               "$ref": "#/components/schemas/Message"
             },
-            "description": "Present only when there is one: the name has a form the provider's documentation advises against but does not forbid (for example `warning.arn_suffix_lookalike`). It never changes `valid` (D112).",
+            "description": "Present only when there is one: the name you sent has a form the provider's documentation advises against but does not forbid (for example `warning.arn_suffix_lookalike`). It never changes `valid` (D112). Warnings for `suggested_name` are in `suggested_warnings`.",
             "example": [
               {
                 "code": "warning.arn_suffix_lookalike",
@@ -1529,6 +1529,19 @@
             "type": "string",
             "description": "Present only when the name is invalid and a fix is possible",
             "example": "billing-trade-prod-ane3-sa-sync"
+          },
+          "suggested_warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            },
+            "description": "Present only when `suggested_name` is present and has a form the documentation advises against: the warnings of the suggested name, not of the name you sent (D112).",
+            "example": [
+              {
+                "code": "warning.arn_suffix_lookalike",
+                "message": "Ends with a hyphen and six characters, like the random suffix Secrets Manager adds to the ARN; AWS advises against it because a search by partial ARN can then give unexpected results. The name is accepted"
+              }
+            ]
           }
         }
       },

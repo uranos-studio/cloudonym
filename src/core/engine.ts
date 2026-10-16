@@ -295,18 +295,23 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
 }
 
 export function validateName(provider: Provider, resourceType: string, name: string):
-  { valid: boolean; violations: CoreMessage[]; warnings?: CoreMessage[]; suggestedName?: string } {
+  { valid: boolean; violations: CoreMessage[]; warnings?: CoreMessage[]; suggestedName?: string; suggestedWarnings?: CoreMessage[] } {
   const rule = getRule(provider, resourceType);
   if (!rule) return { valid: false, violations: [{ code: 'rule.unknown_resource_type', params: { provider, supported: rulesFor(provider).map((r) => r.resourceType) } }] };
 
-  // 권고 경고는 판정과 따로 — 유효여도 무효여도 싣는다 (D112)
+  // 권고 경고는 판정과 따로 — 유효여도 무효여도 싣는다 (D112). warnings 는 보낸 이름의 것,
+  // suggestedWarnings 는 제안한 이름의 것이다 — 제안을 그대로 쓰는 쪽이 그 경고를 놓치지 않게 따로 싣는다
   const violations = checkName(name, rule);
   const advice = adviceOf(name, rule);
+  const suggest = (suggestedName: string) => {
+    const w = adviceOf(suggestedName, rule).warnings;
+    return { suggestedName, ...(w ? { suggestedWarnings: w } : {}) };
+  };
   if (violations.length === 0) return { valid: true, violations, ...advice };
 
   // ⑴ 정제만으로 되는가
   const normalized = normalizeToken(name, rule.allowed).value;
-  if (checkName(normalized, rule).length === 0) return { valid: false, violations, ...advice, suggestedName: normalized };
+  if (checkName(normalized, rule).length === 0) return { valid: false, violations, ...advice, ...suggest(normalized) };
 
   // ⑵ 길이 초과면 정제한 값을 쪼개 앞 토큰부터 뗀다.
   // 생성의 축소 1단계(template 순서대로 optional 을 뗀다)와 다른 까닭: 검증은 이름이 어떤 template 으로 만들어졌는지 모른다
@@ -315,7 +320,7 @@ export function validateName(provider: Provider, resourceType: string, name: str
     const parts = normalized.split(rule.separator);
     for (let i = 1; i < parts.length; i++) {
       const candidate = parts.slice(i).join(rule.separator);
-      if (checkName(candidate, rule).length === 0) return { valid: false, violations, ...advice, suggestedName: candidate };
+      if (checkName(candidate, rule).length === 0) return { valid: false, violations, ...advice, ...suggest(candidate) };
     }
   }
   return { valid: false, violations, ...advice };

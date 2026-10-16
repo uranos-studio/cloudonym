@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ResultCard } from './ResultCard';
-import { generate, generateMany, type NameItem } from '../core/engine';
+import { generate, generateMany, validateName, type NameItem } from '../core/engine';
+import { en } from '../messages/en';
 import { getRule } from '../core/constraints';
 import type { NameResult } from '../core/types';
 
@@ -134,5 +135,34 @@ describe('ResultCard compact (D93 — 마법사 이름 칸)', () => {
     expect(m.indexOf('data-violations')).toBeGreaterThan(-1);
     expect(m.indexOf('data-violations')).toBeLessThan(details);
     expect(copyDisabled(m)).toBe(true);
+  });
+});
+
+describe('ResultCard — 권고 경고 (D112)', () => {
+  const secret = getRule('aws', 'secretsmanager_secret')!;
+  const named = (name: string): NameResult => {
+    const base = generate({ ...ctx, region: 'apne2', zone: undefined }, ['aws']).aws!.secretsmanager_secret!;
+    const v = validateName('aws', 'secretsmanager_secret', name);
+    return { ...base, name, valid: v.valid, violations: v.violations, ...(v.warnings ? { warnings: v.warnings } : {}) };
+  };
+  const warn = (markup: string) => /<div data-warnings[^>]*>([\s\S]*?)<\/ul><\/div><\/div>/.exec(markup)?.[1];
+  it.each([false, true])('경고가 있으면 PASS 그대로 · 위반 목록이 아니라 따로 둔 경고 목록에 (compact %s)', (compact) => {
+    const r = named('app-eu-west-1');
+    expect(secret.advice).toBeDefined();
+    expect(r.valid).toBe(true);
+    const m = renderToStaticMarkup(createElement(ResultCard, { result: r, compact }));
+    expect(m).toContain('PASS');
+    expect(m).not.toContain('FAIL');
+    expect(m).not.toContain('data-violations');
+    const w = warn(m);
+    expect(w).toBeDefined();
+    expect(w).toContain(en.ui.name_warnings);
+    expect(w).toContain('Ends with a hyphen and six characters');
+    expect(copyDisabled(m)).toBe(false);
+  });
+  it.each([false, true])('경고가 없으면 경고 칸이 없다 (compact %s)', (compact) => {
+    const r = named('app-secret-01');
+    expect(r.warnings).toBeUndefined();
+    expect(renderToStaticMarkup(createElement(ResultCard, { result: r, compact }))).not.toContain('data-warnings');
   });
 });

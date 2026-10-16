@@ -89,10 +89,10 @@ describe('apiDocModel — 명세(public/openapi.json)에서 만든 엔드포인�
     expect(keysOf(row('validate').response!)).toEqual(Object.keys(spec.components.schemas['ValidateResponse']!.properties!));
   });
 
-  it('선택 필드 표시 — 스키마의 required 에 없는 키만 「"키"?:」 (validate 의 warnings · suggested_name)', () => {
+  it('선택 필드 표시 — 스키마의 required 에 없는 키만 「"키"?:」 (validate 의 warnings · suggested_name · suggested_warnings)', () => {
     for (const r of rows.filter((x) => x.response)) {
       const optional = [...r.response!.matchAll(/^ {2}"(\w+)"\?:/gm)].map((m) => m[1]);
-      expect(optional, r.id).toEqual(r.id === 'validate' ? ['warnings', 'suggested_name'] : []);
+      expect(optional, r.id).toEqual(r.id === 'validate' ? ['warnings', 'suggested_name', 'suggested_warnings'] : []);
     }
     expect(spec.components.schemas['ValidateResponse']!.required).not.toContain('suggested_name');
     expect(spec.components.schemas['ValidateResponse']!.required).not.toContain('warnings');

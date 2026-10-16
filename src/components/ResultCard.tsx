@@ -1,4 +1,4 @@
-// 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
+// 카드 하나 — 이름 · PASS/FAIL · 축약/변환 안내(steps) · 위반 이유 · 권고 경고(warnings) · 규칙(물리 · 생성 · note · 공식 문서). 판정은 전부 엔진 값이다.
 // 제목에 종류 토큰 · 순번 · 역할을 붙이고(`Virtual Machine (Linux) · 01` · `IP Address · int · 01`) data-key 로 항목을 가리킨다
 import { useState } from 'react';
 import { CircleCheck, CircleX, ExternalLink, Info, TriangleAlert } from 'lucide-react';
@@ -48,6 +48,18 @@ export function ResultCard({ result: r, parentName, scope, compact = false }: { 
       {r.violations.map((v) => format(v, en)).map((v) => <li key={v}>{v}</li>)}
     </ul>
   );
+  // 권고 경고 (D112) — 위반이 아니다. PASS 는 그대로이고 문서가 권고하지 않는 꼴이라는 안내만 따로 보인다
+  const warnings = r.warnings !== undefined && r.warnings.length > 0 && (
+    <div data-warnings className="flex items-start gap-1.5 text-xs text-amber-800 dark:text-amber-300">
+      <TriangleAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+      <div>
+        <p className="font-medium">{en.ui.name_warnings}</p>
+        <ul className="list-disc space-y-0.5 pl-4">
+          {r.warnings.map((w) => format(w, en)).map((w) => <li key={w}>{w}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
   const rule = (
     <>
       <p>
@@ -83,6 +95,7 @@ export function ResultCard({ result: r, parentName, scope, compact = false }: { 
         {r.valid && r.ruleId === BUCKET_RULE && <BucketCheck key={r.name} name={r.name} />}
         {steps}
         {violations}
+        {warnings}
         {/* 규칙 — 펼칠 때만 보인다(hidden). 글자는 DOM 에 남아 「attached to」 · 문서 링크를 찾을 수 있다 */}
         <div id={ruleId} data-rule-details hidden={!ruleOpen} className="space-y-0.5 rounded-md bg-zinc-50 px-2 py-1.5 text-[11px] leading-relaxed text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
           {item?.parent !== undefined && (
@@ -114,6 +127,7 @@ export function ResultCard({ result: r, parentName, scope, compact = false }: { 
       {r.valid && r.ruleId === BUCKET_RULE && <BucketCheck key={r.name} name={r.name} />}
       {steps}
       {violations}
+      {warnings}
 
       <footer className="mt-auto border-t border-zinc-100 pt-2 text-[11px] leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
         {rule}

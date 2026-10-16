@@ -33,8 +33,8 @@ export interface WireNameItem extends WireName {
 }
 export interface WireNamesProvider { valid: boolean; items: WireNameItem[]; conflicts: WireMessage[] }
 export interface WireNames extends Omit<WireGenerate, 'data'> { data: Partial<Record<Provider, WireNamesProvider>> }
-/** warnings 는 있을 때만 — 문서가 권고하지 않는 꼴. valid 를 바꾸지 않는다 (D112) */
-export interface WireValidate { valid: boolean; version: Version; violations: WireMessage[]; warnings?: WireMessage[]; suggested_name?: string }
+/** warnings 는 있을 때만 — 보낸 이름이 문서가 권고하지 않는 꼴. suggested_warnings 는 suggested_name 의 것. valid 를 바꾸지 않는다 (D112) */
+export interface WireValidate { valid: boolean; version: Version; violations: WireMessage[]; warnings?: WireMessage[]; suggested_name?: string; suggested_warnings?: WireMessage[] }
 
 /** provider 하나의 결과 — 라우터가 요청 providers 순서대로 만든다. data 와 metadata 셋의 provider 집합이 같아지는 자리다 */
 export interface ProviderResult { provider: Provider; names: Record<string, NameResult>; labels: LabelSet }
@@ -76,11 +76,12 @@ export function toWireGenerate(results: ProviderResult[], transformed: readonly 
   return w;
 }
 
-export function toWireValidate(r: { valid: boolean; violations: readonly Message[]; warnings?: readonly Message[]; suggestedName?: string }, version: Version, catalog: Catalog = en): WireValidate {
+export function toWireValidate(r: { valid: boolean; violations: readonly Message[]; warnings?: readonly Message[]; suggestedName?: string; suggestedWarnings?: readonly Message[] }, version: Version, catalog: Catalog = en): WireValidate {
   return {
     valid: r.valid, version: { ...version }, violations: wire(r.violations, catalog),
     ...(r.warnings !== undefined ? { warnings: wire(r.warnings, catalog) } : {}),
     ...(r.suggestedName !== undefined ? { suggested_name: r.suggestedName } : {}),
+    ...(r.suggestedWarnings !== undefined ? { suggested_warnings: wire(r.suggestedWarnings, catalog) } : {}),
   };
 }
 

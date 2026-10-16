@@ -426,6 +426,7 @@ export const en: Catalog = {
     copy_invalid_label: 'Invalid names cannot be copied',
     shortened: 'Shortened',
     transformed: 'Transformed',
+    name_warnings: 'Advice (the verdict does not change)',
     originally_chars: '(originally {n} characters)',
     length_range: 'Length {min}–{max}',
     generation_charset: 'Generation charset',

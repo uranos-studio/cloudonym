@@ -296,8 +296,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   });
   it('API 절 — /v1/validate 의 응답 칸 · warnings 는 valid 를 바꾸지 않는다 (D112)', () => {
     const v = section('## API').find((l) => l.startsWith('- `POST /v1/validate`'))!;
-    expect(v).toContain('`{ valid, version, violations, warnings?, suggested_name? }`');
-    expect(v).toContain('it never changes `valid`');
+    expect(v).toContain('`{ valid, version, violations, warnings?, suggested_name?, suggested_warnings? }`');
+    expect(v).toContain('warnings never change `valid`');
+    expect(v).toContain('`suggested_warnings` when `suggested_name` has one');
     expect(text).toContain('`violations`, `warnings`, `steps`, `errors`, `rule.notes` and the label lists are arrays of');
   });
   it('플래그가 있는 pattern 은 플래그를 같이 적는다 — azure.resource_group 은 u', () => {
