@@ -45,7 +45,7 @@ describe('카드 더하기 (D93)', () => {
     expect(ids(st, 0)).toEqual([['static-site', true]]);
     const vm = addBundle(startPlan(DEFAULT_PROJECT), 0, 'vm-app');
     expect(presets(vm, 0)).toEqual(['intweb', 'intwas', 'db', 'bastion']); // D116 — 내부 전용 서버는 tier intweb · intwas
-    expect(presets(vm, null)).toEqual(['vpc', 'subnet', 'router', 'nat', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'psa']);
+    expect(presets(vm, null)).toEqual(['vpc', 'subnet', 'router', 'nat', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'firewall:internal', 'psa']);
     expect(ids(vm, 0)).toEqual([['vm-app', true]]);
     for (const p of [run, st, vm]) expect(validatePlan(p)).toEqual({ ok: true });
   });
@@ -101,7 +101,7 @@ describe('되읽기 · 미완성 (D93)', () => {
     const chips = togglePreset(togglePreset(togglePreset(startPlan(DEFAULT_PROJECT), 0, 'web'), 0, 'was'), 0, 'db');
     expect(cardsIn(chips, 0)).toEqual([]);
     const vm = togglePreset(togglePreset(togglePreset(startPlan(DEFAULT_PROJECT), 0, 'intweb'), 0, 'intwas'), 0, 'db');
-    expect(cardsIn(vm, 0).map((m) => [m.bundle.id, m.complete, m.missing.length])).toEqual([['vm-app', false, 4]]);
+    expect(cardsIn(vm, 0).map((m) => [m.bundle.id, m.complete, m.missing.length])).toEqual([['vm-app', false, 5]]);
   });
 
   it('Website 의 선택 was · db 는 Internal app 이 아니다 — vm-app 이 뜨지 않아 그 Remove 가 Website 의 선택을 지우지 않는다 · 두 카드는 한 서비스에 함께 둔다(D116)', () => {

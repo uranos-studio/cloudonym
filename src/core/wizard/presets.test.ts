@@ -22,7 +22,7 @@ describe('프리셋 데이터 (D64)', () => {
   it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 + D116 의 여섯 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
-      'bq', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis',
+      'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'cron', 'runjob', 'redis',
       'worker', 'raw', 'ingest', 'appdata',
       'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
@@ -31,7 +31,7 @@ describe('프리셋 데이터 (D64)', () => {
       'gcp.global_address', 'gcp.instance_group', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
       'gcp.url_map', 'gcp.target_http_proxy', 'gcp.global_forwarding_rule', 'gcp.region_network_endpoint_group', 'gcp.backend_bucket',
     ]);
-    expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp', 'iap', 'lbhc']);
+    expect(presetOf('firewall')?.tierChoices).toEqual(['ssh', 'web', 'icmp', 'iap', 'lbhc', 'internal']);
     expect(presetOf('firewall')?.tier).toBe('ssh');
   });
 
@@ -115,6 +115,8 @@ describe('프리셋 데이터 (D64)', () => {
     expect(item).toMatchObject({ name: 'billing_shop_prod_ane3_bq', valid: true });
     expect(item!.name).not.toContain('-');
     expect(presetOf('dlq')).toMatchObject({ ruleId: presetOf('topic')!.ruleId, tier: 'dlq' });
+    // D117 — 데드레터 구독은 구독 규칙에 tier dlq — sub 와 한 서비스에 두면 이름이 갈린다
+    expect(presetOf('dlqsub')).toMatchObject({ ruleId: presetOf('sub')!.ruleId, tier: 'dlq', level: 'service' });
   });
 
   it('D116 — 같은 종류를 다른 일에 쓰는 둘째 프리셋: 같은 규칙 · tier 하나 · 기본 프리셋과 한 서비스에 함께 두면 이름 · 중복 키가 다르다', () => {

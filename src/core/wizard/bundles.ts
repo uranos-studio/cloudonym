@@ -93,9 +93,10 @@ export const BUNDLES: readonly Bundle[] = [
     id: 'website', label: 'Website', family: 'lb', tested: true,
     summary: 'A web server VM behind an HTTPS load balancer. HTTP is redirected to HTTPS.',
     parts: [P('web'), ...VM_BACKEND, ...LB_FRONT, ...LB_FIREWALLS],
-    options: [{ ...DB_OPTION }, { id: 'was', label: 'App server', on: false, parts: [P('was')] }, { id: 'bastion', label: 'Bastion', on: false, parts: [P('bastion'), P('firewall', 'ssh'), P('firewall', 'iap')] }],
+    // D117 — App server 선택은 방화벽 internal 을 함께 켠다: web → was 는 네트워크 안의 통신이라 web(GFE 대역) 방화벽으로는 닿지 않는다(실배포 시험)
+    options: [{ ...DB_OPTION }, { id: 'was', label: 'App server', on: false, parts: [P('was'), P('firewall', 'internal')] }, { id: 'bastion', label: 'Bastion', on: false, parts: [P('bastion'), P('firewall', 'ssh'), P('firewall', 'iap')] }],
     refs: [...VM_BACKEND_REFS, ...LB_FRONT_REFS],
-    evidence: ['D91', `${TF}compute_backend_service`],
+    evidence: ['D117', 'D91', `${TF}compute_backend_service`],
   },
   {
     id: 'serverless-web', label: 'Serverless web', family: 'lb', tested: true,
@@ -103,7 +104,7 @@ export const BUNDLES: readonly Bundle[] = [
     parts: [P('run'), ...RUN_BACKEND, ...LB_FRONT],
     options: [{ ...DB_OPTION, on: false }, { id: 'sa', label: 'Service account', on: false, parts: [P('sa')] }, { id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }],
     refs: [...RUN_BACKEND_REFS, ...LB_FRONT_REFS],
-    evidence: ['D96', SERVERLESS_NEG_DOC, `${TF}compute_region_network_endpoint_group`, RUN_PUBLIC_DOC],
+    evidence: ['D117', 'D96', SERVERLESS_NEG_DOC, `${TF}compute_region_network_endpoint_group`, RUN_PUBLIC_DOC],
   },
   {
     id: 'static-site', label: 'Static site', family: 'lb', tested: true,
@@ -111,16 +112,17 @@ export const BUNDLES: readonly Bundle[] = [
     parts: [P('object'), ...BUCKET_BACKEND, ...LB_FRONT],
     options: [],
     refs: [...BUCKET_BACKEND_REFS, ...LB_FRONT_REFS],
-    evidence: ['D96', `${TF}compute_backend_bucket`, STATIC_SITE_DOC],
+    evidence: ['D117', 'D96', `${TF}compute_backend_bucket`, STATIC_SITE_DOC],
   },
   {
     id: 'vm-app', label: 'Internal app on VMs', tested: true,
     summary: 'Web, app and database servers reachable only inside the network, with a bastion.',
     // D116 — 서버는 tier intweb · intwas(공개 Website 의 web · was 와 같은 서비스에 함께 둘 수 있게) · 버킷은 appdata(Static site 의 공개 버킷과 별개)
-    parts: [P('intweb'), P('intwas'), P('db'), P('firewall', 'ssh'), P('firewall', 'icmp'), P('firewall', 'iap'), P('psa')],
+    // D117 — internal: 네트워크 안에서 intweb · intwas 의 서비스 포트를 받는다. 없으면 bastion 에서도 HTTP 가 막힌다(실배포 시험)
+    parts: [P('intweb'), P('intwas'), P('db'), P('firewall', 'ssh'), P('firewall', 'icmp'), P('firewall', 'iap'), P('firewall', 'internal'), P('psa')],
     options: [{ id: 'bastion', label: 'Bastion', on: true, parts: [P('bastion')] }, { id: 'file', label: 'File server', on: false, parts: [P('file')] }, { id: 'object', label: 'Object storage', on: false, parts: [P('appdata')] }],
     refs: [],
-    evidence: ['D91'],
+    evidence: ['D117', 'D91'],
   },
   {
     id: 'https-lb', label: 'HTTPS load balancer', family: 'lb', tested: false,
@@ -136,16 +138,16 @@ export const BUNDLES: readonly Bundle[] = [
     evidence: ['D91', SERVERLESS_NEG_DOC],
   },
   {
-    id: 'data-warehouse', label: 'Data warehouse (BigQuery)', tested: false,
+    id: 'data-warehouse', label: 'Data warehouse (BigQuery)', tested: true,
     summary: 'A landing bucket, a BigQuery dataset and a service account that loads it. Dataset names use underscores, not hyphens.',
     // D116 — 적재 버킷은 raw(Static site 의 공개 버킷과 별개) · 예약 적재는 ingest(Batch job 의 cron 과 별개)
     parts: [P('raw'), P('bq'), P('sa')],
     options: [{ id: 'schedule', label: 'Scheduled load (Cloud Scheduler)', on: false, parts: [P('ingest')] }],
     refs: [],
-    evidence: [`${DOCS}bigquery/docs/datasets#dataset-naming`, `${DOCS}bigquery/docs/batch-loading-data`],
+    evidence: ['D117', `${DOCS}bigquery/docs/datasets#dataset-naming`, `${DOCS}bigquery/docs/batch-loading-data`],
   },
   {
-    id: 'gke', label: 'GKE cluster', tested: false,
+    id: 'gke', label: 'GKE cluster', tested: true,
     summary: 'A GKE cluster on the VPC network, an Artifact Registry repository for its images and a service account for its nodes.',
     parts: [P('gke'), P('ar'), P('sa'), P('vpc'), P('subnet')],
     options: [{ id: 'cache', label: 'Cache (Memorystore for Redis)', on: false, parts: [P('redis')] }],
@@ -154,31 +156,33 @@ export const BUNDLES: readonly Bundle[] = [
       { from: 'gke', to: 'subnet', attr: 'subnetwork', evidence: `${TF}container_cluster` },
       { from: 'gke', to: 'sa', attr: 'node_config.service_account', evidence: `${TF}container_cluster` },
     ],
-    evidence: [`${DOCS}kubernetes-engine/docs/how-to/service-accounts`, `${DOCS}artifact-registry/docs/integrate-gke`],
+    evidence: ['D117', `${DOCS}kubernetes-engine/docs/how-to/service-accounts`, `${DOCS}artifact-registry/docs/integrate-gke`],
   },
   {
-    id: 'event-pipeline', label: 'Event pipeline (Pub/Sub)', tested: false,
+    id: 'event-pipeline', label: 'Event pipeline (Pub/Sub)', tested: true,
     summary: 'A Pub/Sub topic and subscription that push to a Cloud Run service, with a dead-letter topic for messages that keep failing.',
     // D116 — push 대상 Cloud Run 은 worker(공개 웹의 run 과 별개 — push 대상은 인증을 요구한다)
-    parts: [P('topic'), P('sub'), P('dlq'), P('worker'), P('sa')],
+    // D117 — dlqsub: 데드레터 토픽의 구독. 없으면 넘어간 메시지가 사라진다(실배포 시험 · pubsub/docs/handling-failures)
+    parts: [P('topic'), P('sub'), P('dlq'), P('dlqsub'), P('worker'), P('sa')],
     options: [],
     refs: [
       { from: 'sub', to: 'topic', attr: 'topic', evidence: `${TF}pubsub_subscription` },
       { from: 'sub', to: 'dlq', attr: 'dead_letter_policy.dead_letter_topic', evidence: `${TF}pubsub_subscription` },
+      { from: 'dlqsub', to: 'dlq', attr: 'topic', evidence: `${TF}pubsub_subscription` },
       { from: 'worker', to: 'sa', attr: 'template.service_account', evidence: `${TF}cloud_run_v2_service` },
     ],
-    evidence: [`${DOCS}run/docs/triggering/pubsub-push`, `${DOCS}pubsub/docs/handling-failures`],
+    evidence: ['D117', `${DOCS}run/docs/triggering/pubsub-push`, `${DOCS}pubsub/docs/handling-failures`],
   },
   {
-    id: 'ci-cd', label: 'CI/CD (Cloud Build)', tested: false,
+    id: 'ci-cd', label: 'CI/CD (Cloud Build)', tested: true,
     summary: 'A Cloud Build trigger that builds images into an Artifact Registry repository, running as its own service account.',
     parts: [P('ar'), P('build'), P('sa')],
     options: [{ id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }],
     refs: [{ from: 'build', to: 'sa', attr: 'service_account', evidence: `${TF}cloudbuild_trigger` }],
-    evidence: [`${DOCS}build/docs/build-push-docker-image`, `${DOCS}build/docs/securing-builds/configure-user-specified-service-accounts`],
+    evidence: ['D117', `${DOCS}build/docs/build-push-docker-image`, `${DOCS}build/docs/securing-builds/configure-user-specified-service-accounts`],
   },
   {
-    id: 'batch-job', label: 'Batch job', tested: false,
+    id: 'batch-job', label: 'Batch job', tested: true,
     summary: 'A Cloud Run job started on a schedule by Cloud Scheduler, running as its own service account.',
     parts: [P('runjob'), P('cron'), P('sa')],
     options: [],
@@ -186,7 +190,7 @@ export const BUNDLES: readonly Bundle[] = [
       { from: 'runjob', to: 'sa', attr: 'template.template.service_account', evidence: `${TF}cloud_run_v2_job` },
       { from: 'cron', to: 'sa', attr: 'http_target.oauth_token.service_account_email', evidence: `${TF}cloud_scheduler_job` },
     ],
-    evidence: [`${DOCS}run/docs/execute/jobs-on-schedule`],
+    evidence: ['D117', `${DOCS}run/docs/execute/jobs-on-schedule`],
   },
 ];
 

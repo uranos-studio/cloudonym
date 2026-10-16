@@ -72,20 +72,20 @@ describe('namingDocModel', () => {
     expect(rowsOf(model, 'tokens').find((r) => r.key === 'tier')!.cells[1]).toMatch(/naming wizard/);
     expect(section(model, 'shrink').items![1]).toContain('tier');
   });
-  it('실제 데이터 — 약어 115행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 스물넷', () => {
+  it('실제 데이터 — 약어 115행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 스물다섯', () => {
     expect(rowsOf(model, 'abbreviations')).toHaveLength(115);
     expect(rowsOf(model, 'regions')).toHaveLength(43);
     expect(rowsOf(model, 'kinds')).toHaveLength(19);
     expect(rowsOf(model, 'env').map((r) => r.cells[0])).toEqual([...ENV_VALUES]);
     expect(rowsOf(model, 'tokens').map((r) => r.cells[0])).toEqual(['owner', 'system', 'purpose', 'env', 'region', 'slug', 'kind', 'tier', 'seq', 'role']);
     expect(rowsOf(model, 'attached').map((r) => r.cells[0])).toEqual(['-boot', `-data-<seq>`, '-ip', '-ipi']);
-    expect(rowsOf(model, 'presets').map((r) => r.key)).toEqual(['server', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'lb', 'network']);
+    expect(rowsOf(model, 'presets').map((r) => r.key)).toEqual(['server', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'lb', 'network']);
     expect(rowsOf(model, 'presets').flatMap((r) => r.cells[0]!.split(' · '))).toEqual(PRESETS.map((p) => p.id));
     // 묶음 일부에만 있는 선택 사항은 그 프리셋을 밝힌다 — bastion 에는 HA · 서버리스가 없다
     const server = rowsOf(model, 'presets').find((r) => r.key === 'server')!;
     const ha = PRESETS.filter((p) => p.ha && p.ruleId === 'gcp.compute_instance' && !p.defaultAttach).map((p) => p.id);
     expect(server.cells[4]).toContain(`${ha.join(', ')}: High availability: at least 2 servers`);
-    expect(rowsOf(model, 'presets').find((r) => r.key === 'network')!.cells[3]).toBe('firewall: ssh / web / icmp / iap / lbhc · psa');
+    expect(rowsOf(model, 'presets').find((r) => r.key === 'network')!.cells[3]).toBe('firewall: ssh / web / icmp / iap / lbhc / internal · psa');
     expect(model.intro).toContain(VERSION.rules);
   });
 

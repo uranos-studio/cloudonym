@@ -266,9 +266,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — 묶음 스물넷 · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — 묶음 스물다섯 · 프리셋 id 전부 · HA 규칙', () => {
     const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
-    expect(rows).toHaveLength(24);
+    expect(rows).toHaveLength(25);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');
@@ -279,7 +279,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
     expect(rows[6]).toContain('project: `vpc`, `subnet`');
     expect(rows[7]).toContain('`dlq`');
-    for (const r of rows.slice(5)) expect(r).toContain('rules verified, the set not yet applied');
+    // D117 — https-lb 만 아직 묶음으로 만들어 보지 않았다
+    expect(rows[4]).toContain('rules verified, the set not yet applied');
+    for (const r of [...rows.slice(0, 4), ...rows.slice(5)]) expect(r).toContain('built and tested on Google Cloud');
     expect(rows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `lbhc`');
     expect(rows[0]).toContain('built and tested on Google Cloud');
     expect(rows[1]).toContain('built and tested on Google Cloud');

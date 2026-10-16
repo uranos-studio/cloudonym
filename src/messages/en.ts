@@ -504,6 +504,7 @@ export const en: Catalog = {
     wizard_project_picks_full: 'Up to {max} project resources (required network and shared extras together) — remove one to add another',
     wizard_add_same_subnet: 'Add number (same kind and tier)',
     wizard_firewall_iap_hint: 'SSH or RDP through IAP TCP forwarding — allow ingress from 35.235.240.0/20',
+    wizard_firewall_internal_hint: 'Inside the network — allow the web and app ports between your servers (a user VPC blocks all incoming traffic until a rule allows it)',
     wizard_firewall_lbhc_hint: 'Load balancer health checks — allow ingress from the probe ranges (35.191.0.0/16 and the others on the health check page)',
     wizard_nat_hint: 'Cloud NAT is configured on a Cloud Router — name the router too if you create it here.',
     wizard_lb_parts: 'Load balancer',

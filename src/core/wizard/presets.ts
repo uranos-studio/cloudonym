@@ -55,6 +55,8 @@ export const PRESETS: readonly Preset[] = [
   { id: 'topic', label: 'Pub/Sub topic', ruleId: 'gcp.pubsub_topic', ...NONE, level: 'service' },
   { id: 'sub', label: 'Pub/Sub subscription', ruleId: 'gcp.pubsub_subscription', ...NONE, level: 'service' },
   { id: 'dlq', label: 'Dead-letter topic', ruleId: 'gcp.pubsub_topic', tier: 'dlq', ha: null, serverless: null, level: 'service' },
+  // D117 — 데드레터 토픽의 구독. 구독이 없는 토픽에 넘어간 메시지는 사라진다(pubsub/docs/handling-failures) — 구독 규칙에 tier dlq
+  { id: 'dlqsub', label: 'Dead-letter subscription', ruleId: 'gcp.pubsub_subscription', tier: 'dlq', ha: null, serverless: null, level: 'service' },
   { id: 'build', label: 'Cloud Build trigger', ruleId: 'gcp.cloudbuild_trigger', ...NONE, level: 'service' },
   { id: 'cron', label: 'Cloud Scheduler job', ruleId: 'gcp.scheduler_job', ...NONE, level: 'service' },
   { id: 'runjob', label: 'Cloud Run job', ruleId: 'gcp.run_job', ...NONE, level: 'service' },
@@ -84,8 +86,9 @@ export const PRESETS: readonly Preset[] = [
   { id: 'bb', label: 'Backend bucket', ruleId: 'gcp.backend_bucket', ...NONE, level: 'service', group: 'lb' },
   { id: 'vpc', label: 'VPC network', ruleId: 'gcp.vpc_network', ...NONE, level: 'project', group: 'network' },
   { id: 'subnet', label: 'Subnet', ruleId: 'gcp.subnet', ...NONE, level: 'project', group: 'network' },
-  // D87 — iap: IAP TCP forwarding 소스 35.235.240.0/20 을 받는 규칙 · lbhc: 로드 밸런서 health check 프로브 대역(35.191.0.0/16 등)을 받는 규칙
-  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp', 'iap', 'lbhc'], ha: null, serverless: null, level: 'project', group: 'network' },
+  // D87 — iap: IAP TCP forwarding 소스 35.235.240.0/20 을 받는 규칙 · lbhc: 로드 밸런서 health check 프로브 대역(35.191.0.0/16 등)을 받는 규칙 ·
+  // D117 — internal: 네트워크 안의 서버끼리 서비스 포트(웹 · 앱)를 받는 규칙. 사용자 VPC 는 들어오는 것을 모두 막으므로 없으면 내부 서버에 닿지 않는다
+  { id: 'firewall', label: 'Firewall rule', ruleId: 'gcp.firewall_rule', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp', 'iap', 'lbhc', 'internal'], ha: null, serverless: null, level: 'project', group: 'network' },
   { id: 'router', label: 'Cloud Router', ruleId: 'gcp.router', ...NONE, level: 'project', group: 'network' },
   { id: 'nat', label: 'Cloud NAT', ruleId: 'gcp.router_nat', ...NONE, level: 'project', group: 'network' },
   // D88 — Private services access 대역: 전역 내부 주소(--global --purpose=VPC_PEERING). purpose 는 종류 표(address_type)와 다른 API 필드라 kind 는 INTERNAL 로 고정한다

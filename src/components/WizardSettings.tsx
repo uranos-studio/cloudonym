@@ -155,7 +155,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
 
 // ── ② 필수 네트워크 (D84) — 네트워크 칩(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽 tier 줄 · PSA 대역)과 그 프리셋 pick ──
 // 모델은 projectPicks 하나다 — 이 칸은 프리셋 pick 만, 「Shared extra resources」는 custom pick 만 그린다(자리 번호 · path 는 모델 순서 그대로)
-const FIREWALL_HINTS: Record<string, string> = { iap: en.ui.wizard_firewall_iap_hint, lbhc: en.ui.wizard_firewall_lbhc_hint };
+const FIREWALL_HINTS: Record<string, string> = { iap: en.ui.wizard_firewall_iap_hint, lbhc: en.ui.wizard_firewall_lbhc_hint, internal: en.ui.wizard_firewall_internal_hint };
 const FIREWALL_PROBLEM: Record<NonNullable<ReturnType<typeof S.firewallTierProblem>>, string> = {
   pattern: en.ui.wizard_firewall_custom_hint, reserved: en.ui.wizard_firewall_custom_hint, exists: en.ui.wizard_firewall_custom_exists, full: PICKS_FULL,
 };
