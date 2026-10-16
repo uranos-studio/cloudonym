@@ -486,6 +486,11 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       <main data-wizard className={`mx-auto max-w-[100rem] space-y-4 px-4 pt-4 ${layout === 'phone' ? 'pb-24' : layout === 'tablet' ? 'pb-20' : 'pb-4'}`}>
         {/* 짧은 소개 (D97 · D107) — 예시 한 줄(입력 넷 → 이름 셋, 엔진이 빌드 때 만든 값)이 먼저, 그 아래 순서 한 문장. 경고색이 아니다(공유 링크 경고는 Share 를 누를 때 따로 뜬다).
             「무엇을 안 하나」는 이름 칸 아래 PASS 문단 곁에 있다 — 이름을 본 사람에게 필요한 말이다 */}
+        {/* 머리글 (D113) — 무엇을 하는 도구인지 한 줄 · 무엇을 넣고 무엇을 받는지 한 줄. 소개 상자를 닫아도 남고 폰에서도 보인다(머리의 작은 부제를 대신한다) */}
+        <div data-wizard-headline className="space-y-1">
+          <h2 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">{en.ui.headline}</h2>
+          <p data-wizard-headline-sub className="text-sm text-pretty text-zinc-600 sm:text-base dark:text-zinc-400">{en.ui.headline_sub}</p>
+        </div>
         {introOpen && (
           <section data-wizard-intro aria-label={en.ui.wizard_about_label}
             className="flex items-start justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">

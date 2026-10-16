@@ -11,6 +11,10 @@ Rules revision for this release: 2026-10-16.2. New wizard presets only; no name,
 - **Five more wizard cards** (D114) — **Data warehouse (BigQuery)** (a landing bucket, a BigQuery dataset whose name uses underscores, a service account; a Cloud Scheduler job as an option), **GKE cluster** (the cluster, an Artifact Registry repository and a node service account on the project's VPC network and subnet; Memorystore for Redis as an option), **Event pipeline (Pub/Sub)** (topic, subscription, dead-letter topic, Cloud Run service, service account), **CI/CD (Cloud Build)** (Artifact Registry repository, Cloud Build trigger, service account; a secret as an option) and **Batch job** (Cloud Run job, Cloud Scheduler job, service account). Their rules are checked against the official documents; none of the five sets has been built on Google Cloud yet, and the cards say so.
 - **Nine wizard presets** for those parts: `bq`, `ar`, `topic`, `sub`, `dlq` (a Pub/Sub topic with the tier `dlq`), `build`, `cron`, `runjob` and `redis`, also accepted by `POST /v1/wizard` and listed in `/llms.txt`.
 
+### Changed
+
+- **The wizard opens with a headline** (D113) — "Generate valid Google Cloud resource names." with a one-line explanation above the work area, on every screen width. The small header line it replaces is gone, and the intro example is labelled as sample output that does not come from your inputs.
+
 ## [0.1.7] - 2026-10-16
 
 `/llms.txt` now opens with guidance for AI coding agents: call the API instead of composing names, how the engine shortens, and which rules a naming convention breaks. The Secrets Manager "hyphen and six characters" ending is a warning instead of a failure, shown in a new `warnings` list on the API and on the result cards. The site has its own mark on the favicon, the header and the share preview image.

@@ -85,7 +85,6 @@ export function AppHeader({ share, shareText, onShare, screen, otherHref, naming
               <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
               {badge}
             </div>
-            {!phone && <p className="text-xs text-zinc-600 dark:text-zinc-400">{en.ui.tagline}</p>}
           </div>
         </div>
         <nav aria-label={en.ui.nav_label} className="ml-auto flex flex-wrap items-center gap-2">

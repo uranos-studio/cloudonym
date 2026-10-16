@@ -258,14 +258,17 @@ describe('영어 사전 (D24)', () => {
     expect(fillUi(en, 'length_range', { min: 3 })).toBe('Length 3–{max}');
   });
   it('첫 화면 문구 (D97 · D107) — 켜진 것은 Google Cloud 하나 · AWS · Azure 를 지원한다고 말하지 않는다 · 부제는 입력 → 출력 · 소개는 한 문장 · 「하지 않는 것」은 PASS 문단 곁 · 공유 경고는 소개에 없다', () => {
-    for (const t of [en.ui.tagline, en.ui.meta_description]) {
-      expect(t).toContain('Google Cloud');
-      expect(t).toMatch(/owner, system, environment and region/);
-      expect(t).not.toMatch(/AWS · GCP · Azure|each cloud/);
-    }
-    // 부제는 AWS · Azure 를 말하지 않는다(옆 뱃지가 「soon」을 말한다) · meta 는 「나중」으로만
-    expect(en.ui.tagline).not.toMatch(/AWS|Azure/);
-    expect(en.ui.tagline.indexOf('region')).toBeLessThan(en.ui.tagline.indexOf('resource names'));
+    expect(en.ui.meta_description).toContain('Google Cloud');
+    expect(en.ui.meta_description).toMatch(/owner, system, environment and region/);
+    // 머리글 (D113) — 무엇을 하나(Google Cloud 이름) · 무엇을 넣나(문맥값 다섯) · 무엇을 받나(공식 규칙에 맞는 이름). AWS · Azure 는 말하지 않는다(뱃지가 「soon」을 말한다)
+    expect(en.ui.headline).toBe('Generate valid Google Cloud resource names.');
+    expect(en.ui.headline_sub).toBe("Enter five context values. Get consistent, ready-to-use names that fit each service's official rules.");
+    for (const t of [en.ui.headline, en.ui.headline_sub, en.ui.meta_description]) expect(t).not.toMatch(/AWS · GCP · Azure|each cloud/);
+    expect(`${en.ui.headline} ${en.ui.headline_sub}`).not.toMatch(/AWS|Azure/);
+    // 예시 줄은 입력 칸의 값이 아니다 (D113) — 보이는 표지와 읽는 이름 둘 다 그렇게 말하고, 개수를 말하지 않는다(머리글의 「다섯」과 엇갈리지 않게)
+    expect(`${en.ui.intro_example} ${en.ui.intro_example_note}`).toMatch(/^Example output .*not your inputs$/);
+    expect(en.ui.intro_example_label).toMatch(/not generated from your inputs/);
+    expect(en.ui.intro_example_label).not.toMatch(/\b(three|four|five)\b/);
     expect(en.ui.meta_description).toMatch(/AWS and Azure coming\./);
     // 소개 한 문장 (D107) — 순서: 값 넷 → 무엇을 만드나 → 받는 것(이름 · JSON · Terraform locals)
     expect(en.ui.wizard_intro).toMatch(/four values/);

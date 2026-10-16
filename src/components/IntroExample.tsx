@@ -17,7 +17,8 @@ export function IntroExample({ phone, example = INTRO_EXAMPLE }: { phone: boolea
     <figure data-intro-example aria-label={en.ui.intro_example_label}
       className="overflow-x-auto rounded-md border border-zinc-900 bg-zinc-900 px-3 py-2 font-mono text-[11px] leading-relaxed sm:text-xs text-zinc-100 dark:border-zinc-700 dark:bg-black">
       <div className="flex flex-wrap items-baseline gap-x-3">
-        <span className="font-sans text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{en.ui.intro_example}</span>
+        {/* 예시는 입력 칸의 값으로 만든 것이 아니다 (D113) — 표지 옆에 그 말을 붙인다 */}
+        <span className="font-sans text-[11px] text-zinc-400"><span data-intro-example-tag className="font-semibold uppercase tracking-wider">{en.ui.intro_example}</span>{' '}<span data-intro-example-note>{en.ui.intro_example_note}</span></span>
         {/* 값 하나는 줄을 바꾸지 않는다(asia-northeast3 가 하이픈에서 잘리지 않게) — 줄은 「 · 」 자리에서만 바뀐다 */}
         <code data-intro-example-input>{example.input.map((v, i) => <Fragment key={v}>{i > 0 ? ' · ' : ''}<span className="whitespace-nowrap">{v}</span></Fragment>)}</code>
       </div>
