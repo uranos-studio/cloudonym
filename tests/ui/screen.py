@@ -310,7 +310,7 @@ INTRO_EXAMPLE = ['demo-payment-prod', 'payment-shop-prod-ane3-run-01', 'payment-
 # 첫 방문 예시 계획 (D108) — 입력 넷 · 서비스 shop 의 serverless-web 카드 · 네트워크 미리 채움 넷. 이름 열여섯이 전부 PASS (엔진 실측 · wizardSample.test)
 SAMPLE = {'owner': 'demo', 'system': 'payment', 'env': 'prod', 'region': 'asia-northeast3'}
 SAMPLE_NAMES = 16
-INTRO_ORDER = 'Fill in your four values below and pick what you are building — you get names, JSON and Terraform locals. Naming guide'
+INTRO_ORDER = 'Fill in the project values below and pick what you are building — you get names, JSON and Terraform locals. Naming guide'
 NEED_PROJECT = 'Enter the project values first — owner, system, environment and region. The names appear here once they are valid.'
 PENDING = 'Fill in owner, system, environment and region to continue.'
 INTRO_KEY = 'cloudonym:intro_dismissed_v2'
