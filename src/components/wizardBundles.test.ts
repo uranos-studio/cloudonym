@@ -275,3 +275,44 @@ describe('LB 카드 후보 — 공유 부품과 부품 여럿 빼기', () => {
     expect(m[0]!.noBackend).toBe(true);
   });
 });
+
+describe('D114 의 카드 다섯 — 화면에서 더하기 · 되읽기 · 지우기', () => {
+  const NEW = ['data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job'] as const;
+
+  it('첫 화면에 카드 하나(선택 전부)를 더하면 그 카드 하나로 완성되어 되읽히고 · 이름이 전부 PASS · 링크로 다시 열어도 같다 · 지우면 서비스가 빈다', () => {
+    for (const id of NEW) {
+      const all = Object.fromEntries(bundleById(id)!.options.map((o) => [o.id, true]));
+      const start = startPlan(DEFAULT_PROJECT);
+      expect(cardBlocked(start, 0, id, all), id).toBeUndefined();
+      const p = addBundle(start, 0, id, all);
+      expect(ids(p, 0), id).toEqual([[id, true]]);
+      // GKE 의 네트워크(vpc · subnet)는 첫 화면에 이미 있다 — 다시 더하지 않는다
+      expect(presets(p, null), id).toEqual(['vpc', 'subnet', 'router', 'nat']);
+      expect(validatePlan(p), id).toEqual({ ok: true });
+      expect(generateProject(expandPlan(p), 'gcp').items.every((i) => i.valid), id).toBe(true);
+      for (const o of bundleById(id)!.options) expect(optionOn(p, 0, o.parts), `${id} ${o.id}`).toBe(true);
+      const back = decodeWizardState(`#state=${encodeWizardState(p, RULES_REVISION, [])!}`)!.plan!;
+      expect(back.services, id).toEqual(p.services);
+      expect(ids(back, 0), id).toEqual([[id, true]]);
+      const removed = removeBundle(p, 0, id);
+      expect(presets(removed, 0).filter((x) => !bundleById(id)!.options.some((o) => o.parts.some((q) => q.preset === x))), id).toEqual([]);
+      expect(cardsIn(removed, 0), id).toEqual([]);
+    }
+  });
+
+  it('네트워크를 비운 계획에 GKE 를 더하면 vpc · subnet 을 프로젝트 공용 자리에 더한다', () => {
+    const p = addBundle(startPlan(DEFAULT_PROJECT), 0, 'gke');
+    const empty = { ...p, projectPicks: [], services: [{ purpose: 'shop', picks: [] }] };
+    expect(presets(addBundle(empty, 0, 'gke'), null)).toEqual(['vpc', 'subnet']);
+    expect(ids(addBundle(empty, 0, 'gke'), 0)).toEqual([['gke', true]]);
+  });
+
+  it('부품(서비스 계정)을 함께 쓰는 카드는 한 서비스에 하나 — 둘째는 overlap 으로 막히고, 다른 서비스에는 더할 수 있다', () => {
+    const p = addBundle(startPlan(DEFAULT_PROJECT), 0, 'gke');
+    expect(cardBlocked(p, 0, 'ci-cd', {})).toBe('overlap');
+    expect(addBundle(p, 0, 'ci-cd')).toBe(p);
+    const two = addService(p);
+    expect(cardBlocked(two, 1, 'ci-cd', {})).toBeUndefined();
+    expect(ids(addBundle(two, 1, 'ci-cd'), 1)).toEqual([['ci-cd', true]]);
+  });
+});

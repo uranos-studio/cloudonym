@@ -82,7 +82,12 @@ const SERVERLESS_NEG_DOC = 'https://docs.cloud.google.com/load-balancing/docs/ne
 export const RUN_PUBLIC_DOC = 'https://docs.cloud.google.com/run/docs/authenticating/public';
 export const STATIC_SITE_DOC = 'https://docs.cloud.google.com/storage/docs/hosting-static-website';
 
-/** 1차 카드 다섯 (D93) — 순서가 갤러리 순서이고 되읽기의 동률 순서다 */
+// D114 — 서비스 부품 카드 다섯. 부품은 표에 이미 있는 규칙(D72)으로만 만든다 — 노드 풀 · Dataflow · Cloud Deploy · Eventarc 는 규칙이 없어 카드에 넣지 않는다.
+// 사설 네트워크 카드는 두지 않는다 — 부품(VPC · 서브넷 · Cloud Router · Cloud NAT · 방화벽)이 전부 프로젝트 공용이라 서비스에서 되읽을 수 없고(모든 서비스에 뜬다),
+// 첫 화면(D90)이 이미 그 넷을 켜고 방화벽은 tier 칩이다. 선택도 서비스 부품이 하나 이상이어야 한다 — 그래서 GKE 의 Cloud Router · NAT 는 선택이 아니라 네트워크 칸에 둔다
+const DOCS = 'https://docs.cloud.google.com/';
+
+/** 1차 카드 다섯 (D93) + D114 의 다섯 — 순서가 갤러리 순서이고 되읽기의 동률 순서다 */
 export const BUNDLES: readonly Bundle[] = [
   {
     id: 'website', label: 'Website', family: 'lb', tested: true,
@@ -128,6 +133,57 @@ export const BUNDLES: readonly Bundle[] = [
     options: [],
     refs: [...LB_FRONT_REFS, ...VM_BACKEND_REFS, ...RUN_BACKEND_REFS, ...BUCKET_BACKEND_REFS],
     evidence: ['D91', SERVERLESS_NEG_DOC],
+  },
+  {
+    id: 'data-warehouse', label: 'Data warehouse (BigQuery)', tested: false,
+    summary: 'A landing bucket, a BigQuery dataset and a service account that loads it. Dataset names use underscores, not hyphens.',
+    parts: [P('object'), P('bq'), P('sa')],
+    options: [{ id: 'schedule', label: 'Scheduled load (Cloud Scheduler)', on: false, parts: [P('cron')] }],
+    refs: [],
+    evidence: [`${DOCS}bigquery/docs/datasets#dataset-naming`, `${DOCS}bigquery/docs/batch-loading-data`],
+  },
+  {
+    id: 'gke', label: 'GKE cluster', tested: false,
+    summary: 'A GKE cluster on the VPC network, an Artifact Registry repository for its images and a service account for its nodes.',
+    parts: [P('gke'), P('ar'), P('sa'), P('vpc'), P('subnet')],
+    options: [{ id: 'cache', label: 'Cache (Memorystore for Redis)', on: false, parts: [P('redis')] }],
+    refs: [
+      { from: 'gke', to: 'vpc', attr: 'network', evidence: `${TF}container_cluster` },
+      { from: 'gke', to: 'subnet', attr: 'subnetwork', evidence: `${TF}container_cluster` },
+      { from: 'gke', to: 'sa', attr: 'node_config.service_account', evidence: `${TF}container_cluster` },
+    ],
+    evidence: [`${DOCS}kubernetes-engine/docs/how-to/service-accounts`, `${DOCS}artifact-registry/docs/integrate-gke`],
+  },
+  {
+    id: 'event-pipeline', label: 'Event pipeline (Pub/Sub)', tested: false,
+    summary: 'A Pub/Sub topic and subscription that push to a Cloud Run service, with a dead-letter topic for messages that keep failing.',
+    parts: [P('topic'), P('sub'), P('dlq'), P('run'), P('sa')],
+    options: [],
+    refs: [
+      { from: 'sub', to: 'topic', attr: 'topic', evidence: `${TF}pubsub_subscription` },
+      { from: 'sub', to: 'dlq', attr: 'dead_letter_policy.dead_letter_topic', evidence: `${TF}pubsub_subscription` },
+      { from: 'run', to: 'sa', attr: 'template.service_account', evidence: `${TF}cloud_run_v2_service` },
+    ],
+    evidence: [`${DOCS}run/docs/triggering/pubsub-push`, `${DOCS}pubsub/docs/handling-failures`],
+  },
+  {
+    id: 'ci-cd', label: 'CI/CD (Cloud Build)', tested: false,
+    summary: 'A Cloud Build trigger that builds images into an Artifact Registry repository, running as its own service account.',
+    parts: [P('ar'), P('build'), P('sa')],
+    options: [{ id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }],
+    refs: [{ from: 'build', to: 'sa', attr: 'service_account', evidence: `${TF}cloudbuild_trigger` }],
+    evidence: [`${DOCS}build/docs/build-push-docker-image`, `${DOCS}build/docs/securing-builds/configure-user-specified-service-accounts`],
+  },
+  {
+    id: 'batch-job', label: 'Batch job', tested: false,
+    summary: 'A Cloud Run job started on a schedule by Cloud Scheduler, running as its own service account.',
+    parts: [P('runjob'), P('cron'), P('sa')],
+    options: [],
+    refs: [
+      { from: 'runjob', to: 'sa', attr: 'template.template.service_account', evidence: `${TF}cloud_run_v2_job` },
+      { from: 'cron', to: 'sa', attr: 'http_target.oauth_token.service_account_email', evidence: `${TF}cloud_scheduler_job` },
+    ],
+    evidence: [`${DOCS}run/docs/execute/jobs-on-schedule`],
   },
 ];
 

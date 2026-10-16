@@ -19,9 +19,10 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 — 서버형 넷 · db · object · 서비스 다섯 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
+      'bq', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis',
       'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
     expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
@@ -76,7 +77,7 @@ describe('프리셋 데이터 (D64)', () => {
 
   it('D73 의 새 칩 — 각각 켜면 이름 하나(PASS) · 서비스 계정은 기본 역할 sync', () => {
     const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
-    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'router', 'nat'];
+    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'router', 'nat'];
     const names: Record<string, string> = {};
     for (const id of created) {
       const p = presetOf(id)!;
@@ -93,12 +94,25 @@ describe('프리셋 데이터 (D64)', () => {
     expect(names).toEqual({
       run: 'billing-shop-prod-ane3-run-01', sa: 'billing-shop-prod-sa-sync', secret: 'billing-shop-prod-secret-01',
       gke: 'billing-shop-prod-ane3-gke-01', wip: 'billing-shop-prod-wip-01',
+      ar: 'billing-shop-prod-ane3-ar-01', topic: 'billing-shop-prod-topic-01', sub: 'billing-shop-prod-sub-01', dlq: 'billing-shop-prod-topic-dlq-01',
+      build: 'billing-shop-prod-ane3-trigger-01', cron: 'billing-shop-prod-ane3-cron-01', runjob: 'billing-shop-prod-ane3-crj-01', redis: 'billing-shop-prod-ane3-redis-01',
       ip: 'billing-shop-prod-ip-01', bs: 'billing-shop-prod-bs-01', hc: 'billing-shop-prod-hc-01', url: 'billing-shop-prod-url-01',
       cert: 'billing-shop-prod-cert-01', thps: 'billing-shop-prod-thps-01', fwd: 'billing-shop-prod-fwd-01',
       ig: 'billing-shop-prod-ane3-ig-01', urlredir: 'billing-shop-prod-url-redir-01', thp: 'billing-shop-prod-thp-01', fwdredir: 'billing-shop-prod-fwd-redir-01',
       neg: 'billing-shop-prod-ane3-neg-01', bb: 'billing-shop-prod-bb-01',
       router: 'billing-prod-ane3-cr-01', nat: 'billing-prod-nat-01',
     });
+  });
+
+  it('D114 — BigQuery 데이터셋 칩은 하이픈 없이 밑줄로 잇는다(데이터셋 이름에 - 를 쓸 수 없다) · 입력 없는 규칙', () => {
+    const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
+    expect(inputKind(RULES[presetOf('bq')!.ruleId]!)).toBe('none');
+    const plan: WizardPlan = { provider: 'gcp', project: PROJECT, projectPicks: [], services: [{ purpose: 'shop', picks: [{ preset: 'bq' }] }] };
+    expect(validatePlan(plan)).toEqual({ ok: true });
+    const [item] = generateProject(expandPlan(plan), 'gcp').items.slice(1);
+    expect(item).toMatchObject({ name: 'billing_shop_prod_ane3_bq', valid: true });
+    expect(item!.name).not.toContain('-');
+    expect(presetOf('dlq')).toMatchObject({ ruleId: presetOf('topic')!.ruleId, tier: 'dlq' });
   });
 
   it('프리셋 tier 는 TIER_PATTERN 을 지나고 예약 목록과 겹침 0 — 데이터에서 센다', () => {

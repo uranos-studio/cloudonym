@@ -5,7 +5,7 @@ import { PRESETS, presetOf } from './presets';
 import { RULES } from '../constraints';
 import { inputKind } from '../tree';
 import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type Pick, type WizardPlan } from './plan';
-import { generateProject } from '../engine';
+import { generateProject, validateName } from '../engine';
 
 const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
 const NETWORK: BundlePart[] = [{ preset: 'vpc' }, { preset: 'subnet' }, { preset: 'router' }, { preset: 'nat' }];
@@ -26,13 +26,14 @@ function partsOf(b: Bundle, opts: 'default' | 'all' | 'none' = 'default'): Bundl
   return out;
 }
 function planOf(parts: BundlePart[], withNetwork = true): WizardPlan {
-  const project = [...(withNetwork ? NETWORK : []), ...parts.filter(partIsProject)];
+  const own = parts.filter(partIsProject);
+  const project = [...(withNetwork ? NETWORK.filter((n) => !own.some((p) => partKey(p) === partKey(n))) : []), ...own];
   return { provider: 'gcp', project: PROJECT, projectPicks: project.map(pickOf), services: [{ purpose: 'site', picks: parts.filter((p) => !partIsProject(p)).map(pickOf) }] };
 }
 
 describe('카드 데이터 (D93)', () => {
-  it('1차 카드 다섯 — id 는 고유 · 갤러리 순서', () => {
-    expect(BUNDLES.map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb']);
+  it('1차 카드 다섯 + D114 의 다섯 — id 는 고유 · 갤러리 순서', () => {
+    expect(BUNDLES.map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
     expect(bundleById('website')?.label).toBe('Website');
     expect(bundleById('nope')).toBeUndefined();
   });
@@ -122,5 +123,75 @@ describe('카드 데이터 (D93)', () => {
       for (const o of b.options) expect(o.label.length, `${b.id} ${o.id}`).toBeGreaterThan(0);
     }
     expect(PRESETS.length).toBeGreaterThan(0);
+  });
+
+  it('선택마다 서비스 부품이 하나 이상 — 프로젝트 공용 부품뿐인 선택은 켜짐(optionOn)을 되읽을 수 없고 끌 수도 없다', () => {
+    for (const b of BUNDLES) for (const o of b.options) expect(o.parts.some((p) => !partIsProject(p)), `${b.id} ${o.id}`).toBe(true);
+  });
+
+  it('카드마다 필수 서비스 부품이 하나 이상 — 프로젝트 공용 부품뿐인 카드는 모든 서비스에 되읽힌다(그래서 사설 네트워크 카드는 두지 않는다 · D114)', () => {
+    for (const b of BUNDLES) expect([...b.parts, ...(b.backends ?? []).map((x) => ({ preset: x.needs }))].some((p) => !partIsProject(p)), b.id).toBe(true);
+  });
+
+  it('가족 밖 카드끼리 필수 서비스 부품 묶음이 서로의 부분집합이 아니다 — 되읽기가 한 카드로 정해진다', () => {
+    const others = BUNDLES.filter((b) => b.family === undefined).map((b) => ({ id: b.id, keys: new Set(b.parts.filter((p) => !partIsProject(p)).map(partKey)) }));
+    for (const a of others) for (const b of others) {
+      if (a.id === b.id) continue;
+      expect([...a.keys].every((k) => b.keys.has(k)), `${a.id} ⊂ ${b.id}`).toBe(false);
+    }
+  });
+
+  it('D114 의 새 카드 다섯 — 필수 부품 · 선택 · 아직 만들어 보지 않음(tested false)', () => {
+    const shape = (id: string) => { const b = bundleById(id)!; return { parts: b.parts.map(partKey), options: b.options.map((o) => [o.id, o.on, o.parts.map(partKey)]), tested: b.tested, family: b.family }; };
+    expect(shape('data-warehouse')).toEqual({ parts: ['object', 'bq', 'sa'], options: [['schedule', false, ['cron']]], tested: false, family: undefined });
+    expect(shape('gke')).toEqual({ parts: ['gke', 'ar', 'sa', 'vpc', 'subnet'], options: [['cache', false, ['redis']]], tested: false, family: undefined });
+    expect(shape('event-pipeline')).toEqual({ parts: ['topic', 'sub', 'dlq', 'run', 'sa'], options: [], tested: false, family: undefined });
+    expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']]], tested: false, family: undefined });
+    expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [], tested: false, family: undefined });
+    // 네트워크(vpc · subnet)는 프로젝트 공용 자리다 — 첫 화면에 이미 있으면 카드가 더하지 않는다
+    expect(bundleById('gke')!.parts.filter(partIsProject).map(partKey)).toEqual(['vpc', 'subnet']);
+  });
+
+  it('D114 — 카드를 펼친 이름: 데이터셋은 밑줄 · 버킷과 나머지는 하이픈 · 데드레터 토픽은 토픽과 키 · 이름이 다르다', () => {
+    const names = (id: string) => Object.fromEntries(generateProject(expandPlan(planOf(partsOf(bundleById(id)!, 'all'), false)), 'gcp').items.slice(1).map((i) => [i.key, i.name]));
+    expect(names('data-warehouse')).toEqual({
+      'service/site/storage_bucket/-/-/-': 'platform-billing-site-prod-ane3-gcs',
+      'service/site/bigquery_dataset/-/-/-': 'billing_site_prod_ane3_bq',
+      'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
+      'service/site/scheduler_job/-/-/01': 'billing-site-prod-ane3-cron-01',
+    });
+    expect(names('event-pipeline')).toEqual({
+      'service/site/pubsub_topic/-/-/01': 'billing-site-prod-topic-01',
+      'service/site/pubsub_subscription/-/-/01': 'billing-site-prod-sub-01',
+      'service/site/pubsub_topic/-/dlq/01': 'billing-site-prod-topic-dlq-01',
+      'service/site/run_service/-/-/01': 'billing-site-prod-ane3-run-01',
+      'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
+    });
+    expect(Object.keys(names('gke'))).toEqual([
+      'project/-/vpc_network/-/-/01', 'project/-/subnet/-/-/01',
+      'service/site/gke_cluster/-/-/01', 'service/site/artifact_registry_repository/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/redis_instance/-/-/01',
+    ]);
+    expect(Object.keys(names('ci-cd'))).toEqual(['service/site/artifact_registry_repository/-/-/01', 'service/site/cloudbuild_trigger/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/secret/-/-/01']);
+    expect(Object.keys(names('batch-job'))).toEqual(['service/site/run_job/-/-/01', 'service/site/scheduler_job/-/-/01', 'service/site/service_account/-/-/sync']);
+  });
+
+  it('D114 — 긴 문맥값에서도 GKE 클러스터 이름은 40자 이하로 줄거나 실패(valid false)로 돌아온다 · 유효로 표시된 이름은 엔진 검사를 다시 지난다', () => {
+    const gkeOf = (system: string, purpose: string) => {
+      const plan: WizardPlan = { provider: 'gcp', project: { owner: 'platform', system, env: 'prod', region: 'asia-northeast3' }, projectPicks: [], services: [{ purpose, picks: partsOf(bundleById('gke')!, 'all').filter((p) => !partIsProject(p)).map(pickOf) }] };
+      expect(validatePlan(plan), `${system} ${purpose}`).toEqual({ ok: true });
+      const items = generateProject(expandPlan(plan), 'gcp').items;
+      for (const i of items) if (i.valid) expect(validateName('gcp', i.resourceType, i.name).valid, `${i.key} ${i.name}`).toBe(true);
+      const gke = items.find((i) => i.key.includes('/gke_cluster/'))!;
+      expect(!gke.valid || gke.name.length <= 40, gke.name).toBe(true);
+      return gke;
+    };
+    const shortened = gkeOf('customerbillingplatform', 'recommendationengine');
+    expect(shortened).toMatchObject({ valid: true, isTruncated: true });
+    expect(shortened.name.length).toBeLessThanOrEqual(40);
+    // 축소 없이 40자를 넘는 입력 — 축소가 실제로 걸린다
+    expect('customerbillingplatform-recommendationengine-prod-ane3-gke-01'.length).toBeGreaterThan(40);
+    expect(shortened.name).toBe('customerbilli-recommendatio-prod-gke-01');
+    // 입력 상한(40자) 둘 — 지역 토큰을 빼고 두 값을 고르게 줄여 40자 안에 든다
+    expect(gkeOf('x'.repeat(40), 'y'.repeat(40))).toMatchObject({ name: 'xxxxxxxxxxxxx-yyyyyyyyyyyyy-prod-gke-01', valid: true, isTruncated: true });
   });
 });

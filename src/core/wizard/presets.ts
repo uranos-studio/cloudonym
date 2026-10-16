@@ -46,6 +46,16 @@ export const PRESETS: readonly Preset[] = [
   { id: 'secret', label: 'Secret', ruleId: 'gcp.secret', ...NONE, level: 'service' },
   { id: 'gke', label: 'GKE cluster', ruleId: 'gcp.gke_cluster', ...NONE, level: 'service' },
   { id: 'wip', label: 'Workload Identity pool', ruleId: 'gcp.iam_workload_identity_pool', ...NONE, level: 'service' },
+  // D114 — 새 카드(bundles.ts)의 서비스 부품. 규칙은 이미 표에 있고(D72), 칩 하나 = 이름 하나다. dlq: 데드레터 토픽 — 위 topic 과 같은 규칙이라 tier dlq 로 가른다(urlredir 와 같은 꼴)
+  { id: 'bq', label: 'BigQuery dataset', ruleId: 'gcp.bigquery_dataset', ...NONE, level: 'service' },
+  { id: 'ar', label: 'Artifact Registry repository', ruleId: 'gcp.artifact_registry_repository', ...NONE, level: 'service' },
+  { id: 'topic', label: 'Pub/Sub topic', ruleId: 'gcp.pubsub_topic', ...NONE, level: 'service' },
+  { id: 'sub', label: 'Pub/Sub subscription', ruleId: 'gcp.pubsub_subscription', ...NONE, level: 'service' },
+  { id: 'dlq', label: 'Dead-letter topic', ruleId: 'gcp.pubsub_topic', tier: 'dlq', ha: null, serverless: null, level: 'service' },
+  { id: 'build', label: 'Cloud Build trigger', ruleId: 'gcp.cloudbuild_trigger', ...NONE, level: 'service' },
+  { id: 'cron', label: 'Cloud Scheduler job', ruleId: 'gcp.scheduler_job', ...NONE, level: 'service' },
+  { id: 'runjob', label: 'Cloud Run job', ruleId: 'gcp.run_job', ...NONE, level: 'service' },
+  { id: 'redis', label: 'Memorystore for Redis', ruleId: 'gcp.redis_instance', ...NONE, level: 'service' },
   // D73 — HTTPS 로드 밸런서 부품. 칩 하나 = 이름 하나 · 자동 연결 없음
   { id: 'ip', label: 'Global IP address', ruleId: 'gcp.global_address', ...NONE, level: 'service', group: 'lb' },
   { id: 'ig', label: 'Instance group', ruleId: 'gcp.instance_group', ...NONE, level: 'service', group: 'lb' },
