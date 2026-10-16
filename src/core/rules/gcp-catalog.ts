@@ -4376,6 +4376,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     ]
   },
   {
+    "key": "gcp.cloudbuild_connection",
+    "displayName": "Cloud Build Connection",
+    "category": "management",
+    "rules": {
+      "gcp.cloudbuild_connection": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "conn",
+      "basis": "Short form of the dominant word (connection, 10 letters, is past principle 2); github would name one host of several (GitHub, GitHub Enterprise, GitLab, Bitbucket) and host reads as a Compute Engine host; principles 1, 2, 3; GitHub code search API 2026-10-16 (\"google_cloudbuildv2_connection\" extension:tf, 500 files, 300 declarations, tokens of the name value): connection 226 / host 100 / github 89 / gh 6 / conn 1 / cbc 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-16)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Build connection to a source host such as GitHub (2nd gen repositories); letters, digits and -._~%!$&'()*+,;=@, at most 158 characters, unique per location and project. Cloudonym generates lowercase letters, digits and hyphens.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud builds connections create github"
+      ],
+      "terraform": [
+        "google_cloudbuildv2_connection.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_cloudbuildv2_connection",
+      "builds connections"
+    ]
+  },
+  {
     "key": "gcp.dns_managed_zone",
     "displayName": "Cloud DNS Managed Zone",
     "category": "networking",

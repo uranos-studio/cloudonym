@@ -72,8 +72,8 @@ describe('namingDocModel', () => {
     expect(rowsOf(model, 'tokens').find((r) => r.key === 'tier')!.cells[1]).toMatch(/naming wizard/);
     expect(section(model, 'shrink').items![1]).toContain('tier');
   });
-  it('실제 데이터 — 약어 115행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 스물다섯', () => {
-    expect(rowsOf(model, 'abbreviations')).toHaveLength(115);
+  it('실제 데이터 — 약어 116행 · 리전 43행 · 종류 토큰 19행 · 환경 값 넷 · 토큰 열 · 딸린 것 넷 · 프리셋 묶음 스물다섯', () => {
+    expect(rowsOf(model, 'abbreviations')).toHaveLength(116);
     expect(rowsOf(model, 'regions')).toHaveLength(43);
     expect(rowsOf(model, 'kinds')).toHaveLength(19);
     expect(rowsOf(model, 'env').map((r) => r.cells[0])).toEqual([...ENV_VALUES]);

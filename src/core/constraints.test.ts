@@ -330,8 +330,8 @@ describe('Cloud Run 서비스 (D65)', () => {
 
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
-  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 둘뿐 — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
-    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.run_job']);
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결(D118) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.cloudbuild_connection', 'gcp.run_job']);
     for (const r of withEvidence) {
       expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
       expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
@@ -344,7 +344,7 @@ describe('문서 문장이 아닌 근거 (D80)', () => {
         expect(['sdk', 'api_error'], r.id).toContain(e.kind);
         expect(e.date, r.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         expect(e.quote.length, r.id).toBeGreaterThan(10);
-        if (e.kind === 'api_error') expect(e.source, r.id).toMatch(/^POST https:\/\/[a-z]+\.googleapis\.com\/v\d\/projects\/<project>\/locations\//);
+        if (e.kind === 'api_error') expect(e.source, r.id).toMatch(/^(?:POST|GET) https:\/\/[a-z]+\.googleapis\.com\/v\d\/projects\/<project>\/locations\//);
       }
     }
   });
@@ -355,5 +355,27 @@ describe('문서 문장이 아닌 근거 (D80)', () => {
     }
     expect(RULES['gcp.run_job']!.slug).toBe('crj');
     expect(RULES['gcp.artifact_registry_repository']!.slug).toBe('ar');
+  });
+});
+
+describe('Cloud Build 2세대 연결 (D118)', () => {
+  const r = RULES['gcp.cloudbuild_connection']!;
+  const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
+  it('REST 참조의 글자(영숫자와 -._~%!$&\'()*+,;=@) · 위치마다 유일 · 지역 토큰 · 약어', () => {
+    expect({ scope: r.scope, entity: r.entity, category: r.category, regionToken: r.regionToken, slug: r.slug })
+      .toEqual({ scope: 'gcp:project_location', entity: 'cloudbuild.connections', category: 'management', regionToken: 'region', slug: 'conn' });
+    expect(r.docUrl).toBe('https://docs.cloud.google.com/build/docs/api/reference/rest/v2/projects.locations.connections/create#body.QUERY_PARAMETERS.connection_id');
+    for (const name of ['a', 'Abc', '1abc', '-a', 'a-', 'a_b', 'a.b', "a~%!$&'()*+,;=@b"]) expect(ok(name), name).toBe(true);
+    for (const name of ['a:b', 'a b', 'a#b', 'a/b', '']) expect(ok(name), name).toBe(false);
+  });
+  it('길이 1-158 — 서버는 200 자까지 만들지만 ID 와 지역 이름이 합쳐 181 자를 넘으면 그 연결을 읽거나 지울 수 없다(가장 긴 지역 23 자)', () => {
+    expect([r.minLength, r.maxLength]).toEqual([1, 158]);
+    expect(ok('a'.repeat(158))).toBe(true);
+    expect(ok('a'.repeat(159))).toBe(false);
+    expect(r.notes?.map((n) => n.code)).toEqual(expect.arrayContaining(['note.observed_server_rule', 'note.narrower_source_used']));
+    expect(r.evidence?.map((e) => e.source.split(' ')[0])).toEqual(['POST', 'GET']);
+  });
+  it('생성은 소문자 · 숫자 · 하이픈 — 넓은 글자는 검사만 받는다', () => {
+    expect({ allowed: r.allowed, caseRule: r.caseRule, separator: r.separator }).toEqual({ allowed: 'lower-digit-hyphen', caseRule: 'lower', separator: '-' });
   });
 });

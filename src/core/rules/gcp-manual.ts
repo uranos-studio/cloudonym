@@ -33,6 +33,15 @@ const AR_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
     quote: 'Invalid repository ID: "<id>" for Abc, a_b, a.b, a-, -a, 1abc and 64 or 100 characters; a, a1, a-1, a--b and 49, 50 or 63 characters pass the ID check; a 63-character DOCKER repository was created and deleted' },
 ];
 
+const CB_CONNECTIONS_CREATE = 'https://docs.cloud.google.com/build/docs/api/reference/rest/v2/projects.locations.connections/create#body.QUERY_PARAMETERS.connection_id';
+/** Cloud Build 2세대 연결 (D118) — 문서는 글자 · 유일 범위만 적었다. 길이는 서버 응답으로 정한다 */
+const CB_CONNECTION_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://cloudbuild.googleapis.com/v2/projects/<project>/locations/asia-northeast3/connections?connectionId=<id>', date: '2026-10-16',
+    quote: "Resource name should match regex ^projects/((?:[^:]+:.)?[a-z0-9\\\\-]+)/locations/([\\w-]{2,40})/connections/([a-zA-Z0-9-._~%!$&'()*+,;=@]{1,200})$ (make sure connection_id is 200 chars or less) — for 201 and 300 characters; a, Abc, 1abc, -a, a-, a_b, a.b and 200 characters were created; a:b, 'a b' and a#b answered Malformed name" },
+  { kind: 'api_error', source: 'GET https://cloudbuild.googleapis.com/v2/projects/<project>/locations/<location>/connections/<id>', date: '2026-10-16',
+    quote: "Malformed name: … (gcloud: Resource path is longer than allowed) once the ID and the location name together pass 181 characters — 166 + asia-northeast3, 173 + us-east1, 169 + europe-west1, 158 + northamerica-northeast2 answer 404; one more character answers 400. A 200-character connection that create accepted could not be read or deleted" },
+];
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -234,6 +243,12 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.cloudbuild_trigger', displayName: 'Cloud Build Trigger', slug: 'trigger', minLength: 1, maxLength: 64, pattern: /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/,
     allowed: 'alnum-hyphen', caseRule: 'any', startsWithLetter: false, scope: 'gcp:project', entity: 'cloudbuild.triggers', category: 'management',
     docUrl: 'https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name' }),
+  // Cloud Build 2세대 연결 (D118) — connections.create connectionId "Names must be unique per-project per-location. Allows alphanumeric characters and any of -._~%!$&'()*+,;=@."
+  // 길이 문장은 없다. 서버는 1-200 을 만들지만 ID + 지역 이름이 181 자를 넘으면 그 연결을 읽지도 지우지도 못한다(evidence) — 가장 긴 지역 이름 23 자를 빼 158 로 좁힌다.
+  // 안내서 "Your connection cannot exist globally." — 지역 토큰을 둔다. 검사는 문서의 넓은 글자, 생성은 소문자 · 숫자 · 하이픈
+  rule({ id: 'gcp.cloudbuild_connection', displayName: 'Cloud Build Connection', slug: 'conn', minLength: 1, maxLength: 158, pattern: /^[A-Za-z0-9._~%!$&'()*+,;=@-]{1,158}$/,
+    startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'cloudbuild.connections', category: 'management',
+    docUrl: CB_CONNECTIONS_CREATE, evidence: CB_CONNECTION_EVIDENCE, notes: [OBSERVED, NARROWER] }),
   // ManagedZone.name "User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter,
   // end with a letter or digit, and only contain lowercase letters, digits or dashes."
   rule({ id: 'gcp.dns_managed_zone', displayName: 'Cloud DNS Managed Zone', slug: 'dns', minLength: 1, maxLength: 63, pattern: RFC1035, template: UNPLACED, scope: 'gcp:project', entity: 'dns.managedZones', category: 'networking',

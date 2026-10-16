@@ -79,9 +79,9 @@ describe('buildTree — rules 인자 (화면 fixture 진입점)', () => {
 describe('buildTree — 행 (D53)', () => {
   const rows = (p: Parameters<typeof buildTree>[0]) => walk(buildTree(p)).flatMap((n) => n.rows.map((row) => ({ row, node: n.scope.id })));
 
-  it('GCP 행 = catalog 115 · 합친 행 20 은 모두 gcp:project 에 놓인다', () => {
+  it('GCP 행 = catalog 116 · 합친 행 20 은 모두 gcp:project 에 놓인다', () => {
     const all = rows('gcp');
-    expect(all).toHaveLength(115);
+    expect(all).toHaveLength(116);
     expect(all.map((x) => x.row.key)).toEqual([...new Set(all.map((x) => x.row.key))]);
     const merged = all.filter((x) => x.row.rules.length >= 2);
     expect(merged).toHaveLength(20);

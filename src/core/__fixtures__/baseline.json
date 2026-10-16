@@ -2744,6 +2744,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "billing-trade-prod-dns-01",
             "valid": true,
@@ -8963,6 +8972,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -15188,6 +15206,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "billing-trade-prod-dns-01",
             "valid": true,
@@ -21407,6 +21434,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -27632,6 +27668,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "windows-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "windows-trade-prod-dns-01",
             "valid": true,
@@ -33851,6 +33896,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "google-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -40076,6 +40130,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "azure-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "azure-trade-prod-dns-01",
             "valid": true,
@@ -46295,6 +46358,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-trigger-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "cloudbuild_connection": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-conn-01",
             "violations": 1,
             "steps": 1
           },
@@ -52520,6 +52592,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "paymentsettlement-reconciliation-dev-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "paymentsettlement-reconciliation-dev-dns-01",
             "valid": true,
@@ -58739,6 +58820,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "a-long-longpurpose-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -64964,6 +65054,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "3tier-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "3tier-trade-prod-dns-01",
             "valid": false,
@@ -71183,6 +71282,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -77408,6 +77516,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "billing-trade-prod-dns-01",
             "valid": true,
@@ -83630,6 +83747,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "billing-trade-prod-dns-01",
             "valid": true,
@@ -89849,6 +89975,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -96098,6 +96233,15 @@
             "violations": 0,
             "steps": 0
           },
+          "cloudbuild_connection": {
+            "name": "billing-trade-uat-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-conn-01",
+            "violations": 0,
+            "steps": 0
+          },
           "dns_managed_zone": {
             "name": "billing-trade-uat-dns-01",
             "valid": true,
@@ -100817,6 +100961,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-trigger-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "cloudbuild_connection": {
+            "name": "billing-trade-prod-ane3-conn-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-conn-01",
             "violations": 0,
             "steps": 0
           },
@@ -212230,6 +212383,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "cloudbuild_connection",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "cloudbuild_trigger",
         "name": "",
         "known": true,
@@ -226609,6 +226870,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -227324,6 +227586,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -228033,6 +228296,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -228749,6 +229013,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -229464,6 +229729,7 @@
           "gcp_pubsub_topic = \"windows-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"windows-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"windows-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"windows-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"windows-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"windows-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"windows_trade_prod_ane3_bq\"",
@@ -230175,6 +230441,7 @@
           "gcp_cloud_sql_user = \"google_trade_prod_user_sync\"",
           "gcp_router_nat = \"google-trade-prod-nat-01\"",
           "gcp_cloudbuild_trigger = \"google-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"google-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"google-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"google-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"google_trade_prod_ane3_bq\"",
@@ -230894,6 +231161,7 @@
           "gcp_pubsub_topic = \"azure-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"azure-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"azure-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"azure-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"azure-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"azure-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"azure_trade_prod_ane3_bq\"",
@@ -231628,6 +231896,7 @@
           "# INVALID: gcp_pubsub_topic",
           "# INVALID: gcp_pubsub_subscription",
           "# INVALID: gcp_cloudbuild_trigger",
+          "# INVALID: gcp_cloudbuild_connection",
           "# INVALID: gcp_dns_managed_zone",
           "# INVALID: gcp_scheduler_job",
           "# INVALID: gcp_bigquery_dataset",
@@ -232324,6 +232593,7 @@
           "gcp_pubsub_topic = \"paymentsettlement-reconciliation-dev-topic-01\"",
           "gcp_pubsub_subscription = \"paymentsettlement-reconciliation-dev-sub-01\"",
           "gcp_cloudbuild_trigger = \"paymentsettlement-reconciliation-dev-trigger-01\"",
+          "gcp_cloudbuild_connection = \"paymentsettlement-reconciliation-dev-conn-01\"",
           "gcp_dns_managed_zone = \"paymentsettlement-reconciliation-dev-dns-01\"",
           "gcp_scheduler_job = \"paymentsettlement-reconciliation-dev-cron-01\"",
           "gcp_bigquery_dataset = \"paymentsettlement_reconciliation_dev_bq\"",
@@ -233039,6 +233309,7 @@
           "gcp_pubsub_topic = \"a-long-longpurpose-prod-topic-01\"",
           "gcp_pubsub_subscription = \"a-long-longpurpose-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"a-long-longpurpose-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"a-long-longpurpose-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"a-long-longpurpose-prod-dns-01\"",
           "gcp_scheduler_job = \"a-long-longpurpose-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"a_long_longpurpose_prod_ane3_bq\"",
@@ -233632,6 +233903,7 @@
           "gcp_iam_wip_provider_key = \"3tier-trade-prod-wipk-01\"",
           "gcp_secret = \"3tier-trade-prod-secret-01\"",
           "gcp_cloudbuild_trigger = \"3tier-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"3tier-trade-prod-ane3-conn-01\"",
           "gcp_scheduler_job = \"3tier-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"3tier_trade_prod_ane3_bq\"",
           "gcp_tasks_queue = \"3tier-trade-prod-ane3-queue-01\"",
@@ -234469,6 +234741,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -235173,6 +235446,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -235873,6 +236147,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -236589,6 +236864,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
@@ -237304,6 +237580,7 @@
           "gcp_pubsub_topic = \"billing-trade-uat-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-uat-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-uat-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-uat-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-uat-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-uat-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_uat_ane3_bq\"",
@@ -237844,6 +238121,7 @@
           "gcp_pubsub_topic = \"billing-trade-prod-topic-01\"",
           "gcp_pubsub_subscription = \"billing-trade-prod-sub-01\"",
           "gcp_cloudbuild_trigger = \"billing-trade-prod-ane3-trigger-01\"",
+          "gcp_cloudbuild_connection = \"billing-trade-prod-ane3-conn-01\"",
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",

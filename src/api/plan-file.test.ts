@@ -28,7 +28,7 @@ const apiNames = (body: { data: { gcp: { items: { key: string; name: string; val
 
 describe('계획 파일 → POST /v1/wizard (D100)', () => {
   it('규칙 버전은 그대로다 — src/core 를 고치지 않았다', () => {
-    expect(RULES_REVISION).toBe('2026-10-16.4');
+    expect(RULES_REVISION).toBe('2026-10-16.5');
     expect(VERSION.rules).toBe(RULES_REVISION);
   });
 
