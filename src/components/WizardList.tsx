@@ -52,7 +52,12 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   const move = (path: RowPath) => {
     onSelect(path);
     // 선택한 줄이 그려진 뒤 포커스를 옮긴다(펼침 · 접힘으로 줄이 새로 생길 수 있다)
-    requestAnimationFrame(() => rowElement(path)?.focus());
+    // 그 사이 포커스가 목록 밖(Enter 로 설정 칸 등)으로 나갔으면 되찾아오지 않는다 — 빠른 ↑ → Enter 에서 설정 칸 포커스를 덮어쓰던 경쟁
+    requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active && active !== document.body && !active.closest('[data-wizard-list]')) return;
+      rowElement(path)?.focus();
+    });
   };
   const onKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
     const at = rows.indexOf(selected);

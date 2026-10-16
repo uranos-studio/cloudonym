@@ -1020,6 +1020,24 @@ def wizard_scenarios(browser, rules_version, errors):
     no_hangul(p42)
     ctx42.close()
 
+    # ── ㊷-b D117 새 부품 — Event pipeline 의 dlqsub(데드레터 구독) · Internal app on VMs 의 방화벽 internal 이 점검표에 이름과 함께 그려진다 ──
+    ctx117 = browser.new_context(viewport={'width': 1280, 'height': 900})
+    p117 = ctx117.new_page()
+    p117.on('pageerror', lambda e: errors.append(str(e)))
+    start_example(p117)
+    p117.locator('[data-row-path="services[0]"]').click()
+    settings(p117).locator('[data-card-add="event-pipeline"]').click()
+    dlq = settings(p117).locator('[data-card-panel="event-pipeline"] [data-card-part="dlqsub"]')
+    expect(dlq).to_have_count(1)
+    expect(dlq.locator('[data-card-part-name]')).to_contain_text('-sub-dlq-')
+    p117.locator('[data-row-path="services[0]"]').click()
+    settings(p117).locator('[data-card-add="vm-app"]').click()
+    fw = settings(p117).locator('[data-card-panel="vm-app"] [data-card-network] [data-card-part="firewall:internal"]')
+    expect(fw).to_have_count(1)
+    expect(fw.locator('[data-card-part-name]')).to_contain_text('-fw-internal-')
+    no_hangul(p117)
+    ctx117.close()
+
     # ── ㊶ 버킷 「Check」 (D83) — 누를 때만 브라우저가 storage.googleapis.com 에 직접 묻는다 · 404 available · 401 taken · 실패 unknown · 이름은 Cloudonym 에 가지 않는다 ──
     ctx41 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p41 = ctx41.new_page()
@@ -3060,7 +3078,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 115, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 24}.items():
+    for table_id, rows in {'abbreviations': 115, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 25}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
