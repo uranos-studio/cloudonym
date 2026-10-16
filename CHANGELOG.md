@@ -2,12 +2,15 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.1.7] - 2026-10-16
 
-Rules revision for this release: 2026-10-16.1.
+`/llms.txt` now opens with guidance for AI coding agents: call the API instead of composing names, how the engine shortens, and which rules a naming convention breaks. The Secrets Manager "hyphen and six characters" ending is a warning instead of a failure, shown in a new `warnings` list on the API and on the result cards. The site has its own mark on the favicon, the header and the share preview image.
+
+Rules revision for this release: 2026-10-16.1. AWS Secrets Manager names ending in a hyphen and six characters are now valid with a warning; AWS is not enabled, so no Google Cloud name or verdict changes.
 
 ### Changed
 
+- **Own mark for the favicon, the header and the share image** — the favicon was still the Vite template logo. It is now a round blue-to-violet badge with an open C (cloud) holding a lowercase n (name); the header shows the same file in place of the generic cloud icon at the same size, and the share preview image puts it left of the title (the image script reads `public/favicon.svg`, so the three cannot drift apart).
 - **`/llms.txt` opens with guidance for AI coding agents** — a new first section, *For AI coding agents*, tells an agent not to compose names itself but to call `POST /v1/generate` or `POST /v1/names` and use the names as they come, and to check an existing name with `POST /v1/validate` and take `suggested_name`. It spells out how the engine shortens a name (the four steps, the abbreviation list, region codes) and lists, per enabled provider, the rules a naming convention breaks when applied word for word: no hyphen between tokens, characters most rules reject, maximums of 32 characters or less, and names unique across all customers. Every list is built from the rule table.
 - **Secrets Manager: the "hyphen and six characters" ending is a warning, not a failure** (D112) — the AWS API reference says not to end a secret name with a hyphen followed by six characters because a search by partial ARN can then give unexpected results; it does not forbid it. Such names (`…-eu-west-1`, `…-A1b2C3`) were `valid: false` with `name.pattern_mismatch`; they are now `valid: true` with `warning.arn_suffix_lookalike` in a new `warnings` list. `warnings` appears on `/v1/validate` and on name items only when there is one; it never changes `valid`. When `/v1/validate` returns a `suggested_name` in that form, its warnings come in `suggested_warnings`, apart from the warnings of the name sent. Result cards on the web show warnings in their own list under the verdict, which stays PASS. AWS is not enabled yet, so no response changes today.
 
@@ -195,6 +198,7 @@ These changes were made before any public deployment, so no released name depend
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
 
+[0.1.7]: https://github.com/uranos-studio/cloudonym/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/uranos-studio/cloudonym/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/uranos-studio/cloudonym/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/uranos-studio/cloudonym/compare/v0.1.3...v0.1.4
