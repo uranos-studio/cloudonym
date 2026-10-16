@@ -22,6 +22,7 @@ import { CATALOG_LIMITS, catalogAttachments, catalogPresets } from './catalog';
 import { MAX_ITEMS, MAX_NAMES } from '../core/selection';
 import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
 import { API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED } from '../components/apiDocModel';
+import { SHAREABLE_PARTS } from '../components/wizardBundles';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -173,6 +174,8 @@ function cardLines(): string[] {
       return `- ${bits.join(' · ')}`;
     }),
     `One load balancer card per service (shared parts such as \`${partKey({ preset: 'ip' })}\` and \`${partKey({ preset: 'url' })}\` would be duplicate picks); add another service for a second one.`,
+    // D115 — 함께 쓰는 부품은 pick 하나로 보낸다(같은 pick 둘은 duplicate_pick)
+    `Other cards can share a service: send ${[...SHAREABLE_PARTS].map((x) => `\`${x}\``).join(', ')} once and every card in that service uses it (for example \`event-pipeline\`, \`ci-cd\` and \`batch-job\` with one \`sa\`).`,
   ];
 }
 

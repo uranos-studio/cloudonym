@@ -136,7 +136,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
               {c.complete ? en.ui.wizard_card_state_complete : en.ui.wizard_card_state_incomplete}
             </span>
           </span>
-          <span className={`truncate text-xs ${HINT}`}>{fillUi(en, 'wizard_card_parts_count', { n: mine.length })}{first ? ` · ${first}` : ''}</span>
+          <span className={`truncate text-xs ${HINT}`}>{fillUi(en, 'wizard_card_parts_count', { n: c.picks.length })}{first ? ` · ${first}` : ''}</span>
         </span>
       ), { expanded: open, card: c.bundle.id }));
       if (open) for (const j of mine) out.push(pickRow({ service: i, pick: j }, 3));

@@ -1,12 +1,12 @@
 // 카드 화면 상태 (D93) — 더하기 · 되읽기 · 미완성 · 가족 · 상한 · 지우기(공용 방화벽은 남는다)
 import { describe, it, expect } from 'vitest';
-import { addBundle, cardBlocked, cardIn, cardsIn, fillBlocked, fillMissing, optionBlocked, optionOn, partBlocked, partsToAdd, removeBundle, serviceLayout, setOption, setPart } from './wizardBundles';
+import { addBundle, cardBlocked, cardIn, cardsIn, fillBlocked, fillMissing, optionBlocked, optionOn, partBlocked, partsToAdd, partUsers, removeBundle, serviceLayout, setOption, setPart, SHAREABLE_PARTS } from './wizardBundles';
 import { addPresetPick, addService, DEFAULT_PROJECT, findPreset, renameService, startPlan, togglePreset } from './wizardState';
 import { cardRow, parentRow, parseRow, rowExists, rowTitle, selectionAfter, visibleRows } from './wizardSelection';
 import { decodeWizardState, encodeWizardState } from './urlState';
 import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
-import { bundleById } from '../core/wizard/bundles';
+import { BUNDLES, bundleById, partIsProject, partKey } from '../core/wizard/bundles';
 import { RULES_REVISION } from '../core/revision';
 
 const ids = (plan: WizardPlan, s: number) => cardsIn(plan, s).map((m) => [m.bundle.id, m.complete]);
@@ -109,9 +109,10 @@ describe('되읽기 · 미완성 (D93)', () => {
     expect(loose).toEqual([12, 13]); // db · was — 선택 부품은 카드 밖 줄
     expect(removeBundle(p, 0, 'vm-app')).toEqual(p); // 보이지 않는 카드는 지울 것이 없다
     expect(optionOn(p, 0, bundleById('website')!.options[0]!.parts)).toBe(true);
-    // vm-app 을 먼저 더하고 website 를 더해도 web 은 website(LB 카드)가 차지한다 — vm-app 의 나머지는 카드 밖 줄
-    const both = addBundle(addBundle(startPlan(DEFAULT_PROJECT), 0, 'vm-app'), 0, 'website', { db: false });
-    expect(ids(both, 0)).toEqual([['website', true]]);
+    // vm-app 을 먼저 더하면 website 는 막힌다 (D115) — 더하면 web 을 LB 카드가 차지해 vm-app 이 말없이 사라진다. 내부 전용 웹 서버를 공개 LB 뒤에 둘 수 없다
+    const vm = addBundle(startPlan(DEFAULT_PROJECT), 0, 'vm-app');
+    expect(cardBlocked(vm, 0, 'website', { db: false })).toBe('overlap');
+    expect(addBundle(vm, 0, 'website', { db: false })).toBe(vm);
     // 갤러리 — 더해도 vm-app 으로 되읽히지 않으니 단추가 꺼진다(부품만 흩어 놓지 않는다)
     expect(cardBlocked(p, 0, 'vm-app', {})).toBe('overlap');
     expect(addBundle(p, 0, 'vm-app')).toBe(p);
@@ -307,12 +308,172 @@ describe('D114 의 카드 다섯 — 화면에서 더하기 · 되읽기 · 지�
     expect(ids(addBundle(empty, 0, 'gke'), 0)).toEqual([['gke', true]]);
   });
 
-  it('부품(서비스 계정)을 함께 쓰는 카드는 한 서비스에 하나 — 둘째는 overlap 으로 막히고, 다른 서비스에는 더할 수 있다', () => {
+  it('서비스 계정을 함께 쓰는 카드도 한 서비스에 둘 수 있다 (D115) — 둘째 카드는 있는 서비스 계정을 다시 쓴다', () => {
     const p = addBundle(startPlan(DEFAULT_PROJECT), 0, 'gke');
-    expect(cardBlocked(p, 0, 'ci-cd', {})).toBe('overlap');
-    expect(addBundle(p, 0, 'ci-cd')).toBe(p);
-    const two = addService(p);
-    expect(cardBlocked(two, 1, 'ci-cd', {})).toBeUndefined();
-    expect(ids(addBundle(two, 1, 'ci-cd'), 1)).toEqual([['ci-cd', true]]);
+    expect(cardBlocked(p, 0, 'ci-cd', {})).toBeUndefined();
+    expect(partsToAdd(p, 0, 'ci-cd', {})).toEqual([{ preset: 'build' }]);
+    expect(ids(addBundle(p, 0, 'ci-cd'), 0)).toEqual([['gke', true], ['ci-cd', true]]);
+  });
+});
+
+describe('한 서비스에 카드 여럿 (D115) — 함께 쓰는 부품 · 막히는 까닭 · 지우기 · 되읽기', () => {
+  // https-lb 는 백엔드를 서비스에서 고르는 카드라 아래 따로 본다
+  const NINE = BUNDLES.map((b) => b.id).filter((id) => id !== 'https-lb');
+  // 진짜 까닭으로 막히는 쌍 — 같은 부품을 서로 다른 일에 쓴다(공유 불가)
+  const BLOCKED: Record<string, string> = {
+    'website|serverless-web': 'family', 'website|static-site': 'family', 'serverless-web|static-site': 'family', // URL 맵 · 주소 · 인증서가 서비스에 하나
+    'website|vm-app': 'web', // 공개 LB 뒤의 웹 서버 ↔ 내부 전용 웹 서버
+    'serverless-web|event-pipeline': 'run', // 공개(allUsers) Cloud Run ↔ 인증을 요구하는 push 대상
+    'static-site|data-warehouse': 'object', // 공개 읽기 버킷 ↔ 적재 데이터 버킷
+  };
+  const key = (a: string, b: string) => (BUNDLES.findIndex((x) => x.id === a) < BUNDLES.findIndex((x) => x.id === b) ? `${a}|${b}` : `${b}|${a}`);
+  const pairs = NINE.flatMap((a, i) => NINE.slice(i + 1).map((b) => [a, b] as const));
+  const coexist = pairs.filter(([a, b]) => BLOCKED[key(a, b)] === undefined);
+  const order = (xs: readonly string[]) => [...xs].sort((a, b) => BUNDLES.findIndex((x) => x.id === a) - BUNDLES.findIndex((x) => x.id === b));
+  const start = () => startPlan(DEFAULT_PROJECT);
+  const addAll = (xs: readonly string[]) => xs.reduce((p, id) => {
+    expect(cardBlocked(p, 0, id, {}), `${xs.join('+')}: ${id}`).toBeUndefined();
+    return addBundle(p, 0, id);
+  }, start());
+
+  it('쌍 서른여섯 — 막히는 여섯과 함께 두는 서른', () => {
+    expect(pairs.length).toBe(36);
+    expect(coexist.length).toBe(30);
+  });
+
+  it.each(coexist)('%s + %s — 어느 순서로 더해도 둘 다 완성 · 이름 PASS · 링크로 다시 열어도 같다 · 하나를 지우면 다른 하나는 완성 그대로', (a, b) => {
+    const want = order([a, b]).map((id) => [id, true]);
+    for (const xs of [[a, b], [b, a]]) {
+      const p = addAll(xs);
+      expect(ids(p, 0)).toEqual(want);
+      expect(validatePlan(p)).toEqual({ ok: true });
+      expect(generateProject(expandPlan(p), 'gcp').items.every((i) => i.valid)).toBe(true);
+      const back = decodeWizardState(`#state=${encodeWizardState(p, RULES_REVISION, [])!}`)!.plan!;
+      expect(ids(back, 0)).toEqual(want);
+      // 지우기 — 남은 카드의 부품(함께 쓰던 서비스 계정 · 저장소 포함)은 그대로
+      for (const [gone, kept] of [[a, b], [b, a]] as const) {
+        const r = removeBundle(p, 0, gone);
+        expect(ids(r, 0), `remove ${gone}`).toEqual([[kept, true]]);
+      }
+      const none = removeBundle(removeBundle(p, 0, a), 0, b);
+      expect(cardsIn(none, 0)).toEqual([]);
+    }
+  });
+
+  it.each(Object.entries(BLOCKED))('%s 는 한 서비스에 둘 수 없다 (%s) — 어느 순서든 둘째가 막히고 계획은 그대로 · 다른 서비스에는 된다', (pair, why) => {
+    const [a, b] = pair.split('|') as [string, string];
+    for (const [first, second] of [[a, b], [b, a]] as const) {
+      const p = addBundle(start(), 0, first);
+      expect(cardBlocked(p, 0, second, {})).toBe(why === 'family' ? 'family' : 'overlap');
+      expect(addBundle(p, 0, second)).toBe(p);
+      const two = addService(p);
+      expect(cardBlocked(two, 1, second, {})).toBeUndefined();
+      expect(ids(addBundle(two, 1, second), 1)).toEqual([[second, true]]);
+    }
+  });
+
+  it('주인이 말한 둘 — Event pipeline + Batch job + CI/CD(서비스 계정 하나) · GKE + CI/CD(Artifact Registry 하나)', () => {
+    const three = addAll(['event-pipeline', 'batch-job', 'ci-cd']);
+    expect(ids(three, 0)).toEqual([['event-pipeline', true], ['ci-cd', true], ['batch-job', true]]);
+    expect(presets(three, 0).filter((x) => x === 'sa')).toEqual(['sa']);
+    const { claims, owned } = serviceLayout(three, 0);
+    const sa = findPreset(three, 0, 'sa');
+    expect(claims.get(sa)).toEqual(['event-pipeline', 'ci-cd', 'batch-job']);
+    expect(owned.get(sa)).toBe('event-pipeline'); // 목록에는 표 순서로 첫 카드 아래 한 번
+    // 카드 줄의 부품 수는 그 카드가 쓰는 부품 전부 — 목록 자식 줄은 첫 카드에만 있다
+    expect(cardIn(three, 0, 'ci-cd')!.picks.length).toBe(3);
+    const gk = addAll(['gke', 'ci-cd']);
+    expect(ids(gk, 0)).toEqual([['gke', true], ['ci-cd', true]]);
+    expect(presets(gk, 0)).toEqual(['gke', 'ar', 'sa', 'build']);
+    expect(presets(removeBundle(gk, 0, 'gke'), 0)).toEqual(['ar', 'sa', 'build']);
+    expect(presets(removeBundle(gk, 0, 'ci-cd'), 0)).toEqual(['gke', 'ar', 'sa']);
+  });
+
+  it('D114 의 다섯 + Website 를 한 서비스에 — 서비스 계정 하나 · 서른 개 안 · 전부 완성 · 하나씩 지워도 나머지는 완성', () => {
+    const all = ['website', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job'];
+    const p = addAll(all);
+    expect(ids(p, 0)).toEqual(all.map((id) => [id, true]));
+    expect(presets(p, 0).filter((x) => x === 'sa').length).toBe(1);
+    expect(validatePlan(p)).toEqual({ ok: true });
+    expect(generateProject(expandPlan(p), 'gcp').items.every((i) => i.valid)).toBe(true);
+    for (const gone of all) expect(ids(removeBundle(p, 0, gone), 0), gone).toEqual(all.filter((x) => x !== gone).map((id) => [id, true]));
+  });
+
+  it('칩으로 같은 부품을 켜도 같은 카드들로 되읽힌다 — 카드 표시는 hash 에 없다', () => {
+    const viaCards = addAll(['gke', 'ci-cd', 'batch-job']);
+    const viaChips = ['gke', 'ar', 'sa', 'build', 'runjob', 'cron'].reduce((q, id) => togglePreset(q, 0, id), start());
+    expect(encodeWizardState(viaChips, RULES_REVISION, [])).toBe(encodeWizardState(viaCards, RULES_REVISION, []));
+    expect(ids(viaChips, 0)).toEqual([['gke', true], ['ci-cd', true], ['batch-job', true]]);
+  });
+
+  it('카드마다 함께 쓰지 않는 서비스 부품이 하나 이상 — 목록에서 카드 줄 아래가 비지 않는다', () => {
+    for (const b of BUNDLES) expect(b.parts.some((p) => !partIsProject(p) && !SHAREABLE_PARTS.has(partKey(p))), b.id).toBe(true);
+  });
+
+  it('함께 쓰는 부품은 점검표에서 끄지 않는다 — 다른 카드가 쓴다. 끌 수 있는 것은 그 카드 혼자 쓰는 부품', () => {
+    const p = addAll(['gke', 'ci-cd']);
+    expect(partUsers(p, 0, { preset: 'sa' }, 'gke')).toEqual(['ci-cd']);
+    expect(partUsers(p, 0, { preset: 'gke' }, 'gke')).toEqual([]);
+    expect(setPart(p, 0, { preset: 'sa' }, false, 'gke')).toBe(p);
+    expect(setPart(p, 0, { preset: 'ar' }, false, 'ci-cd')).toBe(p);
+    expect(ids(setPart(p, 0, { preset: 'build' }, false, 'ci-cd'), 0)).toEqual([['gke', true]]);
+  });
+
+  it('선택이 함께 쓰는 부품이면 끄기도 그 부품을 남긴다 — Serverless web 의 서비스 계정 · 시크릿 선택과 CI/CD', () => {
+    const sw = bundleById('serverless-web')!;
+    const opt = (id: string) => sw.options.find((o) => o.id === id)!.parts;
+    const p = addBundle(addBundle(start(), 0, 'serverless-web', { sa: true, secret: true, db: true }), 0, 'ci-cd', { secret: true });
+    expect(ids(p, 0)).toEqual([['serverless-web', true], ['ci-cd', true]]);
+    expect(optionOn(p, 0, opt('sa'), 'serverless-web')).toBe(true);
+    expect(setOption(p, 0, opt('sa'), false, 'serverless-web')).toBe(p);
+    expect(setOption(p, 0, opt('secret'), false, 'serverless-web')).toBe(p);
+    // CI/CD 를 지워도 Serverless web 의 켜진 선택이 쓰는 서비스 계정 · 시크릿은 남는다 — 지우는 것은 CI/CD 혼자 쓰는 저장소 · 트리거
+    const noCi = removeBundle(p, 0, 'ci-cd');
+    expect(presets(noCi, 0).filter((x) => x !== null && ['sa', 'secret', 'ar', 'build'].includes(x)).sort()).toEqual(['sa', 'secret']);
+    expect(optionOn(noCi, 0, opt('sa'), 'serverless-web')).toBe(true);
+    // 데이터베이스는 함께 쓴다 — Cloud SQL 인스턴스 하나가 데이터베이스 여럿 · 접속자 여럿을 받는다
+    const withVm = addBundle(p, 0, 'vm-app');
+    expect(ids(withVm, 0)).toEqual([['serverless-web', true], ['vm-app', true], ['ci-cd', true]]);
+    expect(presets(withVm, 0).filter((x) => x === 'db')).toEqual(['db']);
+  });
+
+  it('Cloud Scheduler 작업은 함께 쓰지 않는다 — 작업 하나는 대상 하나다. Data warehouse 의 예약 적재 선택과 Batch job', () => {
+    const sched = bundleById('data-warehouse')!.options.find((o) => o.id === 'schedule')!.parts;
+    // 예약 적재를 켠 Data warehouse 에 Batch job 을 더하면 그 작업을 빼앗는다 — 막는다
+    const dw = addBundle(start(), 0, 'data-warehouse', { schedule: true });
+    expect(cardBlocked(dw, 0, 'batch-job', {})).toBe('overlap');
+    // 선택을 끈 Data warehouse 와는 함께 둔다
+    const both = addBundle(addBundle(start(), 0, 'data-warehouse'), 0, 'batch-job');
+    expect(ids(both, 0)).toEqual([['data-warehouse', true], ['batch-job', true]]);
+    // 그때 Data warehouse 의 예약 적재는 꺼져 있고 켤 수 없다 — 그 작업은 Batch job 의 것이다
+    expect(optionOn(both, 0, sched, 'data-warehouse')).toBe(false);
+    expect(optionBlocked(both, 0, sched, 'data-warehouse')).toBe('overlap');
+    expect(setOption(both, 0, sched, true, 'data-warehouse')).toBe(both);
+    // Batch job 이 먼저 있으면 예약 적재를 켠 채 Data warehouse 를 더할 수 없다(켠 선택이 들어가지 않는다) · 끈 채로는 된다
+    const batch = addBundle(start(), 0, 'batch-job');
+    expect(cardBlocked(batch, 0, 'data-warehouse', { schedule: true })).toBe('overlap');
+    expect(cardBlocked(batch, 0, 'data-warehouse', {})).toBeUndefined();
+  });
+
+  it('버킷도 함께 쓰지 않는다 — Internal app 의 Object storage 선택은 Static site 의 공개 버킷 · Data warehouse 의 적재 버킷과 겹치면 막힌다', () => {
+    const obj = bundleById('vm-app')!.options.find((o) => o.id === 'object')!.parts;
+    const vm = addBundle(start(), 0, 'vm-app', { object: true });
+    expect(cardBlocked(vm, 0, 'static-site', {})).toBe('overlap');
+    expect(cardBlocked(vm, 0, 'data-warehouse', {})).toBe('overlap');
+    const dw = addBundle(addBundle(start(), 0, 'data-warehouse'), 0, 'vm-app');
+    expect(optionOn(dw, 0, obj, 'vm-app')).toBe(false);
+    expect(optionBlocked(dw, 0, obj, 'vm-app')).toBe('overlap');
+  });
+
+  it('https-lb — 백엔드가 없는 서비스(GKE · CI/CD · Batch job)에서는 「백엔드 없음」으로 함께 보이고, 백엔드를 다른 카드가 쓰면 막힌다', () => {
+    for (const other of ['gke', 'ci-cd', 'batch-job']) {
+      const p = addBundle(addBundle(start(), 0, other), 0, 'https-lb');
+      expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete, m.noBackend]), other).toEqual(order(['https-lb', other]).map((id) => (id === 'https-lb' ? ['https-lb', false, true] : [id, true, false])));
+    }
+    // web(vm-app) · run(event-pipeline) · object(data-warehouse) 를 백엔드로 고르면 그 카드가 사라진다 — 막는다
+    for (const other of ['vm-app', 'event-pipeline', 'data-warehouse']) {
+      const p = addBundle(start(), 0, other);
+      expect(cardBlocked(p, 0, 'https-lb', {}), other).toBe('overlap');
+    }
   });
 });

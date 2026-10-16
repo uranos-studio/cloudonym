@@ -5,7 +5,7 @@ import { ChevronRight, CircleCheck, ExternalLink, TriangleAlert, X } from 'lucid
 import type { ProjectResult } from '../core/engine';
 import type { WizardPlan } from '../core/wizard/plan';
 import { MAX_PICKS_PER_SERVICE } from '../core/wizard/plan';
-import { BUNDLES, partIsProject, partKey, RUN_PUBLIC_DOC, STATIC_SITE_DOC, type Bundle, type BundlePart } from '../core/wizard/bundles';
+import { BUNDLES, bundleById, partIsProject, partKey, RUN_PUBLIC_DOC, STATIC_SITE_DOC, type Bundle, type BundlePart } from '../core/wizard/bundles';
 import { presetOf } from '../core/wizard/presets';
 import * as B from './wizardBundles';
 import { findPreset } from './wizardState';
@@ -138,26 +138,32 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
     return i < 0 ? undefined : { path: at === null ? `projectPicks[${i}]` : `services[${service}].picks[${i}]`, names: rowNames(plan, { service: at, pick: i }, result) };
   };
   // 켤 수 없는 체크 상자(상한 · 이름 겹침) — 끄고, 까닭 문단을 aria-describedby 로 잇는다
-  const turnOnId = (why: 'full' | 'duplicate') => `${titleId}-turn-on-${why}`;
+  const turnOnId = (why: 'full' | 'duplicate' | 'overlap') => `${titleId}-turn-on-${why}`;
   const networkHintId = `${titleId}-network-hint`;
   const fillWhy = B.fillBlocked(plan, service, b.id);
   const partWhy = (p: BundlePart) => B.partBlocked(plan, service, p);
-  const optionWhy = (parts: readonly BundlePart[]) => B.optionBlocked(plan, service, parts);
+  const optionWhy = (parts: readonly BundlePart[]) => B.optionBlocked(plan, service, parts, b.id);
+  // 이 서비스의 다른 카드도 쓰는 부품 (D115) — 끄거나 카드를 지워도 남으므로 체크 상자를 끄고 누가 쓰는지 보인다
+  const sharedWith = (p: BundlePart) => B.partUsers(plan, service, p, b.id).map((id) => bundleById(id)?.label ?? id);
+  const sharedId = (p: BundlePart) => `${titleId}-shared-${partKey(p).replace(':', '-')}`;
   const whys = new Set([...m.parts.map(partWhy), ...b.options.map((o) => optionWhy(o.parts))].filter((x) => x !== undefined));
   const partRow = (p: BundlePart) => {
     const on = B.partPresent(plan, service, p);
     const why = on ? undefined : partWhy(p);
-    // 네트워크 부품은 카드에서 지우지 않는다(B.setPart) — 있으면 체크 상자를 끄고 안내 문단을 잇는다. 빠졌으면 켤 수 있다
+    // 네트워크 부품은 카드에서 지우지 않는다(B.setPart) — 있으면 체크 상자를 끄고 안내 문단을 잇는다. 빠졌으면 켤 수 있다.
+    // 다른 카드도 쓰는 서비스 부품(D115)도 끄지 않는다 — 누가 쓰는지 줄에 적고 그 글을 잇는다
+    const users = on && !partIsProject(p) ? sharedWith(p) : [];
     const shared = on && partIsProject(p);
     const n = nameOf(p);
     const id = `${titleId}-${partKey(p).replace(':', '-')}`;
     return (
       <li key={partKey(p)} data-card-part={partKey(p)} data-present={on} className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-zinc-100 py-1 last:border-b-0 dark:border-zinc-800">
         <label htmlFor={id} className="inline-flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm">
-          <input id={id} type="checkbox" checked={on} disabled={why !== undefined || shared} aria-describedby={why ? turnOnId(why) : shared ? networkHintId : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
-            onChange={(e) => edit((x) => B.setPart(x, service, p, e.target.checked))} />
+          <input id={id} type="checkbox" checked={on} disabled={why !== undefined || shared || users.length > 0} aria-describedby={why ? turnOnId(why) : shared ? networkHintId : users.length > 0 ? sharedId(p) : undefined} className="size-4 shrink-0 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40"
+            onChange={(e) => edit((x) => B.setPart(x, service, p, e.target.checked, b.id))} />
           <span className={on ? '' : 'text-zinc-500 line-through dark:text-zinc-400'}>{label(p)}</span>
         </label>
+        {users.length > 0 && <span id={sharedId(p)} data-card-part-shared className={`text-xs ${HINT}`}>{fillUi(en, 'wizard_card_shared', { cards: users.join(', ') })}</span>}
         <code data-card-part-name className={`min-w-0 max-w-full truncate font-mono text-xs ${HINT}`} title={n?.names?.first}>{n?.names ? n.names.first : '—'}</code>
         {n && (
           <button type="button" data-card-part-edit={partKey(p)} data-edit-path={n.path} aria-label={fillUi(en, 'wizard_card_edit_label', { part: label(p) })} className="inline-flex min-h-8 items-center gap-0.5 rounded px-1 text-xs font-medium text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-indigo-600 dark:text-indigo-300"
@@ -218,12 +224,19 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             {b.options.map((o) => {
               const why = optionWhy(o.parts);
+              const on = B.optionOn(plan, service, o.parts, b.id);
+              // 켜진 선택의 부품을 다른 카드도 쓰면(D115 — Serverless web 의 서비스 계정과 CI/CD) 꺼도 남으므로 끄지 못하게 하고 누가 쓰는지 보인다
+              const users = on ? [...new Set(o.parts.filter((p) => !partIsProject(p)).flatMap(sharedWith))] : [];
+              const usersId = `${titleId}-option-${o.id}-shared`;
               return (
-                <label key={o.id} className="inline-flex min-h-8 items-center gap-2 text-sm">
-                  <input type="checkbox" data-card-option={o.id} checked={B.optionOn(plan, service, o.parts)} disabled={why !== undefined} aria-describedby={why ? turnOnId(why) : undefined}
-                    className="size-4 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40" onChange={(e) => edit((x) => B.setOption(x, service, o.parts, e.target.checked))} />
+                <span key={o.id} className="inline-flex flex-wrap items-center gap-x-2">
+                <label className="inline-flex min-h-8 items-center gap-2 text-sm">
+                  <input type="checkbox" data-card-option={o.id} checked={on} disabled={why !== undefined || users.length > 0} aria-describedby={why ? turnOnId(why) : users.length > 0 ? usersId : undefined}
+                    className="size-4 accent-indigo-600 disabled:cursor-not-allowed disabled:opacity-40" onChange={(e) => edit((x) => B.setOption(x, service, o.parts, e.target.checked, b.id))} />
                   {o.label}
                 </label>
+                {users.length > 0 && <span id={usersId} data-card-option-shared className={`text-xs ${HINT}`}>{fillUi(en, 'wizard_card_shared', { cards: users.join(', ') })}</span>}
+                </span>
               );
             })}
           </div>
@@ -231,7 +244,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
       )}
       {[...whys].map((why) => (
         <p key={why} id={turnOnId(why)} data-card-turn-on-blocked={why} className={HINT}>
-          {why === 'full' ? fillUi(en, 'wizard_card_turn_on_full', { max: MAX_PICKS_PER_SERVICE }) : en.ui.wizard_card_turn_on_duplicate}
+          {why === 'full' ? fillUi(en, 'wizard_card_turn_on_full', { max: MAX_PICKS_PER_SERVICE }) : why === 'overlap' ? en.ui.wizard_card_turn_on_overlap : en.ui.wizard_card_turn_on_duplicate}
         </p>
       ))}
 
