@@ -19,10 +19,11 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 + D116 의 여섯 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
-      'web', 'was', 'bastion', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
+      'web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
       'bq', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis',
+      'worker', 'raw', 'ingest', 'appdata',
       'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
     expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
@@ -34,8 +35,8 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('firewall')?.tier).toBe('ssh');
   });
 
-  it('ha 가 있는 프리셋은 서버형(web · was)뿐이고 그 minInstances 는 2 · db · object · 네트워크 · bastion · file 은 null', () => {
-    expect(PRESETS.filter((p) => p.ha !== null).map((p) => p.id)).toEqual(['web', 'was']);
+  it('ha 가 있는 프리셋은 서버형(web · was · D116 의 intweb · intwas)뿐이고 그 minInstances 는 2 · db · object · 네트워크 · bastion · file 은 null', () => {
+    expect(PRESETS.filter((p) => p.ha !== null).map((p) => p.id)).toEqual(['web', 'was', 'intweb', 'intwas']);
     for (const p of PRESETS.filter((x) => x.ha !== null)) {
       expect(p.ha).toEqual({ minInstances: 2 });
       expect(p.ruleId).toBe('gcp.compute_instance');
@@ -55,7 +56,8 @@ describe('프리셋 데이터 (D64)', () => {
   it('프리셋 입력 종류가 규칙의 inputKind 와 맞다 — tier 를 가진 프리셋 · serverless 규칙은 count 규칙', () => {
     for (const p of PRESETS) {
       const rule = RULES[p.ruleId]!;
-      if (p.tier !== null || p.tierChoices) expect(inputKind(rule), p.id).toBe('count');
+      // tier 는 템플릿에 tier 자리가 있는 규칙에만(D74) — count 규칙이거나 순번 없는 규칙(버킷 raw · appdata, D116)
+      if (p.tier !== null || p.tierChoices) expect(rule.template.includes('tier'), p.id).toBe(true);
       if (p.ha !== null) expect(inputKind(rule), p.id).toBe('count');
       for (const r of p.serverless?.ruleIds ?? []) expect(inputKind(RULES[r]!), r).toBe('count');
     }
@@ -113,6 +115,29 @@ describe('프리셋 데이터 (D64)', () => {
     expect(item).toMatchObject({ name: 'billing_shop_prod_ane3_bq', valid: true });
     expect(item!.name).not.toContain('-');
     expect(presetOf('dlq')).toMatchObject({ ruleId: presetOf('topic')!.ruleId, tier: 'dlq' });
+  });
+
+  it('D116 — 같은 종류를 다른 일에 쓰는 둘째 프리셋: 같은 규칙 · tier 하나 · 기본 프리셋과 한 서비스에 함께 두면 이름 · 중복 키가 다르다', () => {
+    const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
+    const pairs: [string, string, string][] = [['worker', 'run', 'worker'], ['raw', 'object', 'raw'], ['ingest', 'cron', 'ingest'], ['intweb', 'web', 'intweb'], ['intwas', 'was', 'intwas'], ['appdata', 'object', 'appdata']];
+    const pickOf = (id: string): Pick => (inputKind(RULES[presetOf(id)!.ruleId]!) === 'count' ? { preset: id, instances: [{ id: '1', seq: '01' }] } : { preset: id });
+    const names: Record<string, [string, string]> = {};
+    for (const [id, base, tier] of pairs) {
+      expect(presetOf(id), id).toMatchObject({ ruleId: presetOf(base)!.ruleId, tier, level: 'service' });
+      const plan: WizardPlan = { provider: 'gcp', project: PROJECT, projectPicks: [], services: [{ purpose: 'shop', picks: [pickOf(base), pickOf(id)] }] };
+      expect(validatePlan(plan), id).toEqual({ ok: true });
+      const items = generateProject(expandPlan(plan), 'gcp').items.slice(1);
+      expect(items.every((i) => i.valid), id).toBe(true);
+      names[id] = [items[0]!.name, items[1]!.name];
+    }
+    expect(names).toEqual({
+      worker: ['billing-shop-prod-ane3-run-01', 'billing-shop-prod-ane3-run-worker-01'],
+      raw: ['platform-billing-shop-prod-ane3-gcs', 'platform-billing-shop-prod-ane3-gcs-raw'],
+      ingest: ['billing-shop-prod-ane3-cron-01', 'billing-shop-prod-ane3-cron-ingest-01'],
+      intweb: ['billing-shop-prod-ane3-gce-web-01', 'billing-shop-prod-ane3-gce-intweb-01'],
+      intwas: ['billing-shop-prod-ane3-gce-was-01', 'billing-shop-prod-ane3-gce-intwas-01'],
+      appdata: ['platform-billing-shop-prod-ane3-gcs', 'platform-billing-shop-prod-ane3-gcs-appdata'],
+    });
   });
 
   it('프리셋 tier 는 TIER_PATTERN 을 지나고 예약 목록과 겹침 0 — 데이터에서 센다', () => {

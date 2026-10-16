@@ -4,15 +4,19 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-16.2. New wizard presets only; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-16.3. New wizard presets; no name, verdict or suggestion for an existing input changes. Three cards now produce different names because their parts changed (see Changed).
 
 ### Added
 
 - **Five more wizard cards** (D114) — **Data warehouse (BigQuery)** (a landing bucket, a BigQuery dataset whose name uses underscores, a service account; a Cloud Scheduler job as an option), **GKE cluster** (the cluster, an Artifact Registry repository and a node service account on the project's VPC network and subnet; Memorystore for Redis as an option), **Event pipeline (Pub/Sub)** (topic, subscription, dead-letter topic, Cloud Run service, service account), **CI/CD (Cloud Build)** (Artifact Registry repository, Cloud Build trigger, service account; a secret as an option) and **Batch job** (Cloud Run job, Cloud Scheduler job, service account). Their rules are checked against the official documents; none of the five sets has been built on Google Cloud yet, and the cards say so.
 - **Nine wizard presets** for those parts: `bq`, `ar`, `topic`, `sub`, `dlq` (a Pub/Sub topic with the tier `dlq`), `build`, `cron`, `runjob` and `redis`, also accepted by `POST /v1/wizard` and listed in `/llms.txt`.
+- **Several cards in one service** (D115, D116) — a service account, Artifact Registry repository, secret, Cloud SQL instance or bastion that a service already has is shared by every card that needs one, so Event pipeline, CI/CD and Batch job hold one service account and GKE and CI/CD one repository. Removing a card keeps what another card in the service still uses, and the checklist says which card uses a shared part. Every pair of the ten cards can now share a service except two load balancers (a service has one URL map with one default backend; the second goes in another service).
+- **Six wizard presets for the second of a kind** (D116) — the same rule with its own tier, so two cards that need the same kind of resource for different jobs both get a name: `intweb` and `intwas` (internal web and app servers), `worker` (a private Cloud Run service, tier `worker`), `raw` (a landing bucket), `ingest` (a scheduled load job) and `appdata` (an app bucket). Each tier is checked against the reserved tokens (abbreviations, kind tokens, environment values, region and zone codes).
 
 ### Changed
 
+- **Card parts with their own tier** (D116) — **Internal app on VMs** names its servers `…-gce-intweb-01` and `…-gce-intwas-01` (was `…-gce-web-01`, `…-gce-was-01`) and its Object storage option `…-gcs-appdata`; **Event pipeline** names its Cloud Run service `…-run-worker-01` (was `…-run-01`); **Data warehouse** names its landing bucket `…-gcs-raw` (was `…-gcs`) and its scheduled load `…-cron-ingest-01` (was `…-cron-01`). Picks made with the plain chips keep their names; an older share link with `web`, `was` and `db` shows those resources without the Internal app card.
+- **The first screen does not count the project values** — the intro line and the Project subtitle say "project values" instead of "four values", which disagreed with the headline's "five context values".
 - **The wizard opens with a headline** (D113) — "Generate valid Google Cloud resource names." with a one-line explanation above the work area, on every screen width. The small header line it replaces is gone, and the intro example is labelled as sample output that does not come from your inputs.
 
 ## [0.1.7] - 2026-10-16

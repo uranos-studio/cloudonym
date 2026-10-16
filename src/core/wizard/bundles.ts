@@ -116,8 +116,9 @@ export const BUNDLES: readonly Bundle[] = [
   {
     id: 'vm-app', label: 'Internal app on VMs', tested: true,
     summary: 'Web, app and database servers reachable only inside the network, with a bastion.',
-    parts: [P('web'), P('was'), P('db'), P('firewall', 'ssh'), P('firewall', 'icmp'), P('firewall', 'iap'), P('psa')],
-    options: [{ id: 'bastion', label: 'Bastion', on: true, parts: [P('bastion')] }, { id: 'file', label: 'File server', on: false, parts: [P('file')] }, { id: 'object', label: 'Object storage', on: false, parts: [P('object')] }],
+    // D116 — 서버는 tier intweb · intwas(공개 Website 의 web · was 와 같은 서비스에 함께 둘 수 있게) · 버킷은 appdata(Static site 의 공개 버킷과 별개)
+    parts: [P('intweb'), P('intwas'), P('db'), P('firewall', 'ssh'), P('firewall', 'icmp'), P('firewall', 'iap'), P('psa')],
+    options: [{ id: 'bastion', label: 'Bastion', on: true, parts: [P('bastion')] }, { id: 'file', label: 'File server', on: false, parts: [P('file')] }, { id: 'object', label: 'Object storage', on: false, parts: [P('appdata')] }],
     refs: [],
     evidence: ['D91'],
   },
@@ -137,8 +138,9 @@ export const BUNDLES: readonly Bundle[] = [
   {
     id: 'data-warehouse', label: 'Data warehouse (BigQuery)', tested: false,
     summary: 'A landing bucket, a BigQuery dataset and a service account that loads it. Dataset names use underscores, not hyphens.',
-    parts: [P('object'), P('bq'), P('sa')],
-    options: [{ id: 'schedule', label: 'Scheduled load (Cloud Scheduler)', on: false, parts: [P('cron')] }],
+    // D116 — 적재 버킷은 raw(Static site 의 공개 버킷과 별개) · 예약 적재는 ingest(Batch job 의 cron 과 별개)
+    parts: [P('raw'), P('bq'), P('sa')],
+    options: [{ id: 'schedule', label: 'Scheduled load (Cloud Scheduler)', on: false, parts: [P('ingest')] }],
     refs: [],
     evidence: [`${DOCS}bigquery/docs/datasets#dataset-naming`, `${DOCS}bigquery/docs/batch-loading-data`],
   },
@@ -157,12 +159,13 @@ export const BUNDLES: readonly Bundle[] = [
   {
     id: 'event-pipeline', label: 'Event pipeline (Pub/Sub)', tested: false,
     summary: 'A Pub/Sub topic and subscription that push to a Cloud Run service, with a dead-letter topic for messages that keep failing.',
-    parts: [P('topic'), P('sub'), P('dlq'), P('run'), P('sa')],
+    // D116 — push 대상 Cloud Run 은 worker(공개 웹의 run 과 별개 — push 대상은 인증을 요구한다)
+    parts: [P('topic'), P('sub'), P('dlq'), P('worker'), P('sa')],
     options: [],
     refs: [
       { from: 'sub', to: 'topic', attr: 'topic', evidence: `${TF}pubsub_subscription` },
       { from: 'sub', to: 'dlq', attr: 'dead_letter_policy.dead_letter_topic', evidence: `${TF}pubsub_subscription` },
-      { from: 'run', to: 'sa', attr: 'template.service_account', evidence: `${TF}cloud_run_v2_service` },
+      { from: 'worker', to: 'sa', attr: 'template.service_account', evidence: `${TF}cloud_run_v2_service` },
     ],
     evidence: [`${DOCS}run/docs/triggering/pubsub-push`, `${DOCS}pubsub/docs/handling-failures`],
   },

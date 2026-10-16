@@ -10,11 +10,12 @@ import { BUNDLES, bundleById, partIsProject, partKey, type Bundle, type BundleBa
 import { addPresetPick, findPreset } from './wizardState';
 
 /** 한 서비스 안에서 카드 여럿이 함께 쓰는 부품 (D115) — 같은 이름 하나를 여러 카드가 가리켜도 각 카드가 맞게 돈다:
- *  서비스 계정은 여러 리소스가 실행 주체로 쓰고, Artifact Registry 저장소는 이미지를 여럿 담고, 시크릿은 여러 곳이 읽고, Cloud SQL 인스턴스는 데이터베이스 · 접속자를 여럿 받는다.
- *  함께 쓰지 않는 것 — Cloud Run 서비스(공개 웹은 익명 호출을 받고 Pub/Sub push 대상은 인증을 요구한다) · 버킷(정적 사이트는 공개 읽기 · 적재 버킷은 아니다) ·
- *  Cloud Scheduler 작업(대상이 하나다) · 웹 서버(공개 LB 뒤 ↔ 내부 전용) · LB 부품(URL 맵의 기본 백엔드가 하나다 — 가족 lb).
- *  화면만의 판정이라 src/core 가 아니라 여기에 둔다 — 이름 · hash · API 는 그대로다 */
-export const SHAREABLE_PARTS: ReadonlySet<string> = new Set(['sa', 'ar', 'secret', 'db']);
+ *  서비스 계정은 여러 리소스가 실행 주체로 쓰고, Artifact Registry 저장소는 이미지를 여럿 담고, 시크릿은 여러 곳이 읽고, Cloud SQL 인스턴스는 데이터베이스 · 접속자를 여럿 받고,
+ *  bastion 은 서비스의 VM 어디로든 들어가는 관문 하나다(D116).
+ *  같은 종류를 서로 다른 일에 쓰는 부품은 함께 쓰지 않고 tier 를 단 다른 프리셋으로 둔다(D116 — worker · raw · ingest · intweb · intwas · appdata).
+ *  LB 부품(URL 맵의 기본 백엔드가 하나다 — 가족 lb)은 서비스에 하나다.
+ *  화면만의 판정이라 src/core 가 아니라 여기에 둔다 */
+export const SHAREABLE_PARTS: ReadonlySet<string> = new Set(['sa', 'ar', 'secret', 'db', 'bastion']);
 
 /** 가족 lb 의 앞쪽 — 이 중 하나가 있어야 로드 밸런서 카드가 후보다(주소 · 인증서만 있는 서비스에 「미완성 LB」를 띄우지 않는다) */
 const LB_ANCHORS = ['url', 'thps', 'fwd'];

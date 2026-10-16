@@ -266,9 +266,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — 묶음 스물 · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — 묶음 스물넷 · 프리셋 id 전부 · HA 규칙', () => {
     const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
-    expect(rows).toHaveLength(20);
+    expect(rows).toHaveLength(24);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');

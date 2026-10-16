@@ -37,6 +37,9 @@ export const PRESETS: readonly Preset[] = [
   { id: 'web', label: 'Web server', ruleId: VM, tier: 'web', ha: { minInstances: 2 }, serverless: SERVERLESS, level: 'service' },
   { id: 'was', label: 'App server', ruleId: VM, tier: 'was', ha: { minInstances: 2 }, serverless: SERVERLESS, level: 'service' },
   { id: 'bastion', label: 'Bastion', ruleId: VM, tier: 'bastion', ha: null, serverless: null, level: 'service' },
+  // D116 — 내부 전용 웹 · 앱 서버(Internal app 카드). 공개 LB 뒤의 web · was 와 같은 서비스에 둘 수 있게 tier 를 따로 둔다
+  { id: 'intweb', label: 'Internal web server', ruleId: VM, tier: 'intweb', ha: { minInstances: 2 }, serverless: null, level: 'service' },
+  { id: 'intwas', label: 'Internal app server', ruleId: VM, tier: 'intwas', ha: { minInstances: 2 }, serverless: null, level: 'service' },
   { id: 'file', label: 'File server', ruleId: VM, tier: 'file', ha: null, serverless: null, defaultAttach: { data: ['01'] }, level: 'service' },
   { id: 'db', label: 'Database (Cloud SQL)', ruleId: 'gcp.cloud_sql_instance', ...NONE, level: 'service' },
   { id: 'object', label: 'Object storage', ruleId: 'gcp.storage_bucket', ...NONE, level: 'service' },
@@ -56,6 +59,13 @@ export const PRESETS: readonly Preset[] = [
   { id: 'cron', label: 'Cloud Scheduler job', ruleId: 'gcp.scheduler_job', ...NONE, level: 'service' },
   { id: 'runjob', label: 'Cloud Run job', ruleId: 'gcp.run_job', ...NONE, level: 'service' },
   { id: 'redis', label: 'Memorystore for Redis', ruleId: 'gcp.redis_instance', ...NONE, level: 'service' },
+  // D116 — 한 서비스의 두 카드가 같은 종류의 리소스를 서로 다른 일에 쓸 때 둘째 것. 같은 규칙에 tier 를 달아 이름 · 중복 키가 갈린다(dlq · urlredir 와 같은 꼴).
+  // worker: Pub/Sub push 를 받는 비공개 Cloud Run(공개 웹의 run 과 별개) · raw: 적재 버킷(정적 사이트의 공개 버킷과 별개) · ingest: 예약 적재 작업(Batch job 의 cron 과 별개 — 작업 하나는 대상 하나) ·
+  // appdata: 내부 앱의 버킷(intweb · intwas 는 위 서버형 옆에 둔다)
+  { id: 'worker', label: 'Cloud Run worker service', ruleId: 'gcp.run_service', tier: 'worker', ha: null, serverless: null, level: 'service' },
+  { id: 'raw', label: 'Landing bucket', ruleId: 'gcp.storage_bucket', tier: 'raw', ha: null, serverless: null, level: 'service' },
+  { id: 'ingest', label: 'Scheduled load job', ruleId: 'gcp.scheduler_job', tier: 'ingest', ha: null, serverless: null, level: 'service' },
+  { id: 'appdata', label: 'App bucket', ruleId: 'gcp.storage_bucket', tier: 'appdata', ha: null, serverless: null, level: 'service' },
   // D73 — HTTPS 로드 밸런서 부품. 칩 하나 = 이름 하나 · 자동 연결 없음
   { id: 'ip', label: 'Global IP address', ruleId: 'gcp.global_address', ...NONE, level: 'service', group: 'lb' },
   { id: 'ig', label: 'Instance group', ruleId: 'gcp.instance_group', ...NONE, level: 'service', group: 'lb' },

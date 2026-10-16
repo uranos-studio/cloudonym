@@ -143,9 +143,12 @@ describe('카드 데이터 (D93)', () => {
 
   it('D114 의 새 카드 다섯 — 필수 부품 · 선택 · 아직 만들어 보지 않음(tested false)', () => {
     const shape = (id: string) => { const b = bundleById(id)!; return { parts: b.parts.map(partKey), options: b.options.map((o) => [o.id, o.on, o.parts.map(partKey)]), tested: b.tested, family: b.family }; };
-    expect(shape('data-warehouse')).toEqual({ parts: ['object', 'bq', 'sa'], options: [['schedule', false, ['cron']]], tested: false, family: undefined });
+    // D116 — 적재 버킷 raw · 예약 적재 ingest · push 대상 Cloud Run worker (같은 서비스의 Static site · Batch job · Serverless web 과 이름이 갈린다)
+    expect(shape('data-warehouse')).toEqual({ parts: ['raw', 'bq', 'sa'], options: [['schedule', false, ['ingest']]], tested: false, family: undefined });
     expect(shape('gke')).toEqual({ parts: ['gke', 'ar', 'sa', 'vpc', 'subnet'], options: [['cache', false, ['redis']]], tested: false, family: undefined });
-    expect(shape('event-pipeline')).toEqual({ parts: ['topic', 'sub', 'dlq', 'run', 'sa'], options: [], tested: false, family: undefined });
+    expect(shape('event-pipeline')).toEqual({ parts: ['topic', 'sub', 'dlq', 'worker', 'sa'], options: [], tested: false, family: undefined });
+    // D116 — Internal app 은 내부 전용 서버 intweb · intwas 와 버킷 appdata (같은 서비스의 Website 와 이름이 갈린다)
+    expect(shape('vm-app')).toMatchObject({ parts: ['intweb', 'intwas', 'db', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'psa'], options: [['bastion', true, ['bastion']], ['file', false, ['file']], ['object', false, ['appdata']]], tested: true });
     expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']]], tested: false, family: undefined });
     expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [], tested: false, family: undefined });
     // 네트워크(vpc · subnet)는 프로젝트 공용 자리다 — 첫 화면에 이미 있으면 카드가 더하지 않는다
@@ -155,16 +158,16 @@ describe('카드 데이터 (D93)', () => {
   it('D114 — 카드를 펼친 이름: 데이터셋은 밑줄 · 버킷과 나머지는 하이픈 · 데드레터 토픽은 토픽과 키 · 이름이 다르다', () => {
     const names = (id: string) => Object.fromEntries(generateProject(expandPlan(planOf(partsOf(bundleById(id)!, 'all'), false)), 'gcp').items.slice(1).map((i) => [i.key, i.name]));
     expect(names('data-warehouse')).toEqual({
-      'service/site/storage_bucket/-/-/-': 'platform-billing-site-prod-ane3-gcs',
+      'service/site/storage_bucket/-/raw/-': 'platform-billing-site-prod-ane3-gcs-raw',
       'service/site/bigquery_dataset/-/-/-': 'billing_site_prod_ane3_bq',
       'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
-      'service/site/scheduler_job/-/-/01': 'billing-site-prod-ane3-cron-01',
+      'service/site/scheduler_job/-/ingest/01': 'billing-site-prod-ane3-cron-ingest-01',
     });
     expect(names('event-pipeline')).toEqual({
       'service/site/pubsub_topic/-/-/01': 'billing-site-prod-topic-01',
       'service/site/pubsub_subscription/-/-/01': 'billing-site-prod-sub-01',
       'service/site/pubsub_topic/-/dlq/01': 'billing-site-prod-topic-dlq-01',
-      'service/site/run_service/-/-/01': 'billing-site-prod-ane3-run-01',
+      'service/site/run_service/-/worker/01': 'billing-site-prod-ane3-run-worker-01',
       'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
     });
     expect(Object.keys(names('gke'))).toEqual([

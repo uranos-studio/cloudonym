@@ -44,7 +44,7 @@ describe('카드 더하기 (D93)', () => {
     expect(presets(st, 0)).toEqual(['object', 'bb', 'ip', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir']);
     expect(ids(st, 0)).toEqual([['static-site', true]]);
     const vm = addBundle(startPlan(DEFAULT_PROJECT), 0, 'vm-app');
-    expect(presets(vm, 0)).toEqual(['web', 'was', 'db', 'bastion']);
+    expect(presets(vm, 0)).toEqual(['intweb', 'intwas', 'db', 'bastion']); // D116 — 내부 전용 서버는 tier intweb · intwas
     expect(presets(vm, null)).toEqual(['vpc', 'subnet', 'router', 'nat', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'psa']);
     expect(ids(vm, 0)).toEqual([['vm-app', true]]);
     for (const p of [run, st, vm]) expect(validatePlan(p)).toEqual({ ok: true });
@@ -97,11 +97,14 @@ describe('되읽기 · 미완성 (D93)', () => {
     for (const id of ['web', 'db', 'ip', 'cert']) p = togglePreset(p, 0, id);
     expect(cardsIn(p, 0)).toEqual([]);
     expect(ids(togglePreset(p, 0, 'url'), 0)).toEqual([['website', false]]);
-    const vm = togglePreset(togglePreset(togglePreset(startPlan(DEFAULT_PROJECT), 0, 'web'), 0, 'was'), 0, 'db');
+    // web · was · db 칩은 Internal app 이 아니다(D116 — 그 카드의 서버는 intweb · intwas). 그 칩 셋으로는 카드가 뜨지 않는다
+    const chips = togglePreset(togglePreset(togglePreset(startPlan(DEFAULT_PROJECT), 0, 'web'), 0, 'was'), 0, 'db');
+    expect(cardsIn(chips, 0)).toEqual([]);
+    const vm = togglePreset(togglePreset(togglePreset(startPlan(DEFAULT_PROJECT), 0, 'intweb'), 0, 'intwas'), 0, 'db');
     expect(cardsIn(vm, 0).map((m) => [m.bundle.id, m.complete, m.missing.length])).toEqual([['vm-app', false, 4]]);
   });
 
-  it('다른 카드가 차지한 pick 이 든 카드는 보이지 않는다 — website + 선택 was · db 에 vm-app 이 뜨지 않아, 그 Remove 가 Website 의 선택을 지우지 않는다', () => {
+  it('Website 의 선택 was · db 는 Internal app 이 아니다 — vm-app 이 뜨지 않아 그 Remove 가 Website 의 선택을 지우지 않는다 · 두 카드는 한 서비스에 함께 둔다(D116)', () => {
     const p = addBundle(startPlan(DEFAULT_PROJECT), 0, 'website', { db: true, was: true });
     expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete])).toEqual([['website', true]]);
     const { owned, loose } = serviceLayout(p, 0);
@@ -109,13 +112,10 @@ describe('되읽기 · 미완성 (D93)', () => {
     expect(loose).toEqual([12, 13]); // db · was — 선택 부품은 카드 밖 줄
     expect(removeBundle(p, 0, 'vm-app')).toEqual(p); // 보이지 않는 카드는 지울 것이 없다
     expect(optionOn(p, 0, bundleById('website')!.options[0]!.parts)).toBe(true);
-    // vm-app 을 먼저 더하면 website 는 막힌다 (D115) — 더하면 web 을 LB 카드가 차지해 vm-app 이 말없이 사라진다. 내부 전용 웹 서버를 공개 LB 뒤에 둘 수 없다
-    const vm = addBundle(startPlan(DEFAULT_PROJECT), 0, 'vm-app');
-    expect(cardBlocked(vm, 0, 'website', { db: false })).toBe('overlap');
-    expect(addBundle(vm, 0, 'website', { db: false })).toBe(vm);
-    // 갤러리 — 더해도 vm-app 으로 되읽히지 않으니 단추가 꺼진다(부품만 흩어 놓지 않는다)
-    expect(cardBlocked(p, 0, 'vm-app', {})).toBe('overlap');
-    expect(addBundle(p, 0, 'vm-app')).toBe(p);
+    // D116 — vm-app 의 서버는 intweb · intwas 라 Website 의 web · was 와 다른 pick 이다. db 는 함께 쓴다(D115)
+    const both = addBundle(p, 0, 'vm-app');
+    expect(ids(both, 0)).toEqual([['website', true], ['vm-app', true]]);
+    expect(presets(both, 0).filter((x) => x === 'db')).toEqual(['db']);
   });
 });
 
@@ -316,15 +316,12 @@ describe('D114 의 카드 다섯 — 화면에서 더하기 · 되읽기 · 지�
   });
 });
 
-describe('한 서비스에 카드 여럿 (D115) — 함께 쓰는 부품 · 막히는 까닭 · 지우기 · 되읽기', () => {
+describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품 · tier 로 가른 부품 · 막히는 까닭 · 지우기 · 되읽기', () => {
   // https-lb 는 백엔드를 서비스에서 고르는 카드라 아래 따로 본다
   const NINE = BUNDLES.map((b) => b.id).filter((id) => id !== 'https-lb');
-  // 진짜 까닭으로 막히는 쌍 — 같은 부품을 서로 다른 일에 쓴다(공유 불가)
+  // 막히는 쌍은 로드 밸런서 둘뿐이다 — URL 맵 · 주소 · 인증서 · 프록시 · 전달 규칙이 서비스에 하나씩이고 URL 맵의 기본 백엔드가 하나다(D93). 둘째 LB 는 다른 서비스에 둔다
   const BLOCKED: Record<string, string> = {
-    'website|serverless-web': 'family', 'website|static-site': 'family', 'serverless-web|static-site': 'family', // URL 맵 · 주소 · 인증서가 서비스에 하나
-    'website|vm-app': 'web', // 공개 LB 뒤의 웹 서버 ↔ 내부 전용 웹 서버
-    'serverless-web|event-pipeline': 'run', // 공개(allUsers) Cloud Run ↔ 인증을 요구하는 push 대상
-    'static-site|data-warehouse': 'object', // 공개 읽기 버킷 ↔ 적재 데이터 버킷
+    'website|serverless-web': 'family', 'website|static-site': 'family', 'serverless-web|static-site': 'family',
   };
   const key = (a: string, b: string) => (BUNDLES.findIndex((x) => x.id === a) < BUNDLES.findIndex((x) => x.id === b) ? `${a}|${b}` : `${b}|${a}`);
   const pairs = NINE.flatMap((a, i) => NINE.slice(i + 1).map((b) => [a, b] as const));
@@ -336,9 +333,9 @@ describe('한 서비스에 카드 여럿 (D115) — 함께 쓰는 부품 · 막�
     return addBundle(p, 0, id);
   }, start());
 
-  it('쌍 서른여섯 — 막히는 여섯과 함께 두는 서른', () => {
+  it('쌍 서른여섯(https-lb 제외) — 막히는 셋(LB 둘)과 함께 두는 서른셋', () => {
     expect(pairs.length).toBe(36);
-    expect(coexist.length).toBe(30);
+    expect(coexist.length).toBe(33);
   });
 
   it.each(coexist)('%s + %s — 어느 순서로 더해도 둘 다 완성 · 이름 PASS · 링크로 다시 열어도 같다 · 하나를 지우면 다른 하나는 완성 그대로', (a, b) => {
@@ -364,7 +361,7 @@ describe('한 서비스에 카드 여럿 (D115) — 함께 쓰는 부품 · 막�
     const [a, b] = pair.split('|') as [string, string];
     for (const [first, second] of [[a, b], [b, a]] as const) {
       const p = addBundle(start(), 0, first);
-      expect(cardBlocked(p, 0, second, {})).toBe(why === 'family' ? 'family' : 'overlap');
+      expect(cardBlocked(p, 0, second, {})).toBe(why);
       expect(addBundle(p, 0, second)).toBe(p);
       const two = addService(p);
       expect(cardBlocked(two, 1, second, {})).toBeUndefined();
@@ -437,43 +434,69 @@ describe('한 서비스에 카드 여럿 (D115) — 함께 쓰는 부품 · 막�
     expect(presets(withVm, 0).filter((x) => x === 'db')).toEqual(['db']);
   });
 
-  it('Cloud Scheduler 작업은 함께 쓰지 않는다 — 작업 하나는 대상 하나다. Data warehouse 의 예약 적재 선택과 Batch job', () => {
-    const sched = bundleById('data-warehouse')!.options.find((o) => o.id === 'schedule')!.parts;
-    // 예약 적재를 켠 Data warehouse 에 Batch job 을 더하면 그 작업을 빼앗는다 — 막는다
-    const dw = addBundle(start(), 0, 'data-warehouse', { schedule: true });
-    expect(cardBlocked(dw, 0, 'batch-job', {})).toBe('overlap');
-    // 선택을 끈 Data warehouse 와는 함께 둔다
-    const both = addBundle(addBundle(start(), 0, 'data-warehouse'), 0, 'batch-job');
-    expect(ids(both, 0)).toEqual([['data-warehouse', true], ['batch-job', true]]);
-    // 그때 Data warehouse 의 예약 적재는 꺼져 있고 켤 수 없다 — 그 작업은 Batch job 의 것이다
-    expect(optionOn(both, 0, sched, 'data-warehouse')).toBe(false);
-    expect(optionBlocked(both, 0, sched, 'data-warehouse')).toBe('overlap');
-    expect(setOption(both, 0, sched, true, 'data-warehouse')).toBe(both);
-    // Batch job 이 먼저 있으면 예약 적재를 켠 채 Data warehouse 를 더할 수 없다(켠 선택이 들어가지 않는다) · 끈 채로는 된다
-    const batch = addBundle(start(), 0, 'batch-job');
-    expect(cardBlocked(batch, 0, 'data-warehouse', { schedule: true })).toBe('overlap');
-    expect(cardBlocked(batch, 0, 'data-warehouse', {})).toBeUndefined();
+  it('같은 종류를 다른 일에 쓰는 부품은 tier 로 갈려 둘 다 있다 (D116) — 이름이 다르고 선택도 그대로 켜진다', () => {
+    const namesOf = (p: WizardPlan) => generateProject(expandPlan(p), 'gcp').items.map((i) => i.name);
+    // Data warehouse(예약 적재 켬) + Batch job — Cloud Scheduler 작업 둘(cron-ingest · cron)
+    const dwb = addBundle(addBundle(start(), 0, 'data-warehouse', { schedule: true }), 0, 'batch-job');
+    expect(ids(dwb, 0)).toEqual([['data-warehouse', true], ['batch-job', true]]);
+    expect(optionOn(dwb, 0, bundleById('data-warehouse')!.options[0]!.parts, 'data-warehouse')).toBe(true);
+    expect(namesOf(dwb)).toEqual(expect.arrayContaining(['billing-shop-prod-ane3-cron-ingest-01', 'billing-shop-prod-ane3-cron-01']));
+    // Serverless web + Event pipeline — Cloud Run 둘(공개 run · push 대상 run-worker)
+    const swe = addAll(['serverless-web', 'event-pipeline']);
+    expect(namesOf(swe)).toEqual(expect.arrayContaining(['billing-shop-prod-ane3-run-01', 'billing-shop-prod-ane3-run-worker-01']));
+    // Static site + Data warehouse + Internal app(Object storage 켬) — 버킷 셋(공개 · raw · appdata)
+    const buckets = addBundle(addAll(['static-site', 'data-warehouse']), 0, 'vm-app', { object: true });
+    expect(ids(buckets, 0)).toEqual([['static-site', true], ['vm-app', true], ['data-warehouse', true]]);
+    expect(namesOf(buckets).filter((n) => n.includes('-gcs'))).toEqual(['platform-billing-shop-prod-ane3-gcs', 'platform-billing-shop-prod-ane3-gcs-raw', 'platform-billing-shop-prod-ane3-gcs-appdata']);
+    // Website + Internal app — 서버 넷(web · intweb · intwas, 공개 쪽 was 는 선택) · bastion 하나를 함께 쓴다
+    const wv = addBundle(addBundle(start(), 0, 'website', { was: true, bastion: true }), 0, 'vm-app');
+    expect(ids(wv, 0)).toEqual([['website', true], ['vm-app', true]]);
+    expect(presets(wv, 0).filter((x) => x === 'bastion')).toEqual(['bastion']);
+    expect(namesOf(wv).filter((n) => n.includes('-gce-'))).toEqual(['billing-shop-prod-ane3-gce-web-01', 'billing-shop-prod-ane3-gce-was-01', 'billing-shop-prod-ane3-gce-bastion-01', 'billing-shop-prod-ane3-gce-intweb-01', 'billing-shop-prod-ane3-gce-intwas-01']);
+    for (const p of [dwb, swe, buckets, wv]) expect(validatePlan(p)).toEqual({ ok: true });
   });
 
-  it('버킷도 함께 쓰지 않는다 — Internal app 의 Object storage 선택은 Static site 의 공개 버킷 · Data warehouse 의 적재 버킷과 겹치면 막힌다', () => {
-    const obj = bundleById('vm-app')!.options.find((o) => o.id === 'object')!.parts;
-    const vm = addBundle(start(), 0, 'vm-app', { object: true });
-    expect(cardBlocked(vm, 0, 'static-site', {})).toBe('overlap');
-    expect(cardBlocked(vm, 0, 'data-warehouse', {})).toBe('overlap');
-    const dw = addBundle(addBundle(start(), 0, 'data-warehouse'), 0, 'vm-app');
-    expect(optionOn(dw, 0, obj, 'vm-app')).toBe(false);
-    expect(optionBlocked(dw, 0, obj, 'vm-app')).toBe('overlap');
+  it('카드 데이터 — LB 가족 밖에서는 함께 쓰지 않는 필수 서비스 부품이 두 카드에 겹치지 않고, 선택의 함께 쓰지 않는 부품이 다른 카드의 필수 부품이 아니다 (D116)', () => {
+    const unshared = (ps: readonly { preset: string; tier?: string }[]) => ps.filter((p) => !partIsProject(p) && !SHAREABLE_PARTS.has(partKey(p))).map(partKey);
+    for (const a of BUNDLES) for (const b of BUNDLES) {
+      if (a.id === b.id || (a.family !== undefined && a.family === b.family)) continue;
+      const req = new Set(unshared(b.parts));
+      expect(unshared(a.parts).filter((k) => req.has(k)), `${a.id} · ${b.id}`).toEqual([]);
+      expect(unshared(a.options.flatMap((o) => o.parts)).filter((k) => req.has(k)), `${a.id} 선택 · ${b.id}`).toEqual([]);
+    }
   });
 
-  it('https-lb — 백엔드가 없는 서비스(GKE · CI/CD · Batch job)에서는 「백엔드 없음」으로 함께 보이고, 백엔드를 다른 카드가 쓰면 막힌다', () => {
-    for (const other of ['gke', 'ci-cd', 'batch-job']) {
-      const p = addBundle(addBundle(start(), 0, other), 0, 'https-lb');
-      expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete, m.noBackend]), other).toEqual(order(['https-lb', other]).map((id) => (id === 'https-lb' ? ['https-lb', false, true] : [id, true, false])));
+  it('https-lb 와 아홉 — LB 셋과는 family(백엔드가 있으면) · 나머지 여섯과는 함께 보이고 백엔드가 없어 「무엇을 더하라」를 말한다', () => {
+    const NON_LB = ['vm-app', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job'];
+    for (const other of NON_LB) {
+      for (const xs of [[other, 'https-lb'], ['https-lb', other]]) {
+        const p = addAll(xs);
+        expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete, m.noBackend]), xs.join('+')).toEqual(order(['https-lb', other]).map((id) => (id === 'https-lb' ? ['https-lb', false, true] : [id, true, false])));
+        // 이 카드들의 부품(intweb · worker · raw …)은 공개 백엔드가 아니다 — https-lb 가 가져가지 않는다
+        expect(partsToAdd(p, 0, 'https-lb', {}), xs.join('+')).toEqual([]);
+        // 백엔드를 더하는 LB 카드(Website)를 더하면 https-lb 가 그 카드로 채워지고 다른 카드는 그대로다
+        const filled = addBundle(p, 0, 'website', { db: false });
+        expect(ids(filled, 0), xs.join('+')).toEqual(order(['website', other]).map((id) => [id, true]));
+      }
     }
-    // web(vm-app) · run(event-pipeline) · object(data-warehouse) 를 백엔드로 고르면 그 카드가 사라진다 — 막는다
-    for (const other of ['vm-app', 'event-pipeline', 'data-warehouse']) {
-      const p = addBundle(start(), 0, other);
-      expect(cardBlocked(p, 0, 'https-lb', {}), other).toBe('overlap');
+    for (const lb of ['website', 'serverless-web', 'static-site']) {
+      expect(cardBlocked(addBundle(start(), 0, lb), 0, 'https-lb', {}), lb).toBe('family');
+      // 백엔드 없는 https-lb 는 그 LB 카드가 채운다 — 둘이 아니라 하나다
+      expect(ids(addBundle(addBundle(start(), 0, 'https-lb'), 0, lb), 0), lb).toEqual([[lb, true]]);
     }
+  });
+
+  it('마흔다섯 쌍 — 서른아홉이 한 서비스에 함께 보이고(https-lb 여섯은 백엔드를 기다리는 미완성) · 막히는 여섯은 전부 LB 둘이다', () => {
+    const all = BUNDLES.map((b) => b.id);
+    const lb = new Set(BUNDLES.filter((b) => b.family === 'lb').map((b) => b.id));
+    const results = all.flatMap((a, i) => all.slice(i + 1).map((b) => {
+      const p = addBundle(start(), 0, a);
+      const why = cardBlocked(p, 0, b, {});
+      return { pair: `${a}|${b}`, why, both: why === undefined && cardsIn(addBundle(p, 0, b), 0).length === 2 };
+    }));
+    expect(results.length).toBe(45);
+    expect(results.filter((r) => r.both).length).toBe(39);
+    expect(results.filter((r) => !r.both).map((r) => r.pair).every((x) => x.split('|').every((id) => lb.has(id)))).toBe(true);
+    expect(results.filter((r) => !r.both).length).toBe(6);
   });
 });

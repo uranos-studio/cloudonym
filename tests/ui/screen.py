@@ -1317,7 +1317,7 @@ def wizard_cards(browser, errors):
     pg.click('[data-add-service]')
     settings(pg).locator('[data-service-name]').fill('edge')
     settings(pg).locator('[data-card-add="https-lb"]').click()
-    expect(settings(pg).locator('[data-card-warning]')).to_have_text('No backend — add a web server, a Cloud Run service or a bucket to this service.')
+    expect(settings(pg).locator('[data-card-warning]')).to_have_text('No backend — add Website, Serverless web or Static site, or a Web server, Cloud Run service or Object storage chip. Internal servers, worker services and landing buckets stay private.')
     svc(pg, 2).locator('[data-purpose-chip="run"]').click()
     expect(pg.locator('[data-row-path^="services[2].card."]')).to_have_attribute('data-row-card', 'serverless-web')
     select(pg, 'services[2].card.serverless-web').locator('[data-card-fill]').click()
@@ -3060,7 +3060,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 115, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 20}.items():
+    for table_id, rows in {'abbreviations': 115, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 24}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)
