@@ -2,7 +2,9 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.1.8] - 2026-10-17
+
+The naming wizard grows five cards — Data warehouse (BigQuery), GKE cluster, Event pipeline (Pub/Sub), CI/CD (Cloud Build) and Batch job — with their presets, cards in one service share the parts they have in common, the CI/CD card can connect a GitHub repository, and the wizard opens with a headline. Every card except HTTPS load balancer was built and tested on Google Cloud under its exported names.
 
 Rules revision for this release: 2026-10-17.1. New wizard presets and two new Google Cloud rules; no name, verdict or suggestion for an existing input changes. Some cards now produce more or different names because their parts changed (see Changed).
 
@@ -218,6 +220,7 @@ These changes were made before any public deployment, so no released name depend
 
 Cloudonym started as a three-provider naming engine with an API and a single-page UI, then grew a four-step screen, per-resource selection (`/v1/names`), documented uniqueness scopes and rule tables imported from official sources for AWS, Google Cloud and Azure (667 rules in all). Before the first release the scope was narrowed to Google Cloud and the naming scheme was replaced — `prod`, provider region codes, kind tokens and catalog abbreviations — and then the naming wizard was added, zone codes were taken out of names and the Cloud Run service rule was added, so that the first public names use the scheme that will be kept. AWS and Azure are planned for later releases.
 
+[0.1.8]: https://github.com/uranos-studio/cloudonym/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/uranos-studio/cloudonym/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/uranos-studio/cloudonym/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/uranos-studio/cloudonym/compare/v0.1.4...v0.1.5
