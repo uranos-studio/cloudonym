@@ -12,7 +12,7 @@ import { VERSION } from '../version';
 import { logTelemetry } from './telemetry';
 import { fail, internalError } from './errors';
 import { overLimit, tooManyRequests } from './ratelimit';
-import { servePage, serveRobots, serveSitemap } from './site';
+import { indexNowKeyPath, servePage, serveIndexNowKey, serveRobots, serveSitemap } from './site';
 
 // 모듈 로드 때 한 번 만든다 — 요청마다 만들지 않는다
 const LLMS_TEXT = buildLlmsText(Object.values(RULES), VERSION);
@@ -29,7 +29,7 @@ app.use('*', async (c, next) => {
   const m = c.req.method;
   const p = c.req.path;
   const assets = c.env?.ASSETS;
-  if (!assets || (m !== 'GET' && m !== 'HEAD') || WORKER_FILES.has(p) || p === '/v1' || p.startsWith('/v1/')) return next();
+  if (!assets || (m !== 'GET' && m !== 'HEAD') || WORKER_FILES.has(p) || p === indexNowKeyPath(c.env?.INDEXNOW_KEY) || p === '/v1' || p.startsWith('/v1/')) return next();
   return servePage(c, assets);
 });
 // 모든 Worker 응답에 nosniff · X-Frame-Options 등. _headers 는 Worker 응답에 적용되지 않는다.
@@ -59,6 +59,8 @@ app.get('/catalog.json', async (c) => {
 // 검색 엔진용 (D106) — 상수 본문이라 요청 제한 · 카운터를 걸지 않는다. 절대 URL 은 요청의 origin 으로 만든다
 app.get('/robots.txt', serveRobots);
 app.get('/sitemap.xml', serveSitemap);
+// IndexNow 키 파일 (D120) — 경로가 vars 의 키로 정해진다. 정적 파일이 없는 경로라 run_worker_first 없이도 Worker 로 온다(not_found_handling none)
+app.get('/:file', (c, next) => serveIndexNowKey(c) ?? next());
 
 app.route('/v1', v1);
 

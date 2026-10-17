@@ -2,6 +2,12 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Added
+
+- **Search-engine ownership checks and IndexNow** (D120) — the home page carries the Naver site-verification meta tag, `/robots.txt` ends with the Daum webmaster line, and `/<key>.txt` serves the IndexNow key; all three values come from `wrangler.jsonc` `vars` and are left out when unset. `scripts/indexnow-ping.mjs <BASE>` submits the URLs of a deployed site's sitemap to IndexNow.
+
 ## [0.1.8] - 2026-10-17
 
 The naming wizard grows five cards — Data warehouse (BigQuery), GKE cluster, Event pipeline (Pub/Sub), CI/CD (Cloud Build) and Batch job — with their presets, cards in one service share the parts they have in common, the CI/CD card can connect a GitHub repository, and the wizard opens with a headline. Every card except HTTPS load balancer was built and tested on Google Cloud under its exported names.

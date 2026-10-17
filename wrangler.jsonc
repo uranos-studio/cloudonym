@@ -47,7 +47,14 @@
 	 */
 	// Axiom 데이터셋 이름 — 비밀이 아니라 vars 에 둔다. 토큰은 `wrangler secret put AXIOM_API_KEY`(없으면 Axiom 으로 보내지 않는다).
 	// 데이터셋의 보존 기간을 정하면 src/components/privacyModel.ts 의 PRIVACY_AXIOM_RETENTION_DAYS 에 같은 값을 적는다(/privacy 안내)
-	"vars": { "AXIOM_DATASET": "cloudonym" },
+	// 검색 엔진 소유 확인 값 (D120) — 공개용 확인 토큰이라 비밀이 아니다. 네이버는 `/` 의 head 메타, Daum 은 robots.txt 끝 줄,
+	// IndexNow 키는 `/<키>.txt` 로 Worker 가 낸다(정적 파일이 없는 경로라 not_found_handling none 으로 Worker 에 온다). 비우면 내지 않는다
+	"vars": {
+		"AXIOM_DATASET": "cloudonym",
+		"NAVER_SITE_VERIFICATION": "840adcf594babcee8a5e7afd9cf3ae927f671b14",
+		"DAUM_WEBMASTER_LINE": "#DaumWebMasterTool:2aba08c8ccc90a30747fb8745790df3d0f2adb237bf1be270d08eeb290062b2b:nmRPv+AMqgHpYd33WRjhZA==",
+		"INDEXNOW_KEY": "49099bb7655296b243ab6ad364e69237"
+	},
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

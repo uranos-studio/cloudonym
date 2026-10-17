@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from './index';
 import { req, fakeLimiter } from './test-support';
-import { headersRule, PAGE_HEADERS, pageHeaders, renderPage, robotsText, sitemapXml } from './site';
+import { headersRule, indexNowKeyPath, PAGE_HEADERS, pageHeaders, renderPage, robotsText, sitemapXml } from './site';
 import { PAGES } from '../site/pages';
 import { pageText } from '../site/copy';
 import { en } from '../messages/en';
@@ -179,5 +179,68 @@ describe('wrangler.jsonc — 화면 HTML 을 Worker 가 받는 설정 (D106)', (
     expect(cfg).toMatch(/"not_found_handling":\s*"none"/);
     const first = JSON.parse(/"run_worker_first":\s*(\[[^\]]*\])/.exec(cfg)![1]!) as string[];
     expect(first).toEqual(['/', '/v1/*', '/llms.txt', '/catalog.json', '/robots.txt', '/sitemap.xml']);
+  });
+});
+
+describe('검색 엔진 소유 확인 · IndexNow (D120) — vars 가 없으면 아무것도 내지 않는다', () => {
+  const NAVER = 'n0a1v2e3r4';
+  const DAUM = '#DaumWebMasterTool:abc:def+/==';
+  const KEY = '0123456789abcdef0123456789abcdef';
+  const VARS = { NAVER_SITE_VERIFICATION: NAVER, DAUM_WEBMASTER_LINE: DAUM, INDEXNOW_KEY: KEY };
+  const getEnv = (path: string, env: Record<string, unknown>) => req(app, `https://example.org${path}`, undefined, { ASSETS: fakeAssets().assets, ...env });
+
+  it('네이버 메타는 뿌리 `/` 의 head 에만', async () => {
+    const home = await (await getEnv('/', VARS)).res.text();
+    const head = home.slice(0, home.indexOf('</head>'));
+    expect(head).toContain(`<meta name="naver-site-verification" content="${NAVER}">`);
+    for (const p of PAGES.filter((x) => x.path !== '/')) {
+      expect(await (await getEnv(p.path, VARS)).res.text()).not.toContain('naver-site-verification');
+    }
+    expect(await (await getEnv('/nope', VARS)).res.text()).not.toContain('naver-site-verification');
+  });
+  it('vars 가 없거나 비면 네이버 메타가 없다', async () => {
+    expect(await (await getEnv('/', {})).res.text()).not.toContain('naver-site-verification');
+    expect(await (await getEnv('/', { NAVER_SITE_VERIFICATION: '' })).res.text()).not.toContain('naver-site-verification');
+  });
+
+  it('robots — Daum 줄이 맨 끝 줄 · 전부 허용은 그대로', async () => {
+    const body = await (await getEnv('/robots.txt', VARS)).res.text();
+    const lines = body.trimEnd().split('\n');
+    expect(lines.at(-1)).toBe(DAUM);
+    expect(body).toMatch(/^User-agent: \*\nAllow: \/\n/);
+    expect(robotsText('https://a.test', DAUM)).toBe(`User-agent: *\nAllow: /\nDisallow: /v1/\n\nSitemap: https://a.test/sitemap.xml\n\n${DAUM}\n`);
+  });
+  it('robots — Daum 값이 없거나 비거나 줄바꿈이 섞이면 원래 본문', async () => {
+    const plain = robotsText('https://example.org');
+    expect(await (await getEnv('/robots.txt', {})).res.text()).toBe(plain);
+    expect(robotsText('https://example.org', '')).toBe(plain);
+    expect(robotsText('https://example.org', 'a\nDisallow: /')).toBe(plain);
+  });
+
+  it('`/<키>.txt` → 200 text/plain · 본문은 키', async () => {
+    const { res, promises } = await getEnv(`/${KEY}.txt`, VARS);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/^text\/plain/);
+    expect(await res.text()).toBe(KEY);
+    expect(promises).toEqual([]);
+  });
+  it('다른 .txt 와 키가 없을 때는 지금처럼 — 화면 404', async () => {
+    for (const [path, env] of [[`/${KEY.slice(1)}0.txt`, VARS], [`/${KEY}.txt`, {}], [`/${KEY}.txt`, { INDEXNOW_KEY: '' }], ['/../x.txt', { INDEXNOW_KEY: 'bad key!' }]] as const) {
+      const { res } = await getEnv(path, env);
+      expect(res.status, path).toBe(404);
+      expect(await res.text()).not.toBe(KEY);
+    }
+    expect(indexNowKeyPath('short')).toBeUndefined();
+    expect(indexNowKeyPath(KEY)).toBe(`/${KEY}.txt`);
+  });
+
+  it('wrangler.jsonc vars 에 세 값이 있다 — 키 파일 경로는 정적 파일과 겹치지 않는다', () => {
+    const w = readFileSync(join(root, 'wrangler.jsonc'), 'utf-8');
+    for (const k of ['NAVER_SITE_VERIFICATION', 'DAUM_WEBMASTER_LINE', 'INDEXNOW_KEY']) expect(w).toMatch(new RegExp(`"${k}": "[^"]+"`));
+    const key = /"INDEXNOW_KEY": "([^"]+)"/.exec(w)![1];
+    expect(indexNowKeyPath(key)).toBeDefined();
+    expect(readdirSync(join(root, 'public'))).not.toContain(`${key}.txt`);
+    // not_found_handling none — 정적 파일이 없는 경로는 Worker 로 온다
+    expect(w).toMatch(/"not_found_handling": "none"/);
   });
 });
