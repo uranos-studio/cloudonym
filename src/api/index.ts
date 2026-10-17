@@ -34,7 +34,7 @@ app.use('*', async (c, next) => {
 });
 // 모든 Worker 응답에 nosniff · X-Frame-Options 등. _headers 는 Worker 응답에 적용되지 않는다.
 // 공개 CORS API 라 CORP 는 cross-origin — 기본값 same-origin 이면 다른 출처의 no-cors 읽기가 막힌다. CSP 는 JSON · text 응답이라 걸지 않는다(기본값도 없음).
-// HSTS 는 내지 않는다 — 기본값 includeSubDomains 가 커스텀 도메인 전체를 묶는다. 커스텀 도메인을 붙일 때 존 설정에서 한 곳으로 켠다(_headers 와 같은 방침)
+// HSTS 는 내지 않는다 — 존 설정이 모든 응답에 건다(Always Use HTTPS · max-age 1년 · includeSubDomains). 여기서도 내면 헤더가 두 번 붙는다(_headers 와 같은 방침)
 app.use('*', secureHeaders({ crossOriginResourcePolicy: 'cross-origin', strictTransportSecurity: false }));
 
 // Worker 라우트로 서빙한다 (D17) — 카운터와 Cache-Control 을 코드에서 건다

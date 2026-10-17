@@ -2,6 +2,14 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+### Security
+
+- **Rate limiting counts IPv6 clients per /64** — `/v1/*` POSTs, `/llms.txt` and `/catalog.json` used the full IPv6 address as the limiter key, so one client holding a /64 could rotate addresses past the 60-per-minute limit. IPv4 keys are unchanged.
+- **HTTPS only** — plain HTTP now gets a 301 to HTTPS, and every response carries `Strict-Transport-Security: max-age=31536000; includeSubDomains`. Both come from the zone settings, not the Worker.
+- Development dependencies updated with `npm audit fix` (wrangler, miniflare, undici, sharp, source-map-js); the production bundle had no advisories.
+
 ## [0.1.9] - 2026-10-17
 
 Search engines can confirm site ownership, and the site can tell IndexNow about its pages. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.

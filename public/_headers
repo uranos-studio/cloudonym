@@ -7,7 +7,7 @@
 # script-src 의 static.cloudflareinsights.com 은 Cloudflare 가 HTML 응답에 넣는 Web Analytics 스크립트다(D110). 경로까지 적지 않고 호스트만 적는다 —
 # 주입되는 URL 이 beacon.min.js/v<버전> 이라 문서의 「…/beacon.min.js」 형태로는 막힌다. 측정값을 보내는 곳은 이 사이트의 /cdn-cgi/rum 이라 connect-src 'self' 로 된다
 # 클립보드는 막지 않는다 — 복사(writeText)는 화면 기능이고, clipboard-read=() 는 화면 시험(tests/ui/screen.py)이 복사된 값을 readText 로 대어 보는 길을 막는다.
-# 읽기는 어차피 브라우저가 사용자 허락을 묻는다. HSTS 는 커스텀 도메인을 붙일 때 존 설정에서 켠다
+# 읽기는 어차피 브라우저가 사용자 허락을 묻는다. HSTS 와 HTTP→HTTPS 전환은 존 설정이 한 곳에서 건다(Always Use HTTPS · HSTS max-age 1년 · includeSubDomains)
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://storage.googleapis.com; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
