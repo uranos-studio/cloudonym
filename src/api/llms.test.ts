@@ -122,7 +122,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('켜진 CSP 만 — GCP 절만 있고 공식 줄 수는 GCP 규칙 수 · AWS · Azure 는 「planned」 한 줄 (D45)', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
     expect(enabledRules).toHaveLength(rulesFor('gcp').length);
-    expect(rulesFor('gcp')).toHaveLength(137);
+    expect(rulesFor('gcp')).toHaveLength(138);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
     expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
     expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
@@ -266,9 +266,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — 묶음 스물다섯 · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — 묶음 스물일곱 · 프리셋 id 전부 · HA 규칙', () => {
     const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
-    expect(rows).toHaveLength(25);
+    expect(rows).toHaveLength(27);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');

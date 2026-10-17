@@ -58,6 +58,9 @@ export const PRESETS: readonly Preset[] = [
   // D117 — 데드레터 토픽의 구독. 구독이 없는 토픽에 넘어간 메시지는 사라진다(pubsub/docs/handling-failures) — 구독 규칙에 tier dlq
   { id: 'dlqsub', label: 'Dead-letter subscription', ruleId: 'gcp.pubsub_subscription', tier: 'dlq', ha: null, serverless: null, level: 'service' },
   { id: 'build', label: 'Cloud Build trigger', ruleId: 'gcp.cloudbuild_trigger', ...NONE, level: 'service' },
+  // D119 — Cloud Build 2세대 연결(GitHub 등)과 그 안의 저장소. 서비스 자리다 — 프로젝트 자리 범위(PROJECT_SCOPES)에 위치 범위가 없다(D63)
+  { id: 'conn', label: 'Cloud Build connection', ruleId: 'gcp.cloudbuild_connection', ...NONE, level: 'service' },
+  { id: 'repo', label: 'Cloud Build repository', ruleId: 'gcp.cloudbuild_repository', ...NONE, level: 'service' },
   { id: 'cron', label: 'Cloud Scheduler job', ruleId: 'gcp.scheduler_job', ...NONE, level: 'service' },
   { id: 'runjob', label: 'Cloud Run job', ruleId: 'gcp.run_job', ...NONE, level: 'service' },
   { id: 'redis', label: 'Memorystore for Redis', ruleId: 'gcp.redis_instance', ...NONE, level: 'service' },

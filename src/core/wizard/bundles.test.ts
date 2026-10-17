@@ -64,9 +64,9 @@ describe('카드 데이터 (D93)', () => {
     expect(count('static-site').map(partKey)).not.toContain('bs');
   });
 
-  it('참조는 카드의 부품(필수 · 백엔드)이나 vpc 만 가리킨다 · 근거는 https URL', () => {
+  it('참조는 카드의 부품(필수 · 선택 · 백엔드)이나 vpc 만 가리킨다 · 근거는 https URL', () => {
     for (const b of BUNDLES) {
-      const keys = new Set([...b.parts, ...(b.backends ?? []).flatMap((x) => [{ preset: x.needs }, ...x.parts])].map(partKey));
+      const keys = new Set([...b.parts, ...b.options.flatMap((o) => o.parts), ...(b.backends ?? []).flatMap((x) => [{ preset: x.needs }, ...x.parts])].map(partKey));
       for (const r of b.refs) {
         expect(keys.has(r.from), `${b.id} ${r.from}`).toBe(true);
         expect(r.to === 'vpc' || keys.has(r.to), `${b.id} ${r.to}`).toBe(true);
@@ -153,7 +153,8 @@ describe('카드 데이터 (D93)', () => {
     // D116 — Internal app 은 내부 전용 서버 intweb · intwas 와 버킷 appdata (같은 서비스의 Website 와 이름이 갈린다)
     // D117 — 네트워크 안의 웹 · 앱 포트를 여는 방화벽 internal 이 없으면 bastion 에서도 intweb · intwas 의 HTTP 가 막힌다(실배포 시험)
     expect(shape('vm-app')).toMatchObject({ parts: ['intweb', 'intwas', 'db', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'firewall:internal', 'psa'], options: [['bastion', true, ['bastion']], ['file', false, ['file']], ['object', false, ['appdata']]], tested: true });
-    expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']]], tested: true, family: undefined });
+    // D119 — GitHub 연결은 선택(webhook · 1세대 트리거는 연결 없이 된다) — 연결 conn 과 연결된 저장소 repo
+    expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']], ['github', false, ['conn', 'repo']]], tested: true, family: undefined });
     expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [], tested: true, family: undefined });
     // 네트워크(vpc · subnet)는 프로젝트 공용 자리다 — 첫 화면에 이미 있으면 카드가 더하지 않는다
     expect(bundleById('gke')!.parts.filter(partIsProject).map(partKey)).toEqual(['vpc', 'subnet']);
@@ -179,8 +180,19 @@ describe('카드 데이터 (D93)', () => {
       'project/-/vpc_network/-/-/01', 'project/-/subnet/-/-/01',
       'service/site/gke_cluster/-/-/01', 'service/site/artifact_registry_repository/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/redis_instance/-/-/01',
     ]);
-    expect(Object.keys(names('ci-cd'))).toEqual(['service/site/artifact_registry_repository/-/-/01', 'service/site/cloudbuild_trigger/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/secret/-/-/01']);
+    expect(Object.keys(names('ci-cd'))).toEqual(['service/site/artifact_registry_repository/-/-/01', 'service/site/cloudbuild_trigger/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/secret/-/-/01', 'service/site/cloudbuild_connection/-/-/01', 'service/site/cloudbuild_repository/-/-/01']);
+    // D119 — 연결은 지역 토큰 · 저장소는 부모(연결)의 위치를 물려받아 지역 토큰이 없다
+    const ci = names('ci-cd');
+    expect(ci['service/site/cloudbuild_connection/-/-/01']).toBe('billing-site-prod-ane3-conn-01');
+    expect(ci['service/site/cloudbuild_repository/-/-/01']).toBe('billing-site-prod-repo-01');
     expect(Object.keys(names('batch-job'))).toEqual(['service/site/run_job/-/-/01', 'service/site/scheduler_job/-/-/01', 'service/site/service_account/-/-/sync']);
+  });
+
+  it('D119 — 저장소는 연결을 · 트리거는 저장소를 가리킨다', () => {
+    const ci = bundleById('ci-cd')!;
+    expect(ci.refs).toContainEqual(expect.objectContaining({ from: 'repo', to: 'conn', attr: 'parent_connection' }));
+    expect(ci.refs).toContainEqual(expect.objectContaining({ from: 'build', to: 'repo', attr: 'repository_event_config.repository' }));
+    expect(ci.evidence).toContain('D119');
   });
 
   it('D117 — 데드레터 구독은 데드레터 토픽을 가리킨다 · vm-app 과 website 의 App server 선택에는 internal 방화벽이 있다', () => {

@@ -177,9 +177,14 @@ export const BUNDLES: readonly Bundle[] = [
     id: 'ci-cd', label: 'CI/CD (Cloud Build)', tested: true,
     summary: 'A Cloud Build trigger that builds images into an Artifact Registry repository, running as its own service account.',
     parts: [P('ar'), P('build'), P('sa')],
-    options: [{ id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }],
-    refs: [{ from: 'build', to: 'sa', attr: 'service_account', evidence: `${TF}cloudbuild_trigger` }],
-    evidence: ['D117', `${DOCS}build/docs/build-push-docker-image`, `${DOCS}build/docs/securing-builds/configure-user-specified-service-accounts`],
+    // D119 — GitHub 연결(2세대): 연결 conn 과 그 안의 저장소 repo 를 트리거가 가리킨다. 선택이다 — webhook · 1세대 GitHub 트리거는 이름 있는 연결 없이 된다
+    options: [{ id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }, { id: 'github', label: 'GitHub connection', on: false, parts: [P('conn'), P('repo')] }],
+    refs: [
+      { from: 'build', to: 'sa', attr: 'service_account', evidence: `${TF}cloudbuild_trigger` },
+      { from: 'repo', to: 'conn', attr: 'parent_connection', evidence: `${TF}cloudbuildv2_repository` },
+      { from: 'build', to: 'repo', attr: 'repository_event_config.repository', evidence: `${TF}cloudbuild_trigger` },
+    ],
+    evidence: ['D117', 'D119', `${DOCS}build/docs/build-push-docker-image`, `${DOCS}build/docs/securing-builds/configure-user-specified-service-accounts`, `${DOCS}build/docs/automating-builds/github/connect-repo-github`],
   },
   {
     id: 'batch-job', label: 'Batch job', tested: true,

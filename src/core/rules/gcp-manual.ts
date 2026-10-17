@@ -40,6 +40,16 @@ const CB_CONNECTION_EVIDENCE: readonly RuleEvidence[] = [
     quote: "Resource name should match regex ^projects/((?:[^:]+:.)?[a-z0-9\\\\-]+)/locations/([\\w-]{2,40})/connections/([a-zA-Z0-9-._~%!$&'()*+,;=@]{1,200})$ (make sure connection_id is 200 chars or less) — for 201 and 300 characters; a, Abc, 1abc, -a, a-, a_b, a.b and 200 characters were created; a:b, 'a b' and a#b answered Malformed name" },
   { kind: 'api_error', source: 'GET https://cloudbuild.googleapis.com/v2/projects/<project>/locations/<location>/connections/<id>', date: '2026-10-16',
     quote: "Malformed name: … (gcloud: Resource path is longer than allowed) once the ID and the location name together pass 181 characters — 166 + asia-northeast3, 173 + us-east1, 169 + europe-west1, 158 + northamerica-northeast2 answer 404; one more character answers 400. A 200-character connection that create accepted could not be read or deleted" },
+  { kind: 'api_error', source: 'POST https://cloudbuild.googleapis.com/v2/projects/<project>/locations/asia-northeast3/connections/<connection>/repositories?repositoryId=<id>', date: '2026-10-17',
+    quote: "resource name 'projects/<number>/locations/asia-northeast3/connections/<connection>/repositories/<id>' length (201) exceeds the limit 200 — with a 25-character connection a 101-character ID passes the ID check (the next error is remote_uri must be specified) and 102 is refused, so connection + repository + location name may total 141 with a 12-digit project number; 201 characters answer the regex ([a-zA-Z0-9-._~%!$&'()*+,;=@]{1,200}); a, Abc, 1abc, -a, a-, a_b, a.b pass and a:b, 'a b', a#b answer Malformed name" },
+];
+const CB_REPOSITORIES_CREATE = 'https://docs.cloud.google.com/build/docs/api/reference/rest/v2/projects.locations.connections.repositories/create#body.QUERY_PARAMETERS.repository_id';
+/** Cloud Build 2세대 저장소 (D119) — 연결과 같은 만들기 한계를 나눠 쓴다 */
+const CB_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://cloudbuild.googleapis.com/v2/projects/<project>/locations/asia-northeast3/connections/<connection>/repositories?repositoryId=<id>', date: '2026-10-17',
+    quote: "resource name 'projects/<number>/locations/asia-northeast3/connections/<connection>/repositories/<id>' length (201) exceeds the limit 200 — with a 25-character connection a 101-character ID passes the ID check (the next error is remote_uri must be specified) and 102 is refused, so connection + repository + location name may total 141 with a 12-digit project number; 201 characters answer the regex ([a-zA-Z0-9-._~%!$&'()*+,;=@]{1,200}); a, Abc, 1abc, -a, a-, a_b, a.b pass and a:b, 'a b', a#b answer Malformed name" },
+  { kind: 'api_error', source: 'GET https://cloudbuild.googleapis.com/v2/projects/<project>/locations/<location>/connections/<connection>/repositories/<id>', date: '2026-10-16',
+    quote: 'Malformed name: … once repository + connection + location name pass 180 characters (164 with a 1-character connection in asia-northeast3, 155 with a 10-character one, 171 in us-east1) — wider than the create limit' },
 ];
 
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
@@ -82,7 +92,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -97,6 +107,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:cloud_sql_instance': { id: 'gcp:cloud_sql_instance', provider: 'gcp', displayName: 'Cloud SQL instance', parent: 'gcp:project', ruleId: 'gcp.cloud_sql_instance', docUrl: 'https://docs.cloud.google.com/sql/docs/mysql/admin-api/rest/v1/databases#Database.FIELDS.name' },
   // Router.nats[].name "Unique name of this Nat service. The name must be 1-63 characters long and comply with RFC1035." — NAT 는 라우터 안의 칸이다
   'gcp:router': { id: 'gcp:router', provider: 'gcp', displayName: 'Cloud Router', parent: 'gcp:project_region', ruleId: 'gcp.router', docUrl: ROUTERS_REST },
+  // repositories.create repositoryId "This ID should be unique in the connection." — 저장소는 연결 아래다 (D119)
+  'gcp:cloudbuild_connection': { id: 'gcp:cloudbuild_connection', provider: 'gcp', displayName: 'Cloud Build connection', parent: 'gcp:project_location', ruleId: 'gcp.cloudbuild_connection', docUrl: CB_REPOSITORIES_CREATE },
 };
 
 const RULES: ResourceRule[] = [
@@ -243,12 +255,18 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.cloudbuild_trigger', displayName: 'Cloud Build Trigger', slug: 'trigger', minLength: 1, maxLength: 64, pattern: /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$/,
     allowed: 'alnum-hyphen', caseRule: 'any', startsWithLetter: false, scope: 'gcp:project', entity: 'cloudbuild.triggers', category: 'management',
     docUrl: 'https://docs.cloud.google.com/build/docs/api/reference/rest/v1/projects.locations.triggers#BuildTrigger.FIELDS.name' }),
-  // Cloud Build 2세대 연결 (D118) — connections.create connectionId "Names must be unique per-project per-location. Allows alphanumeric characters and any of -._~%!$&'()*+,;=@."
-  // 길이 문장은 없다. 서버는 1-200 을 만들지만 ID + 지역 이름이 181 자를 넘으면 그 연결을 읽지도 지우지도 못한다(evidence) — 가장 긴 지역 이름 23 자를 빼 158 로 좁힌다.
+  // Cloud Build 2세대 연결 (D118 · D119) — connections.create connectionId "Names must be unique per-project per-location. Allows alphanumeric characters and any of -._~%!$&'()*+,;=@."
+  // 길이 문장은 없다(evidence). 서버는 1-200 을 만들지만 ID + 지역 이름이 181 자를 넘으면 읽지도 지우지도 못한다(D118 은 158).
+  // 저장소 만들기는 연결 + 저장소 + 지역 이름 ≤ 141 — 가장 긴 지역 이름 23 자를 빼면 118 자를 연결 · 저장소가 반씩(59) 쓴다 (D119).
   // 안내서 "Your connection cannot exist globally." — 지역 토큰을 둔다. 검사는 문서의 넓은 글자, 생성은 소문자 · 숫자 · 하이픈
-  rule({ id: 'gcp.cloudbuild_connection', displayName: 'Cloud Build Connection', slug: 'conn', minLength: 1, maxLength: 158, pattern: /^[A-Za-z0-9._~%!$&'()*+,;=@-]{1,158}$/,
+  rule({ id: 'gcp.cloudbuild_connection', displayName: 'Cloud Build Connection', slug: 'conn', minLength: 1, maxLength: 59, pattern: /^[A-Za-z0-9._~%!$&'()*+,;=@-]{1,59}$/,
     startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'cloudbuild.connections', category: 'management',
     docUrl: CB_CONNECTIONS_CREATE, evidence: CB_CONNECTION_EVIDENCE, notes: [OBSERVED, NARROWER] }),
+  // Cloud Build 2세대 저장소 (D119) — repositories.create repositoryId "This ID should be unique in the connection. Allows alphanumeric characters and any of -._~%!$&'()*+,;=@."
+  // 길이는 연결과 같은 만들기 한계를 반씩 나눈 59(evidence). 위치는 부모 연결의 것이다 — 지역 토큰이 없다(D77)
+  rule({ id: 'gcp.cloudbuild_repository', displayName: 'Cloud Build Repository', slug: 'repo', minLength: 1, maxLength: 59, pattern: /^[A-Za-z0-9._~%!$&'()*+,;=@-]{1,59}$/,
+    startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:cloudbuild_connection', entity: 'cloudbuild.connections.repositories', category: 'management',
+    docUrl: CB_REPOSITORIES_CREATE, evidence: CB_REPOSITORY_EVIDENCE, notes: [OBSERVED, NARROWER] }),
   // ManagedZone.name "User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter,
   // end with a letter or digit, and only contain lowercase letters, digits or dashes."
   rule({ id: 'gcp.dns_managed_zone', displayName: 'Cloud DNS Managed Zone', slug: 'dns', minLength: 1, maxLength: 63, pattern: RFC1035, template: UNPLACED, scope: 'gcp:project', entity: 'dns.managedZones', category: 'networking',

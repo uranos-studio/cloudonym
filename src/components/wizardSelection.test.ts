@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { addedRow, expandedAfterRemove, firstErrorRow, firstSelection, rowTitle, parentRow, selectAdded, parseRow, resolveSelection, rowErrorCount, rowExists, rowNames, selectionAfter, visibleRows } from './wizardSelection';
 import { addCustom, addPresetPick, addService, clearNetwork, DEFAULT_PROJECT, duplicatePick, EMPTY_PROJECT, initialPlan, removePick, removeService, renameService, setPickField, startPlan, togglePreset, SERVICE_PRESETS, PROJECT_PRESETS } from './wizardState';
-import { expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
+import { expandPlan, validatePlan, MAX_PICKS_PER_SERVICE, type WizardPlan } from '../core/wizard/plan';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { decodeWizardState, encodeWizardState, HASH_KEY } from './urlState';
 import { RULES_REVISION } from '../core/revision';
@@ -162,7 +162,8 @@ describe('줄 이름 rowNames — 항목 키 머리 접두 일치 (core 변경 �
   it('모든 프리셋 × 종류 · tier 변형 — 항목마다 정확히 한 pick 에 맞고 pick 마다 하나 이상', () => {
     // 서비스 칩 전부 · 네트워크 칩 전부(방화벽 tier 칩 · 서브넷 종류 셋) · 역할 둘 · 버킷 tier 둘 · custom 하나
     let p = startPlan(DEFAULT_PROJECT);
-    for (const pr of SERVICE_PRESETS) p = togglePreset(p, 0, pr.id);
+    // 칩이 pick 상한보다 많다(D119) — 상한을 넘는 칩은 둘째 서비스에 켠다
+    for (const pr of SERVICE_PRESETS.slice(0, MAX_PICKS_PER_SERVICE)) p = togglePreset(p, 0, pr.id);
     p = renameService(addService(p), 1, 'pay');
     p = togglePreset(p, 1, 'sa');
     p = addPresetPick(p, 1, 'sa');
@@ -182,6 +183,8 @@ describe('줄 이름 rowNames — 항목 키 머리 접두 일치 (core 변경 �
     p = setPickField(p, { service: null, pick: p.projectPicks.length - 1 }, 'kind', 'PRIVATE_SERVICE_CONNECT');
     p = setPickField(p, { service: null, pick: p.projectPicks.length - 1 }, 'tier', 'edge');
     p = addCustom(p, 0, { ruleId: 'gcp.compute_instance', input: 'count', count: 2, tier: 'batch' });
+    p = renameService(addService(p), 2, 'ci');
+    for (const pr of SERVICE_PRESETS.slice(MAX_PICKS_PER_SERVICE)) p = togglePreset(p, 2, pr.id);
     expect(PROJECT_PRESETS.every((pr) => p.projectPicks.some((x) => x.preset === pr.id))).toBe(true);
     expect(validatePlan(p)).toEqual({ ok: true });
     const r = result(p);

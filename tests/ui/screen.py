@@ -3070,7 +3070,7 @@ with sync_playwright() as p:
     no_hangul(page27)
     ctx27.close()
 
-    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 116(Cloud Run · D72 · D80 · 프로젝트 이름 D85 · Cloud Build 연결 D118 포함) · 리전 43 · 종류 토큰 19 · 환경 9 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 11) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
+    # ── ㉘ /docs/naming — 200 · 절 열둘 · 표 행 수(약어 117(Cloud Run · D72 · D80 · 프로젝트 이름 D85 · Cloud Build 연결 D118 · 저장소 D119 포함) · 리전 43 · 종류 토큰 19 · 환경 9 · 토큰 10 · 딸린 것 4 · 프리셋 묶음 27) · PASS 문장 · 휴대폰 폭 · 스크린샷 (D57) ──
     ctx28 = browser.new_context(viewport={'width': 360, 'height': 800})
     page28 = ctx28.new_page()
     page28.on('pageerror', lambda e: errors.append(str(e)))
@@ -3078,7 +3078,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 116, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 25}.items():
+    for table_id, rows in {'abbreviations': 117, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 27}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)

@@ -24,14 +24,17 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
     expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.empty']);
   });
   it('칩 데이터 — 서비스 칩은 level service(로드 밸런서 묶음 포함) · 프로젝트 칩은 network 묶음 (D73)', () => {
-    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb']);
+    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb']);
     expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
   });
-  it('첫 화면에 서비스 칩을 전부 켜도(로드 밸런서 열하나 포함 · pick 상한 안) 이름은 전부 유효하고 축소되는 이름이 없다 (D91)', () => {
-    const plan = SERVICE_PRESETS.reduce((p, x) => togglePreset(p, 0, x.id), startPlan(DEFAULT_PROJECT));
-    expect(plan.services[0]!.picks.length).toBe(SERVICE_PRESETS.length);
+  it('서비스 칩을 전부 켜도(로드 밸런서 열하나 포함) 이름은 전부 유효하고 축소되는 이름이 없다 — 칩이 pick 상한보다 많아(D119) 상한을 넘는 칩은 둘째 서비스에 켠다 (D91)', () => {
+    const first = SERVICE_PRESETS.slice(0, MAX_PICKS_PER_SERVICE);
+    const rest = SERVICE_PRESETS.slice(MAX_PICKS_PER_SERVICE);
+    const one = first.reduce((p, x) => togglePreset(p, 0, x.id), startPlan(DEFAULT_PROJECT));
+    const plan = rest.reduce((p, x) => togglePreset(p, 1, x.id), renameService(addService(one), 1, 'pay'));
+    expect(plan.services[0]!.picks.length).toBe(MAX_PICKS_PER_SERVICE);
+    expect(plan.services[1]!.picks.length).toBe(rest.length);
     expect(SERVICE_PRESETS.length).toBeGreaterThan(20);
-    expect(SERVICE_PRESETS.length).toBeLessThanOrEqual(MAX_PICKS_PER_SERVICE);
     expect(validatePlan(plan)).toEqual({ ok: true });
     const items = generateProject(expandPlan(plan), 'gcp').items;
     expect(items.filter((i) => !i.valid).map((i) => i.key)).toEqual([]);

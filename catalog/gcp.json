@@ -4358,7 +4358,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "A Cloud Build connection to a source host such as GitHub (2nd gen repositories); letters, digits and -._~%!$&'()*+,;=@, at most 158 characters, unique per location and project. Cloudonym generates lowercase letters, digits and hyphens.",
+      "info": "A Cloud Build connection to a source host such as GitHub (2nd gen repositories); letters, digits and -._~%!$&'()*+,;=@, at most 59 characters, unique per location and project. Cloudonym generates lowercase letters, digits and hyphens.",
       "enterNameAt": {
         "gcloud": [
           "gcloud builds connections create github"
@@ -4373,6 +4373,40 @@
       "aliases": [
         "google_cloudbuildv2_connection",
         "builds connections"
+      ]
+    },
+    {
+      "key": "gcp.cloudbuild_repository",
+      "displayName": "Cloud Build Repository",
+      "category": "management",
+      "rules": {
+        "gcp.cloudbuild_repository": {
+          "scope": "in cloudbuild_connection",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "repo",
+        "basis": "Short form of the dominant word (repository, 10 letters, is past principle 2); ar already names the Artifact Registry repository, so repo reads as the source repository linked to a connection; github would name one host of several; principles 1, 2, 3; GitHub code search API 2026-10-16 (\"google_cloudbuildv2_repository\" extension:tf, 478 files, 305 declarations, tokens of the name value): repository 129 / repo 97 / github 51 / gh 1 / cbr 0; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-17)",
+        "previous": []
+      },
+      "entity": null,
+      "kind": null,
+      "info": "A source repository linked to a Cloud Build connection (2nd gen); letters, digits and -._~%!$&'()*+,;=@, at most 59 characters, unique in the connection. Cloudonym generates lowercase letters, digits and hyphens.",
+      "enterNameAt": {
+        "gcloud": [
+          "gcloud builds repositories create"
+        ],
+        "terraform": [
+          "google_cloudbuildv2_repository.name"
+        ],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "google_cloudbuildv2_repository",
+        "builds repositories"
       ]
     },
     {

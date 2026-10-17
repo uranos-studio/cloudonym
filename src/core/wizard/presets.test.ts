@@ -19,10 +19,10 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('nope')).toBeUndefined();
   });
 
-  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 + D116 의 여섯 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
+  it('계획 §4-1 의 아홉 칩 + D73 의 열넷 + D88 의 psa + D91 의 넷 + D93 의 둘 + D114 의 아홉 + D116 의 여섯 + D119 의 둘 — 서버형 넷 · db · object · 서비스 열넷 · 로드 밸런서 열셋 · 네트워크 여섯', () => {
     expect(PRESETS.map((p) => p.id)).toEqual([
       'web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
-      'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'cron', 'runjob', 'redis',
+      'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis',
       'worker', 'raw', 'ingest', 'appdata',
       'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
     ]);
@@ -79,7 +79,7 @@ describe('프리셋 데이터 (D64)', () => {
 
   it('D73 의 새 칩 — 각각 켜면 이름 하나(PASS) · 서비스 계정은 기본 역할 sync', () => {
     const PROJECT = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' };
-    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ar', 'topic', 'sub', 'dlq', 'build', 'cron', 'runjob', 'redis', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'router', 'nat'];
+    const created = ['run', 'sa', 'secret', 'gke', 'wip', 'ar', 'topic', 'sub', 'dlq', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'router', 'nat'];
     const names: Record<string, string> = {};
     for (const id of created) {
       const p = presetOf(id)!;
@@ -97,7 +97,7 @@ describe('프리셋 데이터 (D64)', () => {
       run: 'billing-shop-prod-ane3-run-01', sa: 'billing-shop-prod-sa-sync', secret: 'billing-shop-prod-secret-01',
       gke: 'billing-shop-prod-ane3-gke-01', wip: 'billing-shop-prod-wip-01',
       ar: 'billing-shop-prod-ane3-ar-01', topic: 'billing-shop-prod-topic-01', sub: 'billing-shop-prod-sub-01', dlq: 'billing-shop-prod-topic-dlq-01',
-      build: 'billing-shop-prod-ane3-trigger-01', cron: 'billing-shop-prod-ane3-cron-01', runjob: 'billing-shop-prod-ane3-crj-01', redis: 'billing-shop-prod-ane3-redis-01',
+      build: 'billing-shop-prod-ane3-trigger-01', conn: 'billing-shop-prod-ane3-conn-01', repo: 'billing-shop-prod-repo-01', cron: 'billing-shop-prod-ane3-cron-01', runjob: 'billing-shop-prod-ane3-crj-01', redis: 'billing-shop-prod-ane3-redis-01',
       ip: 'billing-shop-prod-ip-01', bs: 'billing-shop-prod-bs-01', hc: 'billing-shop-prod-hc-01', url: 'billing-shop-prod-url-01',
       cert: 'billing-shop-prod-cert-01', thps: 'billing-shop-prod-thps-01', fwd: 'billing-shop-prod-fwd-01',
       ig: 'billing-shop-prod-ane3-ig-01', urlredir: 'billing-shop-prod-url-redir-01', thp: 'billing-shop-prod-thp-01', fwdredir: 'billing-shop-prod-fwd-redir-01',
@@ -117,6 +117,9 @@ describe('프리셋 데이터 (D64)', () => {
     expect(presetOf('dlq')).toMatchObject({ ruleId: presetOf('topic')!.ruleId, tier: 'dlq' });
     // D117 — 데드레터 구독은 구독 규칙에 tier dlq — sub 와 한 서비스에 두면 이름이 갈린다
     expect(presetOf('dlqsub')).toMatchObject({ ruleId: presetOf('sub')!.ruleId, tier: 'dlq', level: 'service' });
+    // D119 — Cloud Build 2세대 연결 · 저장소는 서비스 자리다(프로젝트 자리 범위에 위치 범위가 없다 — D63)
+    expect(presetOf('conn')).toMatchObject({ ruleId: 'gcp.cloudbuild_connection', tier: null, level: 'service' });
+    expect(presetOf('repo')).toMatchObject({ ruleId: 'gcp.cloudbuild_repository', tier: null, level: 'service' });
   });
 
   it('D116 — 같은 종류를 다른 일에 쓰는 둘째 프리셋: 같은 규칙 · tier 하나 · 기본 프리셋과 한 서비스에 함께 두면 이름 · 중복 키가 다르다', () => {
