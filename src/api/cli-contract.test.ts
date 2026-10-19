@@ -2,6 +2,7 @@
 // 방향은 src 시험 → cli 뿐이다 — cli/ 는 src/ 를 들여오지 않는다(cli/boundary.test.mjs)
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { Readable } from 'node:stream';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { app } from './index';
@@ -16,6 +17,7 @@ import { toWizardExport } from '../components/wizardExport';
 import { expandPlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { toModelPick } from '../plan/wire';
+import { catalogPresets } from './catalog';
 
 const SERVER = 'http://cli.test';
 
@@ -333,5 +335,77 @@ describe('cloudonym add — 「같은 pick」을 서버의 duplicate 판정과 �
     expect(r.code, r.err).toBe(EXIT.OK);
     expect(r.err).toMatch(/--ha is ignored/);
     expect(readPlanFile().services[0].picks[0].ha).toBeUndefined();
+  });
+});
+
+describe('묻고 답하는 흐름 — 진짜 엔진의 답 (D121 · 설계 §7 · §8 ④ ⑥)', () => {
+  /** 터미널인 척 — 답은 스트림으로, 물음 · 표는 한 줄기로 */
+  async function term(argv: string[], answers: string[], cwd: string) {
+    let screen = '';
+    const err: string[] = [];
+    const code = await main(argv, {
+      fetchFn: viaApp(), cwd, env: { CLOUDONYM_SERVER: SERVER }, configPath: null, now: () => new Date('2026-10-20T00:00:00+09:00'), sleep: async () => {},
+      tty: { stdin: true, stdout: true }, stdin: Readable.from(answers.map((a) => `${a}\n`)), write: (x) => { screen += x; }, stdout: (x) => { screen += `${x}\n`; }, stderr: (x) => { err.push(x); },
+    });
+    return { code, screen, err: err.join('\n') };
+  }
+  /** 메뉴 번호 — 프로젝트 공용 프리셋 먼저, 그다음 서비스 프리셋(catalog 순서) */
+  const menuNumber = (id: string) => {
+    const all = catalogPresets('gcp') as { id: string; level: string }[];
+    const ordered = [...all.filter((p) => p.level === 'project'), ...all.filter((p) => p.level !== 'project')];
+    return ordered.findIndex((p) => p.id === id) + 1;
+  };
+  const ANSWERS = () => [
+    'demo', 'payment', '1', 'seoul', '1', ['vpc', 'subnet', 'web', 'db'].map(menuNumber).join(','),
+    '', // VPC network — how many? [1]
+    '', '', // Subnet — how many? [1] · kind [PRIVATE]
+    'shop', '2', 'y', 'y', '0', 'n', 'n', // Web server — 서비스 이름 · 2대 · HA · boot · data 0 · ip · ipi
+    '', 'POSTGRES', // Database — how many? [1] · kind
+    'n', // Add more?
+  ];
+
+  it('④ 답으로 만든 계획 파일이 init · add(--pick 포함) 명령으로 만든 파일과 바이트까지 같다', async () => {
+    const a = mkdtempSync(join(tmpdir(), 'cloudonym-cli-before-'));
+    try {
+      const steps = [
+        ['init', '--owner', 'demo', '--system', 'payment', '--env', 'prod', '--region', 'asia-northeast3'],
+        ['add', 'vpc', '--project'], ['add', 'subnet', '--project'],
+        ['add', '--service', 'shop', '--pick', '{"preset":"web","ha":true,"instances":[{"id":"1","seq":"01","attach":{"boot":true}},{"id":"2","seq":"02","attach":{"boot":true}}]}'],
+        ['add', 'db', '--service', 'shop', '--kind', 'POSTGRES'],
+      ];
+      for (const argv of steps) {
+        const code = await main(argv, { fetchFn: viaApp(), cwd: a, env: { CLOUDONYM_SERVER: SERVER }, configPath: null, stdout: () => {}, stderr: () => {}, sleep: async () => {}, now: () => new Date('2026-10-20T00:00:00+09:00') });
+        expect(code, argv.join(' ')).toBe(EXIT.OK);
+      }
+      const r = await term([], ANSWERS(), dir);
+      expect(r.code, `${r.err}\n${r.screen}`).toBe(EXIT.OK);
+      expect(readFileSync(file, 'utf-8')).toBe(readFileSync(join(a, 'cloudonym.plan.json'), 'utf-8'));
+    } finally {
+      rmSync(a, { recursive: true, force: true });
+    }
+  });
+
+  it('⑥ 표 — What · Name · Check, 키 없이 · 딸린 것은 들여 쓴다 · 요약과 다음 할 일 (규칙 버전이 바뀌면 이름이 바뀔 수 있다)', async () => {
+    const r = await term([], ANSWERS(), dir);
+    expect(r.code, r.err).toBe(EXIT.OK);
+    expect(r.screen).toContain(`Cloudonym — names for a Google Cloud project. Rules ${VERSION.rules}.\n`);
+    expect(r.screen).toContain('Environments, comma-separated [1 prod · 2 stg · 3 dev · 4 sbx · 5 qa · 6 uat · 7 test · 8 perf · 9 dr]: 1\n');
+    expect(r.screen).toContain('   1 asia-northeast3 — Seoul, South Korea, APAC\nPick [1]: 1\n');
+    expect(r.screen.slice(r.screen.indexOf('What  ')).trimEnd().split('\n')).toEqual([
+      'What                            Name                                    Check',
+      'Project ID                      demo-payment-prod                       PASS',
+      'VPC network 01                  payment-prod-vpc-01                     PASS',
+      'Subnet 01                       payment-prod-ane3-snet-01               PASS',
+      'Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS',
+      '  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS',
+      'Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS',
+      '  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS',
+      'Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS',
+      '',
+      '8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json',
+      'Add more: cloudonym add · Check before applying: cloudonym validate · Machines: cloudonym names --json',
+    ]);
+    // 보관 파일은 names 가 쓰는 것과 같은 꼴 — validate 가 그대로 통과한다
+    expect((await run(['validate'])).code).toBe(EXIT.OK);
   });
 });

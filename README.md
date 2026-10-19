@@ -285,9 +285,27 @@ Items come in order: the project ID, the project-level items, then each service,
 
 ## Command-line tool (CLI)
 
-The repository has a small command-line tool, `cli/cloudonym.mjs` (Node 22, no dependencies). It is not published to npm; run it from a clone with `node cli/cloudonym.mjs …`, `npm run cli -- …` or, after `npm link`, `cloudonym …`. It holds no naming rules: it edits a plan file (the [Plan file](#plan-file--save-plan-and-open-plan) the wizard saves) and asks the API for every name and verdict, so the web, the API and the CLI give the same names for the same rules revision. What it needs to know about presets, rules, numbered resources and limits comes from `/catalog.json`.
+The repository has a small command-line tool, `cli/cloudonym.mjs` (Node 22, no dependencies). `cli/package.json` makes it a package of its own, but it is not published to npm yet; run it from a clone with `node cli/cloudonym.mjs …`, `npm run cli -- …` or, after `npm link`, `cloudonym …`. It holds no naming rules: it edits a plan file (the [Plan file](#plan-file--save-plan-and-open-plan) the wizard saves) and asks the API for every name and verdict, so the web, the API and the CLI give the same names for the same rules revision. What it needs to know about presets, rules, numbered resources and limits comes from `/catalog.json`.
 
 It calls the public deployment unless you say otherwise — there is nothing to set. To call another deployment (your own Worker, or `wrangler dev` at `http://127.0.0.1:8787`), pass `--server <origin>`, set `CLOUDONYM_SERVER`, or write `{ "server": "https://…" }` to `~/.config/cloudonym/config.json` (`$XDG_CONFIG_HOME/cloudonym/config.json` when that is set, `%APPDATA%\cloudonym\config.json` on Windows); the first one given wins, in that order. A config file that is not a JSON object is ignored with a warning; a `server` that is not a usable URL stops the command (exit 64) rather than falling back to the public deployment. `cloudonym --version` prints its version on stdout and the server it would call, with where that came from, on stderr.
+
+**On a terminal, run `cloudonym` with no command** (or `cloudonym new`). It asks who runs the system, its name, the environments, the region and what you are building, then the details each part takes (how many, high availability, kind, disks and addresses). Every choice is a numbered list from `/catalog.json`, so you need no preset ids. It saves `cloudonym.plan.json` and `cloudonym.plan.names.json` and prints the names; a wrong answer is asked again with the server's reason. Once the plan file is there, `cloudonym` shows its names and `cloudonym add` with no arguments asks what to add, then checks and saves it the way `add` does. On a terminal names are a table (`--keys` adds each key):
+
+```text
+What                            Name                                    Check
+Project ID                      demo-payment-prod                       PASS
+VPC network 01                  payment-prod-vpc-01                     PASS
+Subnet 01                       payment-prod-ane3-snet-01               PASS
+Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS
+Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS
+Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS
+
+8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json
+```
+
+Piped, in CI or with `--json` it never asks: the commands below work as they always did, and the output keeps its `name  key` lines.
 
 ```sh
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # or: init --owner … --system … --env prod --region asia-northeast3
@@ -296,6 +314,7 @@ node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
 node cli/cloudonym.mjs validate                       # exit 0 when every name is valid and matches the names file
 ```
 
+- **`init --from`** takes a file saved with Save plan; share links are not read yet — open the link, press Save plan, then `cloudonym new --from <file>` (the same as `init --from`).
 - **`add`** appends a pick to a service (`--service <purpose>`) or the project (`--project`); the first argument is a preset (`db`), a rule id (`gcp.cloud_sql_instance`) or a resource name (`cloud_sql_instance`). If the same pick is already there and the resource is numbered, it appends servers with the next free number instead (`01 03` → `04`). It sends the plan before and after, **in every environment of the plan** (`--env` only narrows what it prints), and **writes the file only if every existing name and verdict stays the same** and every new name passes; otherwise it prints what would change and exits 1 with the file untouched. It prints only the new names. A pick counts as the same when the rule, the kind token, the tier and the role match — the server's rule; a different `--location` alone is refused (exit 2), and `--ha` is ignored when servers are added to an existing pick. `--pick '<json>'` adds one pick in the request form; `--dry-run` checks without writing.
 - **`names`** prints `name  key` per line (`--json` for machines: per environment, the same name fields as the wizard's JSON export), `--new` only keys not in the names file. With `environments` in the plan, it sends one request per environment. `--no-write` writes neither the plan nor the names file (with `--repin` the plan keeps its `rules_version`).
 - **Saving** — every write holds `<plan>.lock` next to the file (an exclusive create) from the last check that the file is unchanged to the replace, then removes it. While it exists another command does not write and exits 2, so two commands that read the same file cannot overwrite each other's change. A lock left by a command that was killed is not removed automatically: if no cloudonym command is running, delete it. If the file is saved but its lock cannot be removed, the command says the file is written, names the lock to delete and exits 2.
@@ -511,9 +530,27 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 
 ### 명령줄 도구 (CLI)
 
-저장소에 작은 명령줄 도구 `cli/cloudonym.mjs` 가 있다(Node 22 · 의존성 없음). npm 에 내지 않는다 — clone 한 저장소에서 `node cli/cloudonym.mjs …` · `npm run cli -- …` · `npm link` 뒤 `cloudonym …` 로 돈다. 이름 규칙을 들고 있지 않다 — 계획 파일(마법사의 Save plan 이 내려주는 파일)을 고치고 이름과 판정은 전부 API 에 묻는다. 그래서 같은 규칙 버전이면 웹 · API · CLI 가 같은 이름을 낸다. 프리셋 · 규칙 · 번호 붙는 리소스 · 상한은 `/catalog.json` 에서 읽는다.
+저장소에 작은 명령줄 도구 `cli/cloudonym.mjs` 가 있다(Node 22 · 의존성 없음). `cli/package.json` 이 따로 있어 npm 꾸러미 꼴은 갖췄지만 아직 npm 에 내지 않았다 — clone 한 저장소에서 `node cli/cloudonym.mjs …` · `npm run cli -- …` · `npm link` 뒤 `cloudonym …` 로 돈다. 이름 규칙을 들고 있지 않다 — 계획 파일(마법사의 Save plan 이 내려주는 파일)을 고치고 이름과 판정은 전부 API 에 묻는다. 그래서 같은 규칙 버전이면 웹 · API · CLI 가 같은 이름을 낸다. 프리셋 · 규칙 · 번호 붙는 리소스 · 상한은 `/catalog.json` 에서 읽는다.
 
 따로 정하지 않으면 공개 배포를 부른다 — 설정할 것이 없다. 다른 배포(직접 띄운 Worker, `http://127.0.0.1:8787` 의 `wrangler dev`)를 부르려면 `--server <origin>` · 환경변수 `CLOUDONYM_SERVER` · 설정 파일 `~/.config/cloudonym/config.json`(`$XDG_CONFIG_HOME` 이 있으면 `$XDG_CONFIG_HOME/cloudonym/config.json`, 윈도우는 `%APPDATA%\cloudonym\config.json`)의 `{ "server": "https://…" }` 가운데 하나를 쓴다. 여럿이면 이 순서로 앞의 것이 이긴다. JSON 객체가 아닌 설정 파일은 경고 한 줄을 내고 건너뛰고, 쓸 수 없는 URL 의 `server` 는 공개 배포로 넘어가지 않고 명령을 멈춘다(exit 64). `cloudonym --version` 은 stdout 에 버전, stderr 에 부를 서버 URL 과 그 출처를 찍는다.
+
+**터미널에서는 명령 없이 `cloudonym`**(또는 `cloudonym new`)만 치면 된다. 누가 운영하는지 · 시스템 이름 · 환경 · 리전 · 무엇을 만드는지를 묻고, 부품마다 받는 세부(개수 · 고가용성 · 종류 · 디스크와 주소)를 묻는다. 선택지는 전부 `/catalog.json` 에서 온 번호 목록이라 프리셋 id 를 몰라도 된다. 답하면 `cloudonym.plan.json` · `cloudonym.plan.names.json` 을 쓰고 이름을 보인다. 틀린 답은 서버가 준 이유와 함께 그 질문만 다시 묻는다. 계획 파일이 생긴 뒤에는 `cloudonym` 이 이름을 보이고, 인자 없는 `cloudonym add` 가 더할 것을 물어 `add` 와 같은 방식으로 확인하고 저장한다. 터미널에서 이름은 표다(`--keys` 는 키 칸을 더한다):
+
+```text
+What                            Name                                    Check
+Project ID                      demo-payment-prod                       PASS
+VPC network 01                  payment-prod-vpc-01                     PASS
+Subnet 01                       payment-prod-ane3-snet-01               PASS
+Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS
+Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS
+Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS
+
+8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json
+```
+
+파이프 · CI · `--json` 에서는 묻지 않는다 — 아래 명령은 전과 같고, 출력도 `이름  키` 줄 그대로다.
 
 ```sh
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # 또는 init --owner … --system … --env prod --region asia-northeast3
@@ -522,6 +559,7 @@ node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
 node cli/cloudonym.mjs validate                       # 이름이 전부 유효하고 보관 파일과 같으면 0
 ```
 
+- **`init --from`** 은 Save plan 으로 받은 파일을 읽는다. 공유 링크는 아직 읽지 않는다 — 링크를 브라우저에서 열어 Save plan 을 누른 뒤 `cloudonym new --from <파일>`(`init --from` 과 같다)
 - **`add`** 는 서비스(`--service <purpose>`)나 프로젝트(`--project`)에 pick 하나를 덧붙인다. 첫 인자는 프리셋(`db`) · 규칙 id(`gcp.cloud_sql_instance`) · 리소스 이름(`cloud_sql_instance`). 같은 pick 이 이미 있고 번호 붙는 리소스면 그 pick 에 다음 빈 번호로 서버를 더한다(`01 03` → `04`). 고치기 전과 뒤를 **계획의 모든 환경에서** 보내(`--env` 는 출력만 거른다) **기존 이름 · 판정이 하나도 바뀌지 않고** 새 이름이 모두 PASS 일 때만 파일을 쓴다. 아니면 바뀔 것을 보이고 파일을 그대로 둔 채 exit 1. 출력은 새 이름뿐이다. 같은 pick 은 규칙 · 종류 토큰 · tier · role 이 같은 것이다(서버의 판정). 위치만 다른 `--location` 은 거부하고(exit 2), 기존 pick 에 서버를 더할 때 `--ha` 는 쓰지 않는다. `--pick '<json>'` 은 요청 꼴 pick 하나, `--dry-run` 은 쓰지 않고 확인만
 - **`names`** 는 한 줄에 `이름  키`(`--json` 은 환경마다 마법사 JSON 내보내기와 같은 칸), `--new` 는 보관 파일에 없는 키만. 계획에 `environments` 가 있으면 환경마다 한 번씩 보낸다. `--no-write` 는 계획 파일도 보관 파일도 쓰지 않는다(`--repin` 과 함께 주면 계획의 `rules_version` 도 그대로)
 - **저장** — 쓸 때마다 파일 옆 `<계획>.lock` 을 배타적으로 만들어, 파일이 그대로인지 마지막으로 확인하는 때부터 바꿔 넣을 때까지 쥐고 끝나면 지운다. 잠금이 있으면 다른 명령은 쓰지 않고 exit 2 — 같은 파일을 읽은 두 명령이 서로의 변경을 덮지 않는다. 강제로 끝난 명령이 남긴 잠금은 저절로 지우지 않는다 — 도는 cloudonym 명령이 없으면 지운다. 저장은 됐는데 잠금을 못 지우면 저장됐다는 것과 지울 잠금 경로를 알리고 exit 2

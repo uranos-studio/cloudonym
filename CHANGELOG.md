@@ -6,11 +6,14 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Added
 
+- **The CLI asks on a terminal** (D121) — `cloudonym` with no command (or `cloudonym new`) asks who runs the system, its name, the environments, the region and what to build, every choice a numbered list from `/catalog.json`; it saves the plan and names files and prints a What · Name · Check table. With a plan file, `cloudonym` shows the names and `cloudonym add` with no arguments asks what to add. A wrong answer is asked again with the server's reason. Piped, in CI or with `--json` nothing is asked and the output is unchanged; `--keys` adds the key column to the table.
+- **`cli/package.json`** (D121) — the CLI is a package of its own (`cloudonym`, Node 22 or later, no dependencies), ready for npm but not published.
 - **`env_values` in `/catalog.json`** (D121) — the standard environment values (`prod`, `stg`, `dev`, `sbx`, `qa`, `uat`, `test`, `perf`, `dr`) at the top level, in the engine's order, so a client can offer them without its own copy. No name or verdict changes; the rules revision is unchanged.
 
 ### Changed
 
 - **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
+- **`--from` with a share link** says what to do instead: open the link, press Save plan, then `cloudonym new --from <file>`.
 
 ### Security
 

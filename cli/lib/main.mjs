@@ -10,6 +10,8 @@ import { serverOf, configPathOf } from './server.mjs';
 import {
   PlanError, readPlan, writeJson, environmentsOf, bodyFor, appendSlots, namesPathFor, readNamesFile, kstTime, isRecord, nextSeq, nextSlotId, planLists,
 } from './plan.mjs';
+import { nameTable } from './table.mjs';
+import { guideNew, guideAdd } from './guide.mjs';
 
 export { nextSeq, nextSlotId, USER_AGENT, CLI_VERSION };
 
@@ -25,20 +27,27 @@ export const EXIT = { OK: 0, FAIL: 1, INPUT: 2, VERSION: 3, UNAVAILABLE: 4, USAG
 /** @typedef {import('./plan.mjs').PlanFile} PlanFile */
 /** @typedef {import('./plan.mjs').Pick} Pick */
 /**
- * configPath: 설정 파일 자리(null 이면 읽지 않는다) — 주지 않으면 env 의 XDG_CONFIG_HOME · HOME · APPDATA 로 찾는다(server.mjs configPathOf)
- * @typedef {{ fetchFn: FetchFn, env: Record<string, string | undefined>, stdout: (s: string) => void, stderr: (s: string) => void, cwd: string, sleep: (ms: number) => Promise<void>, now: () => Date, configPath: string | null }} Deps
+ * configPath: 설정 파일 자리(null 이면 읽지 않는다) — 주지 않으면 env 의 XDG_CONFIG_HOME · HOME · APPDATA 로 찾는다(server.mjs configPathOf).
+ * tty: stdin · stdout 이 터미널인가 — 기본은 둘 다 아니다(묻지 않고 표 대신 줄). 진입점(cloudonym.mjs)만 실제 값을 넘긴다.
+ * stdin · write: 묻는 흐름의 입력과 줄바꿈 없는 출력(물음). 시험은 스트림을 넣어 터미널 없이 흐름을 돌린다
+ * @typedef {{ fetchFn: FetchFn, env: Record<string, string | undefined>, stdout: (s: string) => void, stderr: (s: string) => void, cwd: string, sleep: (ms: number) => Promise<void>, now: () => Date, configPath: string | null, tty: { stdin: boolean, stdout: boolean }, stdin: NodeJS.ReadableStream, write: (s: string) => void }} Deps
  */
 
-const DEFAULT_FILE = 'cloudonym.plan.json';
+export const DEFAULT_FILE = 'cloudonym.plan.json';
 
-const USAGE = `Usage: cloudonym <command> [options]
+const USAGE = `Usage: cloudonym [command] [options]
+
+On a terminal, cloudonym with no command asks what you are building, then saves the plan and its names
+(if ${DEFAULT_FILE} is already there, it shows the names). Scripts and agents use the commands below.
 
 Commands
+  new       [--force]                                                   asks the questions (terminal only), saves the plan and names files
   init      --owner O --system S --env E[,E2…] --region R [--suffix X]   new plan file (rules_version from the server)
-  init      --from <plan.json>                                          copy a plan saved from the web (Save plan)
+  init      --from <plan.json>                                          copy a plan saved from the web (Save plan); also new --from
   add       <preset | rule id | resource> (--service <purpose> | --project)
             [--count N] [--kind K] [--tier T] [--role R] [--ha] [--serverless <rule>] [--location L] [--pick '<json>'] [--dry-run]
             appends a pick (or numbered servers to the same pick); writes the file only if every existing name and verdict stays the same
+  add       (no arguments, on a terminal)                               asks what to add, then checks and writes the same way
   names     [--new] [--repin] [--no-write]                              names for every environment of the plan
   validate                                                              0 when every name is valid and matches the names file
 
@@ -47,7 +56,8 @@ Options
   --server <origin>    the Cloudonym deployment to call; else CLOUDONYM_SERVER, else "server" in the config file
                        (~/.config/cloudonym/config.json), else the public deployment. --version shows which
   --env <e>            one environment of the plan only
-  --json               machine output
+  --json               machine output (never asks)
+  --keys               on a terminal, show each name's key in the table
   --wait               on 429, wait Retry-After (at most ${MAX_WAIT_SECONDS} s) and retry; once per command
   --timeout <ms>       per request (default 15000, at most ${MAX_TIMEOUT_MS})
   --no-write           names: write neither the plan nor the names file (with --repin, rules_version is not updated)
@@ -64,11 +74,11 @@ const OPTIONS = /** @type {const} */ ({
   owner: { type: 'string' }, system: { type: 'string' }, region: { type: 'string' }, suffix: { type: 'string' }, from: { type: 'string' }, force: { type: 'boolean' },
   service: { type: 'string' }, project: { type: 'boolean' }, count: { type: 'string' }, kind: { type: 'string' }, tier: { type: 'string' }, role: { type: 'string' },
   ha: { type: 'boolean' }, serverless: { type: 'string' }, location: { type: 'string' }, pick: { type: 'string' }, 'dry-run': { type: 'boolean' },
-  new: { type: 'boolean' }, repin: { type: 'boolean' }, 'no-write': { type: 'boolean' },
+  new: { type: 'boolean' }, repin: { type: 'boolean' }, 'no-write': { type: 'boolean' }, keys: { type: 'boolean' },
 });
 
 /** 사용법 오류 — 종료 코드 64 */
-class UsageError extends Error {}
+export class UsageError extends Error {}
 
 /**
  * @param {string[]} argv
@@ -86,6 +96,9 @@ export async function main(argv, given = {}) {
     sleep: given.sleep ?? ((ms) => new Promise((r) => { setTimeout(r, ms); })),
     now: given.now ?? (() => new Date()),
     configPath: given.configPath === undefined ? configPathOf(given.env ?? process.env) : given.configPath,
+    tty: given.tty ?? { stdin: false, stdout: false },
+    stdin: given.stdin ?? process.stdin,
+    write: given.write ?? ((s) => { process.stdout.write(s); }),
   };
   try {
     let parsed;
@@ -104,9 +117,17 @@ export async function main(argv, given = {}) {
       return EXIT.OK;
     }
     const [cmd, ...rest] = positionals;
-    if (v.help || cmd === undefined || cmd === 'help') { d.stdout(USAGE); return cmd === undefined && !v.help ? EXIT.USAGE : EXIT.OK; }
     const ctx = new Ctx(d, v);
+    // 터미널에서 명령 없이 — 계획이 없으면 묻고, 있으면 이름 표를 보인다. 파이프 · CI 에서는 지금처럼 사용법과 64 (D121)
+    if (cmd === undefined && !v.help && ctx.canAsk()) {
+      if (!existsSync(ctx.file)) return await guideNew(ctx);
+      const code = await names(ctx, []);
+      if (code === EXIT.OK || code === EXIT.FAIL) d.stdout(`\nAdd more: ${ctx.command('add')} · Check before applying: ${ctx.command('validate')}`);
+      return code;
+    }
+    if (v.help || cmd === undefined || cmd === 'help') { d.stdout(USAGE); return cmd === undefined && !v.help ? EXIT.USAGE : EXIT.OK; }
     switch (cmd) {
+      case 'new': return await newPlan(ctx, rest);
       case 'init': return await init(ctx, rest);
       case 'add': return await add(ctx, rest);
       case 'names': return await names(ctx, rest);
@@ -124,7 +145,7 @@ export async function main(argv, given = {}) {
 
 /** @typedef {ReturnType<typeof parseArgs<{ options: typeof OPTIONS, allowPositionals: true, strict: true }>>['values']} Values */
 
-class Ctx {
+export class Ctx {
   /** @param {Deps} d @param {Values} v */
   constructor(d, v) {
     this.d = d;
@@ -132,6 +153,25 @@ class Ctx {
     this.file = resolve(d.cwd, v.file ?? DEFAULT_FILE);
     /** 문장에 쓰는 이름 — 받은 그대로(절대 경로로 바꾸지 않는다) */
     this.shown = v.file ?? DEFAULT_FILE;
+    /** /catalog.json 의 providers.<provider> — 표의 What 칸을 찾을 때. 읽지 않았으면 undefined @type {any} */
+    this.cat = undefined;
+    /** @type {string | undefined} */
+    this.server = undefined;
+  }
+
+  /** 물어도 되는가 — stdin · stdout 이 둘 다 터미널이고 --json 이 아닐 때만 (설계 §5 원칙 ②) */
+  canAsk() {
+    return this.d.tty.stdin && this.d.tty.stdout && !this.v.json;
+  }
+
+  /** 사람 표로 보이는가 — stdout 이 터미널이고 --json 이 아닐 때. 파이프로 받는 출력은 지금 꼴 그대로 (설계 §6) */
+  table() {
+    return this.d.tty.stdout && !this.v.json;
+  }
+
+  /** 다음 할 일에 적는 명령 — -f 를 받았으면 그것도 @param {string} cmd */
+  command(cmd) {
+    return `cloudonym ${cmd}${this.v.file === undefined ? '' : ` -f ${this.v.file}`}`;
   }
 
   /** 서버 클라이언트 — 고른 서버를 쓸 수 없으면 사용법 오류(64). 설정 파일을 건너뛰었으면 그 까닭을 stderr 에 */
@@ -181,7 +221,7 @@ class Ctx {
 // ── 응답 → 이름 목록 (웹 JSON 내보내기 wizardExport.ts 의 names · invalid 와 같은 칸) ──
 
 /** @param {any} it */
-function exportName(it) {
+export function exportName(it) {
   /** @type {Record<string, unknown>} */
   const out = { key: it.key, namespace: it.namespace ?? '', resource_type: it.resource_type };
   for (const k of ['level', 'tier', 'seq', 'role', 'kind', 'parent', 'attach']) if (it[k] !== undefined) out[k] = it[k];
@@ -195,7 +235,7 @@ function exportName(it) {
  * @param {any} body @param {string} provider
  * @returns {{ valid: boolean, items: any[] } | undefined}
  */
-function wizardData(body, provider) {
+export function wizardData(body, provider) {
   const data = isRecord(body?.data) ? body.data[provider] : undefined;
   if (!isRecord(data) || !Array.isArray(data.items) || data.items.length === 0) return undefined;
   const items = /** @type {unknown[]} */ (data.items);
@@ -207,13 +247,13 @@ function wizardData(body, provider) {
  * 2xx 인데 data.<provider>.items 꼴이 아니면 malformed 로 바꾼다 — 보고(report)가 exit 4 와 「해석할 수 없다」를 낸다
  * @param {ApiResult} r @param {string} provider @returns {ApiResult}
  */
-function checkWizard(r, provider) {
+export function checkWizard(r, provider) {
   if (r.kind !== 'ok' || wizardData(r.body, provider)) return r;
   return { kind: 'malformed', status: r.status, message: `no data.${provider}.items list of names in the body` };
 }
 
 /** 200 본문 하나 → { valid, names, invalid } — checkWizard 를 거친 본문만 @param {any} body @param {string} provider */
-function exportEnv(body, provider) {
+export function exportEnv(body, provider) {
   const data = wizardData(body, provider);
   const items = data?.items ?? [];
   return {
@@ -239,7 +279,7 @@ function itemsByKey(body, provider) {
 }
 
 /** 종료 코드는 가장 큰 값 — 환경 하나가 실패해도 나머지를 다 보낸다 @param {number[]} codes */
-const worst = (codes) => codes.reduce((a, b) => Math.max(a, b), EXIT.OK);
+export const worst = (codes) => codes.reduce((a, b) => Math.max(a, b), EXIT.OK);
 
 /** 환경마다 POST /v1/wizard @param {ReturnType<Ctx['client']>} client @param {PlanFile} plan @param {string[]} envs */
 async function sendAll(client, plan, envs) {
@@ -247,6 +287,20 @@ async function sendAll(client, plan, envs) {
   const out = [];
   for (const env of envs) out.push({ env, r: checkWizard(await client.post('/v1/wizard', bodyFor(plan, env)), plan.provider) });
   return out;
+}
+
+// ── new ──
+
+/**
+ * new — 터미널에서 묻는 흐름(guide.mjs). --from 이나 init 의 플래그를 받으면 init 과 같다. 터미널이 아니면 init 을 쓰라고 알리고 64
+ * @param {Ctx} ctx @param {string[]} rest
+ */
+async function newPlan(ctx, rest) {
+  const { v } = ctx;
+  if (rest.length > 0) throw new UsageError(`new takes no positional arguments: ${rest.join(' ')}`);
+  if (v.from !== undefined || ['owner', 'system', 'env', 'region'].some((k) => v[/** @type {'owner'} */ (k)] !== undefined)) return init(ctx, rest);
+  if (!ctx.canAsk()) throw new UsageError('new asks questions, so it needs a terminal (and no --json). In scripts use: cloudonym init --owner O --system S --env E --region R, then cloudonym add.');
+  return guideNew(ctx);
 }
 
 // ── init ──
@@ -260,7 +314,7 @@ async function init(ctx, rest) {
   const expect = v.force ? undefined : null;
   if (v.from !== undefined) {
     if (/^[a-z][a-z0-9+.-]*:\/\//i.test(v.from) || v.from.includes('#')) {
-      throw new UsageError('init --from takes a plan file. Share links are not read yet: open the link in the browser, press Save plan and pass that file.');
+      throw new UsageError('--from takes a plan file, not a share link (links are not read yet). Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>');
     }
     const { plan } = readPlan(resolve(d.cwd, v.from));
     const envs = environmentsOf(plan);
@@ -308,6 +362,8 @@ async function names(ctx, rest) {
   const namesPath = namesPathFor(ctx.file);
   const { doc: stored, digest: storedDigest } = readNamesFile(namesPath, namesPathFor(ctx.shown));
   const client = ctx.client();
+  // 표의 What 칸은 /catalog.json 에서 찾는다 — 못 읽으면 resource_type 으로 보인다(이름 · 판정은 그대로)
+  if (ctx.table()) { const c = await client.get('/catalog.json'); ctx.cat = c.kind === 'ok' ? c.body?.providers?.[plan.provider] : undefined; }
   let results = await sendAll(client, plan, envs);
 
   // --repin — 409 의 current 로 rules_version 을 고쳐 다시 보낸다. 보관 파일과 키마다 대어 바뀐 이름을 보인다 (D27: 핀은 호출자가 쥔다)
@@ -325,13 +381,20 @@ async function names(ctx, rest) {
   // 보관 이름은 모든 환경이 닿지 않을 때만 보인다 — 429 · 5xx · 413 · 해석할 수 없는 응답이면 보이지 않는다
   if (results.every(({ r }) => r.kind === 'unreachable') && stored) {
     d.stderr(`Showing the stored names from ${namesPathFor(ctx.shown)} (received ${stored.received_at}, rules ${stored.rules_version}); they are not fresh.`);
-    printNames(ctx, stored.environments, shownEnvs, undefined);
+    if (ctx.table()) {
+      /** @type {Record<string, TableRow[]>} */
+      const kept = {};
+      for (const [env, e] of Object.entries(stored.environments)) kept[env] = [...(/** @type {any} */ (e).names ?? []).map((/** @type {any} */ item) => ({ item, valid: true })), ...(/** @type {any} */ (e).invalid ?? []).map((/** @type {any} */ item) => ({ item, valid: false, messages: item.messages }))];
+      printTable(ctx, kept, shownEnvs, undefined, plan.provider);
+    } else printNames(ctx, stored.environments, shownEnvs, undefined);
     return EXIT.UNAVAILABLE;
   }
 
   /** @type {Record<string, ReturnType<typeof exportEnv>>} */
   const fresh = {};
-  for (const { env, r } of results) if (r.kind === 'ok') fresh[env] = exportEnv(r.body, plan.provider);
+  /** 표 줄 — 서버가 낸 순서 그대로(PASS · FAIL 섞어서) @type {Record<string, TableRow[]>} */
+  const rows = {};
+  for (const { env, r } of results) if (r.kind === 'ok') { fresh[env] = exportEnv(r.body, plan.provider); rows[env] = tableRows(r.body, plan.provider); }
   const okCount = Object.keys(fresh).length;
   const version = results.find(({ r }) => r.kind === 'ok')?.r;
   const ver = version && version.kind === 'ok' ? version.body.version : undefined;
@@ -345,7 +408,8 @@ async function names(ctx, rest) {
     }
   }
 
-  if (okCount > 0) printNames(ctx, fresh, shownEnvs, v.new ? stored : undefined, ver);
+  if (okCount > 0 && ctx.table()) printTable(ctx, rows, shownEnvs, v.new ? stored : undefined, plan.provider);
+  else if (okCount > 0) printNames(ctx, fresh, shownEnvs, v.new ? stored : undefined, ver);
   const allOk = okCount === envs.length;
   // --no-write 는 두 파일 모두 막는다 — 계획의 rules_version 도 보관 파일도 쓰지 않는다
   if (allOk && repinned && v['no-write']) d.stderr(`Not written (--no-write): ${ctx.shown} keeps rules_version ${read.plan.rules_version}; the server has ${plan.rules_version}.`);
@@ -385,6 +449,29 @@ function printNames(ctx, byEnv, envs, onlyNewAgainst, version) {
   }
 }
 
+/** @typedef {{ item: any, valid: boolean, messages?: string[] }} TableRow */
+
+/** 2xx 본문 → 표 줄(서버 순서) @param {any} body @param {string} provider @returns {TableRow[]} */
+export function tableRows(body, provider) {
+  return (wizardData(body, provider)?.items ?? []).map((/** @type {any} */ it) => ({
+    item: exportName(it), valid: it.valid === true, messages: (Array.isArray(it.violations) ? it.violations : []).map((/** @type {any} */ x) => String(x?.message ?? x?.code)),
+  }));
+}
+
+/**
+ * 사람 표 — 환경이 여럿이면 환경 제목. onlyNewAgainst 를 주면 보관 파일에 없는 키만
+ * @param {Ctx} ctx @param {Record<string, TableRow[]>} byEnv @param {string[]} envs @param {any} [onlyNewAgainst] @param {string} [provider]
+ */
+export function printTable(ctx, byEnv, envs, onlyNewAgainst, provider = 'gcp') {
+  const shown = envs.filter((e) => byEnv[e] !== undefined);
+  shown.forEach((env, i) => {
+    const known = new Set(onlyNewAgainst ? (onlyNewAgainst.environments[env]?.names ?? []).map((/** @type {any} */ n) => n.key) : []);
+    const list = (byEnv[env] ?? []).filter((r) => !known.has(r.item.key));
+    if (shown.length > 1) ctx.d.stdout(`${i > 0 ? '\n' : ''}# ${env}`);
+    for (const line of nameTable(list, ctx.cat, provider, ctx.v.keys === true)) ctx.d.stdout(line);
+  });
+}
+
 // ── validate ──
 
 /** @param {Ctx} ctx @param {string[]} rest */
@@ -413,7 +500,7 @@ async function validate(ctx, rest) {
 // ── add ──
 
 /** @param {any} catalog @param {string} provider */
-function catalogOf(catalog, provider) {
+export function catalogOf(catalog, provider) {
   const p = catalog?.providers?.[provider];
   if (!isRecord(p) || !Array.isArray(p.rows) || !Array.isArray(p.presets) || !isRecord(p.limits)) return undefined;
   return /** @type {{ rows: any[], presets: any[], limits: Record<string, any> }} */ (/** @type {unknown} */ (p));
@@ -446,7 +533,7 @@ function hint(arg, cat) {
 }
 
 /** 규칙의 catalog 칸 @param {{ rows: any[] }} cat @param {string} id @returns {any} */
-function ruleSpec(cat, id) {
+export function ruleSpec(cat, id) {
   for (const r of cat.rows) if (id in r.rules) return r.rules[id];
   return undefined;
 }
@@ -473,7 +560,7 @@ function kindTokenIn(cat, rule, kind) {
  * 위치 · HA · 번호는 세지 않는다(서버도 세지 않는다 — 다르게 세면 새 pick 을 만들어 서버가 400 으로 막는다)
  * @param {Pick} p @param {{ rows: any[], presets: any[] }} cat
  */
-function pickIdentity(p, cat) {
+export function pickIdentity(p, cat) {
   const preset = p.preset === null || p.preset === undefined ? undefined : cat.presets.find((x) => x.id === p.preset);
   const rule = preset ? (typeof p.serverless === 'string' && (preset.serverless ?? []).includes(p.serverless) ? p.serverless : preset.rule) : p.rule;
   const kind = p.kind === undefined ? preset?.kind : p.kind;
@@ -484,15 +571,16 @@ function pickIdentity(p, cat) {
 async function add(ctx, rest) {
   const { v, d } = ctx;
   if (v.service !== undefined && v.project) throw new UsageError('Pass either --service <purpose> or --project, not both.');
+  // 터미널에서 대상 없이 — 무엇을 더할지 묻는다(guide.mjs). 확인 · 저장은 아래 commitAdd 그대로 (D121)
+  if (rest.length === 0 && v.pick === undefined && ctx.canAsk()) return guideAdd(ctx);
   if (v.service === undefined && !v.project) throw new UsageError('add needs --service <purpose> or --project.');
   if (v.pick === undefined && rest.length !== 1) throw new UsageError('add takes one preset, rule id or resource name (or --pick \'<json>\').');
   if (v.pick !== undefined && rest.length > 0) throw new UsageError('Pass either a resource name or --pick, not both.');
   const { plan, digest } = readPlan(ctx.file);
   // 편집할 목록 — 생략은 빈 목록(API 와 같다) · 틀린 구조는 여기서 2 (고치다 예외로 70 이 되지 않게)
   const lists = planLists(plan);
-  // 확인은 늘 계획의 모든 환경으로 한다 — 파일은 모든 환경에 쓰이므로. --env 는 출력만 거른다(목록에 없으면 2)
-  const shownEnvs = environmentsOf(plan, v.env);
-  const envs = environmentsOf(plan);
+  // 확인은 늘 계획의 모든 환경으로 한다 — 파일은 모든 환경에 쓰이므로. --env 는 출력만 거른다(목록에 없으면 2 — 서버에 보내기 전에 본다)
+  environmentsOf(plan, v.env);
   const client = ctx.client();
 
   const catRes = await client.get('/catalog.json');
@@ -561,12 +649,27 @@ async function add(ctx, rest) {
   /** @type {PlanFile} */
   const next = { ...plan, project_picks: target ?? [...lists.project_picks], services };
   const where = v.project ? 'the project' : `service ${v.service}`;
+  return commitAdd(ctx, { plan, digest, lists, next, summary, where, client, provider: plan.provider });
+}
 
-  // 확인 — 지금 파일 그대로(기준)와 덧붙인 뒤를 환경마다 보낸다. 기존 키의 이름 · 판정(위반 코드 포함)이 하나라도 바뀌면 쓰지 않는다
+/**
+ * add 의 확인과 저장 — 지금 파일 그대로(기준)와 덧붙인 뒤(next)를 계획의 모든 환경에서 보낸다. 기존 키의 이름 · 판정(위반 코드 포함)이
+ * 하나라도 바뀌거나 새 이름이 FAIL 이면 쓰지 않는다(exit 1). 묻는 흐름(guideAdd)도 이 길로 합류한다
+ * @param {Ctx} ctx
+ * @param {{ plan: PlanFile, digest: string, lists: ReturnType<typeof planLists>, next: PlanFile, summary: string, where: string, client: ReturnType<Ctx['client']>, provider: string }} o
+ * @returns {Promise<number>}
+ */
+export async function commitAdd(ctx, o) {
+  const { v, d } = ctx;
+  const { plan, digest, lists, next, summary, where, client } = o;
+  const shownEnvs = environmentsOf(plan, v.env);
+  const envs = environmentsOf(plan);
   const hadPicks = lists.project_picks.length > 0 || lists.services.some((s) => s.picks.length > 0);
   const codes = [];
   /** @type {Record<string, any[]>} */
   const added = {};
+  /** @type {Record<string, TableRow[]>} */
+  const addedRows = {};
   let blocked = false;
   for (const env of envs) {
     const label = envs.length > 1 ? env : undefined;
@@ -598,11 +701,13 @@ async function add(ctx, rest) {
     for (const [k, x] of badNew) d.stderr(`${at}new name FAILs ${k}: ${x.name}  ${(x.item.violations ?? []).map((/** @type {any} */ y) => y.message).join(' ')}`);
     if (changed.length > 0 || badNew.length > 0) { blocked = true; codes.push(EXIT.FAIL); continue; }
     added[env] = fresh.map(([, x]) => exportName(x.item));
+    addedRows[env] = fresh.map(([, x]) => ({ item: exportName(x.item), valid: x.valid }));
   }
   const code = worst(codes);
   if (code !== EXIT.OK || blocked) { d.stderr(`Not written: ${ctx.shown} is unchanged.`); return code; }
 
   if (v.json) d.stdout(JSON.stringify({ environments: Object.fromEntries(shownEnvs.map((e) => [e, { names: added[e] ?? [] }])) }, null, 2));
+  else if (ctx.table()) printTable(ctx, addedRows, shownEnvs, undefined, o.provider);
   else {
     for (const env of shownEnvs) {
       if (shownEnvs.length > 1) d.stdout(`# ${env}`);

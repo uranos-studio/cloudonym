@@ -431,7 +431,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     for (const k of presetKeys) expect(sec, k).toContain(`\`${k}\``);
     for (const k of Object.keys(catalogAttachments('gcp')[0]!)) expect(sec, k).toContain(`\`${k}\``);
   });
-  it('「## CLI」 — 저장소에서 node cli/cloudonym.mjs · npm 공개 없음 · 서버 URL · 명령 넷(--help 와 같다) · 파일 둘 · add 는 덧붙이기만', async () => {
+  it('「## CLI」 — 저장소에서 node cli/cloudonym.mjs · npm 공개 없음 · 서버 URL · 명령 다섯(--help 와 같다) · 파일 둘 · add 는 덧붙이기만', async () => {
     const sec = section('## CLI');
     const body = sec.join('\n');
     expect(body).toContain('`node cli/cloudonym.mjs');
@@ -442,7 +442,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     await cliMain(['--help'], { stdout: (x: string) => { out.push(x); } });
     const help = out.join('\n').split('\n');
     const commands = [...new Set(help.slice(help.indexOf('Commands') + 1, help.indexOf('Options')).map((l) => /^ {2}([a-z]+) /.exec(l)?.[1]).filter((c): c is string => c !== undefined))];
-    expect(commands).toEqual(['init', 'add', 'names', 'validate']);
+    expect(commands).toEqual(['new', 'init', 'add', 'names', 'validate']);
     for (const c of commands) expect(sec.some((l) => l.startsWith(`- \`${c}\``)), c).toBe(true);
     expect(body).toContain('`cloudonym.plan.json`');
     expect(body).toContain('`cloudonym.plan.names.json`');
