@@ -2,8 +2,8 @@
 // API 부르기 (D102) — 요청마다 User-Agent: cloudonym-cli/<버전>. 다시 보내는 것은 429 의 --wait 뿐이고 명령 전체에서 한 번이다(400 · 409 · 413 은 다시 보내도 같다)
 import { readFileSync } from 'node:fs';
 
-/** 저장소 package.json 의 version — CLI 는 저장소 안에서만 돈다(npm 공개 없음) */
-export const CLI_VERSION = /** @type {{ version: string }} */ (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf-8'))).version;
+/** cli/package.json 의 version — 공개 단위는 cli/ 다(뿌리 package.json 은 웹 · Worker 의 것). 두 version 이 같은지 cli/package.test.mjs 가 센다 */
+export const CLI_VERSION = /** @type {{ version: string }} */ (JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8'))).version;
 export const USER_AGENT = `cloudonym-cli/${CLI_VERSION}`;
 
 /** --wait 가 기다리는 상한(초) — Retry-After 가 이보다 크면 기다리지 않는다 */

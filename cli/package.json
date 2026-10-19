@@ -1,0 +1,33 @@
+{
+  "name": "cloudonym",
+  "version": "0.1.9",
+  "description": "Cloud resource names from five context values, checked by the Cloudonym API. Asks questions on a terminal; flags and JSON for scripts.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "cloudonym": "cloudonym.mjs"
+  },
+  "files": [
+    "cloudonym.mjs",
+    "lib/",
+    "NOTICE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uranos-studio/cloudonym.git",
+    "directory": "cli"
+  },
+  "keywords": [
+    "cloud",
+    "naming",
+    "gcp",
+    "cli"
+  ],
+  "scripts": {
+    "prepack": "node -e \"for (const f of ['LICENSE', 'NOTICE']) require('node:fs').copyFileSync('../' + f, f)\"",
+    "postpack": "node -e \"for (const f of ['LICENSE', 'NOTICE']) require('node:fs').rmSync(f, { force: true })\""
+  }
+}

@@ -35,3 +35,7 @@ examples/terraform/.terraform/
 examples/terraform/*.tfvars
 examples/terraform/*.tfstate
 examples/terraform/*.tfstate.*
+
+# cli/ 를 npm 꾸러미로 만들 때 prepack 이 잠깐 복사하는 파일 (postpack 이 지운다)
+cli/LICENSE
+cli/NOTICE
