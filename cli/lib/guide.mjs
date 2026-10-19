@@ -350,7 +350,8 @@ export async function guideNew(ctx) {
       rows[env] = tableRows(r.body, PROVIDER);
       version ??= r.body?.version;
     }
-    writeJson(namesPathFor(ctx.file), { received_at: kstTime(d.now()), rules_version: version?.rules, environments: fresh }, v.force ? undefined : null);
+    // 보관 파일은 방금 쓴 계획에서 나온 것이다 — 계획만 지우고 다시 시작했으면 옛 보관 파일이 남아 있으니 내용을 대어 보지 않고 바꾼다
+    writeJson(namesPathFor(ctx.file), { received_at: kstTime(d.now()), rules_version: version?.rules, environments: fresh });
     ask.say('');
     printTable(ctx, rows, a.envs, undefined, PROVIDER);
     return finish(ctx, rows, a.envs.length);

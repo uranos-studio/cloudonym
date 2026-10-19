@@ -198,6 +198,16 @@ test('⑤ 같은 답 · 틀린 답 — 번호 밖 · 숫자 아님은 그 자리
   assert.match(r.screen, /4 names in 2 environments · all valid/);
 });
 
+test('계획만 지우고 다시 시작 — 남아 있던 옛 보관 파일은 새 이름으로 바뀐다(계획만 쓰고 멈추지 않는다)', async () => {
+  const dir = tmpDir();
+  writeFileSync(join(dir, 'cloudonym.plan.names.json'), '{"environments": {"prod": {"names": [{"key": "old", "name": "old-name"}]}}}');
+  const r = await term([], ANSWERS, { cwd: dir, fetchFn: server().fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  const names = JSON.parse(readFileSync(join(dir, 'cloudonym.plan.names.json'), 'utf-8'));
+  assert.equal(names.environments.prod.names.some((/** @type {any} */ n) => n.key === 'old'), false);
+  assert.equal(names.environments.prod.names.length, 7);
+});
+
 test('⑤ 입력이 끝나면(Ctrl-D) 멈추지 않고 64 · 아무것도 쓰지 않는다', async () => {
   const dir = tmpDir();
   const r = await term([], ['demo', 'payment'], { cwd: dir, fetchFn: server().fetchFn });
