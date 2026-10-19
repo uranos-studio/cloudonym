@@ -9,7 +9,7 @@ import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
 import { SHORT_WORDS } from '../core/shorten';
 import { SCOPES } from '../core/scopes';
-import { ENV_ALIASES } from '../core/normalize';
+import { ENV_ALIASES, ENV_VALUES } from '../core/normalize';
 import { LOCATIONS, REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { catalogFor } from '../core/catalog';
@@ -308,6 +308,7 @@ function catalogFieldLines(order: readonly Provider[]): string[] {
   return [
     '', '## catalog.json fields', '',
     '`GET /catalog.json` is what a client reads to build a `/v1/wizard` pick or a plan file without keeping its own copy of the rules. The limits are guidance before sending — the API\'s answer is the verdict.',
+    `- \`env_values\` (top level, not per provider): the standard \`project.env\` values in order — ${codes(ENV_VALUES)}; aliases resolve to these`,
     '- per rule (`providers.<provider>.rows[].rules.<rule id>`): `input` — what a pick of it takes: `count` (numbered servers in `instances[]`), `role` (a `role`) or `none`; `tier` — `true` when the name has a tier slot (see `## Tiers`); `locations` — the values a pick may send as `location`, only on rules that take one',
     `- \`presets\` (per provider): the wizard presets in request names — ${codes(presetKeys)}; send \`id\` as \`preset\``,
     `- \`attachments\` (per provider): what a server slot can carry — ${codes(attachKeys)} (see \`## Attached resources\`)`,

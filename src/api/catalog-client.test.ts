@@ -10,6 +10,7 @@ import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, SLOT_ID_PATTERN } from '../core/wizard/plan';
 import { MAX_COUNT, MAX_NAMES, ROLE_PATTERN, SEQ_PATTERN } from '../core/selection';
 import { TIER_PATTERN } from '../core/types';
+import { ENV_VALUES } from '../core/normalize';
 import { MAX_BODY_BYTES } from './v1';
 import type { Loose } from './test-support';
 
@@ -64,6 +65,12 @@ describe('/catalog.json 클라이언트 칸 (D101)', () => {
       seq_pattern: SEQ_PATTERN.source, slot_id_pattern: SLOT_ID_PATTERN.source, tier_pattern: TIER_PATTERN.source, role_pattern: ROLE_PATTERN.source,
     });
     expect(CATALOG_LIMITS.max_body_bytes).toBe(MAX_BODY_BYTES);
+  });
+
+  it('env_values — 맨 위 칸 · core 의 ENV_VALUES 그대로(순서까지) · CSP 와 무관하게 한 번 (D121)', () => {
+    expect(Object.keys(doc)).toEqual(['version', 'env_values', 'providers']);
+    expect(doc.env_values).toEqual([...ENV_VALUES]);
+    expect(gcp.env_values).toBeUndefined();
   });
 
   it('마법사가 없는 CSP 는 빈 presets · 그 CSP 부모의 attachments 만', () => {

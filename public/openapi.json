@@ -1689,12 +1689,31 @@
         "additionalProperties": false,
         "required": [
           "version",
+          "env_values",
           "providers"
         ],
-        "description": "The resource catalog and region table of the enabled providers, with what a client needs to build a wizard plan: each rule's input kind, tier slot and locations, the wizard presets, the attachment table and the request limits. Generated from catalog/*.json and the engine's tables in the repository, the same data the engine and /llms.txt use.",
+        "description": "The resource catalog and region table of the enabled providers, with what a client needs to build a wizard plan: the standard environment values, each rule's input kind, tier slot and locations, the wizard presets, the attachment table and the request limits. Generated from catalog/*.json and the engine's tables in the repository, the same data the engine and /llms.txt use.",
         "properties": {
           "version": {
             "$ref": "#/components/schemas/Version"
+          },
+          "env_values": {
+            "type": "array",
+            "description": "The standard values project.env accepts, in order (aliases such as production or staging resolve to these). Not provider-specific",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "prod",
+              "stg",
+              "dev",
+              "sbx",
+              "qa",
+              "uat",
+              "test",
+              "perf",
+              "dr"
+            ]
           },
           "providers": {
             "type": "object",

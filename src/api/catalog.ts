@@ -1,4 +1,4 @@
-// GET /catalog.json 본문 (D46 · D101) — 켜진 CSP 의 catalog 행과 리전 표, 그리고 클라이언트(저장소 CLI)가 물을 것을 정하는 데이터.
+// GET /catalog.json 본문 (D46 · D101 · D121) — 켜진 CSP 의 catalog 행과 리전 표, 그리고 클라이언트(저장소 CLI)가 물을 것을 정하는 데이터.
 // 정본은 catalog/*.json 과 core 의 표다. 여기서는 읽어 옮겨 적기만 한다 — core 를 바꾸지 않으므로 규칙 버전이 그대로다 (D101)
 import { TIER_PATTERN, type Provider } from '../core/types';
 import { catalogFor } from '../core/catalog';
@@ -12,6 +12,7 @@ import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, SLOT_ID_PATTERN } from '../core/wi
 import { PRESETS } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
+import { ENV_VALUES } from '../core/normalize';
 
 /** catalog 머리(출처 버전) — catalog 가 아직 없는 CSP 는 null */
 const META: Partial<Record<Provider, unknown>> = { gcp: GCP_CATALOG_META };
@@ -65,5 +66,6 @@ export function buildCatalogJson(enabled: readonly Provider[], version: { engine
     meta: META[p] ?? null, rows: catalogFor(p).map(withRuleExtras), regions: REGIONS[p],
     presets: catalogPresets(p), attachments: catalogAttachments(p), limits: CATALOG_LIMITS,
   }]));
-  return JSON.stringify({ version, providers });
+  // env_values — project.env 가 받는 표준값(별칭을 푼 뒤) 순서 그대로. CSP 와 무관해 providers 밖에 둔다 (D121 — CLI 가 환경을 번호 목록으로 묻는다)
+  return JSON.stringify({ version, env_values: [...ENV_VALUES], providers });
 }

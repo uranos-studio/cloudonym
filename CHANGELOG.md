@@ -4,6 +4,10 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Added
+
+- **`env_values` in `/catalog.json`** (D121) — the standard environment values (`prod`, `stg`, `dev`, `sbx`, `qa`, `uat`, `test`, `perf`, `dr`) at the top level, in the engine's order, so a client can offer them without its own copy. No name or verdict changes; the rules revision is unchanged.
+
 ### Changed
 
 - **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
