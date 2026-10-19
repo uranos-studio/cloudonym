@@ -12,4 +12,11 @@ describe('wizardLayout', () => {
     expect(WIDE_QUERY).toBe('(min-width: 1280px)');
     expect(TABLET_QUERY).toBe('(min-width: 768px)');
   });
+  // 칸에 overscroll-contain 을 걸면 휠이 페이지로 넘어가지 않아 머리글 아래(격자 아래쪽)에 닿을 수 없다
+  it('칸은 끝에서 휠을 페이지로 넘긴다 — overscroll-contain 없음', () => {
+    const src = Object.values(import.meta.glob('./Wizard.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>)[0] ?? '';
+    const line = src.split('\n').find((l: string) => l.includes('const COLUMN ='));
+    expect(line).toBeDefined();
+    expect(line).not.toContain('overscroll-contain');
+  });
 });

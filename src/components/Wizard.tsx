@@ -394,7 +394,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
   // 넓은 화면(≥1280)은 세 칸 · 태블릿(768–1279)은 목록 · 설정 두 칸 — 높이가 고정이고 칸마다 스크롤한다(무엇을 더해도 페이지가 길어지지 않는다).
   // 폰(<768)은 한 칸이고 페이지가 스크롤한다. relative — 칸 안의 절대 위치 요소(sr-only 글자 등)가 칸의 스크롤 안에 갇히게 한다
   const fixed = layout !== 'phone';
-  const COLUMN = `${PANEL} relative min-w-0 ${fixed ? 'min-h-0 overflow-y-auto overscroll-contain' : ''}`;
+  const COLUMN = `${PANEL} relative min-w-0 ${fixed ? 'min-h-0 overflow-y-auto' : ''}`;
   const GRID = {
     wide: 'grid h-[calc(100dvh-2rem)] grid-rows-1 grid-cols-[17.5rem_minmax(0,1fr)_26rem] gap-4',
     tablet: 'grid h-[calc(100dvh-2rem)] grid-rows-1 grid-cols-[15rem_minmax(0,1fr)] gap-4',
