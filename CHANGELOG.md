@@ -4,6 +4,10 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Changed
+
+- **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
+
 ### Security
 
 - **Rate limiting counts IPv6 clients per /64** — `/v1/*` POSTs, `/llms.txt` and `/catalog.json` used the full IPv6 address as the limiter key, so one client holding a /64 could rotate addresses past the 60-per-minute limit. IPv4 keys are unchanged.

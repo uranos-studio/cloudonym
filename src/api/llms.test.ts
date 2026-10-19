@@ -429,7 +429,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     for (const k of presetKeys) expect(sec, k).toContain(`\`${k}\``);
     for (const k of Object.keys(catalogAttachments('gcp')[0]!)) expect(sec, k).toContain(`\`${k}\``);
   });
-  it('「## CLI」 — 저장소에서 node cli/cloudonym.mjs · npm 공개 없음 · 서버 주소 · 명령 넷(--help 와 같다) · 파일 둘 · add 는 덧붙이기만', async () => {
+  it('「## CLI」 — 저장소에서 node cli/cloudonym.mjs · npm 공개 없음 · 서버 URL · 명령 넷(--help 와 같다) · 파일 둘 · add 는 덧붙이기만', async () => {
     const sec = section('## CLI');
     const body = sec.join('\n');
     expect(body).toContain('`node cli/cloudonym.mjs');

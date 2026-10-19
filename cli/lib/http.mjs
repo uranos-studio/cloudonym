@@ -23,30 +23,6 @@ export const MAX_TIMEOUT_MS = 2 ** 31 - 1;
  */
 
 /**
- * 서버를 고른다 — --server → CLOUDONYM_SERVER. 기본값은 없다(배포 URL 을 도구에 박지 않는다).
- * origin + 경로(끝의 / 를 뗀다)로 조립한다 — 쿼리 · fragment 가 있으면 API 경로가 그 뒤에 붙으므로 거부하고,
- * 사용자 이름 · 암호가 든 URL 은 오류 문장 · 「Cannot reach」 줄에 그대로 찍히므로 거부한다.
- * 거부 문장에는 받은 URL 을 넣지 않는다 — 쿼리의 토큰 · 해석되지 않는 URL 의 자격이 stderr 로 나가므로, 무엇이 틀렸는지만 말한다
- * @param {string | undefined} flag @param {Record<string, string | undefined>} env
- * @returns {{ server: string } | { error: string }}
- */
-export function serverOf(flag, env) {
-  const raw = flag ?? env.CLOUDONYM_SERVER;
-  if (raw === undefined || raw === '') return { error: 'No server: pass --server <origin> or set CLOUDONYM_SERVER (for example http://127.0.0.1:8787 for wrangler dev).' };
-  /** @type {URL} */
-  let u;
-  try {
-    u = new URL(raw);
-  } catch {
-    return { error: 'The server URL is not a valid URL (it is not repeated here, in case it carries a secret).' };
-  }
-  if (u.username !== '' || u.password !== '') return { error: 'The server URL must not carry a user name or password.' };
-  if (u.protocol !== 'http:' && u.protocol !== 'https:') return { error: 'The server URL must start with http:// or https://.' };
-  if (u.search !== '' || u.hash !== '') return { error: 'The server URL must not have a query or fragment.' };
-  return { server: `${u.origin}${u.pathname.replace(/\/+$/, '')}` };
-}
-
-/**
  * Retry-After → 기다릴 초. 0 이상 정수 초 · HTTP-date(남은 초, 지났으면 0). 음수 · 소수 · 그 밖의 꼴은 없는 것(undefined)
  * @param {string | null} value @param {Date} now
  * @returns {number | undefined}

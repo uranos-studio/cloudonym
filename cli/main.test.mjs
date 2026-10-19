@@ -7,7 +7,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main, EXIT, resolveTarget, USER_AGENT } from './lib/main.mjs';
 import { nextSeq, nextSlotId, appendSlots, environmentsOf, bodyFor, namesPathFor, kstTime, writeJson, readPlan, PlanError } from './lib/plan.mjs';
-import { serverOf, MAX_WAIT_SECONDS } from './lib/http.mjs';
+import { MAX_WAIT_SECONDS } from './lib/http.mjs';
+import { serverOf, DEFAULT_SERVER } from './lib/server.mjs';
 
 /** 시험이 만든 임시 폴더 — 끝나면 지운다(시스템 임시 폴더에 남기지 않는다) @type {string[]} */
 const made = [];
@@ -45,11 +46,12 @@ test('namesPathFor · kstTime · serverOf', () => {
   assert.equal(namesPathFor('/x/cloudonym.plan.json'), '/x/cloudonym.plan.names.json');
   assert.equal(namesPathFor('/x/plan'), '/x/plan.names.json');
   assert.equal(kstTime(new Date('2026-10-14T15:30:05Z')), '2026-10-15T00:30:05+09:00');
-  assert.deepEqual(serverOf('http://127.0.0.1:8787/', {}), { server: 'http://127.0.0.1:8787' });
-  assert.deepEqual(serverOf(undefined, { CLOUDONYM_SERVER: 'https://example.org' }), { server: 'https://example.org' });
-  assert.deepEqual(serverOf('https://example.org/base//', {}), { server: 'https://example.org/base' });
+  assert.equal(/** @type {any} */ (serverOf('http://127.0.0.1:8787/', {})).server, 'http://127.0.0.1:8787');
+  assert.equal(/** @type {any} */ (serverOf(undefined, { CLOUDONYM_SERVER: 'https://example.org' })).server, 'https://example.org');
+  assert.equal(/** @type {any} */ (serverOf('https://example.org/base//', {})).server, 'https://example.org/base');
   assert.ok('error' in serverOf('--x', {}));
-  assert.ok('error' in serverOf(undefined, {}));
+  // 기본값이 있다 (D121) — 아무것도 없으면 공개 배포
+  assert.equal(/** @type {any} */ (serverOf(undefined, {})).server, DEFAULT_SERVER);
   assert.match(USER_AGENT, /^cloudonym-cli\/\d+\.\d+\.\d+$/);
 });
 

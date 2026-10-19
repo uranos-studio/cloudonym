@@ -287,8 +287,9 @@ Items come in order: the project ID, the project-level items, then each service,
 
 The repository has a small command-line tool, `cli/cloudonym.mjs` (Node 22, no dependencies). It is not published to npm; run it from a clone with `node cli/cloudonym.mjs …`, `npm run cli -- …` or, after `npm link`, `cloudonym …`. It holds no naming rules: it edits a plan file (the [Plan file](#plan-file--save-plan-and-open-plan) the wizard saves) and asks the API for every name and verdict, so the web, the API and the CLI give the same names for the same rules revision. What it needs to know about presets, rules, numbered resources and limits comes from `/catalog.json`.
 
+It calls the public deployment unless you say otherwise — there is nothing to set. To call another deployment (your own Worker, or `wrangler dev` at `http://127.0.0.1:8787`), pass `--server <origin>`, set `CLOUDONYM_SERVER`, or write `{ "server": "https://…" }` to `~/.config/cloudonym/config.json` (`$XDG_CONFIG_HOME/cloudonym/config.json` when that is set, `%APPDATA%\cloudonym\config.json` on Windows); the first one given wins, in that order. A config file that is not a JSON object is ignored with a warning; a `server` that is not a usable URL stops the command (exit 64) rather than falling back to the public deployment. `cloudonym --version` prints its version on stdout and the server it would call, with where that came from, on stderr.
+
 ```sh
-export CLOUDONYM_SERVER=https://<your-deployment>     # or --server; there is no default
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # or: init --owner … --system … --env prod --region asia-northeast3
 node cli/cloudonym.mjs names                          # every name; kept in cloudonym.plan.names.json
 node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
@@ -303,7 +304,7 @@ node cli/cloudonym.mjs validate                       # exit 0 when every name i
 
 ## AI-agent integration
 
-- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, the region codes and the zones they accept, kind tokens, the tier token, attached resources and wizard presets, abbreviations with their sources, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, the API summary, the limits (body size, rate limit with `429` and `Retry-After`, field, item and error caps, echoed values), the plan file, the `/catalog.json` fields and the repository CLI (commands, server address, exit codes). It is built from the rule table, the catalog and the server's constants, so it never drifts from the engine.
+- **`GET /llms.txt`** — engine and rules version, naming formulas, canonical values with aliases, the region codes and the zones they accept, kind tokens, the tier token, attached resources and wizard presets, abbreviations with their sources, every rule's length · pattern · forbidden words · notes · doc link, the resource tree per provider, what PASS means, the API summary, the limits (body size, rate limit with `429` and `Retry-After`, field, item and error caps, echoed values), the plan file, the `/catalog.json` fields and the repository CLI (commands, server URL, exit codes). It is built from the rule table, the catalog and the server's constants, so it never drifts from the engine.
 - **`GET /openapi.json`** — OpenAPI 3.0.3 for `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate`, `/v1/events`, `/v1/health` and `/catalog.json`, including every error status. The test suite validates real responses against it.
 - **`GET /catalog.json`** — the resource catalog and region table of the enabled providers as JSON: one row per screen row with its rule ids, abbreviation, kinds and tokens, region-token kind, description, where the name is entered and search aliases, plus `version: { engine, rules }`; each rule also says what a wizard pick of it takes (`input`, `tier`, `locations`), and each provider lists the wizard `presets`, the `attachments` of a server slot and the request `limits` — what the CLI reads instead of keeping its own copy. The source is `catalog/*.json` in this repository (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - **`/docs/naming`** — the same data as a page for people: formulas, tokens, the region table, how names are shortened, abbreviations, kind tokens, tiers, attached resources and the wizard presets.
@@ -512,8 +513,9 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 
 저장소에 작은 명령줄 도구 `cli/cloudonym.mjs` 가 있다(Node 22 · 의존성 없음). npm 에 내지 않는다 — clone 한 저장소에서 `node cli/cloudonym.mjs …` · `npm run cli -- …` · `npm link` 뒤 `cloudonym …` 로 돈다. 이름 규칙을 들고 있지 않다 — 계획 파일(마법사의 Save plan 이 내려주는 파일)을 고치고 이름과 판정은 전부 API 에 묻는다. 그래서 같은 규칙 버전이면 웹 · API · CLI 가 같은 이름을 낸다. 프리셋 · 규칙 · 번호 붙는 리소스 · 상한은 `/catalog.json` 에서 읽는다.
 
+따로 정하지 않으면 공개 배포를 부른다 — 설정할 것이 없다. 다른 배포(직접 띄운 Worker, `http://127.0.0.1:8787` 의 `wrangler dev`)를 부르려면 `--server <origin>` · 환경변수 `CLOUDONYM_SERVER` · 설정 파일 `~/.config/cloudonym/config.json`(`$XDG_CONFIG_HOME` 이 있으면 `$XDG_CONFIG_HOME/cloudonym/config.json`, 윈도우는 `%APPDATA%\cloudonym\config.json`)의 `{ "server": "https://…" }` 가운데 하나를 쓴다. 여럿이면 이 순서로 앞의 것이 이긴다. JSON 객체가 아닌 설정 파일은 경고 한 줄을 내고 건너뛰고, 쓸 수 없는 URL 의 `server` 는 공개 배포로 넘어가지 않고 명령을 멈춘다(exit 64). `cloudonym --version` 은 stdout 에 버전, stderr 에 부를 서버 URL 과 그 출처를 찍는다.
+
 ```sh
-export CLOUDONYM_SERVER=https://<your-deployment>     # 또는 --server. 기본값은 없다
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # 또는 init --owner … --system … --env prod --region asia-northeast3
 node cli/cloudonym.mjs names                          # 이름 전부 — cloudonym.plan.names.json 에 보관
 node cli/cloudonym.mjs add cloud_sql_instance --service shop --kind POSTGRES
@@ -528,7 +530,7 @@ node cli/cloudonym.mjs validate                       # 이름이 전부 유효�
 
 ### AI 에이전트 연동
 
-- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 리전 코드와 받는 존 · 종류 토큰 · 용도 토큰 tier · 딸린 리소스 · 마법사 프리셋 · 약어와 그 출처 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약 · 한도(본문 크기 · `429` 와 `Retry-After` 의 요청 제한 · 필드 · 항목 · 오류 수 · 되돌려 싣는 값) · 계획 파일 · `/catalog.json` 칸 · 저장소 CLI(명령 · 서버 주소 · 종료 코드). 규칙 표 · catalog · 서버 상수에서 만들므로 엔진과 어긋나지 않는다
+- **`GET /llms.txt`** — 엔진 · 규칙 버전 · 이름 공식 · 표준값과 별칭 · 리전 코드와 받는 존 · 종류 토큰 · 용도 토큰 tier · 딸린 리소스 · 마법사 프리셋 · 약어와 그 출처 · 규칙마다 길이 · pattern · 금지어 · 설명 · 문서 링크 · CSP 별 리소스 트리 · PASS 의 뜻 · API 요약 · 한도(본문 크기 · `429` 와 `Retry-After` 의 요청 제한 · 필드 · 항목 · 오류 수 · 되돌려 싣는 값) · 계획 파일 · `/catalog.json` 칸 · 저장소 CLI(명령 · 서버 URL · 종료 코드). 규칙 표 · catalog · 서버 상수에서 만들므로 엔진과 어긋나지 않는다
 - **`GET /openapi.json`** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/events` · `/v1/health` · `/catalog.json` 의 OpenAPI 3.0.3. 시험이 실제 응답을 이 명세로 검증한다
 - **`GET /catalog.json`** — 켜진 CSP 의 리소스 catalog 와 지역 표(JSON). 화면 행마다 규칙 id · 약어 · 종류와 토큰 · 지역 토큰 종류 · 설명 · 이름 넣는 자리 · 검색 별칭과 `version: { engine, rules }`. 규칙마다 마법사 pick 이 받는 것(`input` · `tier` · `locations`), CSP 마다 마법사 `presets` · 서버 슬롯의 `attachments` · 요청 `limits` 도 싣는다 — CLI 가 규칙을 복제하지 않고 이것을 읽는다. 정본은 이 저장소의 `catalog/*.json` 이다([CONTRIBUTING.md](CONTRIBUTING.md))
 - **`/docs/naming`** — 같은 데이터를 사람이 읽는 쪽으로 — 이름 공식 · 토큰 · 지역 표 · 축소 방법 · 약어 · 종류 토큰 · tier · 딸린 리소스 · 마법사 프리셋

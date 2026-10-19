@@ -10,6 +10,7 @@ import type { Bindings } from './env';
 import { classifyClient } from './telemetry';
 import { VERSION } from '../version';
 import { main, EXIT, USER_AGENT, nextSeq as cliNextSeq, nextSlotId as cliNextSlotId, type FetchFn } from '../../cli/lib/main.mjs';
+import { DEFAULT_SERVER } from '../../cli/lib/server.mjs';
 import { nextSeq, nextSlotId } from '../components/wizardState';
 import { toWizardExport } from '../components/wizardExport';
 import { expandPlan, type WizardPlan } from '../core/wizard/plan';
@@ -43,7 +44,7 @@ async function run(argv: string[], o: { fetchFn?: FetchFn; env?: Record<string, 
   const out: string[] = [];
   const err: string[] = [];
   const code = await main(argv, {
-    fetchFn: o.fetchFn ?? viaApp(), env: o.env ?? { CLOUDONYM_SERVER: SERVER }, cwd: dir,
+    fetchFn: o.fetchFn ?? viaApp(), env: o.env ?? { CLOUDONYM_SERVER: SERVER }, cwd: dir, configPath: null,
     stdout: (s) => { out.push(s); }, stderr: (s) => { err.push(s); }, sleep: o.sleep ?? (async () => {}), now: () => new Date('2026-10-14T12:00:00Z'),
   });
   return { code, out: out.join('\n'), err: err.join('\n') };
@@ -262,11 +263,12 @@ describe('cloudonym — 409 · 429 · 연결 실패 · 서버 없음 · User-Age
     expect((await run(['validate'], { fetchFn: down })).code).toBe(EXIT.UNAVAILABLE);
   });
 
-  it('서버 주소가 없으면 64 — 기본값이 없다 · http(s) 가 아니면 64', async () => {
+  it('서버를 주지 않으면 공개 배포(DEFAULT_SERVER)를 부른다 (D121) · http(s) 가 아니면 64', async () => {
     writePlan(PLAN_A);
-    const r = await run(['names'], { env: {} });
-    expect(r.code).toBe(EXIT.USAGE);
-    expect(r.err).toContain('No server');
+    const calls: { url: string; headers: Record<string, string>; body?: string }[] = [];
+    const r = await run(['names'], { env: {}, fetchFn: viaApp({}, calls as never) });
+    expect(r.code, r.err).toBe(EXIT.OK);
+    expect(calls.map((c) => c.url)).toEqual([`${DEFAULT_SERVER}/v1/wizard`]);
     expect((await run(['names', '--server', 'ftp://x'], { env: {} })).code).toBe(EXIT.USAGE);
     expect((await run(['names', '--server', SERVER], { env: {} })).code).toBe(EXIT.OK);
   });

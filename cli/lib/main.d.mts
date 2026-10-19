@@ -9,6 +9,7 @@ export interface Deps {
   cwd: string;
   sleep: (ms: number) => Promise<void>;
   now: () => Date;
+  configPath: string | null;
 }
 export const EXIT: { OK: 0; FAIL: 1; INPUT: 2; VERSION: 3; UNAVAILABLE: 4; USAGE: 64; INTERNAL: 70 };
 export const USER_AGENT: string;

@@ -322,7 +322,7 @@ function cliLines(): string[] {
   return [
     '', '## CLI', '',
     'The source repository has a command-line tool. It is not published to npm: run it from a clone with `node cli/cloudonym.mjs <command>` (Node 22, no dependencies). It holds no naming rules — it edits a plan file and asks `POST /v1/wizard` for every name and verdict, and reads presets, rule inputs and limits from `/catalog.json`, so it gives the same names as the web and the API for the same rules revision.',
-    '- Server: `--server <origin>` or `CLOUDONYM_SERVER`; there is no default.',
+    '- Server: the public deployment by default, nothing to set; `--server <origin>`, then `CLOUDONYM_SERVER`, then `"server"` in the config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\\cloudonym\\config.json` on Windows) override it. `--version` prints the server and its source on stderr.',
     '- Files: the plan file (default `cloudonym.plan.json`, `-f` to choose) and the names kept next to it (`cloudonym.plan.names.json`).',
     '- `init` — a new plan file (`--owner --system --env E[,E2] --region`, `rules_version` from the server) or `--from <file>` to copy a file saved with Save plan',
     '- `add` — appends a pick (a preset, a rule id or a resource name) to a service (`--service <purpose>`) or the project (`--project`), or numbered servers to the same pick; it writes the file only if every existing name and verdict stays the same in every environment and every new name passes, otherwise it exits 1 and leaves the file as it was. It never edits an existing pick. `--dry-run` checks without writing',

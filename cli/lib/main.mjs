@@ -1,11 +1,12 @@
 // @ts-check
-// cloudonym CLI (D102) — 저장소 안에서만 돈다(npm 공개 없음). 엔진을 들이지 않고 API 만 부른다: 웹 · API · CLI 가 같은 규칙 버전에서 같은 이름을 낸다.
+// cloudonym CLI (D102 · D121) — 엔진을 들이지 않고 API 만 부른다: 웹 · API · CLI 가 같은 규칙 버전에서 같은 이름을 낸다. 서버는 server.mjs 가 고른다(기본은 공개 배포).
 // 명령: init · add · names · validate. 물을 것 · 풀 것(프리셋 · 규칙 · 입력 종류 · 상한)은 /catalog.json(D101)에서 읽는다 — 규칙을 여기 복제하지 않는다.
 // 경계: cli/ 의 import 는 node: 와 cli/ 안뿐이다(cli/boundary.test.mjs)
 import { parseArgs } from 'node:util';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createClient, serverOf, USER_AGENT, CLI_VERSION, MAX_TIMEOUT_MS, MAX_WAIT_SECONDS } from './http.mjs';
+import { createClient, USER_AGENT, CLI_VERSION, MAX_TIMEOUT_MS, MAX_WAIT_SECONDS } from './http.mjs';
+import { serverOf, configPathOf } from './server.mjs';
 import {
   PlanError, readPlan, writeJson, environmentsOf, bodyFor, appendSlots, namesPathFor, readNamesFile, kstTime, isRecord, nextSeq, nextSlotId, planLists,
 } from './plan.mjs';
@@ -24,7 +25,8 @@ export const EXIT = { OK: 0, FAIL: 1, INPUT: 2, VERSION: 3, UNAVAILABLE: 4, USAG
 /** @typedef {import('./plan.mjs').PlanFile} PlanFile */
 /** @typedef {import('./plan.mjs').Pick} Pick */
 /**
- * @typedef {{ fetchFn: FetchFn, env: Record<string, string | undefined>, stdout: (s: string) => void, stderr: (s: string) => void, cwd: string, sleep: (ms: number) => Promise<void>, now: () => Date }} Deps
+ * configPath: 설정 파일 자리(null 이면 읽지 않는다) — 주지 않으면 env 의 XDG_CONFIG_HOME · HOME · APPDATA 로 찾는다(server.mjs configPathOf)
+ * @typedef {{ fetchFn: FetchFn, env: Record<string, string | undefined>, stdout: (s: string) => void, stderr: (s: string) => void, cwd: string, sleep: (ms: number) => Promise<void>, now: () => Date, configPath: string | null }} Deps
  */
 
 const DEFAULT_FILE = 'cloudonym.plan.json';
@@ -42,7 +44,8 @@ Commands
 
 Options
   -f, --file <plan>    plan file (default ${DEFAULT_FILE}); names are kept next to it in <plan>.names.json
-  --server <origin>    the Cloudonym deployment to call (or CLOUDONYM_SERVER). There is no default
+  --server <origin>    the Cloudonym deployment to call; else CLOUDONYM_SERVER, else "server" in the config file
+                       (~/.config/cloudonym/config.json), else the public deployment. --version shows which
   --env <e>            one environment of the plan only
   --json               machine output
   --wait               on 429, wait Retry-After (at most ${MAX_WAIT_SECONDS} s) and retry; once per command
@@ -82,6 +85,7 @@ export async function main(argv, given = {}) {
     cwd: given.cwd ?? process.cwd(),
     sleep: given.sleep ?? ((ms) => new Promise((r) => { setTimeout(r, ms); })),
     now: given.now ?? (() => new Date()),
+    configPath: given.configPath === undefined ? configPathOf(given.env ?? process.env) : given.configPath,
   };
   try {
     let parsed;
@@ -91,7 +95,14 @@ export async function main(argv, given = {}) {
       throw new UsageError(e instanceof Error ? e.message : String(e));
     }
     const { values: v, positionals } = parsed;
-    if (v.version) { d.stdout(USER_AGENT); return EXIT.OK; }
+    if (v.version) {
+      // stdout 은 한 줄 그대로(파이프로 받는 스크립트가 안 깨진다) — 부를 서버와 출처는 stderr 에 (D121)
+      d.stdout(USER_AGENT);
+      const picked = serverOf(v.server, d.env, { configPath: d.configPath });
+      if ('error' in picked) d.stderr(`server: not usable — ${picked.error}`);
+      else { for (const w of picked.warnings) d.stderr(w); d.stderr(`server ${picked.server} (${picked.source})`); }
+      return EXIT.OK;
+    }
     const [cmd, ...rest] = positionals;
     if (v.help || cmd === undefined || cmd === 'help') { d.stdout(USAGE); return cmd === undefined && !v.help ? EXIT.USAGE : EXIT.OK; }
     const ctx = new Ctx(d, v);
@@ -123,10 +134,11 @@ class Ctx {
     this.shown = v.file ?? DEFAULT_FILE;
   }
 
-  /** 서버 클라이언트 — 서버가 없으면 사용법 오류(64) */
+  /** 서버 클라이언트 — 고른 서버를 쓸 수 없으면 사용법 오류(64). 설정 파일을 건너뛰었으면 그 까닭을 stderr 에 */
   client() {
-    const picked = serverOf(this.v.server, this.d.env);
+    const picked = serverOf(this.v.server, this.d.env, { configPath: this.d.configPath });
     if ('error' in picked) throw new UsageError(picked.error);
+    for (const w of picked.warnings) this.d.stderr(w);
     const timeout = this.v.timeout === undefined ? 15000 : Number(this.v.timeout);
     if (!Number.isInteger(timeout) || timeout <= 0 || timeout > MAX_TIMEOUT_MS) throw new UsageError(`--timeout must be 1–${MAX_TIMEOUT_MS} milliseconds: ${this.v.timeout}`);
     this.server = picked.server;
