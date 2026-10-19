@@ -21,7 +21,8 @@ const PROVIDER = 'gcp';
 
 /**
  * 고른 부품 하나 — 프리셋 · 세부 답으로 만든 pick(instances 없이) · 개수 · 슬롯마다 딸린 것
- * @typedef {{ preset: any, pick: Pick, count?: number, attach?: Record<string, unknown> }} Entry
+ * asked: 답한 개수 — 고가용성 때문에 count 를 최소 대수로 올렸어도 원래 답(기존 pick 에 더할 때는 고가용성을 쓰지 않으므로 이것을 쓴다)
+ * @typedef {{ preset: any, pick: Pick, count?: number, asked?: number, attach?: Record<string, unknown> }} Entry
  */
 
 /**
@@ -153,6 +154,7 @@ async function askDetails(ask, cat, preset) {
     if (got !== def) tier = got;
   }
   let ha = false;
+  const asked = count;
   if (isRecord(preset.ha) && count !== undefined) {
     const min = Number(preset.ha.min_instances ?? 2);
     ha = await ask.yesNo(`${label} — high availability (at least ${min} servers)?`, false);
@@ -184,12 +186,12 @@ async function askDetails(ask, cat, preset) {
   if (kind !== undefined) pick.kind = kind;
   if (ha) pick.ha = true;
   if (location !== undefined) pick.location = location;
-  return { preset, pick, ...(count === undefined ? {} : { count }), ...(attach && Object.keys(attach).length > 0 ? { attach } : {}) };
+  return { preset, pick, ...(count === undefined ? {} : { count, asked }), ...(attach && Object.keys(attach).length > 0 ? { attach } : {}) };
 }
 
-/** 슬롯 n 개를 덧붙이고 새 슬롯마다 딸린 것을 단다 — 기존 슬롯은 그대로 @param {Slot[]} slots @param {Entry} e */
-function withSlots(slots, e) {
-  const out = appendSlots(slots, e.count ?? 1);
+/** 슬롯 n 개(기본 e.count)를 덧붙이고 새 슬롯마다 딸린 것을 단다 — 기존 슬롯은 그대로 @param {Slot[]} slots @param {Entry} e @param {number} [n] */
+function withSlots(slots, e, n = e.count ?? 1) {
+  const out = appendSlots(slots, n);
   return out.map((s, i) => (i < slots.length || !e.attach ? s : { ...s, attach: structuredClone(e.attach) }));
 }
 
@@ -209,8 +211,13 @@ function place(list, entries, cat, ask) {
       return out.length - 1;
     }
     const old = /** @type {Pick} */ (out[i]);
+    // add 와 같다 — 위치만 다른 pick 은 서버가 같은 pick 으로 세므로(같은 이름) 위치가 조용히 버려지지 않게 넣지 않는다
+    if (e.pick.location !== old.location) { ask.say(`  ${e.preset.label} is already in the plan there${old.location === undefined ? '' : ` (location ${old.location})`}; a different location alone does not make a separate pick, because the names would be the same — not added.`); return -1; }
     if (e.count === undefined) { ask.say(`  ${e.preset.label} is already in the plan there — not added twice.`); return -1; }
-    out[i] = { ...old, instances: withSlots(old.instances ?? [], e) };
+    // 기존 pick 에 서버를 더한다 — 그 pick 의 설정(고가용성 등)은 그대로다. 다르게 답했으면 알린다(add 의 --ha 와 같다)
+    const haIgnored = e.pick.ha === true && old.ha !== true;
+    if (haIgnored) ask.say(`  Note: high availability is not changed — the servers are added to the ${e.preset.label} already in the plan, which keeps its own settings.`);
+    out[i] = { ...old, instances: withSlots(old.instances ?? [], e, haIgnored ? e.asked : e.count) };
     return i;
   });
   return { list: out, at };

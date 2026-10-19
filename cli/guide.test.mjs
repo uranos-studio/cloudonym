@@ -269,6 +269,19 @@ test('인자 없는 add(터미널) — 있는 서비스를 골라 부품을 더�
   assert.deepEqual(s.calls.map((c) => c.path), ['/catalog.json', '/v1/wizard', '/v1/wizard', '/v1/wizard']);
 });
 
+test('인자 없는 add — 같은 pick 에 서버를 더할 때 다르게 답한 고가용성은 바뀌지 않는다고 알린다(조용히 버리지 않는다)', async () => {
+  const dir = tmpDir();
+  // 고가용성 없이 웹 1대
+  await term([], ['demo', 'payment', '1', 'seoul', '', '2', 'shop', '1', 'n', 'n', '0', 'n'], { cwd: dir, fetchFn: server().fetchFn });
+  assert.equal(plan(dir).services[0].picks[0].ha, undefined);
+  const r = await term(['add'], ['2', '', '1', 'y', 'n', '0', 'n'], { cwd: dir, fetchFn: server().fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  assert.match(r.screen, /Note: high availability is not changed — the servers are added to the Web server already in the plan/);
+  const web = plan(dir).services[0].picks[0];
+  assert.equal(web.ha, undefined);
+  assert.equal(web.instances.length, 2);
+});
+
 test('--from 에 공유 링크를 주면 64 — 브라우저의 Save plan 뒤 new --from <파일> 을 안내한다 (설계 §9 ⑤(c))', async () => {
   const dir = tmpDir();
   for (const argv of [['init', '--from', 'https://example.org/#p=abc'], ['new', '--from', 'https://example.org/#p=abc']]) {
