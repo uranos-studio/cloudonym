@@ -90,7 +90,7 @@ function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
     if (picked.size > 0 && !window.confirm(fillUi(en, 'switch_cloud_confirm', { n: picked.size }))) return;
     setLink(undefined);
     // 지역이 새 CSP 표에서 안 풀리면 그 CSP 의 예시로 — 남겨 두면 이름이 하나도 안 나온다
-    setForm((f) => formForCloudSwitch(f, provider ?? ENABLED_PROVIDERS[0]!, p));
+    setForm((f) => formForCloudSwitch(f, provider, p));
     setProvider(p);
     setPicked(clearForCloudSwitch());
     setDropped(0);

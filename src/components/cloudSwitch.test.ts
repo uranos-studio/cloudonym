@@ -23,6 +23,22 @@ describe('formForCloudSwitch', () => {
     expect(formForCloudSwitch(DEFAULT_FORM, 'gcp', 'gcp')).toBe(DEFAULT_FORM);
   });
 
+  it('옛 CSP 의 멀티 · 이중 리전(US · ASIA1)도 풀리는 값이다 — 새 CSP 에서 안 풀리면 예시로 바꾼다', () => {
+    for (const region of ['US', 'ASIA1']) {
+      const form = { ...DEFAULT_FORM, region };
+      expect(formForCloudSwitch(form, 'gcp', 'aws'), region).toEqual({ ...form, region: EXAMPLE_REGIONS.aws });
+    }
+  });
+
+  it('CSP 를 고르지 않은 상태(옛 링크)면 켜진 CSP 어디서든 풀리는 값을 옛 지역으로 본다', () => {
+    const enabled = ['aws', 'gcp'] as const;
+    const gcp = { ...DEFAULT_FORM, region: 'ane3' };
+    expect(formForCloudSwitch(gcp, undefined, 'aws', enabled)).toEqual({ ...gcp, region: EXAMPLE_REGIONS.aws });
+    expect(formForCloudSwitch(gcp, undefined, 'gcp', enabled)).toBe(gcp);
+    const typo = { ...DEFAULT_FORM, region: 'asia-northeast' };
+    expect(formForCloudSwitch(typo, undefined, 'aws', enabled)).toBe(typo);
+  });
+
   it('CSP 마다 예시 지역은 자기 표에서 풀린다 — 바꾼 뒤 이름이 나온다', () => {
     for (const p of PROVIDERS) expect(canonicalRegion(EXAMPLE_REGIONS[p], p), p).toBeDefined();
   });
