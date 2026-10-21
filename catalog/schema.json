@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Cloudonym resource catalog",
-  "description": "Schema for catalog/gcp.json. catalog/regions.json and catalog/kind-sources.json are described under definitions.",
+  "description": "Schema for catalog/gcp.json and catalog/aws.json — rows follow meta.provider (aws → awsRow, otherwise row). catalog/regions.json and catalog/kind-sources.json are described under definitions.",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "rows"],
@@ -16,8 +16,11 @@
         "sources": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1 } }
       }
     },
-    "rows": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/row" } }
+    "rows": { "type": "array", "minItems": 1 }
   },
+  "if": { "type": "object", "properties": { "meta": { "type": "object", "properties": { "provider": { "const": "aws" } } } } },
+  "then": { "type": "object", "properties": { "rows": { "type": "array", "items": { "$ref": "#/definitions/awsRow" } } } },
+  "else": { "type": "object", "properties": { "rows": { "type": "array", "items": { "$ref": "#/definitions/row" } } } },
   "definitions": {
     "nonEmpty": { "type": "string", "minLength": 1 },
     "scopeChoice": { "type": "string", "pattern": "^(namespace|project|location|global|region|zone|in [a-z0-9_]+)$" },
@@ -62,6 +65,39 @@
         },
         "badges": { "type": "array", "items": { "enum": ["api-only", "preview"] }, "uniqueItems": true },
         "aliases": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9_ .-]+$" }, "uniqueItems": true }
+      }
+    },
+    "awsRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "displayName", "category", "rules", "slug", "entity", "kind", "info", "enterNameAt", "badges", "aliases"],
+      "properties": {
+        "key": { "type": "string", "pattern": "^aws\\.[a-z0-9_]+$" },
+        "displayName": { "$ref": "#/definitions/row/properties/displayName" },
+        "category": { "$ref": "#/definitions/row/properties/category" },
+        "rules": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^aws\\.[a-z0-9_]+$" },
+          "additionalProperties": { "$ref": "#/definitions/ruleSpec" }
+        },
+        "slug": { "$ref": "#/definitions/row/properties/slug" },
+        "entity": { "$ref": "#/definitions/row/properties/entity" },
+        "kind": { "$ref": "#/definitions/row/properties/kind" },
+        "info": { "$ref": "#/definitions/row/properties/info" },
+        "enterNameAt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["awsCli", "terraform", "apiOnly", "preview"],
+          "properties": {
+            "awsCli": { "type": "array", "items": { "$ref": "#/definitions/nonEmpty" } },
+            "terraform": { "type": "array", "items": { "$ref": "#/definitions/nonEmpty" } },
+            "apiOnly": { "type": "boolean" },
+            "preview": { "type": "boolean" }
+          }
+        },
+        "badges": { "$ref": "#/definitions/row/properties/badges" },
+        "aliases": { "$ref": "#/definitions/row/properties/aliases" }
       }
     },
     "ruleSpec": {

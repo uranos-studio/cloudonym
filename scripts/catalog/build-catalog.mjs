@@ -1,6 +1,7 @@
-// catalog 생성기 (D46) — catalog/gcp.json · catalog/regions.json(정본)을 스키마로 검사한 뒤
+// catalog 생성기 (D46) — catalog/gcp.json · catalog/aws.json · catalog/regions.json(정본)을 스키마로 검사한 뒤
 // src/core/rules/gcp-catalog.ts · src/core/regions-data.ts 를 쓴다(종류 표의 확인일은 kind-sources.json 에서). 개발 때만 돈다 — 엔진은 JSON 을 읽지 않고 생성 TS 를 들여온다(D9).
-// 사용: node scripts/catalog/build-catalog.mjs   (npm run catalog)
+// aws.json 은 검사만 하고 기본으로는 쓰지 않는다 — src/core 에 파일이 하나 늘면 규칙 지문(D26)이 바뀌므로 AWS 를 켜는 커밋에서 --aws 로 aws-catalog.ts 를 함께 쓴다
+// 사용: node scripts/catalog/build-catalog.mjs [--aws]   (npm run catalog)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -8,17 +9,19 @@ import Ajv from 'ajv';
 
 const HEADER = '// 생성 파일 — 손으로 고치지 않는다. scripts/catalog/build-catalog.mjs 가 catalog/';
 
-/** catalog 폴더의 JSON 넷 */
+/** catalog 폴더의 JSON 다섯 */
 export function loadCatalog(root) {
   const read = (f) => JSON.parse(readFileSync(join(root, 'catalog', f), 'utf-8'));
-  return { gcp: read('gcp.json'), regions: read('regions.json'), kindSources: read('kind-sources.json'), schema: read('schema.json') };
+  return { gcp: read('gcp.json'), aws: read('aws.json'), regions: read('regions.json'), kindSources: read('kind-sources.json'), schema: read('schema.json') };
 }
 
 /** 스키마를 어기면 던진다 — 생성 파일에 틀린 데이터가 들어가지 않게 */
-export function validateCatalog({ gcp, regions, kindSources, schema }) {
+export function validateCatalog({ gcp, aws, regions, kindSources, schema }) {
   const ajv = new Ajv({ allErrors: true });
   ajv.addSchema(schema, 'catalog');
-  for (const [name, ref, data] of [['gcp.json', 'catalog', gcp], ['regions.json', 'catalog#/definitions/regions', regions], ['kind-sources.json', 'catalog#/definitions/kindSources', kindSources]]) {
+  if (gcp.meta.provider !== 'gcp') throw new Error(`gcp.json 의 meta.provider 가 ${gcp.meta.provider} 다`);
+  if (aws.meta.provider !== 'aws') throw new Error(`aws.json 의 meta.provider 가 ${aws.meta.provider} 다`);
+  for (const [name, ref, data] of [['gcp.json', 'catalog', gcp], ['aws.json', 'catalog', aws], ['regions.json', 'catalog#/definitions/regions', regions], ['kind-sources.json', 'catalog#/definitions/kindSources', kindSources]]) {
     if (!ajv.validate(ref, data)) throw new Error(`${name} 이 schema 를 어겼다: ${ajv.errorsText()}`);
   }
 }
@@ -84,6 +87,22 @@ export const GCP_KIND_CHECKED: Readonly<Record<string, string | null>> = ${liter
 `;
 }
 
+/** aws.json → aws-catalog.ts. 행 꼴은 gcp-catalog.ts 의 CatalogRow 에서 enterNameAt 만 다르다(gcloud 대신 awsCli) */
+export function renderAwsCatalog(aws) {
+  return `${HEADER}aws.json 에서 만든다 (D46).
+// 행 하나 = 화면 행 하나. 행 꼴은 gcp-catalog.ts 의 CatalogRow 에서 enterNameAt 만 다르다
+import type { CatalogRow } from './gcp-catalog';
+
+export interface AwsCatalogRow extends Omit<CatalogRow, 'enterNameAt'> {
+  enterNameAt: { awsCli: readonly string[]; terraform: readonly string[]; apiOnly: boolean; preview: boolean };
+}
+
+export const AWS_CATALOG_META = ${literal(aws.meta)} as const;
+
+export const AWS_CATALOG: readonly AwsCatalogRow[] = ${literal(aws.rows)};
+`;
+}
+
 /** label — GCP 는 도시 · 나라(location), AWS · Azure 는 표시 이름 */
 export function renderRegions(regions) {
   const gcp = regions.gcp.map((r) => ({ region: r.region, code: r.code, zones: r.zones, label: r.location }));
@@ -114,5 +133,6 @@ if (isMain) {
   validateCatalog(catalog);
   writeFileSync(join(root, 'src/core/rules/gcp-catalog.ts'), renderGcpCatalog(catalog.gcp, catalog.kindSources));
   writeFileSync(join(root, 'src/core/regions-data.ts'), renderRegions(catalog.regions));
-  console.log(`gcp-catalog.ts ${catalog.gcp.rows.length}행 · regions-data.ts gcp ${catalog.regions.gcp.length} · aws ${catalog.regions.aws.length} · azure ${catalog.regions.azure.length}`);
+  if (process.argv.includes('--aws')) writeFileSync(join(root, 'src/core/rules/aws-catalog.ts'), renderAwsCatalog(catalog.aws));
+  console.log(`gcp-catalog.ts ${catalog.gcp.rows.length}행 · aws.json ${catalog.aws.rows.length}행(${process.argv.includes('--aws') ? 'aws-catalog.ts 씀' : '검사만'}) · regions-data.ts gcp ${catalog.regions.gcp.length} · aws ${catalog.regions.aws.length} · azure ${catalog.regions.azure.length}`);
 }
