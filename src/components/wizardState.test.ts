@@ -8,16 +8,16 @@ import { treeRules } from './selection';
 import { buildTree } from '../core/tree';
 import { expandPlan, validatePlan, MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, type WizardPlan } from '../core/wizard/plan';
 import { generateProject } from '../core/engine';
-import { DEFAULT_FORM } from './formContext';
+import { DEFAULT_FORM, EXAMPLE_REGIONS } from './formContext';
 
 const shop: PickRef = { service: 0, pick: 0 };
 const names = (plan: WizardPlan) => generateProject(expandPlan(plan), 'gcp').items.map((i) => i.name);
 const ok = (plan: WizardPlan) => expect(validatePlan(plan)).toEqual({ ok: true });
 
 describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', () => {
-  it('문맥 예시는 트리 화면 예시와 같다(purpose 없음) · 칩을 켜기 전에는 이름이 없다(wizard.empty)', () => {
+  it('문맥 예시는 트리 화면 예시와 같다(purpose 없음 · 지역은 마법사가 GCP 만이라 GCP 예시) · 칩을 켜기 전에는 이름이 없다(wizard.empty)', () => {
     const { purpose: _p, ...four } = DEFAULT_FORM;
-    expect(DEFAULT_PROJECT).toEqual(four);
+    expect(DEFAULT_PROJECT).toEqual({ ...four, region: EXAMPLE_REGIONS.gcp });
     const p = initialPlan();
     expect(p.services).toEqual([{ purpose: 'shop', picks: [] }]);
     const r = validatePlan(p);

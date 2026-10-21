@@ -21,7 +21,7 @@ import * as S from './wizardState';
 import { selectAdded, type Edit, type RowPath } from './wizardSelection';
 import { CardGallery } from './WizardCards';
 import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, PRIMARY, RULES, SMALL_INPUT, inline } from './wizardStyles';
-import { EXAMPLE_REGION } from './formContext';
+import { EXAMPLE_REGIONS } from './formContext';
 import type { ProjectField } from './wizardProjectGate';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -103,7 +103,7 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
           {errorFor('env') && <p id="wizard-envs-error" className={`mt-1 ${ERR}`}>{errorFor('env')}</p>}
         </div>
         <RegionPicker provider="gcp" value={v.region} onChange={(region) => { onTouch('region'); onChange({ ...v, region }); }} onBlur={() => onTouch('region')}
-          placeholder={fillUi(en, 'wizard_region_placeholder', { region: EXAMPLE_REGION })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
+          placeholder={fillUi(en, 'wizard_region_placeholder', { region: EXAMPLE_REGIONS.gcp })} error={errorFor('region')} labelClass={LABEL} controlClass={CONTROL} />
         {/* 프로젝트 ID 접미사 (D85) — 선택. tier 와 같은 꼴 · 예약어. 빈 칸이면 모델에서 키를 지운다 */}
         <div>
           <label htmlFor="wizard-project-id-suffix" className={LABEL}>{en.ui.wizard_project_id_suffix} <span className={`ml-1 font-normal ${HINT}`}>{en.ui.wizard_project_id_suffix_hint}</span></label>

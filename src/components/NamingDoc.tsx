@@ -5,7 +5,7 @@ import { en } from '../messages/en';
 import { catalogFor } from '../core/catalog';
 import { REGIONS } from '../core/regions-data';
 import { buildTree } from '../core/tree';
-import { ENABLED_PROVIDERS } from '../core/types';
+import type { Provider } from '../core/types';
 import { VERSION } from '../version';
 import { PRESETS } from '../core/wizard/presets';
 import { ATTACHMENTS } from '../core/wizard/attachments';
@@ -59,7 +59,8 @@ function Section({ section }: { section: DocSection }) {
 }
 
 export function NamingDoc() {
-  const provider = ENABLED_PROVIDERS[0]!;
+  // catalog · 마법사 프리셋이 있는 CSP 는 GCP 뿐이다 — 켜진 첫 CSP 가 바뀌어도 이 문서는 GCP 를 그린다
+  const provider: Provider = 'gcp';
   const model = namingDocModel({
     provider, catalog: catalogFor(provider), regions: REGIONS[provider], rules: treeRules(buildTree(provider)), messages: en, version: VERSION,
     presets: PRESETS, attachments: ATTACHMENTS, reservedTiers: RESERVED_TIERS,

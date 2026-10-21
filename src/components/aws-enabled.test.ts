@@ -6,3 +6,9 @@ vi.mock('../core/types', async (orig) => ({ ...(await orig<typeof import('../cor
 await import('./urlState.test');
 await import('./linkRevision.test');
 await import('./roundtrip.test');
+await import('./wizardState.test');
+await import('./wizardBundles.test');
+await import('./wizardCustom.test');
+await import('./wizardProjectGate.test');
+await import('./wizardSelection.test');
+await import('./namingDoc.test');

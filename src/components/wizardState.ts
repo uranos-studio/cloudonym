@@ -5,7 +5,7 @@ import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
 import { MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, checkProjectIdSuffix, validatePlan, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
 import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
-import { EXAMPLE_REGION } from './formContext';
+import { EXAMPLE_REGIONS } from './formContext';
 import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
 import { kindToken } from '../core/catalog';
@@ -27,8 +27,8 @@ const GCP_RULES = new Map(treeRules(buildTree('gcp')).map((r) => [r.id, r]));
 /** pick 의 자리 — service 가 null 이면 프로젝트 공용(Project resources) */
 export interface PickRef { service: number | null; pick: number }
 
-/** 마법사 ① 예시 넷 — 트리 화면의 예시(DEFAULT_FORM)와 같은 값 · 첫 서비스 이름 예시 */
-export const DEFAULT_PROJECT: WizardPlan['project'] = { owner: 'platform', system: 'billing', env: 'prod', region: EXAMPLE_REGION };
+/** 마법사 ① 예시 넷 — 트리 화면의 예시(DEFAULT_FORM)와 같은 값 · 첫 서비스 이름 예시. 마법사는 GCP 만이라 지역도 GCP 예시다 */
+export const DEFAULT_PROJECT: WizardPlan['project'] = { owner: 'platform', system: 'billing', env: 'prod', region: EXAMPLE_REGIONS.gcp };
 export const EXAMPLE_SERVICE = 'shop';
 /** 처음 온 사람의 프로젝트 값 (D97) — 넷 다 비어 있다. 예시(DEFAULT_PROJECT)는 입력 칸의 placeholder 로만 보인다 */
 export const EMPTY_PROJECT: WizardPlan['project'] = { owner: '', system: '', env: '', region: '' };
