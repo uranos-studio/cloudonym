@@ -139,7 +139,7 @@ describe('waitUntil — 응답은 텔레메트리를 기다리지 않는다', ()
   });
   it('generate · validate 도 waitUntil 1건 — api_generate · api_validate 키', async () => {
     const g = fakeKv();
-    const gen = await req(app, '/v1/generate', jsonPost({ context: ctx }), { CLOUDONYM_KV: g.kv });
+    const gen = await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), { CLOUDONYM_KV: g.kv });
     await Promise.all(gen.promises);
     expect([...g.store.keys()][0]).toMatch(/^stats:api_generate:/);
     const v = fakeKv();

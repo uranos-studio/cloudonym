@@ -86,7 +86,7 @@ describe('필드 길이 상한(자유 입력 64 · 나머지 1024) — 본문 �
     const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(65) } }));
     expect(res.status).toBe(400);
     expect(await json(res)).toEqual({ success: false, errors: [{ code: 'request.field_too_long', field: 'owner', params: { max: 64 }, message: "'owner' is longer than 64 characters" }] });
-    expect((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(64) } }))).res.status).toBe(200);
+    expect((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(64) }, providers: ['gcp'] }))).res.status).toBe(200);
   });
   it('generate context system · purpose 65자 · env 1025자 → 오류 셋, 문맥 필드 순서', async () => {
     const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...ctx, system: 's'.repeat(65), purpose: 'p'.repeat(65), env: 'e'.repeat(1025) } }));
@@ -109,7 +109,7 @@ describe('onError — 처리하지 못한 예외도 JSON 500 (안전망)', () =>
   it('v1 라우트에서 던지면 500 { success:false, errors:[내부 오류] } · console.error', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const res = await app.request('/v1/generate', jsonPost({ context: ctx }), {});
+      const res = await app.request('/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), {});
       expect(res.status).toBe(500);
       expect(res.headers.get('content-type')).toMatch(/^application\/json/);
       expect(await json(res)).toEqual({ success: false, errors: [{ code: 'server.internal_error', message: 'Internal error' }] });

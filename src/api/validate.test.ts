@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, json } from './test-support';
+import { req, jsonPost, json, ENABLED } from './test-support';
 import { VERSION } from '../version';
 import { GCP_INTAKE_ROWS } from '../core/rules/gcp-intake';
 import { GCP_MANUAL_RULES } from '../core/rules/gcp-manual';
@@ -29,12 +29,12 @@ describe('POST /v1/validate', () => {
   it('아는데 꺼진 provider → 400 request.provider_not_enabled + supported 는 켜진 것 (D45)', async () => {
     const { res } = await post({ provider: 'azure', resource_type: 'storage_account', name: 'st-web-prod' });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' }, message: "Provider 'azure' is not available yet; 'supported' lists the providers you can use" }], supported: ['gcp'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' }, message: "Provider 'azure' is not available yet; 'supported' lists the providers you can use" }], supported: ENABLED });
   });
   it('모르는 provider → 400 + supported 는 켜진 것', async () => {
     const { res } = await post({ provider: 'oci', resource_type: 'bucket', name: 'x' });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' }, message: "Unsupported provider 'oci'" }], supported: ['gcp'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' }, message: "Unsupported provider 'oci'" }], supported: ENABLED });
   });
   it('모르는 resource_type → 400 + 그 provider 의 유형 목록', async () => {
     const { res } = await post({ provider: 'gcp', resource_type: 'nope', name: 'x' });

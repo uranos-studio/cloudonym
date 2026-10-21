@@ -19,7 +19,7 @@ describe('요청 제한 — Rate Limiting 바인딩 API_LIMITER, 클라이언트
     expect(Number(m![3])).toBe(RATE_LIMIT.period);
   });
   for (const [path, init] of [
-    ['/v1/generate', { ...jsonPost({ context: ctx }), headers: ip({ 'content-type': 'application/json' }) }],
+    ['/v1/generate', { ...jsonPost({ context: ctx, providers: ['gcp'] }), headers: ip({ 'content-type': 'application/json' }) }],
     ['/v1/validate', { ...jsonPost({ provider: 'gcp', resource_type: 'project_id', name: 'my-proj' }), headers: ip({ 'content-type': 'application/json' }) }],
     ['/v1/events', beaconPost({ event: 'ui_visit' }, ip())],
   ] as const) {
@@ -37,27 +37,27 @@ describe('요청 제한 — Rate Limiting 바인딩 API_LIMITER, 클라이언트
   }
   it('429 에도 CORS 헤더가 실린다 — 브라우저 클라이언트가 이유를 읽는다', async () => {
     const { limiter } = fakeLimiter('deny');
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: limiter });
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), { API_LIMITER: limiter });
     expect(res.status).toBe(429);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
   });
   it('한도 안 → 200 · IP 헤더가 없으면 key 는 unknown', async () => {
     const { limiter, keys } = fakeLimiter('ok');
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: limiter });
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), { API_LIMITER: limiter });
     expect(res.status).toBe(200);
     expect(keys).toEqual(['unknown']);
   });
   it('IPv6 는 /64 대역으로 센다 — 한 대역 안에서 주소를 바꿔도 같은 key · 줄임 표기도 같은 key', async () => {
     const { limiter, keys } = fakeLimiter('ok');
     for (const a of ['2001:db8:1:2::1', '2001:DB8:1:2:ffff:0:0:9', '2001:db8:0:0::5', '::1', '2001:db8::ffff:203.0.113.7']) {
-      await req(app, '/v1/generate', { ...jsonPost({ context: ctx }), headers: { 'content-type': 'application/json', 'cf-connecting-ip': a } }, { API_LIMITER: limiter });
+      await req(app, '/v1/generate', { ...jsonPost({ context: ctx, providers: ['gcp'] }), headers: { 'content-type': 'application/json', 'cf-connecting-ip': a } }, { API_LIMITER: limiter });
     }
     expect(keys).toEqual(['2001:db8:1:2::/64', '2001:db8:1:2::/64', '2001:db8:0:0::/64', '0:0:0:0::/64', '2001:db8:0:0::/64']);
   });
   it('바인딩이 없으면(로컬 · 시험) 건너뛴다 · limit 이 던지면 막지 않고 통과시킨다(fail-open)', async () => {
-    expect((await req(app, '/v1/generate', jsonPost({ context: ctx }))).res.status).toBe(200);
+    expect((await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }))).res.status).toBe(200);
     const { limiter, keys } = fakeLimiter('throw');
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: limiter });
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), { API_LIMITER: limiter });
     expect(res.status).toBe(200);
     expect(keys).toHaveLength(1);
   });
@@ -127,12 +127,12 @@ describe('Worker 응답 보안 헤더 — secureHeaders', () => {
     hasSecure((await req(app, '/v1/events', jsonPost({ event: 'ui_visit' }))).res, '403');
     hasSecure((await req(app, '/v1/nope')).res, '404');
     hasSecure((await req(app, '/v1/generate', jsonPost({ context: { ...ctx, owner: 'a'.repeat(40 * 1024) } }))).res, '413');
-    hasSecure((await req(app, '/v1/generate', jsonPost({ context: ctx }), { API_LIMITER: fakeLimiter('deny').limiter })).res, '429');
+    hasSecure((await req(app, '/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), { API_LIMITER: fakeLimiter('deny').limiter })).res, '429');
   });
   it('500(onError) 에도 싣는다 · HSTS 는 Worker 가 내지 않는다(존 설정이 건다)', async () => {
     // ExecutionContext 없이 부르면 c.executionCtx 가 던져 500 이 된다 — root onError(/llms.txt) 와 v1 onError(/v1/generate) 둘 다
     const root = await app.request('/llms.txt', undefined, {});
-    const sub = await app.request('/v1/generate', jsonPost({ context: ctx }), {});
+    const sub = await app.request('/v1/generate', jsonPost({ context: ctx, providers: ['gcp'] }), {});
     for (const [label, res] of [['root', root], ['v1', sub]] as const) {
       expect(res.status, label).toBe(500);
       hasSecure(res, label);

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
 import { MAX_ECHO_CHARS } from './errors';
-import { req, jsonPost, json, fakeKv, fakeLimiter, WIZARD_WIRE_SAMPLE, type Loose } from './test-support';
+import { req, jsonPost, json, fakeKv, fakeLimiter, WIZARD_WIRE_SAMPLE, ENABLED, DISABLED, type Loose } from './test-support';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -97,7 +97,7 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(body.data.gcp.service_account.name).toBe('billing-trade-prod-sa-sync');
   });
   it('잘못된 env → 400 { success:false, errors }', async () => {
-    const { res } = await post({ context: { ...ctx, env: 'preprod' } });
+    const { res } = await post({ context: { ...ctx, env: 'preprod' }, providers: ['gcp'] });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ success: false, errors: [{ code: 'context.value_unsupported', field: 'env', params: { value: 'preprod', supported: ['prod', 'stg', 'dev', 'sbx', 'qa', 'uat', 'test', 'perf', 'dr'] }, message: "env 'preprod' is not supported (prod, stg, dev, sbx, qa, uat, test, perf, dr)" }] });
   });
@@ -107,19 +107,20 @@ describe('POST /v1/generate (D15 wire)', () => {
     expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.body_not_json', message: 'Request body is not JSON' }] });
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', async () => {
-    const { res } = await post({ context: ctx, providers: ['aws'] });
+    const off = DISABLED[0]!;
+    const { res } = await post({ context: ctx, providers: [off] });
     expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'providers[0]', params: { provider: 'aws' }, message: "Provider 'aws' is not available yet; 'supported' lists the providers you can use" }], supported: ['gcp'] });
+    expect(await res.json()).toEqual({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'providers[0]', params: { provider: off }, message: `Provider '${off}' is not available yet; 'supported' lists the providers you can use` }], supported: ENABLED });
   });
   it('providers 가 빈 배열 · 배열 아님 · 모르는 값이면 400 + supported', async () => {
     const empty = await post({ context: ctx, providers: [] });
     expect(empty.res.status).toBe(400);
-    expect(await empty.res.json()).toEqual({ success: false, errors: [{ code: 'request.providers_empty', message: "'providers' is empty" }], supported: ['gcp'] });
+    expect(await empty.res.json()).toEqual({ success: false, errors: [{ code: 'request.providers_empty', message: "'providers' is empty" }], supported: ENABLED });
     const notArray = await post({ context: ctx, providers: 'gcp' });
     expect(notArray.res.status).toBe(400);
     const unknown = await post({ context: ctx, providers: ['gcp', 'oci'] });
     expect(unknown.res.status).toBe(400);
-    expect(await unknown.res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'oci' }, message: "Unsupported providers[1] 'oci'" }], supported: ['gcp'] });
+    expect(await unknown.res.json()).toEqual({ success: false, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: 'oci' }, message: "Unsupported providers[1] 'oci'" }], supported: ENABLED });
   });
   it('context 가 없거나 null 이면 400 (500 이 아니다)', async () => {
     expect((await post({})).res.status).toBe(400);
@@ -130,8 +131,8 @@ describe('POST /v1/generate (D15 wire)', () => {
 
 describe('rules_version 핀 (D27 ⑴)', () => {
   it('지금 버전이면 200 · 다르면 409 request.rules_version_mismatch', async () => {
-    expect((await post({ context: ctx, rules_version: VERSION.rules })).res.status).toBe(200);
-    const { res } = await post({ context: ctx, rules_version: '2026-09-15.1' });
+    expect((await post({ context: ctx, providers: ['gcp'], rules_version: VERSION.rules })).res.status).toBe(200);
+    const { res } = await post({ context: ctx, providers: ['gcp'], rules_version: '2026-09-15.1' });
     expect(res.status).toBe(409);
     const body = await json(res);
     expect(body.success).toBe(false);
@@ -233,12 +234,12 @@ describe('POST /v1/names (D39)', () => {
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', async () => {
     const { res } = await names({ provider: 'azure', context: base, resources: [{ type: 'virtual_machine' }] });
     expect(res.status).toBe(400);
-    expect(await res.json()).toMatchObject({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ['gcp'] });
+    expect(await res.json()).toMatchObject({ success: false, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ENABLED });
   });
   it('모르는 provider → 400 + supported · rules_version 다르면 409', async () => {
     const bad = await names({ provider: 'oci', context: base, resources: [{ type: 'x' }] });
     expect(bad.res.status).toBe(400);
-    expect(await bad.res.json()).toMatchObject({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider' }], supported: ['gcp'] });
+    expect(await bad.res.json()).toMatchObject({ success: false, errors: [{ code: 'request.value_unsupported', field: 'provider' }], supported: ENABLED });
     const pin = await names({ provider: 'gcp', context: base, resources: [{ type: 'project_id' }], rules_version: '2026-01-01.1' });
     expect(pin.res.status).toBe(409);
   });
@@ -281,7 +282,7 @@ describe('POST /v1/names (D39)', () => {
     expect(JSON.stringify(body)).not.toContain(rlo);
   });
   it('/v1/generate — 리소스 정책은 종류를 받을 길이 없어 늘 valid:false + name.kind_required (D52)', async () => {
-    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...base, region: 'asia-northeast3' } }));
+    const { res } = await req(app, '/v1/generate', jsonPost({ context: { ...base, region: 'asia-northeast3' }, providers: ['gcp'] }));
     const rp = (await json(res)).data.gcp.resource_policy;
     expect(rp).toMatchObject({ name: 'billing-trade-prod-ane3-rp-01', valid: false });
     expect(rp.violations.map((v: { code: string }) => v.code)).toEqual(['name.kind_required']);

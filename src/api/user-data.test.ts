@@ -107,7 +107,7 @@ describe('계측 쪽에는 문맥값이 없다 — 요청자에게 돌려주는 
     }
   });
   it('/v1/generate · /v1/validate 도 같다', async () => {
-    const gen = await capture(() => req(app, '/v1/generate', { ...jsonPost({ context: MARK }), headers: { 'content-type': 'application/json', 'user-agent': UA } }, env));
+    const gen = await capture(() => req(app, '/v1/generate', { ...jsonPost({ context: MARK, providers: ['gcp'] }), headers: { 'content-type': 'application/json', 'user-agent': UA } }, env));
     expect(gen.res.status).toBe(200);
     const val = await capture(() => req(app, '/v1/validate', { ...jsonPost({ provider: 'gcp', resource_type: 'project_id', name: 'example-team-payroll' }), headers: { 'content-type': 'application/json', 'user-agent': UA } }, env));
     expect(val.res.status).toBe(200);

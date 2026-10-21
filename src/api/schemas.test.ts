@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseEventBody, parseGenerateBody, parseNamesBody, parseValidateBody, parseWizardBody, toWirePath, UI_COPY_TARGETS } from './schemas';
-import { WIZARD_WIRE_SAMPLE } from './test-support';
+import { WIZARD_WIRE_SAMPLE, ENABLED, DISABLED } from './test-support';
 import { MAX_PICKS_PER_SERVICE, validatePlan } from '../core/wizard/plan';
 import { rulesFor } from '../core/constraints';
 import { RULES_REVISION } from '../core/revision';
@@ -23,15 +23,17 @@ describe('parseGenerateBody', () => {
     expect(r.ok && r.value.providers).toEqual([...ENABLED_PROVIDERS]);
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', () => {
-    expect(parseGenerateBody({ context: ctx, providers: ['aws'] }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'providers[0]', params: { provider: 'aws' } }], supported: ['gcp'] } });
+    const off = DISABLED[0]!;
+    expect(parseGenerateBody({ context: ctx, providers: [off] }))
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'providers[0]', params: { provider: off } }], supported: ENABLED } });
     // 켜진 것과 섞여도 꺼진 자리마다 하나 · 모르는 값은 value_unsupported 그대로
-    expect(parseGenerateBody({ context: ctx, providers: ['gcp', 'azure', 'oci', 'aws'] }))
+    const [a, b] = [DISABLED.at(-1)!, DISABLED[0]!];
+    expect(parseGenerateBody({ context: ctx, providers: ['gcp', a, 'oci', b] }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [
-        { code: 'request.provider_not_enabled', field: 'providers[1]', params: { provider: 'azure' } },
+        { code: 'request.provider_not_enabled', field: 'providers[1]', params: { provider: a } },
         { code: 'request.value_unsupported', field: 'providers[2]', params: { value: 'oci' } },
-        { code: 'request.provider_not_enabled', field: 'providers[3]', params: { provider: 'aws' } },
-      ], supported: ['gcp'] } });
+        { code: 'request.provider_not_enabled', field: 'providers[3]', params: { provider: b } },
+      ], supported: ENABLED } });
   });
   it('객체가 아닌 본문 · context 없음 · context null → 400 본문', () => {
     expect(parseGenerateBody('x')).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.body_not_object' }] } });
@@ -39,13 +41,13 @@ describe('parseGenerateBody', () => {
     expect(parseGenerateBody({ context: null })).toMatchObject({ ok: false });
   });
   it('providers 배열 아님 · 빈 배열 · 모르는 값 → supported 는 켜진 것', () => {
-    const supported = ['gcp'];
+    const supported = ENABLED;
     expect(parseGenerateBody({ context: ctx, providers: 'gcp' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.providers_not_array' }], supported } });
     expect(parseGenerateBody({ context: ctx, providers: [] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.providers_empty' }], supported } });
     expect(parseGenerateBody({ context: ctx, providers: ['oci', 1] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'providers[0]', params: { value: 'oci' } }, { code: 'request.value_unsupported', field: 'providers[1]', params: { value: '1' } }], supported } });
   });
   it('parseContext 의 오류를 그대로 전달한다 (owner → region 순서)', () => {
-    const r = parseGenerateBody({ context: { ...ctx, owner: '', region: 'mars' } });
+    const r = parseGenerateBody({ context: { ...ctx, owner: '', region: 'mars' }, providers: ['gcp'] });
     expect(r).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.empty', field: 'owner' }, { code: 'context.value_unsupported', field: 'region', params: { value: 'mars', supported: REGIONS.gcp.map((x) => x.region) } }] } });
   });
 });
@@ -57,16 +59,16 @@ describe('parseValidateBody', () => {
   });
   it('모르는 provider · resource_type · 문자열 아닌 name → 400 + supported', () => {
     expect(parseValidateBody({ provider: 'oci', resource_type: 'x', name: 'x' }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported: ['gcp'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }], supported: ENABLED } });
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'nope', name: 'x' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: 'nope' } }], supported: rulesFor('gcp').map((r) => r.resourceType) } });
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'project_id', name: 3 }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_not_string', field: 'name' }] } });
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', () => {
-    for (const provider of ['aws', 'azure']) {
+    for (const provider of DISABLED) {
       expect(parseValidateBody({ provider, resource_type: 's3_bucket', name: 'x' }))
-        .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider } }], supported: ['gcp'] } });
+        .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider } }], supported: ENABLED } });
     }
   });
 });
@@ -83,7 +85,7 @@ describe('parseEventBody', () => {
     expect(parseEventBody({}))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'event' }], supported: ['ui_visit', 'ui_generate', 'ui_copy'] } });
     expect(parseValidateBody({ resource_type: 'project_id', name: 'x' }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'provider' }], supported: ['gcp'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'provider' }], supported: ENABLED } });
     expect(parseValidateBody({ provider: 'gcp', name: 'x' }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'resource_type' }], supported: rulesFor('gcp').map((r) => r.resourceType) } });
     // null 은 보낸 값이다 — 목록 밖 값으로 되돌려 싣는다
@@ -107,13 +109,13 @@ describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400', ()
   const evil = { toString: 1 };
   it('provider · resource_type 자리 → ok:false', () => {
     const p = parseValidateBody({ provider: evil, resource_type: 'x', name: 'y' });
-    expect(p).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: '{"toString":1}' } }], supported: ['gcp'] } });
+    expect(p).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'provider', params: { value: '{"toString":1}' } }], supported: ENABLED } });
     const r = parseValidateBody({ provider: 'gcp', resource_type: evil, name: 'y' });
     expect(r).toMatchObject({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'resource_type', params: { value: '{"toString":1}' } }] } });
   });
   it('providers 원소 자리 → ok:false', () => {
     expect(parseGenerateBody({ context: ctx, providers: ['gcp', evil] }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: '{"toString":1}' } }], supported: ['gcp'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.value_unsupported', field: 'providers[1]', params: { value: '{"toString":1}' } }], supported: ENABLED } });
   });
   it('event 자리 → ok:false', () => {
     expect(parseEventBody({ event: evil }))
@@ -129,8 +131,8 @@ describe('toString 이 호출 불가능한 객체 — 500 이 아니라 400', ()
 describe('rules_version (D27 ⑴)', () => {
   const current = RULES_REVISION;
   it('없거나 undefined 면 통과 · 지금 버전과 같으면 통과', () => {
-    expect(parseGenerateBody({ context: ctx }).ok).toBe(true);
-    expect(parseGenerateBody({ context: ctx, rules_version: current }).ok).toBe(true);
+    expect(parseGenerateBody({ context: ctx, providers: ['gcp'] }).ok).toBe(true);
+    expect(parseGenerateBody({ context: ctx, providers: ['gcp'], rules_version: current }).ok).toBe(true);
     expect(parseValidateBody({ provider: 'gcp', resource_type: 'service_account', name: 'x', rules_version: current }).ok).toBe(true);
   });
   it('다르면 409 · 빈 문자열도 다르므로 409', () => {
@@ -168,10 +170,10 @@ describe('parseNamesBody (D39)', () => {
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', () => {
     expect(parseNamesBody({ ...ok, provider: 'azure', resources: [{ type: 'virtual_machine' }] }))
-      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ['gcp'] } });
+      .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'azure' } }], supported: ENABLED } });
   });
   it('provider 없음 → 400 request.field_missing · 모르는 값 → request.value_unsupported · supported 는 켜진 것', () => {
-    const supported = ['gcp'];
+    const supported = ENABLED;
     expect(parseNamesBody({ ...ok, provider: undefined }))
       .toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.field_missing', field: 'provider' }], supported } });
     expect(parseNamesBody({ ...ok, provider: 'oci' }))
@@ -252,7 +254,7 @@ describe('parseWizardBody (D66) — 모양은 API 가, 마법사 검사는 core 
 
   it('본문 · provider · project 모양 — 400 · 꺼진 provider 는 provider_not_enabled · supported 는 켜진 것', () => {
     expect(errorsOf('x')).toEqual([{ code: 'request.body_not_object' }]);
-    expect(parseWizardBody({ ...W, provider: 'aws' })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: 'aws' } }], supported: ['gcp'] } });
+    expect(parseWizardBody({ ...W, provider: DISABLED[0] })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'request.provider_not_enabled', field: 'provider', params: { provider: DISABLED[0] } }], supported: ENABLED } });
     expect(errorsOf({ ...W, provider: undefined })).toEqual([{ code: 'request.field_missing', field: 'provider' }]);
     expect(errorsOf({ ...W, provider: 'oci' })).toEqual([{ code: 'request.value_unsupported', field: 'provider', params: { value: 'oci' } }]);
     expect(errorsOf({ ...W, project: null })).toEqual([{ code: 'request.context_not_object' }]);
