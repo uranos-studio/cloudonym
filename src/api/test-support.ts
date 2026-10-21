@@ -9,12 +9,12 @@ import { UI_COPY_TARGETS } from './schemas';
 import { VERSION } from '../version';
 import { ENABLED_PROVIDERS, PROVIDERS, type Provider } from '../core/types';
 
-/** 시험 표본의 지역 입력 — CSP 마다 다른 표로 푼다 (D49). gcp 는 존 입력(리전으로 풀린다)을 그대로 둔다.
- *  aws 존 입력(ap-northeast-2a)은 존 토큰이 정해지지 않아 받지 않으므로 리전 이름이다 */
 /** supported 에 실리는 켜진 CSP · 꺼진 CSP 표본 — 0.1(['gcp'])에서는 ['gcp'] · ['aws', 'azure'] 다. 켜는 CSP 가 늘어도 시험이 그대로 뜻을 지킨다 */
-export const ENABLED: string[] = [...ENABLED_PROVIDERS];
+export const ENABLED: Provider[] = [...ENABLED_PROVIDERS];
 export const DISABLED: Provider[] = PROVIDERS.filter((p) => !ENABLED_PROVIDERS.includes(p));
 
+/** 시험 표본의 지역 입력 — CSP 마다 다른 표로 푼다 (D49). gcp 는 존 입력(리전으로 풀린다)을 그대로 둔다.
+ *  aws 존 입력(ap-northeast-2a)은 존 토큰이 정해지지 않아 받지 않으므로 리전 이름이다 */
 export const SAMPLE_REGION: Readonly<Record<Provider, string>> = { gcp: 'asia-northeast3-a', aws: 'ap-northeast-2', azure: 'koreacentral' };
 
 /** Hono 의 ExecutionContext 타입은 props 를 요구한다 — 빼면 TS2345 */

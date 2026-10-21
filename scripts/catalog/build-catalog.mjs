@@ -19,11 +19,12 @@ export function loadCatalog(root) {
 export function validateCatalog({ gcp, aws, regions, kindSources, schema }) {
   const ajv = new Ajv({ allErrors: true });
   ajv.addSchema(schema, 'catalog');
-  if (gcp.meta.provider !== 'gcp') throw new Error(`gcp.json 의 meta.provider 가 ${gcp.meta.provider} 다`);
-  if (aws.meta.provider !== 'aws') throw new Error(`aws.json 의 meta.provider 가 ${aws.meta.provider} 다`);
   for (const [name, ref, data] of [['gcp.json', 'catalog', gcp], ['aws.json', 'catalog', aws], ['regions.json', 'catalog#/definitions/regions', regions], ['kind-sources.json', 'catalog#/definitions/kindSources', kindSources]]) {
     if (!ajv.validate(ref, data)) throw new Error(`${name} 이 schema 를 어겼다: ${ajv.errorsText()}`);
   }
+  // 스키마가 meta 를 보장한 뒤에 본다 — 먼저 보면 meta 가 없을 때 스키마 오류 대신 TypeError 로 죽는다
+  if (gcp.meta.provider !== 'gcp') throw new Error(`gcp.json 의 meta.provider 가 ${gcp.meta.provider} 다`);
+  if (aws.meta.provider !== 'aws') throw new Error(`aws.json 의 meta.provider 가 ${aws.meta.provider} 다`);
 }
 
 /** JSON 값을 TS 리터럴로 — JSON.stringify 가 따옴표 · 제어 문자를 이스케이프하고, JS 줄 끝 문자 둘은 따로 막는다 */
