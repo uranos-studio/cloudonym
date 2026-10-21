@@ -8,7 +8,7 @@ import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS, REGIONAL_LOCATION, canonicalLocation } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
 import { ENABLED_PROVIDERS, PROVIDERS, type Env, type NamingContext, type Provider, type RawContext, type ResourceRule } from '../core/types';
-import { EXAMPLE_REGION } from './formContext';
+import { EXAMPLE_REGIONS } from './formContext';
 import { envList, envsFromHash } from './wizardEnvs';
 
 export const HASH_KEY = 'state';
@@ -168,7 +168,7 @@ const entryCount = (r: unknown): number => (r !== null && typeof r === 'object' 
  *  `v` 는 parseContext 가 읽지 않는다 — 꼴이 `YYYY-MM-DD.N` 일 때만 rulesVersion 으로 돌려주고, 아니면 없는 것으로 본다.
  *  `p` 가 셋 밖이면 없는 것으로 보고 `r` 은 판정할 수 없어 버린다. rules 는 기본이 규칙 표(시험 전용 fixture 가 다른 표를 넘긴다).
  *  enabled — 켜진 CSP (D45). 지역은 CSP 마다 다른 표로 푼다 (D49) — 링크의 p 가 켜져 있으면 그 표, p 가 없으면 켜진 CSP 를 차례로 대어 처음 풀리는 표.
- *  p 가 꺼진 CSP 면 (D55) ① p 로 원래 CSP 를 알고 ② 그 CSP 의 표로 풀리는지 본다(안 풀리면 깨진 링크) ③ 지역은 켜진 CSP 로 옮길 수 없어 예시(R0)로 바꾸고
+ *  p 가 꺼진 CSP 면 (D55) ① p 로 원래 CSP 를 알고 ② 그 CSP 의 표로 풀리는지 본다(안 풀리면 깨진 링크) ③ 지역은 켜진 CSP 로 옮길 수 없어 켜진 첫 CSP 의 예시(R0)로 바꾸고
  *  ④ 선택은 전부 버린다 ⑤ 켜진 CSP 가 하나면 그것을 고르고 unavailable 에 원래 CSP 를 싣는다(화면이 안내 한 줄을 띄운다) */
 export function decodeState(hash: string, rules?: readonly ResourceRule[], enabled: readonly Provider[] = ENABLED_PROVIDERS): DecodedState | undefined {
   if (hash.length > MAX_HASH_CHARS) return undefined;
@@ -208,7 +208,7 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
   let input = raw as RawContext;
   if (disabled !== undefined) {
     if (!firstOk(input, [disabled])?.ok) return undefined;
-    input = { ...input, region: EXAMPLE_REGION };
+    input = { ...input, region: EXAMPLE_REGIONS[only ?? enabled[0]!] };
   }
   const parsed = firstOk(input, only !== undefined ? [only] : enabled);
   if (!parsed?.ok) return undefined;

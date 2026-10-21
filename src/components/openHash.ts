@@ -25,9 +25,10 @@ export interface Opened {
 }
 
 /** hash 가 온전하면 그 상태 — 폼과 대어 볼 key 는 지금 규칙 버전 · 트리 순서로 만든다.
- *  hash 의 r 순서가 트리 순서와 달라도 같은 선택이면 같은 key 다 — 링크를 연 직후 hash 를 덮어쓰지 않는다 */
-export function openHash(hash: string, rules: readonly ResourceRule[] | undefined): Opened | undefined {
-  const d = decodeState(hash, rules);
+ *  hash 의 r 순서가 트리 순서와 달라도 같은 선택이면 같은 key 다 — 링크를 연 직후 hash 를 덮어쓰지 않는다.
+ *  enabled — 켜진 CSP (생략하면 ENABLED_PROVIDERS · decodeState 와 같다) */
+export function openHash(hash: string, rules: readonly ResourceRule[] | undefined, enabled?: readonly Provider[]): Opened | undefined {
+  const d = decodeState(hash, rules, enabled);
   if (!d) return undefined;
   const picked = d.selection ? fromItems(d.selection) : NO_PICK;
   const selection = d.provider ? toItems(buildTree(d.provider, rules?.filter((r) => r.provider === d.provider)), picked) : [];

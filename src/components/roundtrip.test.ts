@@ -4,11 +4,11 @@ import { describe, it, expect } from 'vitest';
 import { generateMany, parseContext } from '../core/engine';
 import { getRule } from '../core/constraints';
 import { canonicalRegion } from '../core/regions';
-import { ENABLED_PROVIDERS, type NamingContext, type Provider } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider } from '../core/types';
 import type { SelectionItem } from '../core/selection';
 import { decodeState, encodeState } from './urlState';
 import { openHash } from './openHash';
-import { DEFAULT_FORM, EXAMPLE_REGION, formOf, type FormContext } from './formContext';
+import { DEFAULT_FORM, EXAMPLE_REGION, EXAMPLE_REGIONS, formOf, type FormContext } from './formContext';
 import { VERSION } from '../version';
 
 const disk = (): SelectionItem[] => [{ rule: getRule('gcp', 'disk')!, count: 1 }];
@@ -25,13 +25,15 @@ const hashOf = (ctx: NamingContext, selection: SelectionItem[]) => `#state=${enc
 const names = (ctx: NamingContext, items: SelectionItem[]) => generateMany(ctx, 'gcp', items).items.map((i) => i.name);
 
 describe('첫 화면 예시 (R0) — 리전 이름이고 존 행도 처음부터 이름이 나온다 (D50 revised)', () => {
-  it('EXAMPLE_REGION 은 asia-northeast3 이고 켜진 CSP 모두에서 풀린다', () => {
-    expect(EXAMPLE_REGION).toBe('asia-northeast3');
+  it('예시 지역은 CSP 마다 있고 그 CSP 에서 풀린다 — 첫 화면은 켜진 첫 CSP 의 것(GCP 는 asia-northeast3)', () => {
+    expect(EXAMPLE_REGIONS).toEqual({ gcp: 'asia-northeast3', aws: 'ap-northeast-2', azure: 'koreacentral' });
+    for (const p of PROVIDERS) expect(parseContext({ ...DEFAULT_FORM, region: EXAMPLE_REGIONS[p] }, p).ok, p).toBe(true);
+    expect(EXAMPLE_REGION).toBe(EXAMPLE_REGIONS[ENABLED_PROVIDERS[0]!]);
     expect(DEFAULT_FORM).toEqual({ owner: 'platform', system: 'billing', purpose: 'trade', env: 'prod', region: EXAMPLE_REGION });
-    for (const p of ENABLED_PROVIDERS) expect(parseContext(DEFAULT_FORM, p).ok, p).toBe(true);
+    expect(parseContext(DEFAULT_FORM, ENABLED_PROVIDERS[0]!).ok).toBe(true);
   });
   it('기본 문맥 · disk → billing-trade-prod-ane3-disk-01 (disk 템플릿에 owner 가 없다)', () => {
-    expect(names(ctxOf(DEFAULT_FORM), disk())).toEqual(['billing-trade-prod-ane3-disk-01']);
+    expect(names(ctxOf({ ...DEFAULT_FORM, region: EXAMPLE_REGIONS.gcp }), disk())).toEqual(['billing-trade-prod-ane3-disk-01']);
   });
 });
 
@@ -96,9 +98,10 @@ describe('국가 코드 지역', () => {
 });
 
 describe('꺼진 CSP 링크 (D55 ①~⑤) — 공유 → 열기 → 재파싱 왕복', () => {
+  // 0.1 의 설정(GCP 하나)을 명시한다 — 켜진 CSP 가 하나일 때만 그것을 자동으로 고른다
   const azureLink = `#state=${btoa(JSON.stringify({ owner: 'infra', system: 'ledger', purpose: 'batch', env: 'production', region: 'krc', v: '2026-10-06.4', p: 'azure', r: { virtual_machine: 2, resource_group: 1 } }))}`;
   it('자유 입력 셋 · 환경은 남고 지역은 예시로 · 선택은 비고 · 켜진 CSP · 안내', () => {
-    const o = openHash(azureLink, undefined)!;
+    const o = openHash(azureLink, undefined, ['gcp'])!;
     expect(o.form).toEqual({ owner: 'infra', system: 'ledger', purpose: 'batch', env: 'prod', region: 'ane3' });
     expect(o.provider).toBe('gcp');
     expect(o.picked.size).toBe(0);
@@ -108,7 +111,7 @@ describe('꺼진 CSP 링크 (D55 ①~⑤) — 공유 → 열기 → 재파싱 �
     expect(names(ctxOf(o.form), disk())).toEqual(['ledger-batch-prod-ane3-disk-01']);
   });
   it('그 상태를 공유해 다시 열면 같은 문맥 · 안내 없음', () => {
-    const o = openHash(azureLink, undefined)!;
+    const o = openHash(azureLink, undefined, ['gcp'])!;
     const again = openHash(hashOf(ctxOf(o.form), []), undefined)!;
     expect(again.form).toEqual(o.form);
     expect(again.unavailable).toBeUndefined();

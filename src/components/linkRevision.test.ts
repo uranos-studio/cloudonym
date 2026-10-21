@@ -54,7 +54,8 @@ describe('mismatchedLinkVersion — 안내는 옛 v 링크가 폼과 같은 동�
 describe('링크 키에 p · r 이 들어간다 (D42)', () => {
   /** App 이 하는 것과 같다 — 풀린 문맥 · CSP · 선택을 지금 버전으로 다시 인코딩한 것이 키 */
   const openV2 = (hash: string) => {
-    const d = decodeState(hash);
+    // 0.1 의 설정(GCP 하나)을 명시한다 — 자동 선택은 켜진 CSP 가 하나일 때만 일어난다
+    const d = decodeState(hash, undefined, ['gcp']);
     if (!d) throw new Error('hash 가 풀리지 않는다');
     return linkStateOf(d, hash, encodeState(d.context, CURRENT, { provider: d.provider, selection: d.selection }));
   };

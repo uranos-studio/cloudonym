@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { decodeState as decodeEnabled, encodeState, shareUrl, MAX_HASH_CHARS, MAX_FIELD_CHARS } from './urlState';
 import { MAX_FIELD_CHARS as API_MAX_FIELD_CHARS } from '../api/schemas';
-import { PROVIDERS, type NamingContext, type ResourceRule } from '../core/types';
+import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type Provider, type ResourceRule } from '../core/types';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
 import { MAX_REGION_CHARS } from '../core/regions';
 
@@ -277,51 +277,60 @@ describe('hash v2 — 최대 상태 왕복과 상한', () => {
   });
 });
 
-describe('켜진 CSP (D45 · D55) — 기본 디코더는 켜진 것만 연다', () => {
+describe('켜진 CSP (D45 · D55) — 디코더는 켜진 것만 연다', () => {
+  // 0.1 의 설정(GCP 하나)을 명시한다 — 실제 ENABLED_PROVIDERS 가 바뀌어도 이 블록의 기대값은 그대로다
+  const decodeGcp = (hash: string, rules?: readonly ResourceRule[], enabled: readonly Provider[] = ['gcp']) => decodeEnabled(hash, rules, enabled);
   const vm = (n: number) => ({ virtual_machine: n, resource_group: 1, managed_identity: 'db' });
   // 꺼진 CSP 링크는 지역을 예시(R0)로 바꾼다 — 그 CSP 의 지역 코드는 켜진 CSP 로 옮길 수 없다 (D55 ③)
   const reset: NamingContext = { ...ctx, region: 'ane3' };
   it('p 가 꺼진 CSP(azure)면 선택을 전부 버리고 켜진 GCP 로 푼다 · 버린 수 · 원래 CSP 를 돌려준다(안내용) · 지역은 예시로', () => {
-    const d = decodeEnabled(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: vm(2) })}`);
+    const d = decodeGcp(`#state=${b64({ ...ctx, v: V2, p: 'azure', r: vm(2) })}`);
     expect(d).toEqual({ context: reset, rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure' });
   });
   it('p 가 꺼진 CSP 이고 r 이 없으면 버린 것 없이 GCP · 안내는 낸다', () => {
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws' })}`)).toEqual({ context: reset, provider: 'gcp', unavailable: 'aws' });
+    expect(decodeGcp(`#state=${b64({ ...ctx, p: 'aws' })}`)).toEqual({ context: reset, provider: 'gcp', unavailable: 'aws' });
   });
   it('p 가 꺼진 CSP 이고 r 이 객체가 아니면 한 건을 버린다', () => {
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: reset, provider: 'gcp', dropped: 1, unavailable: 'aws' });
+    expect(decodeGcp(`#state=${b64({ ...ctx, p: 'aws', r: 'x' })}`)).toEqual({ context: reset, provider: 'gcp', dropped: 1, unavailable: 'aws' });
   });
   it('D55 ①~⑤ — p azure · region krc · r: 자유 입력 셋과 env 는 그대로 · region 은 asia-northeast3 · r 전부 버림 · gcp · 안내', () => {
-    const d = decodeEnabled(`#state=${b64({ owner: 'infra', system: 'ledger', purpose: 'batch', env: 'production', region: 'krc', v: V2, p: 'azure', r: vm(1) })}`);
+    const d = decodeGcp(`#state=${b64({ owner: 'infra', system: 'ledger', purpose: 'batch', env: 'production', region: 'krc', v: V2, p: 'azure', r: vm(1) })}`);
     expect(d).toEqual({
       context: { owner: 'infra', system: 'ledger', purpose: 'batch', env: 'prod', region: 'ane3' },
       rulesVersion: V2, provider: 'gcp', dropped: 3, unavailable: 'azure',
     });
   });
   it('D55 ② — 꺼진 CSP 의 표로도 풀리지 않는 링크는 열지 않는다(옛 kr · 다른 CSP 의 지역 · 깨진 owner)', () => {
-    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'kr', p: 'azure', r: vm(1) })}`)).toBeUndefined();
-    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'asia-northeast3', p: 'azure' })}`)).toBeUndefined();
-    expect(decodeEnabled(`#state=${b64({ ...ctx, owner: '', region: 'krc', p: 'azure' })}`)).toBeUndefined();
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'kr', p: 'azure', r: vm(1) })}`)).toBeUndefined();
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'asia-northeast3', p: 'azure' })}`)).toBeUndefined();
+    expect(decodeGcp(`#state=${b64({ ...ctx, owner: '', region: 'krc', p: 'azure' })}`)).toBeUndefined();
     // 검사기 자체 — 같은 링크가 azure 지역이면 열린다
-    expect(decodeEnabled(`#state=${b64({ ...ctx, region: 'krc', p: 'azure' })}`)?.context).toEqual(reset);
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'krc', p: 'azure' })}`)?.context).toEqual(reset);
   });
   it('p 가 켜진 CSP(gcp)면 그대로 연다 — 안내 없음', () => {
-    const d = decodeEnabled(`#state=${b64({ ...ctx, p: 'gcp', r: { compute_instance: 2, project_id: 1 } })}`);
+    const d = decodeGcp(`#state=${b64({ ...ctx, p: 'gcp', r: { compute_instance: 2, project_id: 1 } })}`);
     expect(d?.provider).toBe('gcp');
     expect(flat(d?.selection)).toEqual([['compute_instance', 2, null], ['project_id', 1, null]]);
     expect(d?.unavailable).toBeUndefined();
     expect(d?.dropped).toBeUndefined();
   });
   it('p 가 없으면(옛 다섯 키 링크) 켜진 CSP 하나로 푼다 — 안내 없음', () => {
-    expect(decodeEnabled(`#state=${b64(ctx)}`)).toEqual({ context: ctx, provider: 'gcp' });
+    expect(decodeGcp(`#state=${b64(ctx)}`)).toEqual({ context: ctx, provider: 'gcp' });
   });
   it.each([['AWS'], ['oci'], [1], [null]])('p 가 셋 밖(%j)이면 없는 것으로 — 켜진 CSP 하나로 풀고 r 은 버린다 · 안내 없음', (p) => {
-    const d = decodeEnabled(`#state=${b64({ ...ctx, p, r: { vpc: 1 } })}`);
+    const d = decodeGcp(`#state=${b64({ ...ctx, p, r: { vpc: 1 } })}`);
     expect(d).toEqual({ context: ctx, provider: 'gcp', dropped: 1 });
   });
   it('켜진 목록을 넘기면 그것을 따른다 — 둘 이상 켜졌으면 p 없는 링크는 CSP 를 고르지 않는다', () => {
-    expect(decodeEnabled(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
-    expect(decodeEnabled(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: reset, dropped: 3, unavailable: 'azure' });
+    expect(decodeGcp(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
+    expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: reset, dropped: 3, unavailable: 'azure' });
+  });
+  it('꺼진 CSP 링크의 예시 지역은 켜진 첫 CSP 의 것이다 — AWS 가 앞이면 ap-northeast-2', () => {
+    expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['aws', 'gcp'])).toEqual({ context: { ...ctx, region: 'apne2' }, dropped: 3, unavailable: 'azure' });
+    expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure' })}`, undefined, ['aws'])).toEqual({ context: { ...ctx, region: 'apne2' }, provider: 'aws', unavailable: 'azure' });
+  });
+  it('켜진 목록을 넘기지 않으면 ENABLED_PROVIDERS 를 따른다', () => {
+    for (const h of [`#state=${b64(ctx)}`, `#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`]) expect(decodeEnabled(h)).toEqual(decodeEnabled(h, undefined, ENABLED_PROVIDERS));
   });
 });
 
