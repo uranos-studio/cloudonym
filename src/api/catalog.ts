@@ -13,6 +13,7 @@ import { PRESETS } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 import { ENV_VALUES } from '../core/normalize';
+import { SCOPES } from '../core/scopes';
 
 /** catalog 머리(출처 버전) — catalog 가 아직 없는 CSP 는 null */
 const META: Partial<Record<Provider, unknown>> = { gcp: GCP_CATALOG_META };
@@ -53,6 +54,11 @@ export function catalogAttachments(provider: Provider): Record<string, unknown>[
   return ATTACHMENTS.filter((a) => a.parent.startsWith(`${provider}.`)).map((a) => ({ parent: a.parent, attach: a.attach, child: a.child, seq: a.seq }));
 }
 
+/** 유일 범위 표 (D37) — /v1/wizard · /v1/names 항목의 scope id 를 사람 이름과 부모로 푼다. parent 가 없으면 그 CSP 의 가장 넓은 범위(전역 유일) */
+export function catalogScopes(provider: Provider): { id: string; name: string; parent?: string }[] {
+  return Object.values(SCOPES).filter((s) => s.provider === provider).map((s) => ({ id: s.id, name: s.displayName, ...(s.parent === undefined ? {} : { parent: s.parent }) }));
+}
+
 /** 요청 상한과 꼴 — 보내기 전 안내용이다. 판정은 늘 서버가 한다 */
 export const CATALOG_LIMITS = {
   max_services: MAX_SERVICES, max_picks_per_service: MAX_PICKS_PER_SERVICE, max_names: MAX_NAMES, max_count: MAX_COUNT,
@@ -64,7 +70,7 @@ export const CATALOG_LIMITS = {
 export function buildCatalogJson(enabled: readonly Provider[], version: { engine: string; rules: string }): string {
   const providers = Object.fromEntries(enabled.map((p) => [p, {
     meta: META[p] ?? null, rows: catalogFor(p).map(withRuleExtras), regions: REGIONS[p],
-    presets: catalogPresets(p), attachments: catalogAttachments(p), limits: CATALOG_LIMITS,
+    presets: catalogPresets(p), attachments: catalogAttachments(p), limits: CATALOG_LIMITS, scopes: catalogScopes(p),
   }]));
   // env_values — project.env 가 받는 표준값(별칭을 푼 뒤) 순서 그대로. CSP 와 무관해 providers 밖에 둔다 (D121 — CLI 가 환경을 번호 목록으로 묻는다)
   return JSON.stringify({ version, env_values: [...ENV_VALUES], providers });

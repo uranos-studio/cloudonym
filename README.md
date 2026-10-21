@@ -292,20 +292,23 @@ It calls the public deployment unless you say otherwise — there is nothing to 
 **On a terminal, run `cloudonym` with no command** (or `cloudonym new`). It asks who runs the system, its name, the environments, the region and what you are building, then the details each part takes (how many, high availability, kind, disks and addresses). Every choice is a numbered list from `/catalog.json`, so you need no preset ids. It saves `cloudonym.plan.json` and `cloudonym.plan.names.json` and prints the names; a wrong answer is asked again with the server's reason. Once the plan file is there, `cloudonym` shows its names and `cloudonym add` with no arguments asks what to add, then checks and saves it the way `add` does. On a terminal names are a table (`--keys` adds each key):
 
 ```text
-What                            Name                                    Check
-Project ID                      demo-payment-prod                       PASS
-VPC network 01                  payment-prod-vpc-01                     PASS
-Subnet 01                       payment-prod-ane3-snet-01               PASS
-Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS
-  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS
-Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS
-  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS
-Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS
+What                            Name                                    Unique in         Check
+Project ID                      demo-payment-prod                       global            PASS
+VPC network 01                  payment-prod-vpc-01                     Project · Global  PASS
+Subnet 01                       payment-prod-ane3-snet-01               Project · Region  PASS
+Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       Project           PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  Project · Zone    PASS
+Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       Project           PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  Project · Zone    PASS
+Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        Project           PASS
+global: unique across every customer of the provider — a name that passes can still be taken by someone else.
 
 8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json
 ```
 
-Piped, in CI or with `--json` it never asks: the commands below work as they always did, and the output keeps its `name  key` lines.
+The **Unique in** column is where each name must be unique, from the scope table in `/catalog.json`: `global` names (a project ID, a bucket) are unique across every customer of the provider, so a name that passes can still be taken by someone else. When a menu has more than 12 parts, the first question lists groups (`a Shared by the project`, `b Compute`, …): pick a letter, type part of a name to filter, or type part numbers directly — the numbers are the same with or without groups.
+
+Piped, in CI, with `--json` or `--output json|tsv`, or with `--no-input` (or `CLOUDONYM_NO_INPUT=1`) it never asks: the commands below work as they always did, and the output keeps its `name  key` lines. Where a question would be needed, `--no-input` exits 64 and names the flags to pass.
 
 ```sh
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # or: init --owner … --system … --env prod --region asia-northeast3
@@ -319,6 +322,11 @@ node cli/cloudonym.mjs validate                       # exit 0 when every name i
 - **`names`** prints `name  key` per line (`--json` for machines: per environment, the same name fields as the wizard's JSON export), `--new` only keys not in the names file. With `environments` in the plan, it sends one request per environment. `--no-write` writes neither the plan nor the names file (with `--repin` the plan keeps its `rules_version`).
 - **Saving** — every write holds `<plan>.lock` next to the file (an exclusive create) from the last check that the file is unchanged to the replace, then removes it. While it exists another command does not write and exits 2, so two commands that read the same file cannot overwrite each other's change. A lock left by a command that was killed is not removed automatically: if no cloudonym command is running, delete it. If the file is saved but its lock cannot be removed, the command says the file is written, names the lock to delete and exits 2.
 - **Exit codes** — `0` ok · `1` a name fails or `add` would change existing names or verdicts · `2` the plan, the names file or the arguments are rejected (400, 413), a file cannot be read or written, the plan changed while the command ran, or its lock could not be removed after saving · `3` the plan's `rules_version` differs from the server's (409; `names --repin` checks every environment, shows what changes and updates the plan) · `4` the server is unreachable, 429, 5xx, or a 2xx answer that is not JSON or has no `data.<provider>.items` (when every environment is unreachable, `names` shows the stored names and says they are not fresh) · `64` usage · `70` internal error. On 429 it prints `Retry-After`; `--wait` waits that long (at most 120 s; 60 s when the header is missing or unreadable) and retries **once per command**, so the longest wait of a many-environment `add` is one 120 s wait plus `--timeout` per request (at most 2147483647 ms).
+- **Provider** — `init --provider gcp|aws|azure` (also `new --provider`; default `gcp`) writes the plan file's `provider`. One plan file is one provider: later commands read it from the file, and several clouds are several files (`-f aws.plan.json`). A provider the server has not enabled is refused with one line — `aws is not enabled on this server yet (this server supports gcp)` — and exit 2 (`init --provider` checks `/catalog.json` before writing).
+- **Output** — `--output table|json|tsv` (`-o`); `--json` is `--output json`. `tsv` is a header line, then `env`, `what`, `name` and `check` per name (and `key` with `--keys`) — `cloudonym names -o tsv | cut -f3` gives the names alone. `--output table` prints the table even when piped.
+- **Typos** — an unknown command or flag gets a suggestion (`valdate` → `Did you mean validate?`, exit 64), and an unknown resource for `add` lists the nearest preset and rule ids. `add 15` says that menu numbers work only in the questions of `cloudonym add` with no arguments, and which preset that number is.
+- **Shell completion** — `cloudonym completion bash|zsh|fish` prints a completion script for the commands and flags: `source <(cloudonym completion zsh)`, `eval "$(cloudonym completion bash)"`, or `cloudonym completion fish > ~/.config/fish/completions/cloudonym.fish`.
+- **Single executable** — `npm run build:cli-bin` builds a standalone `build/cli-sea/cloudonym` (Node single executable application: no Node needed to run it) with this machine's Node, checks it with `--version`, and writes a tar.gz, its sha256 and a filled Homebrew formula from `cli/packaging/homebrew/cloudonym.rb.tmpl`. Nothing is released or published; the build fetches `postject` with `npx` the first time.
 - Each request carries `User-Agent: cloudonym-cli/<version>` and is counted as client class `cli` ([Privacy](#telemetry-and-privacy)). The CLI has no Terraform output: read the JSON with `jsondecode(file(...))`.
 
 ## AI-agent integration
@@ -537,20 +545,23 @@ curl -s -X POST https://<your-deployment>/v1/wizard -H 'content-type: applicatio
 **터미널에서는 명령 없이 `cloudonym`**(또는 `cloudonym new`)만 치면 된다. 누가 운영하는지 · 시스템 이름 · 환경 · 리전 · 무엇을 만드는지를 묻고, 부품마다 받는 세부(개수 · 고가용성 · 종류 · 디스크와 주소)를 묻는다. 선택지는 전부 `/catalog.json` 에서 온 번호 목록이라 프리셋 id 를 몰라도 된다. 답하면 `cloudonym.plan.json` · `cloudonym.plan.names.json` 을 쓰고 이름을 보인다. 틀린 답은 서버가 준 이유와 함께 그 질문만 다시 묻는다. 계획 파일이 생긴 뒤에는 `cloudonym` 이 이름을 보이고, 인자 없는 `cloudonym add` 가 더할 것을 물어 `add` 와 같은 방식으로 확인하고 저장한다. 터미널에서 이름은 표다(`--keys` 는 키 칸을 더한다):
 
 ```text
-What                            Name                                    Check
-Project ID                      demo-payment-prod                       PASS
-VPC network 01                  payment-prod-vpc-01                     PASS
-Subnet 01                       payment-prod-ane3-snet-01               PASS
-Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS
-  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS
-Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS
-  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS
-Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS
+What                            Name                                    Unique in         Check
+Project ID                      demo-payment-prod                       global            PASS
+VPC network 01                  payment-prod-vpc-01                     Project · Global  PASS
+Subnet 01                       payment-prod-ane3-snet-01               Project · Region  PASS
+Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       Project           PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  Project · Zone    PASS
+Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       Project           PASS
+  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  Project · Zone    PASS
+Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        Project           PASS
+global: unique across every customer of the provider — a name that passes can still be taken by someone else.
 
 8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json
 ```
 
-파이프 · CI · `--json` 에서는 묻지 않는다 — 아래 명령은 전과 같고, 출력도 `이름  키` 줄 그대로다.
+**Unique in** 칸은 이름이 유일해야 하는 범위다(`/catalog.json` 의 범위 표). `global` 인 이름(프로젝트 ID · 버킷)은 그 CSP 의 모든 고객 사이에서 유일해야 하므로 PASS 여도 남이 이미 쓰고 있을 수 있다. 메뉴의 부품이 12개보다 많으면 첫 물음이 묶음(`a Shared by the project` · `b Compute` …)을 보인다 — 글자를 고르거나, 이름 일부를 쳐서 거르거나, 아는 번호를 바로 친다. 번호는 묶음이 있든 없든 같다.
+
+파이프 · CI · `--json` · `--output json|tsv` · `--no-input`(또는 `CLOUDONYM_NO_INPUT=1`)에서는 묻지 않는다 — 아래 명령은 전과 같고, 출력도 `이름  키` 줄 그대로다. 물어야 하는 자리에서 `--no-input` 은 넘길 플래그를 알리고 64 로 끝낸다.
 
 ```sh
 node cli/cloudonym.mjs init --from cloudonym-plan-billing-prod.json   # 또는 init --owner … --system … --env prod --region asia-northeast3
@@ -564,6 +575,11 @@ node cli/cloudonym.mjs validate                       # 이름이 전부 유효�
 - **`names`** 는 한 줄에 `이름  키`(`--json` 은 환경마다 마법사 JSON 내보내기와 같은 칸), `--new` 는 보관 파일에 없는 키만. 계획에 `environments` 가 있으면 환경마다 한 번씩 보낸다. `--no-write` 는 계획 파일도 보관 파일도 쓰지 않는다(`--repin` 과 함께 주면 계획의 `rules_version` 도 그대로)
 - **저장** — 쓸 때마다 파일 옆 `<계획>.lock` 을 배타적으로 만들어, 파일이 그대로인지 마지막으로 확인하는 때부터 바꿔 넣을 때까지 쥐고 끝나면 지운다. 잠금이 있으면 다른 명령은 쓰지 않고 exit 2 — 같은 파일을 읽은 두 명령이 서로의 변경을 덮지 않는다. 강제로 끝난 명령이 남긴 잠금은 저절로 지우지 않는다 — 도는 cloudonym 명령이 없으면 지운다. 저장은 됐는데 잠금을 못 지우면 저장됐다는 것과 지울 잠금 경로를 알리고 exit 2
 - **종료 코드** — `0` 성공 · `1` FAIL 이 있거나 `add` 가 기존 이름 · 판정을 바꾼다 · `2` 계획 · 보관 파일 · 인자 거부(400 · 413), 파일을 못 읽거나 못 씀, 명령 도중 계획 파일이 바뀜, 저장 뒤 잠금을 못 지움 · `3` 계획의 `rules_version` 이 서버와 다르다(409 — `names --repin` 이 모든 환경을 확인해 바뀌는 것을 보이고 계획을 고친다) · `4` 못 닿음 · 429 · 5xx · JSON 이 아니거나 `data.<provider>.items` 가 없는 2xx 응답(모든 환경이 못 닿을 때만 `names` 가 보관 파일을 「새 값이 아님」이라 밝히고 보인다) · `64` 사용법 · `70` 내부 오류. 429 면 `Retry-After` 를 알리고, `--wait` 는 그만큼(상한 120초 · 헤더가 없거나 못 읽으면 60초) 기다려 **명령 전체에서 한 번** 다시 보낸다 — 환경이 여럿인 `add` 의 최악 대기는 120초 한 번에 요청마다 `--timeout`(상한 2147483647 ms)이다
+- **provider** — `init --provider gcp|aws|azure`(`new --provider` 도 같다 · 기본 `gcp`)가 계획 파일의 `provider` 를 쓴다. 계획 파일 하나 = provider 하나다 — 그 뒤 명령은 파일에서 읽고, 여러 CSP 는 파일을 나눈다(`-f aws.plan.json`). 서버가 켜지 않은 provider 는 한 줄(`aws is not enabled on this server yet (this server supports gcp)`)과 exit 2 로 거부한다(`init --provider` 는 쓰기 전에 `/catalog.json` 을 본다)
+- **출력** — `--output table|json|tsv`(`-o`) · `--json` 은 `--output json` 과 같다. `tsv` 는 머리 줄 하나 뒤에 이름마다 `env` · `what` · `name` · `check`(`--keys` 면 `key`) — `cloudonym names -o tsv | cut -f3` 이 이름만 낸다. `--output table` 은 파이프에서도 표다
+- **오타** — 모르는 명령 · 플래그는 가까운 것을 제안한다(`valdate` → `Did you mean validate?` · exit 64). `add` 의 모르는 리소스는 가까운 프리셋 · 규칙 id 를 보인다. `add 15` 는 메뉴 번호가 인자 없는 `cloudonym add` 의 물음에서만 통한다는 것과 그 번호가 어느 프리셋인지 알린다
+- **셸 완성** — `cloudonym completion bash|zsh|fish` 가 명령 · 플래그 완성 스크립트를 낸다: `source <(cloudonym completion zsh)` · `eval "$(cloudonym completion bash)"` · `cloudonym completion fish > ~/.config/fish/completions/cloudonym.fish`
+- **단일 실행 파일** — `npm run build:cli-bin` 이 이 기계의 Node 로 `build/cli-sea/cloudonym`(Node single executable application — 돌릴 때 Node 가 필요 없다)을 만들고 `--version` 으로 확인한 뒤, tar.gz · sha256 · `cli/packaging/homebrew/cloudonym.rb.tmpl` 을 채운 Homebrew formula 를 쓴다. 릴리스 · 공개는 하지 않는다. 처음 한 번 `npx` 로 `postject` 를 받는다
 - 요청마다 `User-Agent: cloudonym-cli/<버전>` 을 달고 client class `cli` 로 센다. Terraform 출력은 없다 — JSON 을 `jsondecode(file(...))` 로 읽는다
 
 ### AI 에이전트 연동

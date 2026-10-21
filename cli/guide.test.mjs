@@ -19,10 +19,12 @@ const PRESETS = [
   { id: 'sa', label: 'Service account', rule: 'gcp.service_account', tier: null, ha: null, serverless: null, level: 'service' },
   { id: 'vpc', label: 'VPC network', rule: 'gcp.vpc_network', tier: null, ha: null, serverless: null, level: 'project', group: 'network' },
 ];
+/** 메뉴가 FLAT_MENU_MAX(12)를 넘는 서버 — 2단 메뉴 시험용(같은 Cloud SQL 규칙 · tier 만 다르다) */
+const EXTRA = Array.from({ length: 10 }, (_, i) => ({ id: `x${i + 1}`, label: `Extra ${i + 1}`, rule: 'gcp.cloud_sql_instance', tier: `t${i + 1}`, ha: null, serverless: null, level: 'service' }));
 const ROWS = [
-  { key: 'gcp.compute_instance', displayName: 'VM Instance', rules: { 'gcp.compute_instance': { input: 'count', tier: true } } },
-  { key: 'gcp.cloud_sql_instance', displayName: 'Cloud SQL', kind: { tokens: { MYSQL: null, POSTGRES: 'pg' }, omitValues: ['MYSQL'] }, rules: { 'gcp.cloud_sql_instance': { input: 'count', tier: true, kinds: { default: 'MYSQL', allowed: ['MYSQL', 'POSTGRES'] } } } },
-  { key: 'gcp.service_account', displayName: 'Service Account', rules: { 'gcp.service_account': { input: 'role', tier: true } } },
+  { key: 'gcp.compute_instance', displayName: 'VM Instance', category: 'compute', rules: { 'gcp.compute_instance': { input: 'count', tier: true } } },
+  { key: 'gcp.cloud_sql_instance', displayName: 'Cloud SQL', category: 'database', kind: { tokens: { MYSQL: null, POSTGRES: 'pg' }, omitValues: ['MYSQL'] }, rules: { 'gcp.cloud_sql_instance': { input: 'count', tier: true, kinds: { default: 'MYSQL', allowed: ['MYSQL', 'POSTGRES'] } } } },
+  { key: 'gcp.service_account', displayName: 'Service Account', category: 'identity', rules: { 'gcp.service_account': { input: 'role', tier: true } } },
   { key: 'gcp.vpc_network', displayName: 'VPC Network', rules: { 'gcp.vpc_network': { input: 'count', tier: false } } },
   { key: 'gcp.project_id', displayName: 'Project ID', rules: { 'gcp.project_id': { input: 'none', tier: false } } },
   { key: 'gcp.disk', displayName: 'Persistent Disk', rules: { 'gcp.disk': { input: 'none', tier: false } } },
@@ -33,10 +35,10 @@ const ATTACHMENTS = [
 ];
 const REGIONS = [{ region: 'asia-northeast3', code: 'ane3', label: 'Seoul, South Korea' }, { region: 'us-central1', code: 'usc1', label: 'Iowa, USA' }];
 const ENVS = ['prod', 'stg', 'dev'];
-/** @param {boolean} withEnvValues */
-const catalog = (withEnvValues) => ({
+/** @param {boolean} withEnvValues @param {boolean} [big] */
+const catalog = (withEnvValues, big = false) => ({
   version: { engine: '0.1.0', rules: 'v1' }, ...(withEnvValues ? { env_values: ENVS } : {}),
-  providers: { gcp: { meta: null, rows: ROWS, regions: REGIONS, presets: PRESETS, attachments: ATTACHMENTS, limits: { max_count: 99, max_data_disks: 9 } } },
+  providers: { gcp: { meta: null, rows: ROWS, regions: REGIONS, presets: big ? [...PRESETS, ...EXTRA] : PRESETS, attachments: ATTACHMENTS, limits: { max_count: 99, max_data_disks: 9 } } },
 });
 
 /** 계획 → 항목(프로젝트 ID + 슬롯마다 하나 + boot) — 가짜 서버의 답. role 이 대문자면 400 @param {any} plan */
@@ -47,7 +49,7 @@ function wizardAnswer(plan) {
   const items = [{ key: 'project/-/project_id/-/-/-', namespace: 'project', level: 'project', resource_type: 'project_id', name: `${plan.project.owner}-${plan.project.system}-${env}`, valid: true, violations: [] }];
   /** @param {any} p @param {string} ns @param {number} j @param {string} at */
   const pickItems = (p, ns, j, at) => {
-    const preset = PRESETS.find((x) => x.id === p.preset);
+    const preset = [...PRESETS, ...EXTRA].find((x) => x.id === p.preset);
     if (!preset) return { error: { code: 'x', field: `${at}[${j}]`, message: 'unknown preset' } };
     if (p.role !== undefined && !/^[a-z0-9]{2,16}$/.test(p.role)) return { error: { code: 'selection.invalid_role', field: `${at}[${j}]`, message: `${at}[${j}]: role '${p.role}' does not match ^[a-z0-9]{2,16}$` } };
     const type = preset.rule.slice(4);
@@ -68,7 +70,7 @@ function wizardAnswer(plan) {
   return { status: 200, body: { success: true, version: { engine: '0.1.0', rules: 'v1' }, data: { gcp: { valid: true, items, conflicts: [] } } } };
 }
 
-/** @param {{ envValues?: boolean }} [o] */
+/** @param {{ envValues?: boolean, big?: boolean, clouds?: boolean }} [o] */
 function server(o = {}) {
   /** @type {{ path: string, body: any }[]} */
   const calls = [];
@@ -77,7 +79,10 @@ function server(o = {}) {
     const path = new URL(url).pathname;
     const body = init.body === undefined ? undefined : JSON.parse(init.body);
     calls.push({ path, body });
-    const r = path === '/catalog.json' ? { status: 200, body: catalog(o.envValues ?? true) }
+    const cat = catalog(o.envValues ?? true, o.big);
+    // 마법사 데이터가 있는 provider 가 둘 — 묻는 흐름이 provider 를 묻는다
+    if (o.clouds) /** @type {any} */ (cat.providers).aws = { ...cat.providers.gcp };
+    const r = path === '/catalog.json' ? { status: 200, body: cat }
       : path === '/v1/health' ? { status: 200, body: { ok: true, version: { engine: '0.1.0', rules: 'v1' } } }
         : wizardAnswer(body);
     return { status: r.status, headers: { get: () => null }, text: async () => JSON.stringify(r.body) };
@@ -186,7 +191,7 @@ test('⑤ 같은 답 · 틀린 답 — 번호 밖 · 숫자 아님은 그 자리
   assert.match(r.screen, /Who runs it\? \(team or organisation, e\.g\. platform\): \n {2}An answer is needed\.\n/);
   assert.match(r.screen, /\[1 prod · 2 stg · 3 dev\]: 9\n {2}Pick numbers from 1 to 3 or the values listed\.\n/);
   assert.match(r.screen, /No region matches "nowhere"\. Filter again: iowa\n/);
-  assert.match(r.screen, /Pick one or more \(e\.g\. 1,2\): 1,1,9\n {2}Pick one or more numbers from 1 to 4/);
+  assert.match(r.screen, /Pick one or more \(e\.g\. 1,2\), or type to filter: 1,1,9\n {2}Pick one or more numbers from 1 to 4/);
   assert.match(r.screen, /VPC network — how many\? \[1\]: x\n {2}A whole number from 1 to 99\.\nVPC network — how many\? \[1\]: 0\n {2}A whole number from 1 to 99\.\nVPC network — how many\? \[1\]: 1\n/);
   const p = plan(dir);
   assert.deepEqual(p.environments, ['prod', 'stg']);
@@ -295,4 +300,50 @@ test('--from 에 공유 링크를 주면 64 — 브라우저의 Save plan 뒤 ne
   const r = await term(['new', '--from', src], [], { cwd: dir, fetchFn: server().fetchFn, tty: false });
   assert.equal(r.code, EXIT.OK, r.err);
   assert.equal(plan(dir).project.owner, 'o');
+});
+
+test('⑥ 부품이 많으면 2단 메뉴 — 분류 글자 → 그 분류의 부품 · Enter 로 돌아가기 · 글자로 거르기 · 번호는 평평한 순서 그대로', async () => {
+  const dir = tmpDir();
+  const s = server({ big: true });
+  const answers = ['demo', 'payment', '1', 'seoul', '', 'b', '', 'zzz', 'sql', '3', 'shop', '', '', 'n'];
+  const r = await term([], answers, { cwd: dir, fetchFn: s.fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  assert.equal(count(r.screen, '  14 parts in 4 groups\n    a Shared by the project (1) · b Compute (1) · c Database (11) · d Identity (1)\n'), 3);
+  assert.match(r.screen, /\(e\.g\. 1,2\): b\n {2}1 part\n {4}2 Web server\nPick one or more \(e\.g\. 2\), type to filter again, or Enter to go back: \n/);
+  assert.match(r.screen, /: zzz\n {2}No part matches "zzz"\.\n/);
+  assert.match(r.screen, /: sql\n {2}11 parts\n {4}3 Database \(Cloud SQL\) · 5 Extra 1 · 6 Extra 2/);
+  assert.deepEqual(plan(dir).services, [{ purpose: 'shop', picks: [{ preset: 'db', instances: [{ id: '1', seq: '01' }] }] }]);
+});
+
+test('⑥ 2단 메뉴에서도 아는 번호는 분류 없이 바로 · 짧은 메뉴는 글자로 거른다', async () => {
+  const dir = tmpDir();
+  const r = await term([], ['demo', 'payment', '1', 'seoul', '', '1,2', '', 'shop', '1', 'n', 'n', '0', 'n'], { cwd: dir, fetchFn: server({ big: true }).fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  assert.deepEqual(plan(dir).project_picks.map((/** @type {any} */ p) => p.preset), ['vpc']);
+  assert.deepEqual(plan(dir).services[0].picks.map((/** @type {any} */ p) => p.preset), ['web']);
+  // 짧은 메뉴(4개) — 「zzz」 는 없고 「account」 로 거르면 4 Service account
+  const d2 = tmpDir();
+  const f = await term([], ['demo', 'payment', '1', 'seoul', '', 'zzz', 'account', '4', 'shop', 'deploy', 'n'], { cwd: d2, fetchFn: server().fetchFn });
+  assert.equal(f.code, EXIT.OK, `${f.err}\n${f.screen}`);
+  assert.match(f.screen, /or type to filter: zzz\n {2}No part matches "zzz"\.\nPick one or more \(e\.g\. 1,2\), or type to filter: account\n {2}1 part\n {4}4 Service account\n/);
+  assert.deepEqual(plan(d2).services, [{ purpose: 'shop', picks: [{ preset: 'sa', role: 'deploy' }] }]);
+});
+
+test('① 마법사 데이터가 있는 provider 가 여럿이면 먼저 묻는다(Enter 는 첫째) · 하나면 묻지 않는다 · 고른 값이 계획 파일의 provider', async () => {
+  const dir = tmpDir();
+  const r = await term([], ['', ...ANSWERS], { cwd: dir, fetchFn: server({ clouds: true }).fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  assert.match(r.screen, /^Which cloud \[1 gcp · 2 aws\] \[gcp\]: \nCloudonym — names for a Google Cloud project\./);
+  assert.equal(plan(dir).provider, 'gcp');
+  const one = await term([], ANSWERS, { cwd: tmpDir(), fetchFn: server().fetchFn });
+  assert.equal(one.screen.includes('Which cloud'), false);
+});
+
+test('⑥ 2단 메뉴 — 없는 분류 글자는 거르기로 넘기지 않고 다시 묻는다 · 목록 안에서 글자 하나는 다른 분류로 간다', async () => {
+  const dir = tmpDir();
+  const r = await term([], ['demo', 'payment', '1', 'seoul', '', 'z', 'b', 'c', '3', 'shop', '', '', 'n'], { cwd: dir, fetchFn: server({ big: true }).fetchFn });
+  assert.equal(r.code, EXIT.OK, `${r.err}\n${r.screen}`);
+  assert.match(r.screen, /: z\n {2}No group "z": pick a letter from a to d, or type two or more letters to filter\.\n/);
+  assert.match(r.screen, /Enter to go back: c\n {2}11 parts\n {4}3 Database \(Cloud SQL\)/);
+  assert.deepEqual(plan(dir).services[0].picks.map((/** @type {any} */ p) => p.preset), ['db']);
 });

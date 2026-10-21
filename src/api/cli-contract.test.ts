@@ -385,22 +385,23 @@ describe('묻고 답하는 흐름 — 진짜 엔진의 답 (D121 · 설계 §7 �
     }
   });
 
-  it('⑥ 표 — What · Name · Check, 키 없이 · 딸린 것은 들여 쓴다 · 요약과 다음 할 일 (규칙 버전이 바뀌면 이름이 바뀔 수 있다)', async () => {
+  it('⑥ 표 — What · Name · Unique in(/catalog.json scopes) · Check, 키 없이 · 딸린 것은 들여 쓴다 · 요약과 다음 할 일 (규칙 버전이 바뀌면 이름이 바뀔 수 있다)', async () => {
     const r = await term([], ANSWERS(), dir);
     expect(r.code, r.err).toBe(EXIT.OK);
     expect(r.screen).toContain(`Cloudonym — names for a Google Cloud project. Rules ${VERSION.rules}.\n`);
     expect(r.screen).toContain('Environments, comma-separated [1 prod · 2 stg · 3 dev · 4 sbx · 5 qa · 6 uat · 7 test · 8 perf · 9 dr]: 1\n');
     expect(r.screen).toContain('   1 asia-northeast3 — Seoul, South Korea, APAC\nPick [1]: 1\n');
     expect(r.screen.slice(r.screen.indexOf('What  ')).trimEnd().split('\n')).toEqual([
-      'What                            Name                                    Check',
-      'Project ID                      demo-payment-prod                       PASS',
-      'VPC network 01                  payment-prod-vpc-01                     PASS',
-      'Subnet 01                       payment-prod-ane3-snet-01               PASS',
-      'Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       PASS',
-      '  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  PASS',
-      'Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       PASS',
-      '  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  PASS',
-      'Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        PASS',
+      'What                            Name                                    Unique in         Check',
+      'Project ID                      demo-payment-prod                       global            PASS',
+      'VPC network 01                  payment-prod-vpc-01                     Project · Global  PASS',
+      'Subnet 01                       payment-prod-ane3-snet-01               Project · Region  PASS',
+      'Web server 01 (shop)            payment-shop-prod-ane3-gce-web-01       Project           PASS',
+      '  boot disk                     payment-shop-prod-ane3-gce-web-01-boot  Project · Zone    PASS',
+      'Web server 02 (shop)            payment-shop-prod-ane3-gce-web-02       Project           PASS',
+      '  boot disk                     payment-shop-prod-ane3-gce-web-02-boot  Project · Zone    PASS',
+      'Database (Cloud SQL) 01 (shop)  payment-shop-prod-ane3-sql-pg-01        Project           PASS',
+      'global: unique across every customer of the provider — a name that passes can still be taken by someone else.',
       '',
       '8 names · all valid · saved cloudonym.plan.json and cloudonym.plan.names.json',
       'Add more: cloudonym add · Check before applying: cloudonym validate · Machines: cloudonym names --json',

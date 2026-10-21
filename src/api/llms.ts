@@ -313,6 +313,7 @@ function catalogFieldLines(order: readonly Provider[]): string[] {
     `- \`presets\` (per provider): the wizard presets in request names — ${codes(presetKeys)}; send \`id\` as \`preset\``,
     `- \`attachments\` (per provider): what a server slot can carry — ${codes(attachKeys)} (see \`## Attached resources\`)`,
     `- \`limits\` (per provider): ${codes(Object.keys(CATALOG_LIMITS))}`,
+    '- `scopes` (per provider): the uniqueness scopes — `id` (the `scope` that `/v1/wizard` and `/v1/names` items carry), `name` and `parent`; a scope with no `parent` is the provider\'s widest one, so a name unique there is unique across every customer of the provider (see `## Resource tree`)',
   ];
 }
 
@@ -330,6 +331,9 @@ function cliLines(): string[] {
     '- `add` — with no arguments on a terminal, asks what to add; otherwise appends a pick (a preset, a rule id or a resource name) to a service (`--service <purpose>`) or the project (`--project`), or numbered servers to the same pick; it writes the file only if every existing name and verdict stays the same in every environment and every new name passes, otherwise it exits 1 and leaves the file as it was. It never edits an existing pick. `--dry-run` checks without writing',
     '- `names` — every name, one request per environment; `--new` only names not yet kept, `--repin` re-pins `rules_version` after a 409; `--no-write` writes neither the plan nor the names file',
     '- `validate` — exit 0 when every name is valid and matches the kept names',
+    '- `completion` — prints a bash, zsh or fish completion script for the commands and flags',
+    '- Provider: `init --provider gcp|aws|azure` (or `new --provider`) sets the plan file\'s `provider` (default `gcp`); one plan file is one provider and later commands read it from the file. A provider the server has not enabled is refused with one line (400 `request.provider_not_enabled`, exit 2).',
+    '- Output: `--output table|json|tsv` (`-o`; `--json` is `--output json`). `tsv` is a header line, then `env`, `what`, `name`, `check` (and `key` with `--keys`) per name. `--no-input` or `CLOUDONYM_NO_INPUT=1` never asks; where a question would be needed it exits 64 and names the flags to pass.',
     '- On 429 it prints `Retry-After`; `--wait` waits that long and retries once per command.',
     '- Saving holds `<plan>.lock` next to the file from the last check to the replace; while it exists another command does not write (exit 2). If no command is running, a left-over lock is from one that stopped: delete it. If the file is saved but its lock cannot be removed, the command says so, names the lock and exits 2.',
     `- ${CLI_EXIT_LINE}`,

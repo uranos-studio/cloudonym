@@ -25,9 +25,14 @@ export function resolveTarget(arg: string, provider: string, cat: { rows: any[];
 // 묻는 흐름(cli/lib/guide.mjs)이 main.mjs 에서 들여오는 것 (D121) — guide 의 타입 검사도 이 선언을 본다
 export type ApiResult = { kind: 'ok'; status: number; body: any } | { kind: 'malformed'; status: number; message: string } | { kind: 'http'; status: number; body: any; retryAfter?: number } | { kind: 'unreachable'; message: string };
 export interface Client { get(path: string): Promise<ApiResult>; post(path: string, body: unknown): Promise<ApiResult> }
-export interface TableRow { item: any; valid: boolean; messages?: string[] }
+export interface TableRow { item: any; valid: boolean; messages?: string[]; scope?: string; uniqueness?: string }
 export const DEFAULT_FILE: string;
-export class UsageError extends Error {}
+export class UsageError extends Error { constructor(message: string, o?: { short?: boolean }); short: boolean }
+export const COMMANDS: readonly string[];
+export const OUTPUTS: readonly ['table', 'json', 'tsv'];
+export const PROVIDERS: readonly ['gcp', 'aws', 'azure'];
+export function notEnabled(provider: unknown, supported: unknown): string;
+export function providerOf(given: string | undefined): string;
 export class Ctx {
   d: Deps;
   v: Record<string, any>;
@@ -35,8 +40,12 @@ export class Ctx {
   shown: string;
   cat: any;
   server: string | undefined;
+  format: 'auto' | 'table' | 'json' | 'tsv';
+  noInput(): boolean;
   canAsk(): boolean;
   table(): boolean;
+  json(): boolean;
+  tsv(): boolean;
   command(cmd: string): string;
   client(): Client;
   report(r: ApiResult, label?: string): number;
@@ -47,7 +56,7 @@ export function exportName(it: any): Record<string, unknown>;
 export function exportEnv(body: any, provider: string): { valid: boolean; names: any[]; invalid: any[] };
 export const worst: (codes: number[]) => number;
 export function tableRows(body: any, provider: string): TableRow[];
-export function printTable(ctx: Ctx, byEnv: Record<string, TableRow[]>, envs: string[], onlyNewAgainst?: any, provider?: string): void;
+export function printTable(ctx: Ctx, byEnv: Record<string, TableRow[]>, envs: string[], onlyNewAgainst: any, provider: string): void;
 export function catalogOf(catalog: any, provider: string): { rows: any[]; presets: any[]; limits: Record<string, any> } | undefined;
 export function ruleSpec(cat: { rows: any[] }, id: string): any;
 export function pickIdentity(p: any, cat: { rows: any[]; presets: any[] }): string;

@@ -19,6 +19,7 @@
     "test:rules": "node --test scripts/rules/*.test.mjs scripts/catalog/*.test.mjs",
     "test:cli": "node --test cli/*.test.mjs",
     "cli": "node cli/cloudonym.mjs",
+    "build:cli-bin": "node scripts/cli-sea.mjs",
     "catalog": "node scripts/catalog/build-catalog.mjs",
     "intro-examples": "node scripts/gen-intro-examples.mjs",
     "typecheck": "tsc -b --noEmit"

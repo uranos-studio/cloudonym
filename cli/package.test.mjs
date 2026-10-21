@@ -37,3 +37,18 @@ test('⑦ 꾸러미 꼴 — 이름 cloudonym · bin 하나 · 의존성 0 · 시
   assert.equal(root.private, true);
   assert.deepEqual(root.bin, { cloudonym: 'cli/cloudonym.mjs' });
 });
+
+test('⑧ 단일 실행 파일 — scripts/cli-sea.mjs 가 바꿔 넣는 버전 읽기가 http.mjs 에 그대로 있다 · Homebrew 틀은 자리표 셋 · 꾸러미에 싣지 않는다', () => {
+  const sea = readFileSync(new URL('../scripts/cli-sea.mjs', import.meta.url), 'utf-8');
+  const http = readFileSync(new URL('./lib/http.mjs', import.meta.url), 'utf-8');
+  const read = /const VERSION_READ = "([^"]+)";/.exec(sea)?.[1];
+  assert.ok(read && http.includes(read), 'VERSION_READ');
+  assert.equal(root.scripts['build:cli-bin'], 'node scripts/cli-sea.mjs');
+  const tmpl = readFileSync(new URL('./packaging/homebrew/cloudonym.rb.tmpl', import.meta.url), 'utf-8');
+  assert.deepEqual([...new Set(tmpl.match(/@[A-Z0-9_]+@/g))].sort(), ['@SHA256@', '@URL@', '@VERSION@']);
+  for (const p of ['@SHA256@', '@URL@', '@VERSION@']) assert.ok(sea.includes(`replaceAll('${p}'`), p);
+  assert.match(tmpl, /homepage "https:\/\/github\.com\/uranos-studio\/cloudonym"/);
+  assert.match(tmpl, /generate_completions_from_executable\(bin\/"cloudonym", "completion"\)/);
+  assert.match(tmpl, /cloudonym --version/);
+  assert.equal(cli.files.some((/** @type {string} */ f) => f.startsWith('packaging')), false);
+});

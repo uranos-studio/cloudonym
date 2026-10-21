@@ -39,3 +39,6 @@ examples/terraform/*.tfstate.*
 # cli/ 를 npm 꾸러미로 만들 때 prepack 이 잠깐 복사하는 파일 (postpack 이 지운다)
 cli/LICENSE
 cli/NOTICE
+
+# CLI 단일 실행 파일 (npm run build:cli-bin — scripts/cli-sea.mjs). 내지 않는 로컬 산출물
+build/

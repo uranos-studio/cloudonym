@@ -423,7 +423,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
   });
   it('「## catalog.json fields」 — 규칙 칸 셋 · 프리셋 · 딸린 것 · limits 의 키가 /catalog.json 과 같다', () => {
     const sec = section('## catalog.json fields').join('\n');
-    for (const k of ['env_values', 'input', 'tier', 'locations', 'presets', 'attachments', 'limits']) expect(sec, k).toContain(`\`${k}\``);
+    for (const k of ['env_values', 'input', 'tier', 'locations', 'presets', 'attachments', 'limits', 'scopes']) expect(sec, k).toContain(`\`${k}\``);
     for (const e of ENV_VALUES) expect(sec, e).toContain(`\`${e}\``);
     for (const v of ['count', 'role', 'none']) expect(sec, v).toContain(`\`${v}\``);
     for (const k of Object.keys(CATALOG_LIMITS)) expect(sec, k).toContain(`\`${k}\``);
@@ -442,7 +442,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     await cliMain(['--help'], { stdout: (x: string) => { out.push(x); } });
     const help = out.join('\n').split('\n');
     const commands = [...new Set(help.slice(help.indexOf('Commands') + 1, help.indexOf('Options')).map((l) => /^ {2}([a-z]+) /.exec(l)?.[1]).filter((c): c is string => c !== undefined))];
-    expect(commands).toEqual(['new', 'init', 'add', 'names', 'validate']);
+    expect(commands).toEqual(['new', 'init', 'add', 'names', 'validate', 'completion']);
     for (const c of commands) expect(sec.some((l) => l.startsWith(`- \`${c}\``)), c).toBe(true);
     expect(body).toContain('`cloudonym.plan.json`');
     expect(body).toContain('`cloudonym.plan.names.json`');

@@ -8,6 +8,15 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 - **The CLI asks on a terminal** (D121) — `cloudonym` with no command (or `cloudonym new`) asks who runs the system, its name, the environments, the region and what to build, every choice a numbered list from `/catalog.json`; it saves the plan and names files and prints a What · Name · Check table. With a plan file, `cloudonym` shows the names and `cloudonym add` with no arguments asks what to add. A wrong answer is asked again with the server's reason. Piped, in CI or with `--json` nothing is asked and the output is unchanged; `--keys` adds the key column to the table.
 - **`cli/package.json`** (D121) — the CLI is a package of its own (`cloudonym`, Node 22 or later, no dependencies), ready for npm but not published.
+- **CLI: provider from the plan file** — `init --provider gcp|aws|azure` (and `new --provider`; default `gcp`) sets the plan file's `provider`, and every later command reads it from the file (one plan file is one provider). A provider the server has not enabled (400 `request.provider_not_enabled`) is one line and exit 2.
+- **CLI: `--output table|json|tsv`** (`-o`) — `--json` stays as `--output json`. `tsv` is a header line, then `env`, `what`, `name`, `check` (and `key` with `--keys`); `init -o json` prints what it wrote.
+- **CLI: `--no-input` and `CLOUDONYM_NO_INPUT=1`** — never ask, even on a terminal; where a question would be needed the command exits 64 and names the flags to pass.
+- **CLI: suggestions** — an unknown command or flag gets "Did you mean …?" by edit distance (exit 64, a one-line pointer to `--help` instead of the whole usage for commands); `add` suggests near preset and rule ids for typos; `add <number>` says menu numbers work only in the questions and which preset the number is.
+- **CLI: Unique in column** — the names table shows where each name must be unique, and marks `global` names (unique across every customer of the provider) with a note under the table.
+- **CLI: two-level parts menu** — with more than 12 parts, the first question lists groups (from each rule row's `category`); type a letter, type to filter, or type part numbers directly. Shorter menus also filter by typing.
+- **CLI: `cloudonym completion bash|zsh|fish`** — prints a completion script for the commands and flags.
+- **CLI: single executable** — `npm run build:cli-bin` builds a standalone executable with Node SEA in `build/cli-sea/` and fills the Homebrew formula template `cli/packaging/homebrew/cloudonym.rb.tmpl`; nothing is released.
+- **`scopes` in `/catalog.json`** — per provider, each uniqueness scope's `id` (the `scope` of `/v1/wizard` and `/v1/names` items), `name` and `parent`; a scope with no `parent` is the provider's widest one. Additive; no name or verdict changes and the rules revision is unchanged.
 - **`env_values` in `/catalog.json`** (D121) — the standard environment values (`prod`, `stg`, `dev`, `sbx`, `qa`, `uat`, `test`, `perf`, `dr`) at the top level, in the engine's order, so a client can offer them without its own copy. No name or verdict changes; the rules revision is unchanged.
 
 ### Changed

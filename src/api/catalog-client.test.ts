@@ -11,6 +11,7 @@ import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, SLOT_ID_PATTERN } from '../core/wi
 import { MAX_COUNT, MAX_NAMES, ROLE_PATTERN, SEQ_PATTERN } from '../core/selection';
 import { TIER_PATTERN } from '../core/types';
 import { ENV_VALUES } from '../core/normalize';
+import { SCOPES } from '../core/scopes';
 import { MAX_BODY_BYTES } from './v1';
 import type { Loose } from './test-support';
 
@@ -65,6 +66,16 @@ describe('/catalog.json 클라이언트 칸 (D101)', () => {
       seq_pattern: SEQ_PATTERN.source, slot_id_pattern: SLOT_ID_PATTERN.source, tier_pattern: TIER_PATTERN.source, role_pattern: ROLE_PATTERN.source,
     });
     expect(CATALOG_LIMITS.max_body_bytes).toBe(MAX_BODY_BYTES);
+  });
+
+  it('scopes — 그 CSP 의 SCOPES 그대로(id · displayName · parent) · 뿌리만 parent 가 없다 · 규칙의 scope 는 전부 표에 있다 (CLI 의 Unique in 칸)', () => {
+    const want = Object.values(SCOPES).filter((s) => s.provider === 'gcp').map((s) => ({ id: s.id, name: s.displayName, ...(s.parent === undefined ? {} : { parent: s.parent }) }));
+    expect(gcp.scopes).toEqual(want);
+    expect(gcp.scopes.filter((s: Loose) => s.parent === undefined).map((s: Loose) => s.id)).toEqual(['gcp:namespace']);
+    const ids = new Set(gcp.scopes.map((s: Loose) => s.id));
+    for (const row of gcp.rows) for (const id of Object.keys(row.rules)) expect(ids.has(RULES[id]!.scope), id).toBe(true);
+    const aws = JSON.parse(buildCatalogJson(['gcp', 'aws'], VERSION)).providers.aws;
+    expect(aws.scopes.every((s: Loose) => s.id.startsWith('aws:'))).toBe(true);
   });
 
   it('env_values — 맨 위 칸 · core 의 ENV_VALUES 그대로(순서까지) · CSP 와 무관하게 한 번 (D121)', () => {

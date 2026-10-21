@@ -1,0 +1,25 @@
+# Homebrew formula template for the single-binary cloudonym CLI (Node SEA).
+# scripts/cli-sea.mjs (npm run build:cli-bin) fills in the version, the archive URL and its sha256 from the
+# archive it builds and writes the result next to the binary (build/cli-sea/cloudonym.rb). Nothing is
+# published: copy that file into a tap once the archive is attached to a release at that URL.
+class Cloudonym < Formula
+  desc "Cloud resource names from five context values, checked by the Cloudonym API"
+  homepage "https://github.com/uranos-studio/cloudonym"
+  url "@URL@"
+  version "@VERSION@"
+  sha256 "@SHA256@"
+  license "Apache-2.0"
+
+  # The archive holds one executable built for macOS on Apple silicon.
+  depends_on arch: :arm64
+  depends_on :macos
+
+  def install
+    bin.install "cloudonym"
+    generate_completions_from_executable(bin/"cloudonym", "completion")
+  end
+
+  test do
+    assert_match "cloudonym-cli/#{version}", shell_output("#{bin}/cloudonym --version")
+  end
+end

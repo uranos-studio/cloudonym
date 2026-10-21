@@ -1727,7 +1727,8 @@
                 "regions",
                 "presets",
                 "attachments",
-                "limits"
+                "limits",
+                "scopes"
               ],
               "properties": {
                 "meta": {
@@ -2152,6 +2153,32 @@
                     },
                     "role_pattern": {
                       "type": "string"
+                    }
+                  }
+                },
+                "scopes": {
+                  "type": "array",
+                  "description": "The uniqueness scopes of the provider: the scope id that /v1/wizard and /v1/names items carry in scope, its name and its parent scope. A scope with no parent is the provider's widest one: a name unique there is unique across every customer of the provider (globally unique), so a name that passes can still be taken",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "name"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "gcp:project_region"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Region"
+                      },
+                      "parent": {
+                        "type": "string",
+                        "example": "gcp:project"
+                      }
                     }
                   }
                 }

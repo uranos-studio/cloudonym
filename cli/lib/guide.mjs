@@ -6,9 +6,10 @@ import { existsSync } from 'node:fs';
 import { NoAnswer, createPrompter } from './prompt.mjs';
 import { readPlan, planLists, writeJson, bodyFor, appendSlots, namesPathFor, kstTime, isRecord, environmentsOf } from './plan.mjs';
 import {
-  EXIT, checkWizard, exportEnv, tableRows, printTable, catalogOf, ruleSpec, pickIdentity, commitAdd, worst,
+  EXIT, checkWizard, exportEnv, tableRows, printTable, catalogOf, ruleSpec, pickIdentity, commitAdd, worst, notEnabled, providerOf,
 } from './main.mjs';
 import { attachLabel } from './table.mjs';
+import { menuOrder, menuGroups, filterItems } from './menu.mjs';
 
 /** @typedef {import('./main.mjs').Ctx} Ctx */
 /** @typedef {import('./prompt.mjs').Prompter} Prompter */
@@ -16,8 +17,11 @@ import { attachLabel } from './table.mjs';
 /** @typedef {import('./plan.mjs').PlanFile} PlanFile */
 /** @typedef {import('./plan.mjs').Slot} Slot */
 
-/** init 이 쓰는 provider 와 같다 — 마법사는 gcp 만이다(/catalog.json presets 가 다른 CSP 는 비어 있다) */
-const PROVIDER = 'gcp';
+/** 첫 줄에 쓰는 사람 이름 — 화면 글자일 뿐이다. 표에 없으면 provider 값 그대로 */
+const CLOUD_NAME = /** @type {Record<string, string>} */ ({ gcp: 'Google Cloud', aws: 'AWS', azure: 'Azure' });
+
+/** 메뉴가 이보다 길면 분류부터 묻는다(2단) — 짧으면 지금처럼 번호 목록 하나 */
+const FLAT_MENU_MAX = 12;
 
 /**
  * 고른 부품 하나 — 프리셋 · 세부 답으로 만든 pick(instances 없이) · 개수 · 슬롯마다 딸린 것
@@ -36,19 +40,37 @@ function prompterOf(ctx) {
   return createPrompter(input, ctx.d.write, input.isTTY !== true);
 }
 
-/** /catalog.json 을 읽는다 — 실패하면 종료 코드 @param {Ctx} ctx @param {ReturnType<Ctx['client']>} client @returns {Promise<Server | number>} */
-async function loadServer(ctx, client) {
+/** /catalog.json 을 읽는다 — 실패하면 종료 코드 @param {Ctx} ctx @param {ReturnType<Ctx['client']>} client @returns {Promise<any | number>} */
+async function fetchCatalog(ctx, client) {
   const r = await client.get('/catalog.json');
   if (r.kind !== 'ok') return ctx.report(r);
-  const p = catalogOf(r.body, PROVIDER);
-  if (!p) { ctx.d.stderr(`The server's /catalog.json has no wizard data for ${PROVIDER}.`); return EXIT.INPUT; }
+  return r.body;
+}
+
+/**
+ * /catalog.json 본문에서 그 provider 의 마법사 데이터 — 켜지지 않았거나 데이터가 없으면 종료 코드
+ * @param {Ctx} ctx @param {any} body @param {string} provider @returns {Server | number}
+ */
+function serverFor(ctx, body, provider) {
+  const p = catalogOf(body, provider);
+  if (!p) {
+    const enabled = isRecord(body?.providers) ? Object.keys(body.providers) : [];
+    ctx.d.stderr(enabled.includes(provider) ? `The server's /catalog.json has no wizard data for ${provider}.` : notEnabled(provider, enabled));
+    return EXIT.INPUT;
+  }
   const raw = /** @type {any} */ (p);
   const cat = { ...p, regions: Array.isArray(raw.regions) ? raw.regions : [], attachments: Array.isArray(raw.attachments) ? raw.attachments : [] };
-  const ev = r.body?.env_values;
+  const ev = body?.env_values;
   const envValues = Array.isArray(ev) && ev.length > 0 && ev.every((x) => typeof x === 'string') ? /** @type {string[]} */ (ev) : undefined;
-  const rules = typeof r.body?.version?.rules === 'string' ? r.body.version.rules : undefined;
+  const rules = typeof body?.version?.rules === 'string' ? body.version.rules : undefined;
   ctx.cat = raw;
   return { cat, envValues, rules };
+}
+
+/** 묻는 흐름의 provider 후보 — 마법사 프리셋이 있는 provider 만(서버가 켠 순서) @param {any} body @returns {string[]} */
+function wizardProviders(body) {
+  const ps = isRecord(body?.providers) ? body.providers : {};
+  return Object.keys(ps).filter((k) => Array.isArray(ps[k]?.presets) && ps[k].presets.length > 0);
 }
 
 // ── 질문 ──
@@ -96,12 +118,15 @@ async function askRegion(ask, regions) {
   }
 }
 
-/** 메뉴 줄 — 번호와 label 을 「 · 」로 잇고 폭 96 에서 감는다 @param {Prompter} ask @param {string} title @param {{ n: number, label: string }[]} items */
-function menuGroup(ask, title, items) {
+/**
+ * 메뉴 줄 — 번호와 label 을 「 · 」로 잇고 폭 96 에서 감는다. bare 면 번호 없이 label 만(분류 줄 — label 에 글자가 들어 있다)
+ * @param {Prompter} ask @param {string} title @param {{ n: number, label: string }[]} items @param {boolean} [bare]
+ */
+function menuGroup(ask, title, items, bare = false) {
   ask.say(`  ${title}`);
   let line = '';
   for (const it of items) {
-    const cell = `${it.n} ${it.label}`;
+    const cell = bare ? it.label : `${it.n} ${it.label}`;
     if (line !== '' && line.length + 3 + cell.length > 92) { ask.say(`    ${line}`); line = ''; }
     line = line === '' ? cell : `${line} · ${cell}`;
   }
@@ -109,18 +134,85 @@ function menuGroup(ask, title, items) {
 }
 
 /**
- * 부품 메뉴 — presets 를 level 로 둘로 나눠(프로젝트 공용 먼저) 번호를 붙인다. 고른 프리셋을 메뉴 순서로
- * @param {Prompter} ask @param {any[]} presets @param {{ project: boolean, service: boolean }} show @returns {Promise<any[]>}
+ * 번호 답 — 전부 1..max 의 번호면 그 번호들(중복 없이 작은 것 먼저), 번호이긴 한데 범위 밖이면 'range', 번호가 아니면 undefined(글자로 거른다)
+ * @param {string} a @param {number} max @returns {number[] | 'range' | undefined}
  */
-async function askParts(ask, presets, show) {
-  const project = show.project ? presets.filter((p) => p.level === 'project') : [];
-  const service = show.service ? presets.filter((p) => p.level !== 'project') : [];
-  const ordered = [...project, ...service];
+function numbersIn(a, max) {
+  const parts = a.split(/[\s,]+/).filter((x) => x !== '');
+  if (parts.length === 0 || !parts.every((x) => /^\d+$/.test(x))) return undefined;
+  const nums = parts.map(Number);
+  return nums.every((n) => n >= 1 && n <= max) ? [...new Set(nums)].sort((x, y) => x - y) : 'range';
+}
+
+/**
+ * 부품 메뉴 — 번호는 늘 같은 평평한 순서다(프로젝트 공용 먼저 · menu.mjs). 번호 여럿을 한 번에 받고, 글자를 치면 거른다.
+ * 프리셋이 FLAT_MENU_MAX 개보다 많으면 2단 — 먼저 분류(글자 a, b, …), 고른 분류 · 거른 결과에서 번호. 어느 자리에서나 아는 번호는 바로 받는다
+ * @param {Prompter} ask @param {Server['cat']} cat @param {{ project: boolean, service: boolean }} show @returns {Promise<any[]>}
+ */
+async function askParts(ask, cat, show) {
+  const menu = menuOrder(cat.presets, show);
+  const { project, service, ordered } = menu;
+  const max = ordered.length;
+  const all = ordered.map((preset, i) => ({ n: i + 1, preset }));
+  const example = project.length > 0 && service.length > 0 ? `1,${project.length + 1}` : '1,2';
+  const pick = (/** @type {number[]} */ nums) => nums.map((n) => ordered[n - 1]);
+  /** 2단일 때 분류 — 글자 하나는 분류 글자로 읽는다 @type {{ label: string, items: { n: number, preset: any }[] }[]} */
+  const groups = max > FLAT_MENU_MAX ? menuGroups(menu, cat.rows) : [];
+  const letter = (/** @type {number} */ i) => String.fromCharCode(97 + i);
+  /** 글자 하나 → 분류(없는 글자면 'bad') · 2단이 아니거나 글자가 하나가 아니면 undefined @param {string} a @returns {{ n: number, preset: any }[] | 'bad' | undefined} */
+  const groupOf = (a) => {
+    if (groups.length === 0 || !/^[a-z]$/i.test(a)) return undefined;
+    return groups[a.toLowerCase().charCodeAt(0) - 97]?.items ?? 'bad';
+  };
+  const badLetter = (/** @type {string} */ a) => ask.say(`  No group "${a}": pick a letter from a to ${letter(groups.length - 1)}, or type two or more letters to filter.`);
+  /** 거른 결과 · 분류 하나를 보이고 고르게 한다 — Enter 면 null(분류로 돌아간다) @param {{ n: number, preset: any }[]} items @returns {Promise<any[] | null>} */
+  const fromList = async (items) => {
+    let list = items;
+    for (;;) {
+      menuGroup(ask, `${list.length} part${list.length === 1 ? '' : 's'}`, list.map(({ n, preset }) => ({ n, label: preset.label })));
+      const a = await ask.line(`Pick one or more (e.g. ${list.slice(0, 2).map((x) => x.n).join(',')}), type to filter again, or Enter to go back: `);
+      if (a === '') return null;
+      const nums = numbersIn(a, max);
+      if (Array.isArray(nums)) return pick(nums);
+      if (nums === 'range') { ask.say(`  Pick one or more numbers from 1 to ${max}, separated by commas.`); continue; }
+      const g = groupOf(a);
+      if (g === 'bad') { badLetter(a); continue; }
+      const hits = g ?? filterItems(all, a);
+      if (hits.length === 0) { ask.say(`  No part matches "${a}".`); continue; }
+      list = hits;
+    }
+  };
+
   ask.say('What are you building?');
-  if (project.length > 0) menuGroup(ask, 'Shared by the project', project.map((p, i) => ({ n: i + 1, label: p.label })));
-  if (service.length > 0) menuGroup(ask, 'Parts of a service', service.map((p, i) => ({ n: project.length + i + 1, label: p.label })));
-  const nums = await ask.numbers(`Pick one or more (e.g. ${project.length > 0 && service.length > 0 ? `1,${project.length + 1}` : '1,2'}): `, ordered.length);
-  return nums.map((n) => ordered[n - 1]);
+  if (max <= FLAT_MENU_MAX) {
+    if (project.length > 0) menuGroup(ask, 'Shared by the project', project.map((p, i) => ({ n: i + 1, label: p.label })));
+    if (service.length > 0) menuGroup(ask, 'Parts of a service', service.map((p, i) => ({ n: project.length + i + 1, label: p.label })));
+    for (;;) {
+      const a = await ask.line(`Pick one or more (e.g. ${example}), or type to filter: `);
+      const nums = numbersIn(a, max);
+      if (Array.isArray(nums)) return pick(nums);
+      if (nums === 'range' || a === '') { ask.say(`  Pick one or more numbers from 1 to ${max}, separated by commas.`); continue; }
+      const hits = filterItems(all, a);
+      if (hits.length === 0) { ask.say(`  No part matches "${a}".`); continue; }
+      const got = await fromList(hits);
+      if (got) return got;
+    }
+  }
+  // 2단 — 분류 글자 · 거르기 · 아는 번호
+  for (;;) {
+    menuGroup(ask, `${max} parts in ${groups.length} groups`, groups.map((g, i) => ({ n: 0, label: `${letter(i)} ${g.label} (${g.items.length})` })), true);
+    const a = await ask.line(`Pick a group letter, type part of a name to filter, or part numbers if you know them (e.g. ${example}): `);
+    const nums = numbersIn(a, max);
+    if (Array.isArray(nums)) return pick(nums);
+    if (nums === 'range') { ask.say(`  Pick one or more numbers from 1 to ${max}, separated by commas.`); continue; }
+    if (a === '') { ask.say('  Pick a group letter, or type to filter.'); continue; }
+    const g = groupOf(a);
+    if (g === 'bad') { badLetter(a); continue; }
+    const items = g ?? filterItems(all, a);
+    if (items.length === 0) { ask.say(`  No part matches "${a}".`); continue; }
+    const got = await fromList(items);
+    if (got) return got;
+  }
 }
 
 /**
@@ -265,18 +357,30 @@ export async function guideNew(ctx) {
     d.stderr(`${ctx.shown} already exists. Add to it with "${ctx.command('add')}", or pass --force to start over.`);
     return EXIT.INPUT;
   }
+  // --provider 를 받았으면 그것 — 표에 없는 값은 서버에 묻기 전에 64
+  const given = v.provider === undefined ? undefined : providerOf(v.provider);
   const client = ctx.client();
-  const server = await loadServer(ctx, client);
-  if (typeof server === 'number') return server;
+  const body = await fetchCatalog(ctx, client);
+  if (typeof body === 'number') return body;
+  // 받은 provider 가 켜져 있는지는 묻기 전에 본다 — 묻고 나서 막히지 않게
+  if (given !== undefined) { const ok = serverFor(ctx, body, given); if (typeof ok === 'number') return ok; }
+  // provider 를 받지 않았는데 마법사 프리셋이 있는 provider 가 없다 — 물을 것이 없으므로 health 전에 2
+  else if (wizardProviders(body).length === 0) { d.stderr("The server's /catalog.json has no wizard presets for any provider; make a plan with cloudonym init instead."); return EXIT.INPUT; }
   const h = await client.get('/v1/health');
   if (h.kind !== 'ok') return ctx.report(h);
   const rules = h.body?.version?.rules;
   if (typeof rules !== 'string') { d.stderr('The server did not say its rules version (GET /v1/health).'); return EXIT.UNAVAILABLE; }
-  const { cat } = server;
 
   const ask = prompterOf(ctx);
   try {
-    ask.say(`Cloudonym — names for a Google Cloud project. Rules ${rules}.`);
+    // provider — 마법사 데이터가 있는 provider 가 여럿일 때만 묻는다(하나면 그것). 계획 파일 하나 = provider 하나
+    const candidates = wizardProviders(body);
+    const provider = given ?? (candidates.length > 1 ? (await ask.choose('Which cloud', candidates, { def: candidates[0] })) ?? 'gcp' : candidates[0] ?? 'gcp');
+    const server = serverFor(ctx, body, provider);
+    if (typeof server === 'number') return server;
+    const { cat } = server;
+    const cloud = CLOUD_NAME[provider] ?? provider;
+    ask.say(`Cloudonym — names for ${provider === 'gcp' ? `a ${cloud} project` : cloud}. Rules ${rules}.`);
     const a = {
       owner: await ask.text('Who runs it? (team or organisation, e.g. platform)'),
       system: await ask.text('System name (e.g. payment)'),
@@ -287,7 +391,7 @@ export async function guideNew(ctx) {
       /** @type {Entry[]} */ service: [],
     };
     do {
-      const chosen = await askParts(ask, cat.presets, { project: true, service: true });
+      const chosen = await askParts(ask, cat, { project: true, service: true });
       for (const preset of chosen) {
         if (preset.level !== 'project' && a.purpose === undefined) a.purpose = await ask.text('What is the service called? (e.g. shop)');
         const e = await askDetails(ask, cat, preset);
@@ -304,7 +408,7 @@ export async function guideNew(ctx) {
       const p = place([], a.project, cat, ask);
       const s = place([], a.service, cat, ask);
       plan = {
-        provider: PROVIDER,
+        provider,
         project: { owner: a.owner, system: a.system, env: /** @type {string} */ (a.envs[0]), region: a.region },
         project_picks: p.list, services: a.purpose === undefined ? [] : [{ purpose: a.purpose, picks: s.list }], rules_version: rules,
         ...(a.envs.length > 1 ? { environments: a.envs } : {}),
@@ -313,7 +417,7 @@ export async function guideNew(ctx) {
       /** @type {any} */
       let rejected;
       for (const env of a.envs) {
-        const r = checkWizard(await client.post('/v1/wizard', bodyFor(plan, env)), PROVIDER);
+        const r = checkWizard(await client.post('/v1/wizard', bodyFor(plan, env)), provider);
         if (r.kind === 'http' && r.status === 400) { rejected = { env, r }; break; }
         results.push({ env, r });
       }
@@ -353,14 +457,14 @@ export async function guideNew(ctx) {
     let version;
     for (const { env, r } of results) {
       if (r.kind !== 'ok') continue;
-      fresh[env] = exportEnv(r.body, PROVIDER);
-      rows[env] = tableRows(r.body, PROVIDER);
+      fresh[env] = exportEnv(r.body, provider);
+      rows[env] = tableRows(r.body, provider);
       version ??= r.body?.version;
     }
     // 보관 파일은 방금 쓴 계획에서 나온 것이다 — 계획만 지우고 다시 시작했으면 옛 보관 파일이 남아 있으니 내용을 대어 보지 않고 바꾼다
     writeJson(namesPathFor(ctx.file), { received_at: kstTime(d.now()), rules_version: version?.rules, environments: fresh });
     ask.say('');
-    printTable(ctx, rows, a.envs, undefined, PROVIDER);
+    printTable(ctx, rows, a.envs, undefined, provider);
     return finish(ctx, rows, a.envs.length);
   } catch (e) {
     if (e instanceof NoAnswer) { d.stderr('No answer (the input closed): nothing was written.'); return EXIT.USAGE; }
@@ -398,7 +502,9 @@ export async function guideAdd(ctx) {
   const lists = planLists(plan);
   environmentsOf(plan, v.env);
   const client = ctx.client();
-  const server = await loadServer(ctx, client);
+  const body = await fetchCatalog(ctx, client);
+  if (typeof body === 'number') return body;
+  const server = serverFor(ctx, body, plan.provider);
   if (typeof server === 'number') return server;
   const { cat } = server;
   if (plan.rules_version !== undefined && server.rules !== undefined && server.rules !== plan.rules_version) d.stderr(`Note: the plan was made with rules ${plan.rules_version}; the server has ${server.rules}.`);
@@ -412,7 +518,7 @@ export async function guideAdd(ctx) {
     /** @type {string | undefined} */
     let purpose = v.service;
     do {
-      const chosen = await askParts(ask, cat.presets, { project: v.service === undefined, service: !v.project });
+      const chosen = await askParts(ask, cat, { project: v.service === undefined, service: !v.project });
       for (const preset of chosen) {
         if (preset.level !== 'project' && purpose === undefined) purpose = await askService(ask, lists.services.map((s) => s.purpose));
         const e = await askDetails(ask, cat, preset);

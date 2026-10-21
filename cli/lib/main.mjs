@@ -10,8 +10,11 @@ import { serverOf, configPathOf } from './server.mjs';
 import {
   PlanError, readPlan, writeJson, environmentsOf, bodyFor, appendSlots, namesPathFor, readNamesFile, kstTime, isRecord, nextSeq, nextSlotId, planLists,
 } from './plan.mjs';
-import { nameTable } from './table.mjs';
+import { nameTable, nameTsv, tsvHead } from './table.mjs';
 import { guideNew, guideAdd } from './guide.mjs';
+import { closest } from './suggest.mjs';
+import { completionScript, SHELLS } from './completion.mjs';
+import { menuOrder } from './menu.mjs';
 
 export { nextSeq, nextSlotId, USER_AGENT, CLI_VERSION };
 
@@ -43,6 +46,7 @@ On a terminal, cloudonym with no command asks what you are building, then saves 
 Commands
   new       [--force]                                                   asks the questions (terminal only), saves the plan and names files
   init      --owner O --system S --env E[,E2…] --region R [--suffix X]   new plan file (rules_version from the server)
+            [--provider P]                                              P is gcp (default), aws or azure; one plan file is one provider
   init      --from <plan.json>                                          copy a plan saved from the web (Save plan); also new --from
   add       <preset | rule id | resource> (--service <purpose> | --project)
             [--count N] [--kind K] [--tier T] [--role R] [--ha] [--serverless <rule>] [--location L] [--pick '<json>'] [--dry-run]
@@ -50,13 +54,18 @@ Commands
   add       (no arguments, on a terminal)                               asks what to add, then checks and writes the same way
   names     [--new] [--repin] [--no-write]                              names for every environment of the plan
   validate                                                              0 when every name is valid and matches the names file
+  completion <bash|zsh|fish>                                            prints a shell completion script, e.g. source <(cloudonym completion zsh)
 
 Options
   -f, --file <plan>    plan file (default ${DEFAULT_FILE}); names are kept next to it in <plan>.names.json
   --server <origin>    the Cloudonym deployment to call; else CLOUDONYM_SERVER, else "server" in the config file
                        (~/.config/cloudonym/config.json), else the public deployment. --version shows which
   --env <e>            one environment of the plan only
-  --json               machine output (never asks)
+  -o, --output <fmt>   table (people), json or tsv (scripts; header, then env, what, name, check — and key with --keys).
+                       Default: table on a terminal, else name  key lines. json and tsv never ask
+  --json               the same as --output json
+  --no-input           never ask (also CLOUDONYM_NO_INPUT=1); where a question would be needed, exit 64 and name the flags to pass
+  --provider <p>       init and new: the cloud of the new plan (gcp, aws or azure); later commands read it from the plan file
   --keys               on a terminal, show each name's key in the table
   --wait               on 429, wait Retry-After (at most ${MAX_WAIT_SECONDS} s) and retry; once per command
   --timeout <ms>       per request (default 15000, at most ${MAX_TIMEOUT_MS})
@@ -75,10 +84,21 @@ const OPTIONS = /** @type {const} */ ({
   service: { type: 'string' }, project: { type: 'boolean' }, count: { type: 'string' }, kind: { type: 'string' }, tier: { type: 'string' }, role: { type: 'string' },
   ha: { type: 'boolean' }, serverless: { type: 'string' }, location: { type: 'string' }, pick: { type: 'string' }, 'dry-run': { type: 'boolean' },
   new: { type: 'boolean' }, repin: { type: 'boolean' }, 'no-write': { type: 'boolean' }, keys: { type: 'boolean' },
+  output: { type: 'string', short: 'o' }, 'no-input': { type: 'boolean' }, provider: { type: 'string' },
 });
 
-/** 사용법 오류 — 종료 코드 64 */
-export class UsageError extends Error {}
+/** 명령 표 — 오타 제안 · 셸 완성이 이것을 쓴다 */
+export const COMMANDS = /** @type {const} */ (['new', 'init', 'add', 'names', 'validate', 'completion', 'help']);
+/** --output 이 받는 값 */
+export const OUTPUTS = /** @type {const} */ (['table', 'json', 'tsv']);
+/** --provider 가 받는 값 — 계획 파일 최상위 provider 와 같다. 켜졌는지는 서버가 정한다(400 request.provider_not_enabled) */
+export const PROVIDERS = /** @type {const} */ (['gcp', 'aws', 'azure']);
+
+/** 사용법 오류 — 종료 코드 64. short 면 사용법 전체 대신 --help 를 가리키는 한 줄만 덧붙인다 */
+export class UsageError extends Error {
+  /** @param {string} message @param {{ short?: boolean }} [o] */
+  constructor(message, o = {}) { super(message); this.short = o.short === true; }
+}
 
 /**
  * @param {string[]} argv
@@ -105,7 +125,14 @@ export async function main(argv, given = {}) {
     try {
       parsed = parseArgs({ args: argv, options: OPTIONS, allowPositionals: true, strict: true });
     } catch (e) {
-      throw new UsageError(e instanceof Error ? e.message : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      // 모르는 플래그 — 가까운 플래그를 제안한다
+      const bad = /Unknown option '(-{1,2})([^']+)'/.exec(msg);
+      // 짧은 플래그(-H)는 짧은 플래그 표에서(대소문자만 다르면 그것), 긴 플래그는 긴 이름에서 찾는다
+      const shortOf = (/** @type {string} */ x) => Object.values(OPTIONS).map((o) => /** @type {{ short?: string }} */ (o).short).find((c) => c !== undefined && c.toLowerCase() === x.toLowerCase());
+      const near = !bad ? [] : bad[1] === '-' ? (shortOf(/** @type {string} */ (bad[2])) ? [`-${shortOf(/** @type {string} */ (bad[2]))}`] : [])
+        : closest(/** @type {string} */ (bad[2]), Object.keys(OPTIONS)).slice(0, 2).map((k) => `--${k}`);
+      throw new UsageError(bad && near.length > 0 ? `Unknown option '${bad[1]}${bad[2]}'. Did you mean ${near.join(' or ')}?` : msg, { short: bad !== null });
     }
     const { values: v, positionals } = parsed;
     if (v.version) {
@@ -118,6 +145,11 @@ export async function main(argv, given = {}) {
     }
     const [cmd, ...rest] = positionals;
     const ctx = new Ctx(d, v);
+    // --no-input 인데 명령 없이 — 계획이 있으면 이름을 보이고(묻지 않는다), 없으면 물을 수 없으니 무엇을 넘길지 알리고 64
+    if (cmd === undefined && !v.help && ctx.noInput()) {
+      if (existsSync(ctx.file)) return await names(ctx, []);
+      throw new UsageError(`Nothing is asked with --no-input (or CLOUDONYM_NO_INPUT). Make a plan with: cloudonym init --owner O --system S --env E --region R [--provider P], then cloudonym add <preset> --service <purpose>; with a plan, cloudonym names.`, { short: true });
+    }
     // 터미널에서 명령 없이 — 계획이 없으면 묻고, 있으면 이름 표를 보인다. 파이프 · CI 에서는 지금처럼 사용법과 64 (D121)
     if (cmd === undefined && !v.help && ctx.canAsk()) {
       if (!existsSync(ctx.file)) return await guideNew(ctx);
@@ -132,10 +164,14 @@ export async function main(argv, given = {}) {
       case 'add': return await add(ctx, rest);
       case 'names': return await names(ctx, rest);
       case 'validate': return await validate(ctx, rest);
-      default: throw new UsageError(`Unknown command: ${cmd}`);
+      case 'completion': return completion(ctx, rest);
+      default: {
+        const near = closest(cmd, COMMANDS);
+        throw new UsageError(`Unknown command: ${cmd}.${near.length > 0 ? ` Did you mean ${near.slice(0, 2).join(' or ')}?` : ''}`, { short: true });
+      }
     }
   } catch (e) {
-    if (e instanceof UsageError) { d.stderr(`${e.message}\n\n${USAGE}`); return EXIT.USAGE; }
+    if (e instanceof UsageError) { d.stderr(e.short ? `${e.message}\nRun "cloudonym --help" for the commands and options.` : `${e.message}\n\n${USAGE}`); return EXIT.USAGE; }
     if (e instanceof PlanError) { d.stderr(e.message); return EXIT.INPUT; }
     // 뜻밖의 예외 — 스택 대신 한 줄 · 「이름 FAIL」(1)과 겹치지 않는 코드
     try { d.stderr(`Internal error: ${e instanceof Error ? e.message : String(e)}`); } catch { /* stderr 도 닫혔으면 코드만 */ }
@@ -157,17 +193,33 @@ export class Ctx {
     this.cat = undefined;
     /** @type {string | undefined} */
     this.server = undefined;
+    if (v.output !== undefined && !OUTPUTS.includes(/** @type {any} */ (v.output))) throw new UsageError(`--output must be ${OUTPUTS.join(', ')}: ${v.output}`);
+    if (v.json && v.output !== undefined && v.output !== 'json') throw new UsageError(`--json is --output json; it cannot be used with --output ${v.output}.`);
+    /** 출력 꼴 — 'auto' 는 터미널이면 표, 아니면 「이름  키」 줄 @type {'auto' | 'table' | 'json' | 'tsv'} */
+    this.format = v.json ? 'json' : /** @type {'table' | 'json' | 'tsv' | undefined} */ (v.output) ?? 'auto';
   }
 
-  /** 물어도 되는가 — stdin · stdout 이 둘 다 터미널이고 --json 이 아닐 때만 (설계 §5 원칙 ②) */
+  /** 묻지 말라는 스위치 — --no-input 또는 CLOUDONYM_NO_INPUT(빈 값 · 0 · false 가 아니면 켜짐) */
+  noInput() {
+    const e = String(this.d.env.CLOUDONYM_NO_INPUT ?? '').trim().toLowerCase();
+    return this.v['no-input'] === true || (e !== '' && e !== '0' && e !== 'false' && e !== 'no');
+  }
+
+  /** 물어도 되는가 — stdin · stdout 이 둘 다 터미널이고, 기계 출력(json · tsv)이 아니고, --no-input 이 아닐 때만 (설계 §5 원칙 ②) */
   canAsk() {
-    return this.d.tty.stdin && this.d.tty.stdout && !this.v.json;
+    return this.d.tty.stdin && this.d.tty.stdout && this.format !== 'json' && this.format !== 'tsv' && !this.noInput();
   }
 
-  /** 사람 표로 보이는가 — stdout 이 터미널이고 --json 이 아닐 때. 파이프로 받는 출력은 지금 꼴 그대로 (설계 §6) */
+  /** 사람 표로 보이는가 — --output table 이거나, 따로 정하지 않았고 stdout 이 터미널일 때. 파이프로 받는 출력은 지금 꼴 그대로 (설계 §6) */
   table() {
-    return this.d.tty.stdout && !this.v.json;
+    return this.format === 'table' || (this.format === 'auto' && this.d.tty.stdout);
   }
+
+  /** --output json(--json) */
+  json() { return this.format === 'json'; }
+
+  /** --output tsv */
+  tsv() { return this.format === 'tsv'; }
 
   /** 다음 할 일에 적는 명령 — -f 를 받았으면 그것도 @param {string} cmd */
   command(cmd) {
@@ -204,6 +256,10 @@ export class Ctx {
     }
     // 다시 보내도 같다 — 계획이 상한보다 크다(2)
     if (r.status === 413) { say(`Request body too large (413): at most ${errors[0]?.params?.max_bytes ?? '?'} bytes. Split the plan.`); return EXIT.INPUT; }
+    if (r.status === 400 && errors[0]?.code === 'request.provider_not_enabled') {
+      say(notEnabled(errors[0].params?.provider, r.body?.supported));
+      return EXIT.INPUT;
+    }
     if (r.status === 400) {
       say('The server rejected the plan (400):');
       for (const e of errors) say(`  ${e.field ? `${e.field}: ` : ''}${e.message ?? e.code}`);
@@ -216,6 +272,15 @@ export class Ctx {
     say(`The server answered ${r.status}${errors[0] ? `: ${errors[0].message ?? errors[0].code}` : ''}.`);
     return EXIT.UNAVAILABLE;
   }
+}
+
+/**
+ * 켜지지 않은 provider 한 줄 — 400 request.provider_not_enabled 의 supported, 또는 /catalog.json 의 providers 키
+ * @param {unknown} provider @param {unknown} supported
+ */
+export function notEnabled(provider, supported) {
+  const list = Array.isArray(supported) && supported.length > 0 ? supported.join(', ') : undefined;
+  return `${String(provider)} is not enabled on this server yet${list ? ` (this server supports ${list})` : ''}. One plan file is one provider: make a plan with --provider ${list ? (/** @type {string[]} */ (supported))[0] : 'gcp'}.`;
 }
 
 // ── 응답 → 이름 목록 (웹 JSON 내보내기 wizardExport.ts 의 names · invalid 와 같은 칸) ──
@@ -299,7 +364,7 @@ async function newPlan(ctx, rest) {
   const { v } = ctx;
   if (rest.length > 0) throw new UsageError(`new takes no positional arguments: ${rest.join(' ')}`);
   if (v.from !== undefined || ['owner', 'system', 'env', 'region'].some((k) => v[/** @type {'owner'} */ (k)] !== undefined)) return init(ctx, rest);
-  if (!ctx.canAsk()) throw new UsageError('new asks questions, so it needs a terminal (and no --json). In scripts use: cloudonym init --owner O --system S --env E --region R, then cloudonym add.');
+  if (!ctx.canAsk()) throw new UsageError('new asks questions, so it needs a terminal (and no --json, --output json|tsv or --no-input). In scripts use: cloudonym init --owner O --system S --env E --region R [--provider P], then cloudonym add <preset> --service <purpose>.', { short: true });
   return guideNew(ctx);
 }
 
@@ -317,6 +382,8 @@ async function init(ctx, rest) {
       throw new UsageError('--from takes a plan file, not a share link (links are not read yet). Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>');
     }
     const { plan } = readPlan(resolve(d.cwd, v.from));
+    // 계획 파일 하나 = provider 하나 — --provider 가 파일과 다르면 쓰지 않는다(파일의 provider 를 조용히 덮지도 버리지도 않는다)
+    if (v.provider !== undefined && providerOf(v.provider) !== plan.provider) throw new UsageError(`--provider ${v.provider} does not match the provider of ${v.from} (${plan.provider}); one plan file is one provider.`);
     const envs = environmentsOf(plan);
     /** @type {PlanFile} */
     const out = { ...plan };
@@ -324,10 +391,12 @@ async function init(ctx, rest) {
     if (envs.length > 1) out.environments = envs;
     writeJson(ctx.file, out, expect);
     d.stderr(`Wrote ${ctx.shown}${plan.rules_version ? ` (rules ${plan.rules_version})` : ' (no rules_version: requests are not pinned)'}.`);
+    printWritten(ctx, plan.provider, plan.rules_version, envs);
     return EXIT.OK;
   }
   const missing = ['owner', 'system', 'env', 'region'].filter((k) => v[/** @type {'owner'} */ (k)] === undefined);
   if (missing.length > 0) throw new UsageError(`init needs --${missing.join(', --')} (or --from <plan.json>).`);
+  const provider = providerOf(v.provider);
   const envs = [...new Set(String(v.env).split(',').map((s) => s.trim()).filter((s) => s !== ''))];
   if (envs.length === 0) throw new UsageError('--env is empty.');
   const client = ctx.client();
@@ -335,9 +404,16 @@ async function init(ctx, rest) {
   if (r.kind !== 'ok') return ctx.report(r);
   const rules = r.body?.version?.rules;
   if (typeof rules !== 'string') { d.stderr('The server did not say its rules version (GET /v1/health).'); return EXIT.UNAVAILABLE; }
+  // --provider 를 받았으면 서버가 그 provider 를 켰는지 먼저 본다 — 켜지지 않은 계획 파일을 쓰고 나중 명령에서 막히지 않게(기본 gcp 는 묻지 않는다)
+  if (v.provider !== undefined) {
+    const c = await client.get('/catalog.json');
+    if (c.kind !== 'ok') return ctx.report(c);
+    const enabled = isRecord(c.body?.providers) ? Object.keys(c.body.providers) : [];
+    if (!enabled.includes(provider)) { d.stderr(notEnabled(provider, enabled)); return EXIT.INPUT; }
+  }
   /** @type {PlanFile} */
   const plan = {
-    provider: 'gcp',
+    provider,
     project: { owner: String(v.owner), system: String(v.system), env: /** @type {string} */ (envs[0]), region: String(v.region) },
     ...(v.suffix === undefined ? {} : { project_id_suffix: v.suffix }),
     project_picks: [], services: [], rules_version: rules,
@@ -345,7 +421,23 @@ async function init(ctx, rest) {
   };
   writeJson(ctx.file, plan, expect);
   d.stderr(`Wrote ${ctx.shown} (rules ${rules}). Add resources with "cloudonym add".`);
+  printWritten(ctx, provider, rules, envs);
   return EXIT.OK;
+}
+
+/** init 이 쓴 계획의 요약 — -o json · tsv 일 때만 stdout 에 @param {Ctx} ctx @param {string} provider @param {string | undefined} rules @param {string[]} envs */
+function printWritten(ctx, provider, rules, envs) {
+  if (ctx.json()) ctx.d.stdout(JSON.stringify({ file: ctx.shown, provider, rules_version: rules ?? null, environments: envs }, null, 2));
+  else if (ctx.tsv()) { ctx.d.stdout('file\tprovider\trules_version\tenvironments'); ctx.d.stdout([ctx.shown, provider, rules ?? '', envs.join(',')].join('\t')); }
+}
+
+/** --provider 값 — 없으면 gcp. 표에 없는 값은 64(가까운 값을 제안) @param {string | undefined} given @returns {string} */
+export function providerOf(given) {
+  if (given === undefined) return 'gcp';
+  const p = given.toLowerCase();
+  if (PROVIDERS.includes(/** @type {any} */ (p))) return p;
+  const near = closest(p, PROVIDERS);
+  throw new UsageError(`--provider must be ${PROVIDERS.join(', ')}: ${given}.${near.length > 0 ? ` Did you mean ${near[0]}?` : ''}`);
 }
 
 // ── names ──
@@ -363,7 +455,7 @@ async function names(ctx, rest) {
   const { doc: stored, digest: storedDigest } = readNamesFile(namesPath, namesPathFor(ctx.shown));
   const client = ctx.client();
   // 표의 What 칸은 /catalog.json 에서 찾는다 — 못 읽으면 resource_type 으로 보인다(이름 · 판정은 그대로)
-  if (ctx.table()) { const c = await client.get('/catalog.json'); ctx.cat = c.kind === 'ok' ? c.body?.providers?.[plan.provider] : undefined; }
+  if (ctx.table() || ctx.tsv()) { const c = await client.get('/catalog.json'); ctx.cat = c.kind === 'ok' ? c.body?.providers?.[plan.provider] : undefined; }
   let results = await sendAll(client, plan, envs);
 
   // --repin — 409 의 current 로 rules_version 을 고쳐 다시 보낸다. 보관 파일과 키마다 대어 바뀐 이름을 보인다 (D27: 핀은 호출자가 쥔다)
@@ -381,12 +473,12 @@ async function names(ctx, rest) {
   // 보관 이름은 모든 환경이 닿지 않을 때만 보인다 — 429 · 5xx · 413 · 해석할 수 없는 응답이면 보이지 않는다
   if (results.every(({ r }) => r.kind === 'unreachable') && stored) {
     d.stderr(`Showing the stored names from ${namesPathFor(ctx.shown)} (received ${stored.received_at}, rules ${stored.rules_version}); they are not fresh.`);
-    if (ctx.table()) {
+    if (ctx.table() || ctx.tsv()) {
       /** @type {Record<string, TableRow[]>} */
       const kept = {};
       for (const [env, e] of Object.entries(stored.environments)) kept[env] = [...(/** @type {any} */ (e).names ?? []).map((/** @type {any} */ item) => ({ item, valid: true })), ...(/** @type {any} */ (e).invalid ?? []).map((/** @type {any} */ item) => ({ item, valid: false, messages: item.messages }))];
       printTable(ctx, kept, shownEnvs, undefined, plan.provider);
-    } else printNames(ctx, stored.environments, shownEnvs, undefined);
+    } else printNames(ctx, stored.environments, shownEnvs, undefined, undefined, plan.provider);
     return EXIT.UNAVAILABLE;
   }
 
@@ -408,8 +500,8 @@ async function names(ctx, rest) {
     }
   }
 
-  if (okCount > 0 && ctx.table()) printTable(ctx, rows, shownEnvs, v.new ? stored : undefined, plan.provider);
-  else if (okCount > 0) printNames(ctx, fresh, shownEnvs, v.new ? stored : undefined, ver);
+  if (okCount > 0 && (ctx.table() || ctx.tsv())) printTable(ctx, rows, shownEnvs, v.new ? stored : undefined, plan.provider);
+  else if (okCount > 0) printNames(ctx, fresh, shownEnvs, v.new ? stored : undefined, ver, plan.provider);
   const allOk = okCount === envs.length;
   // --no-write 는 두 파일 모두 막는다 — 계획의 rules_version 도 보관 파일도 쓰지 않는다
   if (allOk && repinned && v['no-write']) d.stderr(`Not written (--no-write): ${ctx.shown} keeps rules_version ${read.plan.rules_version}; the server has ${plan.rules_version}.`);
@@ -424,10 +516,10 @@ async function names(ctx, rest) {
 
 /**
  * @param {Ctx} ctx @param {Record<string, any>} byEnv @param {string[]} envs @param {any} onlyNewAgainst 보관 파일 — 주면 거기 없는 키만
- * @param {any} [version]
+ * @param {any} version @param {string} provider 계획 파일의 provider
  */
-function printNames(ctx, byEnv, envs, onlyNewAgainst, version) {
-  const { v, d } = ctx;
+function printNames(ctx, byEnv, envs, onlyNewAgainst, version, provider) {
+  const { d } = ctx;
   /** @param {string} env @param {any[]} list */
   const filter = (env, list) => {
     if (!onlyNewAgainst) return list;
@@ -435,11 +527,11 @@ function printNames(ctx, byEnv, envs, onlyNewAgainst, version) {
     return list.filter((n) => !known.has(n.key));
   };
   const shown = envs.filter((e) => byEnv[e] !== undefined);
-  if (v.json) {
+  if (ctx.json()) {
     /** @type {Record<string, unknown>} */
     const environments = {};
     for (const env of shown) environments[env] = { valid: byEnv[env].valid, names: filter(env, byEnv[env].names), invalid: filter(env, byEnv[env].invalid ?? []) };
-    d.stdout(JSON.stringify({ ...(version ? { version } : {}), provider: 'gcp', environments }, null, 2));
+    d.stdout(JSON.stringify({ ...(version ? { version } : {}), provider, environments }, null, 2));
     return;
   }
   for (const env of shown) {
@@ -449,24 +541,33 @@ function printNames(ctx, byEnv, envs, onlyNewAgainst, version) {
   }
 }
 
-/** @typedef {{ item: any, valid: boolean, messages?: string[] }} TableRow */
+/** scope · uniqueness: 응답 항목의 유일 범위(있을 때만) — 표의 Unique in 칸. 보관 파일 · --json 의 이름 칸(exportName)에는 넣지 않는다 @typedef {{ item: any, valid: boolean, messages?: string[], scope?: string, uniqueness?: string }} TableRow */
+
+/** 응답 항목의 유일 범위 — 문자열일 때만 @param {any} it */
+const scopeOf = (it) => ({ ...(typeof it.scope === 'string' ? { scope: it.scope } : {}), ...(typeof it.uniqueness === 'string' ? { uniqueness: it.uniqueness } : {}) });
 
 /** 2xx 본문 → 표 줄(서버 순서) @param {any} body @param {string} provider @returns {TableRow[]} */
 export function tableRows(body, provider) {
   return (wizardData(body, provider)?.items ?? []).map((/** @type {any} */ it) => ({
-    item: exportName(it), valid: it.valid === true, messages: (Array.isArray(it.violations) ? it.violations : []).map((/** @type {any} */ x) => String(x?.message ?? x?.code)),
+    item: exportName(it), valid: it.valid === true, messages: (Array.isArray(it.violations) ? it.violations : []).map((/** @type {any} */ x) => String(x?.message ?? x?.code)), ...scopeOf(it),
   }));
 }
 
 /**
- * 사람 표 — 환경이 여럿이면 환경 제목. onlyNewAgainst 를 주면 보관 파일에 없는 키만
- * @param {Ctx} ctx @param {Record<string, TableRow[]>} byEnv @param {string[]} envs @param {any} [onlyNewAgainst] @param {string} [provider]
+ * 사람 표 — 환경이 여럿이면 환경 제목. onlyNewAgainst 를 주면 보관 파일에 없는 키만. --output tsv 면 머리 줄 하나 + 환경 칸이 붙은 줄
+ * @param {Ctx} ctx @param {Record<string, TableRow[]>} byEnv @param {string[]} envs @param {any} onlyNewAgainst @param {string} provider 계획 파일의 provider
  */
-export function printTable(ctx, byEnv, envs, onlyNewAgainst, provider = 'gcp') {
+export function printTable(ctx, byEnv, envs, onlyNewAgainst, provider) {
   const shown = envs.filter((e) => byEnv[e] !== undefined);
+  if (ctx.tsv()) ctx.d.stdout(tsvHead(ctx.v.keys === true));
   shown.forEach((env, i) => {
-    const known = new Set(onlyNewAgainst ? (onlyNewAgainst.environments[env]?.names ?? []).map((/** @type {any} */ n) => n.key) : []);
+    // 보관 파일이 아는 키 — names 와 invalid 둘 다(printNames 와 같다)
+    const kept = onlyNewAgainst?.environments?.[env];
+    const known = new Set(onlyNewAgainst ? [...(kept?.names ?? []), ...(kept?.invalid ?? [])].map((/** @type {any} */ n) => n.key) : []);
     const list = (byEnv[env] ?? []).filter((r) => !known.has(r.item.key));
+    if (ctx.tsv()) { for (const line of nameTsv(env, list, ctx.cat, provider, ctx.v.keys === true)) ctx.d.stdout(line); return; }
+    // --new 로 새 것이 없으면 머리만 있는 표를 내지 않는다
+    if (onlyNewAgainst && list.length === 0) return;
     if (shown.length > 1) ctx.d.stdout(`${i > 0 ? '\n' : ''}# ${env}`);
     for (const line of nameTable(list, ctx.cat, provider, ctx.v.keys === true)) ctx.d.stdout(line);
   });
@@ -524,12 +625,39 @@ export function resolveTarget(arg, provider, cat) {
   return { error: `Not a preset, rule or resource: ${arg}.${hint(arg, cat)}` };
 }
 
-/** 비슷한 후보 셋 @param {string} arg @param {{ rows: any[], presets: any[] }} cat */
+/**
+ * 비슷한 후보 셋 — 편집 거리로 가까운 것(오타: dbb → db, cloud_sql_instnce → gcp.cloud_sql_instance) 먼저, 그다음 부분 문자열로 든 것
+ * @param {string} arg @param {{ rows: any[], presets: any[] }} cat
+ */
 function hint(arg, cat) {
   const low = arg.toLowerCase().replace(/^[a-z]+\./, '');
+  // 「gcp.」 처럼 뗀 뒤 남는 글자가 없으면 무엇이든 든다 — 제안하지 않는다
+  if (low === '') return '';
   const all = [...cat.presets.map((p) => p.id), ...cat.rows.flatMap((r) => Object.keys(r.rules))];
-  const near = all.filter((id) => id.toLowerCase().includes(low)).slice(0, 3);
+  // 규칙 id 는 provider 를 뗀 글자로도 잰다 — 사람은 「cloud_sql_instnce」처럼 앞을 빼고 친다. 같은 글자가 둘이면(프리셋 id 와 규칙) 둘 다
+  const bare = all.map((id) => id.replace(/^[a-z]+\./, ''));
+  const near1 = new Set(closest(low, bare));
+  const byDistance = all.filter((_, i) => near1.has(/** @type {string} */ (bare[i])));
+  const bySubstring = all.filter((id) => id.toLowerCase().includes(low));
+  const near = [...new Set([...byDistance, ...bySubstring])].slice(0, 3);
   return near.length > 0 ? ` Did you mean: ${near.join(', ')}?` : '';
+}
+
+/**
+ * 「add 15」 — 번호는 묻는 흐름의 메뉴 번호다. 그 번호가 메뉴의 무엇인지(그 자리의 프리셋 id)와 id 를 찾는 길을 알린다
+ * @param {Ctx} ctx @param {string} arg @param {{ presets: any[] } | undefined} cat
+ */
+function menuNumberHint(ctx, arg, cat) {
+  const { v } = ctx;
+  const lines = [`${arg} is a menu number: numbers work only in the questions of "cloudonym add" with no arguments on a terminal. Here, pass a preset id, a rule id or a resource name.`];
+  if (cat) {
+    // 번호는 인자 없는 add · new 가 보이는 메뉴 그대로 — 프로젝트 공용 먼저(--service 를 받았어도 사람이 본 번호는 이 순서다)
+    const { ordered } = menuOrder(cat.presets, { project: true, service: !v.project });
+    const at = ordered[Number(arg) - 1];
+    if (at) lines.push(`In that menu ${arg} is ${at.label} — preset ${at.id}: cloudonym add ${at.id} ${at.level === 'project' ? '--project' : `--service ${v.service ?? '<purpose>'}`}`);
+    lines.push(`Preset ids: ${ordered.slice(0, 6).map((p) => p.id).join(', ')}${ordered.length > 6 ? ', …' : ''} (all of them: "presets" in /catalog.json, or the "Wizard presets" section of /llms.txt).`);
+  }
+  return lines.join('\n');
 }
 
 /** 규칙의 catalog 칸 @param {{ rows: any[] }} cat @param {string} id @returns {any} */
@@ -573,7 +701,29 @@ async function add(ctx, rest) {
   if (v.service !== undefined && v.project) throw new UsageError('Pass either --service <purpose> or --project, not both.');
   // 터미널에서 대상 없이 — 무엇을 더할지 묻는다(guide.mjs). 확인 · 저장은 아래 commitAdd 그대로 (D121)
   if (rest.length === 0 && v.pick === undefined && ctx.canAsk()) return guideAdd(ctx);
-  if (v.service === undefined && !v.project) throw new UsageError('add needs --service <purpose> or --project.');
+  // --no-input 인데 더할 것이 없다 — --service · --project 를 받았어도 물을 수 없다
+  if (rest.length === 0 && v.pick === undefined && ctx.noInput()) {
+    throw new UsageError('add asks what to add only on a terminal without --no-input. Pass what to add: cloudonym add <preset | rule id | resource> --service <purpose> (or --project), or --pick \'<json>\'.', { short: true });
+  }
+  // 메뉴 번호(add 15) — 프리셋 목록을 읽어 그 번호가 무엇인지 알린다. 종료 코드는 전과 같다(대상 자리가 비었으면 64 · 아니면 2)
+  if (rest.length === 1 && /^\d+$/.test(/** @type {string} */ (rest[0])) && v.pick === undefined) {
+    /** @type {any} */
+    let cat;
+    /** @type {string | undefined} */
+    let planError;
+    try {
+      const { plan } = readPlan(ctx.file);
+      const c = await ctx.client().get('/catalog.json');
+      cat = c.kind === 'ok' ? catalogOf(c.body, plan.provider) : undefined;
+    } catch (e) { if (!(e instanceof PlanError)) throw e; planError = e.message; }
+    d.stderr(menuNumberHint(ctx, /** @type {string} */ (rest[0]), cat));
+    // 계획 파일을 못 읽었으면 그 까닭도 알린다(숨기지 않는다) — 종료 코드는 그대로
+    if (planError !== undefined) d.stderr(planError);
+    return v.service === undefined && !v.project ? EXIT.USAGE : EXIT.INPUT;
+  }
+  if (v.service === undefined && !v.project) {
+    throw new UsageError('add needs --service <purpose> or --project.');
+  }
   if (v.pick === undefined && rest.length !== 1) throw new UsageError('add takes one preset, rule id or resource name (or --pick \'<json>\').');
   if (v.pick !== undefined && rest.length > 0) throw new UsageError('Pass either a resource name or --pick, not both.');
   const { plan, digest } = readPlan(ctx.file);
@@ -586,7 +736,13 @@ async function add(ctx, rest) {
   const catRes = await client.get('/catalog.json');
   if (catRes.kind !== 'ok') return ctx.report(catRes);
   const cat = catalogOf(catRes.body, plan.provider);
-  if (!cat) { d.stderr(`The server's /catalog.json has no wizard data for ${plan.provider}.`); return EXIT.INPUT; }
+  if (!cat) {
+    const enabled = isRecord(catRes.body?.providers) ? Object.keys(catRes.body.providers) : [];
+    d.stderr(enabled.includes(plan.provider) ? `The server's /catalog.json has no wizard data for ${plan.provider}.` : notEnabled(plan.provider, enabled));
+    return EXIT.INPUT;
+  }
+  // 표 · tsv 의 What · Unique in 칸 — 같은 응답의 그 provider 칸
+  ctx.cat = catRes.body.providers[plan.provider];
   const catRules = catRes.body?.version?.rules;
   if (plan.rules_version !== undefined && catRules !== undefined && catRules !== plan.rules_version) d.stderr(`Note: the plan was made with rules ${plan.rules_version}; the server has ${catRules}.`);
 
@@ -701,13 +857,13 @@ export async function commitAdd(ctx, o) {
     for (const [k, x] of badNew) d.stderr(`${at}new name FAILs ${k}: ${x.name}  ${(x.item.violations ?? []).map((/** @type {any} */ y) => y.message).join(' ')}`);
     if (changed.length > 0 || badNew.length > 0) { blocked = true; codes.push(EXIT.FAIL); continue; }
     added[env] = fresh.map(([, x]) => exportName(x.item));
-    addedRows[env] = fresh.map(([, x]) => ({ item: exportName(x.item), valid: x.valid }));
+    addedRows[env] = fresh.map(([, x]) => ({ item: exportName(x.item), valid: x.valid, ...scopeOf(x.item) }));
   }
   const code = worst(codes);
   if (code !== EXIT.OK || blocked) { d.stderr(`Not written: ${ctx.shown} is unchanged.`); return code; }
 
-  if (v.json) d.stdout(JSON.stringify({ environments: Object.fromEntries(shownEnvs.map((e) => [e, { names: added[e] ?? [] }])) }, null, 2));
-  else if (ctx.table()) printTable(ctx, addedRows, shownEnvs, undefined, o.provider);
+  if (ctx.json()) d.stdout(JSON.stringify({ environments: Object.fromEntries(shownEnvs.map((e) => [e, { names: added[e] ?? [] }])) }, null, 2));
+  else if (ctx.table() || ctx.tsv()) printTable(ctx, addedRows, shownEnvs, undefined, o.provider);
   else {
     for (const env of shownEnvs) {
       if (shownEnvs.length > 1) d.stdout(`# ${env}`);
@@ -719,5 +875,21 @@ export async function commitAdd(ctx, o) {
   if (v['dry-run']) { d.stderr(`Dry run: ${summary} would add ${newCount} name(s) to ${where}${checked}; ${ctx.shown} is unchanged.`); return EXIT.OK; }
   writeJson(ctx.file, next, digest);
   d.stderr(`Added ${summary} to ${where} in ${ctx.shown}: ${newCount} new name(s)${checked}; existing names unchanged.`);
+  return EXIT.OK;
+}
+
+// ── completion ──
+
+/** 값을 받는 플래그의 후보 — 파일 자리 · 고정 목록 */
+const COMPLETION_HINTS = { files: ['file', 'from'], values: { output: OUTPUTS, provider: PROVIDERS } };
+
+/** cloudonym completion <bash|zsh|fish> — 서버 · 계획 파일 없이 stdout 에 스크립트 @param {Ctx} ctx @param {string[]} rest */
+function completion(ctx, rest) {
+  const [shell, ...more] = rest;
+  if (shell === undefined || more.length > 0 || !SHELLS.includes(/** @type {any} */ (shell))) {
+    const near = shell === undefined ? [] : closest(shell, SHELLS);
+    throw new UsageError(`completion takes one shell: ${SHELLS.join(', ')}${shell === undefined ? '' : ` (got ${rest.join(' ')})`}.${near.length > 0 ? ` Did you mean ${near[0]}?` : ''}`, { short: true });
+  }
+  ctx.d.stdout(completionScript(/** @type {'bash' | 'zsh' | 'fish'} */ (shell), COMMANDS, /** @type {any} */ (OPTIONS), COMPLETION_HINTS).replace(/\n$/, ''));
   return EXIT.OK;
 }
