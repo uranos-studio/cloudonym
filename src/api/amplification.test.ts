@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
-import { req, jsonPost, json } from './test-support';
+import { req, jsonPost, json, SAMPLE_REGION } from './test-support';
 import { rulesFor } from '../core/constraints';
 import { inputKind } from '../core/tree';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
@@ -10,6 +10,8 @@ import { ENABLED_PROVIDERS, type Provider } from '../core/types';
 // 수치는 상한이지 목표가 아니다: 최악 입력의 실제 응답이 이 안이어야 한다.
 // HTTP 로 닿는 것은 켜진 CSP 뿐이다 (D45) — 켜는 CSP 가 늘면 이 시험이 그것도 돈다.
 // 이름 200개 응답은 입력이 짧아도 규칙(rule)을 항목마다 실어 azure 가 약 270KB 다 — 상한은 그 바닥의 2.4배쯤이다
+// 최악 입력(자유 입력 64자 × 3) 실측 2026-10-21 — gcp 443KB · aws 437KB · azure 580KB. 지역 표본은 CSP 마다 다르다(SAMPLE_REGION) —
+// GCP 존을 aws 에 넣으면 크기를 재기 전에 400 이 난다
 const MAX_NAMES_RESPONSE_BYTES = 640 * 1024;
 const MAX_ERROR_RESPONSE_BYTES = 64 * 1024;
 
@@ -39,7 +41,7 @@ describe('POST /v1/names 응답 증폭', () => {
     for (const [label, ch] of FILLERS) {
       it(`${p} · 상한(${MAX_CONTEXT_CHARS}자) ${label} × 3 · 이름 200개 → 응답 ${MAX_NAMES_RESPONSE_BYTES / 1024}KB 안`, async () => {
         const v = ch.repeat(MAX_CONTEXT_CHARS / ch.length);
-        const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: v, system: v, purpose: v, env: 'prod', region: 'asia-northeast3-a' }, resources: worstSelection(p) }));
+        const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: v, system: v, purpose: v, env: 'prod', region: SAMPLE_REGION[p] }, resources: worstSelection(p) }));
         expect(res.status).toBe(200);
         expect(await bytes(res)).toBeLessThan(MAX_NAMES_RESPONSE_BYTES);
       });

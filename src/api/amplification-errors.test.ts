@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { app } from './index';
-import { req, jsonPost } from './test-support';
+import { req, jsonPost, SAMPLE_REGION } from './test-support';
 import { MAX_BODY_BYTES } from './v1';
 import { rulesFor } from '../core/constraints';
 import { ENABLED_PROVIDERS } from '../core/types';
@@ -12,7 +12,7 @@ const MAX_ERROR_RESPONSE_BYTES = 64 * 1024;
 describe('POST /v1/names 400 오류 증폭', () => {
   for (const p of ENABLED_PROVIDERS) {
     it(`${p} · 모르는 type 200개 → supported 는 응답에 한 번만 · 응답 ${MAX_ERROR_RESPONSE_BYTES / 1024}KB 안`, async () => {
-      const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: 'o', system: 's', purpose: 'p', env: 'prod', region: 'asia-northeast3-a' }, resources: Array.from({ length: 200 }, () => ({ type: 1 })) }));
+      const { res } = await req(app, '/v1/names', jsonPost({ provider: p, context: { owner: 'o', system: 's', purpose: 'p', env: 'prod', region: SAMPLE_REGION[p] }, resources: Array.from({ length: 200 }, () => ({ type: 1 })) }));
       expect(res.status).toBe(400);
       const text = await res.text();
       expect(new TextEncoder().encode(text).length).toBeLessThan(MAX_ERROR_RESPONSE_BYTES);
