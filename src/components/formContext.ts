@@ -1,6 +1,7 @@
 // 폼의 값 (D50 revised) — 문맥 다섯 칸. region 은 사용자가 넣은 지역 입력 문자열(리전 · 존의 이름 또는 코드)이다.
 // 존 입력은 받아 리전으로 푼다 — 존은 이름에 들지 않는다
 import { ENABLED_PROVIDERS, type NamingContext, type Provider } from '../core/types';
+import { canonicalRegion } from '../core/regions';
 
 export type FormContext = Omit<NamingContext, 'zone'>;
 
@@ -17,4 +18,11 @@ export const DEFAULT_FORM: FormContext = { owner: 'platform', system: 'billing',
 /** 풀린 문맥 → 폼. 지역 칸은 hash 에 싣는 값과 같다 — 리전 코드 · global */
 export function formOf(ctx: NamingContext): FormContext {
   return { owner: ctx.owner, system: ctx.system, purpose: ctx.purpose, env: ctx.env, region: ctx.region };
+}
+
+/** CSP 를 바꿀 때의 폼 — 지역이 옛 CSP 표에서 풀리고 새 CSP 표에서 안 풀리면 새 CSP 의 예시로 바꾼다(ap-northeast-2 는 GCP 에서 안 풀린다).
+ *  옛 CSP 에서도 안 풀리던 값(입력 중 · 오타)은 사용자의 입력이라 그대로 둔다. 같은 CSP 면 그대로다 */
+export function formForCloudSwitch(form: FormContext, from: Provider, to: Provider): FormContext {
+  if (from === to || canonicalRegion(form.region, to) || !canonicalRegion(form.region, from)) return form;
+  return { ...form, region: EXAMPLE_REGIONS[to] };
 }

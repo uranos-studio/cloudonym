@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 vi.mock('../core/types', async (orig) => ({ ...(await orig<typeof import('../core/types')>()), ENABLED_PROVIDERS: ['aws', 'gcp'] }));
 
 await import('./urlState.test');
+await import('./cloudSwitch.test');
 await import('./linkRevision.test');
 await import('./roundtrip.test');
 await import('./wizardState.test');
