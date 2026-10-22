@@ -28,7 +28,7 @@ for bin in curl jq perl; do
   command -v "${bin}" >/dev/null || { echo "missing dependency: ${bin}" >&2; exit 2; }
 done
 
-# /v1/names 의 기대 이름 — 규칙 버전 2026-10-17.1 의 엔진 출력이다(2026-10-13.3 과 같다). 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
+# /v1/names 의 기대 이름 — 규칙 버전 2026-10-22.1 의 엔진 출력이다(2026-10-13.3 과 같다 — 2026-10-22.1 은 AWS 약어만 바꿨다). 규칙이 바뀌면 이 검사가 실패하고, 그때 아래 요청을
 # 새 빌드에 보내 값을 다시 적는다(조용히 통과하지 않는다)
 NAMES_REQUEST='{"provider":"gcp","context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"},"resources":[{"type":"vpc_network"},{"type":"storage_bucket"},{"type":"service_account","role":"db"}]}'
 NAMES_EXPECTED='{"service_account_db":"payments-batch-prod-sa-db","storage_bucket":"platform-payments-batch-prod-ane3-gcs","vpc_network_01":"payments-batch-prod-vpc-01"}'
@@ -105,43 +105,47 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (CSP, nosniff, X-Frame-Options: DENY)"; fi
 fi
 
-# 2. /llms.txt — 200 · text/plain · 하루 캐시 · CORS * · 첫 줄 · 소절은 GCP 만
+# 2. /llms.txt — 200 · text/plain · 하루 캐시 · CORS * · 첫 줄 · 소절은 AWS · GCP 만
 name='GET /llms.txt'
 code="$(fetch GET /llms.txt)"
 if expect_status "${name}" "${code}" 200; then
   ctype="$(header content-type)"
   first="$(head -1 "${body}" | tr -d '\r')"
   sub_gcp="$(grep -c '^### GCP$' "${body}")"
-  sub_other="$(grep -ciE '^### (AWS|Azure)' "${body}")"
+  sub_aws="$(grep -c '^### AWS$' "${body}")"
+  sub_other="$(grep -ciE '^### Azure' "${body}")"
   if [[ "${ctype}" != text/plain* ]]; then fail "${name}" "content-type '${ctype}'"
   elif [[ "$(header cache-control)" != *max-age=86400* ]]; then fail "${name}" "Cache-Control is '$(header cache-control)'"
   elif [ "$(header access-control-allow-origin)" != "*" ]; then fail "${name}" "Access-Control-Allow-Origin is '$(header access-control-allow-origin)'"
   elif [ "${first}" != "# Cloudonym" ]; then fail "${name}" "first line is '${first}'"
-  elif [ "${sub_other}" != "0" ]; then fail "${name}" "${sub_other} AWS/Azure section(s)"
+  elif [ "${sub_other}" != "0" ]; then fail "${name}" "${sub_other} Azure section(s)"
+  elif [ "${sub_aws}" = "0" ]; then fail "${name}" "no '### AWS' section"
   elif [ "${sub_gcp}" = "0" ]; then fail "${name}" "no '### GCP' section"
-  else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_gcp} '### GCP' sections, no AWS or Azure)"; fi
+  else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_aws} '### AWS' · ${sub_gcp} '### GCP' sections, no Azure)"; fi
 fi
 
-# 3. /catalog.json — 200 · provider 는 gcp 하나 · 116행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80 · cloudbuild_connection — D118 · cloudbuild_repository — D119)
+# 3. /catalog.json — 200 · provider 는 aws · gcp · aws 169행 · gcp 117행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80 · cloudbuild_connection — D118 · cloudbuild_repository — D119)
 name='GET /catalog.json'
 code="$(fetch GET /catalog.json)"
 if expect_status "${name}" "${code}" 200; then
   providers="$(jq -c '.providers | keys' "${body}" 2>/dev/null)"
   rows="$(jq '.providers.gcp.rows | length' "${body}" 2>/dev/null)"
-  if [ "${providers}" != '["gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
+  aws_rows="$(jq '.providers.aws.rows | length' "${body}" 2>/dev/null)"
+  if [ "${providers}" != '["aws","gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
   elif [ "${rows}" != "117" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 117"
-  else pass "${name} (providers [\"gcp\"], 117 rows)"; fi
+  elif [ "${aws_rows}" != "169" ]; then fail "${name}" "aws rows ${aws_rows:-<none>}, expected 169"
+  else pass "${name} (providers [\"aws\",\"gcp\"], aws 169 · gcp 117 rows)"; fi
 fi
 
-# 4. /openapi.json — provider enum 셋이 모두 ["gcp"]
+# 4. /openapi.json — provider enum 셋이 모두 ["aws","gcp"]
 name='GET /openapi.json'
 code="$(fetch GET /openapi.json)"
 if expect_status "${name}" "${code}" 200; then
   enums="$(jq -c '[.components.schemas.GenerateRequest.properties.providers.items.enum,
                    .components.schemas.NamesRequest.properties.provider.enum,
                    .components.schemas.ValidateRequest.properties.provider.enum]' "${body}" 2>/dev/null)"
-  if [ "${enums}" != '[["gcp"],["gcp"],["gcp"]]' ]; then fail "${name}" "provider enums (generate, names, validate) are ${enums:-<not JSON>}"
-  else pass "${name} (provider enums [\"gcp\"] in generate, names, validate)"; fi
+  if [ "${enums}" != '[["aws","gcp"],["aws","gcp"],["aws","gcp"]]' ]; then fail "${name}" "provider enums (generate, names, validate) are ${enums:-<not JSON>}"
+  else pass "${name} (provider enums [\"aws\",\"gcp\"] in generate, names, validate)"; fi
 fi
 
 # 5. 화면 경로 (D106) — Worker 가 경로마다 head 를 넣는다: 200 · 제 <title> · canonical 은 그 경로 · 보안 헤더(CSP · DENY).
@@ -223,16 +227,28 @@ if expect_status "${name}" "${code}" 204; then
   else pass "${name} (204, Allow-Origin *, Allow-Methods ${methods}, Allow-Headers content-type)"; fi
 fi
 
-# 8. POST /v1/generate providers:["aws"] — 아직 열지 않은 provider 는 400
+# 8. POST /v1/generate providers:["aws"] — 0.2.0 에서 연 AWS 는 200 · data 에 aws 만
 name='POST /v1/generate aws'
 code="$(fetch POST /v1/generate -H 'content-type: application/json' \
-  --data '{"providers":["aws"],"context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"asia-northeast3"}}')"
+  --data '{"providers":["aws"],"context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"ap-northeast-2"}}')"
+if expect_status "${name}" "${code}" 200; then
+  keys="$(jq -c '.data | keys' "${body}" 2>/dev/null)"
+  s3="$(jq -r '.data.aws.s3_bucket.name' "${body}" 2>/dev/null)"
+  if [ "${keys}" != '["aws"]' ]; then fail "${name}" "data keys ${keys:-<none>}"
+  elif [ "${s3}" != 'platform-payments-batch-prod-s3' ]; then fail "${name}" "s3_bucket ${s3:-<none>}"
+  else pass "${name} (200, data [\"aws\"], s3_bucket ${s3})"; fi
+fi
+
+# 8b. POST /v1/generate providers:["azure"] — 아직 열지 않은 provider 는 400 · supported 는 켜진 둘
+name='POST /v1/generate azure'
+code="$(fetch POST /v1/generate -H 'content-type: application/json' \
+  --data '{"providers":["azure"],"context":{"owner":"platform","system":"payments","purpose":"batch","env":"prod","region":"koreacentral"}}')"
 if expect_status "${name}" "${code}" 400; then
   ecode="$(jq -r '.errors[0].code' "${body}" 2>/dev/null)"
   supported="$(jq -c '.supported' "${body}" 2>/dev/null)"
   if [ "${ecode}" != "request.provider_not_enabled" ]; then fail "${name}" "error code ${ecode:-<none>}"
-  elif [ "${supported}" != '["gcp"]' ]; then fail "${name}" "supported ${supported:-<none>}"
-  else pass "${name} (400 request.provider_not_enabled, supported [\"gcp\"])"; fi
+  elif [ "${supported}" != '["aws","gcp"]' ]; then fail "${name}" "supported ${supported:-<none>}"
+  else pass "${name} (400 request.provider_not_enabled, supported [\"aws\",\"gcp\"])"; fi
 fi
 
 # 9. POST /v1/events — Fetch Metadata 헤더가 없으면 403

@@ -1,7 +1,6 @@
-// AWS 를 켠 상태로 같은 시험을 돈다 (0.2 준비) — 켜진 CSP 목록만 바꿔 끼우고 시험 파일을 그대로 불러온다.
-// 실제 설정(ENABLED_PROVIDERS = ['gcp'])의 시험은 각 파일이 그대로 돈다. 순서는 PROVIDERS 순서(types.test)를 따른다.
-// 여기 넣는 파일은 두 설정 모두에서 통과해야 한다 — 켜는 날 기대값이 바뀌는 시험(types · llms · readme · openapi · revision)은 넣지 않는다.
-// routes 는 넣지 않는다 — /catalog.json(AWS catalog 를 잇기 전) 시험이 켜는 날을 기다린다.
+// AWS 를 켠 상태로 같은 시험을 돈다 — 0.2 준비 때 켜진 CSP 목록만 바꿔 끼우고 시험 파일을 그대로 불러오던 묶음이다.
+// 0.2.0 에서 실제 설정이 ENABLED_PROVIDERS = ['aws', 'gcp'] 가 되어 아래 mock 은 실제 값과 같다 — 지금은 각 파일을 한 번 더 도는 중복이다.
+// 지울지 · Azure 를 켜는 준비 묶음(['aws', 'gcp', 'azure'])으로 바꿀지는 정하지 않았다. 순서는 PROVIDERS 순서(types.test)를 따른다.
 // 화면 쪽은 src/components/aws-enabled.test.ts 다(tsconfig 가 갈린다)
 import { vi } from 'vitest';
 

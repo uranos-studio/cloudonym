@@ -1,6 +1,6 @@
 # Cloudonym
 
-Multi-cloud resource naming engine — **Google Cloud** in this release, with AWS and Azure in the rule table and planned for later releases. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people (a **naming wizard** for a whole project, and a resource tree for any single resource), and `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` for AI coding agents and IaC. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+Multi-cloud resource naming engine — **AWS** and **Google Cloud** in this release, with Azure in the rule table and planned for a later release. From five context values (owner · system · purpose · env · region) it **generates, corrects and validates** resource names against each provider's physical constraints — a web UI for people (a **naming wizard** for a whole project, and a resource tree for any single resource), and `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` for AI coding agents and IaC. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 [한국어](#한국어)
 
@@ -50,7 +50,7 @@ Most numbered resources follow `<system>-<purpose>-<env>-<region>-<abbreviation>
 
 The resource tree is at `/pick` (**Pick resources** in the header's **More** menu); a tree link opened at `/` moves there. It names single resources from one set of five values, in four steps:
 
-1. **① Cloud** — GCP is selected for you. AWS and Azure are shown as **Coming soon** and cannot be picked yet.
+1. **① Cloud** — pick AWS or GCP. Azure is shown as **Coming soon** and cannot be picked yet.
 2. **② Context** — type **Owner · System · Purpose** (at most 64 characters each), pick **Environment**, and pick a **Region** (searching by a zone name also finds its region). Names are regenerated as you type.
 3. **③ Resources** — a tree of the provider's resources, grouped by the scope in which the provider requires a name to be unique. Search by name, id, Terraform type, gcloud group or alias, filter by category, or show the selected rows only. Each row has an ⓘ with a one-line description and where the name is entered (gcloud flag or Terraform argument); rows marked **API only** have no gcloud command or Terraform resource and are created through the API. Tick a resource and set how many you need (1–99, numbered `01`…`99`); resources without a sequence number are always one, and identity-like resources take a short role (`sync` by default). A row that covers several scopes (for example a regional and a global address) asks for the scope first, and some rows take a **kind** (for example the Cloud SQL engine).
 4. **④ Names** — only the picked resources, grouped by scope, each with `PASS`/`FAIL` and why it was shortened or transformed. Copy one name, **all valid names** (one per line), the **names JSON** or **Terraform locals** (names and tags). The **Tags · Labels** panel copies the provider's standard tags as JSON. Two picked resources that would get the same name in the same scope are both marked `FAIL` (`name.conflict`).
@@ -73,7 +73,7 @@ Both screens keep their state in the URL hash — the wizard its project values,
   "project": { "owner": "platform", "system": "billing", "env": "prod", "region": "ane3" },
   "project_picks": [{ "preset": "vpc", "instances": [{ "id": "1", "seq": "01" }] }],
   "services": [{ "purpose": "shop", "picks": [{ "preset": "db", "kind": "POSTGRES", "instances": [{ "id": "1", "seq": "01" }] }] }],
-  "rules_version": "2026-10-17.1",
+  "rules_version": "2026-10-22.1",
   "environments": ["prod", "stg"]
 }
 ```
@@ -109,12 +109,12 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
   -d '{"provider":"gcp","resource_type":"storage_bucket","name":"Payments-Prod-Bucket"}'
 ```
 
-`/v1/generate` returns a name for **every** resource type of the requested providers; `/v1/names` returns names only for the resources you pick, as many as you ask for. `providers` is optional (default: the enabled providers — `gcp` in this release); `aws` or `azure` is `400 request.provider_not_enabled` with `supported: ["gcp"]`. Response of `/v1/generate`, trimmed to one resource:
+`/v1/generate` returns a name for **every** resource type of the requested providers; `/v1/names` returns names only for the resources you pick, as many as you ask for. `providers` is optional (default: the enabled providers — `aws` and `gcp` in this release — whose region table resolves `context.region`, so `asia-northeast3-a` gives `gcp` only; when none resolves it, all enabled providers and the region error); `azure` is `400 request.provider_not_enabled` with `supported: ["aws", "gcp"]`. Response of `/v1/generate`, trimmed to one resource:
 
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.9", "rules": "2026-10-17.1" },
+  "version": { "engine": "0.2.0", "rules": "2026-10-22.1" },
   "data": {
     "gcp": {
       "compute_instance": {
@@ -157,7 +157,7 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.9", "rules": "2026-10-17.1" },
+  "version": { "engine": "0.2.0", "rules": "2026-10-22.1" },
   "data": {
     "gcp": {
       "valid": true,
@@ -197,14 +197,14 @@ Response of `/v1/names`, trimmed to two of the five items (`rule` and `metadata`
 }
 ```
 
-`resources` — `count` 1–99 (default 1) on rules with a sequence number, `role` (`^[a-z0-9]{2,16}$`, default `sync`) on rules with a role, `kind` (a value name such as `POSTGRES`, listed per rule in `/llms.txt` and `/catalog.json`) on rules with kinds; at most 200 items and 200 names per request, no type twice. A kind that equals the provider default adds no token. `scope` is the uniqueness scope the name belongs to and `uniqueness: "none"` means the provider enforces none (AWS `Name` tags, not enabled yet). One request is treated as one instance of the parent scope: two items that would get the same name are both `valid: false` with `name.conflict`, and `conflicts` summarises them.
+`resources` — `count` 1–99 (default 1) on rules with a sequence number, `role` (`^[a-z0-9]{2,16}$`, default `sync`) on rules with a role, `kind` (a value name such as `POSTGRES`, listed per rule in `/llms.txt` and `/catalog.json`) on rules with kinds; at most 200 items and 200 names per request, no type twice. A kind that equals the provider default adds no token. `scope` is the uniqueness scope the name belongs to and `uniqueness: "none"` means the provider enforces none (AWS `Name` tags). One request is treated as one instance of the parent scope: two items that would get the same name are both `valid: false` with `name.conflict`, and `conflicts` summarises them.
 
 Response of `/v1/validate`:
 
 ```json
 {
   "valid": false,
-  "version": { "engine": "0.1.9", "rules": "2026-10-17.1" },
+  "version": { "engine": "0.2.0", "rules": "2026-10-22.1" },
   "violations": [
     { "code": "name.pattern_mismatch", "params": { "pattern": "^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }, "message": "Does not match the allowed pattern ^[a-z0-9][a-z0-9._-]{1,61}[a-z0-9]$" }
   ],
@@ -235,7 +235,7 @@ One request is one project. `project` holds four values (no `purpose`), `project
 ```json
 {
   "success": true,
-  "version": { "engine": "0.1.9", "rules": "2026-10-17.1" },
+  "version": { "engine": "0.2.0", "rules": "2026-10-22.1" },
   "data": {
     "gcp": {
       "valid": true,
@@ -338,11 +338,11 @@ node cli/cloudonym.mjs validate                       # exit 0 when every name i
 
 Point your agent at `https://<your-deployment>/llms.txt`; paths in it are relative to the host that served it.
 
-## Supported resources (138 rules)
+## Supported resources (307 rules)
 
-**GCP 138** rules are enabled in this release (rules revision `2026-10-17.1`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **AWS 169 · Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them.
+**AWS 169 · GCP 138** rules are enabled in this release (rules revision `2026-10-22.1`; counted from the engine's rule table and matching the rule list in `/llms.txt`). **Azure 377** — in the rule table, not enabled yet: the engine and its tests cover them, but the UI, the API, `/llms.txt` and `/catalog.json` do not offer them. The naming wizard on the home page is Google Cloud only; AWS is offered in the resource tree, the API, `/llms.txt` and `/catalog.json`.
 
-The 36 hand-written rules below (the AWS and Azure rows among them are not enabled yet) are each checked against the official document linked. On top of them, **332 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md) (29 rows), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) (10 discovery methods, and the 23 of the 116 supported GCP asset types that have no rule: 5 held, 13 with no user-chosen name, 5 named outside this engine) and [docs/aws-intake-held.md](docs/aws-intake-held.md) (33 types). A further **46 GCP rules**, **42 AWS rules** and **30 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
+The 36 hand-written rules below (the Azure rows among them are not enabled yet) are each checked against the official document linked. On top of them, **332 Azure rules** are imported from the formal rows of the [Azure naming rules table](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) (generated by `scripts/rules/build-azure-rules.mjs`) **82 GCP rules** from the [Compute Engine](https://www.googleapis.com/discovery/v1/apis/compute/v1/rest) and [Cloud KMS](https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest) discovery documents (generated by `scripts/rules/build-gcp-rules.mjs`), and **116 AWS rules** from the [CloudFormation resource schemas](https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip) — 23 physical names with a schema pattern and length, and 93 `Name` tags (generated by `scripts/rules/build-aws-rules.mjs`); `/llms.txt` lists every rule, and the rows not imported yet are in [docs/azure-intake-held.md](docs/azure-intake-held.md) (29 rows), [docs/gcp-intake-held.md](docs/gcp-intake-held.md) (10 discovery methods, and the 23 of the 116 supported GCP asset types that have no rule: 5 held, 13 with no user-chosen name, 5 named outside this engine) and [docs/aws-intake-held.md](docs/aws-intake-held.md) (33 types). A further **46 GCP rules**, **42 AWS rules** and **30 Azure rules** were added by hand after reading each REST or API reference, product guide or naming-rules row again (`src/core/rules/gcp-manual.ts`, `src/core/rules/aws-manual.ts`, `src/core/rules/azure-manual.ts`, with the source sentence quoted above each rule).
 
 Every limit is checked against the official document linked below. The line-by-line comparison is in [docs/rule-verification.md](docs/rule-verification.md).
 
@@ -451,7 +451,7 @@ See the LICENSE file for details.
 
 ## 한국어
 
-**Cloudonym** 은 클라우드 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 이번 릴리스는 **Google Cloud** 만 연다 — AWS · Azure 는 규칙 표에 있고 다음 릴리스에서 연다. 사람은 웹 화면(프로젝트 전체를 짓는 **이름 마법사**와 리소스 하나씩 고르는 리소스 트리)으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` 으로 쓴다. 바뀐 점은 [CHANGELOG.md](CHANGELOG.md)(영어)에 있다.
+**Cloudonym** 은 클라우드 리소스 이름을 다섯 문맥값(owner · system · purpose · env · region)에서 각 CSP 의 물리 제약에 맞게 **생성 · 교정 · 검증**하는 엔진이다. 이번 릴리스는 **AWS** 와 **Google Cloud** 를 연다 — Azure 는 규칙 표에 있고 다음 릴리스에서 연다. 사람은 웹 화면(프로젝트 전체를 짓는 **이름 마법사**와 리소스 하나씩 고르는 리소스 트리)으로, AI 코딩 에이전트와 IaC 는 `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/llms.txt` · `/openapi.json` · `/catalog.json` 으로 쓴다. 바뀐 점은 [CHANGELOG.md](CHANGELOG.md)(영어)에 있다.
 
 ### 이름 마법사 (웹 화면 `/`)
 
@@ -483,7 +483,7 @@ See the LICENSE file for details.
 
 리소스 트리는 `/pick`(머리 **More** 메뉴의 **Pick resources**)에 있고, 마법사 전에 나간 공유 링크도 이 화면으로 열린다. 다섯 값 한 벌로 리소스를 하나씩 네 단계로 짓는다.
 
-1. **① Cloud** — GCP 가 골라져 있다. AWS · Azure 는 **Coming soon** 표지와 함께 보이고 아직 고를 수 없다
+1. **① Cloud** — AWS 나 GCP 를 고른다. Azure 는 **Coming soon** 표지와 함께 보이고 아직 고를 수 없다
 2. **② Context** — **Owner · System · Purpose** 를 적고(각 64자까지) **Environment** 를 고르고, **Region** 을 고른다(존 이름으로 찾아도 그 리전이 나온다). 입력하는 대로 이름이 다시 만들어진다
 3. **③ Resources** — CSP 가 이름을 유일하게 요구하는 범위로 묶은 리소스 트리다. 이름 · id · Terraform 타입 · gcloud 그룹 · 별칭으로 찾고, 분류로 거르고, 고른 행만 볼 수 있다. 행마다 ⓘ 에 한 줄 설명과 이름을 넣는 자리(gcloud 플래그 · Terraform 인자)가 있고, **API only** 표지가 붙은 행은 gcloud 명령 · Terraform 리소스가 없어 API 로 만든다. 체크하고 개수(1~99 · 순번 `01`…`99`)를 정한다. 순번이 없는 리소스는 늘 하나이고, ID 성격의 리소스는 짧은 역할(기본 `sync`)을 받는다. 범위가 여럿인 행(지역 주소와 전역 주소 등)은 범위부터 고르고, 어떤 행은 **종류**(Cloud SQL 엔진 등)를 받는다
 4. **④ Names** — 고른 리소스만 범위별로 보이고, 카드마다 `PASS`/`FAIL` 과 줄이거나 바꾼 이유가 나온다. 이름 하나 · **유효한 이름 전부**(한 줄에 하나) · **이름 JSON** · **Terraform locals**(이름 + 태그)를 복사한다. **Tags · Labels** 칸은 CSP 표준 태그를 JSON 으로 복사한다. 같은 범위에서 같은 이름이 될 두 리소스는 둘 다 `FAIL`(`name.conflict`)이다
@@ -511,7 +511,7 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
   -d '{"provider":"gcp","resource_type":"storage_bucket","name":"Payments-Prod-Bucket"}'
 ```
 
-`providers` 는 생략할 수 있다(기본은 켜진 CSP — 이번 릴리스는 `gcp`). `aws` · `azure` 는 `400 request.provider_not_enabled` 이고 `supported: ["gcp"]` 가 실린다. `/v1/generate` 는 고른 CSP 의 **모든** 리소스 종류에 이름을 하나씩 주고, `/v1/names` 는 **고른 리소스만** 요청한 개수만큼 준다.
+`providers` 는 생략할 수 있다(기본은 켜진 CSP — 이번 릴리스는 `aws` · `gcp` — 가운데 `context.region` 을 지역 표로 풀 수 있는 것만이다. `asia-northeast3-a` 면 `gcp` 하나다. 어느 쪽도 못 풀면 켜진 CSP 전부와 지역 오류). `azure` 는 `400 request.provider_not_enabled` 이고 `supported: ["aws", "gcp"]` 가 실린다. `/v1/generate` 는 고른 CSP 의 **모든** 리소스 종류에 이름을 하나씩 주고, `/v1/names` 는 **고른 리소스만** 요청한 개수만큼 준다.
 
 - **`/v1/generate` 에서 늘 FAIL 인 행** — 기본 입력으로 전체 목록을 만들기 때문이다. 리소스 정책은 종류가 필요하고(`name.kind_required`), Cloud Functions 1세대 · 2세대는 이름공간이 하나라 같은 이름이 되어 둘 다 `name.conflict` 다. 리소스 정책은 `/v1/names` 에 `kind` 를 넣어 만든다
 - **`/v1/names`** — `resources` 의 `count` 는 순번이 있는 규칙에만 1~99(기본 1), `role` 은 역할 규칙에만 `^[a-z0-9]{2,16}$`(기본 `sync`), `kind` 는 종류가 있는 규칙에만 값 이름(`POSTGRES` 등 — 규칙별 목록은 `/llms.txt` · `/catalog.json`)이다. CSP 기본값과 같은 종류는 토큰을 붙이지 않는다. 한 요청에 항목 200개 · 이름 200개까지, 같은 종류는 한 번만. 항목마다 `scope`(이름이 유일해야 하는 범위)와 `uniqueness`(`none` 이면 CSP 가 유일성을 매기지 않는다 — AWS `Name` 태그, 아직 켜지지 않음)가 실린다. 한 요청은 부모 범위 하나로 본다 — 같은 이름이 될 두 항목은 둘 다 `valid: false` · `name.conflict` 이고 `conflicts` 가 요약한다
@@ -591,7 +591,7 @@ node cli/cloudonym.mjs validate                       # 이름이 전부 유효�
 
 ### 지원 리소스
 
-이번 릴리스에서 켠 것은 **GCP 138** 개 규칙이다(규칙 버전 `2026-10-17.1` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **AWS 169 · Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 GCP 만 내놓는다. 손으로 쓴 36개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-138-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 46개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
+이번 릴리스에서 켠 것은 **AWS 169 · GCP 138** 개 규칙이다(규칙 버전 `2026-10-22.1` · 엔진의 규칙 표에서 세고 `/llms.txt` 의 규칙 목록과 대어 본 값). **Azure 377** 은 규칙 표에 있지만 아직 켜지 않았다 — 엔진과 시험은 셋을 다 돌리고, 화면 · API · `/llms.txt` · `/catalog.json` 은 AWS · GCP 만 내놓는다. 첫 화면의 이름 마법사는 Google Cloud 만 다루고, AWS 는 리소스 트리 · API · `/llms.txt` · `/catalog.json` 에서 쓴다. 손으로 쓴 36개의 표와 공식 문서 링크는 위 [Supported resources](#supported-resources-307-rules) 에 있다. Azure 332개는 Azure 이름 규칙 표의 정형 행에서(`scripts/rules/build-azure-rules.mjs`), GCP 82개는 Compute Engine · Cloud KMS 디스커버리 문서의 정형 행에서(`scripts/rules/build-gcp-rules.mjs`), AWS 116개(물리 이름 23 · Name 태그 93)는 CloudFormation 리소스 스키마에서(`scripts/rules/build-aws-rules.mjs`) 들였다. 전체 목록은 `/llms.txt`, 아직 들이지 않은 행은 [docs/azure-intake-held.md](docs/azure-intake-held.md)(29행) · [docs/gcp-intake-held.md](docs/gcp-intake-held.md)(디스커버리 메서드 10행, 그리고 지원 범위 GCP 자산 유형 116종 가운데 규칙이 없는 23종 — 보류 5 · 사람이 짓는 이름 없음 13 · 이 엔진 밖에서 정해지는 이름 5) · [docs/aws-intake-held.md](docs/aws-intake-held.md)(33 타입) 에 있다. 생성기가 정형으로 읽지 못한 행 가운데 GCP 46개 · AWS 42개 · Azure 30개는 REST · API 참조와 제품 안내서, Azure 이름 규칙 표를 다시 읽고 손으로 넣었다(`src/core/rules/gcp-manual.ts` · `src/core/rules/aws-manual.ts` · `src/core/rules/azure-manual.ts`, 규칙마다 원문 인용). 손으로 쓴 규칙마다 공식 문서와 대조한 기록은 [docs/rule-verification.md](docs/rule-verification.md)(영어) 다.
 
 ### 한계
 

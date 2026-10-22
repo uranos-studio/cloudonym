@@ -151,7 +151,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   const pick = (resources: unknown, provider = 'gcp') => ({ provider, context: SAMPLE_CTX, resources });
   await names('names-ok', pick([{ type: 'compute_instance', count: 2 }, { type: 'subnet', count: 2 }, { type: 'service_account', role: 'db' }, { type: 'project_id' }, { type: 'storage_bucket' }]));
   await names('names-item-fail', { provider: 'gcp', context: { ...SAMPLE_CTX, owner: 'goog' }, resources: [{ type: 'storage_bucket' }, { type: 'compute_instance', count: 2 }] });
-  await names('400-names-provider-not-enabled', pick([{ type: 'ec2_instance' }, { type: 'vpc' }, { type: 's3_bucket' }], 'aws'));
+  await names('400-names-provider-not-enabled', pick([{ type: 'storage_account' }, { type: 'virtual_network' }, { type: 'key_vault' }], 'azure'));
   await names('names-pinned-current', { ...pick([{ type: 'project_id' }]), rules_version: rulesVersion });
   // 충돌 fixture (D41) — 시험 전용 규칙은 HTTP 로 닿지 않으므로(규칙 표에 없다) 라우터와 같은 직렬화기로 직접 만든다. HTTP 쪽은 names-conflict.test
   out.push({ id: 'names-conflict', method: 'POST', path: '/v1/names', status: 200,
@@ -181,7 +181,7 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   await wiz('400-wizard-too-many-picks', { ...W, project_picks: Array.from({ length: 21 }, (_, i) => ({ preset: 'firewall', tier: `t${i}`, instances: [{ id: 'a', seq: '01' }] })), services: [] });
   await wiz('400-wizard-project-context', { ...W, project: { ...W.project, env: 'preprod' } });
   await wiz('400-wizard-unknown-rule', { ...W, services: [{ purpose: 'shop', picks: [{ preset: null, rule: 'gcp.nope' }] }] });
-  await wiz('400-wizard-provider-not-enabled', { ...W, provider: 'aws' });
+  await wiz('400-wizard-provider-not-enabled', { ...W, provider: 'azure' });
   await wiz('409-wizard-rules-version', { ...W, rules_version: '2026-01-01.1' });
   await val('validate-invalid-too-long', { provider: 'gcp', resource_type: 'service_account', name: 'platform-billing-trade-prod-kr-sa-sync' });
   await val('validate-invalid-goog', { provider: 'gcp', resource_type: 'storage_bucket', name: 'goog-billing' });

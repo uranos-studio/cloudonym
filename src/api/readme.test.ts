@@ -12,8 +12,8 @@ describe('README.md — 지원 리소스 · 규칙 버전 · 예시', () => {
   it('「Supported resources (N rules」 의 N 은 켜진 CSP 의 규칙 수다', () => {
     const m = /^## Supported resources \((\d+) rules/m.exec(readme);
     expect(m, '머리가 없다').not.toBeNull();
-    expect(ENABLED_PROVIDERS).toEqual(['gcp']);
-    expect(Number(m![1])).toBe(rulesFor('gcp').length);
+    expect(ENABLED_PROVIDERS).toEqual(['aws', 'gcp']);
+    expect(Number(m![1])).toBe(rulesFor('aws').length + rulesFor('gcp').length);
   });
   it('켜지지 않은 CSP 의 규칙 수도 엔진 값과 같다', () => {
     for (const p of PROVIDERS.filter((x) => !ENABLED_PROVIDERS.includes(x))) {

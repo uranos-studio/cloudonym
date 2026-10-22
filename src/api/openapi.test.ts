@@ -51,7 +51,8 @@ describe('public/openapi.json — 형식', () => {
       expect(region.description, r).not.toMatch(/\bkr\b/);
       expect(region.description, r).toMatch(/zone/i);
       expect(region.description, r).toContain('/llms.txt');
-      for (const p of ENABLED_PROVIDERS) expect(parseContext({ ...ctxExample, region: region.example }, p).ok, `${r} ${p}`).toBe(true);
+      // 지역 표가 CSP 마다 달라 한 값이 모든 CSP 에서 풀리지는 않는다 — 켜진 CSP 가운데 하나에서 풀리면 된다(요청 예시는 아래 「example 요청은 200」 이 본다)
+      expect(ENABLED_PROVIDERS.some((p) => parseContext({ ...ctxExample, region: region.example }, p).ok), r).toBe(true);
     }
     // 이름 예시에 옛 지역 토큰이 남지 않는다
     expect(JSON.stringify(spec)).not.toMatch(/-kr-/);
@@ -264,7 +265,7 @@ describe('계약 시험 — 실제 응답을 명세의 스키마로 검증한다
     const codesSeen = new Set(samples.filter((x) => x.path === '/v1/names' && x.status === 400).flatMap((x) => (x.body.errors as { code: string }[]).map((e) => e.code)));
     expect(SELECTION_CODES_IN_SAMPLES).toHaveLength(14);
     for (const c of SELECTION_CODES_IN_SAMPLES) expect([...codesSeen], c).toContain(c);
-    // uniqueness "none"(AWS Name 태그)은 꺼진 CSP 에만 있다 — 켜진 GCP 의 항목은 전부 csp (D45)
+    // GCP 규칙에는 uniqueness "none"(AWS Name 태그)이 없다 — names-ok(GCP) 의 항목은 전부 csp
     const ok = samples.find((x) => x.id === 'names-ok')!.body.data.gcp.items as { uniqueness: string }[];
     expect(ok.length).toBeGreaterThan(0);
     for (const i of ok) expect(i.uniqueness).toBe('csp');

@@ -12,7 +12,7 @@ export const AWS_CATALOG_META = {
   "sources": {
     "rules": "src/core/rules/aws.ts · aws-manual.ts · aws-intake.ts (cloudonym-aws ade60fb)",
     "cfnSchema": "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip (2026-10-21)",
-    "status": "draft — enterNameAt.awsCli/terraform 비움(확인 못 함) · kind 전부 null(종류 토큰 조사 안 함) · info · entity 는 엔진 규칙 칸에서 만든 것(문서 대조 아님)"
+    "status": "draft: enterNameAt.awsCli/terraform empty (not verified); every kind is null (kind tokens not researched); info and entity are derived from the engine rule fields (not checked against AWS docs)"
   }
 } as const;
 

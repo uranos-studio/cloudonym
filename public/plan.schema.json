@@ -16,6 +16,7 @@
     "provider": {
       "type": "string",
       "enum": [
+        "aws",
         "gcp"
       ],
       "maxLength": 1024

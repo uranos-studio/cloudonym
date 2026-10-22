@@ -4,8 +4,13 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-22
+
+AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-22.1. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
+
 ### Added
 
+- **AWS** (D45) — 169 AWS rules in the resource tree, `/v1/generate`, `/v1/names`, `/v1/validate`, `/llms.txt`, `/openapi.json` and `/catalog.json` (169 rows with `AWS_CATALOG_META`). The provider enums are `["aws", "gcp"]`; Azure stays **Coming soon**. AWS names carry no availability-zone token: a zone input resolves to its region, as on Google Cloud (D50 revised). The naming wizard on the home page stays Google Cloud only.
 - **The CLI asks on a terminal** (D121) — `cloudonym` with no command (or `cloudonym new`) asks who runs the system, its name, the environments, the region and what to build, every choice a numbered list from `/catalog.json`; it saves the plan and names files and prints a What · Name · Check table. With a plan file, `cloudonym` shows the names and `cloudonym add` with no arguments asks what to add. A wrong answer is asked again with the server's reason. Piped, in CI or with `--json` nothing is asked and the output is unchanged; `--keys` adds the key column to the table.
 - **`cli/package.json`** (D121) — the CLI is a package of its own (`cloudonym`, Node 22 or later, no dependencies), ready for npm but not published.
 - **CLI: provider from the plan file** — `init --provider gcp|aws|azure` (and `new --provider`; default `gcp`) sets the plan file's `provider`, and every later command reads it from the file (one plan file is one provider). A provider the server has not enabled (400 `request.provider_not_enabled`) is one line and exit 2.
@@ -21,6 +26,8 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **AWS abbreviations re-derived for all 169 rules** — by the Google Cloud abbreviation principles, with measured frequency in public Terraform: 71 change, among them `s3` (was `bucket`), `ec2` (`vm`), `rds` (`db`), `ebs` (`vol`), `snet` (`subnet`) and the Transit Gateway family under `tgw`. Each catalog row records the basis and the old abbreviation in `slug.previous` and `aliases`. Shared by design: `sng` (RDS · ElastiCache subnet groups), `pg` (parameter groups), `pol` (IAM policies), `st` (API Gateway stages v1 · v2).
+- **`/v1/generate` without `providers`** — names only the clouds whose region table resolves the `region` sent, so a request with a Google Cloud region keeps getting Google Cloud names and no 400 from AWS. A region no enabled cloud resolves still returns every cloud's error.
 - **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
 - **`--from` with a share link** says what to do instead: open the link, press Save plan, then `cloudonym new --from <file>`.
 

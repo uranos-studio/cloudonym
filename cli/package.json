@@ -1,6 +1,6 @@
 {
   "name": "cloudonym",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "Cloud resource names from five context values, checked by the Cloudonym API. Asks questions on a terminal; flags and JSON for scripts.",
   "license": "Apache-2.0",
   "type": "module",

@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Cloudonym API",
-    "description": "Multi-cloud resource naming engine. This release enables Google Cloud (gcp) only; AWS and Azure are in the rule table but not enabled, and a request for them is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names, one by one or for a whole project with the naming wizard (/wizard), against each provider's physical constraints. Names from /wizard may carry a tier token (web, was) after the abbreviation and kind token, and attached resources (boot and data disks, reserved addresses) are named after their server; /generate and /names never put a tier in a name. Formulas, region codes, the zones they accept, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /wizard, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
-    "version": "0.1.9",
+    "description": "Multi-cloud resource naming engine. This release enables AWS (aws) and Google Cloud (gcp); Azure is in the rule table but not enabled, and a request for it is 400 request.provider_not_enabled with the enabled providers in supported. Generates, corrects and validates resource names, one by one or for a whole project with the naming wizard (/wizard), against each provider's physical constraints. Names from /wizard may carry a tier token (web, was) after the abbreviation and kind token, and attached resources (boot and data disks, reserved addresses) are named after their server; /generate and /names never put a tier in a name. Formulas, region codes, the zones they accept, kind tokens and every rule are in /llms.txt; the resource catalog and region table are in /catalog.json (served from the site root, not under /v1). Cloudonym does not replace the provider's final verdict: it checks only the reserved words and patterns that the official documents state. Successful responses of /generate, /names, /wizard, /validate and /health carry version { engine, rules }; failures and /events do not. Every failure has the ErrorResponse shape; an unknown /v1 path or method returns 404 with code request.not_found. PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.",
+    "version": "0.2.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
@@ -88,11 +88,8 @@
                   "system": "billing",
                   "purpose": "trade",
                   "env": "prod",
-                  "region": "asia-northeast3"
-                },
-                "providers": [
-                  "gcp"
-                ]
+                  "region": "global"
+                }
               }
             }
           }
@@ -756,21 +753,23 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt. Multi-region and dual-region locations (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4; by name or code, any case) are taken only by the resource types that support them: storage_bucket takes all nine, bigquery_dataset takes US and EU; names carry the lower-case code (us). A location is accepted only when every requested type that carries a region token takes it, otherwise 400 context.location_unsupported — always on /v1/generate, which names every type.",
+                "description": "A region or a zone of the provider, by name or by code (gcp: asia-northeast3, asia-northeast3-a, ane3, ane3a; aws: ap-northeast-2, apne2), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt. Multi-region and dual-region locations (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4; by name or code, any case) are taken only by the resource types that support them: storage_bucket takes all nine, bigquery_dataset takes US and EU; names carry the lower-case code (us). A location is accepted only when every requested type that carries a region token takes it, otherwise 400 context.location_unsupported — always on /v1/generate, which names every type.",
                 "example": "asia-northeast3-a"
               }
             }
           },
           "providers": {
             "type": "array",
-            "description": "Omit for every enabled provider (only gcp for now; aws and azure are planned). Must be non-empty when present. A known provider that is not enabled yet is 400 request.provider_not_enabled.",
+            "description": "Omit for every enabled provider (aws and gcp; azure is planned) whose region table resolves context.region — a GCP region or zone gives gcp only, an AWS region gives aws only, global gives both; when no enabled provider resolves it, every enabled provider is used and the region error is returned. Must be non-empty when present. A known provider that is not enabled yet is 400 request.provider_not_enabled.",
             "items": {
               "type": "string",
               "enum": [
+                "aws",
                 "gcp"
               ]
             },
             "example": [
+              "aws",
               "gcp"
             ]
           },
@@ -947,6 +946,7 @@
           "provider": {
             "type": "string",
             "enum": [
+              "aws",
               "gcp"
             ],
             "maxLength": 1024,
@@ -986,7 +986,7 @@
               "region": {
                 "type": "string",
                 "maxLength": 1024,
-                "description": "A region or a zone of the provider, by name or by code (asia-northeast3, asia-northeast3-a, ane3, ane3a), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt. Multi-region and dual-region locations (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4; by name or code, any case) are taken only by the resource types that support them: storage_bucket takes all nine, bigquery_dataset takes US and EU; names carry the lower-case code (us). A location is accepted only when every requested type that carries a region token takes it, otherwise 400 context.location_unsupported — always on /v1/generate, which names every type.",
+                "description": "A region or a zone of the provider, by name or by code (gcp: asia-northeast3, asia-northeast3-a, ane3, ane3a; aws: ap-northeast-2, apne2), or global. Names carry the region code (ane3); a zone name is accepted and resolved to its region, so zonal resources are named like regional ones. Country values and region names of another provider are 400 context.value_unsupported with candidates in supported. The region table is in /llms.txt. Multi-region and dual-region locations (US, EU, ASIA, ASIA1, EUR4, EUR5, EUR7, EUR8, NAM4; by name or code, any case) are taken only by the resource types that support them: storage_bucket takes all nine, bigquery_dataset takes US and EU; names carry the lower-case code (us). A location is accepted only when every requested type that carries a region token takes it, otherwise 400 context.location_unsupported — always on /v1/generate, which names every type.",
                 "example": "asia-northeast3-a"
               }
             }
@@ -1435,7 +1435,7 @@
         "properties": {
           "engine": {
             "type": "string",
-            "example": "0.1.9"
+            "example": "0.2.0"
           },
           "rules": {
             "type": "string",
@@ -1456,6 +1456,7 @@
             "type": "string",
             "maxLength": 1024,
             "enum": [
+              "aws",
               "gcp"
             ],
             "example": "gcp"
@@ -1717,7 +1718,7 @@
           },
           "providers": {
             "type": "object",
-            "description": "Keyed by enabled provider (gcp in this release)",
+            "description": "Keyed by enabled provider (aws and gcp in this release)",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": false,
@@ -1890,12 +1891,17 @@
                       "enterNameAt": {
                         "type": "object",
                         "required": [
-                          "gcloud",
                           "terraform",
                           "apiOnly"
                         ],
                         "properties": {
                           "gcloud": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "awsCli": {
                             "type": "array",
                             "items": {
                               "type": "string"
@@ -1913,7 +1919,20 @@
                           "preview": {
                             "type": "boolean"
                           }
-                        }
+                        },
+                        "description": "Where the name is entered: gcloud flags on gcp rows, AWS CLI parameters (awsCli) on aws rows, plus the Terraform argument",
+                        "anyOf": [
+                          {
+                            "required": [
+                              "gcloud"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "awsCli"
+                            ]
+                          }
+                        ]
                       },
                       "badges": {
                         "type": "array",
@@ -2199,6 +2218,7 @@
           "provider": {
             "type": "string",
             "enum": [
+              "aws",
               "gcp"
             ],
             "maxLength": 1024,

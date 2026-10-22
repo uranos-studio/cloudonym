@@ -7,7 +7,7 @@ export type Provider = 'aws' | 'gcp' | 'azure';
 export const PROVIDERS: readonly Provider[] = ['aws', 'gcp', 'azure'];
 /** 켜진 CSP (D45) — 화면 · API · llms.txt · openapi.json 이 이 목록만 연다. 규칙 · 시험 · 기준선은 PROVIDERS 셋을 그대로 돈다.
  *  꺼진 CSP 는 데이터를 남기고 노출만 끈다. 다음 CSP 를 여는 것은 이 배열에 더하는 것이다 */
-export const ENABLED_PROVIDERS: readonly Provider[] = ['gcp'];
+export const ENABLED_PROVIDERS: readonly Provider[] = ['aws', 'gcp'];
 export type Env = 'prod' | 'stg' | 'dev' | 'sbx' | 'qa' | 'uat' | 'test' | 'perf' | 'dr';
 
 /** region 은 그 CSP 의 리전 코드(ane3 · apne2 · krc) 또는 'global' · zone 은 존 코드(ane3a) — 존 이름 · 존 코드를 넣었을 때만 (D49).

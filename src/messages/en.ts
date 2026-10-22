@@ -181,7 +181,6 @@ export const en: Catalog = {
     cloud_group_label: 'Choose a cloud',
     pick_cloud_prompt: 'Choose a cloud above to see its resources.',
     cloud_coming_soon: 'Coming soon',
-    cloud_planned_aws: 'AWS: planned for 0.2.0',
     cloud_planned_azure: 'Azure: planned for 0.3.0',
     provider_unavailable: 'This link was made for {name}, which is not available yet — the region was reset to the example and the selection was cleared.',
     resources_title: 'Resources — {provider}',

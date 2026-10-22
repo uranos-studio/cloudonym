@@ -120,15 +120,17 @@ describe('「## For AI coding agents」 — 직접 짓지 말고 API 를 부른�
 
 describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('첫 줄은 # Cloudonym', () => expect(lines[0]).toBe('# Cloudonym'));
-  it('켜진 CSP 만 — GCP 절만 있고 공식 줄 수는 GCP 규칙 수 · AWS · Azure 는 「planned」 한 줄 (D45)', () => {
+  it('켜진 CSP 만 — GCP · AWS 절이 있고 공식 줄 수는 두 CSP 규칙 수 · Azure 는 「planned」 한 줄 (D45)', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
-    expect(enabledRules).toHaveLength(rulesFor('gcp').length);
+    expect(enabledRules).toHaveLength(rulesFor('gcp').length + rulesFor('aws').length);
     expect(rulesFor('gcp')).toHaveLength(138);
-    expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### env' || l === '### region')).toBe(true);
+    expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### AWS' || l === '### env' || l === '### region')).toBe(true);
     expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
-    expect(text).not.toMatch(/`(aws|azure)\.[a-z0-9_]+`/);
-    expect(lines.filter((l) => l.includes('planned'))).toEqual(['> AWS and Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
-    expect(text).toContain('"providers"?: ["gcp"]');
+    expect(lines.filter((l) => l === '### AWS')).toHaveLength(4); // 공식 · 지역 · 제약 · 트리 — AWS 는 종류 표가 아직 없다
+    expect(text).toMatch(/`aws\.[a-z0-9_]+`/);
+    expect(text).not.toMatch(/`azure\.[a-z0-9_]+`/);
+    expect(lines.filter((l) => l.includes('planned'))).toEqual(['> Azure: planned — not enabled yet. The API answers 400 `request.provider_not_enabled` for them.']);
+    expect(text).toContain('"providers"?: ["gcp", "aws"]');
   });
   it('공식 줄이 규칙 수(손 36 + 들인 행)만큼 있고 template 을 그대로 펼친다 (세 CSP 를 펼친 본문)', () => {
     expect(allLines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(rules.length);
@@ -162,10 +164,12 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const section = lines.slice(start, end);
     const rows = section.filter((l) => /^- `[a-z0-9-]+` · `[a-z0-9]+` — /.test(l));
     expect(REGIONS.gcp).toHaveLength(43);
-    expect(rows).toHaveLength(REGIONS.gcp.length);
+    expect(REGIONS.aws).toHaveLength(34);
+    expect(rows).toHaveLength(REGIONS.gcp.length + REGIONS.aws.length);
     // 지역 표는 입력 표다 — 존 이름 · 존 코드를 받으므로 그대로 둔다
     expect(rows).toContain('- `asia-northeast3` · `ane3` — Seoul, South Korea, APAC · zones: `asia-northeast3-a` `ane3a`, `asia-northeast3-b` `ane3b`, `asia-northeast3-c` `ane3c`');
-    for (const r of REGIONS.gcp) expect(rows.some((l) => l.startsWith(`- \`${r.region}\` · \`${r.code}\` — ${r.label}`)), r.region).toBe(true);
+    for (const r of [...REGIONS.gcp, ...REGIONS.aws]) expect(rows.some((l) => l.startsWith(`- \`${r.region}\` · \`${r.code}\` — ${r.label}`)), r.region).toBe(true);
+    expect(rows).toContain('- `ap-northeast-2` · `apne2` — Asia Pacific (Seoul)');
     const body = section.join('\n');
     expect(body).toContain('`kr` and `jp` are rejected');
     // 멀티 · 이중 리전 위치 (D78) — 줄마다 받는 resourceType 과 공식 위치 문서
@@ -344,7 +348,8 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const pubAt = lines.indexOf('## Resource tree');
     const pub = lines.slice(pubAt, lines.findIndex((l, i) => i > pubAt && l.startsWith('## ')));
     expect(pub.filter((l) => /^ +- `[a-z]+\.[a-z0-9_]+` · input: /.test(l))).toHaveLength(enabledRules.length);
-    expect(pub.some((l) => /\(`(aws|azure):/.test(l))).toBe(false);
+    expect(pub.some((l) => /\(`aws:/.test(l))).toBe(true);
+    expect(pub.some((l) => /\(`azure:/.test(l))).toBe(false);
     const at = allLines.indexOf('## Resource tree');
     const end = allLines.findIndex((l, i) => i > at && l.startsWith('## '));
     expect(at).toBeGreaterThan(0);

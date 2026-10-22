@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ENABLED_PROVIDERS } from '../core/types';
 import { GCP_CATALOG, GCP_CATALOG_META } from '../core/rules/gcp-catalog';
+import { AWS_CATALOG, AWS_CATALOG_META } from '../core/rules/aws-catalog';
 import { REGIONS } from '../core/regions-data';
 import { buildCatalogJson } from './catalog';
 import { afterEach, vi } from 'vitest';
@@ -311,13 +312,16 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     expect(body.version).toEqual(VERSION);
     expect(Object.keys(body.providers)).toEqual([...ENABLED_PROVIDERS]);
     // 규칙마다 더한 칸(D101 — input · tier · locations)을 떼면 catalog 행 그대로다. 더한 칸은 catalog-client.test 가 센다
-    const bare = body.providers.gcp.rows.map((row: Loose) => ({ ...row, rules: Object.fromEntries(Object.entries(row.rules as Record<string, Loose>)
+    const bare = (rows: Loose[]) => rows.map((row: Loose) => ({ ...row, rules: Object.fromEntries(Object.entries(row.rules as Record<string, Loose>)
       .map(([id, { input: _i, tier: _t, locations: _l, ...spec }]) => [id, spec])) }));
-    expect(bare).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
+    expect(bare(body.providers.gcp.rows)).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
     expect(body.providers.gcp.rows).toHaveLength(117);
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
-    expect(body.providers.aws).toBeUndefined();
+    expect(bare(body.providers.aws.rows)).toEqual(JSON.parse(JSON.stringify(AWS_CATALOG)));
+    expect(body.providers.aws.rows).toHaveLength(169);
+    expect(body.providers.aws.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.aws)));
+    expect(body.providers.aws.meta).toEqual(JSON.parse(JSON.stringify(AWS_CATALOG_META)));
     expect(body.providers.azure).toBeUndefined();
     expect(promises).toHaveLength(1);
     await promises[0];

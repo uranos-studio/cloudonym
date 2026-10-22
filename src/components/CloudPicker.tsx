@@ -11,7 +11,7 @@ import type { UiKey } from '../messages/catalog';
 import { providerName, providerShort } from './providerName';
 
 /** 꺼진 CSP 의 툴팁 — 언제 열리는지 (사전 문구) */
-const PLANNED: Partial<Record<Provider, UiKey>> = { aws: 'cloud_planned_aws', azure: 'cloud_planned_azure' };
+const PLANNED: Partial<Record<Provider, UiKey>> = { azure: 'cloud_planned_azure' };
 
 const BUTTON =
   // 좁은 화면에서 버튼 셋 + 「Coming soon」 표지가 360px 에 들어가도록 표지를 글자 아래로 내린다
