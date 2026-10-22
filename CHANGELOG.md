@@ -4,8 +4,13 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-10-22
+
+The CLI asks on a terminal and follows common cloud CLI conventions; visits and conversions can be attributed to the referring house-ad campaign. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.
+
 ### Added
 
+- **Campaign source on usage counters** (D122) — a visit that arrives with `utm_source` and `utm_medium=house_ad` keeps the source for the tab session (sessionStorage, no cookies or identifiers) and adds it to `ui_visit`, `ui_generate` and `ui_copy`; daily counters are also kept per source. The address bar drops the `utm_*` parameters.
 - **The CLI asks on a terminal** (D121) — `cloudonym` with no command (or `cloudonym new`) asks who runs the system, its name, the environments, the region and what to build, every choice a numbered list from `/catalog.json`; it saves the plan and names files and prints a What · Name · Check table. With a plan file, `cloudonym` shows the names and `cloudonym add` with no arguments asks what to add. A wrong answer is asked again with the server's reason. Piped, in CI or with `--json` nothing is asked and the output is unchanged; `--keys` adds the key column to the table.
 - **`cli/package.json`** (D121) — the CLI is a package of its own (`cloudonym`, Node 22 or later, no dependencies), ready for npm but not published.
 - **CLI: provider from the plan file** — `init --provider gcp|aws|azure` (and `new --provider`; default `gcp`) sets the plan file's `provider`, and every later command reads it from the file (one plan file is one provider). A provider the server has not enabled (400 `request.provider_not_enabled`) is one line and exit 2.
