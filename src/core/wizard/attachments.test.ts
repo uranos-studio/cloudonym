@@ -17,12 +17,16 @@ const TAIL = String.raw`(\.instances\[\d+\](\.attach(\.(boot|ip|ipi|data(\[\d+\]
 const PATH = new RegExp(String.raw`^(services\[\d+\](\.picks\[\d+\]${TAIL})?|projectPicks(\[\d+\]${TAIL})?)$`);
 
 describe('호환표 (D62 · §4-5)', () => {
-  it('행은 넷 — VM 의 boot · data(순번) · ip · ipi', () => {
+  it('행은 CSP 마다 넷 — VM 의 boot · data(순번) · ip · ipi (AWS 는 EBS · EIP · ENI)', () => {
     expect(ATTACHMENTS.map((r) => [r.parent, r.attach, r.child, r.seq])).toEqual([
       ['gcp.compute_instance', 'boot', 'gcp.disk', false],
       ['gcp.compute_instance', 'data', 'gcp.disk', true],
       ['gcp.compute_instance', 'ip', 'gcp.address', false],
       ['gcp.compute_instance', 'ipi', 'gcp.address', false],
+      ['aws.ec2_instance', 'boot', 'aws.ebs_volume', false],
+      ['aws.ec2_instance', 'data', 'aws.ebs_volume', true],
+      ['aws.ec2_instance', 'ip', 'aws.ec2_eip', false],
+      ['aws.ec2_instance', 'ipi', 'aws.ec2_network_interface', false],
     ]);
     expect(ATTACH_KINDS).toEqual(['boot', 'data', 'ip', 'ipi']);
     expect(MAX_DATA_DISKS).toBe(9);

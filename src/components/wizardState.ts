@@ -2,16 +2,16 @@
 // 순번은 슬롯의 값이다 — 서버 줄 · 디스크 줄을 지워도 남은 번호를 당기지 않는다. 「+ server」 · 「+ disk」는 다음 빈 번호를 쓴다.
 // 번호를 다시 매기는 것은 사용자가 누르는 별도 동작(renumber)이다. 판정(이름 규칙 · 검사)은 엔진(validatePlan)이 한다
 import { SEQ_PATTERN, MAX_COUNT, type Attachments } from '../core/selection';
-import { MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, checkProjectIdSuffix, validatePlan, type Pick, type PlanError, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
-import { PRESETS, presetOf, type Preset } from '../core/wizard/presets';
+import { MAX_PICKS_PER_SERVICE, PROJECT_ID_RULE, PROJECT_SCOPES, SLOT_ID_PATTERN, checkProjectIdSuffix, projectIdRuleOf, projectScopesFor, validatePlan, type Pick, type PlanError, type WizardPlan, type WizardProvider, type WizardSlot } from '../core/wizard/plan';
+import { PRESETS, presetOf, presetsFor, type Preset } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { EXAMPLE_REGIONS } from './formContext';
 import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
 import { kindToken } from '../core/catalog';
 import { generateItem, generateProject, type NameItem } from '../core/engine';
-import type { NameResult, ProjectContext, ResourceRule } from '../core/types';
-import { RESERVED_TIERS } from '../core/tier';
+import type { NameResult, ProjectContext, Provider, ResourceRule } from '../core/types';
+import { reservedTiersFor } from '../core/tier';
 import { TIER_PATTERN } from '../core/types';
 
 /** 프로젝트 이름 규칙 — Project 칸이 이미 만든다 (D95). 엔진 · API 는 custom pick 으로 받는다 */
@@ -21,8 +21,19 @@ export const PROJECT_NAME_RULE = 'gcp.project_name';
 export const CUSTOM_TREE = buildTree('gcp', treeRules(buildTree('gcp')).filter((r) => r.id !== PROJECT_ID_RULE && r.id !== PROJECT_NAME_RULE));
 /** 프로젝트 공용 칸의 custom 트리 — 프로젝트 수준을 받는 범위(PROJECT_SCOPES)의 규칙만. 거르지 않으면 고른 뒤 level_not_supported 가 뜬다 */
 export const PROJECT_CUSTOM_TREE = buildTree('gcp', treeRules(CUSTOM_TREE).filter((r) => PROJECT_SCOPES.includes(r.scope)));
-/** GCP 규칙 — 칩의 입력 종류(count · role · none)를 본다 */
-const GCP_RULES = new Map(treeRules(buildTree('gcp')).map((r) => [r.id, r]));
+/** 마법사 CSP 의 규칙 — 칩의 입력 종류(count · role · none)를 본다. 규칙 id 에 CSP 접두가 있어 한 표로 둔다 */
+const WIZARD_RULES = new Map((['gcp', 'aws'] as const).flatMap((p) => treeRules(buildTree(p))).map((r) => [r.id, r]));
+/** custom 모달의 트리 — provider 마다(AWS 는 프로젝트 ID · 이름 규칙이 없어 거를 것이 없다). GCP 는 위 두 상수와 같은 값이다 */
+const TREES = new Map<Provider, { service: ReturnType<typeof buildTree>; project: ReturnType<typeof buildTree> }>([['gcp', { service: CUSTOM_TREE, project: PROJECT_CUSTOM_TREE }]]);
+export function customTree(provider: Provider, level: 'service' | 'project'): ReturnType<typeof buildTree> {
+  let t = TREES.get(provider);
+  if (!t) {
+    const service = buildTree(provider, treeRules(buildTree(provider)).filter((r) => r.id !== projectIdRuleOf(provider)));
+    t = { service, project: buildTree(provider, treeRules(service).filter((r) => projectScopesFor(provider).includes(r.scope))) };
+    TREES.set(provider, t);
+  }
+  return t[level];
+}
 
 /** pick 의 자리 — service 가 null 이면 프로젝트 공용(Project resources) */
 export interface PickRef { service: number | null; pick: number }
@@ -34,15 +45,35 @@ export const EXAMPLE_SERVICE = 'shop';
 export const EMPTY_PROJECT: WizardPlan['project'] = { owner: '', system: '', env: '', region: '' };
 
 /** 첫 화면 — 서비스 하나(이름 예시) · 고른 것 없음. 칩을 켜기 전에는 이름이 하나도 나오지 않는다(숨은 기본값 없음) */
-export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT): WizardPlan {
-  return { provider: 'gcp', project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
+export function initialPlan(project: WizardPlan['project'] = DEFAULT_PROJECT, provider: WizardProvider = 'gcp'): WizardPlan {
+  return { provider, project, projectPicks: [], services: [{ purpose: EXAMPLE_SERVICE, picks: [] }] };
 }
 
 /** 첫 화면 (D90 · D97) — hash 가 없을 때만. 프로젝트 값은 비어 있고(D97 — Project 부터 채운다), initialPlan 위에 네트워크 넷(VPC · 서브넷(PRIVATE) · Cloud Router · Cloud NAT, 각 01)을 얹는다.
  *  화면 초기값일 뿐이다 — expandPlan · API 에 숨은 기본값이 생기지 않고, 링크는 pick 넷을 그대로 싣는다. 링크에서 연 계획(깨진 링크 포함)은 initialPlan 을 쓴다.
  *  project 를 주면 그 값으로 시작한다 — 시험이 예시 값(DEFAULT_PROJECT)으로 이름을 볼 때 쓴다 */
-export function startPlan(project: WizardPlan['project'] = EMPTY_PROJECT): WizardPlan {
-  return ['vpc', 'subnet', 'router', 'nat'].reduce((p, id) => addPresetPick(p, null, id), initialPlan(project));
+export function startPlan(project: WizardPlan['project'] = EMPTY_PROJECT, provider: WizardProvider = 'gcp'): WizardPlan {
+  return START_NETWORK[provider].reduce((p, id) => addPresetPick(p, null, id), initialPlan(project, provider));
+}
+/** 첫 화면의 네트워크 — GCP 는 VPC · 서브넷 · Cloud Router · Cloud NAT, AWS 는 VPC · 서브넷 · 인터넷 게이트웨이 · 라우트 테이블 · NAT 게이트웨이 */
+const START_NETWORK: Readonly<Record<WizardProvider, readonly string[]>> = { gcp: ['vpc', 'subnet', 'router', 'nat'], aws: ['vpc', 'subnet', 'igw', 'rt', 'nat'] };
+
+/** 클라우드를 바꾼다 (0.2) — pick · 접미사는 다른 CSP 의 프리셋 · 규칙이라 지우고 그 CSP 의 첫 네트워크로 시작한다.
+ *  프로젝트 값은 남기고, 새 CSP 가 풀지 못하는 지역은 비운다(gcp 리전을 aws 계획에 남기지 않는다). 같은 CSP 면 그대로 */
+export function switchProvider(plan: WizardPlan, provider: WizardProvider, regionOk: (region: string) => boolean): WizardPlan {
+  if (plan.provider === provider) return plan;
+  const project = regionOk(plan.project.region) ? plan.project : { ...plan.project, region: '' };
+  const purpose = plan.services[0]?.purpose ?? EXAMPLE_SERVICE;
+  const fresh = startPlan(project, provider);
+  return { ...fresh, services: [{ purpose, picks: [] }] };
+}
+
+/** 클라우드를 바꾸면 사라질 것이 있는가 — 서비스 pick · 둘째 이후 서비스 · 접미사 · 첫 네트워크와 다른 프로젝트 pick(custom 포함).
+ *  첫 네트워크 그대로이거나 비운 네트워크는 switchProvider 가 새 CSP 의 첫 네트워크로 바꿀 뿐이라 묻지 않는다 */
+export function switchLoses(plan: WizardPlan): boolean {
+  if (plan.projectIdSuffix !== undefined || plan.services.length > 1 || plan.services.some((s) => s.picks.length > 0)) return true;
+  if (plan.projectPicks.length === 0) return false;
+  return JSON.stringify(plan.projectPicks) !== JSON.stringify(startPlan(plan.project, plan.provider).projectPicks);
 }
 
 /** 「Clear network」 (D90) — ② 네트워크의 프리셋 pick 을 전부 뗀다. Shared extras(custom pick)는 남긴다 */
@@ -51,33 +82,37 @@ export function clearNetwork(plan: WizardPlan): WizardPlan {
 }
 
 /** pick 의 유효 규칙 — 화면 목록의 줄 이름(rowNames)이 항목 키 머리를 만들 때 쓴다 */
-export function pickRule(pick: Pick): ResourceRule | undefined {
-  return GCP_RULES.get(effectiveRuleId(pick) ?? '');
+export function pickRule(pick: Pick, provider: Provider = 'gcp'): ResourceRule | undefined {
+  return WIZARD_RULES.get(effectiveRuleId(pick, provider) ?? '');
 }
 
 /** 서비스 칩 · 프로젝트 칩(네트워크) — 데이터의 level 로 나눈다 (D73). 서비스 칸의 묶음(lb)은 화면이 group 으로 한 줄에 모은다 */
 export const SERVICE_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.level === 'service');
 export const PROJECT_PRESETS: readonly Preset[] = PRESETS.filter((p) => p.level === 'project');
+/** provider 의 서비스 칩 · 프로젝트 칩 */
+export function presetsAt(provider: Provider, level: 'service' | 'project'): readonly Preset[] {
+  return presetsFor(provider).filter((p) => p.level === level);
+}
 
 /** pick 의 유효 규칙 id — 프리셋이면 데이터의 규칙(서버리스를 고르면 그 규칙), custom 이면 ruleId */
-export function effectiveRuleId(pick: Pick): string | undefined {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+export function effectiveRuleId(pick: Pick, provider: Provider = 'gcp'): string | undefined {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
   if (!preset) return pick.ruleId;
   return typeof pick.serverless === 'string' && preset.serverless?.ruleIds.includes(pick.serverless) ? pick.serverless : preset.ruleId;
 }
 
 /** 딸린 것(boot · data · ip · ipi)을 받는 pick 인가 — 호환표에 부모로 있는 규칙 */
-export function canAttach(pick: Pick): boolean {
-  const id = effectiveRuleId(pick);
+export function canAttach(pick: Pick, provider: Provider = 'gcp'): boolean {
+  const id = effectiveRuleId(pick, provider);
   return ATTACHMENTS.some((r) => r.parent === id);
 }
 
 /** tier 를 사용자가 치는 pick 인가 (D74) — 유효 규칙에 tier 자리가 있고 프리셋이 tier 를 정하지 않을 때(custom · db · object · 새 칩).
  *  web · was · 방화벽처럼 프리셋이 tier 를 정하면 칸을 보이지 않는다. 「Duplicate」 도 이때만 — tier 를 칠 수 없으면 복사본이 늘 중복이다 */
-export function tierEditable(pick: Pick): boolean {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+export function tierEditable(pick: Pick, provider: Provider = 'gcp'): boolean {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
   if (preset && (preset.tier !== null || preset.tierChoices)) return false;
-  const rule = GCP_RULES.get(effectiveRuleId(pick) ?? '');
+  const rule = WIZARD_RULES.get(effectiveRuleId(pick, provider) ?? '');
   return rule !== undefined && rule.template.includes('tier');
 }
 
@@ -89,8 +124,8 @@ export function singleSlot(pick: Pick): boolean {
 }
 
 /** HA 토글을 보이는가 — 프리셋에 ha 가 있고 서버리스가 꺼져 있을 때 (D61 · §4-2) */
-export function showsHa(pick: Pick): boolean {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+export function showsHa(pick: Pick, provider: Provider = 'gcp'): boolean {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
   return !!preset?.ha && !pick.serverless;
 }
 
@@ -135,11 +170,11 @@ function updateSlot(plan: WizardPlan, ref: PickRef, slot: number, fn: (s: Wizard
   return updatePick(plan, ref, (p) => ({ ...p, instances: (p.instances ?? []).map((s, i) => (i === slot ? fn(s) : s)) }));
 }
 /** 새 서버 줄 — 다음 빈 번호 · 다음 id · 딸린 것을 받는 pick 이면 프리셋의 초기 딸린 것(file 의 data 01)을 모델에 보이게 넣는다 */
-function newSlot(pick: Pick, existing: readonly WizardSlot[]): WizardSlot | undefined {
+function newSlot(pick: Pick, existing: readonly WizardSlot[], provider: Provider): WizardSlot | undefined {
   const seq = nextSeq(existing.map((s) => s.seq));
   if (seq === undefined) return undefined;
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
-  const attach = canAttach(pick) && preset?.defaultAttach ? cloneAttach(preset.defaultAttach) : undefined;
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
+  const attach = canAttach(pick, provider) && preset?.defaultAttach ? cloneAttach(preset.defaultAttach) : undefined;
   return { id: nextSlotId(existing.map((s) => s.id)), seq, ...(attach ? { attach } : {}) };
 }
 function cloneAttach(a: Attachments): Attachments {
@@ -173,12 +208,12 @@ export function projectPicksFull(plan: WizardPlan): boolean {
 }
 /** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1 */
 export function findPreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): number {
-  return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId)?.tier) === tier));
+  return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId, plan.provider)?.tier) === tier));
 }
 
 /** 칩을 켠다 · 끈다. 켜면 count 규칙은 서버 줄 하나(01), 입력 없는 규칙(버킷) · role 규칙(서비스 계정)은 줄 없음. tier 는 방화벽처럼 tierChoices 가 있을 때만 싣는다 */
 export function togglePreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
-  const preset = presetOf(presetId);
+  const preset = presetOf(presetId, plan.provider);
   if (!preset) return plan;
   const picks = picksOf(plan, service);
   const at = findPreset(plan, service, presetId, tier);
@@ -189,15 +224,15 @@ export function togglePreset(plan: WizardPlan, service: number | null, presetId:
 /** 프리셋 pick 을 하나 더한다 — 켜고 끄지 않는다 (D86). 「Add subnet」이 쓴다: 이미 있는 pick 과 종류 · tier 가 같으면 duplicate_pick 이 붙고, 종류나 tier 를 고치면 사라진다.
  *  count 규칙은 서버 줄 하나(01), 입력 없는 규칙 · role 규칙은 줄 없음. tier 는 tierChoices 가 있을 때만 싣는다 */
 export function addPresetPick(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
-  const preset = presetOf(presetId);
+  const preset = presetOf(presetId, plan.provider);
   if (!preset) return plan;
   if (service === null && projectPicksFull(plan)) return plan;
   const picks = picksOf(plan, service);
   const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
   // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
-  const rule = GCP_RULES.get(preset.ruleId);
+  const rule = WIZARD_RULES.get(preset.ruleId);
   const withSlots = rule !== undefined && inputKind(rule) === 'count';
-  const slot = withSlots ? newSlot(pick, []) : undefined;
+  const slot = withSlots ? newSlot(pick, [], plan.provider) : undefined;
   return withPicks(plan, service, [...picks, slot ? { ...pick, instances: [slot] } : pick]);
 }
 
@@ -211,7 +246,7 @@ export function removePresetPicks(plan: WizardPlan, service: number | null, pres
  *  Shared extras 의 custom 방화벽 규칙과 겹치는 것까지). 통과면 undefined */
 export function firewallTierProblem(plan: WizardPlan, tier: string): 'pattern' | 'reserved' | 'exists' | 'full' | undefined {
   if (!TIER_PATTERN.test(tier)) return 'pattern';
-  if (RESERVED_TIERS.has(tier)) return 'reserved';
+  if (reservedTiersFor(plan.provider).has(tier)) return 'reserved';
   if (projectPicksFull(plan)) return 'full';
   if (findPreset(plan, null, 'firewall', tier) >= 0) return 'exists';
   const next = addPresetPick(plan, null, 'firewall', tier);
@@ -223,15 +258,15 @@ export function firewallTierProblem(plan: WizardPlan, tier: string): 'pattern' |
 
 /** pick 머리의 이름 — 프리셋 이름 뒤에 tier 칩 값(방화벽) 또는 종류 토큰 · 사용자가 친 tier 를 붙여 같은 프리셋 pick 여럿을 가른다
  *  (`Subnet · proxy` · `Subnet · web`). 고정 종류 프리셋(psa)은 종류를 붙이지 않는다. custom 은 규칙 표시 이름 */
-export function pickTitle(pick: Pick): { title: string; custom: boolean } {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+export function pickTitle(pick: Pick, provider: Provider = 'gcp'): { title: string; custom: boolean } {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
   if (preset) {
     if (preset.tierChoices) return { title: `${preset.label} · ${pick.tier ?? preset.tier}`, custom: false };
-    const token = pick.kind !== undefined && preset.kind === undefined ? kindToken(effectiveRuleId(pick) ?? preset.ruleId, pick.kind) : null;
-    const parts = [...(typeof token === 'string' && token !== '' ? [token] : []), ...(tierEditable(pick) && pick.tier ? [pick.tier] : [])];
+    const token = pick.kind !== undefined && preset.kind === undefined ? kindToken(effectiveRuleId(pick, provider) ?? preset.ruleId, pick.kind) : null;
+    const parts = [...(typeof token === 'string' && token !== '' ? [token] : []), ...(tierEditable(pick, provider) && pick.tier ? [pick.tier] : [])];
     return { title: [preset.label, ...parts].join(' · '), custom: false };
   }
-  return { title: GCP_RULES.get(pick.ruleId ?? '')?.displayName ?? pick.ruleId ?? '', custom: true };
+  return { title: WIZARD_RULES.get(pick.ruleId ?? '')?.displayName ?? pick.ruleId ?? '', custom: true };
 }
 
 /** custom — 트리에서 고른 규칙 하나. count 규칙은 count 만큼 서버 줄(01…), role 규칙은 역할, 입력 없는 규칙은 줄 없음.
@@ -247,7 +282,7 @@ export function addCustom(plan: WizardPlan, service: number | null, rule: { rule
   if (rule.input !== 'count') return withPicks(plan, service, [...picksOf(plan, service), base]);
   const slots: WizardSlot[] = [];
   for (let i = 0; i < Math.max(1, rule.count ?? 1); i++) {
-    const s = newSlot(base, slots);
+    const s = newSlot(base, slots, plan.provider);
     if (s) slots.push(s);
   }
   return withPicks(plan, service, [...picksOf(plan, service), { ...base, instances: slots }]);
@@ -260,7 +295,7 @@ export function duplicatePick(plan: WizardPlan, ref: PickRef): WizardPlan {
   const cur = picks[ref.pick];
   if (!cur) return plan;
   const { tier: _t, ha: _ha, instances, ...rest } = cur;
-  const slot = instances === undefined ? undefined : newSlot(rest, []);
+  const slot = instances === undefined ? undefined : newSlot(rest, [], plan.provider);
   const copy: Pick = slot ? { ...rest, instances: [slot] } : rest;
   return withPicks(plan, ref.service, [...picks.slice(0, ref.pick + 1), copy, ...picks.slice(ref.pick + 1)]);
 }
@@ -283,14 +318,14 @@ export function setPickField(plan: WizardPlan, ref: PickRef, field: 'tier' | 'ro
 /** HA — 켜면 서버 줄을 minInstances 까지 보이게 늘린다 · 끄면 줄은 그대로 둔다 */
 export function setHa(plan: WizardPlan, ref: PickRef, on: boolean): WizardPlan {
   return updatePick(plan, ref, (p) => {
-    const min = p.preset === null ? undefined : presetOf(p.preset)?.ha?.minInstances;
+    const min = p.preset === null ? undefined : presetOf(p.preset, plan.provider)?.ha?.minInstances;
     if (!on || min === undefined) {
       const { ha: _ha, ...rest } = p;
       return rest;
     }
     const slots = [...(p.instances ?? [])];
     while (slots.length < min) {
-      const s = newSlot(p, slots);
+      const s = newSlot(p, slots, plan.provider);
       if (!s) break;
       slots.push(s);
     }
@@ -311,7 +346,7 @@ export function setServerless(plan: WizardPlan, ref: PickRef, ruleId: string | n
 export function addSlot(plan: WizardPlan, ref: PickRef): WizardPlan {
   return updatePick(plan, ref, (p) => {
     const slots = p.instances ?? [];
-    const s = newSlot(p, slots);
+    const s = newSlot(p, slots, plan.provider);
     return s ? { ...p, instances: [...slots, s] } : p;
   });
 }
@@ -320,7 +355,7 @@ export function addSlot(plan: WizardPlan, ref: PickRef): WizardPlan {
 export function removeSlot(plan: WizardPlan, ref: PickRef, slot: number): WizardPlan {
   return updatePick(plan, ref, (p) => {
     const slots = (p.instances ?? []).filter((_, i) => i !== slot);
-    const min = p.preset === null ? undefined : presetOf(p.preset)?.ha?.minInstances;
+    const min = p.preset === null ? undefined : presetOf(p.preset, plan.provider)?.ha?.minInstances;
     const next: Pick = { ...p, instances: slots };
     if (next.ha === true && min !== undefined && slots.length < min) delete next.ha;
     return next;
@@ -383,11 +418,13 @@ export function setDiskSeq(plan: WizardPlan, ref: PickRef, slot: number, disk: n
 }
 
 // ── ① 미리보기 (D85) ──
-const PROJECT_NAME = GCP_RULES.get(PROJECT_NAME_RULE);
+const PROJECT_NAME = WIZARD_RULES.get(PROJECT_NAME_RULE);
 /** 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥이 풀리면 보인다. 이름은 암묵 항목이 아니라 이 미리보기에만 나온다(마법사 내보내기 · 키는 그대로).
  *  ID 는 generateProject 의 첫 항목과 같다. 접미사가 꼴 · 예약어 검사(checkProjectIdSuffix)에 걸리면 ID 를 내지 않는다 —
  *  접미사 없는 ID 를 보이면 칸의 값과 다른 ID 를 믿게 된다(링크 hash 는 마지막 온전한 계획에 머문다) */
-export function projectPreview(context: ProjectContext, suffix: string | undefined): { name: NameResult | undefined; id: NameItem | undefined } {
+export function projectPreview(context: ProjectContext, suffix: string | undefined, provider: Provider = 'gcp'): { name: NameResult | undefined; id: NameItem | undefined } {
+  // 프로젝트 이름 · ID 가 없는 CSP(AWS — 계정은 번호다)는 미리보기가 없다
+  if (projectIdRuleOf(provider) === undefined) return { name: undefined, id: undefined };
   const name = PROJECT_NAME ? generateItem(context, PROJECT_NAME, { level: 'project' }) : undefined;
   if (checkProjectIdSuffix(suffix).length > 0) return { name, id: undefined };
   const id = generateProject({ project: context, projectItems: [], services: [], ...(suffix === undefined ? {} : { projectIdSuffix: suffix }) }, 'gcp').items[0];

@@ -325,6 +325,14 @@ describe('켜진 CSP (D45 · D55) — 디코더는 켜진 것만 연다', () => 
     expect(decodeGcp(`#state=${b64(ctx)}`, undefined, ['gcp', 'aws'])).toEqual({ context: ctx });
     expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['gcp', 'aws'])).toEqual({ context: reset, dropped: 3, unavailable: 'azure' });
   });
+  it('둘 이상 켜졌어도 p 없는 링크의 지역이 한 CSP 에서만 풀리면 그 CSP 다 — 0.1 의 GCP 링크(ane3)가 AWS 로 읽혀 지역을 잃지 않는다', () => {
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'ane3' })}`, undefined, ['aws', 'gcp'])).toEqual({ context: { ...ctx, region: 'ane3' }, provider: 'gcp' });
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'asia-northeast3' })}`, undefined, ['aws', 'gcp'])?.provider).toBe('gcp');
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'ap-northeast-2' })}`, undefined, ['aws', 'gcp'])?.provider).toBe('aws');
+    // 두 CSP 에 다 있는 코드(use1 · global)는 고르지 않는다 (D45) · r 은 그대로 버린다
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'use1' })}`, undefined, ['aws', 'gcp'])?.provider).toBeUndefined();
+    expect(decodeGcp(`#state=${b64({ ...ctx, region: 'ane3', r: { vpc: 1 } })}`, undefined, ['aws', 'gcp'])).toEqual({ context: { ...ctx, region: 'ane3' }, provider: 'gcp', dropped: 1 });
+  });
   it('꺼진 CSP 링크의 예시 지역은 켜진 첫 CSP 의 것이다 — AWS 가 앞이면 ap-northeast-2', () => {
     expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure', r: vm(1) })}`, undefined, ['aws', 'gcp'])).toEqual({ context: { ...ctx, region: 'apne2' }, dropped: 3, unavailable: 'azure' });
     expect(decodeGcp(`#state=${b64({ ...ctx, p: 'azure' })}`, undefined, ['aws'])).toEqual({ context: { ...ctx, region: 'apne2' }, provider: 'aws', unavailable: 'azure' });
@@ -473,7 +481,7 @@ describe('hash — 종류 값의 수 자리는 MAX_COUNT 와 맞다', () => {
 // ─── hash v4 — 마법사 모델 w (D67) ───
 import { decodeWizardState, encodeWizardState, hashKind, wizardToHash, MAX_WIZARD_HASH_CHARS, MAX_ANY_HASH_CHARS, SERVERLESS_SHORT, type DecodedWizard } from './urlState';
 import { validatePlan, MAX_PICKS_PER_SERVICE, type Pick as WPick, type WizardPlan, type WizardSlot } from '../core/wizard/plan';
-import { PRESETS } from '../core/wizard/presets';
+import { PRESETS, presetsFor } from '../core/wizard/presets';
 import { toWirePath } from '../api/schemas';
 
 const WP = { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' };
@@ -602,7 +610,7 @@ describe('hash v4 — 마법사 w 왕복 (D67)', () => {
     expect(encodeWizardState({ ...W_SAMPLE, projectPicks: [], services: [] })).toBeUndefined();
   });
   it('SERVERLESS_SHORT 는 프리셋의 serverless 규칙 id 전부를 덮는다', () => {
-    const ids = new Set(PRESETS.flatMap((p) => p.serverless?.ruleIds ?? []));
+    const ids = new Set([...PRESETS, ...presetsFor('aws')].flatMap((p) => p.serverless?.ruleIds ?? []));
     expect(new Set(Object.values(SERVERLESS_SHORT))).toEqual(ids);
   });
 });
@@ -768,7 +776,7 @@ describe('hash v4 — 길이 상한 (이름 수로 닫힌 식)', () => {
     // pick 마다 위치 l(코드 ≤ MAX_REGION_CHARS — D78) 13바이트 × 420 pick 이 더해졌다 · Secret 의 regional(8자 — D79)로 2바이트 × 420 이 더해졌다
     // 환경 목록 e(표준값 아홉 전부 — D82) 60바이트가 더해졌다 · 프로젝트 ID 접미사 x(16자 — D85) 24바이트가 더해졌다
     // pick 상한이 20 → 40 이 되어(D91) pick 고정 칸이 420 → 840 개가 됐다
-    expect(MAX_WIZARD_HASH_CHARS).toBe(235407);
+    expect(MAX_WIZARD_HASH_CHARS).toBe(235419);
     expect(MAX_ANY_HASH_CHARS).toBe(Math.max(MAX_HASH_CHARS, MAX_WIZARD_HASH_CHARS));
   });
   it('최대에 가까운 모델(서비스 20 · 자유 입력 최악 64자 · 이름 200)이 왕복하고 상한 안이다', () => {

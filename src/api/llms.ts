@@ -2,7 +2,7 @@
 import { ENABLED_PROVIDERS, MIN_TOKEN, PROTECTED, PROVIDERS, TIER_PATTERN, type Provider, type ResourceRule, type Token } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
-import { PRESETS, PRESET_TIERS, type Preset } from '../core/wizard/presets';
+import { PRESETS, PRESET_TIERS, presetsFor, type Preset } from '../core/wizard/presets';
 import { BUNDLES, partIsProject, partKey } from '../core/wizard/bundles';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
@@ -129,10 +129,10 @@ function attachLines(): string[] {
 }
 
 /** 프리셋 묶음 (D59 · D73) — 네트워크 · 로드 밸런서는 group, 서버 VM(초기 딸린 것 없음)은 한 줄, 나머지는 하나씩 */
-function presetGroups(): Preset[][] {
+function presetGroups(presets: readonly Preset[] = PRESETS): Preset[][] {
   const groups = new Map<string, Preset[]>();
-  for (const p of PRESETS) {
-    const key = p.group ?? (p.ruleId === 'gcp.compute_instance' && !p.defaultAttach ? 'server' : p.id);
+  for (const p of presets) {
+    const key = p.group ?? ((p.ruleId === 'gcp.compute_instance' || p.ruleId === 'aws.ec2_instance') && !p.defaultAttach ? 'server' : p.id);
     groups.set(key, [...(groups.get(key) ?? []), p]);
   }
   return [...groups.values()];
@@ -150,11 +150,14 @@ function presetLines(): string[] {
   return [
     '', '## Wizard presets', '',
     `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets (VPC, subnet, firewall, Cloud Router, Cloud NAT) are usually project-level (\`project_picks\`); the load balancer parts are separate presets, one name each. A working set of them is listed under "Wizard cards" below. At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
-    ...presetGroups().map((g) => {
-      const ha = g.find((p) => p.ha);
-      return `- ${g.map(one).join('; ')}${ha?.ha ? ` · HA (\`ha: true\`) on ${g.filter((p) => p.ha).map((p) => `\`${p.id}\``).join(' and ')} as virtual machines only: at least ${ha.ha.minInstances} servers` : ''}`;
-    }),
+    ...presetGroups().map(groupLine),
+    '', 'On `provider: "aws"` (0.2) the same ids name AWS rules, and some are AWS only. There is no project ID item and no `project_id_suffix` (400 `wizard.project_id_suffix_not_supported`); `project_picks` hold account-wide parts (rules scoped to the partition, account, region or a VPC). A server (`aws.ec2_instance`) can carry `boot` and `data` (EBS volumes), `ip` (Elastic IP) and `ipi` (network interface). The wizard cards below are Google Cloud only.',
+    ...presetGroups(presetsFor('aws')).map(groupLine),
   ];
+  function groupLine(g: Preset[]): string {
+    const ha = g.find((p) => p.ha);
+    return `- ${g.map(one).join('; ')}${ha?.ha ? ` · HA (\`ha: true\`) on ${g.filter((p) => p.ha).map((p) => `\`${p.id}\``).join(' and ')} as virtual machines only: at least ${ha.ha.minInstances} servers` : ''}`;
+  }
 }
 
 /** 「## Wizard cards」 절 (D93) — 카드마다 한 줄: 서비스 picks · project_picks · 선택. 카드는 화면의 동작이고 API 에는 없다 — 같은 picks 를 보내면 같은 이름이다 */
@@ -267,7 +270,7 @@ function constraintLine(rule: ResourceRule, catalog: Catalog): string {
 }
 
 
-/** 세 자리마다 쉼표 — 176,548. Number.toLocale* 은 kst-guard 가 막는 이름이라 쓰지 않는다 */
+/** 세 자리마다 쉼표 — 176,558. Number.toLocale* 은 kst-guard 가 막는 이름이라 쓰지 않는다 */
 const grouped = (n: number): string => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 /** 백틱으로 감싼 목록 — `a`, `b` and `c` */

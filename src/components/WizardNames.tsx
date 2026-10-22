@@ -13,7 +13,7 @@ import { toWizardExport, toWizardExportByEnv } from './wizardExport';
 import { namesSummary, withEnv } from './wizardEnvs';
 import { namesPanel, type NamesNotice } from './wizardProjectGate';
 import { ErrorList } from './WizardSettings';
-import { ENV_NAMES, ICON_BTN } from './wizardStyles';
+import { ENV_NAMES, ICON_BTN, nothingCreatedFor } from './wizardStyles';
 import { fillUi, format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { VERSION } from '../version';
@@ -72,7 +72,7 @@ export function WizardNames({ plan, results, errors, projectPending = false, pro
       {ok && names > 0 && (
         <div data-pass-meaning className="space-y-1 border-t border-zinc-200 pt-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
           <p>{en.ui.pass_meaning}</p>
-          <p data-nothing-created>{en.ui.wizard_nothing_created}</p>
+          <p data-nothing-created>{nothingCreatedFor(plan.provider)}</p>
         </div>
       )}
     </section>
@@ -90,8 +90,8 @@ function ExportButtons({ plan, results, projectContext }: { plan: WizardPlan; re
     ? toWizardExportByEnv(results.map((r) => ({ env: r.env, result: r.result, project: { ...projectContext, env: r.env }, plan: withEnv(plan, r.env) })), VERSION)
     : toWizardExport(results[0]!.result, projectContext, plan, VERSION), null, 2), [multi, results, projectContext, plan]);
   const hcl = useMemo(() => (multi
-    ? wizardTerraformByEnv(results.map((r) => ({ env: r.env, result: r.result, labels: wizardLabels(expandPlan(withEnv(plan, r.env)), 'gcp') })), VERSION, en)
-    : wizardTerraform(results[0]!.result, wizardLabels(expandPlan(plan), 'gcp'), VERSION, en)), [multi, results, plan]);
+    ? wizardTerraformByEnv(results.map((r) => ({ env: r.env, result: r.result, labels: wizardLabels(expandPlan(withEnv(plan, r.env)), plan.provider) })), VERSION, en)
+    : wizardTerraform(results[0]!.result, wizardLabels(expandPlan(plan), plan.provider), VERSION, en)), [multi, results, plan]);
   return (
     <div className="flex flex-wrap gap-2">
       <CopyButton text={all.text} label={en.ui.copy_all_names_label} disabled={all.text === ''} copyKey="all-names">

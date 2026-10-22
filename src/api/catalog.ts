@@ -10,7 +10,7 @@ import { pickLocationNames } from '../core/regions';
 import { inputKind } from '../core/tree';
 import { MAX_COUNT, MAX_NAMES, ROLE_PATTERN, SEQ_PATTERN } from '../core/selection';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, SLOT_ID_PATTERN } from '../core/wizard/plan';
-import { PRESETS } from '../core/wizard/presets';
+import { presetsFor } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 import { ENV_VALUES } from '../core/normalize';
@@ -35,10 +35,9 @@ function withRuleExtras(row: AnyCatalogRow): AnyCatalogRow {
   return { ...row, rules };
 }
 
-/** 마법사 프리셋 (D59 · D64) — 요청 본문의 이름으로(rule · tier_choices · min_instances). 마법사는 gcp 만이라 다른 CSP 는 빈 배열 */
+/** 마법사 프리셋 (D59 · D64) — 요청 본문의 이름으로(rule · tier_choices · min_instances). 마법사는 gcp · aws(0.2)라 다른 CSP 는 빈 배열 */
 export function catalogPresets(provider: Provider): Record<string, unknown>[] {
-  if (provider !== 'gcp') return [];
-  return PRESETS.map((p) => ({
+  return presetsFor(provider).map((p) => ({
     id: p.id, label: p.label, rule: p.ruleId, tier: p.tier,
     ...(p.tierChoices ? { tier_choices: [...p.tierChoices] } : {}),
     ...(p.kind === undefined ? {} : { kind: p.kind }),

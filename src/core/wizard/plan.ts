@@ -6,12 +6,12 @@ import { DEFAULT_ROLE, parseContext, parseProjectContext, serviceNamespace, type
 import type { CoreMessage } from '../messages';
 import { MAX_NAMES, SEQ_PATTERN, validateSelection, type Attachments, type InstanceSlot, type SelectionItem } from '../selection';
 import { REGIONAL_LOCATION, canonicalLocation, locationRuleTypes, pickLocation, pickLocationNames } from '../regions';
-import { RESERVED_TIERS } from '../tier';
+import { reservedTiersFor } from '../tier';
 import { kindTokenFor } from '../compose';
 import { inputKind } from '../tree';
-import { TIER_PATTERN, type ResourceRule, type ScopeId } from '../types';
+import { TIER_PATTERN, type Provider, type ResourceRule, type ScopeId } from '../types';
 import { ATTACH_KINDS, checkAttachments } from './attachments';
-import { PRESETS, presetOf, type Preset } from './presets';
+import { presetOf, presetsFor, type Preset } from './presets';
 
 /** 서비스 수 · 한 서비스(또는 프로젝트 공용)의 pick 수 상한 — hash 길이 상한식이 쓴다 */
 export const MAX_SERVICES = 20;
@@ -23,10 +23,20 @@ export const SLOT_ID_PATTERN = /^[a-z0-9]{1,8}$/;
 const RESERVED_SERVICE = 'project';
 /** 프로젝트 ID 는 늘 암묵 항목 하나라 pick 으로 고를 수 없다 */
 export const PROJECT_ID_RULE = 'gcp.project_id';
+/** 마법사를 받는 CSP (0.2 — AWS 추가) */
+export type WizardProvider = 'gcp' | 'aws';
+export const WIZARD_PROVIDERS: readonly WizardProvider[] = ['gcp', 'aws'];
+/** provider 의 프로젝트 ID 규칙 — AWS 에는 이름 있는 프로젝트가 없다(계정은 번호다). 없으면 암묵 항목도 접미사도 없다 */
+export function projectIdRuleOf(provider: Provider): string | undefined {
+  return provider === 'gcp' ? PROJECT_ID_RULE : undefined;
+}
 /** 프로젝트 수준(level 'project')을 받는 범위 (D63) — Cloud NAT(라우터 안에서 고유)를 프로젝트 칸에 두려고 gcp:router 를 더했다 (D73) */
 export const PROJECT_SCOPES: readonly ScopeId[] = ['gcp:namespace', 'gcp:project', 'gcp:project_global', 'gcp:project_region', 'gcp:router'];
-/** HA 를 받는 유효 규칙 — serverless 를 푼 뒤의 규칙이 이것이어야 한다 */
-const HA_RULE = 'gcp.compute_instance';
+/** AWS 의 프로젝트 칸 = 계정이 함께 쓰는 것 — 파티션 · 계정 · 리전 · VPC 범위 (서비스 하위 범위 ecs_cluster · log_group 은 뺀다) */
+export const AWS_PROJECT_SCOPES: readonly ScopeId[] = ['aws:partition', 'aws:account', 'aws:region', 'aws:vpc'];
+export function projectScopesFor(provider: Provider): readonly ScopeId[] {
+  return provider === 'aws' ? AWS_PROJECT_SCOPES : PROJECT_SCOPES;
+}
 
 /** 서버 줄 하나 (D61) — id 는 hash 의 슬롯 식별 · seq 는 이름의 순번 · attach 는 딸린 것(D62) */
 export interface WizardSlot { id: string; seq: string; attach?: Attachments }
@@ -46,7 +56,7 @@ export interface Pick {
   location?: string;
 }
 export interface WizardPlan {
-  provider: 'gcp';
+  provider: WizardProvider;
   project: { owner: string; system: string; env: string; region: string };
   projectPicks: Pick[];
   services: { purpose: string; picks: Pick[] }[];
@@ -68,13 +78,13 @@ const isObject = (v: unknown): v is Record<string, unknown> => v !== null && typ
 
 /** pick 의 유효 규칙 — 프리셋이면 데이터의 규칙(serverless 를 고르면 그 규칙), custom 이면 ruleId. 못 풀면 undefined */
 interface Resolved { rule: ResourceRule; preset: Preset | undefined; tier: string | undefined; kind: string | undefined }
-function resolve(pick: Pick): Resolved | undefined {
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+function resolve(pick: Pick, provider: Provider): Resolved | undefined {
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
   if (pick.preset !== null && !preset) return undefined;
   const base = preset ? preset.ruleId : pick.ruleId;
   const sv = preset?.serverless?.ruleIds.includes(pick.serverless as string) ? pick.serverless : undefined;
   const rule = RULES[sv ?? base ?? ''];
-  if (!rule || rule.provider !== 'gcp' || rule.id === PROJECT_ID_RULE) return undefined;
+  if (!rule || rule.provider !== provider || rule.id === projectIdRuleOf(provider)) return undefined;
   const tier = pick.tier ?? preset?.tier ?? undefined;
   // 프리셋 종류는 pick 이 kind 를 주지 않았을 때(undefined)만 — null 은 값이라 검사로 보낸다(selection.unknown_kind)
   return { rule, preset, tier, kind: pick.kind === undefined ? preset?.kind : pick.kind };
@@ -107,7 +117,7 @@ function dupKindToken(rule: ResourceRule, kind: unknown): string {
 }
 
 /** pick 목록 하나(서비스 하나 또는 프로젝트 공용)를 검사한다. base 는 그 목록의 위치(services[1] · projectPicks) */
-function checkPicks(picks: readonly unknown[], base: string, level: 'project' | undefined, out: PlanError[], projectRegion: string | undefined): void {
+function checkPicks(provider: Provider, picks: readonly unknown[], base: string, level: 'project' | undefined, out: PlanError[], projectRegion: string | undefined): void {
   const at = (index: number) => base === 'projectPicks' ? `projectPicks[${index}]` : `${base}.picks[${index}]`;
   const seen = new Set<string>();
   picks.forEach((raw, index) => {
@@ -117,12 +127,12 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     const pick = raw as unknown as Pick;
 
     // 규칙 풀기 — 프리셋 · 예약 · 모르는 규칙
-    if (pick.preset !== null && (typeof pick.preset !== 'string' || !presetOf(pick.preset))) {
-      push({ code: 'wizard.unknown_preset', params: { index, value: shown(pick.preset), supported: PRESETS.map((p) => p.id) } });
+    if (pick.preset !== null && (typeof pick.preset !== 'string' || !presetOf(pick.preset, provider))) {
+      push({ code: 'wizard.unknown_preset', params: { index, value: shown(pick.preset), supported: presetsFor(provider).map((p) => p.id) } });
       return;
     }
-    if (pick.preset === null && pick.ruleId === PROJECT_ID_RULE) { push({ code: 'wizard.reserved_pick', params: { index, type: 'project_id' } }); return; }
-    const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+    if (pick.preset === null && pick.ruleId !== undefined && pick.ruleId === projectIdRuleOf(provider)) { push({ code: 'wizard.reserved_pick', params: { index, type: 'project_id' } }); return; }
+    const preset = pick.preset === null ? undefined : presetOf(pick.preset, provider);
     const baseRule = RULES[preset ? preset.ruleId : shown(pick.ruleId)];
     // 고정 종류 프리셋 (D88) — 다른 종류를 주면 거부한다. 주지 않으면 프리셋의 종류다
     if (preset?.kind !== undefined && pick.kind !== undefined && pick.kind !== preset.kind) {
@@ -130,7 +140,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
     }
     // undefined 일 때만 프리셋 값 — `??` 는 null 도 덮어 kind:null 이 검사를 건너뛴다
     const kind: unknown = pick.kind === undefined ? preset?.kind : pick.kind;
-    if (!baseRule || baseRule.provider !== 'gcp') { push({ code: 'selection.unknown_type', params: { index, value: shown(pick.ruleId) } }); return; }
+    if (!baseRule || baseRule.provider !== provider) { push({ code: 'selection.unknown_type', params: { index, value: shown(pick.ruleId) } }); return; }
 
     // serverless — 프리셋 데이터의 규칙 id 하나여야 한다(불리언 · 다른 규칙 id 는 거부)
     let rule = baseRule;
@@ -148,19 +158,20 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
     // HA — 프리셋에 ha 메타데이터가 있고 유효 규칙이 VM 일 때만 · 켜면 슬롯 ≥ minInstances
     if (pick.ha !== undefined && pick.ha !== null && pick.ha !== false) {
-      if (pick.ha !== true || !preset?.ha || rule.id !== HA_RULE) push({ code: 'wizard.ha_not_supported', params: { index, type } });
+      // 유효 규칙이 프리셋의 서버 규칙일 때만 — serverless 를 고르면 HA 가 없다
+      if (pick.ha !== true || !preset?.ha || rule.id !== preset.ruleId) push({ code: 'wizard.ha_not_supported', params: { index, type } });
       else if (!Array.isArray(slots) || slots.length < preset.ha.minInstances) push({ code: 'wizard.count_below_min', params: { index, min: preset.ha.minInstances } });
     }
 
     // level — 프로젝트 공용 pick 은 프로젝트 수준 범위의 규칙만
-    if (level === 'project' && !PROJECT_SCOPES.includes(rule.scope)) push({ code: 'wizard.level_not_supported', params: { index, type } });
+    if (level === 'project' && !projectScopesFor(provider).includes(rule.scope)) push({ code: 'wizard.level_not_supported', params: { index, type } });
 
     // tier — 템플릿에 tier 자리가 있는 규칙(count 규칙 · 순번 없는 GCP 규칙 — D74)에만 · 꼴 · 예약어
     const tier: unknown = pick.tier ?? preset?.tier ?? undefined;
     if (pick.tier !== undefined) {
       if (!rule.template.includes('tier')) push({ code: 'wizard.tier_not_supported', params: { index, type } });
       else if (typeof pick.tier !== 'string' || !TIER_PATTERN.test(pick.tier)) push({ code: 'wizard.invalid_tier', params: { index, value: shown(pick.tier), pattern: TIER_PATTERN.source } });
-      else if (RESERVED_TIERS.has(pick.tier)) push({ code: 'wizard.tier_reserved', params: { index, value: pick.tier } });
+      else if (reservedTiersFor(provider).has(pick.tier)) push({ code: 'wizard.tier_reserved', params: { index, value: pick.tier } });
     }
 
     // 위치 (D78 · D79) — 그 규칙이 받는 멀티 · 이중 리전 위치, 기본이 전역인 규칙(Secret)은 regional 이어야 한다
@@ -205,7 +216,7 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 
     // 지금 검사(한 항목짜리 목록) — type · count · kind · role. index 는 pick 의 자리로 바꿔 싣는다
     const count = input === 'count' ? (Array.isArray(slots) ? slots.length : 0) : 1;
-    const one = validateSelection('gcp', [{ type, count, ...(pick.role === undefined ? {} : { role: pick.role }), ...(kind === undefined ? {} : { kind: kind as string }) }], rulesFor('gcp'));
+    const one = validateSelection(provider, [{ type, count, ...(pick.role === undefined ? {} : { role: pick.role }), ...(kind === undefined ? {} : { kind: kind as string }) }], rulesFor(provider));
     if (!one.ok) {
       for (const e of one.errors) push('params' in e && isObject(e.params) && 'index' in e.params ? ({ ...e, params: { ...e.params, index } } as CoreMessage) : e);
     }
@@ -213,12 +224,13 @@ function checkPicks(picks: readonly unknown[], base: string, level: 'project' | 
 }
 
 /** 프로젝트 ID 접미사 검사 (D85) — tier 와 같은 꼴(TIER_PATTERN) · 예약어. 없으면 오류 없음. hash 디코더도 부른다 */
-export function checkProjectIdSuffix(value: unknown): PlanError[] {
+export function checkProjectIdSuffix(value: unknown, provider: Provider = 'gcp'): PlanError[] {
   if (value === undefined) return [];
+  if (projectIdRuleOf(provider) === undefined) return [{ code: 'wizard.project_id_suffix_not_supported', params: { provider }, path: 'projectIdSuffix' }];
   if (typeof value !== 'string' || !TIER_PATTERN.test(value)) {
     return [{ code: 'wizard.invalid_project_id_suffix', params: { value: shown(value), pattern: TIER_PATTERN.source }, path: 'projectIdSuffix' }];
   }
-  if (RESERVED_TIERS.has(value)) return [{ code: 'wizard.project_id_suffix_reserved', params: { value }, path: 'projectIdSuffix' }];
+  if (reservedTiersFor(provider).has(value)) return [{ code: 'wizard.project_id_suffix_reserved', params: { value }, path: 'projectIdSuffix' }];
   return [];
 }
 
@@ -233,20 +245,22 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
   if (projectPicks.length === 0 && services.every((s) => picksOf(s).length === 0)) return { ok: false, errors: [{ code: 'wizard.empty' }] };
 
   const errors: PlanError[] = [];
-  const ctx = parseProjectContext(plan.project ?? {}, 'gcp');
+  // 문맥 · 규칙 · 프리셋은 계획의 provider 로 푼다 — 'gcp' 를 박아 두면 AWS 리전이 GCP 리전 표에서 거부된다
+  const provider: Provider = plan.provider;
+  const ctx = parseProjectContext(plan.project ?? {}, provider);
   if (!ctx.ok) errors.push(...ctx.errors);
   // 프로젝트 지역은 단일 리전이다 — 멀티 · 이중 리전 위치는 그 위치를 받는 pick 의 location 으로 준다 (D78)
-  const projectLocation = ctx.ok ? canonicalLocation(ctx.context.region, 'gcp') : undefined;
+  const projectLocation = ctx.ok ? canonicalLocation(ctx.context.region, provider) : undefined;
   if (projectLocation) {
     errors.push({ code: 'context.location_unsupported', field: 'region', params: { value: shown(plan.project.region), supported: locationRuleTypes(projectLocation) } });
   }
-  errors.push(...checkProjectIdSuffix(plan.projectIdSuffix));
+  errors.push(...checkProjectIdSuffix(plan.projectIdSuffix, provider));
 
   if (projectPicks.length > MAX_PICKS_PER_SERVICE) {
     errors.push({ code: 'wizard.too_many_picks', params: { index: -1, max: MAX_PICKS_PER_SERVICE, actual: projectPicks.length }, path: 'projectPicks' });
   }
   const projectRegion = ctx.ok ? ctx.context.region : undefined;
-  checkPicks(projectPicks, 'projectPicks', 'project', errors, projectRegion);
+  checkPicks(provider, projectPicks, 'projectPicks', 'project', errors, projectRegion);
 
   const namespaces = new Set<string>();
   services.forEach((svc, index) => {
@@ -260,10 +274,11 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
     if (!isObject(svc) || !Array.isArray(svc.picks)) errors.push({ code: 'selection.not_array', path });
     const picks = picksOf(svc);
     if (picks.length > MAX_PICKS_PER_SERVICE) errors.push({ code: 'wizard.too_many_picks', params: { index, max: MAX_PICKS_PER_SERVICE, actual: picks.length }, path });
-    checkPicks(picks, path, undefined, errors, projectRegion);
+    checkPicks(provider, picks, path, undefined, errors, projectRegion);
   });
 
-  const total = 1 + projectPicks.reduce((n: number, p) => n + namesOf(p), 0) + services.reduce((n: number, s) => n + picksOf(s).reduce((m: number, p) => m + namesOf(p), 0), 0);
+  // 프로젝트 ID 는 그 규칙이 있는 CSP 에서만 한 이름이다
+  const total = (projectIdRuleOf(provider) === undefined ? 0 : 1) + projectPicks.reduce((n: number, p) => n + namesOf(p), 0) + services.reduce((n: number, s) => n + picksOf(s).reduce((m: number, p) => m + namesOf(p), 0), 0);
   if (total > MAX_NAMES) errors.push({ code: 'wizard.too_many_names', params: { max: MAX_NAMES, actual: total } });
   return errors.length === 0 ? { ok: true } : { ok: false, errors };
 }
@@ -273,10 +288,10 @@ export function validatePlan(plan: WizardPlan): { ok: true } | { ok: false; erro
 export function expandPlan(plan: WizardPlan): ProjectSelection {
   // 같은 검사를 다시 지난다 — 검사를 지난 모델은 아래에서 던지지 않는다(모양이 틀린 모델은 여기서 분명히 던진다)
   if (!validatePlan(plan).ok) throw new Error('expandPlan: the plan did not pass validatePlan');
-  const ctx = parseProjectContext(plan.project, 'gcp');
+  const ctx = parseProjectContext(plan.project, plan.provider);
   if (!ctx.ok) throw new Error('expandPlan: invalid project context');
   const item = (pick: Pick, level: 'project' | undefined): SelectionItem => {
-    const r = resolve(pick);
+    const r = resolve(pick, plan.provider);
     if (!r) throw new Error('expandPlan: unresolved pick');
     const { rule, tier, kind } = r;
     const counted = inputKind(rule) === 'count';
@@ -293,7 +308,7 @@ export function expandPlan(plan: WizardPlan): ProjectSelection {
   };
   const services: ServiceSelection[] = plan.services.map((s) => {
     // 서비스 문맥이 성립하는지 — purpose 를 더한 다섯 값
-    if (!parseContext({ ...plan.project, purpose: s.purpose }, 'gcp').ok) throw new Error('expandPlan: invalid service context');
+    if (!parseContext({ ...plan.project, purpose: s.purpose }, plan.provider).ok) throw new Error('expandPlan: invalid service context');
     return { purpose: s.purpose, items: s.picks.map((p) => item(p, undefined)) };
   });
   return { project: ctx.context, projectItems: plan.projectPicks.map((p) => item(p, 'project')), services,

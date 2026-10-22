@@ -712,10 +712,11 @@ describe('generateProject — 길이 · 부모 FAIL · 충돌 (D62 · D69)', () 
     const many = generateMany({ ...WIZARD_PROJECT, purpose: 'shop' }, 'gcp', [{ rule: gvm, count: 1 }]);
     expect(many.items[0]!.key).toBe('compute_instance_01');
   });
-  it('다른 provider 의 규칙 · 프로젝트 ID 규칙이 없는 provider 는 던진다', () => {
+  it('다른 provider 의 규칙은 던진다 · 프로젝트 ID 규칙이 없는 provider(AWS)는 암묵 항목 없이 만든다', () => {
     const aws = rulesFor('aws').find((r) => r.template.includes('seq'))!;
     expect(() => generateProject(oneService('shop', [{ rule: aws, count: 1 }]), 'gcp')).toThrow();
-    expect(() => generateProject({ project: WIZARD_PROJECT, projectItems: [], services: [] }, 'aws')).toThrow();
+    expect(generateProject({ project: WIZARD_PROJECT, projectItems: [], services: [] }, 'aws')).toEqual({ provider: 'aws', valid: true, items: [], conflicts: [] });
+    expect(generateProject(oneService('shop', [{ rule: aws, count: 1 }]), 'aws').items.map((i) => i.ruleId)).toEqual([aws.id]);
   });
 });
 

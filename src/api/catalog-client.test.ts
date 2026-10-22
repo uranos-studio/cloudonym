@@ -5,7 +5,7 @@ import { VERSION } from '../version';
 import { RULES } from '../core/constraints';
 import { inputKind } from '../core/tree';
 import { pickLocationNames } from '../core/regions';
-import { PRESETS } from '../core/wizard/presets';
+import { PRESETS, presetsFor } from '../core/wizard/presets';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, SLOT_ID_PATTERN } from '../core/wizard/plan';
 import { MAX_COUNT, MAX_NAMES, ROLE_PATTERN, SEQ_PATTERN } from '../core/selection';
@@ -59,7 +59,7 @@ describe('/catalog.json 클라이언트 칸 (D101)', () => {
   });
 
   it('attachments · limits — core 상수 그대로 · 본문 상한은 Worker 의 MAX_BODY_BYTES', () => {
-    expect(gcp.attachments).toEqual(ATTACHMENTS.map((a) => ({ ...a })));
+    expect(gcp.attachments).toEqual(ATTACHMENTS.filter((a) => a.parent.startsWith('gcp.')).map((a) => ({ ...a })));
     expect(gcp.limits).toEqual({
       max_services: MAX_SERVICES, max_picks_per_service: MAX_PICKS_PER_SERVICE, max_names: MAX_NAMES, max_count: MAX_COUNT,
       max_data_disks: MAX_DATA_DISKS, max_body_bytes: MAX_BODY_BYTES,
@@ -84,10 +84,16 @@ describe('/catalog.json 클라이언트 칸 (D101)', () => {
     expect(gcp.env_values).toBeUndefined();
   });
 
-  it('마법사가 없는 CSP 는 빈 presets · 그 CSP 부모의 attachments 만', () => {
-    const aws = JSON.parse(buildCatalogJson(['gcp', 'aws'], VERSION)).providers.aws;
-    expect(aws.presets).toEqual([]);
-    expect(aws.attachments).toEqual([]);
+  it('AWS 는 AWS 프리셋 · AWS 부모의 attachments 만 · 마법사가 없는 CSP(Azure)는 빈 presets', () => {
+    const all = JSON.parse(buildCatalogJson(['gcp', 'aws', 'azure'], VERSION)).providers;
+    const aws = all.aws;
+    expect(aws.presets.map((p: Loose) => p.id)).toEqual(presetsFor('aws').map((p) => p.id));
+    expect(aws.presets.every((p: Loose) => String(p.rule).startsWith('aws.'))).toBe(true);
+    expect(aws.presets.find((p: Loose) => p.id === 'firewall')).toMatchObject({ rule: 'aws.security_group', tier_choices: ['ssh', 'web', 'icmp', 'internal'], level: 'project', group: 'network' });
+    expect(aws.attachments).toEqual(ATTACHMENTS.filter((a) => a.parent.startsWith('aws.')).map((a) => ({ ...a })));
+    expect(aws.attachments).toHaveLength(4);
     expect(aws.limits).toEqual(gcp.limits);
+    expect(all.azure.presets).toEqual([]);
+    expect(all.azure.attachments).toEqual([]);
   });
 });

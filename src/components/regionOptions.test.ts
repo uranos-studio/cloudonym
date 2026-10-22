@@ -38,6 +38,17 @@ describe('filterRegions — 리전 이름 · 위치 · 코드로 거른다 (대�
     expect(filterRegions(gcp, 'asia-northeast3-b').map((o) => o.value)).toEqual(['asia-northeast3']);
     expect(filterRegions(gcp, 'ane3b').map((o) => o.value)).toEqual(['asia-northeast3']);
   });
+  it('AWS 존 이름(ap-northeast-2a)은 그 리전이 걸린다 — 지역 표에 AWS 존 목록이 없어도 core(canonicalRegion)와 같게 푼다', () => {
+    const aws = regionOptions('aws');
+    expect(filterRegions(aws, 'ap-northeast-2a').map((o) => o.value)).toEqual(['ap-northeast-2']);
+    expect(filterRegions(aws, ' AP-NORTHEAST-2C ').map((o) => o.value)).toEqual(['ap-northeast-2']);
+    expect(splitRegion('ap-northeast-2a', aws).region?.value).toBe('ap-northeast-2');
+    expect(splitRegion('ap-northeast-2a', aws).zone).toBeUndefined();
+    // 없는 리전에 글자를 붙인 값 · GCP 표는 그대로다
+    expect(filterRegions(aws, 'ap-northeast-9a')).toEqual([]);
+    expect(splitRegion('ap-northeast-9a', aws)).toEqual({});
+    expect(filterRegions(gcp, 'ap-northeast-2a')).toEqual([]);
+  });
   it('빈 검색어는 전부 · 걸리는 것이 없으면 빈 배열', () => {
     expect(filterRegions(gcp, '')).toHaveLength(44);
     expect(filterRegions(gcp, 'mars')).toEqual([]);

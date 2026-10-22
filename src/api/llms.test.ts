@@ -25,7 +25,7 @@ import { GCP_CATALOG, GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
 import { AZURE_MANUAL_ROWS } from '../core/rules/azure-manual';
 import { TIER_PATTERN } from '../core/types';
 import { RESERVED_TIERS } from '../core/tier';
-import { PRESETS, PRESET_TIERS } from '../core/wizard/presets';
+import { PRESETS, PRESET_TIERS, presetsFor } from '../core/wizard/presets';
 import { ATTACHMENTS } from '../core/wizard/attachments';
 import { MAX_BODY_BYTES } from './v1';
 import { RATE_LIMIT } from './ratelimit';
@@ -271,12 +271,20 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — 묶음 스물일곱 · 프리셋 id 전부 · HA 규칙', () => {
-    const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
+  it('「## Wizard presets」 — GCP 묶음 스물일곱 · AWS 묶음 열하나(0.2) · 프리셋 id 전부 · HA 규칙', () => {
+    const sec = section('## Wizard presets');
+    const split = sec.findIndex((l) => l.startsWith('On `provider: "aws"`'));
+    expect(split).toBeGreaterThan(0);
+    const rows = sec.slice(0, split).filter((l) => l.startsWith('- '));
+    const awsRows = sec.slice(split).filter((l) => l.startsWith('- '));
     expect(rows).toHaveLength(27);
+    expect(awsRows).toHaveLength(11);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
+    for (const p of presetsFor('aws')) expect(awsRows.join('\n'), p.id).toContain(`\`${p.id}\` (${p.label}) → \`${p.ruleId}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
+    expect(awsRows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');
+    expect(awsRows.join('\n')).toContain('`aws.lambda_function`');
   });
   it('「## Wizard cards」 (D93 · D114) — 카드 열 · 서비스 부품과 project 부품 · API 에는 카드가 없다고 말한다', () => {
     const sec = section('## Wizard cards');

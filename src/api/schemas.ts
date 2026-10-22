@@ -2,7 +2,7 @@
 import { ENABLED_PROVIDERS, PROVIDERS, type NamingContext, type ProjectContext, type Provider, type RawContext } from '../core/types';
 import { rulesFor } from '../core/constraints';
 import { MAX_CONTEXT_CHARS, parseContext, parseProjectContext, serviceNamespace, type ProjectSelection } from '../core/engine';
-import { expandPlan, validatePlan, PROJECT_ID_RULE, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { expandPlan, validatePlan, projectIdRuleOf, type PlanError, type WizardPlan } from '../core/wizard/plan';
 import { presetOf } from '../core/wizard/presets';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
@@ -282,7 +282,7 @@ function atPath(root: unknown, path: string): unknown {
 const VALUE_FIELD: Readonly<Record<string, string | null>> = {
   'wizard.unknown_preset': 'preset', 'selection.unknown_type': 'ruleId', 'selection.unknown_kind': 'kind', 'selection.invalid_role': 'role',
   'wizard.invalid_tier': 'tier', 'wizard.invalid_slot_id': 'id', 'wizard.invalid_seq': 'seq', 'wizard.invalid_data_seq': null, 'wizard.invalid_location': 'location',
-  'wizard.location_needs_region': 'location', 'wizard.invalid_project_id_suffix': null, 'wizard.project_id_suffix_reserved': null,
+  'wizard.location_needs_region': 'location', 'wizard.invalid_project_id_suffix': null, 'wizard.project_id_suffix_reserved': null, 'wizard.project_id_suffix_not_supported': null,
 };
 
 /** validatePlan 오류 → API 오류. path 가 있으면 field = wire 경로, 프로젝트 문맥 오류(path 없음)는 field 에 project. 접두,
@@ -338,10 +338,10 @@ export function wizardPickedRules(plan: WizardPlan): { chip: string[]; custom: s
   const custom = new Set<string>();
   for (const pick of [...plan.projectPicks, ...plan.services.flatMap((s) => s.picks)]) {
     if (pick.preset === null) {
-      if (typeof pick.ruleId === 'string' && pick.ruleId !== PROJECT_ID_RULE) custom.add(pick.ruleId);
+      if (typeof pick.ruleId === 'string' && pick.ruleId !== projectIdRuleOf(plan.provider)) custom.add(pick.ruleId);
       continue;
     }
-    const preset = presetOf(pick.preset);
+    const preset = presetOf(pick.preset, plan.provider);
     if (!preset) continue;
     const sv = typeof pick.serverless === 'string' && preset.serverless?.ruleIds.includes(pick.serverless) ? pick.serverless : undefined;
     chip.add(sv ?? preset.ruleId);
@@ -388,7 +388,7 @@ export function parseWizardBody(body: unknown): Parsed<WizardInput> {
   const checked = validatePlan(plan);
   if (!checked.ok) {
     const unknownType = checked.errors.some((m) => m.code === 'selection.unknown_type');
-    return reject(mergeServiceShape(checked.errors.map((e) => toApiError(e, plan)), plan.services), unknownType ? rulesFor('gcp').map((r) => r.id) : undefined);
+    return reject(mergeServiceShape(checked.errors.map((e) => toApiError(e, plan)), plan.services), unknownType ? rulesFor(provider).map((r) => r.id) : undefined);
   }
 
   // 서비스마다 다섯 값 문맥 — 프로젝트 넷은 이미 지났으므로 오류는 purpose 의 것이다(field services[i].purpose)

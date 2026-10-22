@@ -2,6 +2,8 @@
 // tier 는 약어 · 종류 토큰 바로 뒤에 오므로(…-{slug}[-{kind}]-{tier}-{seq}) 약어 · 종류 토큰과 같은 글자면
 // tier 가 없는 옛 이름과 글자가 같아질 수 있다. 지역 코드 · 환경 값은 읽는 사람이 그 뜻으로 먼저 읽는다 (D47 ⑶ ⑷ 와 같은 기준)
 import { GCP_CATALOG } from './rules/gcp-catalog';
+import { AWS_CATALOG } from './rules/aws-catalog';
+import type { Provider } from './types';
 import { LOCATIONS, REGIONS } from './regions-data';
 import { ENV_ALIASES } from './normalize';
 
@@ -13,3 +15,16 @@ export const RESERVED_TIERS: ReadonlySet<string> = new Set([
   ...REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]),
   ...LOCATIONS.gcp.map((l) => l.code),
 ].filter((w): w is string => typeof w === 'string' && w !== ''));
+
+/** AWS 의 예약어 — AWS 약어 · 종류 토큰 · 환경 별칭 · AWS 리전 코드(존은 이름에 넣지 않는다) */
+const AWS_RESERVED_TIERS: ReadonlySet<string> = new Set([
+  ...AWS_CATALOG.map((r) => r.slug.value),
+  ...AWS_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {})),
+  ...Object.keys(ENV_ALIASES),
+  ...REGIONS.aws.map((r) => r.code),
+].filter((w): w is string => typeof w === 'string' && w !== ''));
+
+/** provider 의 예약어 — 마법사 모델 검사가 계획의 provider 로 고른다. 마법사가 없는 CSP 는 GCP 표 */
+export function reservedTiersFor(provider: Provider): ReadonlySet<string> {
+  return provider === 'aws' ? AWS_RESERVED_TIERS : RESERVED_TIERS;
+}

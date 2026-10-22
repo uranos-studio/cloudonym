@@ -353,7 +353,7 @@ describe('서브넷마다 종류와 tier (D86) — Add subnet · 칩 끄기 · �
     p = setPickField(p, { service: null, pick: 2 }, 'tier', 'web');
     ok(p);
     expect(names(p).slice(1)).toEqual(['billing-prod-ane3-snet-01', 'billing-prod-ane3-snet-proxy-01', 'billing-prod-ane3-snet-web-01']);
-    expect(p.projectPicks.map(pickTitle).map((t) => t.title)).toEqual(['Subnet', 'Subnet · proxy', 'Subnet · web']);
+    expect(p.projectPicks.map((x) => pickTitle(x)).map((t) => t.title)).toEqual(['Subnet', 'Subnet · proxy', 'Subnet · web']);
     expect(removePresetPicks(p, null, 'subnet').projectPicks).toEqual([]);
   });
   it('고정 종류(psa)는 머리에 종류를 붙이지 않고 · 방화벽은 tier 칩 값 · custom 은 규칙 이름', () => {

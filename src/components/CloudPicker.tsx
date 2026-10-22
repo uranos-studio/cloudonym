@@ -23,9 +23,16 @@ const BUTTON =
   'dark:disabled:bg-zinc-900 dark:disabled:text-zinc-400 dark:disabled:hover:bg-zinc-900';
 
 const isEnabled = (p: Provider): boolean => ENABLED_PROVIDERS.includes(p);
+/** 머리에 넣는 작은 꼴 (0.2 · 마법사) — 360px 머리가 로고 줄 하나에 들어가게 단추를 줄이고 「Coming soon」 은 글자 대신 점선만 남긴다 */
+const COMPACT =
+  'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold ' +
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-400 ' +
+  'aria-checked:border-indigo-600 aria-checked:bg-indigo-600 aria-checked:text-white dark:aria-checked:border-indigo-500 dark:aria-checked:bg-indigo-500 ' +
+  'border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 ' +
+  'disabled:cursor-not-allowed disabled:border-dashed disabled:bg-transparent disabled:text-zinc-500 dark:disabled:text-zinc-400';
 
 /** numbered 가 false 면 머리에 단계 번호를 붙이지 않는다 — 마법사는 ①~⑦ 번호를 그대로 두고 그 위에 「Cloud」 를 둔다 (D75) */
-export function CloudPicker({ value, onPick, numbered = true }: { value: Provider | undefined; onPick: (p: Provider) => void; numbered?: boolean }) {
+export function CloudPicker({ value, onPick, numbered = true, compact = false }: { value: Provider | undefined; onPick: (p: Provider) => void; numbered?: boolean; compact?: boolean }) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   // 방향키가 오가는 자리 — 켜진 버튼의 PROVIDERS 안 위치
   const live = PROVIDERS.flatMap((p, i) => (isEnabled(p) ? [i] : []));
@@ -42,9 +49,9 @@ export function CloudPicker({ value, onPick, numbered = true }: { value: Provide
   // 고른 것이 없으면 첫 켜진 버튼이 탭 순서를 받는다
   const focusIndex = value !== undefined && isEnabled(value) ? PROVIDERS.indexOf(value) : (live[0] ?? 0);
   return (
-    <section aria-labelledby="step-cloud" className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <h2 id="step-cloud" className="text-base font-semibold">{numbered && <span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">1</span>}{en.ui.step_cloud}</h2>
-      <div role="radiogroup" aria-label={en.ui.cloud_group_label} className="flex w-full gap-2 sm:w-auto">
+    <section aria-labelledby="step-cloud" className={compact ? 'inline-flex items-center' : 'flex flex-wrap items-center gap-x-4 gap-y-2'}>
+      <h2 id="step-cloud" className={compact ? 'sr-only' : 'text-base font-semibold'}>{numbered && <span aria-hidden="true" className="mr-1.5 text-indigo-600 dark:text-indigo-400">1</span>}{en.ui.step_cloud}</h2>
+      <div role="radiogroup" aria-label={en.ui.cloud_group_label} className={compact ? 'flex gap-1' : 'flex w-full gap-2 sm:w-auto'}>
         {PROVIDERS.map((p, i) => {
           const on = isEnabled(p);
           const planned = PLANNED[p];
@@ -63,10 +70,10 @@ export function CloudPicker({ value, onPick, numbered = true }: { value: Provide
               tabIndex={i === focusIndex ? 0 : -1}
               onClick={() => { if (on) onPick(p); }}
               onKeyDown={(e) => onKey(e, i)}
-              className={BUTTON}
+              className={compact ? COMPACT : BUTTON}
             >
               {providerShort(p)}
-              {!on && <span data-coming-soon className="whitespace-nowrap rounded bg-zinc-200 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">{en.ui.cloud_coming_soon}</span>}
+              {!on && <span data-coming-soon className={compact ? 'sr-only' : "whitespace-nowrap rounded bg-zinc-200 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"}>{en.ui.cloud_coming_soon}</span>}
             </button>
           );
         })}

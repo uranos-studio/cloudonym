@@ -152,3 +152,14 @@ describe('멀티 · 이중 리전 위치 (D78)', () => {
     expect(locationError('nam4', [bq])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'NAM4', supported: ['storage_bucket'] } });
   });
 });
+
+describe('AWS 존 이름 (0.2) — 리전으로 풀고 존은 남기지 않는다', () => {
+  it('ap-northeast-2a → apne2 · 모르는 리전 · 두 글자 · GCP 는 그대로 거부', async () => {
+    const { canonicalRegion } = await import('./regions');
+    expect(canonicalRegion('ap-northeast-2a', 'aws')).toEqual({ region: 'apne2' });
+    expect(canonicalRegion('US-EAST-1B', 'aws')).toEqual({ region: 'use1' });
+    expect(canonicalRegion('ap-northeast-9a', 'aws')).toBeUndefined();
+    expect(canonicalRegion('ap-northeast-2ab', 'aws')).toBeUndefined();
+    expect(canonicalRegion('ap-northeast-2a', 'gcp')).toBeUndefined();
+  });
+});

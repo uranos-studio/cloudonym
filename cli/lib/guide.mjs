@@ -375,7 +375,9 @@ export async function guideNew(ctx) {
   try {
     // provider — 마법사 데이터가 있는 provider 가 여럿일 때만 묻는다(하나면 그것). 계획 파일 하나 = provider 하나
     const candidates = wizardProviders(body);
-    const provider = given ?? (candidates.length > 1 ? (await ask.choose('Which cloud', candidates, { def: candidates[0] })) ?? 'gcp' : candidates[0] ?? 'gcp');
+    // 기본값(Enter)은 gcp — 서버의 provider 순서(0.2 는 aws 가 앞)가 바뀌어도 묻는 흐름의 기본은 그대로다
+    const def = candidates.includes('gcp') ? 'gcp' : candidates[0];
+    const provider = given ?? (candidates.length > 1 ? (await ask.choose('Which cloud', candidates, { def })) ?? 'gcp' : candidates[0] ?? 'gcp');
     const server = serverFor(ctx, body, provider);
     if (typeof server === 'number') return server;
     const { cat } = server;

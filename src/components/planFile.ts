@@ -115,7 +115,7 @@ export interface OpenedPlan extends DecodedWizard {
   ignoredKeys: number;
 }
 
-/** 파일 글 → 마법사 상태. 너무 크거나 · JSON 이 아니거나 · 객체가 아니거나 · provider 가 gcp 가 아니거나 · project 가 객체가 아니거나 ·
+/** 파일 글 → 마법사 상태. 너무 크거나 · JSON 이 아니거나 · 객체가 아니거나 · provider 가 gcp · aws 가 아니거나 · project 가 객체가 아니거나 ·
  *  프로젝트 값이 풀리지 않으면 undefined(화면은 계획을 그대로 두고 한 줄 알린다). 그 밖은 링크와 같이 고치고 센다 · 모르는 키는 무시하고 센다 */
 export function openPlanFile(text: string): OpenedPlan | undefined {
   if (new TextEncoder().encode(text).length > PLAN_FILE_MAX_BYTES) return undefined;
@@ -125,12 +125,13 @@ export function openPlanFile(text: string): OpenedPlan | undefined {
   } catch {
     return undefined;
   }
-  if (!isRecord(f) || f.provider !== 'gcp' || !isRecord(f.project)) return undefined;
+  // provider — 마법사 CSP(gcp · aws) 만. aws 는 짧은 꼴의 c 로 옮긴다(링크와 같은 길)
+  if (!isRecord(f) || (f.provider !== 'gcp' && f.provider !== 'aws') || !isRecord(f.project)) return undefined;
   const ig: Ignored = { n: 0 };
   countUnknown(f, FILE_KEYS, ig);
   countUnknown(f.project, PROJECT_KEYS, ig);
   const { owner, system, env, region } = f.project;
-  const raw: Record<string, unknown> = { owner, system, env, region };
+  const raw: Record<string, unknown> = { ...(f.provider === 'gcp' ? {} : { c: f.provider }), owner, system, env, region };
   if (f.rules_version !== undefined) raw.v = f.rules_version;
   if (Object.hasOwn(f, 'environments')) raw.e = f.environments;
   if (Object.hasOwn(f, 'project_id_suffix')) raw.x = f.project_id_suffix;
@@ -156,7 +157,7 @@ export async function readPlanFile(file: { size: number; text(): Promise<string>
   }
   const opened = openPlanFile(text);
   if (!opened) return undefined;
-  const plan = opened.plan ?? initialPlan(opened.project);
+  const plan = opened.plan ?? initialPlan(opened.project, opened.provider);
   const envs = opened.envs ?? [];
   return { opened, plan, envs, key: encodeWizardState(plan, rulesVersion, envs) ?? '' };
 }

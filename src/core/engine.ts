@@ -219,8 +219,8 @@ export function attachName(parent: NameItem, child: { attach: AttachKind; seq?: 
  *  ⑤ valid = 항목 전부. 프로젝트 ID(project/-/project_id/-/-/-)는 늘 첫 항목이다. 순번은 슬롯의 값(instances[].seq)이고, 슬롯이 없으면 01…count.
  *  항목 순서 = 선택 순서 · 자식은 부모 바로 뒤(boot · data(준 순서) · ip · ipi). 입력은 마법사 모델 검사를 거친 것이다 */
 export function generateProject(sel: ProjectSelection, provider: Provider): ProjectResult {
+  // 프로젝트 ID 규칙이 없는 CSP(AWS — 계정은 번호다)는 암묵 항목이 없다. 이름은 프로젝트 수준 항목부터다
   const projectRule = getRule(provider, 'project_id');
-  if (!projectRule) throw new Error(`no project_id rule for ${provider}`);
   type Built = { item: NameItem; rule: ResourceRule; children: { attach: AttachKind; seq?: string }[] };
   const parents: Built[] = [];
 
@@ -237,7 +237,7 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
       const res = generateItem(ctx, rule, { ...(kind === undefined ? {} : { kind }), ...(tier === undefined ? {} : { tier }), ...lv, ...(regional ? { regional: true } : {}), ...extra });
       // 키의 kind 칸은 이름이 빈 항목에서도 같은 값이다 — 이름이 아니라 선택이 키를 정한다
       // 프로젝트 ID 의 접미사(tier 자리 · D85)는 키에 넣지 않는다 — 접미사를 바꿔도 Terraform 키(project/-/project_id/-/-/-)가 움직이지 않는다
-      const keyTier = rule.id === projectRule.id ? undefined : tier;
+      const keyTier = rule.id === projectRule?.id ? undefined : tier;
       const key = projectItemKey({ ...lv, namespace, type: rule.resourceType, ...(token === null ? {} : { kindToken: token }), ...(keyTier === undefined ? {} : { tier: keyTier }), ...(slot === undefined ? {} : { slot }) });
       const item: NameItem = {
         ...res, key, ...meta, ...(kind === undefined ? {} : { kind }), ...(token === null || res.name === '' ? {} : { kindToken: token }),
@@ -269,7 +269,7 @@ export function generateProject(sel: ProjectSelection, provider: Provider): Proj
 
   // 입력은 중복이 없어야 한다 — 같은 이름공간으로 정제되는 서비스 · 같은 (type, 종류 토큰, tier, role, level) 항목은 T5 의 마법사 모델 검사(validatePlan)가 먼저 거부한다
   // ① 부모 전부
-  add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1, ...(sel.projectIdSuffix === undefined ? {} : { tier: sel.projectIdSuffix }) }, 'project');
+  if (projectRule) add(sel.project, PROJECT_NAMESPACE, { rule: projectRule, count: 1, ...(sel.projectIdSuffix === undefined ? {} : { tier: sel.projectIdSuffix }) }, 'project');
   for (const it of sel.projectItems) add(sel.project, PROJECT_NAMESPACE, it, 'project');
   for (const svc of sel.services) {
     for (const it of svc.items) {

@@ -67,7 +67,8 @@ function matchOf(plan: WizardPlan, service: number, b: Bundle): CardMatch {
 
 /** 서비스의 카드 (D93) — 표 순서. 가족 lb 는 하나 */
 export function cardsIn(plan: WizardPlan, service: number): CardMatch[] {
-  if (!plan.services[service]) return [];
+  // 카드 표는 GCP 프리셋으로 지었다 — 다른 CSP 계획은 프리셋 id 가 같아도(web · db) 카드로 묶지 않는다
+  if (plan.provider !== 'gcp' || !plan.services[service]) return [];
   const out: CardMatch[] = [];
   if (LB_ANCHORS.some((id) => presentIn(plan, service, id))) {
     // 빠진 수가 적은 카드가 이긴다 — 같으면 표 순서

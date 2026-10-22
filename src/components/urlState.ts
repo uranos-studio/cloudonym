@@ -2,8 +2,8 @@
 // 깨진 hash 는 undefined 로 돌려주고 화면은 기본값으로 간다. 선택은 걸린 항목만 버리고 몇 개 버렸는지 돌려준다
 import { DEFAULT_ROLE, ENV_VALUES, MAX_CONTEXT_CHARS, parseContext, parseProjectContext } from '../core/engine';
 import { MAX_ITEMS, MAX_NAMES, validateSelection, type Attachments, type SelectionItem } from '../core/selection';
-import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, checkProjectIdSuffix, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan } from '../core/wizard/plan';
-import { PRESETS, presetOf } from '../core/wizard/presets';
+import { MAX_PICKS_PER_SERVICE, MAX_SERVICES, MAX_SLOT_ID_CHARS, WIZARD_PROVIDERS, checkProjectIdSuffix, validatePlan, type Pick as WizardPick, type PlanError, type WizardPlan, type WizardProvider } from '../core/wizard/plan';
+import { presetOf, presetsFor } from '../core/wizard/presets';
 import { inputKind } from '../core/tree';
 import { MAX_REGION_CHARS, REGIONAL_LOCATION, canonicalLocation } from '../core/regions';
 import { MAX_KIND_VALUE_CHARS, rowOf } from '../core/catalog';
@@ -213,7 +213,10 @@ export function decodeState(hash: string, rules?: readonly ResourceRule[], enabl
   const parsed = firstOk(input, only !== undefined ? [only] : enabled);
   if (!parsed?.ok) return undefined;
   const out: DecodedState = { context: parsed.context, ...rulesVersion };
+  // p 가 없고 켜진 CSP 가 둘 이상이면 지역이 풀리는 CSP 가 하나일 때만 그것 — 0.1 의 GCP 링크(ane3)를 AWS 로 읽지 않는다. 둘 다 풀리면(use1 · global) 고르지 않는다 (D45)
+  const resolves = only === undefined && disabled === undefined ? enabled.filter((q) => parseContext(input, q).ok) : [];
   if (only !== undefined) out.provider = only;
+  else if (resolves.length === 1) out.provider = resolves[0];
   if (r !== undefined) {
     const n = entryCount(r);
     if (n > 0) out.dropped = n;
@@ -242,7 +245,7 @@ export function shareUrl(ctx: NamingContext, base: string, rulesVersion?: string
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** sv 의 짧은 값 ↔ 규칙 id — 프리셋 데이터의 serverless.ruleIds 와 같은 집합이다(urlState.test 가 센다) */
-export const SERVERLESS_SHORT: Readonly<Record<string, string>> = { gcf: 'gcp.cloud_function', run: 'gcp.run_service' };
+export const SERVERLESS_SHORT: Readonly<Record<string, string>> = { gcf: 'gcp.cloud_function', run: 'gcp.run_service', lam: 'aws.lambda_function' };
 const SERVERLESS_LONG: Readonly<Record<string, string>> = Object.fromEntries(Object.entries(SERVERLESS_SHORT).map(([k, v]) => [v, k]));
 
 /** 마법사 hash 의 문맥 넷 — region 은 리전 코드 */
@@ -299,11 +302,12 @@ export function wizardToHash(plan: WizardPlan): Record<string, unknown> {
 /** 마법사 상태 → hash 문자열(Base64url). 모델이 validatePlan · 프로젝트 문맥을 지나지 못하면 undefined — 화면은 마지막 온전한 hash 를 둔다.
  *  envs — 화면에서 고른 환경 목록(D82). 모델의 env 와 합쳐 둘 이상이면 `e` 로 싣는다 */
 export function encodeWizardState(plan: WizardPlan, rulesVersion?: string, envs: readonly Env[] = []): string | undefined {
-  const ctx = parseProjectContext(plan.project, 'gcp');
+  const ctx = parseProjectContext(plan.project, plan.provider);
   if (!ctx.ok || !validatePlan(plan).ok) return undefined;
-  if (plan.services.some((s) => !parseContext({ ...plan.project, purpose: s.purpose }, 'gcp').ok)) return undefined;
+  if (plan.services.some((s) => !parseContext({ ...plan.project, purpose: s.purpose }, plan.provider).ok)) return undefined;
   const c = ctx.context;
-  const body: Record<string, unknown> = { owner: c.owner, system: c.system, env: c.env, region: c.region };
+  // c — 클라우드 (0.2). gcp 는 싣지 않는다 — 옛 링크와 바이트가 같고, c 가 없는 hash 는 gcp 다
+  const body: Record<string, unknown> = { ...(plan.provider === 'gcp' ? {} : { c: plan.provider }), owner: c.owner, system: c.system, env: c.env, region: c.region };
   if (rulesVersion !== undefined) body.v = rulesVersion;
   const list = envList(c.env, envs);
   if (list.length > 1) body.e = list;
@@ -318,6 +322,8 @@ export interface WizardNotices { dropped: number; haOff: number; serverlessOff: 
 const NO_NOTICES = (): WizardNotices => ({ dropped: 0, haOff: 0, serverlessOff: 0, trimmed: 0, discarded: false });
 
 export interface DecodedWizard {
+  /** 클라우드 — hash 의 c (없으면 gcp) */
+  provider: WizardProvider;
   project: ProjectFields;
   rulesVersion?: string;
   /** w 를 버렸으면 없다 */
@@ -452,7 +458,7 @@ function repair(plan: WizardPlan, e: PlanError, n: WizardNotices): boolean {
     slots.splice(s0.index, 1);
     n.dropped++;
     if (slots.length === 0) { removePick(); return true; }
-    const min = pick.preset === null ? undefined : presetOf(String(pick.preset))?.ha?.minInstances;
+    const min = pick.preset === null ? undefined : presetOf(String(pick.preset), plan.provider)?.ha?.minInstances;
     if (pick.ha === true && min !== undefined && slots.length < min) { delete pick.ha; n.haOff++; }
     return true;
   }
@@ -477,7 +483,7 @@ function repair(plan: WizardPlan, e: PlanError, n: WizardNotices): boolean {
 /** 서비스마다 문맥(넷 + purpose)이 풀리는가 — 안 풀리는 첫 서비스의 오류(path services[i]) */
 function serviceContextError(plan: WizardPlan): PlanError | undefined {
   for (let i = 0; i < plan.services.length; i++) {
-    const res = parseContext({ ...plan.project, purpose: plan.services[i]!.purpose }, 'gcp');
+    const res = parseContext({ ...plan.project, purpose: plan.services[i]!.purpose }, plan.provider);
     if (!res.ok) return { ...res.errors[0]!, path: `services[${i}]` };
   }
   return undefined;
@@ -588,10 +594,10 @@ function rawSize(pp: unknown[], ss: unknown[]): { picks: number; names: number }
  *  합이 MAX_NAMES - 1(프로젝트 ID) 이하다. 그래서 식 = 뼈대 + 자유 입력 둘 + 서비스마다(purpose · 감싸기 + pick 마다 고정 칸) + 프로젝트 공용 pick 고정 칸
  *  + 이름 하나의 최악 바이트 × MAX_NAMES. 값은 urlState.test 가 잰다 */
 /** 프리셋 id 의 가장 긴 길이 — 인코더는 데이터의 id 만 싣는다 */
-const MAX_PRESET_ID_CHARS = Math.max(...PRESETS.map((p) => p.id.length));
+const MAX_PRESET_ID_CHARS = Math.max(...WIZARD_PROVIDERS.flatMap((c) => presetsFor(c).map((p) => p.id.length)));
 const PICK_FIXED_JSON_BYTES = JSON.stringify({
   pr: 'p'.repeat(MAX_PRESET_ID_CHARS), ru: 'r'.repeat(MAX_RESOURCE_TYPE_CHARS + 4), t: 't'.repeat(16), ro: 'o'.repeat(MAX_ROLE_CHARS),
-  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 'run', l: 'l'.repeat(Math.max(MAX_REGION_CHARS, REGIONAL_LOCATION.length)), i: [],
+  k: 'k'.repeat(MAX_KIND_VALUE_CHARS), h: 1, sv: 's'.repeat(Math.max(...Object.keys(SERVERLESS_SHORT).map((k) => k.length))), l: 'l'.repeat(Math.max(MAX_REGION_CHARS, REGIONAL_LOCATION.length)), i: [],
 }).length + 1;
 /** 슬롯 하나(`{"id":"<8>","q":"99","a":{}},` — attach 감싸기 · 데이터 배열 감싸기 포함) 와 딸린 것 하나(`"ipi":1,` · `"99",` 중 큰 쪽) 중 큰 쪽 */
 const NAME_JSON_BYTES = Math.max(
@@ -599,7 +605,7 @@ const NAME_JSON_BYTES = Math.max(
   '"ipi":1,'.length, '"b":1,'.length, '"99",'.length,
 );
 /** 마법사 hash 를 푼 JSON 의 최악 바이트 — 계획 파일의 읽기 상한(planFile.ts)도 이 값이다 */
-export const MAX_WIZARD_JSON_BYTES = JSON.stringify({ owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, x: 'x'.repeat(16), w: { pp: [], s: [] } }).length
+export const MAX_WIZARD_JSON_BYTES = JSON.stringify({ c: 'aws', owner: '', system: '', env: 'prod', region: 'r'.repeat(MAX_REGION_CHARS), v: V_PLACEHOLDER, e: ENV_VALUES, x: 'x'.repeat(16), w: { pp: [], s: [] } }).length
   + 2 * MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT
   + MAX_SERVICES * (JSON.stringify({ n: '', p: [] }).length + 1 + MAX_CONTEXT_CHARS * MAX_JSON_BYTES_PER_UNIT + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES)
   + MAX_PICKS_PER_SERVICE * PICK_FIXED_JSON_BYTES
@@ -647,10 +653,13 @@ export function decodeWizardObject(raw: Record<string, unknown>): DecodedWizard 
   if (!('w' in raw) || 'r' in raw) return undefined;
   if (Object.values(raw).some((v) => typeof v === 'string' && v.length > MAX_FIELD_CHARS)) return undefined;
   if ((['owner', 'system'] as const).some((f) => typeof raw[f] === 'string' && (raw[f] as string).length > MAX_CONTEXT_CHARS)) return undefined;
-  const ctx = parseProjectContext(raw as RawContext, 'gcp');
+  // c — 클라우드 (0.2). 없으면 gcp · 마법사 CSP 가 아닌 값은 깨진 링크다
+  if ('c' in raw && !(WIZARD_PROVIDERS as readonly unknown[]).includes(raw.c)) return undefined;
+  const provider: WizardProvider = 'c' in raw ? raw.c as WizardProvider : 'gcp';
+  const ctx = parseProjectContext(raw as RawContext, provider);
   if (!ctx.ok) return undefined;
   const project: ProjectFields = { owner: ctx.context.owner, system: ctx.context.system, env: ctx.context.env, region: ctx.context.region };
-  const out: DecodedWizard = { project, notices: NO_NOTICES() };
+  const out: DecodedWizard = { provider, project, notices: NO_NOTICES() };
   // e — 배열이 아니면 통째로, 표준값이 아닌 항목은 하나씩 버리고 센다. env 와 합쳐 둘 이상이면 첫째(표준값 순서)가 모델의 env 다
   if ('e' in raw) {
     const e = envsFromHash(raw.e);
@@ -665,7 +674,7 @@ export function decodeWizardObject(raw: Record<string, unknown>): DecodedWizard 
   // x — 프로젝트 ID 접미사 (D85). 꼴 · 예약어가 틀리면 그것만 버리고 센다(모델 검사가 w 전체를 버리지 않게 먼저 본다)
   let projectIdSuffix: string | undefined;
   if ('x' in raw) {
-    if (checkProjectIdSuffix(raw.x).length === 0) projectIdSuffix = raw.x as string;
+    if (checkProjectIdSuffix(raw.x, provider).length === 0) projectIdSuffix = raw.x as string;
     else out.notices.dropped++;
   }
   const w = raw.w;
@@ -687,7 +696,7 @@ export function decodeWizardObject(raw: Record<string, unknown>): DecodedWizard 
     });
   }
   const plan: WizardPlan = {
-    provider: 'gcp', project,
+    provider, project,
     projectPicks: (pp as unknown[]).map((p) => longPick(p, n)).filter((p): p is WizardPick => p !== undefined),
     services,
     ...(projectIdSuffix === undefined ? {} : { projectIdSuffix }),

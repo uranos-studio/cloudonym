@@ -196,9 +196,9 @@ export function rowNames(plan: WizardPlan, ref: PickRef, result: ProjectResult |
   if (!result) return undefined;
   const pick = ref.service === null ? plan.projectPicks[ref.pick] : plan.services[ref.service]?.picks[ref.pick];
   if (!pick) return undefined;
-  const rule = pickRule(pick);
+  const rule = pickRule(pick, plan.provider);
   if (!rule) return undefined;
-  const preset = pick.preset === null ? undefined : presetOf(pick.preset);
+  const preset = pick.preset === null ? undefined : presetOf(pick.preset, plan.provider);
   const tier = pick.tier ?? preset?.tier ?? undefined;
   const kind = pick.kind === undefined ? preset?.kind : pick.kind;
   const token = kind === undefined || kind === null ? null : kindToken(rule, kind);
@@ -264,13 +264,13 @@ export function rowTitle(plan: WizardPlan, path: RowPath): string {
   if (r.kind === 'service') return plan.services[r.service]?.purpose || en.ui.wizard_unnamed_service;
   if (r.kind === 'card') return bundleById(r.card)?.label ?? r.card;
   const pick = r.ref.service === null ? plan.projectPicks[r.ref.pick] : plan.services[r.ref.service]?.picks[r.ref.pick];
-  return pick ? pickTitle(pick).title : en.ui.wizard_step_project;
+  return pick ? pickTitle(pick, plan.provider).title : en.ui.wizard_step_project;
 }
 
 /** 서비스 문맥(넷 + purpose) 오류 — validatePlan 이 지난 뒤에도 서비스 이름이 문맥으로 풀리는지 */
 export function serviceErrorsOf(plan: WizardPlan): CoreMessage[][] {
   return plan.services.map((s) => {
-    const r = parseContext({ ...plan.project, purpose: s.purpose }, 'gcp');
+    const r = parseContext({ ...plan.project, purpose: s.purpose }, plan.provider);
     return r.ok ? [] : r.errors.filter((e) => 'field' in e && e.field === 'purpose');
   });
 }
@@ -278,8 +278,8 @@ export function serviceErrorsOf(plan: WizardPlan): CoreMessage[][] {
 /** 첫 선택 — 오류가 있는 첫 줄, 없으면 첫 서비스 (D93 — 갤러리 「무엇을 만드나」). 프로젝트 값이 비었거나 틀리면 project (D97 — 처음 온 사람은 Project 부터) */
 export function firstSelection(plan: WizardPlan): RowPath {
   const check = validatePlan(plan);
-  const project = parseProjectContext(plan.project, 'gcp');
-  const projectCount = (project.ok ? 0 : project.errors.length) + checkProjectIdSuffix(plan.projectIdSuffix).length;
+  const project = parseProjectContext(plan.project, plan.provider);
+  const projectCount = (project.ok ? 0 : project.errors.length) + checkProjectIdSuffix(plan.projectIdSuffix, plan.provider).length;
   const row = firstErrorRow(plan, check.ok ? [] : check.errors.filter((e) => e.code !== 'wizard.empty'), serviceErrorsOf(plan), projectCount);
   return row === PROJECT_ROW && projectCount === 0 && plan.services.length > 0 ? serviceRow(0) : row;
 }

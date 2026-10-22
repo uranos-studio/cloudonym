@@ -9,7 +9,7 @@ import type { CoreMessage } from '../core/types';
 import * as S from './wizardState';
 import { EXTRAS_ROW, NETWORK_ROW, PROJECT_ROW, cardRow, parseRow, rowErrorCount, rowNames, serviceRow, visibleRows, type RowPath } from './wizardSelection';
 import { serviceLayout } from './wizardBundles';
-import { BTN, HINT } from './wizardStyles';
+import { BTN, HINT, networkText } from './wizardStyles';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
 
@@ -108,7 +108,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   const pickRow = (ref: S.PickRef, level: 2 | 3 = 2) => {
     const pick = ref.service === null ? plan.projectPicks[ref.pick]! : plan.services[ref.service]!.picks[ref.pick]!;
     const path = S.pickPath(ref);
-    const { title } = S.pickTitle(pick);
+    const { title } = S.pickTitle(pick, plan.provider);
     const names = rowNames(plan, ref, result);
     const text = names ? `${names.first}${names.rest > 0 ? ` +${names.rest}` : ''}` : '—';
     return row(path, level, (
@@ -123,7 +123,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
   // 네트워크 한 줄 (D93) — 이름 수(그 pick 들의 이름 합) · pick 제목들
   const networkIdx = S.projectPickIndexes(plan, 'network');
   const networkNames = result ? networkIdx.reduce((n, k) => { const x = rowNames(plan, { service: null, pick: k }, result); return n + (x ? x.rest + 1 : 0); }, 0) : undefined;
-  const networkSummary = [...new Set(networkIdx.map((k) => S.pickTitle(plan.projectPicks[k]!).title))].join(', ');
+  const networkSummary = [...new Set(networkIdx.map((k) => S.pickTitle(plan.projectPicks[k]!, plan.provider).title))].join(', ');
   /** 펼친 서비스의 자식 — 카드 줄(연 카드는 부품 줄까지) · 카드 밖 pick */
   const serviceChildren = (i: number): ReactNode[] => {
     const { cards, owned, loose } = serviceLayout(plan, i);
@@ -167,7 +167,7 @@ export function WizardList({ plan, envs, selected, onSelect, isExpanded, onExpan
                 <span className="truncate font-semibold">{en.ui.wizard_project_resources}</span>
                 {networkNames !== undefined && <span data-row-count className={BADGE}>{fillUi(en, 'wizard_row_names', { n: networkNames })}</span>}
               </span>
-              <span data-network-summary className={`truncate text-xs ${HINT}`}>{networkSummary || en.ui.wizard_project_resources_hint}</span>
+              <span data-network-summary className={`truncate text-xs ${HINT}`}>{networkSummary || networkText(plan.provider).resourcesHint}</span>
             </span>
             {full && <span data-row-full className={BADGE}>{`${plan.projectPicks.length}/${MAX_PICKS_PER_SERVICE}`}</span>}
             <ChevronRight aria-hidden="true" className={`size-4 shrink-0 text-zinc-500 transition-transform ${networkOpen ? 'rotate-90' : ''}`} />

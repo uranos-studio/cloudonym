@@ -651,9 +651,14 @@ def wizard_scenarios(browser, rules_version, errors):
             goto_ready(p36, BASE + '/pick?r' + h)
             goto_ready(p36, BASE + path + h)
             p36.wait_for_url(BASE + '/pick' + h)
-            expect(p36.locator('[data-tree]')).to_have_count(1)
+            # 다섯 키만 든 링크는 CSP 가 없다 — 켜진 CSP 가 둘(0.2)이라 트리 대신 고르라는 안내가 보이고, 지역 코드 euw1 은 두 CSP 에 다 있어 지역 칸은 보지 않는다
+            expect(p36.locator('[data-tree]' if h == v3 else '[data-pick-cloud]')).to_have_count(1)
             expect(p36.locator('[data-wizard]')).to_have_count(0)
-            expect_ctx(p36, INPUT)
+            if h == v3:
+                expect_ctx(p36, INPUT)
+            else:
+                for key in ('owner', 'system', 'purpose', 'env'):
+                    expect(p36.locator(f'#field-{key}')).to_have_value(INPUT[key])
             expect(p36.locator('[data-nav-wizard]')).to_have_attribute('href', '/')
             if h == v3:
                 expect(p36.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
@@ -778,17 +783,15 @@ def wizard_scenarios(browser, rules_version, errors):
     p39 = ctx39.new_page()
     p39.on('pageerror', lambda e: errors.append(str(e)))
     start_example(p39)
-    # 클라우드는 머리의 배지다 (D93) — 켜진 것이 GCP 하나라 고르는 줄을 두지 않는다. 단계 번호(①~⑦)는 뗐다
-    # 배지 둘 (83b0829) — 지금 쓰는 것(Google Cloud · 체크)과 예정인 것(점선)을 나눠 셋 다 되는 것처럼 읽히지 않게 한다 · 묶음의 이름이 둘을 함께 말한다
+    # 클라우드는 머리의 고르기 줄이다 (D93 · 0.2) — 켜진 GCP · AWS 는 누를 수 있고, Azure 는 「Coming soon」 으로 꺼져 있다. 처음은 GCP 다. 단계 번호(①~⑦)는 뗐다
     cloud = p39.locator('header [data-wizard-cloud]')
-    soon = p39.locator('header [data-wizard-cloud-soon]')
-    expect(cloud).to_have_text('Google Cloud')
-    expect(cloud.locator('svg')).to_have_count(1)
-    expect(soon).to_have_text('AWS · Azure coming soon')
-    assert soon.evaluate('e => getComputedStyle(e).borderTopStyle') == 'dashed'
-    assert cloud.evaluate('e => getComputedStyle(e).borderTopStyle') == 'solid'
-    expect(p39.locator('header [role="group"]:has([data-wizard-cloud])')).to_have_attribute('aria-label', 'Supported now: Google Cloud. Coming soon: AWS and Azure.')
-    expect(p39.locator('header [role="group"]:has([data-wizard-cloud]) [data-wizard-cloud-soon]')).to_have_count(1)
+    expect(cloud).to_have_attribute('role', 'group')
+    expect(cloud).to_have_attribute('aria-label', 'Cloud for this plan: Google Cloud or AWS. Coming soon: Azure.')
+    expect(cloud.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    expect(cloud.locator('[data-cloud="aws"]')).to_be_enabled()
+    expect(cloud.locator('[data-cloud="azure"]')).to_be_disabled()
+    expect(cloud.locator('[data-cloud="azure"] [data-coming-soon]')).to_have_count(1)
+    expect(cloud.locator('[data-coming-soon]')).to_have_count(1)
     expect(p39.locator('[data-wizard] [data-cloud]')).to_have_count(0)
     expect(select(p39, 'project').locator('#wizard-project')).to_have_text(re.compile(r'^Project\b'))
     clear_network(p39)
@@ -1998,10 +2001,11 @@ def api_doc(browser, errors):
     pg.click('header [data-nav-api]')
     pg.wait_for_url(BASE + '/docs/api')
     expect(rows).to_have_count(len(ops) + 2)
-    tree_link = BASE + TREE + state_hash(INPUT)
+    # 트리를 여는 링크는 CSP(p)를 싣는다 — 켜진 CSP 가 둘(0.2)이라 p 가 없으면 트리 대신 고르라는 안내가 뜬다
+    tree_link = BASE + TREE + state_hash(INPUT, None, 'gcp')
     goto_ready(pg, tree_link)
     expect(pg.locator('[data-tree]')).to_have_count(1)
-    expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api' + state_hash(INPUT))
+    expect(pg.locator('header [data-nav-api]')).to_have_attribute('href', '/docs/api' + state_hash(INPUT, None, 'gcp'))
     open_more(pg)
     pg.click('header [data-nav-api]')
     pg.wait_for_url(re.compile(re.escape(BASE + '/docs/api') + r'(#.*)?$'))
@@ -2234,7 +2238,7 @@ def header_menu(browser, errors):
     c4 = browser.new_context(viewport={'width': 1280, 'height': 900})
     p4 = c4.new_page()
     p4.on('pageerror', lambda e: errors.append(str(e)))
-    goto_ready(p4, BASE + TREE + state_hash(INPUT))
+    goto_ready(p4, BASE + TREE + state_hash(INPUT, None, 'gcp'))
     expect(p4.locator('header [data-copy="share-url"]')).to_be_visible()
     expect(p4.locator('header [data-plan-save], header [data-plan-open]')).to_have_count(0)
     expect(p4.locator('header [data-nav-menu] [role="menuitem"]')).to_have_text(['Wizard', 'Naming guide', 'API', 'llms.txt', 'About'])  # About 은 /pick 에도 (D109)
@@ -2247,7 +2251,7 @@ def header_menu(browser, errors):
     expect(p4.locator('[data-wizard]')).to_be_visible()
     # /pick 360 — 밖에는 More 하나 · 공유 경고는 메뉴의 Share URL 을 누른 뒤(마법사와 같은 규칙 · D105) · 메뉴에 Open plan 없음
     p4.set_viewport_size({'width': 360, 'height': 800})
-    goto_ready(p4, BASE + TREE + state_hash(INPUT))
+    goto_ready(p4, BASE + TREE + state_hash(INPUT, None, 'gcp'))
     pick360, same_row, one_row = header_rows(p4)
     assert same_row and one_row and pick360 <= 70, ('/pick 360 머리가 한 줄이 아니다', pick360)
     expect(p4.locator('[data-share-warning]')).to_have_count(0)
@@ -2296,21 +2300,23 @@ with sync_playwright() as p:
     assert RULES != OLD_RULES, RULES
     expect(page.locator('h1')).to_have_text('Cloudonym')
     assert page.evaluate('document.documentElement.lang') == 'en'
-    # 버튼은 셋 다 그린다 — 켜진 것이 하나(GCP)라 첫 그리기 때 그것이 골라지고 트리가 바로 보인다 (D45)
+    # 버튼은 셋 다 그린다 — 켜진 것이 둘(AWS · GCP · 0.2)이라 첫 방문은 아무것도 고르지 않는다(숨은 기본값 없음 · D45). GCP 를 눌러 고른다
     assert page.eval_on_selector_all('[role="radio"][data-cloud]', 'els => els.map(e => e.dataset.cloud)') == ['aws', 'gcp', 'azure']
+    expect(page.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(0)
+    expect(page.locator('[data-cloud="aws"]')).to_be_enabled()
+    expect(page.locator('[data-cloud="gcp"]')).to_be_enabled()
+    page.click('[data-cloud="gcp"]')
     expect(page.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(1)
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page.locator('[data-cloud="gcp"]')).to_be_enabled()
     expect(page.locator('[data-pick-cloud]')).to_have_count(0)
     expect(page.locator('[data-tree]')).to_have_count(1)
-    for cloud, tip in (('aws', 'AWS: planned for 0.2.0'), ('azure', 'Azure: planned for 0.3.0')):
-        btn = page.locator(f'[data-cloud="{cloud}"]')
-        expect(btn).to_be_disabled()
-        expect(btn).to_have_attribute('aria-disabled', 'true')
-        expect(btn).to_have_attribute('aria-checked', 'false')
-        expect(btn).to_have_attribute('title', tip)
-        expect(btn.locator('[data-coming-soon]')).to_have_text('Coming soon')
-    expect(page.locator('[data-coming-soon]')).to_have_count(2)
+    btn = page.locator('[data-cloud="azure"]')
+    expect(btn).to_be_disabled()
+    expect(btn).to_have_attribute('aria-disabled', 'true')
+    expect(btn).to_have_attribute('aria-checked', 'false')
+    expect(btn).to_have_attribute('title', 'Azure: planned for 0.3.0')
+    expect(btn.locator('[data-coming-soon]')).to_have_text('Coming soon')
+    expect(page.locator('[data-coming-soon]')).to_have_count(1)
     # PASS 뜻 한 줄(D28) · 버전 꼬리말(D26) · 링크가 없으면 규칙 버전 안내도 없다
     expect(page.locator('[data-pass-meaning]')).to_contain_text('It does not mean the name is available')
     expect(page.locator('[data-pass-meaning]')).to_contain_text('Generated names are not guaranteed unique')
@@ -2341,9 +2347,10 @@ with sync_playwright() as p:
     page.on('dialog', record)
     page.locator('[data-cloud="azure"]').click(force=True)  # disabled 버튼 — 브라우저가 click 을 내지 않는다
     page.locator('[data-cloud="gcp"]').focus()
-    for key in ('ArrowRight', 'ArrowLeft', 'End', 'Home'):  # 켜진 버튼이 하나라 포커스는 GCP 에 머문다
+    # 켜진 버튼은 AWS · GCP 둘(0.2) — 방향키는 그 둘 사이로 포커스만 옮기고(고르지 않는다) Azure 는 건너뛴다
+    for key, want in (('ArrowRight', 'aws'), ('ArrowLeft', 'gcp'), ('End', 'gcp'), ('Home', 'aws'), ('End', 'gcp')):
         page.keyboard.press(key)
-        assert page.evaluate('document.activeElement.dataset.cloud') == 'gcp', key
+        assert page.evaluate('document.activeElement.dataset.cloud') == want, key
     page.wait_for_timeout(200)
     assert dialogs == [], f'꺼진 CSP 가 확인 창을 띄웠다: {dialogs}'
     expect(page.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
@@ -2640,7 +2647,7 @@ with sync_playwright() as p:
     page.evaluate('h => { location.hash = h; }', '#' + share_url.split('#', 1)[1])
     expect(page.locator(f'{VM1} [data-name]')).to_have_text('payments-ledger-prod-euw1-gce-01')
 
-    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — 켜진 CSP(GCP)가 자동 선택 ──
+    # ── ⑶ 깨진 hash 로 열어도 화면이 뜨고 기본값으로 간다 — 켜진 CSP 가 둘이라 고르지 않은 채로 ──
     for broken in ('#state=!!!', '#state=' + 'eyJvd25lciI6NDJ9', '#state=', '#state=W10'):  # !!! · {"owner":42} · 빈 값 · []
         ctx3 = browser.new_context(viewport={'width': 1280, 'height': 900})
         page3 = ctx3.new_page()
@@ -2648,10 +2655,11 @@ with sync_playwright() as p:
         goto_ready(page3, BASE + TREE + broken)
         expect(page3.locator('h1')).to_have_text('Cloudonym')
         expect(page3.locator('#field-owner')).to_have_value('platform')
-        expect(page3.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-        expect(page3.locator('[data-pick-cloud]')).to_have_count(0)
-        # 깨진 hash 는 기본 상태의 hash 로 바뀐다 — 다시 공유해도 깨진 값이 퍼지지 않는다
-        assert hash_state(page3.evaluate('location.hash')) == {**DEFAULT, 'v': RULES, 'p': 'gcp'}, page3.evaluate('location.hash')
+        # 켜진 CSP 가 둘(0.2)이라 아무것도 고르지 않는다 — 고르라는 안내가 보인다(D45)
+        expect(page3.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(0)
+        expect(page3.locator('[data-pick-cloud]')).to_have_count(1)
+        # 깨진 hash 는 남지 않는다 — 다시 공유해도 깨진 값이 퍼지지 않는다
+        page3.wait_for_function('b => location.hash !== b', arg=broken)
         ctx3.close()
 
     # ── ⑷ 정제 뒤 빈 토큰 → FAIL 카드 · 복사 버튼 비활성 · 내보내기 셋에서 빠진다 ──
@@ -2745,7 +2753,7 @@ with sync_playwright() as p:
     assert hash_state(page8.url) == {**INPUT, 'v': RULES, 'p': 'gcp', 'r': {'project_id': 1, 'compute_instance': 3}}, hash_state(page8.url)
 
     # ── ⑼ 같은 탭에서 옛 v hash 로 이동 → 안내가 보이고 폼이 따라온다 · 폼을 고치면 안내가 사라진다 ──
-    other_old = state_hash(OTHER, OLD_RULES)
+    other_old = state_hash(OTHER, OLD_RULES, 'gcp')  # 켜진 CSP 가 둘(0.2) — p 가 없는 링크는 CSP 를 고르지 않는다
     page8.evaluate('h => { location.hash = h; }', other_old)
     expect(notice).to_be_visible()
     expect_ctx(page8, OTHER)
@@ -2754,14 +2762,15 @@ with sync_playwright() as p:
     page8.fill('#field-purpose', 'ledger')
     expect(notice).to_have_count(0)
 
-    # ── ⒁ 다섯 키만 든 링크 → 문맥이 열리고 켜진 CSP(GCP)가 자동 선택 · hash 를 덮어쓰지 않는다 ──
+    # ── ⒁ 다섯 키만 든 링크 → 문맥이 열리고 · 켜진 CSP 가 둘(0.2)이라 고르지 않는다 · hash 를 덮어쓰지 않는다 ──
     v1_hash = state_hash(INPUT)
     goto_ready(page8, BASE + TREE + '?' + v1_hash)  # 경로를 바꿔 새로 불러온다
     goto_ready(page8, BASE + TREE + v1_hash)
-    expect_ctx(page8, INPUT)
-    expect(page8.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(1)
-    expect(page8.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
-    expect(page8.locator('[data-tree]')).to_have_count(1)
+    # 지역 코드 euw1 은 GCP europe-west1 과 AWS eu-west-1 둘 다다 — CSP 를 고르기 전에는 지역 칸을 보지 않는다
+    for key in ('owner', 'system', 'purpose', 'env'):
+        expect(page8.locator(f'#field-{key}')).to_have_value(INPUT[key])
+    expect(page8.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(0)
+    expect(page8.locator('[data-pick-cloud]')).to_have_count(1)
     page8.wait_for_timeout(300)
     assert page8.evaluate('location.hash') == v1_hash, page8.evaluate('location.hash')
 
@@ -3103,16 +3112,19 @@ with sync_playwright() as p:
     page28d.screenshot(path=str(OUT / '05-naming-guide.png'))
     ctx28d.close()
 
-    # ── ㉙ 꺼진 CSP(Azure) 로 만든 링크 → GCP 로 열리고 지역은 예시로 · 선택은 비운다 · 자유 입력 셋과 환경은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
+    # ── ㉙ 꺼진 CSP(Azure) 로 만든 링크 → CSP 를 고르지 않은 채 열리고(GCP 를 눌러 고른다) 지역은 예시로 · 선택은 비운다 · 자유 입력 셋과 환경은 그대로 · 안내 한 줄 · 선택을 바꾸면 안내가 사라진다 (D55) ──
     ctx20 = browser.new_context(viewport={'width': 1280, 'height': 900})
     page20 = ctx20.new_page()
     page20.on('pageerror', lambda e: errors.append(str(e)))
     az_link = state_hash({**INPUT, 'region': 'koreacentral'}, RULES, 'azure', {'virtual_machine': 2, 'resource_group': 1})  # Azure 가 풀 수 있는 지역이라야 이 분기다
     goto_ready(page20, BASE + TREE + az_link)
-    expect(page20.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
+    # 켜진 CSP 가 둘(0.2)이라 고르지 않은 채로 열린다 — 안내 한 줄 뒤 GCP 를 눌러 고른다(누르면 안내는 사라진다)
+    expect(page20.locator('[role="radio"][data-cloud][aria-checked="true"]')).to_have_count(0)
     expect(page20.locator('[data-cloud="azure"]')).to_have_attribute('aria-checked', 'false')
     expect(page20.locator('[data-provider-unavailable]')).to_have_text('This link was made for Azure, which is not available yet — the region was reset to the example and the selection was cleared.')
     expect(page20.locator('[data-selection-dropped]')).to_have_count(0)  # 안내는 한 줄 — 버린 선택은 위 문장이 말한다
+    page20.click('[data-cloud="gcp"]')
+    expect(page20.locator('[data-cloud="gcp"]')).to_have_attribute('aria-checked', 'true')
     reset = {**INPUT, 'region': DEFAULT['region']}
     expect_ctx(page20, reset)  # 자유 입력 셋 · 환경은 링크 그대로, 지역은 예시 asia-northeast3
     expect(page20.locator('[data-selected-count]')).to_have_text('0 selected')

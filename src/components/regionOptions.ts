@@ -29,11 +29,19 @@ export function displayLabel(label: string): string {
   return parts.length > 1 && CONTINENT_TAILS.has(parts.at(-1)!) ? parts.slice(0, -1).join(', ') : label;
 }
 
-/** 리전 이름 · 위치 · 코드 · 존 이름 · 존 코드의 부분 문자열로 거른다(대소문자 · 앞뒤 공백 무시). 빈 검색어는 전부 */
+/** AWS 존 이름(ap-northeast-2a) → 그 리전 항목. 지역 표에 AWS 존 목록이 없어(존 목록이 빈 항목) core 의 canonicalRegion 과 같은 꼴 — 리전 이름 끝 소문자 한 글자 — 만 받는다 */
+function awsZoneOption(key: string, options: readonly RegionOption[]): RegionOption | undefined {
+  const m = /^([a-z]{2}(?:-[a-z]+)+-\d+)[a-z]$/.exec(key);
+  return m ? options.find((o) => o.value === m[1] && o.zones.length === 0) : undefined;
+}
+
+/** 리전 이름 · 위치 · 코드 · 존 이름 · 존 코드의 부분 문자열로 거른다(대소문자 · 앞뒤 공백 무시). AWS 존 이름은 그 리전. 빈 검색어는 전부 */
 export function filterRegions(options: readonly RegionOption[], query: string): RegionOption[] {
   const q = query.trim().toLowerCase();
   if (!q) return [...options];
-  return options.filter((o) => [o.value, o.code, o.label, ...o.zones.flatMap((z) => [z.zone, z.code])].some((s) => s.toLowerCase().includes(q)));
+  const hits = options.filter((o) => [o.value, o.code, o.label, ...o.zones.flatMap((z) => [z.zone, z.code])].some((s) => s.toLowerCase().includes(q)));
+  const zoneOf = hits.length === 0 ? awsZoneOption(q, options) : undefined;
+  return zoneOf ? [zoneOf] : hits;
 }
 
 /** 폼의 지역 문자열 → 고른 리전 · 존. 이름 · 코드 어느 꼴이든 core 가 푼 코드로 항목을 찾는다. 모르는 값이면 둘 다 없음 */
@@ -46,5 +54,6 @@ export function splitRegion(input: string, options: readonly RegionOption[]): { 
     if (zone) return { region: o, zone };
     if (o.value === key || o.code === key) return { region: o };
   }
-  return {};
+  const zoneOf = awsZoneOption(key, options);
+  return zoneOf ? { region: zoneOf } : {};
 }

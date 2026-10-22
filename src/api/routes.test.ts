@@ -378,6 +378,35 @@ describe('POST /v1/wizard (D66)', () => {
   };
   const vm = (purpose: string, attach?: object) => ({ purpose, picks: [{ preset: 'web', instances: [{ id: 'a', seq: '01', ...(attach ? { attach } : {}) }] }] });
 
+  it('provider aws (0.2) — AWS 리전 · 존 입력 200 · 프로젝트 ID 없음 · 새 약어 · 존 토큰 없음 · 접미사 · GCP 리전은 AWS 후보로 400', async () => {
+    const body = {
+      provider: 'aws', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ap-northeast-2' },
+      project_picks: [{ preset: 'vpc', instances: [{ id: 'a', seq: '01' }] }],
+      services: [{ purpose: 'shop', picks: [{ preset: 'web', instances: [{ id: 'b', seq: '01', attach: { boot: true, ip: true } }] }, { preset: 'object' }] }],
+    };
+    const { res } = await wizard(body);
+    expect(res.status).toBe(200);
+    const d = (await json(res)).data.aws as { valid: boolean; items: Loose[] };
+    expect(d.valid).toBe(true);
+    expect(d.items.map((i) => i.name)).toEqual([
+      'billing-prod-apne2-vpc-01',
+      'billing-shop-prod-apne2-ec2-web-01', 'billing-shop-prod-apne2-ec2-web-01-boot', 'billing-shop-prod-apne2-ec2-web-01-ip',
+      'platform-billing-shop-prod-s3',
+    ]);
+    const zoned = await wizard({ ...body, project: { ...body.project, region: 'ap-northeast-2a' } });
+    expect(zoned.res.status).toBe(200);
+    const z = await json(zoned.res);
+    expect(z.data.aws.items.map((i: Loose) => i.name)).toEqual(d.items.map((i) => i.name));
+    expect(z.metadata.transformed).toContainEqual(expect.objectContaining({ code: 'context.normalized', field: 'region', params: { from: 'ap-northeast-2a', to: 'apne2' } }));
+    const suffix = await wizard({ ...body, project_id_suffix: 'team1' });
+    expect(suffix.res.status).toBe(400);
+    expect((await json(suffix.res)).errors).toMatchObject([{ code: 'wizard.project_id_suffix_not_supported', field: 'project_id_suffix', params: { provider: 'aws' } }]);
+    const gcpRegion = await wizard({ ...body, project: { ...body.project, region: 'asia-northeast3' } });
+    expect(gcpRegion.res.status).toBe(400);
+    const e = (await json(gcpRegion.res)).errors[0];
+    expect(e).toMatchObject({ code: 'context.value_unsupported', field: 'project.region' });
+    expect(e.params.supported).toContain('ap-northeast-2');
+  });
   it('project_id_suffix (D85) — 200 · 프로젝트 ID 끝에 · 키 고정 · 틀린 꼴 · 예약어 · 너무 긴 값은 400', async () => {
     const g = await itemsOf({ ...W, project_id_suffix: 'team1' });
     expect(g.items[0]).toMatchObject({ key: 'project/-/project_id/-/-/-', name: 'platform-billing-prod-team1', valid: true });

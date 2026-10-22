@@ -170,6 +170,27 @@ describe('cloudonym names · validate · init (D102)', () => {
     expect((await run(['init', '--from', 'https://example.org/#w=abc', '--force'])).code).toBe(EXIT.USAGE);
   });
 
+  it('init --provider aws → add(프리셋 · 규칙 id) → names · validate — AWS 계획이 진짜 엔진에서 끝까지 돈다 (0.2)', async () => {
+    const i = await run(['init', '--owner', 'platform', '--system', 'billing', '--env', 'prod', '--region', 'ap-northeast-2', '--provider', 'aws']);
+    expect(i.code, i.err).toBe(EXIT.OK);
+    expect(readPlanFile()).toEqual({ provider: 'aws', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ap-northeast-2' }, project_picks: [], services: [], rules_version: VERSION.rules });
+    for (const argv of [['add', 'vpc', '--project'], ['add', 'web', '--service', 'shop'], ['add', 'object', '--service', 'shop'], ['add', 'aws.dynamodb_table', '--service', 'shop']]) {
+      const r = await run(argv);
+      expect(r.code, `${argv.join(' ')}: ${r.err}`).toBe(EXIT.OK);
+    }
+    const plan = readPlanFile();
+    expect(plan.project_picks.map((p: Loose) => p.preset)).toEqual(['vpc']);
+    expect(plan.services[0].picks.map((p: Loose) => p.preset ?? p.rule)).toEqual(['web', 'object', 'aws.dynamodb_table']);
+    const n = await run(['names', '--json']);
+    expect(n.code, n.err).toBe(EXIT.OK);
+    const doc = JSON.parse(n.out);
+    expect(doc.provider).toBe('aws');
+    const names = (doc.environments?.prod?.names ?? doc.names) as Loose[];
+    expect(names.map((x) => x.name)).toEqual(['billing-prod-apne2-vpc-01', 'billing-shop-prod-apne2-ec2-web-01', 'platform-billing-shop-prod-s3', 'billing-shop-prod-apne2-ddb-01']);
+    expect((await run(['names'])).code).toBe(EXIT.OK);
+    expect((await run(['validate'])).code).toBe(EXIT.OK);
+  });
+
   it('names → 보관 파일 · add 뒤 names --new 는 새 키만 · validate 는 보관 파일과 같으면 0, 다르면 1', async () => {
     writePlan(PLAN_A);
     const n = await run(['names']);
@@ -356,6 +377,7 @@ describe('묻고 답하는 흐름 — 진짜 엔진의 답 (D121 · 설계 §7 �
     return ordered.findIndex((p) => p.id === id) + 1;
   };
   const ANSWERS = () => [
+    '', // Which cloud [1 aws · 2 gcp] [gcp] — 마법사 프리셋이 있는 provider 가 둘(0.2)이라 먼저 묻는다 · Enter 는 gcp
     'demo', 'payment', '1', 'seoul', '1', ['vpc', 'subnet', 'web', 'db'].map(menuNumber).join(','),
     '', // VPC network — how many? [1]
     '', '', // Subnet — how many? [1] · kind [PRIVATE]

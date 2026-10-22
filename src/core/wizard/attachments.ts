@@ -19,6 +19,11 @@ export const ATTACHMENTS: readonly AttachmentRow[] = [
   { parent: 'gcp.compute_instance', attach: 'data', child: 'gcp.disk', seq: true },
   { parent: 'gcp.compute_instance', attach: 'ip', child: 'gcp.address', seq: false },
   { parent: 'gcp.compute_instance', attach: 'ipi', child: 'gcp.address', seq: false },
+  // AWS (0.2) — boot · data 는 EBS 볼륨, ip 는 Elastic IP, ipi 는 고정 사설 주소를 드는 네트워크 인터페이스(ENI)
+  { parent: 'aws.ec2_instance', attach: 'boot', child: 'aws.ebs_volume', seq: false },
+  { parent: 'aws.ec2_instance', attach: 'data', child: 'aws.ebs_volume', seq: true },
+  { parent: 'aws.ec2_instance', attach: 'ip', child: 'aws.ec2_eip', seq: false },
+  { parent: 'aws.ec2_instance', attach: 'ipi', child: 'aws.ec2_network_interface', seq: false },
 ];
 
 export function attachmentRow(parentRuleId: string, attach: AttachKind): AttachmentRow | undefined {

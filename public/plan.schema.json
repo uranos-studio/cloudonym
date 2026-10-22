@@ -55,7 +55,7 @@
       "type": "string",
       "pattern": "^[a-z0-9]{2,16}$",
       "maxLength": 1024,
-      "description": "Optional suffix appended to the project ID (platform-billing-prod-team1), so a predictable ID can still be unique. Same rules as a tier: 2-16 lowercase letters or digits, not a reserved word (400 wizard.invalid_project_id_suffix, wizard.project_id_suffix_reserved). It is never shortened; the item key stays project/-/project_id/-/-/-. Project IDs are unique across Google Cloud and cannot be reused; Cloudonym does not check whether an ID is free."
+      "description": "Optional suffix appended to the project ID (platform-billing-prod-team1), so a predictable ID can still be unique. Same rules as a tier: 2-16 lowercase letters or digits, not a reserved word (400 wizard.invalid_project_id_suffix, wizard.project_id_suffix_reserved). It is never shortened; the item key stays project/-/project_id/-/-/-. Project IDs are unique across Google Cloud and cannot be reused; Cloudonym does not check whether an ID is free. Google Cloud only: AWS has no project ID item, so an aws request with a suffix is 400 wizard.project_id_suffix_not_supported."
     },
     "project_picks": {
       "type": "array",

@@ -4,12 +4,12 @@ import { describe, it, expect } from 'vitest';
 import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
 import { AWS_CATALOG } from './rules/aws-catalog';
 import { LOCATIONS, REGIONS } from './regions-data';
-import { RESERVED_TIERS } from './tier';
+import { RESERVED_TIERS, reservedTiersFor } from './tier';
 import { TIER_PATTERN } from './types';
 import { rulesFor } from './constraints';
 import { ENV_ALIASES } from './normalize';
 import { ATTACH_KINDS } from './wizard/attachments';
-import { PRESET_TIERS } from './wizard/presets';
+import { PRESET_TIERS, presetTiersFor } from './wizard/presets';
 
 /** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대 ·
  *  AWS 서브넷 그룹 · 파라미터 그룹(RDS · ElastiCache) · IAM 정책 둘 · API Gateway 스테이지 v1 · v2 — 결정 2026-10-22) */
@@ -192,5 +192,29 @@ describe('RESERVED_TIERS — tier 로 쓸 수 없는 글자 (D60)', () => {
     const envs = Object.keys(ENV_ALIASES);
     const expected = new Set([...slugs, ...kinds, ...envs, ...regionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
     expect([...RESERVED_TIERS].sort()).toEqual([...expected].sort());
+  });
+});
+
+describe('AWS 프리셋 tier · attach 겹침 (0.2) — AWS 약어 · 종류 토큰 · AWS 리전 코드 · 환경 값', () => {
+  const awsTiers = presetTiersFor('aws');
+  const input = { tiers: awsTiers, attach: ATTACH_SUFFIXES, rows: AWS_CATALOG, regionCodes: awsRegionCodes, envValues: ENV_VALUES };
+  it('검사기 자체 — apne2 · prod · ec2 를 tier 로 넣으면 잡는다', () => {
+    expect(tierCollisions({ ...input, tiers: [...awsTiers, 'apne2', 'prod', 'ec2'] })).toEqual(['(6) region apne2: tier', '(6) env prod: tier', '(7) slug ec2: tier']);
+  });
+  it('⑹ ⑺ = 0 · tier 는 TIER_PATTERN 을 지나고 AWS 예약 목록에 없다', () => {
+    expect(awsTiers.length).toBeGreaterThan(0);
+    expect(tierCollisions(input)).toEqual([]);
+    const reserved = reservedTiersFor('aws');
+    for (const t of awsTiers) {
+      expect(TIER_PATTERN.test(t), t).toBe(true);
+      expect(reserved.has(t), t).toBe(false);
+    }
+  });
+  it('AWS 예약 목록 = AWS 약어 · 종류 토큰 · 환경 별칭 · AWS 리전 코드 · GCP 목록은 그대로', () => {
+    const slugs = AWS_CATALOG.map((r) => r.slug.value);
+    const kinds = AWS_CATALOG.flatMap((r) => Object.values(r.kind?.tokens ?? {}));
+    const expected = new Set([...slugs, ...kinds, ...Object.keys(ENV_ALIASES), ...awsRegionCodes].filter((w): w is string => typeof w === 'string' && w !== ''));
+    expect([...reservedTiersFor('aws')].sort()).toEqual([...expected].sort());
+    expect(reservedTiersFor('gcp')).toBe(RESERVED_TIERS);
   });
 });

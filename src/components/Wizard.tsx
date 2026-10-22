@@ -6,7 +6,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEve
 import { flushSync } from 'react-dom';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
-import type { Env } from '../core/types';
+import type { Env, Provider } from '../core/types';
+import { canonicalRegion } from '../core/regions';
+import { CloudPicker } from './CloudPicker';
 import { AppHeader, PLAN_FILE_BUTTON, PLAN_FILE_TEXT } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
@@ -25,10 +27,10 @@ import { WizardNames, type EnvResult } from './WizardNames';
 import { WizardOverlay } from './WizardOverlay';
 import { useWizardLayout } from './wizardLayout';
 import { IntroExample } from './IntroExample';
-import { Check, FileDown, ListChecks, X } from 'lucide-react';
+import { FileDown, ListChecks, X } from 'lucide-react';
 import { introDismissed, rememberIntroDismissed } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
-import { NOTICE, PANEL } from './wizardStyles';
+import { NOTICE, PANEL, headlineFor } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -43,7 +45,7 @@ function startFrom(hash: string, brokenAtRoot: boolean): Start {
   if (hashKind(hash) === 'wizard') {
     const d = decodeWizardState(hash);
     if (!d) return { plan: S.initialPlan(), envs: [], broken: true };
-    const plan = d.plan ?? S.initialPlan(d.project);
+    const plan = d.plan ?? S.initialPlan(d.project, d.provider);
     const envs = d.envs ?? [];
     const key = encodeWizardState(plan, VERSION.rules, envs) ?? '';
     return { plan, envs, notices: d.notices, broken: false, link: { key, hash, ...(d.rulesVersion === undefined ? {} : { rulesVersion: d.rulesVersion }) } };
@@ -109,6 +111,14 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       return { plan: next, selected: selectionAfter(o, resolveSelection(s.plan, s.selected), s.plan, next) };
     });
   };
+  /** 클라우드를 바꾼다 (0.2) — pick 은 다른 CSP 의 것이라 지운다. 고른 것이 있으면 먼저 묻는다 */
+  const onCloud = (p: Provider) => {
+    if (p !== 'gcp' && p !== 'aws') return;
+    const cur = state.plan;
+    if (cur.provider === p) return;
+    if (S.switchLoses(cur) && !window.confirm(en.ui.wizard_cloud_switch_confirm)) return;
+    edit((x) => S.switchProvider(x, p, (r) => canonicalRegion(r, p) !== undefined), { type: 'select', path: PROJECT_ROW });
+  };
   const select = (path: RowPath) => {
     refocus.current = false;
     setState((s) => ({ ...s, selected: path }));
@@ -159,17 +169,17 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     setState((s) => ({ ...s, plan: S.setProject(s.plan, { ...s.plan.project, env: next[0]! }) }));
   };
 
-  const projectParsed = useMemo(() => parseProjectContext(plan.project, 'gcp'), [plan.project]);
+  const projectParsed = useMemo(() => parseProjectContext(plan.project, plan.provider), [plan.project, plan.provider]);
   const check = useMemo(() => validatePlan(plan), [plan]);
   const planErrors: PlanError[] = check.ok ? [] : check.errors;
   const serviceErrors = useMemo(() => serviceErrorsOf(plan), [plan]);
   const ready = check.ok && projectParsed.ok && serviceErrors.every((e) => e.length === 0);
   // env 마다 같은 계획을 돌린다 (D82) — env 하나면 그 하나
-  const results = useMemo<EnvResult[] | undefined>(() => (ready ? envs.map((env) => ({ env, result: generateProject(expandPlan(withEnv(plan, env)), 'gcp') })) : undefined), [ready, plan, envs]);
+  const results = useMemo<EnvResult[] | undefined>(() => (ready ? envs.map((env) => ({ env, result: generateProject(expandPlan(withEnv(plan, env)), plan.provider) })) : undefined), [ready, plan, envs]);
   // 프로젝트 ID 접미사 (D85) — 빈 모델이면 validatePlan 이 wizard.empty 에서 멈추므로 칸의 오류는 직접 검사한다. 미리보기에는 꼴을 지난 값만 싣는다
-  const suffixErrors = useMemo(() => checkProjectIdSuffix(plan.projectIdSuffix), [plan.projectIdSuffix]);
+  const suffixErrors = useMemo(() => checkProjectIdSuffix(plan.projectIdSuffix, plan.provider), [plan.projectIdSuffix, plan.provider]);
   // 프로젝트 이름 · ID 미리보기 — 고른 것이 없어도 문맥 넷이 풀리면 보인다 · env 마다 하나. 이름은 암묵 항목이 아니다(D85) — 미리보기와 이름 칸의 표시 카드에만 나온다
-  const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, plan.projectIdSuffix)) : []), [projectParsed, envs, plan.projectIdSuffix]);
+  const previews = useMemo(() => (projectParsed.ok ? envs.map((env) => S.projectPreview({ ...projectParsed.context, env }, plan.projectIdSuffix, plan.provider)) : []), [projectParsed, envs, plan.projectIdSuffix, plan.provider]);
   const projectIds = previews.map((x) => x.id);
   const projectNames = previews.map((x) => x.name);
   // 보일 프로젝트 오류 (D97) — 손대지 않은 빈 칸은 빠진다. 목록의 오류 수 · 설정 칸 · 이름 칸 안내가 같은 값을 본다
@@ -388,7 +398,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     }
     if (sel.kind === 'card') return <CardPanel plan={plan} service={sel.service} card={sel.card} result={results?.[0]?.result} edit={edit} onSelect={select} />;
     const pick = sel.ref.service === null ? plan.projectPicks[sel.ref.pick] : plan.services[sel.ref.service]?.picks[sel.ref.pick];
-    return pick ? <PickPanel pick={pick} at={sel.ref} errors={planErrors} edit={edit} /> : null;
+    return pick ? <PickPanel pick={pick} at={sel.ref} errors={planErrors} edit={edit} provider={plan.provider} /> : null;
   })();
 
   // 넓은 화면(≥1280)은 세 칸 · 태블릿(768–1279)은 목록 · 설정 두 칸 — 높이가 고정이고 칸마다 스크롤한다(무엇을 더해도 페이지가 길어지지 않는다).
@@ -461,16 +471,10 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
           // Open plan 은 More 메뉴의 항목이다 (D104) — 같은 click 안에서 숨은 input 을 눌러 파일 고르기 창을 연다
           open: () => fileInput.current?.click(),
         }}
-        // 클라우드 (D75 · D93) — 켜진 것은 GCP 하나라 고르는 줄 대신 머리의 배지다. hash 에 provider 키가 없어 이름 · 링크는 같다
+        // 클라우드 (D75 · D93 · 0.2) — 켜진 CSP(Google Cloud · AWS)를 고르는 단추 줄. Azure 는 「Coming soon」 으로 꺼져 있다. hash 는 aws 일 때만 c 를 싣는다
         badge={(
-          // 지금 쓰는 것(진한 배지 · 체크)과 예정인 것(점선 · 흐림)을 두 배지로 나눈다 — 한 배지에 붙여 쓰면 셋 다 되는 것처럼 읽힌다
-          <span role="group" aria-label={en.ui.wizard_cloud_label} className="inline-flex flex-wrap items-center gap-1.5">
-            <span data-wizard-cloud className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
-              <Check aria-hidden="true" className="size-3" />{en.ui.wizard_cloud}
-            </span>
-            <span data-wizard-cloud-soon className="rounded-full border border-dashed border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-              {en.ui.wizard_cloud_soon}
-            </span>
+          <span role="group" aria-label={en.ui.wizard_cloud_label} data-wizard-cloud className="inline-flex flex-wrap items-center gap-1.5">
+            <CloudPicker value={plan.provider} onPick={onCloud} numbered={false} compact />
           </span>
         )}
       />
@@ -488,14 +492,15 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
             「무엇을 안 하나」는 이름 칸 아래 PASS 문단 곁에 있다 — 이름을 본 사람에게 필요한 말이다 */}
         {/* 머리글 (D113) — 무엇을 하는 도구인지 한 줄 · 무엇을 넣고 무엇을 받는지 한 줄. 소개 상자를 닫아도 남고 폰에서도 보인다(머리의 작은 부제를 대신한다) */}
         <div data-wizard-headline className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">{en.ui.headline}</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">{headlineFor(plan.provider)}</h2>
           <p data-wizard-headline-sub className="text-sm text-pretty text-zinc-600 sm:text-base dark:text-zinc-400">{en.ui.headline_sub}</p>
         </div>
         {introOpen && (
           <section data-wizard-intro aria-label={en.ui.wizard_about_label}
             className="flex items-start justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
             <div className="min-w-0 flex-1 space-y-2">
-              <IntroExample phone={layout === 'phone'} />
+              {/* 소개 예시는 GCP 계획에서 뽑은 이름이다 — AWS 계획에서는 보이지 않는다 */}
+              {plan.provider === 'gcp' && <IntroExample phone={layout === 'phone'} />}
               <p data-intro-text>
                 {en.ui.wizard_intro}{' '}
                 <a href={withStateHash(NAMING_PATH, addressHash)} data-intro-guide className="font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100">{en.ui.nav_naming_guide}</a>

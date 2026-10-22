@@ -106,12 +106,20 @@ function indexOf(entries: readonly RegionEntry[]): ReadonlyMap<string, { entry: 
 }
 const INDEX: Readonly<Record<Provider, ReturnType<typeof indexOf>>> = { gcp: indexOf(REGIONS.gcp), aws: indexOf(REGIONS.aws), azure: indexOf(REGIONS.azure) };
 
+/** AWS 존 이름(ap-northeast-2a) → 그 리전. 존은 이름에 넣지 않으므로 zone 을 남기지 않는다 — 존 글자는 옛 계정마다 위치가 달라
+ *  지역 표에 존 목록이 없다. 리전 이름 끝에 소문자 한 글자가 붙은 꼴만 받는다 */
+function awsZoneRegion(key: string): CanonicalRegion | undefined {
+  const m = /^([a-z]{2}(?:-[a-z]+)+-\d+)[a-z]$/.exec(key);
+  const hit = m ? INDEX.aws.get(m[1]!) : undefined;
+  return hit && !hit.zone ? { region: hit.entry.code } : undefined;
+}
+
 /** 지역 입력 → { region: 리전 코드 | 'global', zone?: 존 코드 }. 받지 않는 값이면 undefined */
 export function canonicalRegion(raw: string, provider: Provider): CanonicalRegion | undefined {
   const key = raw.trim().toLowerCase();
   if (key === 'global') return { region: 'global' };
   const hit = INDEX[provider].get(key);
-  if (!hit) return undefined;
+  if (!hit) return provider === 'aws' ? awsZoneRegion(key) : undefined;
   return hit.zone ? { region: hit.entry.code, zone: hit.zone.code } : { region: hit.entry.code };
 }
 

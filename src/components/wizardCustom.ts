@@ -97,7 +97,7 @@ function updateCustom(plan: WizardPlan, service: number | null, rule: ResourceRu
 export function customBlock(plan: WizardPlan, service: number | null, rule: ResourceRule, kind: string | undefined): 'full' | 'duplicate' | undefined {
   const list = listOf(plan, service);
   if (list.length >= MAX_PICKS_PER_SERVICE) return 'full';
-  if (!list.some((p) => pickRule(p)?.resourceType === rule.resourceType)) return undefined;
+  if (!list.some((p) => pickRule(p, plan.provider)?.resourceType === rule.resourceType)) return undefined;
   const input = inputKind(rule);
   const next = addCustom(plan, service, { ruleId: rule.id, input, count: 1, ...(input === 'role' ? { role: DEFAULT_ROLE } : {}), ...(kind === undefined ? {} : { kind }) });
   const at = pickPath({ service, pick: list.length });

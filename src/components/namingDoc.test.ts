@@ -20,7 +20,7 @@ const HANGUL = /\p{Script=Hangul}/u;
 
 const real: NamingDocInput = {
   provider: 'gcp', catalog: catalogFor('gcp'), regions: REGIONS.gcp, rules: treeRules(buildTree('gcp')), messages: en, version: VERSION,
-  presets: PRESETS, attachments: ATTACHMENTS, reservedTiers: RESERVED_TIERS,
+  presets: PRESETS, attachments: ATTACHMENTS.filter((a) => a.parent.startsWith('gcp.')), reservedTiers: RESERVED_TIERS,
 };
 /** 작은 입력 — catalog 3행(종류 표가 있는 subnet 하나 포함) · 리전 2개 · 그 행들의 규칙 · 프리셋 둘(묶음 둘) · 호환표 1행 · 예약어 둘 */
 const FIXTURE_KEYS = ['gcp.project_id', 'gcp.service_account', 'gcp.subnet'];

@@ -1,5 +1,5 @@
 // 마법사에서 고른 규칙 id (D71) — 계측 meta 의 재료. 순수 함수 · DOM 없음
-import { PROJECT_ID_RULE, type Pick, type WizardPlan } from '../core/wizard/plan';
+import { projectIdRuleOf, type Pick, type WizardPlan } from '../core/wizard/plan';
 import { presetOf } from '../core/wizard/presets';
 
 /** 고른 규칙 id (D71) — 칩(프리셋)은 유효 규칙(serverless 를 켜면 그 규칙), Custom 은 ruleId. 프로젝트 공용 · 서비스를 함께 센다.
@@ -11,10 +11,10 @@ export function pickedRuleIds(plan: WizardPlan): { chip: string[]; custom: strin
   const picks: readonly Pick[] = [...plan.projectPicks, ...plan.services.flatMap((s) => s.picks)];
   for (const pick of picks) {
     if (pick.preset === null) {
-      if (typeof pick.ruleId === 'string' && pick.ruleId !== PROJECT_ID_RULE) custom.add(pick.ruleId);
+      if (typeof pick.ruleId === 'string' && pick.ruleId !== projectIdRuleOf(plan.provider)) custom.add(pick.ruleId);
       continue;
     }
-    const preset = presetOf(pick.preset);
+    const preset = presetOf(pick.preset, plan.provider);
     if (!preset) continue;
     const sv = typeof pick.serverless === 'string' && preset.serverless?.ruleIds.includes(pick.serverless) ? pick.serverless : undefined;
     chip.add(sv ?? preset.ruleId);

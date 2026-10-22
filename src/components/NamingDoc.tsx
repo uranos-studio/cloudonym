@@ -63,7 +63,7 @@ export function NamingDoc() {
   const provider: Provider = 'gcp';
   const model = namingDocModel({
     provider, catalog: catalogFor(provider), regions: REGIONS[provider], rules: treeRules(buildTree(provider)), messages: en, version: VERSION,
-    presets: PRESETS, attachments: ATTACHMENTS, reservedTiers: RESERVED_TIERS,
+    presets: PRESETS, attachments: ATTACHMENTS.filter((a) => a.parent.startsWith('gcp.')), reservedTiers: RESERVED_TIERS,
   });
   return (
     <DocPage title={en.ui.doc_title}>

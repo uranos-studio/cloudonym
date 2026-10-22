@@ -2,6 +2,7 @@
 // 프리셋을 늘릴 때는 같은 꼴의 행을 더한다. 「네트워크」 · 「로드 밸런서」는 화면의 묶음(group)이고 데이터에서는 pick 하나씩이다.
 // 칩 하나는 이름 하나다. 여러 칩을 한 번에 더하는 카드는 따로 둔 표(bundles.ts · D92 · D93)이고, 카드로 더한 pick 은 칩으로 더한 pick 과 같다. Cloud NAT 와 Cloud Router 도 따로 켠다(안내 문구만 둔다)
 import type { Attachments } from '../selection';
+import type { Provider } from '../types';
 
 export interface Preset {
   /** pick 의 preset 값 */
@@ -98,9 +99,50 @@ export const PRESETS: readonly Preset[] = [
   { id: 'psa', label: 'Private services access range', ruleId: 'gcp.global_address', tier: 'psa', kind: 'INTERNAL', ha: null, serverless: null, level: 'project', group: 'network' },
 ];
 
-export function presetOf(id: string): Preset | undefined {
-  return PRESETS.find((p) => p.id === id);
+// AWS 프리셋 (0.2) — GCP 표의 같은 자리를 AWS 규칙으로 옮겼다. id 는 GCP 와 겹쳐도 된다(계획의 provider 가 표를 고른다).
+// AWS 규칙이 없는 GCP 프리셋(run · runjob · wip · bq · Pub/Sub · Cloud Build · Scheduler · psa · LB 의 URL map · 프록시 · 전달 규칙 · 인증서)은 옮기지 않는다.
+// 보안 그룹의 tier 칩에서 iap(IAP 소스 대역) · lbhc(GCP 상태 확인 대역)는 GCP 개념이라 뺐다
+const EC2 = 'aws.ec2_instance';
+const LAMBDA = { ruleIds: ['aws.lambda_function'] } as const;
+
+export const AWS_PRESETS: readonly Preset[] = [
+  { id: 'web', label: 'Web server', ruleId: EC2, tier: 'web', ha: { minInstances: 2 }, serverless: LAMBDA, level: 'service' },
+  { id: 'was', label: 'App server', ruleId: EC2, tier: 'was', ha: { minInstances: 2 }, serverless: LAMBDA, level: 'service' },
+  { id: 'bastion', label: 'Bastion', ruleId: EC2, tier: 'bastion', ha: null, serverless: null, level: 'service' },
+  { id: 'intweb', label: 'Internal web server', ruleId: EC2, tier: 'intweb', ha: { minInstances: 2 }, serverless: null, level: 'service' },
+  { id: 'intwas', label: 'Internal app server', ruleId: EC2, tier: 'intwas', ha: { minInstances: 2 }, serverless: null, level: 'service' },
+  { id: 'file', label: 'File server', ruleId: EC2, tier: 'file', ha: null, serverless: null, defaultAttach: { data: ['01'] }, level: 'service' },
+  { id: 'db', label: 'Database (RDS)', ruleId: 'aws.rds_instance', ...NONE, level: 'service' },
+  { id: 'object', label: 'Object storage', ruleId: 'aws.s3_bucket', ...NONE, level: 'service' },
+  { id: 'sa', label: 'IAM role', ruleId: 'aws.iam_role', ...NONE, level: 'service' },
+  { id: 'secret', label: 'Secret', ruleId: 'aws.secretsmanager_secret', ...NONE, level: 'service' },
+  { id: 'eks', label: 'EKS cluster', ruleId: 'aws.eks_cluster', ...NONE, level: 'service' },
+  { id: 'ecr', label: 'ECR repository', ruleId: 'aws.ecr_repository', ...NONE, level: 'service' },
+  { id: 'redis', label: 'ElastiCache replication group', ruleId: 'aws.elasticache_replication_group', ...NONE, level: 'service' },
+  { id: 'lb', label: 'Load balancer (ALB/NLB)', ruleId: 'aws.elbv2_load_balancer', ...NONE, level: 'service', group: 'lb' },
+  { id: 'tg', label: 'Target group', ruleId: 'aws.elbv2_target_group', ...NONE, level: 'service', group: 'lb' },
+  { id: 'eip', label: 'Elastic IP', ruleId: 'aws.ec2_eip', ...NONE, level: 'service', group: 'lb' },
+  { id: 'vpc', label: 'VPC', ruleId: 'aws.vpc', ...NONE, level: 'project', group: 'network' },
+  { id: 'subnet', label: 'Subnet', ruleId: 'aws.subnet', ...NONE, level: 'project', group: 'network' },
+  { id: 'firewall', label: 'Security group', ruleId: 'aws.security_group', tier: 'ssh', tierChoices: ['ssh', 'web', 'icmp', 'internal'], ha: null, serverless: null, level: 'project', group: 'network' },
+  { id: 'igw', label: 'Internet gateway', ruleId: 'aws.internet_gateway', ...NONE, level: 'project', group: 'network' },
+  { id: 'rt', label: 'Route table', ruleId: 'aws.route_table', ...NONE, level: 'project', group: 'network' },
+  { id: 'nat', label: 'NAT gateway', ruleId: 'aws.ec2_nat_gateway', ...NONE, level: 'project', group: 'network' },
+];
+
+/** provider 의 프리셋 표 — 마법사가 없는 CSP 는 빈 표 */
+export function presetsFor(provider: Provider): readonly Preset[] {
+  return provider === 'gcp' ? PRESETS : provider === 'aws' ? AWS_PRESETS : [];
 }
 
-/** 프리셋이 쓰는 tier 글자 전부 — 겹침 시험이 이 값을 센다 */
-export const PRESET_TIERS: readonly string[] = [...new Set(PRESETS.flatMap((p) => [...(p.tier === null ? [] : [p.tier]), ...(p.tierChoices ?? [])]))];
+export function presetOf(id: string, provider: Provider = 'gcp'): Preset | undefined {
+  return presetsFor(provider).find((p) => p.id === id);
+}
+
+const tiersOf = (ps: readonly Preset[]): string[] => [...new Set(ps.flatMap((p) => [...(p.tier === null ? [] : [p.tier]), ...(p.tierChoices ?? [])]))];
+/** 프리셋이 쓰는 tier 글자 전부(GCP) — 겹침 시험이 이 값을 센다 */
+export const PRESET_TIERS: readonly string[] = tiersOf(PRESETS);
+/** provider 의 프리셋 tier 글자 전부 */
+export function presetTiersFor(provider: Provider): readonly string[] {
+  return tiersOf(presetsFor(provider));
+}

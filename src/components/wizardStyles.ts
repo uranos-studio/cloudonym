@@ -1,6 +1,6 @@
 // 마법사 화면의 공용 클래스 · 표 (D89) — 목록 · 설정 · 이름 세 칸이 같이 쓴다. 컴포넌트가 아닌 값만 둔다(react-refresh)
 import { buildTree } from '../core/tree';
-import type { CoreMessage, Env, ResourceRule } from '../core/types';
+import type { CoreMessage, Env, Provider, ResourceRule } from '../core/types';
 import { treeRules } from './selection';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -37,9 +37,22 @@ export const ERR = 'text-xs text-rose-700 dark:text-rose-300';
 
 export const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
 /** 규칙 표 — 표시 이름 · 종류 표. 화면 안에서 한 번 만든다 */
-export const RULES = new Map<string, ResourceRule>(treeRules(buildTree('gcp')).map((r) => [r.id, r]));
+/** 마법사 CSP(gcp · aws)의 규칙 — id 에 CSP 접두가 있어 한 표다 */
+export const RULES = new Map<string, ResourceRule>((['gcp', 'aws'] as const).flatMap((p) => treeRules(buildTree(p))).map((r) => [r.id, r]));
 
 /** 엔진 오류 문장 — 자리에 붙여 보이므로 `picks[0]: ` · `services[1]: ` 머리는 뗀다(API 문장은 그대로다) */
 export function inline(e: CoreMessage): string {
   return format(e, en).replace(/^(?:picks|services)\[-?\d+\]: /, '');
 }
+
+/** 네트워크 칸의 CSP 별 문구 (0.2) — GCP 는 옛 문구 그대로, AWS 는 AWS 부품 이름 */
+export function networkText(provider: Provider): { resourcesHint: string; firewallTiers: string } {
+  return provider === 'aws'
+    ? { resourcesHint: en.ui.wizard_project_resources_hint_aws, firewallTiers: en.ui.wizard_firewall_tiers_aws }
+    : { resourcesHint: en.ui.wizard_project_resources_hint, firewallTiers: en.ui.wizard_firewall_tiers };
+}
+
+/** 마법사 머리글 — CSP 별 (0.2). GCP 는 옛 문구 그대로 */
+export const headlineFor = (provider: Provider): string => (provider === 'aws' ? en.ui.headline_aws : en.ui.headline);
+/** 이름 칸의 「만들지 않는다」 문장 — CSP 별 (0.2) */
+export const nothingCreatedFor = (provider: Provider): string => (provider === 'aws' ? en.ui.wizard_nothing_created_aws : en.ui.wizard_nothing_created);
