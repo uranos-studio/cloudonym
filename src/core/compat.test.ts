@@ -16,17 +16,17 @@ const CANNOT_FIT = new Set(['azure.virtual_machine_windows']);
 
 const EXPECTED: Record<string, Record<string, string>> = {
   aws: {
-    s3_bucket: 'platform-billing-trade-prod-bucket',
+    s3_bucket: 'platform-billing-trade-prod-s3',
     iam_role: 'billing-trade-prod-role-sync',
     vpc: 'billing-trade-prod-apne2-vpc-01',
-    subnet: 'billing-trade-prod-apne2-subnet-01',
-    ec2_instance: 'billing-trade-prod-apne2-vm-01',
-    rds_instance: 'billing-trade-prod-apne2-db-01',
+    subnet: 'billing-trade-prod-apne2-snet-01',
+    ec2_instance: 'billing-trade-prod-apne2-ec2-01',
+    rds_instance: 'billing-trade-prod-apne2-rds-01',
     internet_gateway: 'billing-trade-prod-apne2-igw-01',
     route_table: 'billing-trade-prod-apne2-rt-01',
     security_group: 'billing-trade-prod-apne2-sg-01',
     key_pair: 'billing-trade-prod-apne2-key-01',
-    ebs_volume: 'billing-trade-prod-apne2-vol-01',
+    ebs_volume: 'billing-trade-prod-apne2-ebs-01',
   },
   gcp: {
     project_id: 'platform-billing-trade-prod',

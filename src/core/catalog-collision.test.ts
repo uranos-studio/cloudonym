@@ -2,6 +2,7 @@
 // ⑸ 약어 ↔ 종류 토큰은 자리가 달라(…-{slug}-{kind}-…) 검사하지 않는다
 import { describe, it, expect } from 'vitest';
 import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
+import { AWS_CATALOG } from './rules/aws-catalog';
 import { LOCATIONS, REGIONS } from './regions-data';
 import { RESERVED_TIERS } from './tier';
 import { TIER_PATTERN } from './types';
@@ -10,10 +11,15 @@ import { ENV_ALIASES } from './normalize';
 import { ATTACH_KINDS } from './wizard/attachments';
 import { PRESET_TIERS } from './wizard/presets';
 
-/** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대) */
+/** 같은 약어를 나눠 쓰는 것이 의도된 행 묶음 — 같은 개념(스냅숏 둘 · 함수 1 · 2세대 ·
+ *  AWS 서브넷 그룹 · 파라미터 그룹(RDS · ElastiCache) · IAM 정책 둘 · API Gateway 스테이지 v1 · v2 — 결정 2026-10-22) */
 const SHARED_SLUGS: Record<string, readonly string[]> = {
   snap: ['gcp.region_snapshot', 'gcp.snapshot'],
   gcf: ['gcp.cloud_function', 'gcp.cloud_function_gen1'],
+  sng: ['aws.elasticache_subnet_group', 'aws.rds_db_subnet_group'],
+  pol: ['aws.iam_managed_policy', 'aws.iam_policy'],
+  pg: ['aws.elasticache_parameter_group', 'aws.rds_db_parameter_group'],
+  st: ['aws.apigw_stage', 'aws.apigwv2_stage'],
 };
 /** 한 행 안에서 여러 값이 같은 토큰을 쓰는 것이 의도된 묶음 */
 const SHARED_KIND_TOKENS: Record<string, string> = {
@@ -60,6 +66,8 @@ function collisions({ rows, regionCodes, envValues }: Input): string[] {
 
 // 멀티 · 이중 리전 코드(D78)도 지역 자리에 든다 — 약어 · 종류 토큰과 겹치면 안 된다
 const regionCodes = [...REGIONS.gcp.flatMap((r) => [r.code, ...r.zones.map((z) => z.code)]), ...LOCATIONS.gcp.map((l) => l.code)];
+/** AWS 는 리전 코드만 — 존은 이름에 넣지 않는다(결정 2026-10-22) */
+const awsRegionCodes = REGIONS.aws.map((r) => r.code);
 
 describe('환경 값 ↔ 지역 코드 (D81)', () => {
   // 환경 별칭 전부가 어느 CSP 의 리전 · 존 코드 · 멀티/이중 리전 코드와도 같은 글자가 아니다 — 이름의 env 자리와 region 자리를 읽는 사람이 헷갈리지 않게
@@ -103,9 +111,15 @@ describe('catalog 겹침 검사 (D47)', () => {
     expect(collisions({ rows: GCP_CATALOG, regionCodes, envValues: ENV_VALUES })).toEqual([]);
   });
 
+  it('AWS catalog 에 겹침이 없다 (⑴ sng · pol · pg · st 는 의도한 묶음)', () => {
+    expect(awsRegionCodes.length).toBeGreaterThan(30);
+    expect(collisions({ rows: AWS_CATALOG, regionCodes: awsRegionCodes, envValues: ENV_VALUES })).toEqual([]);
+  });
+
   it('의도한 묶음은 실제로 있다 — 없어지면 예외를 지운다', () => {
     for (const [slug, keys] of Object.entries(SHARED_SLUGS)) {
-      expect(GCP_CATALOG.filter((r) => r.slug.value === slug).map((r) => r.key).sort()).toEqual([...keys].sort());
+      const rows: readonly Pick<CatalogRow, 'key' | 'slug'>[] = keys[0]!.startsWith('aws.') ? AWS_CATALOG : GCP_CATALOG;
+      expect(rows.filter((r) => r.slug.value === slug).map((r) => r.key).sort()).toEqual([...keys].sort());
     }
     for (const [key, token] of Object.entries(SHARED_KIND_TOKENS)) {
       const row = GCP_CATALOG.find((r) => r.key === key)!;

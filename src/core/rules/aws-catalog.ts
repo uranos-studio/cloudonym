@@ -1,0 +1,5300 @@
+// 생성 파일 — 손으로 고치지 않는다. scripts/catalog/build-catalog.mjs 가 catalog/aws.json 에서 만든다 (D46).
+// 행 하나 = 화면 행 하나. 행 꼴은 gcp-catalog.ts 의 CatalogRow 에서 enterNameAt 만 다르다
+import type { CatalogRow } from './gcp-catalog';
+
+export interface AwsCatalogRow extends Omit<CatalogRow, 'enterNameAt'> {
+  enterNameAt: { awsCli: readonly string[]; terraform: readonly string[]; apiOnly: boolean; preview: boolean };
+}
+
+export const AWS_CATALOG_META = {
+  "provider": "aws",
+  "schema": 1,
+  "sources": {
+    "rules": "src/core/rules/aws.ts · aws-manual.ts · aws-intake.ts (cloudonym-aws ade60fb)",
+    "cfnSchema": "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip (2026-10-21)",
+    "status": "draft — enterNameAt.awsCli/terraform 비움(확인 못 함) · kind 전부 null(종류 토큰 조사 안 함) · info · entity 는 엔진 규칙 칸에서 만든 것(문서 대조 아님)"
+  }
+} as const;
+
+export const AWS_CATALOG: readonly AwsCatalogRow[] = [
+  {
+    "key": "aws.s3_bucket",
+    "displayName": "S3 Bucket",
+    "category": "storage",
+    "rules": {
+      "aws.s3_bucket": {
+        "scope": "namespace",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "s3",
+      "basis": "AWS CLI service name s3; \"-s3-\" 12832 vs \"-bucket-\" 12704 in aws_s3_bucket files; pairs with GCP gcs.",
+      "previous": [
+        "bucket"
+      ]
+    },
+    "entity": "s3.bucket",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 bucket",
+      "s3_bucket",
+      "bucket"
+    ]
+  },
+  {
+    "key": "aws.iam_role",
+    "displayName": "IAM Role",
+    "category": "identity",
+    "rules": {
+      "aws.iam_role": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "role",
+      "basis": "\"-role-\" 16640 vs \"-iam-\" 7808; iam names the service, not the role. Same as GCP role.",
+      "previous": []
+    },
+    "entity": "iam.role",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam role",
+      "iam_role"
+    ]
+  },
+  {
+    "key": "aws.vpc",
+    "displayName": "VPC (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.vpc": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vpc",
+      "basis": "Matches the resource name and the vpc- ID prefix; same as GCP vpc.",
+      "previous": []
+    },
+    "entity": "ec2.vpc.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "vpc"
+    ]
+  },
+  {
+    "key": "aws.subnet",
+    "displayName": "Subnet (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.subnet": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "snet",
+      "basis": "Same abbreviation as GCP snet and Azure CAF snet; sub collides with SNS/PubSub subscription.",
+      "previous": [
+        "subnet"
+      ]
+    },
+    "entity": "ec2.subnet.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "subnet"
+    ]
+  },
+  {
+    "key": "aws.ec2_instance",
+    "displayName": "EC2 Instance (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_instance": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ec2",
+      "basis": "AWS CLI service name ec2; \"-ec2-\" 8752 vs \"-vm-\" 600; pairs with GCP gce.",
+      "previous": [
+        "vm"
+      ]
+    },
+    "entity": "ec2.instance.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 instance",
+      "ec2_instance",
+      "vm"
+    ]
+  },
+  {
+    "key": "aws.rds_instance",
+    "displayName": "RDS DB Instance",
+    "category": "database",
+    "rules": {
+      "aws.rds_instance": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rds",
+      "basis": "AWS CLI service name rds; \"-rds-\" 9712 vs \"-db-\" 12896, but 2-letter db also appears in 4128 unrelated aws_s3_bucket files. Pairs with GCP sql (product name).",
+      "previous": [
+        "db"
+      ]
+    },
+    "entity": "rds.dbInstance",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db instance",
+      "rds_instance",
+      "db"
+    ]
+  },
+  {
+    "key": "aws.internet_gateway",
+    "displayName": "Internet Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.internet_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "igw",
+      "basis": "Matches the igw- ID prefix; \"-igw-\" 1952 vs \"-ig-\" 123.",
+      "previous": []
+    },
+    "entity": "ec2.internetGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "internet gateway",
+      "internet_gateway"
+    ]
+  },
+  {
+    "key": "aws.route_table",
+    "displayName": "Route Table (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.route_table": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rt",
+      "basis": "\"-rt-\" 8464 vs \"-rtb-\" 1204 (rtb- is the ID prefix).",
+      "previous": []
+    },
+    "entity": "ec2.routeTable.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "route table",
+      "route_table"
+    ]
+  },
+  {
+    "key": "aws.security_group",
+    "displayName": "Security Group",
+    "category": "networking",
+    "rules": {
+      "aws.security_group": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sg",
+      "basis": "Matches the sg- ID prefix; \"-sg-\" 9840 vs \"-secgrp-\" 31.",
+      "previous": []
+    },
+    "entity": "ec2.securityGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "security group",
+      "security_group"
+    ]
+  },
+  {
+    "key": "aws.key_pair",
+    "displayName": "EC2 Key Pair",
+    "category": "compute",
+    "rules": {
+      "aws.key_pair": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "key",
+      "basis": "\"-key-\" 3420 vs \"-keypair-\" 182 vs \"-kp-\" 36 in aws_key_pair files.",
+      "previous": []
+    },
+    "entity": "ec2.keyPair",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 key pair",
+      "key_pair"
+    ]
+  },
+  {
+    "key": "aws.ebs_volume",
+    "displayName": "EBS Volume (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.ebs_volume": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ebs",
+      "basis": "Product name EBS; \"-ebs-\" 630 vs \"-vol-\" 150 vs \"-disk-\" 53.",
+      "previous": [
+        "vol"
+      ]
+    },
+    "entity": "ec2.volume.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ebs volume",
+      "ebs_volume",
+      "vol"
+    ]
+  },
+  {
+    "key": "aws.ec2_launch_template",
+    "displayName": "EC2 Launch Template",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_launch_template": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lt",
+      "basis": "Matches the lt- launch template ID prefix.",
+      "previous": []
+    },
+    "entity": "ec2.LaunchTemplate",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 launch template",
+      "ec2_launch_template"
+    ]
+  },
+  {
+    "key": "aws.elb_load_balancer",
+    "displayName": "ElasticLoadBalancing Load Balancer",
+    "category": "networking",
+    "rules": {
+      "aws.elb_load_balancer": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "clb",
+      "basis": "Classic Load Balancer, the product name AWS uses for ELB v1.",
+      "previous": []
+    },
+    "entity": "elasticloadbalancing.LoadBalancer",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 32 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancing load balancer",
+      "elb_load_balancer"
+    ]
+  },
+  {
+    "key": "aws.elbv2_load_balancer",
+    "displayName": "ElasticLoadBalancingV2 Load Balancer",
+    "category": "networking",
+    "rules": {
+      "aws.elbv2_load_balancer": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lb",
+      "basis": "One rule covers ALB, NLB and GWLB; \"-alb-\" 11488 vs \"-lb-\" 3840, but alb would misname an NLB.",
+      "previous": []
+    },
+    "entity": "elasticloadbalancingv2.LoadBalancer",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 32 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancingv2 load balancer",
+      "elbv2_load_balancer"
+    ]
+  },
+  {
+    "key": "aws.elbv2_target_group",
+    "displayName": "ElasticLoadBalancingV2 Target Group",
+    "category": "networking",
+    "rules": {
+      "aws.elbv2_target_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tg",
+      "basis": "\"-tg-\" 3792 vs \"-tgt-\" 10.",
+      "previous": []
+    },
+    "entity": "elasticloadbalancingv2.TargetGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 32 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancingv2 target group",
+      "elbv2_target_group"
+    ]
+  },
+  {
+    "key": "aws.elbv2_trust_store",
+    "displayName": "ElasticLoadBalancingV2 Trust Store",
+    "category": "networking",
+    "rules": {
+      "aws.elbv2_trust_store": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "trst",
+      "basis": "TRuST store; \"-trust-\" 11 vs \"-ts-\" 1.",
+      "previous": [
+        "ts"
+      ]
+    },
+    "entity": "elasticloadbalancingv2.TrustStore",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 32 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancingv2 trust store",
+      "elbv2_trust_store",
+      "ts"
+    ]
+  },
+  {
+    "key": "aws.s3_storage_lens_group",
+    "displayName": "S3 Storage Lens Group",
+    "category": "storage",
+    "rules": {
+      "aws.s3_storage_lens_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "slg",
+      "basis": "Initials of Storage Lens Group.",
+      "previous": []
+    },
+    "entity": "s3.StorageLensGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 storage lens group",
+      "s3_storage_lens_group"
+    ]
+  },
+  {
+    "key": "aws.dynamodb_global_table",
+    "displayName": "DynamoDB Global Table",
+    "category": "database",
+    "rules": {
+      "aws.dynamodb_global_table": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "gt",
+      "basis": "Initials of Global Table.",
+      "previous": []
+    },
+    "entity": "dynamodb.GlobalTable",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "dynamodb global table",
+      "dynamodb_global_table"
+    ]
+  },
+  {
+    "key": "aws.dynamodb_table",
+    "displayName": "DynamoDB Table",
+    "category": "database",
+    "rules": {
+      "aws.dynamodb_table": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ddb",
+      "basis": "\"-ddb-\" 151 vs \"-tbl-\" 1 (dynamo 230 has 6 letters).",
+      "previous": [
+        "tbl"
+      ]
+    },
+    "entity": "dynamodb.Table",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "dynamodb table",
+      "dynamodb_table",
+      "tbl"
+    ]
+  },
+  {
+    "key": "aws.elasticache_cache_cluster",
+    "displayName": "ElastiCache Cache Cluster",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_cache_cluster": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ecc",
+      "basis": "ElastiCache Cluster, engine-neutral (Redis, Valkey or Memcached); \"-redis-\" 1332 vs \"-cache-\" 476 vs \"-cc-\" 0.",
+      "previous": [
+        "cc"
+      ]
+    },
+    "entity": "elasticache.CacheCluster",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 50 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache cache cluster",
+      "elasticache_cache_cluster",
+      "cc"
+    ]
+  },
+  {
+    "key": "aws.elasticache_replication_group",
+    "displayName": "ElastiCache Replication Group",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_replication_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ecrg",
+      "basis": "ElastiCache Replication Group, engine-neutral (Redis OSS or Valkey); \"-redis-\" 2104 vs \"-valkey-\" 84 vs \"-rg-\" 5.",
+      "previous": [
+        "rg"
+      ]
+    },
+    "entity": "elasticache.ReplicationGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 40 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache replication group",
+      "elasticache_replication_group",
+      "rg"
+    ]
+  },
+  {
+    "key": "aws.elasticache_subnet_group",
+    "displayName": "ElastiCache Subnet Group",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_subnet_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sng",
+      "basis": "SubNet Group; shared with the RDS DB subnet group (same concept).",
+      "previous": []
+    },
+    "entity": "elasticache.SubnetGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache subnet group",
+      "elasticache_subnet_group"
+    ]
+  },
+  {
+    "key": "aws.rds_db_subnet_group",
+    "displayName": "RDS DB Subnet Group",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_subnet_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sng",
+      "basis": "SubNet Group; shared with the ElastiCache subnet group (same concept).",
+      "previous": []
+    },
+    "entity": "rds.DBSubnetGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db subnet group",
+      "rds_db_subnet_group"
+    ]
+  },
+  {
+    "key": "aws.rds_option_group",
+    "displayName": "RDS Option Group",
+    "category": "database",
+    "rules": {
+      "aws.rds_option_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "og",
+      "basis": "Initials of Option Group.",
+      "previous": []
+    },
+    "entity": "rds.OptionGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds option group",
+      "rds_option_group"
+    ]
+  },
+  {
+    "key": "aws.rds_db_parameter_group",
+    "displayName": "RDS DB Parameter Group",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_parameter_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pg",
+      "basis": "\"-pg-\" 373 vs \"-params-\" 144 vs \"-dbpg-\" 3; shared with the ElastiCache parameter group.",
+      "previous": []
+    },
+    "entity": "rds.DBParameterGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db parameter group",
+      "rds_db_parameter_group"
+    ]
+  },
+  {
+    "key": "aws.rds_db_proxy",
+    "displayName": "RDS DB Proxy",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_proxy": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "prx",
+      "basis": "Short form of proxy.",
+      "previous": []
+    },
+    "entity": "rds.DBProxy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db proxy",
+      "rds_db_proxy"
+    ]
+  },
+  {
+    "key": "aws.rds_db_proxy_endpoint",
+    "displayName": "RDS DB Proxy Endpoint",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_proxy_endpoint": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pe",
+      "basis": "Initials of Proxy Endpoint.",
+      "previous": []
+    },
+    "entity": "rds.DBProxyEndpoint",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db proxy endpoint",
+      "rds_db_proxy_endpoint"
+    ]
+  },
+  {
+    "key": "aws.rds_integration",
+    "displayName": "RDS Integration",
+    "category": "database",
+    "rules": {
+      "aws.rds_integration": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rdsi",
+      "basis": "RDS Integration; int reads as integer/internal and was shared with the Logs integration.",
+      "previous": [
+        "int"
+      ]
+    },
+    "entity": "rds.Integration",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds integration",
+      "rds_integration",
+      "int"
+    ]
+  },
+  {
+    "key": "aws.ecs_capacity_provider",
+    "displayName": "ECS Capacity Provider",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_capacity_provider": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cp",
+      "basis": "\"-cp-\" 16 in aws_ecs_capacity_provider.",
+      "previous": []
+    },
+    "entity": "ecs.CapacityProvider",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs capacity provider",
+      "ecs_capacity_provider"
+    ]
+  },
+  {
+    "key": "aws.ecs_cluster",
+    "displayName": "ECS Cluster",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_cluster": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ecs",
+      "basis": "AWS CLI service name ecs; the cluster is the top-level ECS resource.",
+      "previous": []
+    },
+    "entity": "ecs.Cluster",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs cluster",
+      "ecs_cluster"
+    ]
+  },
+  {
+    "key": "aws.ecs_daemon",
+    "displayName": "ECS Daemon",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_daemon": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dmn",
+      "basis": "Short form of daemon.",
+      "previous": []
+    },
+    "entity": "ecs.Daemon",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs daemon",
+      "ecs_daemon"
+    ]
+  },
+  {
+    "key": "aws.ecs_daemon_task_definition",
+    "displayName": "ECS Daemon Task Definition",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_daemon_task_definition": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dtd",
+      "basis": "Initials of Daemon Task Definition.",
+      "previous": []
+    },
+    "entity": "ecs.DaemonTaskDefinition",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs daemon task definition",
+      "ecs_daemon_task_definition"
+    ]
+  },
+  {
+    "key": "aws.ecs_express_gateway_service",
+    "displayName": "ECS Express Gateway Service",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_express_gateway_service": {
+        "scope": "in ecs_cluster",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "egs",
+      "basis": "Initials of Express Gateway Service.",
+      "previous": []
+    },
+    "entity": "ecs.ExpressGatewayService",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs express gateway service",
+      "ecs_express_gateway_service"
+    ]
+  },
+  {
+    "key": "aws.ecs_service",
+    "displayName": "ECS Service",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_service": {
+        "scope": "in ecs_cluster",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "svc",
+      "basis": "Common short form of service.",
+      "previous": []
+    },
+    "entity": "ecs.Service",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs service",
+      "ecs_service"
+    ]
+  },
+  {
+    "key": "aws.ecs_task_definition",
+    "displayName": "ECS Task Definition",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_task_definition": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "td",
+      "basis": "Initials of Task Definition.",
+      "previous": []
+    },
+    "entity": "ecs.TaskDefinition",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs task definition",
+      "ecs_task_definition"
+    ]
+  },
+  {
+    "key": "aws.eks_nodegroup",
+    "displayName": "EKS Nodegroup",
+    "category": "containers",
+    "rules": {
+      "aws.eks_nodegroup": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ng",
+      "basis": "\"-ng-\" 1472 vs \"-nodes-\" 906.",
+      "previous": []
+    },
+    "entity": "eks.Nodegroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "eks nodegroup",
+      "eks_nodegroup"
+    ]
+  },
+  {
+    "key": "aws.apigw_stage",
+    "displayName": "ApiGateway Stage",
+    "category": "compute",
+    "rules": {
+      "aws.apigw_stage": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "st",
+      "basis": "STage; stage and stg are environment words.",
+      "previous": [
+        "stage"
+      ]
+    },
+    "entity": "apigateway.Stage",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "apigateway stage",
+      "apigw_stage",
+      "stage"
+    ]
+  },
+  {
+    "key": "aws.apigwv2_stage",
+    "displayName": "ApiGatewayV2 Stage",
+    "category": "compute",
+    "rules": {
+      "aws.apigwv2_stage": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "st",
+      "basis": "STage; shared with the API Gateway v1 stage (same concept).",
+      "previous": [
+        "stage"
+      ]
+    },
+    "entity": "apigatewayv2.Stage",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "apigatewayv2 stage",
+      "apigwv2_stage",
+      "stage"
+    ]
+  },
+  {
+    "key": "aws.lambda_alias",
+    "displayName": "Lambda Alias",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_alias": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "als",
+      "basis": "ALiaS; \"-alias-\" 23 vs \"-la-\" 1 vs \"-als-\" 0.",
+      "previous": [
+        "alias"
+      ]
+    },
+    "entity": "lambda.Alias",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda alias",
+      "lambda_alias",
+      "alias"
+    ]
+  },
+  {
+    "key": "aws.lambda_function",
+    "displayName": "Lambda Function",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_function": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lambda",
+      "basis": "AWS CLI service name lambda; \"-lambda-\" 13152 vs \"-fn-\" 54.",
+      "previous": [
+        "fn"
+      ]
+    },
+    "entity": "lambda.Function",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda function",
+      "lambda_function",
+      "fn"
+    ]
+  },
+  {
+    "key": "aws.lambda_network_connector",
+    "displayName": "Lambda Network Connector",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_network_connector": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nc",
+      "basis": "Initials of Network Connector.",
+      "previous": []
+    },
+    "entity": "lambda.NetworkConnector",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda network connector",
+      "lambda_network_connector"
+    ]
+  },
+  {
+    "key": "aws.lambda_capacity_provider",
+    "displayName": "Lambda Capacity Provider",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_capacity_provider": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lcp",
+      "basis": "Lambda Capacity Provider.",
+      "previous": [
+        "cp"
+      ]
+    },
+    "entity": "lambda.CapacityProvider",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 140 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda capacity provider",
+      "lambda_capacity_provider",
+      "cp"
+    ]
+  },
+  {
+    "key": "aws.iam_group",
+    "displayName": "IAM Group",
+    "category": "identity",
+    "rules": {
+      "aws.iam_group": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "grp",
+      "basis": "Common short form of group.",
+      "previous": []
+    },
+    "entity": "iam.Group",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam group",
+      "iam_group"
+    ]
+  },
+  {
+    "key": "aws.iam_group_policy",
+    "displayName": "IAM Group Policy",
+    "category": "identity",
+    "rules": {
+      "aws.iam_group_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "gp",
+      "basis": "Group Policy; parallel to rp (role policy) and up (user policy).",
+      "previous": []
+    },
+    "entity": "iam.GroupPolicy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam group policy",
+      "iam_group_policy"
+    ]
+  },
+  {
+    "key": "aws.iam_instance_profile",
+    "displayName": "IAM Instance Profile",
+    "category": "identity",
+    "rules": {
+      "aws.iam_instance_profile": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "prof",
+      "basis": "\"-profile-\" 2134 vs \"-ip-\" 137; ip was shared with the IPAM pool and reads as an IP address.",
+      "previous": [
+        "ip"
+      ]
+    },
+    "entity": "iam.InstanceProfile",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam instance profile",
+      "iam_instance_profile",
+      "ip"
+    ]
+  },
+  {
+    "key": "aws.iam_policy",
+    "displayName": "IAM Policy (inline)",
+    "category": "identity",
+    "rules": {
+      "aws.iam_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "pol",
+      "basis": "Short form of policy; shared with the IAM managed policy (same concept).",
+      "previous": []
+    },
+    "entity": "iam.Policy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam policy inline",
+      "iam_policy"
+    ]
+  },
+  {
+    "key": "aws.iam_managed_policy",
+    "displayName": "IAM Managed Policy",
+    "category": "identity",
+    "rules": {
+      "aws.iam_managed_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "pol",
+      "basis": "Short form of policy; shared with the IAM inline policy (same concept).",
+      "previous": []
+    },
+    "entity": "iam.ManagedPolicy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam managed policy",
+      "iam_managed_policy"
+    ]
+  },
+  {
+    "key": "aws.iam_role_policy",
+    "displayName": "IAM Role Policy",
+    "category": "identity",
+    "rules": {
+      "aws.iam_role_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "rp",
+      "basis": "Role Policy; parallel to gp (group policy) and up (user policy).",
+      "previous": []
+    },
+    "entity": "iam.RolePolicy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam role policy",
+      "iam_role_policy"
+    ]
+  },
+  {
+    "key": "aws.iam_user",
+    "displayName": "IAM User",
+    "category": "identity",
+    "rules": {
+      "aws.iam_user": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "usr",
+      "basis": "Common short form of user.",
+      "previous": []
+    },
+    "entity": "iam.User",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam user",
+      "iam_user"
+    ]
+  },
+  {
+    "key": "aws.iam_user_policy",
+    "displayName": "IAM User Policy",
+    "category": "identity",
+    "rules": {
+      "aws.iam_user_policy": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "up",
+      "basis": "User Policy; parallel to gp and rp.",
+      "previous": []
+    },
+    "entity": "iam.UserPolicy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam user policy",
+      "iam_user_policy"
+    ]
+  },
+  {
+    "key": "aws.secretsmanager_secret",
+    "displayName": "SecretsManager Secret",
+    "category": "security",
+    "rules": {
+      "aws.secretsmanager_secret": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "secret",
+      "basis": "\"-secret-\" 2664 vs \"-sm-\" 33 vs \"-sec-\" 26.",
+      "previous": []
+    },
+    "entity": "secretsmanager.Secret",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "secretsmanager secret",
+      "secretsmanager_secret"
+    ]
+  },
+  {
+    "key": "aws.logs_log_stream",
+    "displayName": "Logs Log Stream",
+    "category": "management",
+    "rules": {
+      "aws.logs_log_stream": {
+        "scope": "in log_group",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ls",
+      "basis": "Initials of Log Stream.",
+      "previous": []
+    },
+    "entity": "logs.LogStream",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs log stream",
+      "logs_log_stream"
+    ]
+  },
+  {
+    "key": "aws.logs_subscription_filter",
+    "displayName": "Logs Subscription Filter",
+    "category": "management",
+    "rules": {
+      "aws.logs_subscription_filter": {
+        "scope": "in log_group",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sf",
+      "basis": "Subscription Filter initials; unique once the spot fleet uses spot.",
+      "previous": []
+    },
+    "entity": "logs.SubscriptionFilter",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs subscription filter",
+      "logs_subscription_filter"
+    ]
+  },
+  {
+    "key": "aws.apigw_client_certificate",
+    "displayName": "ApiGateway Client Certificate (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.apigw_client_certificate": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cc",
+      "basis": "Initials of Client Certificate; unique once the cache cluster moves to cache.",
+      "previous": []
+    },
+    "entity": "apigateway.ClientCertificate.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "apigateway client certificate",
+      "apigw_client_certificate"
+    ]
+  },
+  {
+    "key": "aws.apigw_domain_name_access_association",
+    "displayName": "ApiGateway Domain Name Access Association (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.apigw_domain_name_access_association": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dnaa",
+      "basis": "Initials of Domain Name Access Association; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "apigateway.DomainNameAccessAssociation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "apigateway domain name access association",
+      "apigw_domain_name_access_association"
+    ]
+  },
+  {
+    "key": "aws.apigwv2_portal_product",
+    "displayName": "ApiGatewayV2 Portal Product (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.apigwv2_portal_product": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pp",
+      "basis": "Initials of Portal Product; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "apigatewayv2.PortalProduct.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "apigatewayv2 portal product",
+      "apigwv2_portal_product"
+    ]
+  },
+  {
+    "key": "aws.ec2_application_status_check",
+    "displayName": "EC2 Application Status Check (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_application_status_check": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "asc",
+      "basis": "Initials of Application Status Check; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.ApplicationStatusCheck.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 application status check",
+      "ec2_application_status_check"
+    ]
+  },
+  {
+    "key": "aws.ec2_capacity_manager_data_export",
+    "displayName": "EC2 Capacity Manager Data Export (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_capacity_manager_data_export": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cmde",
+      "basis": "Initials of Capacity Manager Data Export; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.CapacityManagerDataExport.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 capacity manager data export",
+      "ec2_capacity_manager_data_export"
+    ]
+  },
+  {
+    "key": "aws.ec2_capacity_reservation",
+    "displayName": "EC2 Capacity Reservation (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_capacity_reservation": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cr",
+      "basis": "Matches the cr- ID prefix; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.CapacityReservation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 capacity reservation",
+      "ec2_capacity_reservation"
+    ]
+  },
+  {
+    "key": "aws.ec2_capacity_reservation_fleet",
+    "displayName": "EC2 Capacity Reservation Fleet (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_capacity_reservation_fleet": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "crf",
+      "basis": "Capacity Reservation Fleet; follows cr.",
+      "previous": []
+    },
+    "entity": "ec2.CapacityReservationFleet.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 capacity reservation fleet",
+      "ec2_capacity_reservation_fleet"
+    ]
+  },
+  {
+    "key": "aws.ec2_carrier_gateway",
+    "displayName": "EC2 Carrier Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_carrier_gateway": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cagw",
+      "basis": "Matches the cagw- ID prefix; cg was shared with the customer gateway.",
+      "previous": [
+        "cg"
+      ]
+    },
+    "entity": "ec2.CarrierGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 carrier gateway",
+      "ec2_carrier_gateway",
+      "cg"
+    ]
+  },
+  {
+    "key": "aws.ec2_client_vpn_endpoint",
+    "displayName": "EC2 Client VPN Endpoint (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_client_vpn_endpoint": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cvpn",
+      "basis": "Matches the cvpn-endpoint- ID prefix; cve reads as a vulnerability ID.",
+      "previous": [
+        "cve"
+      ]
+    },
+    "entity": "ec2.ClientVpnEndpoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 client vpn endpoint",
+      "ec2_client_vpn_endpoint",
+      "cve"
+    ]
+  },
+  {
+    "key": "aws.ec2_customer_gateway",
+    "displayName": "EC2 Customer Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_customer_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cgw",
+      "basis": "Matches the cgw- ID prefix; \"-cgw-\" 69 vs \"-cg-\" 0.",
+      "previous": [
+        "cg"
+      ]
+    },
+    "entity": "ec2.CustomerGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 customer gateway",
+      "ec2_customer_gateway",
+      "cg"
+    ]
+  },
+  {
+    "key": "aws.ec2_dhcp_options",
+    "displayName": "EC2 DHCP Options (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_dhcp_options": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dhcp",
+      "basis": "\"-dhcp-\" 203 vs \"-do-\" 15 vs \"-dopt-\" 2.",
+      "previous": [
+        "do"
+      ]
+    },
+    "entity": "ec2.DHCPOptions.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 dhcp options",
+      "ec2_dhcp_options",
+      "do"
+    ]
+  },
+  {
+    "key": "aws.ec2_ec2_fleet",
+    "displayName": "EC2 EC2 Fleet (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_ec2_fleet": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ef",
+      "basis": "EC2 Fleet initials; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.EC2Fleet.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ec2 fleet",
+      "ec2_ec2_fleet"
+    ]
+  },
+  {
+    "key": "aws.ec2_eip",
+    "displayName": "EC2 EIP (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_eip": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "eip",
+      "basis": "\"-eip-\" 6528 vs \"-ip-\" 563.",
+      "previous": []
+    },
+    "entity": "ec2.EIP.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 eip",
+      "ec2_eip"
+    ]
+  },
+  {
+    "key": "aws.ec2_egress_only_internet_gateway",
+    "displayName": "EC2 Egress Only Internet Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_egress_only_internet_gateway": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "eigw",
+      "basis": "Matches the eigw- ID prefix; \"-eigw-\" 5 vs \"-eoig-\" 1.",
+      "previous": [
+        "eoig"
+      ]
+    },
+    "entity": "ec2.EgressOnlyInternetGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 egress only internet gateway",
+      "ec2_egress_only_internet_gateway",
+      "eoig"
+    ]
+  },
+  {
+    "key": "aws.ec2_flow_log",
+    "displayName": "EC2 Flow Log (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_flow_log": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "flow",
+      "basis": "\"-flow-\" 3560 vs \"-flowlog-\" 108 vs \"-fl-\" 1.",
+      "previous": [
+        "fl"
+      ]
+    },
+    "entity": "ec2.FlowLog.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 flow log",
+      "ec2_flow_log",
+      "fl"
+    ]
+  },
+  {
+    "key": "aws.ec2_host",
+    "displayName": "EC2 Host (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_host": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "host",
+      "basis": "\"-host-\" 12 vs \"-hos-\" 0; hos is a bare truncation.",
+      "previous": [
+        "hos"
+      ]
+    },
+    "entity": "ec2.Host.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 host",
+      "ec2_host",
+      "hos"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam",
+    "displayName": "EC2 IPAM (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ipam",
+      "basis": "Product name IPAM; \"-ipam-\" 43 vs \"-ipa-\" 0.",
+      "previous": [
+        "ipa"
+      ]
+    },
+    "entity": "ec2.IPAM.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam",
+      "ec2_ipam",
+      "ipa"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_pool",
+    "displayName": "EC2 IPAM Pool (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_pool": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pool",
+      "basis": "\"-pool-\" 35 vs \"-ip-\" 0; ip was shared with the IAM instance profile and reads as an IP address.",
+      "previous": [
+        "ip"
+      ]
+    },
+    "entity": "ec2.IPAMPool.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam pool",
+      "ec2_ipam_pool",
+      "ip"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_prefix_list_resolver",
+    "displayName": "EC2 IPAM Prefix List Resolver (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_prefix_list_resolver": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "iplr",
+      "basis": "Initials of IPAM Prefix List Resolver; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.IPAMPrefixListResolver.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam prefix list resolver",
+      "ec2_ipam_prefix_list_resolver"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_prefix_list_resolver_target",
+    "displayName": "EC2 IPAM Prefix List Resolver Target (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_prefix_list_resolver_target": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "iplt",
+      "basis": "Initials of IPAM Prefix List resolver Target, kept within 4 characters.",
+      "previous": [
+        "iplrt"
+      ]
+    },
+    "entity": "ec2.IPAMPrefixListResolverTarget.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam prefix list resolver target",
+      "ec2_ipam_prefix_list_resolver_target",
+      "iplrt"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_resource_discovery",
+    "displayName": "EC2 IPAM Resource Discovery (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_resource_discovery": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ird",
+      "basis": "Initials of IPAM Resource Discovery; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.IPAMResourceDiscovery.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam resource discovery",
+      "ec2_ipam_resource_discovery"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_resource_discovery_association",
+    "displayName": "EC2 IPAM Resource Discovery Association (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_resource_discovery_association": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "irda",
+      "basis": "Initials of IPAM Resource Discovery Association; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.IPAMResourceDiscoveryAssociation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam resource discovery association",
+      "ec2_ipam_resource_discovery_association"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_scope",
+    "displayName": "EC2 IPAM Scope (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_scope": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "is",
+      "basis": "Initials of IPAM Scope; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.IPAMScope.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam scope",
+      "ec2_ipam_scope"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipv4_pool",
+    "displayName": "EC2 IPv4 Pool (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipv4_pool": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ipp",
+      "basis": "Initials of IPv4 Pool (public IPv4 pool); unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.IPv4Pool.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipv4 pool",
+      "ec2_ipv4_pool"
+    ]
+  },
+  {
+    "key": "aws.ec2_instance_connect_endpoint",
+    "displayName": "EC2 Instance Connect Endpoint (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_instance_connect_endpoint": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "eice",
+      "basis": "Matches the eice- ID prefix; \"-eice-\" 24 vs \"-ice-\" 3.",
+      "previous": [
+        "ice"
+      ]
+    },
+    "entity": "ec2.InstanceConnectEndpoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 instance connect endpoint",
+      "ec2_instance_connect_endpoint",
+      "ice"
+    ]
+  },
+  {
+    "key": "aws.ec2_ipam_ext_resource_verif_token",
+    "displayName": "EC2 Ipam External Resource Verification Token (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_ipam_ext_resource_verif_token": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ivt",
+      "basis": "Initials of IPAM Verification Token, kept within 3 characters.",
+      "previous": [
+        "iervt"
+      ]
+    },
+    "entity": "ec2.IpamExternalResourceVerificationToken.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 ipam external resource verification token",
+      "ec2_ipam_ext_resource_verif_token",
+      "iervt"
+    ]
+  },
+  {
+    "key": "aws.ec2_local_gateway_route_table",
+    "displayName": "EC2 Local Gateway Route Table (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_local_gateway_route_table": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgrt",
+      "basis": "Local Gateway Route Table; lgw- and lgw-rtb- are the ID prefixes.",
+      "previous": []
+    },
+    "entity": "ec2.LocalGatewayRouteTable.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 local gateway route table",
+      "ec2_local_gateway_route_table"
+    ]
+  },
+  {
+    "key": "aws.ec2_local_gw_route_table_vpc_assoc",
+    "displayName": "EC2 Local Gateway Route Table VPC Association (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_local_gw_route_table_vpc_assoc": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgva",
+      "basis": "Local Gateway route table VPC Association, kept within 4 characters.",
+      "previous": [
+        "lgrtva"
+      ]
+    },
+    "entity": "ec2.LocalGatewayRouteTableVPCAssociation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 local gateway route table vpc association",
+      "ec2_local_gw_route_table_vpc_assoc",
+      "lgrtva"
+    ]
+  },
+  {
+    "key": "aws.ec2_lgrtviga",
+    "displayName": "EC2 Local Gateway Route Table Virtual Interface Group Association (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_lgrtviga": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgga",
+      "basis": "Local Gateway route table virtual interface Group Association, kept within 4 characters.",
+      "previous": [
+        "lgrtviga"
+      ]
+    },
+    "entity": "ec2.LocalGatewayRouteTableVirtualInterfaceGroupAssociation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 local gateway route table virtual interface group association",
+      "ec2_lgrtviga",
+      "lgrtviga"
+    ]
+  },
+  {
+    "key": "aws.ec2_local_gateway_virtual_interface",
+    "displayName": "EC2 Local Gateway Virtual Interface (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_local_gateway_virtual_interface": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgvi",
+      "basis": "Local Gateway Virtual Interface.",
+      "previous": []
+    },
+    "entity": "ec2.LocalGatewayVirtualInterface.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 local gateway virtual interface",
+      "ec2_local_gateway_virtual_interface"
+    ]
+  },
+  {
+    "key": "aws.ec2_local_gw_virt_iface_group",
+    "displayName": "EC2 Local Gateway Virtual Interface Group (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_local_gw_virt_iface_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgvg",
+      "basis": "Local Gateway Virtual interface Group, kept within 4 characters.",
+      "previous": [
+        "lgvig"
+      ]
+    },
+    "entity": "ec2.LocalGatewayVirtualInterfaceGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 local gateway virtual interface group",
+      "ec2_local_gw_virt_iface_group",
+      "lgvig"
+    ]
+  },
+  {
+    "key": "aws.ec2_nat_gateway",
+    "displayName": "EC2 NAT Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_nat_gateway": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nat",
+      "basis": "\"-nat-\" 15456 vs \"-natgw-\" 546 vs \"-ngw-\" 482 vs \"-ng-\" 112; same as GCP nat.",
+      "previous": [
+        "ng"
+      ]
+    },
+    "entity": "ec2.NatGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 nat gateway",
+      "ec2_nat_gateway",
+      "ng"
+    ]
+  },
+  {
+    "key": "aws.ec2_network_acl",
+    "displayName": "EC2 Network ACL (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_network_acl": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nacl",
+      "basis": "\"-nacl-\" 192 vs \"-acl-\" 114 vs \"-na-\" 0.",
+      "previous": [
+        "na"
+      ]
+    },
+    "entity": "ec2.NetworkAcl.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network acl",
+      "ec2_network_acl",
+      "na"
+    ]
+  },
+  {
+    "key": "aws.ec2_network_insights_access_scope",
+    "displayName": "EC2 Network Insights Access Scope (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_network_insights_access_scope": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nias",
+      "basis": "Initials of Network Insights Access Scope.",
+      "previous": []
+    },
+    "entity": "ec2.NetworkInsightsAccessScope.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network insights access scope",
+      "ec2_network_insights_access_scope"
+    ]
+  },
+  {
+    "key": "aws.ec2_net_insights_access_scope_analysis",
+    "displayName": "EC2 Network Insights Access Scope Analysis (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_net_insights_access_scope_analysis": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nisa",
+      "basis": "Network Insights access Scope Analysis, kept within 4 characters.",
+      "previous": [
+        "niasa"
+      ]
+    },
+    "entity": "ec2.NetworkInsightsAccessScopeAnalysis.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network insights access scope analysis",
+      "ec2_net_insights_access_scope_analysis",
+      "niasa"
+    ]
+  },
+  {
+    "key": "aws.ec2_network_insights_analysis",
+    "displayName": "EC2 Network Insights Analysis (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_network_insights_analysis": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nia",
+      "basis": "Initials of Network Insights Analysis.",
+      "previous": []
+    },
+    "entity": "ec2.NetworkInsightsAnalysis.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network insights analysis",
+      "ec2_network_insights_analysis"
+    ]
+  },
+  {
+    "key": "aws.ec2_network_insights_path",
+    "displayName": "EC2 Network Insights Path (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_network_insights_path": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "nip",
+      "basis": "Initials of Network Insights Path.",
+      "previous": []
+    },
+    "entity": "ec2.NetworkInsightsPath.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network insights path",
+      "ec2_network_insights_path"
+    ]
+  },
+  {
+    "key": "aws.ec2_network_interface",
+    "displayName": "EC2 Network Interface (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_network_interface": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "eni",
+      "basis": "Matches the eni- ID prefix; \"-eni-\" 114 vs \"-nic-\" 65 vs \"-ni-\" 41.",
+      "previous": [
+        "ni"
+      ]
+    },
+    "entity": "ec2.NetworkInterface.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 network interface",
+      "ec2_network_interface",
+      "ni"
+    ]
+  },
+  {
+    "key": "aws.ec2_placement_group",
+    "displayName": "EC2 Placement Group (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_placement_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "plg",
+      "basis": "PLacement Group; pg stays with the RDS/ElastiCache parameter groups (\"-pg-\" 373 in aws_db_parameter_group).",
+      "previous": [
+        "pg"
+      ]
+    },
+    "entity": "ec2.PlacementGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 placement group",
+      "ec2_placement_group",
+      "pg"
+    ]
+  },
+  {
+    "key": "aws.ec2_route_server",
+    "displayName": "EC2 Route Server (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_route_server": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rs",
+      "basis": "Initials of Route Server.",
+      "previous": []
+    },
+    "entity": "ec2.RouteServer.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 route server",
+      "ec2_route_server"
+    ]
+  },
+  {
+    "key": "aws.ec2_route_server_endpoint",
+    "displayName": "EC2 Route Server Endpoint (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_route_server_endpoint": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rse",
+      "basis": "Initials of Route Server Endpoint.",
+      "previous": []
+    },
+    "entity": "ec2.RouteServerEndpoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 route server endpoint",
+      "ec2_route_server_endpoint"
+    ]
+  },
+  {
+    "key": "aws.ec2_route_server_peer",
+    "displayName": "EC2 Route Server Peer (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_route_server_peer": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rsp",
+      "basis": "Initials of Route Server Peer.",
+      "previous": []
+    },
+    "entity": "ec2.RouteServerPeer.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 route server peer",
+      "ec2_route_server_peer"
+    ]
+  },
+  {
+    "key": "aws.ec2_secondary_network",
+    "displayName": "EC2 Secondary Network (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_secondary_network": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sn",
+      "basis": "Initials of Secondary Network; unique within AWS rules once subnet uses snet.",
+      "previous": []
+    },
+    "entity": "ec2.SecondaryNetwork.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 secondary network",
+      "ec2_secondary_network"
+    ]
+  },
+  {
+    "key": "aws.ec2_spot_fleet",
+    "displayName": "EC2 Spot Fleet (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.ec2_spot_fleet": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "spot",
+      "basis": "\"-spot-\" 55 vs \"-sf-\" 1 vs \"-sfr-\" 0 in aws_spot_fleet_request files.",
+      "previous": [
+        "sf"
+      ]
+    },
+    "entity": "ec2.SpotFleet.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 spot fleet",
+      "ec2_spot_fleet",
+      "sf"
+    ]
+  },
+  {
+    "key": "aws.ec2_subnet_cidr_reservation",
+    "displayName": "EC2 Subnet Cidr Reservation (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_subnet_cidr_reservation": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "scr",
+      "basis": "Initials of Subnet CIDR Reservation.",
+      "previous": []
+    },
+    "entity": "ec2.SubnetCidrReservation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 subnet cidr reservation",
+      "ec2_subnet_cidr_reservation"
+    ]
+  },
+  {
+    "key": "aws.ec2_traffic_mirror_filter",
+    "displayName": "EC2 Traffic Mirror Filter (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_traffic_mirror_filter": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tmf",
+      "basis": "Initials of Traffic Mirror Filter.",
+      "previous": []
+    },
+    "entity": "ec2.TrafficMirrorFilter.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 traffic mirror filter",
+      "ec2_traffic_mirror_filter"
+    ]
+  },
+  {
+    "key": "aws.ec2_traffic_mirror_filter_rule",
+    "displayName": "EC2 Traffic Mirror Filter Rule (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_traffic_mirror_filter_rule": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tmfr",
+      "basis": "Initials of Traffic Mirror Filter Rule.",
+      "previous": []
+    },
+    "entity": "ec2.TrafficMirrorFilterRule.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 traffic mirror filter rule",
+      "ec2_traffic_mirror_filter_rule"
+    ]
+  },
+  {
+    "key": "aws.ec2_traffic_mirror_session",
+    "displayName": "EC2 Traffic Mirror Session (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_traffic_mirror_session": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tms",
+      "basis": "Initials of Traffic Mirror Session.",
+      "previous": []
+    },
+    "entity": "ec2.TrafficMirrorSession.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 traffic mirror session",
+      "ec2_traffic_mirror_session"
+    ]
+  },
+  {
+    "key": "aws.ec2_traffic_mirror_target",
+    "displayName": "EC2 Traffic Mirror Target (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_traffic_mirror_target": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tmt",
+      "basis": "Initials of Traffic Mirror Target.",
+      "previous": []
+    },
+    "entity": "ec2.TrafficMirrorTarget.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 traffic mirror target",
+      "ec2_traffic_mirror_target"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway",
+    "displayName": "EC2 Transit Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgw",
+      "basis": "Matches the tgw- ID prefix; \"-tgw-\" 914 vs \"-tg-\" 33.",
+      "previous": [
+        "tg"
+      ]
+    },
+    "entity": "ec2.TransitGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway",
+      "ec2_transit_gateway",
+      "tg"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_attachment",
+    "displayName": "EC2 Transit Gateway Attachment (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_attachment": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwa",
+      "basis": "Transit Gateway Attachment; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tga"
+      ]
+    },
+    "entity": "ec2.TransitGatewayAttachment.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway attachment",
+      "ec2_transit_gateway_attachment",
+      "tga"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_connect",
+    "displayName": "EC2 Transit Gateway Connect (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_connect": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwc",
+      "basis": "Transit Gateway Connect; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgc"
+      ]
+    },
+    "entity": "ec2.TransitGatewayConnect.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway connect",
+      "ec2_transit_gateway_connect",
+      "tgc"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_connect_peer",
+    "displayName": "EC2 Transit Gateway Connect Peer (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_connect_peer": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwcp",
+      "basis": "Transit Gateway Connect Peer; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgcp"
+      ]
+    },
+    "entity": "ec2.TransitGatewayConnectPeer.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway connect peer",
+      "ec2_transit_gateway_connect_peer",
+      "tgcp"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_metering_policy",
+    "displayName": "EC2 Transit Gateway Metering Policy (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_metering_policy": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwmp",
+      "basis": "Transit Gateway Metering Policy; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgmp"
+      ]
+    },
+    "entity": "ec2.TransitGatewayMeteringPolicy.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway metering policy",
+      "ec2_transit_gateway_metering_policy",
+      "tgmp"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_multicast_domain",
+    "displayName": "EC2 Transit Gateway Multicast Domain (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_multicast_domain": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwmd",
+      "basis": "Transit Gateway Multicast Domain; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgmd"
+      ]
+    },
+    "entity": "ec2.TransitGatewayMulticastDomain.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway multicast domain",
+      "ec2_transit_gateway_multicast_domain",
+      "tgmd"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_peering_attachment",
+    "displayName": "EC2 Transit Gateway Peering Attachment (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_peering_attachment": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwpa",
+      "basis": "Transit Gateway Peering Attachment; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgpa"
+      ]
+    },
+    "entity": "ec2.TransitGatewayPeeringAttachment.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway peering attachment",
+      "ec2_transit_gateway_peering_attachment",
+      "tgpa"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_policy_table",
+    "displayName": "EC2 Transit Gateway Policy Table (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_policy_table": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwpt",
+      "basis": "Transit Gateway Policy Table; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgpt"
+      ]
+    },
+    "entity": "ec2.TransitGatewayPolicyTable.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway policy table",
+      "ec2_transit_gateway_policy_table",
+      "tgpt"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_route_table",
+    "displayName": "EC2 Transit Gateway Route Table (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_route_table": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwrt",
+      "basis": "Transit Gateway Route Table; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgrt"
+      ]
+    },
+    "entity": "ec2.TransitGatewayRouteTable.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway route table",
+      "ec2_transit_gateway_route_table",
+      "tgrt"
+    ]
+  },
+  {
+    "key": "aws.ec2_transit_gateway_vpc_attachment",
+    "displayName": "EC2 Transit Gateway VPC Attachment (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_transit_gateway_vpc_attachment": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "tgwva",
+      "basis": "Transit Gateway VPC Attachment; same tgw head as the Transit Gateway (tgw- ID prefix).",
+      "previous": [
+        "tgva"
+      ]
+    },
+    "entity": "ec2.TransitGatewayVpcAttachment.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 transit gateway vpc attachment",
+      "ec2_transit_gateway_vpc_attachment",
+      "tgva"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpc_block_public_access_exclusion",
+    "displayName": "EC2 VPC Block Public Access Exclusion (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpc_block_public_access_exclusion": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vbpe",
+      "basis": "VPC Block Public access Exclusion, kept within 4 characters.",
+      "previous": [
+        "vbpae"
+      ]
+    },
+    "entity": "ec2.VPCBlockPublicAccessExclusion.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpc block public access exclusion",
+      "ec2_vpc_block_public_access_exclusion",
+      "vbpae"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpc_encryption_control",
+    "displayName": "EC2 VPC Encryption Control (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpc_encryption_control": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vec",
+      "basis": "Initials of VPC Encryption Control.",
+      "previous": []
+    },
+    "entity": "ec2.VPCEncryptionControl.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpc encryption control",
+      "ec2_vpc_encryption_control"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpc_endpoint",
+    "displayName": "EC2 VPC Endpoint (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpc_endpoint": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vpce",
+      "basis": "Matches the vpce- ID prefix; \"-vpce-\" 1028 vs \"-ve-\" 0.",
+      "previous": [
+        "ve"
+      ]
+    },
+    "entity": "ec2.VPCEndpoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpc endpoint",
+      "ec2_vpc_endpoint",
+      "ve"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpc_endpoint_service",
+    "displayName": "EC2 VPC Endpoint Service (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpc_endpoint_service": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ves",
+      "basis": "VPC Endpoint Service initials; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "ec2.VPCEndpointService.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpc endpoint service",
+      "ec2_vpc_endpoint_service"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpc_peering_connection",
+    "displayName": "EC2 VPC Peering Connection (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpc_peering_connection": {
+        "scope": "in vpc",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "peer",
+      "basis": "\"-peer-\" 122 vs \"-pcx-\" 11; vpc collided with the VPC itself. Same as Azure CAF peer.",
+      "previous": [
+        "vpc"
+      ]
+    },
+    "entity": "ec2.VPCPeeringConnection.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpc peering connection",
+      "ec2_vpc_peering_connection",
+      "vpc"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpn_concentrator",
+    "displayName": "EC2 VPN Concentrator (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpn_concentrator": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vc",
+      "basis": "VPN Concentrator initials; unique once the VPN connection uses vpn.",
+      "previous": []
+    },
+    "entity": "ec2.VPNConcentrator.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpn concentrator",
+      "ec2_vpn_concentrator"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpn_connection",
+    "displayName": "EC2 VPN Connection (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpn_connection": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vpn",
+      "basis": "Matches the vpn- ID prefix; \"-vpn-\" 421 vs \"-s2s-\" 6 vs \"-vc-\" 0.",
+      "previous": [
+        "vc"
+      ]
+    },
+    "entity": "ec2.VPNConnection.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpn connection",
+      "ec2_vpn_connection",
+      "vc"
+    ]
+  },
+  {
+    "key": "aws.ec2_vpn_gateway",
+    "displayName": "EC2 VPN Gateway (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_vpn_gateway": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vgw",
+      "basis": "Matches the vgw- ID prefix; \"-vgw-\" 13 vs \"-vg-\" 0.",
+      "previous": [
+        "vg"
+      ]
+    },
+    "entity": "ec2.VPNGateway.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 vpn gateway",
+      "ec2_vpn_gateway",
+      "vg"
+    ]
+  },
+  {
+    "key": "aws.ec2_verified_access_endpoint",
+    "displayName": "EC2 Verified Access Endpoint (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_verified_access_endpoint": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vae",
+      "basis": "Initials of Verified Access Endpoint.",
+      "previous": []
+    },
+    "entity": "ec2.VerifiedAccessEndpoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 verified access endpoint",
+      "ec2_verified_access_endpoint"
+    ]
+  },
+  {
+    "key": "aws.ec2_verified_access_group",
+    "displayName": "EC2 Verified Access Group (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_verified_access_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vag",
+      "basis": "Initials of Verified Access Group.",
+      "previous": []
+    },
+    "entity": "ec2.VerifiedAccessGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 verified access group",
+      "ec2_verified_access_group"
+    ]
+  },
+  {
+    "key": "aws.ec2_verified_access_instance",
+    "displayName": "EC2 Verified Access Instance (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_verified_access_instance": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vai",
+      "basis": "Initials of Verified Access Instance.",
+      "previous": []
+    },
+    "entity": "ec2.VerifiedAccessInstance.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 verified access instance",
+      "ec2_verified_access_instance"
+    ]
+  },
+  {
+    "key": "aws.ec2_verified_access_trust_provider",
+    "displayName": "EC2 Verified Access Trust Provider (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.ec2_verified_access_trust_provider": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "vatp",
+      "basis": "Initials of Verified Access Trust Provider.",
+      "previous": []
+    },
+    "entity": "ec2.VerifiedAccessTrustProvider.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ec2 verified access trust provider",
+      "ec2_verified_access_trust_provider"
+    ]
+  },
+  {
+    "key": "aws.ecr_public_repository",
+    "displayName": "ECR Public Repository",
+    "category": "containers",
+    "rules": {
+      "aws.ecr_public_repository": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ecrp",
+      "basis": "ECR Public; pr reads as a pull request.",
+      "previous": [
+        "pr"
+      ]
+    },
+    "entity": "ecr.PublicRepository",
+    "kind": null,
+    "info": "The resource name set at creation: 2 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecr public repository",
+      "ecr_public_repository",
+      "pr"
+    ]
+  },
+  {
+    "key": "aws.ecr_repository",
+    "displayName": "ECR Repository",
+    "category": "containers",
+    "rules": {
+      "aws.ecr_repository": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ecr",
+      "basis": "AWS CLI service name ecr; \"-ecr-\" 2068 vs \"-repo-\" 267 vs \"-rep-\" 10.",
+      "previous": [
+        "rep"
+      ]
+    },
+    "entity": "ecr.Repository",
+    "kind": null,
+    "info": "The resource name set at creation: 2 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecr repository",
+      "ecr_repository",
+      "rep"
+    ]
+  },
+  {
+    "key": "aws.ecs_task_set",
+    "displayName": "ECS Task Set (Name tag)",
+    "category": "containers",
+    "rules": {
+      "aws.ecs_task_set": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ts",
+      "basis": "Task Set initials; unique once the trust store uses trst.",
+      "previous": []
+    },
+    "entity": "ecs.TaskSet.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "ecs task set",
+      "ecs_task_set"
+    ]
+  },
+  {
+    "key": "aws.efs_access_point",
+    "displayName": "EFS Access Point (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.efs_access_point": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ap",
+      "basis": "\"-ap-\" 62 in aws_efs_access_point (others 0).",
+      "previous": []
+    },
+    "entity": "efs.AccessPoint.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "efs access point",
+      "efs_access_point"
+    ]
+  },
+  {
+    "key": "aws.efs_file_system",
+    "displayName": "EFS File System (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.efs_file_system": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "efs",
+      "basis": "AWS CLI service name efs; \"-efs-\" 1596 vs \"-fs-\" 33.",
+      "previous": [
+        "fs"
+      ]
+    },
+    "entity": "efs.FileSystem.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "efs file system",
+      "efs_file_system",
+      "fs"
+    ]
+  },
+  {
+    "key": "aws.eks_access_entry",
+    "displayName": "EKS Access Entry (Name tag)",
+    "category": "containers",
+    "rules": {
+      "aws.eks_access_entry": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ae",
+      "basis": "Initials of Access Entry.",
+      "previous": []
+    },
+    "entity": "eks.AccessEntry.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "eks access entry",
+      "eks_access_entry"
+    ]
+  },
+  {
+    "key": "aws.eks_cluster",
+    "displayName": "EKS Cluster",
+    "category": "containers",
+    "rules": {
+      "aws.eks_cluster": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "eks",
+      "basis": "AWS CLI service name eks; \"-eks-\" 12608 vs \"-k8s-\" 304 vs \"-clu-\" 0.",
+      "previous": [
+        "clu"
+      ]
+    },
+    "entity": "eks.Cluster",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 100 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "eks cluster",
+      "eks_cluster",
+      "clu"
+    ]
+  },
+  {
+    "key": "aws.eks_pod_identity_association",
+    "displayName": "EKS Pod Identity Association (Name tag)",
+    "category": "containers",
+    "rules": {
+      "aws.eks_pod_identity_association": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pia",
+      "basis": "Initials of Pod Identity Association.",
+      "previous": []
+    },
+    "entity": "eks.PodIdentityAssociation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "eks pod identity association",
+      "eks_pod_identity_association"
+    ]
+  },
+  {
+    "key": "aws.elasticache_global_replication_group",
+    "displayName": "ElastiCache Global Replication Group (Name tag)",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_global_replication_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "grg",
+      "basis": "Initials of Global Replication Group.",
+      "previous": []
+    },
+    "entity": "elasticache.GlobalReplicationGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache global replication group",
+      "elasticache_global_replication_group"
+    ]
+  },
+  {
+    "key": "aws.elasticache_parameter_group",
+    "displayName": "ElastiCache Parameter Group (Name tag)",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_parameter_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "pg",
+      "basis": "Parameter Group; shared with the RDS DB parameter group (same concept).",
+      "previous": []
+    },
+    "entity": "elasticache.ParameterGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache parameter group",
+      "elasticache_parameter_group"
+    ]
+  },
+  {
+    "key": "aws.elasticache_security_group",
+    "displayName": "ElastiCache Security Group (Name tag)",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_security_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "csg",
+      "basis": "Cache Security Group, parallel to dsg (DB security group); sg is the VPC security group.",
+      "previous": [
+        "sg"
+      ]
+    },
+    "entity": "elasticache.SecurityGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache security group",
+      "elasticache_security_group",
+      "sg"
+    ]
+  },
+  {
+    "key": "aws.elasticache_serverless_cache_snapshot",
+    "displayName": "ElastiCache Serverless Cache Snapshot",
+    "category": "database",
+    "rules": {
+      "aws.elasticache_serverless_cache_snapshot": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "scs",
+      "basis": "Initials of Serverless Cache Snapshot.",
+      "previous": []
+    },
+    "entity": "elasticache.ServerlessCacheSnapshot",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticache serverless cache snapshot",
+      "elasticache_serverless_cache_snapshot"
+    ]
+  },
+  {
+    "key": "aws.elbv2_listener",
+    "displayName": "ElasticLoadBalancingV2 Listener (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.elbv2_listener": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lsnr",
+      "basis": "\"-lsnr-\" 1 vs \"-lis-\" 0; lis is a bare truncation and listener (702) has 8 letters.",
+      "previous": [
+        "lis"
+      ]
+    },
+    "entity": "elasticloadbalancingv2.Listener.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancingv2 listener",
+      "elbv2_listener",
+      "lis"
+    ]
+  },
+  {
+    "key": "aws.elbv2_listener_rule",
+    "displayName": "ElasticLoadBalancingV2 Listener Rule (Name tag)",
+    "category": "networking",
+    "rules": {
+      "aws.elbv2_listener_rule": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lr",
+      "basis": "Initials of Listener Rule.",
+      "previous": []
+    },
+    "entity": "elasticloadbalancingv2.ListenerRule.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "elasticloadbalancingv2 listener rule",
+      "elbv2_listener_rule"
+    ]
+  },
+  {
+    "key": "aws.iam_oidc_provider",
+    "displayName": "IAM OIDC Provider (Name tag)",
+    "category": "identity",
+    "rules": {
+      "aws.iam_oidc_provider": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "oidc",
+      "basis": "\"-oidc-\" 1086 vs \"-op-\" 3.",
+      "previous": [
+        "op"
+      ]
+    },
+    "entity": "iam.OIDCProvider.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam oidc provider",
+      "iam_oidc_provider",
+      "op"
+    ]
+  },
+  {
+    "key": "aws.iam_saml_provider",
+    "displayName": "IAM SAML Provider",
+    "category": "identity",
+    "rules": {
+      "aws.iam_saml_provider": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "saml",
+      "basis": "\"-saml-\" 44 vs \"-sp-\" 0.",
+      "previous": [
+        "sp"
+      ]
+    },
+    "entity": "iam.SAMLProvider",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam saml provider",
+      "iam_saml_provider",
+      "sp"
+    ]
+  },
+  {
+    "key": "aws.iam_server_certificate",
+    "displayName": "IAM Server Certificate",
+    "category": "identity",
+    "rules": {
+      "aws.iam_server_certificate": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "cert",
+      "basis": "\"-cert-\" 27 vs \"-sc-\" 1; same as GCP cert.",
+      "previous": [
+        "sc"
+      ]
+    },
+    "entity": "iam.ServerCertificate",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 128 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam server certificate",
+      "iam_server_certificate",
+      "sc"
+    ]
+  },
+  {
+    "key": "aws.iam_virtual_mfa_device",
+    "displayName": "IAM Virtual MFA Device",
+    "category": "identity",
+    "rules": {
+      "aws.iam_virtual_mfa_device": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "mfa",
+      "basis": "\"-mfa-\" 14 vs \"-vmd-\" 0.",
+      "previous": [
+        "vmd"
+      ]
+    },
+    "entity": "iam.VirtualMFADevice",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 226 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "iam virtual mfa device",
+      "iam_virtual_mfa_device",
+      "vmd"
+    ]
+  },
+  {
+    "key": "aws.kms_key",
+    "displayName": "KMS Key (Name tag)",
+    "category": "security",
+    "rules": {
+      "aws.kms_key": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "kms",
+      "basis": "AWS CLI service name kms; \"-kms-\" 2684 vs \"-key-\" 1528 vs \"-cmk-\" 225.",
+      "previous": [
+        "key"
+      ]
+    },
+    "entity": "kms.Key.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "kms key",
+      "kms_key",
+      "key"
+    ]
+  },
+  {
+    "key": "aws.kms_replica_key",
+    "displayName": "KMS Replica Key (Name tag)",
+    "category": "security",
+    "rules": {
+      "aws.kms_replica_key": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rk",
+      "basis": "Replica Key initials.",
+      "previous": []
+    },
+    "entity": "kms.ReplicaKey.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "kms replica key",
+      "kms_replica_key"
+    ]
+  },
+  {
+    "key": "aws.lambda_code_signing_config",
+    "displayName": "Lambda Code Signing Config (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_code_signing_config": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "csc",
+      "basis": "Initials of Code Signing Config.",
+      "previous": []
+    },
+    "entity": "lambda.CodeSigningConfig.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda code signing config",
+      "lambda_code_signing_config"
+    ]
+  },
+  {
+    "key": "aws.lambda_event_source_mapping",
+    "displayName": "Lambda Event Source Mapping (Name tag)",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_event_source_mapping": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "esm",
+      "basis": "Initials of Event Source Mapping.",
+      "previous": []
+    },
+    "entity": "lambda.EventSourceMapping.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda event source mapping",
+      "lambda_event_source_mapping"
+    ]
+  },
+  {
+    "key": "aws.lambda_microvm_image",
+    "displayName": "Lambda Microvm Image",
+    "category": "compute",
+    "rules": {
+      "aws.lambda_microvm_image": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "mi",
+      "basis": "Initials of MicroVM Image.",
+      "previous": []
+    },
+    "entity": "lambda.MicrovmImage",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 64 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "lambda microvm image",
+      "lambda_microvm_image"
+    ]
+  },
+  {
+    "key": "aws.logs_account_policy",
+    "displayName": "Logs Account Policy",
+    "category": "management",
+    "rules": {
+      "aws.logs_account_policy": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "acp",
+      "basis": "ACcount Policy; ap is kept by the EFS access point.",
+      "previous": [
+        "ap"
+      ]
+    },
+    "entity": "logs.AccountPolicy",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs account policy",
+      "logs_account_policy",
+      "ap"
+    ]
+  },
+  {
+    "key": "aws.logs_delivery",
+    "displayName": "Logs Delivery (Name tag)",
+    "category": "management",
+    "rules": {
+      "aws.logs_delivery": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dlv",
+      "basis": "DeLiVery; del reads as delete.",
+      "previous": [
+        "del"
+      ]
+    },
+    "entity": "logs.Delivery.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs delivery",
+      "logs_delivery",
+      "del"
+    ]
+  },
+  {
+    "key": "aws.logs_delivery_destination",
+    "displayName": "Logs Delivery Destination",
+    "category": "management",
+    "rules": {
+      "aws.logs_delivery_destination": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dd",
+      "basis": "Initials of Delivery Destination.",
+      "previous": []
+    },
+    "entity": "logs.DeliveryDestination",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 60 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs delivery destination",
+      "logs_delivery_destination"
+    ]
+  },
+  {
+    "key": "aws.logs_delivery_source",
+    "displayName": "Logs Delivery Source",
+    "category": "management",
+    "rules": {
+      "aws.logs_delivery_source": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ds",
+      "basis": "Delivery Source initials; unique once the RDS DB snapshot uses snap.",
+      "previous": []
+    },
+    "entity": "logs.DeliverySource",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 60 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs delivery source",
+      "logs_delivery_source"
+    ]
+  },
+  {
+    "key": "aws.logs_destination",
+    "displayName": "Logs Destination",
+    "category": "management",
+    "rules": {
+      "aws.logs_destination": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dest",
+      "basis": "\"-dest-\" 4 vs \"-des-\" 0; des reads as the DES cipher.",
+      "previous": [
+        "des"
+      ]
+    },
+    "entity": "logs.Destination",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs destination",
+      "logs_destination",
+      "des"
+    ]
+  },
+  {
+    "key": "aws.logs_integration",
+    "displayName": "Logs Integration",
+    "category": "management",
+    "rules": {
+      "aws.logs_integration": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lgi",
+      "basis": "Log Group-family Integration; int reads as integer or internal.",
+      "previous": [
+        "int"
+      ]
+    },
+    "entity": "logs.Integration",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 50 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs integration",
+      "logs_integration",
+      "int"
+    ]
+  },
+  {
+    "key": "aws.logs_log_group",
+    "displayName": "Logs Log Group",
+    "category": "management",
+    "rules": {
+      "aws.logs_log_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lg",
+      "basis": "Initials of Log Group.",
+      "previous": []
+    },
+    "entity": "logs.LogGroup",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs log group",
+      "logs_log_group"
+    ]
+  },
+  {
+    "key": "aws.logs_metric_filter",
+    "displayName": "Logs Metric Filter",
+    "category": "management",
+    "rules": {
+      "aws.logs_metric_filter": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "mf",
+      "basis": "Initials of Metric Filter.",
+      "previous": []
+    },
+    "entity": "logs.MetricFilter",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 512 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs metric filter",
+      "logs_metric_filter"
+    ]
+  },
+  {
+    "key": "aws.logs_resource_policy",
+    "displayName": "Logs Resource Policy",
+    "category": "management",
+    "rules": {
+      "aws.logs_resource_policy": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "lrp",
+      "basis": "Logs Resource Policy; rp stays with the IAM role policy.",
+      "previous": [
+        "rp"
+      ]
+    },
+    "entity": "logs.ResourcePolicy",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs resource policy",
+      "logs_resource_policy",
+      "rp"
+    ]
+  },
+  {
+    "key": "aws.logs_scheduled_query",
+    "displayName": "Logs Scheduled Query",
+    "category": "management",
+    "rules": {
+      "aws.logs_scheduled_query": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sq",
+      "basis": "Initials of Scheduled Query.",
+      "previous": []
+    },
+    "entity": "logs.ScheduledQuery",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "logs scheduled query",
+      "logs_scheduled_query"
+    ]
+  },
+  {
+    "key": "aws.rds_cluster_snapshot",
+    "displayName": "RDS Cluster Snapshot",
+    "category": "database",
+    "rules": {
+      "aws.rds_cluster_snapshot": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cs",
+      "basis": "Cluster Snapshot initials; unique within AWS rules.",
+      "previous": []
+    },
+    "entity": "rds.ClusterSnapshot",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds cluster snapshot",
+      "rds_cluster_snapshot"
+    ]
+  },
+  {
+    "key": "aws.rds_custom_db_engine_version",
+    "displayName": "RDS Custom DB Engine Version (Name tag)",
+    "category": "database",
+    "rules": {
+      "aws.rds_custom_db_engine_version": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cdev",
+      "basis": "Initials of Custom DB Engine Version.",
+      "previous": []
+    },
+    "entity": "rds.CustomDBEngineVersion.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds custom db engine version",
+      "rds_custom_db_engine_version"
+    ]
+  },
+  {
+    "key": "aws.rds_db_cluster",
+    "displayName": "RDS DB Cluster",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_cluster": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "rdsc",
+      "basis": "RDS Cluster, engine-neutral (the resource also creates non-Aurora Multi-AZ DB clusters); \"-aurora-\" 1328 vs \"-rdsc-\" 0 vs \"-dc-\" 0.",
+      "previous": [
+        "dc"
+      ]
+    },
+    "entity": "rds.DBCluster",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db cluster",
+      "rds_db_cluster",
+      "dc"
+    ]
+  },
+  {
+    "key": "aws.rds_db_security_group",
+    "displayName": "RDS DB Security Group (Name tag)",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_security_group": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dsg",
+      "basis": "Initials of DB Security Group.",
+      "previous": []
+    },
+    "entity": "rds.DBSecurityGroup.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db security group",
+      "rds_db_security_group"
+    ]
+  },
+  {
+    "key": "aws.rds_db_snapshot",
+    "displayName": "RDS DB Snapshot",
+    "category": "database",
+    "rules": {
+      "aws.rds_db_snapshot": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "snap",
+      "basis": "\"-snapshot-\" 76 vs \"-snap-\" 2 vs \"-ds-\" 0; same as GCP snap.",
+      "previous": [
+        "ds"
+      ]
+    },
+    "entity": "rds.DBSnapshot",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 255 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds db snapshot",
+      "rds_db_snapshot",
+      "ds"
+    ]
+  },
+  {
+    "key": "aws.rds_global_cluster",
+    "displayName": "RDS Global Cluster",
+    "category": "database",
+    "rules": {
+      "aws.rds_global_cluster": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "gc",
+      "basis": "Global Cluster initials.",
+      "previous": []
+    },
+    "entity": "rds.GlobalCluster",
+    "kind": null,
+    "info": "The resource name set at creation: 1 to 63 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "rds global cluster",
+      "rds_global_cluster"
+    ]
+  },
+  {
+    "key": "aws.s3_access_grant",
+    "displayName": "S3 Access Grant (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.s3_access_grant": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "ag",
+      "basis": "Initials of Access Grant.",
+      "previous": []
+    },
+    "entity": "s3.AccessGrant.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 access grant",
+      "s3_access_grant"
+    ]
+  },
+  {
+    "key": "aws.s3_access_grants_instance",
+    "displayName": "S3 Access Grants Instance (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.s3_access_grants_instance": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "agi",
+      "basis": "Initials of Access Grants Instance.",
+      "previous": []
+    },
+    "entity": "s3.AccessGrantsInstance.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 access grants instance",
+      "s3_access_grants_instance"
+    ]
+  },
+  {
+    "key": "aws.s3_access_grants_location",
+    "displayName": "S3 Access Grants Location (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.s3_access_grants_location": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "agl",
+      "basis": "Initials of Access Grants Location.",
+      "previous": []
+    },
+    "entity": "s3.AccessGrantsLocation.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 access grants location",
+      "s3_access_grants_location"
+    ]
+  },
+  {
+    "key": "aws.s3_access_point",
+    "displayName": "S3 Access Point",
+    "category": "storage",
+    "rules": {
+      "aws.s3_access_point": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "s3ap",
+      "basis": "S3 Access Point; ap is kept by the EFS access point.",
+      "previous": [
+        "ap"
+      ]
+    },
+    "entity": "s3.AccessPoint",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 50 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 access point",
+      "s3_access_point",
+      "ap"
+    ]
+  },
+  {
+    "key": "aws.s3_multi_region_access_point",
+    "displayName": "S3 Multi Region Access Point",
+    "category": "storage",
+    "rules": {
+      "aws.s3_multi_region_access_point": {
+        "scope": "global",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "mrap",
+      "basis": "Initials of Multi-Region Access Point.",
+      "previous": []
+    },
+    "entity": "s3.MultiRegionAccessPoint",
+    "kind": null,
+    "info": "The resource name set at creation: 3 to 50 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 multi region access point",
+      "s3_multi_region_access_point"
+    ]
+  },
+  {
+    "key": "aws.s3_storage_lens",
+    "displayName": "S3 Storage Lens (Name tag)",
+    "category": "storage",
+    "rules": {
+      "aws.s3_storage_lens": {
+        "scope": "region",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "sl",
+      "basis": "Initials of Storage Lens.",
+      "previous": []
+    },
+    "entity": "s3.StorageLens.NameTag",
+    "kind": null,
+    "info": "The Name tag of this resource: a free-text label of 1 to 256 characters.",
+    "enterNameAt": {
+      "awsCli": [],
+      "terraform": [],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "s3 storage lens",
+      "s3_storage_lens"
+    ]
+  }
+];

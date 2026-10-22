@@ -4,6 +4,7 @@ import type { CoreMessage } from '../messages';
 import { NO_INVISIBLE } from '../invisible.mjs';
 import { AWS_INTAKE_ROWS } from './aws-intake';
 import { AWS_MANUAL_RULES } from './aws-manual';
+import { AWS_CATALOG } from './aws-catalog';
 import { withTier } from '../compose';
 
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
@@ -161,10 +162,19 @@ function fromIntakeRow(r: (typeof AWS_INTAKE_ROWS)[number]): ResourceRule {
   };
 }
 
+/** 규칙 id → catalog 행의 약어 — 약어의 정본은 catalog 다(rules/gcp.ts 의 applyCatalog 와 같다). 위 표 · aws-intake.ts 의 slug 는 옛 값이다 */
+const SLUG_BY_RULE: ReadonlyMap<string, string> = new Map(AWS_CATALOG.flatMap((row) => Object.keys(row.rules).map((id) => [id, row.slug.value] as const)));
+
+function slugFromCatalog(id: string): string {
+  const slug = SLUG_BY_RULE.get(id);
+  if (slug === undefined) throw new Error(`AWS rule not in catalog: ${id}`);
+  return slug;
+}
+
 /** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서(타입 이름 순).
  *  count 규칙 템플릿에는 seq 바로 앞에 용도 토큰 자리를 둔다 (D60) — 꺼진 CSP 라도 템플릿 꼴을 맞춘다. 빈 토큰이라 이름은 그대로다 */
 export const AWS_RULES: Record<string, ResourceRule> = Object.fromEntries(Object.entries({
   ...AWS_HAND_RULES,
   ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
   ...AWS_MANUAL_RULES,
-}).map(([id, r]) => [id, { ...r, template: withTier(r.template) }]));
+}).map(([id, r]) => [id, { ...r, slug: slugFromCatalog(id), template: withTier(r.template) }]));
