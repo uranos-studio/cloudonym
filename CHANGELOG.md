@@ -6,7 +6,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [0.1.10] - 2026-10-22
 
-The CLI asks on a terminal and follows common cloud CLI conventions; visits and conversions can be attributed to the referring house-ad campaign. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.
+The CLI asks on a terminal and follows common cloud CLI conventions; visits and conversions can be attributed to the referring house-ad campaign; the site shows how many resources it can name. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.
 
 ### Added
 
