@@ -12,8 +12,8 @@ import { SCOPES } from '../core/scopes';
 import { ENV_ALIASES, ENV_VALUES } from '../core/normalize';
 import { LOCATIONS, REGIONS } from '../core/regions-data';
 import { MAX_CONTEXT_CHARS } from '../core/engine';
-import { catalogFor } from '../core/catalog';
-import { GCP_KIND_CHECKED, type CatalogRow } from '../core/rules/gcp-catalog';
+import { catalogFor, type AnyCatalogRow } from '../core/catalog';
+import { GCP_KIND_CHECKED } from '../core/rules/gcp-catalog';
 import { MAX_FIELD_CHARS } from './schemas';
 import { MAX_BODY_BYTES } from './v1';
 import { RATE_LIMIT } from './ratelimit';
@@ -215,7 +215,7 @@ function regionLines(order: readonly Provider[]): string[] {
 
 /** 「## Kind tokens」 절 (D52) — 종류 표가 있는 catalog 행마다 한 줄(값 → 토큰 · 기본값 근거 · 확인일), 그 아래 규칙(= 범위)마다 기본값 · 허용 값.
  *  표는 catalog 가 정본이고 확인일은 kind-sources.json 의 전사 날(생성 파일 GCP_KIND_CHECKED)이다 */
-export function kindLines(order: readonly Provider[], rowsOf: (p: Provider) => readonly CatalogRow[] = catalogFor): string[] {
+export function kindLines(order: readonly Provider[], rowsOf: (p: Provider) => readonly AnyCatalogRow[] = catalogFor): string[] {
   const lines = [
     '', '## Kind tokens', '',
     '`kind` on `/v1/names` takes a value name from the list below (`POSTGRES`, `snapshot-schedule`), not the token. The token goes right after the abbreviation: `…-<slug>-<kind>-<seq>`. The provider default of the scope, and values marked (no token), add no token even when sent. A rule that needs a kind (`required`) comes back `valid: false` with `name.kind_required` without one; `/v1/names` rejects that request first (400 `selection.kind_required`). One kind per item.',

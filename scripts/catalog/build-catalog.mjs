@@ -1,7 +1,7 @@
 // catalog 생성기 (D46) — catalog/gcp.json · catalog/aws.json · catalog/regions.json(정본)을 스키마로 검사한 뒤
-// src/core/rules/gcp-catalog.ts · src/core/regions-data.ts 를 쓴다(종류 표의 확인일은 kind-sources.json 에서). 개발 때만 돈다 — 엔진은 JSON 을 읽지 않고 생성 TS 를 들여온다(D9).
-// aws.json 은 검사만 하고 기본으로는 쓰지 않는다 — src/core 에 파일이 하나 늘면 규칙 지문(D26)이 바뀌므로 AWS 를 켜는 커밋에서 --aws 로 aws-catalog.ts 를 함께 쓴다
-// 사용: node scripts/catalog/build-catalog.mjs [--aws]   (npm run catalog)
+// src/core/rules/gcp-catalog.ts · src/core/rules/aws-catalog.ts · src/core/regions-data.ts 를 쓴다(종류 표의 확인일은 kind-sources.json 에서). 개발 때만 돈다 — 엔진은 JSON 을 읽지 않고 생성 TS 를 들여온다(D9).
+// AWS 약어의 정본이 aws.json 이므로(rules/aws.ts 가 aws-catalog.ts 에서 읽는다) aws-catalog.ts 도 늘 다시 쓴다
+// 사용: node scripts/catalog/build-catalog.mjs   (npm run catalog)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -134,6 +134,6 @@ if (isMain) {
   validateCatalog(catalog);
   writeFileSync(join(root, 'src/core/rules/gcp-catalog.ts'), renderGcpCatalog(catalog.gcp, catalog.kindSources));
   writeFileSync(join(root, 'src/core/regions-data.ts'), renderRegions(catalog.regions));
-  if (process.argv.includes('--aws')) writeFileSync(join(root, 'src/core/rules/aws-catalog.ts'), renderAwsCatalog(catalog.aws));
-  console.log(`gcp-catalog.ts ${catalog.gcp.rows.length}행 · aws.json ${catalog.aws.rows.length}행(${process.argv.includes('--aws') ? 'aws-catalog.ts 씀' : '검사만'}) · regions-data.ts gcp ${catalog.regions.gcp.length} · aws ${catalog.regions.aws.length} · azure ${catalog.regions.azure.length}`);
+  writeFileSync(join(root, 'src/core/rules/aws-catalog.ts'), renderAwsCatalog(catalog.aws));
+  console.log(`gcp-catalog.ts ${catalog.gcp.rows.length}행 · aws-catalog.ts ${catalog.aws.rows.length}행 · regions-data.ts gcp ${catalog.regions.gcp.length} · aws ${catalog.regions.aws.length} · azure ${catalog.regions.azure.length}`);
 }

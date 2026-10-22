@@ -1,9 +1,10 @@
 // GET /catalog.json 본문 (D46 · D101 · D121) — 켜진 CSP 의 catalog 행과 리전 표, 그리고 클라이언트(저장소 CLI)가 물을 것을 정하는 데이터.
 // 정본은 catalog/*.json 과 core 의 표다. 여기서는 읽어 옮겨 적기만 한다 — core 를 바꾸지 않으므로 규칙 버전이 그대로다 (D101)
 import { TIER_PATTERN, type Provider } from '../core/types';
-import { catalogFor } from '../core/catalog';
+import { catalogFor, type AnyCatalogRow } from '../core/catalog';
 import { RULES } from '../core/constraints';
-import { GCP_CATALOG_META, type CatalogRow } from '../core/rules/gcp-catalog';
+import { GCP_CATALOG_META } from '../core/rules/gcp-catalog';
+import { AWS_CATALOG_META } from '../core/rules/aws-catalog';
 import { REGIONS } from '../core/regions-data';
 import { pickLocationNames } from '../core/regions';
 import { inputKind } from '../core/tree';
@@ -16,7 +17,7 @@ import { ENV_VALUES } from '../core/normalize';
 import { SCOPES } from '../core/scopes';
 
 /** catalog 머리(출처 버전) — catalog 가 아직 없는 CSP 는 null */
-const META: Partial<Record<Provider, unknown>> = { gcp: GCP_CATALOG_META };
+const META: Partial<Record<Provider, unknown>> = { gcp: GCP_CATALOG_META, aws: AWS_CATALOG_META };
 
 /** 규칙 하나에 더하는 칸 (D101) — input(슬롯 · 역할 · 없음) · tier(템플릿에 tier 자리가 있는가) · locations(pick 의 location 으로 받는 값, 받는 규칙만) */
 export interface CatalogRuleExtra { input: 'count' | 'role' | 'none'; tier: boolean; locations?: string[] }
@@ -29,7 +30,7 @@ export function ruleExtra(id: string): CatalogRuleExtra | undefined {
 }
 
 /** 행의 rules 에 규칙 칸을 얹는다 — 행의 다른 칸은 그대로 */
-function withRuleExtras(row: CatalogRow): CatalogRow {
+function withRuleExtras(row: AnyCatalogRow): AnyCatalogRow {
   const rules = Object.fromEntries(Object.entries(row.rules).map(([id, spec]) => [id, { ...spec, ...ruleExtra(id) }]));
   return { ...row, rules };
 }

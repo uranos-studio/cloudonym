@@ -1,6 +1,7 @@
-// catalog 조회 (D46 · D52) — 생성 파일 rules/gcp-catalog.ts 를 읽는 순수 함수. 규칙에 덮어쓰는 일은 rules/gcp.ts 가 한다
+// catalog 조회 (D46 · D52) — 생성 파일 rules/gcp-catalog.ts · rules/aws-catalog.ts 를 읽는 순수 함수. 규칙에 덮어쓰는 일은 rules/gcp.ts · rules/aws.ts 가 한다
 import type { Provider, RegionToken, ResourceRule } from './types';
 import { GCP_CATALOG, type CatalogRow } from './rules/gcp-catalog';
+import { AWS_CATALOG, type AwsCatalogRow } from './rules/aws-catalog';
 import { kindTokenFor, regionTokenOfRule } from './compose';
 
 /** 종류 토큰 길이 상한 — proxy · grpcs · https 가 5자다 */
@@ -8,20 +9,29 @@ export const MAX_KIND_CHARS = 5;
 /** 종류 값 이름 길이 상한 — catalog 의 가장 긴 값 이름(GCE_VM_IP_DEDICATED_BACKEND). 공유 hash 의 길이 상한식이 쓴다 (catalog.test 가 catalog 에서 다시 센다) */
 export const MAX_KIND_VALUE_CHARS = 27;
 
-const EMPTY: readonly CatalogRow[] = [];
+/** catalog 행 — CSP 마다 enterNameAt 의 CLI 칸만 다르다(gcloud · awsCli) */
+export type AnyCatalogRow = CatalogRow | AwsCatalogRow;
+
+const EMPTY: readonly AnyCatalogRow[] = [];
+const CATALOGS: Partial<Record<Provider, readonly AnyCatalogRow[]>> = { gcp: GCP_CATALOG, aws: AWS_CATALOG };
 
 /** provider 의 catalog 행 — 아직 catalog 가 없는 CSP 는 빈 배열 */
-export function catalogFor(provider: Provider): readonly CatalogRow[] {
-  return provider === 'gcp' ? GCP_CATALOG : EMPTY;
+export function catalogFor(provider: Provider): readonly AnyCatalogRow[] {
+  return CATALOGS[provider] ?? EMPTY;
+}
+
+/** 이름을 넣는 CLI 명령 — GCP 는 gcloud, AWS 는 aws CLI */
+export function cliCommands(row: AnyCatalogRow): readonly string[] {
+  return 'gcloud' in row.enterNameAt ? row.enterNameAt.gcloud : row.enterNameAt.awsCli;
 }
 
 /** 규칙 id → 그 규칙을 담은 행 */
-const ROW_BY_RULE: ReadonlyMap<string, CatalogRow> = new Map(GCP_CATALOG.flatMap((row) => Object.keys(row.rules).map((id) => [id, row] as const)));
+const ROW_BY_RULE: ReadonlyMap<string, AnyCatalogRow> = new Map(Object.values(CATALOGS).flatMap((rows) => rows.flatMap((row) => Object.keys(row.rules).map((id) => [id, row] as const))));
 
 type RuleRef = Pick<ResourceRule, 'id'> | string;
 const idOf = (rule: RuleRef): string => (typeof rule === 'string' ? rule : rule.id);
 
-export function rowOf(rule: RuleRef): CatalogRow | undefined {
+export function rowOf(rule: RuleRef): AnyCatalogRow | undefined {
   return ROW_BY_RULE.get(idOf(rule));
 }
 
@@ -44,7 +54,7 @@ export function kindToken(rule: RuleRef, value: string): string | null | Error {
 
 /** kindToken 의 본체 — 행을 인자로 받는다(시험이 고친 행을 넣는다). 판정은 엔진과 같은 compose.kindTokenFor 다.
  *  허용 값인데 tokens 에 키가 없으면 catalog 데이터가 깨진 것이다(allowed ⊆ keys(tokens)) — 토큰 없음으로 삼키지 않고 던진다 */
-export function kindTokenOf(row: CatalogRow | undefined, id: string, value: string): string | null | Error {
+export function kindTokenOf(row: AnyCatalogRow | undefined, id: string, value: string): string | null | Error {
   const kinds = row?.rules[id]?.kinds;
   if (!row?.kind || !kinds) return kindTokenFor(id, undefined, value);
   return kindTokenFor(id, { default: kinds.default, allowed: kinds.allowed, tokens: row.kind.tokens, omitValues: row.kind.omitValues }, value);

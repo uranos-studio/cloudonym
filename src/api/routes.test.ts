@@ -326,9 +326,14 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
   it('켜진 CSP 목록을 바꾸면 그 CSP 만 싣는다 — 빌더 직접', () => {
     const doc = JSON.parse(buildCatalogJson(['gcp', 'aws'], VERSION));
     expect(Object.keys(doc.providers)).toEqual(['gcp', 'aws']);
-    // catalog 가 아직 없는 CSP 는 빈 행 · 리전 표는 싣는다
-    expect(doc.providers.aws.rows).toEqual([]);
+    expect(doc.providers.aws.rows).toHaveLength(169);
+    expect(doc.providers.aws.meta.provider).toBe('aws');
     expect(doc.providers.aws.regions).toHaveLength(REGIONS.aws.length);
+    // catalog 가 아직 없는 CSP 는 빈 행 · 리전 표는 싣는다
+    const azure = JSON.parse(buildCatalogJson(['azure'], VERSION)).providers.azure;
+    expect(azure.rows).toEqual([]);
+    expect(azure.meta).toBeNull();
+    expect(azure.regions).toHaveLength(REGIONS.azure.length);
     expect(Object.keys(JSON.parse(buildCatalogJson([], VERSION)).providers)).toEqual([]);
   });
   it('HEAD 는 세지 않는다 — 헤더는 GET 과 같다', async () => {

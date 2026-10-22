@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import Ajv from 'ajv';
 import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
 import { GCP_CATALOG } from './rules/gcp-catalog';
+import { AWS_CATALOG } from './rules/aws-catalog';
 import { REGIONS } from './regions-data';
 import { catalogFor, rowOf, allowedKinds, regionTokenOf, kindToken, kindTokenOf, MAX_KIND_CHARS, MAX_KIND_VALUE_CHARS } from './catalog';
 
@@ -237,16 +238,18 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 는 117행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 117행 · AWS 169행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
-    expect(catalogFor('aws')).toEqual([]);
+    expect(catalogFor('aws')).toBe(AWS_CATALOG);
+    expect(AWS_CATALOG).toHaveLength(169);
     expect(catalogFor('azure')).toEqual([]);
   });
 
   it('rowOf — 규칙 · 규칙 id 둘 다 받고, 합친 행의 규칙은 같은 행을 준다', () => {
     expect(rowOf(rule('gcp.global_address'))!.key).toBe('gcp.address');
     expect(rowOf('gcp.address')).toBe(rowOf('gcp.global_address'));
-    expect(rowOf('aws.s3_bucket')).toBeUndefined();
+    expect(rowOf('aws.s3_bucket')!.key).toBe('aws.s3_bucket');
+    expect(rowOf('azure.storage_account')).toBeUndefined();
   });
 
   it('regionTokenOf — catalog 값 · catalog 밖 규칙은 템플릿으로', () => {

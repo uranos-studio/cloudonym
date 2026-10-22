@@ -1,10 +1,9 @@
 // 리소스 트리 (D37 · D53) — SCOPES · RULES · catalog 에서 파생하는 순수 함수. 트리를 따로 적지 않는다.
-// 노드에는 규칙이 아니라 화면 행(TreeRow)이 놓인다 — GCP 는 catalog 행(규칙이 여럿일 수 있다), 행이 없는 규칙(AWS · Azure · 시험 fixture)은 규칙 하나가 행 하나다.
+// 노드에는 규칙이 아니라 화면 행(TreeRow)이 놓인다 — GCP · AWS 는 catalog 행(규칙이 여럿일 수 있다), 행이 없는 규칙(Azure · 시험 fixture)은 규칙 하나가 행 하나다.
 // 자식을 고른다고 부모가 자동으로 체크되지 않는다
 import { rulesFor } from './constraints';
 import { SCOPES, type ScopeDef } from './scopes';
-import { rowOf } from './catalog';
-import type { CatalogRow } from './rules/gcp-catalog';
+import { rowOf, type AnyCatalogRow } from './catalog';
 import type { Category, Provider, ResourceRule, ScopeId } from './types';
 
 /** 화면 행 — rules 는 catalog 규칙 순서(행이 없으면 규칙 하나). 둘 이상이면 행에서 범위를 골라 규칙 하나로 정한다 */
@@ -13,7 +12,7 @@ export interface TreeRow {
   displayName: string;
   category: Category;
   rules: readonly ResourceRule[];
-  catalog?: CatalogRow;
+  catalog?: AnyCatalogRow;
 }
 
 export interface TreeNode {
@@ -34,7 +33,7 @@ function rowScope(rules: readonly ResourceRule[]): ScopeId {
 /** 넘긴 규칙을 행으로 묶는다 — catalog 행에 든 규칙은 그 행으로(넘긴 규칙만 · catalog 규칙 순서), 아니면 규칙 하나가 행 하나. 행 순서는 첫 규칙의 순서 */
 export function treeRows(rules: readonly ResourceRule[]): TreeRow[] {
   const byKey = new Map<string, ResourceRule[]>();
-  const rowFor = new Map<string, CatalogRow | undefined>();
+  const rowFor = new Map<string, AnyCatalogRow | undefined>();
   for (const r of rules) {
     const row = rowOf(r.id);
     const key = row?.key ?? r.id;

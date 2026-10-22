@@ -90,14 +90,15 @@ describe('buildTree — 행 (D53)', () => {
     expect(new Set(all.filter((x) => x.row.rules.length === 1).map((x) => x.node)).size).toBeGreaterThan(3);
   });
 
-  it('AWS · Azure 는 규칙 = 행 — 행 수가 규칙 수와 같고 행 key 는 규칙 id', () => {
+  it('AWS · Azure 는 규칙 = 행 — 행 수가 규칙 수와 같고 행 key 는 규칙 id · AWS 는 catalog 행이 붙는다', () => {
     for (const p of ['aws', 'azure'] as const) {
       const all = rows(p);
       expect(all, p).toHaveLength(rulesFor(p).length);
       for (const x of all) {
         expect(x.row.rules).toHaveLength(1);
         expect(x.row.key).toBe(x.row.rules[0]!.id);
-        expect(x.row.catalog).toBeUndefined();
+        if (p === 'aws') expect(x.row.catalog?.key).toBe(x.row.key);
+        else expect(x.row.catalog).toBeUndefined();
       }
     }
   });

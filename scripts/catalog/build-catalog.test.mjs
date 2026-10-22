@@ -83,7 +83,7 @@ test('aws.json — 행 key 가 겹치지 않고, 행마다 자기 key 의 규칙
   for (const row of aws.rows) assert.ok(Object.hasOwn(row.rules, row.key), row.key);
 });
 
-test('aws-catalog.ts 생성 — 같은 입력이면 같은 출력이고 행을 빠짐없이 싣는다 (AWS 를 켜는 커밋에서 --aws 로 쓴다)', () => {
+test('aws-catalog.ts 생성 — 같은 입력이면 같은 출력이고 행을 빠짐없이 싣는다', () => {
   const { aws } = loadCatalog(root);
   const out = renderAwsCatalog(aws);
   assert.equal(renderAwsCatalog(structuredClone(aws)), out);

@@ -11,6 +11,7 @@ import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Info, Minus, Plus, Search
 import { inputKind, rowRules, scopeChoices, type TreeNode, type TreeRow } from '../core/tree';
 import { ROLE_PATTERN } from '../core/selection';
 import { SCOPES } from '../core/scopes';
+import { cliCommands } from '../core/catalog';
 import type { Category, Provider, ResourceRule, ScopeId } from '../core/types';
 import {
   activeRule, canIncrease, kindChoices, kindSelectValue, pickedRule, refilterKind, rowBlock, setCount, setKind, setRole, setRowScope, toggleRow,
@@ -366,9 +367,9 @@ const Row = memo(function Row({ row, rule, entry, draft, droppedKind, block, blo
       {cat && infoOpen && (
         <div id={infoId} data-info className="basis-full space-y-0.5 pb-1.5 pl-6 text-xs text-zinc-700 dark:text-zinc-300">
           <p>{cat.info}</p>
-          {(cat.enterNameAt.gcloud.length > 0 || cat.enterNameAt.terraform.length > 0) && (
+          {(cliCommands(cat).length > 0 || cat.enterNameAt.terraform.length > 0) && (
             <p data-enter-name-at className="text-zinc-600 dark:text-zinc-400">
-              {en.ui.enter_name_at}: {[...cat.enterNameAt.gcloud, ...cat.enterNameAt.terraform].map((t, i) => (
+              {en.ui.enter_name_at}: {[...cliCommands(cat), ...cat.enterNameAt.terraform].map((t, i) => (
                 <span key={t}>{i > 0 && ' · '}<code className="font-mono">{t}</code></span>
               ))}
             </p>
