@@ -42,6 +42,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+      # 셸 완성 시험이 zsh 문법을 검사한다(cli/options.test.mjs [7]) — 러너에 zsh 가 없다
+      - run: sudo apt-get update -q && sudo apt-get install -y -q zsh
       - run: npm run test:cli
       - run: npm run typecheck
       - run: npm run lint
