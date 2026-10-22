@@ -23,11 +23,16 @@ The CLI asks on a terminal and follows common cloud CLI conventions; visits and 
 - **CLI: single executable** — `npm run build:cli-bin` builds a standalone executable with Node SEA in `build/cli-sea/` and fills the Homebrew formula template `cli/packaging/homebrew/cloudonym.rb.tmpl`; nothing is released.
 - **`scopes` in `/catalog.json`** — per provider, each uniqueness scope's `id` (the `scope` of `/v1/wizard` and `/v1/names` items), `name` and `parent`; a scope with no `parent` is the provider's widest one. Additive; no name or verdict changes and the rules revision is unchanged.
 - **`env_values` in `/catalog.json`** (D121) — the standard environment values (`prod`, `stg`, `dev`, `sbx`, `qa`, `uat`, `test`, `perf`, `dr`) at the top level, in the engine's order, so a client can offer them without its own copy. No name or verdict changes; the rules revision is unchanged.
+- **Supported resource count** — the Cloud picker shows "N resources" under each enabled cloud, and `/about` has a Supported resources section with the count per enabled cloud; `/llms.txt` states the same number under Resource tree (`Supported resources: gcp 117`). Web and `/llms.txt` call one counting function, so they cannot differ. The number is counted from the rule table and catalog when the site is built (one per row of the resource tree), never written by hand.
 
 ### Changed
 
 - **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
 - **`--from` with a share link** says what to do instead: open the link, press Save plan, then `cloudonym new --from <file>`.
+
+### Fixed
+
+- **The mouse wheel scrolls the wizard page past its columns** — on tablet and wide layouts a wheel over a column stopped at the column, so the bottom of the grid could not be reached. Columns now hand the wheel to the page at their edge; the names drawer still keeps its scroll to itself.
 
 ### Security
 

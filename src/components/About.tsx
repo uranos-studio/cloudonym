@@ -10,6 +10,8 @@ import { repositoryFileUrl, repositoryLabel, SOURCE_REPOSITORY_URL } from './abo
 import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
 import { VERSION } from '../version';
+import { enabledResourceCounts } from './resourceCount';
+import { providerName } from './providerName';
 
 const LINK = 'font-medium text-indigo-700 underline hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100';
 
@@ -43,6 +45,12 @@ export function About() {
         <Section id="about-checks" title={ui.about_checks_title}>
           <p data-pass-meaning>{ui.pass_meaning}</p>
           <p data-nothing-created>{ui.wizard_nothing_created}</p>
+        </Section>
+        <Section id="about-resources" title={ui.about_resources_title}>
+          {/* 켜진 CSP 마다 — 숫자는 resourceCount 가 규칙 표 · catalog 에서 센다 */}
+          {enabledResourceCounts().map(({ provider, count }) => (
+            <p key={provider} data-about-resources={provider}>{fillUi(en, 'about_resources_body', { cloud: providerName(provider), count })}</p>
+          ))}
         </Section>
         <Section id="about-source" title={ui.about_source_title}>
           <p>

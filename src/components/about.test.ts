@@ -23,11 +23,11 @@ describe('/about (D109)', () => {
   beforeAll(() => { vi.stubGlobal('window', { location: { hash: '#state=abc' } }); });
   afterAll(() => { vi.unstubAllGlobals(); });
 
-  it('제목 하나와 절 머리 일곱이 순서대로', () => {
+  it('제목 하나와 절 머리 여덟이 순서대로', () => {
     const m = markup();
     expect(m.match(/<h1[^>]*>([^<]*)<\/h1>/)?.[1]).toBe(en.ui.page_about_title);
     expect([...m.matchAll(/<h2[^>]*>([^<]*)<\/h2>/g)].map((x) => x[1])).toEqual([
-      en.ui.about_what_title, en.ui.about_example_title, en.ui.about_checks_title, en.ui.about_source_title,
+      en.ui.about_what_title, en.ui.about_example_title, en.ui.about_checks_title, en.ui.about_resources_title, en.ui.about_source_title,
       en.ui.about_status_title, en.ui.about_versions_title, en.ui.about_links_title,
     ]);
   });

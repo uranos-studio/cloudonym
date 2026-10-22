@@ -23,6 +23,7 @@ import { MAX_ITEMS, MAX_NAMES } from '../core/selection';
 import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
 import { API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED } from '../components/apiDocModel';
 import { SHAREABLE_PARTS } from '../components/wizardBundles';
+import { enabledResourceCounts } from '../components/resourceCount';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -383,6 +384,8 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '', '## Resource tree', '',
     'Where each resource is created, from the widest scope down. Under each scope: its rules (`input` = what `/v1/names` accepts for that rule: `count` 1-99, `role`, or `none`), then its child scopes.',
     '', SCOPE_MEANING, '', UNIQUENESS_MEANING,
+    // 화면(CloudPicker · /about)과 같은 함수 — 웹과 API 의 숫자가 갈라지지 않는다
+    '', `Supported resources: ${enabledResourceCounts().map(({ provider, count }) => `${provider} ${count}`).join(' · ')} (rows of the tree below, counted from the catalog)`,
   );
   for (const p of order) lines.push('', `### ${p.toUpperCase()}`, ...treeLines(buildTree(p)));
   // PASS 의 뜻 (D28) — 정본은 사전의 ui.pass_meaning. README · openapi.json 은 같은 문장을 옮겨 적고 시험이 대어 본다

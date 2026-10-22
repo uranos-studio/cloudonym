@@ -20,7 +20,7 @@ export const UI_KEYS = [
   'step_cloud', 'step_context', 'step_resources', 'step_names', 'selection_dropped', 'switch_cloud_confirm',
   'sticky_summary', 'sticky_jump',
   // CloudPicker — 꺼진 CSP 의 표지 · 툴팁 · 꺼진 CSP 링크 안내 (D45 · D55)
-  'cloud_group_label', 'pick_cloud_prompt', 'cloud_coming_soon', 'cloud_planned_aws', 'cloud_planned_azure', 'provider_unavailable',
+  'cloud_group_label', 'pick_cloud_prompt', 'cloud_coming_soon', 'cloud_resource_count', 'cloud_planned_aws', 'cloud_planned_azure', 'provider_unavailable',
   // ResourceTree
   'resources_title', 'search_label', 'search_placeholder', 'search_empty', 'selected_only', 'selected_count',
   'expand_all', 'collapse_all', 'category_filter_label', 'category_all',
@@ -70,7 +70,7 @@ export const UI_KEYS = [
   'privacy_retention_axiom_unset', 'privacy_hosting_title', 'privacy_ip', 'privacy_hosting',
   'privacy_contact_title', 'privacy_contact_issues', 'privacy_contact_security', 'privacy_contact_changes', 'privacy_last_updated',
   // About — /about (D109)
-  'about_what_title', 'about_what_body', 'about_example_title', 'about_checks_title', 'about_source_title', 'about_source_repo', 'about_license',
+  'about_what_title', 'about_what_body', 'about_example_title', 'about_checks_title', 'about_resources_title', 'about_resources_body', 'about_source_title', 'about_source_repo', 'about_license',
   'about_license_notice', 'about_trademark', 'about_status_title', 'about_status', 'about_versions_title', 'about_versions_body', 'about_links_title', 'about_intro_again',
   // NamesPanel
   'names_summary', 'names_empty_selection', 'copy_all_names', 'copy_all_names_skipped', 'copy_all_names_label',

@@ -8,7 +8,9 @@ import { useRef, type KeyboardEvent } from 'react';
 import { ENABLED_PROVIDERS, PROVIDERS, type Provider } from '../core/types';
 import { en } from '../messages/en';
 import type { UiKey } from '../messages/catalog';
+import { fillUi } from '../messages/catalog';
 import { providerName, providerShort } from './providerName';
+import { resourceCount } from './resourceCount';
 
 /** 꺼진 CSP 의 툴팁 — 언제 열리는지 (사전 문구) */
 const PLANNED: Partial<Record<Provider, UiKey>> = { aws: 'cloud_planned_aws', azure: 'cloud_planned_azure' };
@@ -66,6 +68,7 @@ export function CloudPicker({ value, onPick, numbered = true }: { value: Provide
               className={BUTTON}
             >
               {providerShort(p)}
+              {on && <span data-resource-count className="whitespace-nowrap text-[0.7rem] font-normal opacity-80">{fillUi(en, 'cloud_resource_count', { count: resourceCount(p) })}</span>}
               {!on && <span data-coming-soon className="whitespace-nowrap rounded bg-zinc-200 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">{en.ui.cloud_coming_soon}</span>}
             </button>
           );

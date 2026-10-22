@@ -28,6 +28,7 @@ import { RESERVED_TIERS } from '../core/tier';
 import { PRESETS, PRESET_TIERS } from '../core/wizard/presets';
 import { ATTACHMENTS } from '../core/wizard/attachments';
 import { MAX_BODY_BYTES } from './v1';
+import { resourceCount } from '../components/resourceCount';
 import { RATE_LIMIT } from './ratelimit';
 import { MAX_ECHO_CHARS, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { MAX_FIELD_CHARS } from './schemas';
@@ -338,6 +339,11 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(vpc).toContain('(VPC (Name tag))');
     expect(/\p{Script=Hangul}/u.test(text)).toBe(false);
     expect(/\p{Script=Hangul}/u.test(allText)).toBe(false);
+  });
+  it('「## Resource tree」 절의 Supported resources — 켜진 CSP 마다 화면과 같은 수(resourceCount)', () => {
+    const line = lines.find((l) => l.startsWith('Supported resources: '));
+    expect(line).toBe(`Supported resources: ${ENABLED_PROVIDERS.map((p) => `${p} ${resourceCount(p)}`).join(' · ')} (rows of the tree below, counted from the catalog)`);
+    expect(lines.indexOf(line!)).toBeGreaterThan(lines.indexOf('## Resource tree'));
   });
   it('「## Resource tree」 절 — provider 마다 범위 노드(id · docUrl) 아래 규칙마다 들여쓴 한 줄(id · input) · scope/uniqueness 문장은 openapi 와 같다', () => {
     // 공개 본문은 켜진 CSP 의 범위 · 규칙만
