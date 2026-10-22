@@ -6,7 +6,7 @@ import { expandPlan, validatePlan, PROJECT_ID_RULE, type PlanError, type WizardP
 import { presetOf } from '../core/wizard/presets';
 import { RULES_REVISION } from '../core/revision';
 import { validateSelection, type SelectionItem } from '../core/selection';
-import { locationError } from '../core/regions';
+import { canonicalLocation, canonicalRegion, locationError } from '../core/regions';
 import type { CoreMessage } from '../core/messages';
 import type { ApiMessage } from './codes';
 import type { WireMessage } from './serialize';
@@ -110,6 +110,14 @@ function describe(v: unknown): string {
   return clipForDisplay(text);
 }
 
+/** providers 를 생략한 요청의 CSP — 지역 표(리전 · 멀티/이중 리전 위치)에서 그 값이 풀리는 켜진 CSP. GCP 지역을 보내는 옛 요청이 AWS 를 켠 뒤에도 400 이 되지 않게 한다 */
+function providersForRegion(region: unknown): Provider[] {
+  const all = [...ENABLED_PROVIDERS];
+  if (typeof region !== 'string' || region.trim() === '') return all;
+  const hit = all.filter((p) => canonicalRegion(region, p) !== undefined || canonicalLocation(region, p) !== undefined);
+  return hit.length > 0 ? hit : all;
+}
+
 export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
   if (!isRecord(body)) return reject([{ code: 'request.body_not_object' }]);
   const pin = checkRulesVersion(body);
@@ -118,8 +126,8 @@ export function parseGenerateBody(body: unknown): Parsed<GenerateInput> {
   if (!isRecord(body.context)) return reject([{ code: 'request.context_not_object' }]);
   const long = contextTooLong(body.context);
   if (long.length > 0) return reject(long);
-  // 생략하면 켜진 CSP 전부 (D45)
-  let providers: Provider[] = [...ENABLED_PROVIDERS];
+  // 생략하면 보낸 지역이 풀리는 CSP 만 — 어디서도 안 풀리거나 지역이 없으면 켜진 CSP 전부(오류는 CSP 마다 낸다) (D45 · 결정 2026-10-22)
+  let providers: Provider[] = providersForRegion(body.context.region);
   if (body.providers !== undefined) {
     if (!Array.isArray(body.providers)) return reject([{ code: 'request.providers_not_array' }], enabledList());
     if (body.providers.length === 0) return reject([{ code: 'request.providers_empty' }], enabledList());

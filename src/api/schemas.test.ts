@@ -17,10 +17,29 @@ describe('parseGenerateBody', () => {
     // 존 코드는 리전 코드로 풀리고 그 기록이 남는다 — 존은 이름에 들지 않는다 (D50 revised)
     expect(r).toEqual({ ok: true, value: { contexts: { gcp: parsedCtx }, transformed: [{ code: 'context.normalized', field: 'region', params: { from: 'ane3a', to: 'ane3' } }], providers: ['gcp'] } });
   });
-  it('providers 생략 → 켜진 것만 (D45)', () => {
-    const r = parseGenerateBody({ context: ctx });
-    expect(r.ok && r.value.providers).toEqual(['gcp']);
-    expect(r.ok && r.value.providers).toEqual([...ENABLED_PROVIDERS]);
+  it('providers 생략 · 지역 없음 → 켜진 CSP 전부로 풀고 지역은 필수라 400 하나 (D45)', () => {
+    const { region: _r, ...noRegion } = ctx;
+    expect(parseGenerateBody({ context: noRegion })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.not_string', field: 'region' }] } });
+    expect(parseGenerateBody({ context: { ...ctx, region: '' } })).toEqual({ ok: false, rejection: { status: 400, errors: [{ code: 'context.empty', field: 'region' }] } });
+  });
+  it('providers 생략 · 지역 있음 → 그 지역이 풀리는 CSP 만 — GCP 지역을 보내는 옛 요청은 AWS 를 켜도 400 이 아니다 (결정 2026-10-22)', () => {
+    const gcp = parseGenerateBody({ context: ctx });
+    expect(gcp.ok && gcp.value.providers).toEqual(['gcp']);
+    expect(gcp.ok && Object.keys(gcp.value.contexts)).toEqual(['gcp']);
+    const aws = parseGenerateBody({ context: { ...ctx, region: 'ap-northeast-2' } });
+    if (ENABLED_PROVIDERS.includes('aws')) expect(aws.ok && aws.value.providers).toEqual(['aws']);
+    else expect(aws.ok).toBe(false);
+  });
+  it('providers 생략 · 어느 CSP 에서도 안 풀리는 지역 → 켜진 CSP 전부의 오류로 400', () => {
+    const r = parseGenerateBody({ context: { ...ctx, region: 'mars-1' } });
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.rejection.errors.every((e) => 'field' in e && e.field === 'region')).toBe(true);
+  });
+  it('providers 를 적으면 지역으로 거르지 않는다 — 안 풀리면 400', () => {
+    for (const p of ENABLED_PROVIDERS) {
+      const region = p === 'gcp' ? 'ap-northeast-2' : 'asia-northeast3';
+      expect(parseGenerateBody({ context: { ...ctx, region }, providers: [p] }).ok, p).toBe(false);
+    }
   });
   it('아는데 꺼진 provider → 400 request.provider_not_enabled · supported 는 켜진 것 (D45)', () => {
     const off = DISABLED[0]!;
