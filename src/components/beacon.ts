@@ -3,6 +3,7 @@
 import { COPY_TARGETS, type CopyTarget } from './copyTargets';
 import type { WizardPlan } from '../core/wizard/plan';
 import { pickedRuleIds } from './pickedRules';
+import { storedCampaign } from './campaign';
 
 export type UiBeacon = 'ui_visit' | 'ui_generate' | 'ui_copy';
 export interface BeaconMeta { target?: CopyTarget; chip_rules?: string[]; custom_rules?: string[] }
@@ -15,7 +16,9 @@ export interface StorageLike { getItem(key: string): string | null; setItem(key:
 
 /** navigator.sendBeacon — 없으면 fetch keepalive. 본문은 문자열이라 text/plain 으로 간다 (API 는 content-type 을 보지 않는다 · events.test) */
 export function sendBeacon(event: UiBeacon, meta: BeaconMeta = {}): void {
-  const body = JSON.stringify({ event, ...meta });
+  // 캠페인 출처(D122)가 이 탭 세션에 있으면 src 로 싣는다 — 출처 이름 하나뿐이다
+  const src = storedCampaign(sessionStore());
+  const body = JSON.stringify({ event, ...meta, ...(src !== undefined ? { src } : {}) });
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
       navigator.sendBeacon(EVENTS_PATH, body);

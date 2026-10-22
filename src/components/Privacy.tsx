@@ -67,6 +67,7 @@ export function Privacy() {
           </div>
           <p>{fillUi(en, 'privacy_target_note', { targets: COPY_TARGETS.join(', ') })}</p>
           <p data-privacy-rules>{ui.privacy_rules_note}</p>
+          <p data-privacy-src>{ui.privacy_src_note}</p>
         </Section>
         <Section id="privacy-never" title={ui.privacy_never_title}>
           <p data-privacy-never>{ui.privacy_never_body}</p>

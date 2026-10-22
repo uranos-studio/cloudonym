@@ -88,6 +88,12 @@ describe('/privacy', () => {
     expect(text).toContain('chip_rules and custom_rules list the rule ids of the resource kinds picked in the wizard');
     expect(text).toContain('never the values you typed');
   });
+  it('캠페인 출처 src (D122) — 탭 세션에만 · 쿠키 · localStorage · 식별자 없음 · 출처별 일자 카운터', () => {
+    const text = pageText();
+    expect(text).toContain('src is the campaign source');
+    expect(text).toContain('sessionStorage for this tab only');
+    expect(text).toContain('no cookie, localStorage or identifier is used');
+  });
   it('Workers Logs — 호스팅 제공자로서 요청 메타데이터를 처리할 수 있다 · 로그에는 본문 · 헤더를 쓰지 않는다(오류는 그대로 남는다)', () => {
     const text = pageText();
     expect(text).toContain('As the hosting provider, Cloudflare may process request metadata');
@@ -137,7 +143,7 @@ describe('/privacy', () => {
     expect(text).toContain(footer);
     const body = text.replace(`Last updated: ${PRIVACY_LAST_UPDATED}`, '').replace(footer, '');
     const fingerprint = fnv1a(body);
-    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-15 f5f93a8b');
+    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-22 73ef1e4d');
     // 검사기 — 한 글자만 바뀌어도 지문이 달라진다
     expect(fnv1a(`${body}.`)).not.toBe(fingerprint);
   });

@@ -65,7 +65,7 @@ export const UI_KEYS = [
   'privacy_api_title', 'privacy_api_intro', 'privacy_api_common', 'privacy_col_event',
   'privacy_col_when', 'privacy_col_fields', 'privacy_when_ui_visit', 'privacy_when_ui_generate',
   'privacy_when_ui_copy', 'privacy_when_api_generate', 'privacy_when_api_names', 'privacy_when_api_validate', 'privacy_when_api_wizard',
-  'privacy_when_llms_txt_accessed', 'privacy_when_catalog_json_accessed', 'privacy_target_note', 'privacy_rules_note', 'privacy_never_title',
+  'privacy_when_llms_txt_accessed', 'privacy_when_catalog_json_accessed', 'privacy_target_note', 'privacy_rules_note', 'privacy_src_note', 'privacy_never_title',
   'privacy_never_body', 'privacy_retention_title', 'privacy_retention_kv', 'privacy_retention_axiom',
   'privacy_retention_axiom_unset', 'privacy_hosting_title', 'privacy_ip', 'privacy_hosting',
   'privacy_contact_title', 'privacy_contact_issues', 'privacy_contact_security', 'privacy_contact_changes', 'privacy_last_updated',

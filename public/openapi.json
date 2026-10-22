@@ -1597,6 +1597,11 @@
             "example": [
               "gcp.secret"
             ]
+          },
+          "src": {
+            "type": "string",
+            "description": "Campaign source (D122): the short name of the site whose house_ad link opened the page, from utm_source. Optional on ui_visit, ui_generate and ui_copy. Kept only when it matches ^[a-z0-9-]{1,32}$; any other value is dropped without an error. When kept it is sent to Axiom and adds one to a per-source daily KV counter.",
+            "example": "parking"
           }
         }
       },

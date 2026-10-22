@@ -33,7 +33,7 @@ export function classifyClient(userAgent: string | undefined): ClientClass {
 
 /** 이벤트마다 Axiom 에 싣는 meta 키 (D56 필드 표) — 표에 없는 키 · 표에 없는 이벤트의 meta 는 싣지 않는다 */
 export const META_KEYS: Readonly<Record<string, readonly string[]>> = {
-  ui_visit: [], ui_generate: ['chip_rules', 'custom_rules'], ui_copy: ['target'],
+  ui_visit: ['src'], ui_generate: ['chip_rules', 'custom_rules', 'src'], ui_copy: ['target', 'src'],
   api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
   api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid', 'chip_rules', 'custom_rules'],
   llms_txt_accessed: [], catalog_json_accessed: [],
@@ -50,11 +50,19 @@ export function ruleIdList(value: unknown): string[] | undefined {
   return [...new Set(value.filter((id) => Object.hasOwn(RULES, id)))].sort();
 }
 
+/** 캠페인 출처 (D122) — 화면 쪽 campaign.ts 의 CAMPAIGN_SRC_PATTERN 과 같다(campaign-src.test). 화면 값을 믿지 않고 여기서 다시 거른다 */
+export const CAMPAIGN_SRC_RE = /^[a-z0-9-]{1,32}$/;
+/** 맞으면 그 값, 아니면 undefined(칸째 버린다) */
+export function campaignSrc(value: unknown): string | undefined {
+  return typeof value === 'string' && CAMPAIGN_SRC_RE.test(value) ? value : undefined;
+}
+
 function allowedMeta(event: string, meta: Record<string, unknown>): Record<string, unknown> {
   const keys = Object.hasOwn(META_KEYS, event) ? META_KEYS[event]! : [];
   const out: Record<string, unknown> = {};
   for (const k of keys) {
     if (!Object.hasOwn(meta, k)) continue;
+    if (k === 'src') { const src = campaignSrc(meta[k]); if (src !== undefined) out[k] = src; continue; }
     if (!RULE_ID_KEYS.has(k)) { out[k] = meta[k]; continue; }
     const ids = ruleIdList(meta[k]);
     if (ids !== undefined) out[k] = ids;
@@ -91,9 +99,11 @@ async function bump(kv: KVNamespace, key: string): Promise<void> {
   await kv.put(key, String(current + 1), { expirationTtl: KV_TTL_SECONDS });
 }
 
-async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean): Promise<void> {
+async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean, src: string | undefined): Promise<void> {
   try {
     await bump(kv, `stats:${event}:${day}`);
+    // 캠페인 출처별 카운터 (D122) — 허용 표에 src 가 있는 이벤트이고 값이 정규식에 맞을 때만
+    if (src !== undefined) await bump(kv, `stats:${event}:src:${src}:${day}`);
     if (ai) await bump(kv, `stats:ai_agent_hits:${day}`);
   } catch (e) {
     console.error('KV 카운터 실패:', e);
@@ -167,7 +177,8 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
 
     // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다. 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
     const parts: Promise<void>[] = [];
-    if (kv) parts.push(countKv(kv, event, day, ai));
+    const src = Object.hasOwn(META_KEYS, event) && META_KEYS[event]!.includes('src') ? campaignSrc(meta.src) : undefined;
+    if (kv) parts.push(countKv(kv, event, day, ai, src));
     if (apiKey && dataset) {
       // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다.
       // meta 는 허용 표로 거른 뒤 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · client_class · is_ai_agent)을 meta 가 덮어쓰지 못한다
