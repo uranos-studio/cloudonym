@@ -470,6 +470,7 @@ export const en: Catalog = {
     intro_example_fwd: 'HTTPS forwarding rule',
     nav_about: 'About',
     nav_about_label: 'What Cloudonym is, its source code and license',
+    nav_home_label: 'Back to the start page',
     wizard_project_next: 'Next: what are you building',
     wizard_project_next_hint: 'Pick a card for the first service.',
     wizard_project_pending: 'Fill in owner, system, environment and region to continue.',

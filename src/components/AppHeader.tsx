@@ -78,11 +78,15 @@ export function AppHeader({ share, shareText, onShare, screen, otherHref, naming
     <header className="relative z-30 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/80">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          {/* 제품 표시 — 파비콘과 같은 파일이다(public/favicon.svg). 이름은 옆 h1 이 읽히므로 그림은 alt 를 비운다 */}
-          <img src="/favicon.svg" alt="" width={36} height={36} className="size-9 shrink-0" />
+          {/* 제품 표시 — 파비콘과 같은 파일이다(public/favicon.svg). 이름은 옆 h1 이 읽히므로 그림은 alt 를 비운다.
+              로고 · 이름을 누르면 첫 화면(/)으로 간다 — hash 를 싣지 않으므로 처음 들어온 것과 같다 */}
+          <a href="/" data-nav-home title={en.ui.nav_home_label}
+            className="flex shrink-0 items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <img src="/favicon.svg" alt="" width={36} height={36} className="size-9 shrink-0" />
+            <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
+          </a>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h1 className="text-lg font-bold tracking-tight">Cloudonym</h1>
               {badge}
             </div>
           </div>
