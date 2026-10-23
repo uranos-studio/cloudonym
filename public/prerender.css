@@ -1,0 +1,9 @@
+/* 화면 JS 가 뜨기 전 #root 의 요약 글(D106)을 로딩 화면처럼 그린다 — React 가 #root 를 바꾸면 .prerender 가 사라져 이 규칙도 끝난다.
+   색은 src/index.css 의 body(zinc-50 · zinc-950)와 같다. html.dark 는 public/theme.js 가 첫 칠 전에 단다 */
+html { background: #fafafa; color: #18181b; }
+html.dark { background: #09090b; color: #f4f4f5; }
+.prerender { font-family: ui-sans-serif, system-ui, sans-serif; max-width: 40rem; margin: 30vh auto 0; padding: 0 16px; text-align: center; }
+.prerender h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.5rem; }
+.prerender p { font-size: 0.875rem; opacity: 0.7; margin: 0 0 1rem; }
+.prerender nav { font-size: 0.75rem; opacity: 0.5; }
+.prerender a { color: inherit; }
