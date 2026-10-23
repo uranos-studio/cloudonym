@@ -5,9 +5,12 @@
 // 가족 밖의 카드(vm-app)는 필수 서비스 부품이 다 있을 때 보인다(web · db 칩만 켠 흔한 서비스에 「미완성 카드」를 띄우지 않는다) — 그때 프로젝트 공용 부품이 빠졌으면 미완성이다.
 // 다만 함께 쓰지 않는 서비스 pick 하나라도 앞의 카드(LB 카드가 먼저)가 차지했으면 보이지 않는다(D115) — 서비스 계정 · Artifact Registry 저장소 · 시크릿 · Cloud SQL 은
 // 카드 여럿이 함께 쓴다(SHAREABLE_PARTS). 완성은 필수 부품(서비스 · 프로젝트 공용)이 다 있을 때다
-import { MAX_PICKS_PER_SERVICE, validatePlan, type WizardPlan } from '../core/wizard/plan';
+import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type WizardPlan } from '../core/wizard/plan';
+import { generateProject } from '../core/engine';
 import { BUNDLES, bundleById, partIsProject, partKey, type Bundle, type BundleBackend, type BundlePart } from '../core/wizard/bundles';
 import { addPresetPick, findPreset } from './wizardState';
+import { fillUi, type UiKey } from '../messages/catalog';
+import { en } from '../messages/en';
 
 /** 한 서비스 안에서 카드 여럿이 함께 쓰는 부품 (D115) — 같은 이름 하나를 여러 카드가 가리켜도 각 카드가 맞게 돈다:
  *  서비스 계정은 여러 리소스가 실행 주체로 쓰고, Artifact Registry 저장소는 이미지를 여럿 담고, 시크릿은 여러 곳이 읽고, Cloud SQL 인스턴스는 데이터베이스 · 접속자를 여럿 받고,
@@ -309,4 +312,28 @@ export function setOption(plan: WizardPlan, service: number, parts: readonly Bun
 /** 부품이 있는가 — 점검표 */
 export function partPresent(plan: WizardPlan, service: number, part: BundlePart): boolean {
   return has(plan, service, part);
+}
+
+/** Website (autoscaling) 카드의 기본 인스턴스 이름 예시 — 그룹이 만드는 VM 이름의 앞부분(표시 전용 · 이름 목록 · hash · 내보내기에 싣지 않는다).
+ *  이 서비스에 Web server 칩(web) 하나만 둔 계획을 따로 만들어 엔진(expandPlan → generateProject)으로 이름을 받고, 슬롯 번호(seq)만 뗀다.
+ *  MIG 이름을 고쳐 쓰지 않는다 — Website 카드의 `-gce-web-01` 과 같은 길로 만든다. 문맥이 틀려 이름을 못 만들면 undefined */
+export function migBaseName(plan: WizardPlan, service: number): string | undefined {
+  const svc = plan.services[service];
+  if (!svc) return undefined;
+  const probe = addPresetPick({ ...plan, projectPicks: [], services: [{ ...svc, picks: [] }] }, 0, 'web');
+  if (!validatePlan(probe).ok) return undefined;
+  const seq = probe.services[0]?.picks[0]?.instances?.[0]?.seq;
+  if (seq === undefined) return undefined;
+  const item = generateProject(expandPlan(probe), 'gcp').items.find((i) => i.key.startsWith('service/'));
+  if (!item?.valid || !item.name.endsWith(`-${seq}`)) return undefined;
+  return item.name.slice(0, -(seq.length + 1));
+}
+
+/** 설정 안내 한 줄 — website-mig 는 이 서비스의 기본 인스턴스 이름 예시(migBaseName)를 넣는다. 못 만들면 일반 문장 */
+export function setupNote(plan: WizardPlan, service: number, key: string, text: UiKey): string {
+  if (key === 'website-mig') {
+    const name = migBaseName(plan, service);
+    if (name !== undefined) return fillUi(en, 'wizard_card_setup_mig_named', { name });
+  }
+  return en.ui[text];
 }

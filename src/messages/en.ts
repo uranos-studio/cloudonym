@@ -617,6 +617,7 @@ export const en: Catalog = {
     wizard_card_setup_tasks: "The queue's service account needs Cloud Run Invoker on the handler; the API service's account needs Cloud Tasks Enqueuer. Create the queue in the handler's region.",
     wizard_card_setup_roles: 'Give each account only its job\'s role: Cloud Build Service Account to the build account, Cloud Run Invoker to the push and scheduler callers, and the runtime roles to the service account that runs the code.',
     wizard_card_setup_mig: "Set the group's base instance name to the web server name without its number (for example the Web server chip's name up to -gce-web); instances get a random suffix.",
+    wizard_card_setup_mig_named: "Set the group's base instance name to {name} — the web server name for this service without its number; instances get a random suffix.",
     wizard_card_setup_doc: 'Google Cloud docs',
     wizard_card_tag_lb: 'HTTPS load balancer · {n}',
     wizard_card_tag_redirect: 'HTTP → HTTPS · {n}',
