@@ -28,6 +28,7 @@ import { RESERVED_TIERS } from '../core/tier';
 import { PRESETS, PRESET_TIERS, presetsFor } from '../core/wizard/presets';
 import { ATTACHMENTS } from '../core/wizard/attachments';
 import { MAX_BODY_BYTES } from './v1';
+import { resourceCount } from '../components/resourceCount';
 import { RATE_LIMIT } from './ratelimit';
 import { MAX_ECHO_CHARS, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { MAX_FIELD_CHARS } from './schemas';
@@ -271,13 +272,13 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — GCP 묶음 스물일곱 · AWS 묶음 열하나(0.2) · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — GCP 묶음 서른아홉 · AWS 묶음 열하나(0.2) · 프리셋 id 전부 · HA 규칙', () => {
     const sec = section('## Wizard presets');
     const split = sec.findIndex((l) => l.startsWith('On `provider: "aws"`'));
     expect(split).toBeGreaterThan(0);
     const rows = sec.slice(0, split).filter((l) => l.startsWith('- '));
     const awsRows = sec.slice(split).filter((l) => l.startsWith('- '));
-    expect(rows).toHaveLength(27);
+    expect(rows).toHaveLength(39);
     expect(awsRows).toHaveLength(11);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     for (const p of presetsFor('aws')) expect(awsRows.join('\n'), p.id).toContain(`\`${p.id}\` (${p.label}) → \`${p.ruleId}\``);
@@ -289,17 +290,15 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('「## Wizard cards」 (D93 · D114) — 카드 열 · 서비스 부품과 project 부품 · API 에는 카드가 없다고 말한다', () => {
     const sec = section('## Wizard cards');
     const rows = sec.filter((l) => l.startsWith('- '));
-    expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
-    expect(rows[6]).toContain('project: `vpc`, `subnet`');
-    expect(rows[7]).toContain('`dlq`');
-    // D117 — https-lb 만 아직 묶음으로 만들어 보지 않았다
-    expect(rows[4]).toContain('rules verified, the set not yet applied');
-    for (const r of [...rows.slice(0, 4), ...rows.slice(5)]) expect(r).toContain('built and tested on Google Cloud');
+    expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'website-mig', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job', 'task-queue']);
+    expect(rows[7]).toContain('project: `vpc`, `subnet`');
+    expect(rows[8]).toContain('`dlq`');
+    // D128 — 2026-10-23 실배포로 https-lb · task-queue · website-mig 까지 열둘 전부 만들어 보았다
+    for (const r of rows) expect(r).toContain('built and tested on Google Cloud');
+    expect(rows.join('\n')).not.toContain('rules verified, the set not yet applied');
     expect(rows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `lbhc`');
-    expect(rows[0]).toContain('built and tested on Google Cloud');
-    expect(rows[1]).toContain('built and tested on Google Cloud');
-    expect(rows[2]).toContain('built and tested on Google Cloud');
-    expect(rows[4]).toContain('rules verified, the set not yet applied');
+    // D126 — 역할 부품은 role 을 밝힌다
+    expect(rows[9]).toContain('`sa` role `build`');
     expect(rows[1]).toContain('`neg`');
     expect(rows[1]).not.toContain('`hc`');
     expect(sec.join('\n')).toContain('Cards are not part of `/v1/wizard`');
@@ -350,6 +349,11 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(vpc).toContain('(VPC (Name tag))');
     expect(/\p{Script=Hangul}/u.test(text)).toBe(false);
     expect(/\p{Script=Hangul}/u.test(allText)).toBe(false);
+  });
+  it('「## Resource tree」 절의 Supported resources — 켜진 CSP 마다 화면과 같은 수(resourceCount)', () => {
+    const line = lines.find((l) => l.startsWith('Supported resources: '));
+    expect(line).toBe(`Supported resources: ${ENABLED_PROVIDERS.map((p) => `${p} ${resourceCount(p)}`).join(' · ')} (rows of the tree below, counted from the catalog)`);
+    expect(lines.indexOf(line!)).toBeGreaterThan(lines.indexOf('## Resource tree'));
   });
   it('「## Resource tree」 절 — provider 마다 범위 노드(id · docUrl) 아래 규칙마다 들여쓴 한 줄(id · input) · scope/uniqueness 문장은 openapi 와 같다', () => {
     // 공개 본문은 켜진 CSP 의 범위 · 규칙만
@@ -461,7 +465,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     expect(body).toContain('`cloudonym.plan.names.json`');
     expect(help.join('\n')).toContain('default cloudonym.plan.json');
     expect(body).toMatch(/writes the file only if every existing name and verdict stays the same/);
-    // 종료 코드 — --help 의 줄과 글자까지 같고(그 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다), 번호는 EXIT 와 같다
+    // 종료 코드 — --help 의 줄과 글자까지 같고(그 줄은 cli/main.test.mjs [6] 이 docs/cli.md · D102 와 대어 본다), 번호는 EXIT 와 같다
     const exitLine = sec.find((l) => l.startsWith('- Exit codes: '))!;
     expect(exitLine).toBe(`- ${help.find((l) => l.startsWith('Exit codes: '))}`);
     const nums = [...exitLine.matchAll(/(?:: | · )(\d+) /g)].map((m) => Number(m[1]));

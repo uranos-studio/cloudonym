@@ -7,7 +7,7 @@ import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
 const shown = PLAN_FILE_MAX_BYTES.toLocaleString('en-US');
 
 describe('계획 파일 상한 숫자', () => {
-  it.each(['README.md', 'CHANGELOG.md', 'docs/decisions.md'])('%s 의 숫자가 PLAN_FILE_MAX_BYTES 와 같다', (file) => {
+  it.each(['docs/web-ui.md', 'CHANGELOG.md', 'docs/decisions.md'])('%s 의 숫자가 PLAN_FILE_MAX_BYTES 와 같다', (file) => {
     const all = readFileSync(join(import.meta.dirname, '..', '..', file), 'utf8');
     // CHANGELOG 은 지금 항목(Unreleased · 0.2.0)만 — 지난 릴리스 항목은 낸 그대로 두고 다시 쓰지 않는다
     const past = file === 'CHANGELOG.md' ? all.search(/^## \[0\.1\./m) : -1;

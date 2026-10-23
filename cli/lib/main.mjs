@@ -21,7 +21,7 @@ export { nextSeq, nextSlotId, USER_AGENT, CLI_VERSION };
 /**
  * 종료 코드 — 0 성공 · 1 이름이 FAIL 이거나 add 가 기존 이름 · 판정을 바꾼다 · 2 계획 · 보관 파일 · 인자 거부(400 · 413), 파일을 못 읽거나 못 씀, 읽은 뒤 바뀜 ·
  * 3 규칙 버전 불일치(409) · 4 못 닿음 · 429 · 5xx · 해석할 수 없는 응답 · 64 사용법 · 70 내부 오류.
- * 이 표는 USAGE · README(영어 · 한국어) · D102 와 같아야 한다 — cli/main.test.mjs 가 넷을 대어 본다
+ * 이 표는 USAGE · docs/cli.md(영어 · 한국어) · D102 와 같아야 한다 — cli/main.test.mjs 가 넷을 대어 본다
  */
 export const EXIT = { OK: 0, FAIL: 1, INPUT: 2, VERSION: 3, UNAVAILABLE: 4, USAGE: 64, INTERNAL: 70 };
 
@@ -296,7 +296,7 @@ export function exportName(it) {
 
 /**
  * POST /v1/wizard 의 2xx 본문에서 data.<provider> 를 꺼낸다 — items 가 { key, name, valid } 의 비지 않은 배열이 아니면 undefined.
- * 비지 않음: 응답은 늘 프로젝트 ID 항목으로 시작한다(README · llms.txt 의 응답 꼴). 빈 Map 을 「이름 0개 · 바뀐 것 없음」으로 읽으면 add 가 확인 없이 쓰고 validate 가 0 을 낸다
+ * 비지 않음: 응답은 늘 프로젝트 ID 항목으로 시작한다(docs/api.md · llms.txt 의 응답 꼴). 빈 Map 을 「이름 0개 · 바뀐 것 없음」으로 읽으면 add 가 확인 없이 쓰고 validate 가 0 을 낸다
  * @param {any} body @param {string} provider
  * @returns {{ valid: boolean, items: any[] } | undefined}
  */

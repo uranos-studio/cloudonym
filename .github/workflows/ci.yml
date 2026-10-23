@@ -32,6 +32,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+      # 셸 완성 시험이 zsh 문법을 검사한다(cli/options.test.mjs [7]) — 러너에 zsh 가 없다
+      - run: sudo apt-get update -q && sudo apt-get install -y -q zsh
       # 저장소 CLI (D102) — 단위 · 경계 시험. 엔진 실답의 계약 시험은 npm test(src/api/cli-contract.test.ts)가 돈다
       - run: npm run test:cli
       - run: npm run typecheck

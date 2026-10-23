@@ -12,7 +12,7 @@ const NETWORK: BundlePart[] = [{ preset: 'vpc' }, { preset: 'subnet' }, { preset
 
 function pickOf(p: BundlePart): Pick {
   const preset = presetOf(p.preset)!;
-  const base: Pick = { preset: p.preset, ...(p.tier === undefined ? {} : { tier: p.tier }) };
+  const base: Pick = { preset: p.preset, ...(p.tier === undefined ? {} : { tier: p.tier }), ...(p.role === undefined ? {} : { role: p.role }) };
   return inputKind(RULES[preset.ruleId]!) === 'count' ? { ...base, instances: [{ id: '1', seq: '01' }] } : base;
 }
 /** 카드의 부품(백엔드는 첫째 · 선택은 opts) 전부 — 같은 부품은 한 번 */
@@ -33,7 +33,7 @@ function planOf(parts: BundlePart[], withNetwork = true): WizardPlan {
 
 describe('카드 데이터 (D93)', () => {
   it('1차 카드 다섯 + D114 의 다섯 — id 는 고유 · 갤러리 순서', () => {
-    expect(BUNDLES.map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
+    expect(BUNDLES.map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'website-mig', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job', 'task-queue']);
     expect(bundleById('website')?.label).toBe('Website');
     expect(bundleById('nope')).toBeUndefined();
   });
@@ -76,24 +76,73 @@ describe('카드 데이터 (D93)', () => {
     }
   });
 
-  it('가족 lb 의 카드는 백엔드 셋(VM · Cloud Run · 버킷)을 https-lb 의 백엔드 표와 같은 부품으로 쓴다 — 특정 카드 = https-lb + 그 백엔드', () => {
+  it('가족 lb 의 카드는 https-lb 의 백엔드 표와 같은 부품을 쓴다 — https-lb 앞쪽 + 그 백엔드 부품 ⊆ 고정 카드의 부품 · 백엔드 needs 가 카드의 첫 부품 (D127 — website-mig 은 템플릿 · 자동 확장이 더 있다)', () => {
     const lb = bundleById('https-lb')!;
-    for (const [id, needs] of [['website', 'web'], ['serverless-web', 'run'], ['static-site', 'object']] as const) {
+    for (const [id, needs] of [['website', 'web'], ['serverless-web', 'run'], ['static-site', 'object'], ['website-mig', 'mig']] as const) {
       const backend = lb.backends!.find((x) => x.needs === needs)!;
-      const viaLb = new Set([needs, ...lb.parts.map(partKey), ...backend.parts.map(partKey)]);
-      expect(new Set(bundleById(id)!.parts.map(partKey)), id).toEqual(viaLb);
+      const card = new Set(bundleById(id)!.parts.map(partKey));
+      for (const k of [needs, ...lb.parts.map(partKey), ...backend.parts.map(partKey)]) expect(card.has(k), `${id} ${k}`).toBe(true);
       expect(bundleById(id)!.family, id).toBe('lb');
       // 되읽기는 첫 부품을 그 카드의 백엔드로 본다(wizardBundles.cardsIn)
       expect(bundleById(id)!.parts[0]!.preset, id).toBe(needs);
     }
+    // 옛 셋은 등식 그대로 — 고정 카드 = https-lb + 그 백엔드
+    for (const [id, needs] of [['website', 'web'], ['serverless-web', 'run'], ['static-site', 'object']] as const) {
+      const backend = lb.backends!.find((x) => x.needs === needs)!;
+      expect(new Set(bundleById(id)!.parts.map(partKey)), id).toEqual(new Set([needs, ...lb.parts.map(partKey), ...backend.parts.map(partKey)]));
+    }
     expect(bundleById('vm-app')!.family).toBeUndefined();
   });
 
-  it('실제로 만들어 본 카드(tested)는 https-lb 를 뺀 아홉 (D91 · D96 · D117) — https-lb 는 단독으로 응답하지 않아 빠진다', () => {
-    expect(BUNDLES.filter((b) => b.tested).map((b) => b.id)).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
+  it('실제로 만들어 본 카드(tested)는 열둘 전부 (D91 · D96 · D117 · D128) — https-lb 는 이 카드 계획으로 백엔드 셋(run · web · object)과 함께 만들었다', () => {
+    expect(BUNDLES.filter((b) => b.tested).map((b) => b.id)).toEqual(BUNDLES.map((b) => b.id));
+    expect(BUNDLES).toHaveLength(12);
+    // D128 — 2026-10-23 실배포 시험(https-lb 의 web · object 백엔드 · task-queue · website-mig · 역할별 계정)
+    for (const id of ['https-lb', 'task-queue', 'website-mig']) expect(bundleById(id)!.evidence, id).toContain('D128');
+    expect(bundleById('https-lb')!.testedWith!.map((r) => [r.on, r.backend])).toEqual([['2026-10-16', 'run'], ['2026-10-23', 'web'], ['2026-10-23', 'object']]);
+    expect(bundleById('task-queue')!.testedWith).toEqual([expect.objectContaining({ on: '2026-10-23', options: ['api'] })]);
+    expect(bundleById('website-mig')!.testedWith).toEqual([expect.objectContaining({ on: '2026-10-23', options: [] })]);
+    for (const id of ['ci-cd', 'batch-job', 'event-pipeline']) expect(bundleById(id)!.testedWith!.at(-1), id).toEqual(expect.objectContaining({ on: '2026-10-23', options: ['roles'] }));
     // D117 — 2026-10-16 실배포 시험(카드마다 만들고 동작을 보고 지웠다)
     for (const id of ['website', 'serverless-web', 'static-site', 'vm-app', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']) expect(bundleById(id)!.evidence, id).toContain('D117');
     for (const id of ['serverless-web', 'static-site']) expect(bundleById(id)!.evidence, id).toContain('D96');
+  });
+
+  it('D123 — tested 인 카드는 시험 기록(testedWith)이 하나 이상 · 기록의 선택은 그 카드의 선택 id · backend 는 백엔드 needs · 날짜는 YYYY-MM-DD', () => {
+    for (const b of BUNDLES) {
+      if (b.tested) expect(b.testedWith?.length ?? 0, b.id).toBeGreaterThan(0);
+      else expect(b.testedWith, b.id).toBeUndefined();
+      const ids = new Set(b.options.map((o) => o.id));
+      for (const r of b.testedWith ?? []) {
+        expect(r.on, b.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        for (const o of r.options) expect(ids.has(o), `${b.id} ${o}`).toBe(true);
+        if (r.backend !== undefined) expect((b.backends ?? []).map((x) => x.needs), b.id).toContain(r.backend);
+      }
+    }
+    // 2026-10-16 실배포 — website 는 db 선택을 덮지 않았다(같은 프리셋을 vm-app 에서 시험)
+    expect(bundleById('website')!.testedWith).toEqual([expect.objectContaining({ on: '2026-10-16', options: ['was', 'bastion'] })]);
+    expect(bundleById('ci-cd')!.testedWith!.map((r) => r.on)).toEqual(['2026-10-16', '2026-10-17', '2026-10-23']);
+  });
+
+  it('D125 — Async task queue: 큐 · 처리 서비스(handler) · 서비스 계정 · API 서비스(run) 선택 켜짐 · 나머지 꺼짐 · 실배포 시험 지남(D128)', () => {
+    const b = bundleById('task-queue')!;
+    expect(b.parts.map(partKey)).toEqual(['queue', 'handler', 'sa']);
+    expect(b.options.map((o) => [o.id, o.on, o.parts.map(partKey)])).toEqual([['api', true, ['run']], ['appdata', false, ['appdata']], ['secret', false, ['secret']], ['fs', false, ['fs']], ['roles', false, ['sa@push']]]);
+    expect(b.tested).toBe(true);
+    expect(b.family).toBeUndefined();
+    expect(b.refs).toContainEqual(expect.objectContaining({ from: 'queue', to: 'handler', attr: 'http_target.uri_override' }));
+  });
+
+  it('D127 — Website (autoscaling): 템플릿 · 리전 MIG · 자동 확장 + https-lb 앞쪽 · 백엔드 mig 를 https-lb 가 받는다 · 실배포 시험 지남(D128)', () => {
+    const b = bundleById('website-mig')!;
+    expect(b.label).toBe('Website (autoscaling)');
+    expect(b.family).toBe('lb');
+    expect(b.tested).toBe(true);
+    expect(b.parts.map(partKey)).toEqual(['mig', 'tpl', 'as', 'hc', 'bs', 'ip', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'firewall:web', 'firewall:lbhc']);
+    expect(b.options.map((o) => [o.id, o.on])).toEqual([['db', false], ['bastion', false], ['armor', false]]);
+    expect(bundleById('https-lb')!.backends!.map((x) => x.needs)).toEqual(['web', 'run', 'object', 'mig']);
+    expect(b.refs).toContainEqual(expect.objectContaining({ from: 'mig', to: 'tpl', attr: 'version.instance_template' }));
+    expect(b.refs).toContainEqual(expect.objectContaining({ from: 'as', to: 'mig', attr: 'target' }));
   });
 
   it('카드 하나(기본 선택 · 선택 전부 · 선택 없음)를 첫 화면 네트워크 위에 얹으면 validatePlan 을 지나고 이름이 전부 유효 · 축소 없음 · 상한 안', () => {
@@ -117,6 +166,21 @@ describe('카드 데이터 (D93)', () => {
       'service/site/global_address/-/-/01', 'service/site/url_map/-/-/01', 'service/site/ssl_certificate/-/-/01', 'service/site/target_https_proxy/-/-/01',
       'service/site/global_forwarding_rule/-/-/01', 'service/site/url_map/-/redir/01', 'service/site/target_http_proxy/-/-/01', 'service/site/global_forwarding_rule/-/redir/01',
     ]);
+  });
+
+  it('D124 — 숨은 규칙의 선택: 웹 카드의 Cloud Armor · Database name and user · Firestore · 정적 사이트의 엣지 정책 · 전부 기본 꺼짐', () => {
+    const opts = (id: string) => Object.fromEntries(bundleById(id)!.options.map((o) => [o.id, [o.on, o.parts.map(partKey)]]));
+    expect(opts('website')).toMatchObject({ armor: [false, ['waf']], dbuser: [false, ['sqldb', 'sqluser']] });
+    expect(opts('serverless-web')).toMatchObject({ fs: [false, ['fs']], armor: [false, ['waf']], dbuser: [false, ['sqldb', 'sqluser']] });
+    expect(opts('static-site')).toEqual({ armor: [false, ['wafedge']] });
+    expect(bundleById('static-site')!.refs).toContainEqual(expect.objectContaining({ from: 'bb', to: 'wafedge', attr: 'edge_security_policy' }));
+    expect(bundleById('website')!.refs).toContainEqual(expect.objectContaining({ from: 'bs', to: 'waf', attr: 'security_policy' }));
+    expect(bundleById('data-warehouse')!.refs).toContainEqual(expect.objectContaining({ from: 'key', to: 'ring', attr: 'key_ring' }));
+  });
+
+  it('이 릴리스(D124 · D125 · D126 · D127)에서 더한 선택은 전부 기본 꺼짐 — 옛 카드의 기본 이름 수가 바뀌지 않는다 (task-queue 의 API 서비스만 켜짐 · 새 카드)', () => {
+    const NEW = new Set(['armor', 'dbuser', 'fs', 'kms', 'roles', 'appdata', 'secret']);
+    for (const b of BUNDLES) for (const o of b.options) if (NEW.has(o.id) && !(b.id === 'website' && o.id === 'db')) expect(o.on, `${b.id} ${o.id}`).toBe(false);
   });
 
   it('카드의 선택 id 는 카드 안에서 고유 · 라벨이 있다', () => {
@@ -145,17 +209,17 @@ describe('카드 데이터 (D93)', () => {
 
   it('D114 의 새 카드 다섯 — 필수 부품 · 선택 · 실배포 시험을 지남(tested true · D117)', () => {
     const shape = (id: string) => { const b = bundleById(id)!; return { parts: b.parts.map(partKey), options: b.options.map((o) => [o.id, o.on, o.parts.map(partKey)]), tested: b.tested, family: b.family }; };
-    // D116 — 적재 버킷 raw · 예약 적재 ingest · push 대상 Cloud Run worker (같은 서비스의 Static site · Batch job · Serverless web 과 이름이 갈린다)
-    expect(shape('data-warehouse')).toEqual({ parts: ['raw', 'bq', 'sa'], options: [['schedule', false, ['ingest']]], tested: true, family: undefined });
+    // D116 — 적재 버킷 raw · 예약 적재 ingest · push 대상 Cloud Run worker (같은 서비스의 Static site · Batch job · Serverless web 과 이름이 나뉜다)
+    expect(shape('data-warehouse')).toEqual({ parts: ['raw', 'bq', 'sa'], options: [['schedule', false, ['ingest']], ['kms', false, ['ring', 'key']], ['roles', false, ['sa@cron']]], tested: true, family: undefined });
     expect(shape('gke')).toEqual({ parts: ['gke', 'ar', 'sa', 'vpc', 'subnet'], options: [['cache', false, ['redis']]], tested: true, family: undefined });
     // D117 — 데드레터 토픽에 구독이 없으면 넘어간 메시지가 사라진다(실배포 시험 · pubsub/docs/handling-failures) — 데드레터 구독 dlqsub 가 필수다
-    expect(shape('event-pipeline')).toEqual({ parts: ['topic', 'sub', 'dlq', 'dlqsub', 'worker', 'sa'], options: [], tested: true, family: undefined });
-    // D116 — Internal app 은 내부 전용 서버 intweb · intwas 와 버킷 appdata (같은 서비스의 Website 와 이름이 갈린다)
+    expect(shape('event-pipeline')).toEqual({ parts: ['topic', 'sub', 'dlq', 'dlqsub', 'worker', 'sa'], options: [['roles', false, ['sa@push']]], tested: true, family: undefined });
+    // D116 — Internal app 은 내부 전용 서버 intweb · intwas 와 버킷 appdata (같은 서비스의 Website 와 이름이 나뉜다)
     // D117 — 네트워크 안의 웹 · 앱 포트를 여는 방화벽 internal 이 없으면 bastion 에서도 intweb · intwas 의 HTTP 가 막힌다(실배포 시험)
-    expect(shape('vm-app')).toMatchObject({ parts: ['intweb', 'intwas', 'db', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'firewall:internal', 'psa'], options: [['bastion', true, ['bastion']], ['file', false, ['file']], ['object', false, ['appdata']]], tested: true });
+    expect(shape('vm-app')).toMatchObject({ parts: ['intweb', 'intwas', 'db', 'firewall:ssh', 'firewall:icmp', 'firewall:iap', 'firewall:internal', 'psa'], options: [['bastion', true, ['bastion']], ['file', false, ['file']], ['object', false, ['appdata']], ['dbuser', false, ['sqldb', 'sqluser']]], tested: true });
     // D119 — GitHub 연결은 선택(webhook · 1세대 트리거는 연결 없이 된다) — 연결 conn 과 연결된 저장소 repo
-    expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']], ['github', false, ['conn', 'repo']]], tested: true, family: undefined });
-    expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [], tested: true, family: undefined });
+    expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']], ['github', false, ['conn', 'repo']], ['roles', false, ['sa@build']]], tested: true, family: undefined });
+    expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [['roles', false, ['sa@cron']]], tested: true, family: undefined });
     // 네트워크(vpc · subnet)는 프로젝트 공용 자리다 — 첫 화면에 이미 있으면 카드가 더하지 않는다
     expect(bundleById('gke')!.parts.filter(partIsProject).map(partKey)).toEqual(['vpc', 'subnet']);
   });
@@ -167,6 +231,11 @@ describe('카드 데이터 (D93)', () => {
       'service/site/bigquery_dataset/-/-/-': 'billing_site_prod_ane3_bq',
       'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
       'service/site/scheduler_job/-/ingest/01': 'billing-site-prod-ane3-cron-ingest-01',
+      // D124 — Encryption key (KMS) 선택: 키 링은 위치 범위(지역 토큰) · 키는 키 링 안
+      'service/site/kms_key_ring/-/-/01': 'billing-site-prod-ane3-ring-01',
+      'service/site/kms_crypto_key/-/-/01': 'billing-site-prod-key-01',
+      // D126 — 역할별 서비스 계정 선택: 실행 계정(sync) 옆에 스케줄러 호출 계정이 더해진다
+      'service/site/service_account/-/-/cron': 'billing-site-prod-sa-cron',
     });
     expect(names('event-pipeline')).toEqual({
       'service/site/pubsub_topic/-/-/01': 'billing-site-prod-topic-01',
@@ -175,17 +244,18 @@ describe('카드 데이터 (D93)', () => {
       'service/site/pubsub_subscription/-/dlq/01': 'billing-site-prod-sub-dlq-01',
       'service/site/run_service/-/worker/01': 'billing-site-prod-ane3-run-worker-01',
       'service/site/service_account/-/-/sync': 'billing-site-prod-sa-sync',
+      'service/site/service_account/-/-/push': 'billing-site-prod-sa-push',
     });
     expect(Object.keys(names('gke'))).toEqual([
       'project/-/vpc_network/-/-/01', 'project/-/subnet/-/-/01',
       'service/site/gke_cluster/-/-/01', 'service/site/artifact_registry_repository/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/redis_instance/-/-/01',
     ]);
-    expect(Object.keys(names('ci-cd'))).toEqual(['service/site/artifact_registry_repository/-/-/01', 'service/site/cloudbuild_trigger/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/secret/-/-/01', 'service/site/cloudbuild_connection/-/-/01', 'service/site/cloudbuild_repository/-/-/01']);
+    expect(Object.keys(names('ci-cd'))).toEqual(['service/site/artifact_registry_repository/-/-/01', 'service/site/cloudbuild_trigger/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/secret/-/-/01', 'service/site/cloudbuild_connection/-/-/01', 'service/site/cloudbuild_repository/-/-/01', 'service/site/service_account/-/-/build']);
     // D119 — 연결은 지역 토큰 · 저장소는 부모(연결)의 위치를 물려받아 지역 토큰이 없다
     const ci = names('ci-cd');
     expect(ci['service/site/cloudbuild_connection/-/-/01']).toBe('billing-site-prod-ane3-conn-01');
     expect(ci['service/site/cloudbuild_repository/-/-/01']).toBe('billing-site-prod-repo-01');
-    expect(Object.keys(names('batch-job'))).toEqual(['service/site/run_job/-/-/01', 'service/site/scheduler_job/-/-/01', 'service/site/service_account/-/-/sync']);
+    expect(Object.keys(names('batch-job'))).toEqual(['service/site/run_job/-/-/01', 'service/site/scheduler_job/-/-/01', 'service/site/service_account/-/-/sync', 'service/site/service_account/-/-/cron']);
   });
 
   it('D119 — 저장소는 연결을 · 트리거는 저장소를 가리킨다', () => {

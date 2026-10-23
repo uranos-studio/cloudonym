@@ -23,6 +23,7 @@ import { MAX_ITEMS, MAX_NAMES } from '../core/selection';
 import { PLAN_FILE_MAX_BYTES } from '../components/planFile';
 import { API_DOC_LIMITED_ROOT, API_DOC_UNLIMITED } from '../components/apiDocModel';
 import { SHAREABLE_PARTS } from '../components/wizardBundles';
+import { enabledResourceCounts } from '../components/resourceCount';
 import { formatNotes, type Catalog } from '../messages/catalog';
 import { en } from '../messages/en';
 import type { Version } from '../version';
@@ -162,7 +163,8 @@ function presetLines(): string[] {
 
 /** 「## Wizard cards」 절 (D93) — 카드마다 한 줄: 서비스 picks · project_picks · 선택. 카드는 화면의 동작이고 API 에는 없다 — 같은 picks 를 보내면 같은 이름이다 */
 function cardLines(): string[] {
-  const list = (ps: readonly { preset: string; tier?: string }[]) => ps.map((p) => (p.tier === undefined ? `\`${p.preset}\`` : `\`${p.preset}\` tier \`${p.tier}\``)).join(', ');
+  // D126 — 역할 부품(sa@build)은 role 을 밝힌다 — pick 의 role 로 보내면 같은 이름이다
+  const list = (ps: readonly { preset: string; tier?: string; role?: string }[]) => ps.map((p) => `\`${p.preset}\`${p.tier === undefined ? '' : ` tier \`${p.tier}\``}${p.role === undefined ? '' : ` role \`${p.role}\``}`).join(', ');
   return [
     '', '## Wizard cards', '',
     'A card on the wizard screen adds a working set of presets at once. Cards are not part of `/v1/wizard`: send the same picks to get the same names. Project parts go in `project_picks`; the rest in the service.',
@@ -321,7 +323,7 @@ function catalogFieldLines(order: readonly Provider[]): string[] {
 }
 
 /** 「## CLI」 절 (D102) — 저장소의 명령줄 도구. Worker 는 cli/ 를 들여오지 않는다(src → cli 는 시험만) — 종료 코드 줄은 cli 의 --help 줄과 글자까지 같아야 하고,
- *  llms.test 가 그 줄과 EXIT 를 대어 본다(--help 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다) */
+ *  llms.test 가 그 줄과 EXIT 를 대어 본다(--help 줄은 cli/main.test.mjs [6] 이 docs/cli.md · D102 와 대어 본다) */
 export const CLI_EXIT_LINE = 'Exit codes: 0 ok · 1 a name FAILs or add would change existing names or verdicts · 2 plan, names file or arguments rejected (400, 413), a file cannot be read or written, it changed while the command ran, or its lock could not be removed after saving · 3 rules_version differs (409) · 4 server unreachable, 429, 5xx or an answer that cannot be interpreted · 64 usage · 70 internal error';
 function cliLines(): string[] {
   return [
@@ -386,9 +388,11 @@ export function buildLlmsText(rules: ResourceRule[], version: Version, catalog: 
     '', '## Resource tree', '',
     'Where each resource is created, from the widest scope down. Under each scope: its rules (`input` = what `/v1/names` accepts for that rule: `count` 1-99, `role`, or `none`), then its child scopes.',
     '', SCOPE_MEANING, '', UNIQUENESS_MEANING,
+    // 화면(CloudPicker · /about)과 같은 함수 — 웹과 API 의 숫자가 갈라지지 않는다
+    '', `Supported resources: ${enabledResourceCounts().map(({ provider, count }) => `${provider} ${count}`).join(' · ')} (rows of the tree below, counted from the catalog)`,
   );
   for (const p of order) lines.push('', `### ${p.toUpperCase()}`, ...treeLines(buildTree(p)));
-  // PASS 의 뜻 (D28) — 정본은 사전의 ui.pass_meaning. README · openapi.json 은 같은 문장을 옮겨 적고 시험이 대어 본다
+  // PASS 의 뜻 (D28) — 정본은 사전의 ui.pass_meaning. docs/api.md · openapi.json 은 같은 문장을 옮겨 적고 시험이 대어 본다
   lines.push('', '## What PASS means', '', catalog.ui.pass_meaning);
   lines.push(
     '',

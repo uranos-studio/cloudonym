@@ -1,6 +1,6 @@
 // @ts-check
 // 부를 서버 고르기 (D121) — --server → CLOUDONYM_SERVER → 설정 파일의 server → DEFAULT_SERVER(운영 배포).
-// 운영 URL 은 저장소 전체에서 이 파일의 DEFAULT_SERVER 한 곳에만 있다 — cli/main.test.mjs 가 git ls-files 로 센다.
+// 운영 URL 은 저장소 전체에서 이 파일의 DEFAULT_SERVER 와 README 의 「Try it」 링크(2026-10-23 승인) 두 곳에만 있다 — cli/server.test.mjs 가 git ls-files 로 센다.
 // 셀프호스팅 · 포크는 설정 파일 한 줄({ "server": "https://…" })이나 환경변수로 덮는다
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

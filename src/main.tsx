@@ -14,10 +14,16 @@ import { NotFound } from './components/NotFound'
 import { PICK_PATH, routeOf } from './components/route'
 import { hashKind } from './components/urlState'
 import { pageText } from './site/copy'
+import { captureCampaign, stripUtm } from './components/campaign'
+import { sessionStore } from './components/beacon'
 import type { ResourceRule } from './core/types'
 
 async function start() {
   const route = routeOf(window.location.pathname)
+  // 캠페인 출처(D122) — 첫 비콘보다 먼저 읽어 탭 세션에 두고, 주소창에서 utm_* 를 지운다(hash 는 남긴다)
+  captureCampaign(window.location.search, sessionStore())
+  const clean = stripUtm(window.location.pathname, window.location.search, window.location.hash)
+  if (clean !== undefined) window.history.replaceState(window.history.state, '', clean)
   document.title = pageText(route).title
   // 뿌리는 늘 마법사다 (D76) — 트리 꼴 hash 로 열면 트리 경로로 옮긴다(query 도 실어 간다)
   if (route === 'app' && hashKind(window.location.hash) === 'tree') {

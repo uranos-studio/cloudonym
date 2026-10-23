@@ -9,7 +9,7 @@ import { EXAMPLE_REGIONS } from './formContext';
 import { buildTree, inputKind } from '../core/tree';
 import { treeRules } from './selection';
 import { kindToken } from '../core/catalog';
-import { generateItem, generateProject, type NameItem } from '../core/engine';
+import { DEFAULT_ROLE, generateItem, generateProject, type NameItem } from '../core/engine';
 import type { NameResult, ProjectContext, Provider, ResourceRule } from '../core/types';
 import { reservedTiersFor } from '../core/tier';
 import { TIER_PATTERN } from '../core/types';
@@ -206,9 +206,15 @@ export function setProjectIdSuffix(plan: WizardPlan, value: string): WizardPlan 
 export function projectPicksFull(plan: WizardPlan): boolean {
   return plan.projectPicks.length >= MAX_PICKS_PER_SERVICE;
 }
-/** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1 */
-export function findPreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string): number {
-  return picksOf(plan, service).findIndex((p) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId, plan.provider)?.tier) === tier));
+/** 칩의 pick 자리 — 프리셋 id 와 (방화벽처럼 tier 칩이 여럿이면) tier 로 찾는다. 없으면 -1.
+ *  role 을 주면 (D126) 그 역할의 pick 만. role 을 주지 않으면 역할이 없거나 기본 역할(sync)인 pick 을 먼저, 없으면 그 프리셋의 아무 pick —
+ *  역할 계정(sa@build)이 앞에 있어도 평범한 sa 를 집고, 사용자가 역할을 적은 옛 링크(D73)는 지금처럼 찾는다 */
+export function findPreset(plan: WizardPlan, service: number | null, presetId: string, tier?: string, role?: string): number {
+  const picks = picksOf(plan, service);
+  const match = (p: Pick) => p.preset === presetId && (tier === undefined || (p.tier ?? presetOf(presetId, plan.provider)?.tier) === tier);
+  if (role !== undefined) return picks.findIndex((p) => match(p) && (p.role ?? DEFAULT_ROLE) === role);
+  const plain = picks.findIndex((p) => match(p) && (p.role === undefined || p.role === DEFAULT_ROLE));
+  return plain >= 0 ? plain : picks.findIndex(match);
 }
 
 /** 칩을 켠다 · 끈다. 켜면 count 규칙은 서버 줄 하나(01), 입력 없는 규칙(버킷) · role 규칙(서비스 계정)은 줄 없음. tier 는 방화벽처럼 tierChoices 가 있을 때만 싣는다 */
@@ -223,14 +229,15 @@ export function togglePreset(plan: WizardPlan, service: number | null, presetId:
 
 /** 프리셋 pick 을 하나 더한다 — 켜고 끄지 않는다 (D86). 「Add subnet」이 쓴다: 이미 있는 pick 과 종류 · tier 가 같으면 duplicate_pick 이 붙고, 종류나 tier 를 고치면 사라진다.
  *  count 규칙은 서버 줄 하나(01), 입력 없는 규칙 · role 규칙은 줄 없음. tier 는 tierChoices 가 있을 때만 싣는다 */
-export function addPresetPick(plan: WizardPlan, service: number | null, presetId: string, tier?: string): WizardPlan {
+export function addPresetPick(plan: WizardPlan, service: number | null, presetId: string, tier?: string, role?: string): WizardPlan {
   const preset = presetOf(presetId, plan.provider);
   if (!preset) return plan;
   if (service === null && projectPicksFull(plan)) return plan;
   const picks = picksOf(plan, service);
-  const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}) };
-  // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
   const rule = WIZARD_RULES.get(preset.ruleId);
+  // role 은 role 규칙(서비스 계정)에만 싣는다 (D126)
+  const pick: Pick = { preset: presetId, ...(preset.tierChoices && tier !== undefined ? { tier } : {}), ...(role !== undefined && rule !== undefined && inputKind(rule) === 'role' ? { role } : {}) };
+  // 슬롯은 count 규칙(템플릿에 seq 가 있다)에만 — 규칙의 입력 종류로 정한다
   const withSlots = rule !== undefined && inputKind(rule) === 'count';
   const slot = withSlots ? newSlot(pick, [], plan.provider) : undefined;
   return withPicks(plan, service, [...picks, slot ? { ...pick, instances: [slot] } : pick]);

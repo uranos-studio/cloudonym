@@ -24,9 +24,10 @@ describe('프리셋 데이터 (D64)', () => {
       'web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip',
       'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis',
       'worker', 'raw', 'ingest', 'appdata',
-      'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa',
+      'queue', 'fs', 'ring', 'key', 'waf', 'wafedge', 'sqldb', 'sqluser', 'handler', 'tpl', 'mig', 'as',
+      'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb', 'vpc', 'subnet', 'firewall', 'router', 'nat', 'psa', 'dns',
     ]);
-    expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address']);
+    expect(PRESETS.filter((p) => p.group === 'network').map((p) => p.ruleId)).toEqual(['gcp.vpc_network', 'gcp.subnet', 'gcp.firewall_rule', 'gcp.router', 'gcp.router_nat', 'gcp.global_address', 'gcp.dns_managed_zone']);
     expect(PRESETS.filter((p) => p.group === 'lb').map((p) => p.ruleId)).toEqual([
       'gcp.global_address', 'gcp.instance_group', 'gcp.backend_service', 'gcp.health_check', 'gcp.url_map', 'gcp.ssl_certificate', 'gcp.target_https_proxy', 'gcp.global_forwarding_rule',
       'gcp.url_map', 'gcp.target_http_proxy', 'gcp.global_forwarding_rule', 'gcp.region_network_endpoint_group', 'gcp.backend_bucket',
@@ -66,7 +67,7 @@ describe('프리셋 데이터 (D64)', () => {
   });
 
   it('level — 네트워크 묶음만 project 이고 그 규칙은 프로젝트 수준 범위 · 나머지(lb 묶음 포함)는 service (D73)', () => {
-    expect(PRESETS.filter((p) => p.level === 'project').map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
+    expect(PRESETS.filter((p) => p.level === 'project').map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa', 'dns']);
     for (const p of PRESETS) {
       expect(p.level === 'project', p.id).toBe(p.group === 'network');
       if (p.level === 'project') expect(PROJECT_SCOPES, p.id).toContain(RULES[p.ruleId]!.scope);
@@ -115,7 +116,7 @@ describe('프리셋 데이터 (D64)', () => {
     expect(item).toMatchObject({ name: 'billing_shop_prod_ane3_bq', valid: true });
     expect(item!.name).not.toContain('-');
     expect(presetOf('dlq')).toMatchObject({ ruleId: presetOf('topic')!.ruleId, tier: 'dlq' });
-    // D117 — 데드레터 구독은 구독 규칙에 tier dlq — sub 와 한 서비스에 두면 이름이 갈린다
+    // D117 — 데드레터 구독은 구독 규칙에 tier dlq — sub 와 한 서비스에 두면 이름이 나뉜다
     expect(presetOf('dlqsub')).toMatchObject({ ruleId: presetOf('sub')!.ruleId, tier: 'dlq', level: 'service' });
     // D119 — Cloud Build 2세대 연결 · 저장소는 서비스 자리다(프로젝트 자리 범위에 위치 범위가 없다 — D63)
     expect(presetOf('conn')).toMatchObject({ ruleId: 'gcp.cloudbuild_connection', tier: null, level: 'service' });
@@ -157,7 +158,7 @@ describe('프리셋 데이터 (D64)', () => {
 
   it('고정 종류(D88) — 종류 표가 있는 규칙의 허용 값이고 · pick 이 다른 종류를 주면 wizard.preset_kind_fixed · 같은 값이면 통과', () => {
     for (const p of PRESETS.filter((x) => x.kind !== undefined)) expect(RULES[p.ruleId]!.kinds?.allowed, p.id).toContain(p.kind);
-    expect(PRESETS.filter((x) => x.kind !== undefined).map((x) => [x.id, x.kind])).toEqual([['psa', 'INTERNAL']]);
+    expect(PRESETS.filter((x) => x.kind !== undefined).map((x) => [x.id, x.kind])).toEqual([['wafedge', 'CLOUD_ARMOR_EDGE'], ['psa', 'INTERNAL']]);
     const one = [{ id: 'a', seq: '01' }];
     const plan = (pick: Pick): WizardPlan => ({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' }, projectPicks: [{ ...pick, instances: one }], services: [] });
     const r = validatePlan(plan({ preset: 'psa', kind: 'EXTERNAL' }));
@@ -191,6 +192,35 @@ describe('프리셋 데이터 (D64)', () => {
     // 인스턴스 그룹은 존 범위 규칙 — 엔진 규칙 그대로 이름에 지역 토큰이 들어간다
     expect(RULES[presetOf('ig')!.ruleId]!.scope).toBe('gcp:project_zone');
   });
+  it('D124 · D125 · D127 — 숨은 규칙의 프리셋: 각각 켜면 이름 하나 · 유효 (문맥 demo · shop · dev · ane3 · 서비스 app)', () => {
+    const PROJECT = { owner: 'demo', system: 'shop', env: 'dev', region: 'asia-northeast3' };
+    const ids = ['queue', 'fs', 'ring', 'key', 'waf', 'wafedge', 'dns', 'sqldb', 'sqluser', 'handler', 'tpl', 'mig', 'as'];
+    const names: Record<string, string> = {};
+    for (const id of ids) {
+      const p = presetOf(id)!;
+      const pick: Pick = inputKind(RULES[p.ruleId]!) === 'count' ? { preset: id, instances: [{ id: '1', seq: '01' }] } : { preset: id };
+      const plan: WizardPlan = p.level === 'project'
+        ? { provider: 'gcp', project: PROJECT, projectPicks: [pick], services: [] }
+        : { provider: 'gcp', project: PROJECT, projectPicks: [], services: [{ purpose: 'app', picks: [pick] }] };
+      expect(validatePlan(plan), id).toEqual({ ok: true });
+      const items = generateProject(expandPlan(plan), 'gcp').items.slice(1);
+      expect(items.length, id).toBe(1);
+      expect(items[0]!.valid, id).toBe(true);
+      names[id] = items[0]!.name;
+    }
+    expect(names).toEqual({
+      queue: 'shop-app-dev-ane3-queue-01', fs: 'shop-app-dev-ane3-fs-01', ring: 'shop-app-dev-ane3-ring-01', key: 'shop-app-dev-key-01',
+      waf: 'shop-app-dev-waf-01', wafedge: 'shop-app-dev-waf-edg-01', dns: 'shop-dev-dns-01',
+      sqldb: 'shop_app_dev_db_01', sqluser: 'shop_app_dev_user_sync', handler: 'shop-app-dev-ane3-run-handler-01',
+      tpl: 'shop-app-dev-tpl-01', mig: 'shop-app-dev-ane3-mig-01', as: 'shop-app-dev-ane3-as-01',
+    });
+    // D124 결정 ② — waf(백엔드 서비스) 와 wafedge(백엔드 버킷 · 종류 고정) 는 한 서비스에 함께 들고 중복 키가 다르다
+    const both: WizardPlan = { provider: 'gcp', project: PROJECT, projectPicks: [], services: [{ purpose: 'app', picks: [{ preset: 'waf', instances: [{ id: '1', seq: '01' }] }, { preset: 'wafedge', instances: [{ id: '1', seq: '01' }] }] }] };
+    expect(validatePlan(both)).toEqual({ ok: true });
+    expect(generateProject(expandPlan(both), 'gcp').items.slice(1).map((i) => i.key)).toEqual(['service/app/security_policy/-/-/01', 'service/app/security_policy/edg/-/01']);
+    expect(presetOf('handler')).toMatchObject({ ruleId: presetOf('run')!.ruleId, tier: 'handler', level: 'service' });
+  });
+
   it('psa 와 로드 밸런서의 전역 IP(ip)는 같은 규칙이지만 종류 · tier · 자리가 달라 함께 쓴다', () => {
     const r = validatePlan({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ane3' }, projectPicks: [{ preset: 'psa', instances: [{ id: 'a', seq: '01' }] }, { preset: null, ruleId: 'gcp.global_address', instances: [{ id: 'a', seq: '01' }] }], services: [{ purpose: 'shop', picks: [{ preset: 'ip', instances: [{ id: 'a', seq: '01' }] }] }] });
     expect(r).toEqual({ ok: true });

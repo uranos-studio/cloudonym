@@ -97,7 +97,7 @@ test('① main — 설정 없이 기본 서버를 부른다 · --version 은 std
   assert.match((await run(['--version'], { env: { HOME: home } })).err, /^server https:\/\/home\.example \(config /);
 });
 
-test('② 운영 URL 은 저장소(추적 파일 + 무시하지 않는 새 파일)에서 cli/lib/server.mjs 의 DEFAULT_SERVER 한 곳뿐이다 (D121)', () => {
+test('② 운영 URL 은 저장소(추적 파일 + 무시하지 않는 새 파일)에서 cli/lib/server.mjs 의 DEFAULT_SERVER 와 README 의 「Try it」 링크 두 곳뿐이다 (D121 · 2026-10-23 승인)', () => {
   const root = new URL('../', import.meta.url);
   const host = new URL(DEFAULT_SERVER).host;
   const files = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { cwd: root, encoding: 'utf-8' }).split('\0').filter((f) => f !== '');
@@ -110,7 +110,7 @@ test('② 운영 URL 은 저장소(추적 파일 + 무시하지 않는 새 파�
     const n = text.split(host).length - 1;
     for (let i = 0; i < n; i++) hits.push(f);
   }
-  assert.deepEqual(hits, ['cli/lib/server.mjs']);
+  assert.deepEqual(hits.sort(), ['README.md', 'cli/lib/server.mjs']);
   // 검사기 자체 — 잡아야 할 것을 잡는다
   assert.equal(`x ${DEFAULT_SERVER} y`.split(host).length - 1, 1);
 });

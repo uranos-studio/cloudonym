@@ -72,7 +72,7 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
     expect(html.match(/<title>/g)).toHaveLength(1);
     expect(html.match(/<meta name="description"/g)).toHaveLength(1);
     // 요약 글 — 스크립트 없이 읽힌다 · 한글 0(release-check 가 / 본문에서 센다)
-    expect(html).toMatch(/<div id="root"><main><h1>[^<]+<\/h1><p>[^<]+<\/p><nav>/);
+    expect(html).toMatch(/<div id="root"><main class="prerender"><h1>[^<]+<\/h1><p>[^<]+<\/p><nav>/);
     expect(html).toContain('<a href="/llms.txt">llms.txt</a>');
     expect(html).not.toMatch(HANGUL);
   });

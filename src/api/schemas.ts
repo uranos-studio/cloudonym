@@ -36,7 +36,8 @@ export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 
 export type UiCopyTarget = (typeof UI_COPY_TARGETS)[number];
 /** 비콘 한 건 — target 은 ui_copy 에만 있다. 다른 이벤트에 온 target 은 버린다 */
 /** chip_rules · custom_rules 는 ui_generate 에서만 그대로 넘긴다 — 거르기는 telemetry.ts 의 ruleIdList 한 곳이 한다 (D71) */
-export interface EventInput { event: UiEvent; target?: UiCopyTarget; rules?: { chip_rules?: unknown; custom_rules?: unknown } }
+/** src 는 캠페인 출처(D122) — 세 이벤트 모두 그대로 넘기고 거르기는 telemetry.ts 의 campaignSrc 한 곳이 한다 */
+export interface EventInput { event: UiEvent; target?: UiCopyTarget; rules?: { chip_rules?: unknown; custom_rules?: unknown }; src?: unknown }
 
 function reject(errors: Message[], supported?: string[], status: 400 | 409 = 400): { ok: false; rejection: Rejection } {
   return { ok: false, rejection: { status, errors, ...(supported ? { supported } : {}) } };
@@ -184,19 +185,20 @@ export function parseEventBody(body: unknown): Parsed<EventInput> {
   if (typeof event !== 'string' || !(UI_EVENTS as readonly string[]).includes(event)) {
     return reject([unsupported(event, 'event')], [...UI_EVENTS]);
   }
+  const src = Object.hasOwn(body, 'src') ? { src: body.src } : {};
   if (event === 'ui_generate') {
     const rules: NonNullable<EventInput['rules']> = {};
     for (const k of ['chip_rules', 'custom_rules'] as const) if (Object.hasOwn(body, k)) rules[k] = body[k];
-    return { ok: true, value: Object.keys(rules).length > 0 ? { event, rules } : { event } };
+    return { ok: true, value: Object.keys(rules).length > 0 ? { event, rules, ...src } : { event, ...src } };
   }
-  if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent } };
+  if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent, ...src } };
   const target = body.target;
   const longTarget = tooLong({ target });
   if (longTarget.length > 0) return reject(longTarget);
   if (typeof target !== 'string' || !(UI_COPY_TARGETS as readonly string[]).includes(target)) {
     return reject([unsupported(target, 'target')], [...UI_COPY_TARGETS]);
   }
-  return { ok: true, value: { event, target: target as UiCopyTarget } };
+  return { ok: true, value: { event, target: target as UiCopyTarget, ...src } };
 }
 
 /** selection 오류의 사용자 값(value)을 원래 입력에서 다시 만든다 — 80자 · 보이지 않는 문자 · 비문자열은 JSON (다른 요청 오류와 같은 표시 · 8775326) */

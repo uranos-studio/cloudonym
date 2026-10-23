@@ -115,16 +115,17 @@ export function headTags(route: Route, origin: string, verify: SiteVerification 
   return tags.join('\n    ');
 }
 
-/** #root 안의 요약 글 — 스크립트를 돌리지 않는 크롤러가 읽는다. React 의 createRoot().render 가 첫 그림에서 통째로 바꾼다 */
+/** #root 안의 요약 글 — 스크립트를 돌리지 않는 크롤러가 읽는다. React 의 createRoot().render 가 첫 그림에서 통째로 바꾼다.
+ *  class="prerender" 는 화면 JS 가 뜨기 전 잠깐 보이는 동안 로딩 화면처럼 그리는 public/prerender.css 의 자리다 */
 export function rootFallback(route: Route): string {
   const t = pageText(route);
   if (route === 'notFound') {
-    return `<main><h1>${escapeHtml(t.heading)}</h1><p>${escapeHtml(en.ui.page_not_found_body)}</p><p><a href="/">${escapeHtml(pageText('app').title)}</a></p></main>`;
+    return `<main class="prerender"><h1>${escapeHtml(t.heading)}</h1><p>${escapeHtml(en.ui.page_not_found_body)}</p><p><a href="/">${escapeHtml(pageText('app').title)}</a></p></main>`;
   }
   // AI 에이전트용 두 파일도 건다 — 스크립트 없이 읽는 쪽이 기계용 안내를 찾게
   const links = [...PAGES.map((p) => [p.path, pageText(p.route).heading]), ['/llms.txt', 'llms.txt'], ['/openapi.json', 'OpenAPI']];
   const nav = links.map(([href, text]) => `<a href="${href}">${escapeHtml(text ?? '')}</a>`).join(' · ');
-  return `<main><h1>${escapeHtml(t.title)}</h1><p>${escapeHtml(t.description)}</p><nav>${nav}</nav></main>`;
+  return `<main class="prerender"><h1>${escapeHtml(t.title)}</h1><p>${escapeHtml(t.description)}</p><nav>${nav}</nav></main>`;
 }
 
 /** 빌드한 index.html 에 경로의 head 와 요약 글을 넣는다. 자리(title · description · </head> · 빈 #root)가 없으면 그 부분만 건너뛴다 */

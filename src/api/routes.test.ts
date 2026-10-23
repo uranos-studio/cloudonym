@@ -442,11 +442,11 @@ describe('POST /v1/wizard (D66)', () => {
     expect((await json(multi.res)).errors).toMatchObject([{ code: 'context.location_unsupported', field: 'project.region', params: { value: 'EU' } }]);
   });
 
-  it('examples/terraform/wizard.json — README 의 curl 요청과 같고 · 200 · 예시 README 가 적은 키와 이름이 나온다', async () => {
+  it('examples/terraform/wizard.json — docs/api.md 의 curl 요청과 같고 · 200 · 예시 README 가 적은 키와 이름이 나온다', async () => {
     const root = join(import.meta.dirname, '..', '..');
     const body = JSON.parse(readFileSync(join(root, 'examples', 'terraform', 'wizard.json'), 'utf-8')) as unknown;
-    const curl = /POST https:\/\/<your-deployment>\/v1\/wizard[^\n]*\n\s*-d '([^']+)'/.exec(readFileSync(join(root, 'README.md'), 'utf-8'));
-    expect(curl, 'README 의 /v1/wizard curl 예시').not.toBeNull();
+    const curl = /POST https:\/\/<your-deployment>\/v1\/wizard[^\n]*\n\s*-d '([^']+)'/.exec(readFileSync(join(root, 'docs', 'api.md'), 'utf-8'));
+    expect(curl, 'docs/api.md 의 /v1/wizard curl 예시').not.toBeNull();
     expect(body).toEqual(JSON.parse(curl![1]!));
     const g = await itemsOf(body);
     expect(g.valid).toBe(true);

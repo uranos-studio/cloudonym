@@ -4,14 +4,51 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-10-22
+## [0.2.0] - 2026-10-23
 
-AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-22.1. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
+AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-23.2. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
 
 ### Added
 
 - **AWS** (D45) — 169 AWS rules in the resource tree, `/v1/generate`, `/v1/names`, `/v1/validate`, `/llms.txt`, `/openapi.json` and `/catalog.json` (169 rows with `AWS_CATALOG_META`). The provider enums are `["aws", "gcp"]`; Azure stays **Coming soon**. AWS names carry no availability-zone token: a zone name (`ap-northeast-2a`) resolves to its region, as on Google Cloud (D50 revised).
 - **AWS wizard presets** — the naming wizard (home page, `POST /v1/wizard`, CLI plan files) takes `provider: "aws"`. 22 AWS presets mirror the Google Cloud ones where an AWS rule exists (`web` · `was` · `bastion` · `intweb` · `intwas` · `file` on EC2 with Lambda as the serverless switch, `db` RDS, `object` S3, `sa` IAM role, `secret`, `eks`, `ecr`, `redis` ElastiCache, `lb` · `tg` · `eip`, and the network `vpc` · `subnet` · `firewall` (security group: `ssh` · `web` · `icmp` · `internal`) · `igw` · `rt` · `nat`); an EC2 server carries `boot` and `data` (EBS), `ip` (Elastic IP) and `ipi` (network interface). An AWS plan has no project ID item (an account has no named project) and rejects `project_id_suffix` with the new code `wizard.project_id_suffix_not_supported`. `/catalog.json` fills `presets` and `attachments` for aws; the wizard's cloud picker enables AWS (Azure stays **Coming soon**), switching clouds clears the picks, and a link or plan file for AWS carries `c: "aws"`, so the plan-file limit grows by 10 bytes to 176,558 bytes. The wizard cards stay Google Cloud only. With two clouds the CLI's guided flow asks which one (Enter keeps gcp). Google Cloud names and links are unchanged.
+
+### Changed
+
+- **AWS abbreviations re-derived for all 169 rules** — by the Google Cloud abbreviation principles, with measured frequency in public Terraform: 71 change, among them `s3` (was `bucket`), `ec2` (`vm`), `rds` (`db`), `ebs` (`vol`), `snet` (`subnet`) and the Transit Gateway family under `tgw`. Each catalog row records the basis and the old abbreviation in `slug.previous` and `aliases`. Shared by design: `sng` (RDS · ElastiCache subnet groups), `pg` (parameter groups), `pol` (IAM policies), `st` (API Gateway stages v1 · v2).
+- **`/v1/generate` without `providers`** — names only the clouds whose region table resolves the `region` sent, so a request with a Google Cloud region keeps getting Google Cloud names and no 400 from AWS. A region no enabled cloud resolves still returns every cloud's error.
+
+## [0.1.12] - 2026-10-23
+
+The naming wizard grows without new rules: presets for rules it could not pick, an Async task queue card, a Website (autoscaling) card, per-role service accounts as an option, and a record of what each live build test covered.
+
+Rules revision for this release: 2026-10-23.1. The card table changed, so the revision moves, but no name, verdict or suggestion for an existing input or plan changes: every new option is off by default and the two new cards are new.
+
+### Added
+
+- **Test record on cards** (D123) — each card that says "Built and tested on Google Cloud" now carries, in its data, the date and the options that were part of that test; options added later are not covered until a later record says so.
+- **Presets for rules the wizard could not pick** (D124) — Cloud Tasks queue (`queue`), Firestore database (`fs`), KMS key ring and crypto key (`ring`, `key`), Cloud Armor policy for a backend service (`waf`) and at the edge for a backend bucket (`wafedge`), Cloud DNS zone (`dns`, network group), Cloud SQL database and user (`sqldb`, `sqluser`); new card options **Database (Firestore)**, **Encryption key (KMS)**, **Cloud Armor**, **Cloud Armor (edge)** and **Database name and user**, all off by default, so no existing plan or link changes.
+- **Async task queue card** (D125) — a Cloud Tasks queue, a Cloud Run handler service (preset `handler`, tier `handler`) and a service account; options: the API service that enqueues (on), a bucket, a secret, a Firestore database. Applied on Google Cloud (D128).
+- **Separate service accounts per role** (D126) — an option (off by default) on CI/CD, Batch job, Data warehouse, Event pipeline and Async task queue adds a service account per job (`…-sa-build`, `…-sa-cron`, `…-sa-push`) beside the runtime account; card parts may now name a role. Existing plans and links read back unchanged.
+- **Website (autoscaling) card** (D127) — a regional managed instance group from an instance template with an autoscaler behind the HTTPS front, instead of a web server VM in an unmanaged group (presets `tpl`, `mig`, `as`); the HTTPS load balancer card accepts a managed instance group as its backend. Applied on Google Cloud (D128).
+- **HTTPS load balancer, Async task queue and Website (autoscaling) cards tested** (D128) — built on Google Cloud from each card's own plan and destroyed: the HTTPS load balancer with each of its three backends (a web server VM, a Cloud Run service, a bucket), the Async task queue with its API service, Website (autoscaling), and CI/CD, Batch job and Event pipeline with separate service accounts per role; these cards now say "Built and tested on Google Cloud" like the others.
+- Setup notes on the card checklist for the new options and cards (Firestore named databases, KMS key ring location, the Cloud Armor default rule, Cloud Tasks roles, per-role account roles, the managed group's base instance name), each with its Google Cloud document.
+
+## [0.1.11] - 2026-10-22
+
+The site shows how many resources it can name. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.
+
+### Added
+
+- **Supported resource count** — the Cloud picker shows "N resources" under each enabled cloud, and `/about` has a Supported resources section with the count per enabled cloud; `/llms.txt` states the same number under Resource tree (`Supported resources: gcp 117`). Web and `/llms.txt` call one counting function, so they cannot differ. The number is counted from the rule table and catalog when the site is built (one per row of the resource tree), never written by hand.
+
+## [0.1.10] - 2026-10-22
+
+The CLI asks on a terminal and follows common cloud CLI conventions; visits and conversions can be attributed to the referring house-ad campaign. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.
+
+### Added
+
+- **Campaign source on usage counters** (D122) — a visit that arrives with `utm_source` and `utm_medium=house_ad` keeps the source for the tab session (sessionStorage, no cookies or identifiers) and adds it to `ui_visit`, `ui_generate` and `ui_copy`; daily counters are also kept per source. The address bar drops the `utm_*` parameters.
 - **The CLI asks on a terminal** (D121) — `cloudonym` with no command (or `cloudonym new`) asks who runs the system, its name, the environments, the region and what to build, every choice a numbered list from `/catalog.json`; it saves the plan and names files and prints a What · Name · Check table. With a plan file, `cloudonym` shows the names and `cloudonym add` with no arguments asks what to add. A wrong answer is asked again with the server's reason. Piped, in CI or with `--json` nothing is asked and the output is unchanged; `--keys` adds the key column to the table.
 - **`cli/package.json`** (D121) — the CLI is a package of its own (`cloudonym`, Node 22 or later, no dependencies), ready for npm but not published.
 - **CLI: provider from the plan file** — `init --provider gcp|aws|azure` (and `new --provider`; default `gcp`) sets the plan file's `provider`, and every later command reads it from the file (one plan file is one provider). A provider the server has not enabled (400 `request.provider_not_enabled`) is one line and exit 2.
@@ -27,10 +64,12 @@ AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-22
 
 ### Changed
 
-- **AWS abbreviations re-derived for all 169 rules** — by the Google Cloud abbreviation principles, with measured frequency in public Terraform: 71 change, among them `s3` (was `bucket`), `ec2` (`vm`), `rds` (`db`), `ebs` (`vol`), `snet` (`subnet`) and the Transit Gateway family under `tgw`. Each catalog row records the basis and the old abbreviation in `slug.previous` and `aliases`. Shared by design: `sng` (RDS · ElastiCache subnet groups), `pg` (parameter groups), `pol` (IAM policies), `st` (API Gateway stages v1 · v2).
-- **`/v1/generate` without `providers`** — names only the clouds whose region table resolves the `region` sent, so a request with a Google Cloud region keeps getting Google Cloud names and no 400 from AWS. A region no enabled cloud resolves still returns every cloud's error.
 - **The CLI needs no setup** (D121) — with no `--server`, `CLOUDONYM_SERVER` or config file it calls the public deployment. A config file (`~/.config/cloudonym/config.json`, `$XDG_CONFIG_HOME/cloudonym/config.json` when set, `%APPDATA%\cloudonym\config.json` on Windows) holding `{ "server": "https://…" }` points it at another deployment; `--server` and `CLOUDONYM_SERVER` still come first. `cloudonym --version` prints the server it would call and where that came from on stderr.
 - **`--from` with a share link** says what to do instead: open the link, press Save plan, then `cloudonym new --from <file>`.
+
+### Fixed
+
+- **The mouse wheel scrolls the wizard page past its columns** — on tablet and wide layouts a wheel over a column stopped at the column, so the bottom of the grid could not be reached. Columns now hand the wheel to the page at their edge; the names drawer still keeps its scroll to itself.
 
 ### Security
 

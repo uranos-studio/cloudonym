@@ -322,6 +322,10 @@ describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품
   // 막히는 쌍은 로드 밸런서 둘뿐이다 — URL 맵 · 주소 · 인증서 · 프록시 · 전달 규칙이 서비스에 하나씩이고 URL 맵의 기본 백엔드가 하나다(D93). 둘째 LB 는 다른 서비스에 둔다
   const BLOCKED: Record<string, string> = {
     'website|serverless-web': 'family', 'website|static-site': 'family', 'serverless-web|static-site': 'family',
+    // D127 — Website (autoscaling) 도 가족 lb
+    'website|website-mig': 'family', 'serverless-web|website-mig': 'family', 'static-site|website-mig': 'family',
+    // D125 결정 ③ — task-queue 의 API 서비스 선택(기본 켜짐)은 Serverless web 의 run 이다. run 은 함께 쓰지 않는다 — 선택을 끄면 함께 둔다(아래 새 카드 시험)
+    'serverless-web|task-queue': 'overlap',
   };
   const key = (a: string, b: string) => (BUNDLES.findIndex((x) => x.id === a) < BUNDLES.findIndex((x) => x.id === b) ? `${a}|${b}` : `${b}|${a}`);
   const pairs = NINE.flatMap((a, i) => NINE.slice(i + 1).map((b) => [a, b] as const));
@@ -333,9 +337,9 @@ describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품
     return addBundle(p, 0, id);
   }, start());
 
-  it('쌍 서른여섯(https-lb 제외) — 막히는 셋(LB 둘)과 함께 두는 서른셋', () => {
-    expect(pairs.length).toBe(36);
-    expect(coexist.length).toBe(33);
+  it('쌍 쉰다섯(https-lb 제외) — 막히는 일곱(LB 둘 여섯 · Serverless web 과 API 선택을 켠 task-queue)과 함께 두는 마흔여덟', () => {
+    expect(pairs.length).toBe(55);
+    expect(coexist.length).toBe(48);
   });
 
   it.each(coexist)('%s + %s — 어느 순서로 더해도 둘 다 완성 · 이름 PASS · 링크로 다시 열어도 같다 · 하나를 지우면 다른 하나는 완성 그대로', (a, b) => {
@@ -462,7 +466,9 @@ describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품
       if (a.id === b.id || (a.family !== undefined && a.family === b.family)) continue;
       const req = new Set(unshared(b.parts));
       expect(unshared(a.parts).filter((k) => req.has(k)), `${a.id} · ${b.id}`).toEqual([]);
-      expect(unshared(a.options.flatMap((o) => o.parts)).filter((k) => req.has(k)), `${a.id} 선택 · ${b.id}`).toEqual([]);
+      // D125 결정 ③ — task-queue 의 API 서비스 선택만 예외(run · Serverless web 과 함께 두려면 선택을 끈다)
+      const allowed = a.id === 'task-queue' && b.id === 'serverless-web' ? ['run'] : [];
+      expect(unshared(a.options.flatMap((o) => o.parts)).filter((k) => req.has(k)), `${a.id} 선택 · ${b.id}`).toEqual(allowed);
     }
   });
 
@@ -486,7 +492,7 @@ describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품
     }
   });
 
-  it('마흔다섯 쌍 — 서른아홉이 한 서비스에 함께 보이고(https-lb 여섯은 백엔드를 기다리는 미완성) · 막히는 여섯은 전부 LB 둘이다', () => {
+  it('예순여섯 쌍 — 쉰넷이 한 서비스에 함께 보이고 · 막히는 열둘은 LB 둘(열) 과 task-queue 의 API 서비스(run)가 겹치는 둘 (D125 결정 ③)', () => {
     const all = BUNDLES.map((b) => b.id);
     const lb = new Set(BUNDLES.filter((b) => b.family === 'lb').map((b) => b.id));
     const results = all.flatMap((a, i) => all.slice(i + 1).map((b) => {
@@ -494,9 +500,104 @@ describe('한 서비스에 카드 여럿 (D115 · D116) — 함께 쓰는 부품
       const why = cardBlocked(p, 0, b, {});
       return { pair: `${a}|${b}`, why, both: why === undefined && cardsIn(addBundle(p, 0, b), 0).length === 2 };
     }));
-    expect(results.length).toBe(45);
-    expect(results.filter((r) => r.both).length).toBe(39);
-    expect(results.filter((r) => !r.both).map((r) => r.pair).every((x) => x.split('|').every((id) => lb.has(id)))).toBe(true);
-    expect(results.filter((r) => !r.both).length).toBe(6);
+    expect(results.length).toBe(66);
+    expect(results.filter((r) => r.both).length).toBe(54);
+    const blocked = results.filter((r) => !r.both);
+    expect(blocked.filter((r) => r.pair.split('|').every((id) => lb.has(id))).every((r) => r.why === 'family')).toBe(true);
+    expect(blocked.filter((r) => !r.pair.split('|').every((id) => lb.has(id))).map((r) => `${r.pair}:${r.why}`)).toEqual(['serverless-web|task-queue:overlap', 'https-lb|task-queue:overlap']);
+    expect(blocked.length).toBe(12);
+  });
+
+});
+
+describe('새 카드 (D125 · D127)', () => {
+  const start = () => startPlan(DEFAULT_PROJECT);
+  it('task-queue — 기본 선택으로 완성 · 이름 전부 유효 · event-pipeline 과 한 서비스에(handler ≠ worker · sa 공유)', () => {
+    const p = addBundle(start(), 0, 'task-queue');
+    expect(presets(p, 0)).toEqual(['queue', 'handler', 'sa', 'run']);
+    expect(ids(p, 0)).toEqual([['task-queue', true]]);
+    expect(generateProject(expandPlan(p), 'gcp').items.every((i) => i.valid)).toBe(true);
+    const both = addBundle(addBundle(start(), 0, 'event-pipeline'), 0, 'task-queue');
+    expect(ids(both, 0)).toEqual([['event-pipeline', true], ['task-queue', true]]);
+    expect(presets(both, 0).filter((x) => x === 'sa')).toEqual(['sa']);
+  });
+
+  it('serverless-web + task-queue — API 선택을 켜면 run 이 겹쳐 overlap · 끄면 함께 보인다 (결정 ③ — run 은 함께 쓰지 않는다)', () => {
+    const sw = addBundle(start(), 0, 'serverless-web');
+    expect(cardBlocked(sw, 0, 'task-queue', {})).toBe('overlap');
+    const p = addBundle(sw, 0, 'task-queue', { api: false });
+    expect(ids(p, 0)).toEqual([['serverless-web', true], ['task-queue', true]]);
+  });
+
+  it('website-mig — web + ig 는 website, tpl + mig 는 website-mig 로 되읽힌다 · 둘은 가족 lb 라 하나', () => {
+    const w = addBundle(start(), 0, 'website', { db: false });
+    const m = addBundle(start(), 0, 'website-mig');
+    expect(ids(w, 0)).toEqual([['website', true]]);
+    expect(ids(m, 0)).toEqual([['website-mig', true]]);
+    expect(presets(m, 0)).toEqual(['mig', 'tpl', 'as', 'hc', 'bs', 'ip', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir']);
+    expect(cardBlocked(w, 0, 'website-mig', {})).toBe('family');
+    expect(generateProject(expandPlan(m), 'gcp').items.every((i) => i.valid)).toBe(true);
+  });
+
+  it('https-lb + mig 칩 → 미완성 website-mig(빠진 것 tpl · as) · Add missing parts 뒤 완성', () => {
+    const p = togglePreset(addBundle(start(), 0, 'https-lb'), 0, 'mig');
+    const m = cardsIn(p, 0);
+    expect(m.map((x) => [x.bundle.id, x.complete])).toEqual([['website-mig', false]]);
+    expect(m[0]!.missing.map(partKey).sort()).toEqual(['as', 'bs', 'firewall:lbhc', 'firewall:web', 'hc', 'tpl']);
+    expect(ids(fillMissing(p, 0, 'website-mig'), 0)).toEqual([['website-mig', true]]);
   });
 });
+
+describe('역할별 서비스 계정 (D126)', () => {
+  const start = () => startPlan(DEFAULT_PROJECT);
+  const roles = (id: string) => bundleById(id)!.options.find((o) => o.id === 'roles')!.parts;
+  const namesOf = (p: WizardPlan) => generateProject(expandPlan(p), 'gcp').items.map((i) => i.name);
+  it('partKey 는 role 을 담고 role 없는 sa 와 다르다', () => {
+    expect(partKey({ preset: 'sa', role: 'build' })).toBe('sa@build');
+    expect(partKey({ preset: 'sa' })).toBe('sa');
+  });
+  it('선택을 켜면 pick 에 role 이 실리고 이름 -sa-build 가 더해진다 · 끄면 그 계정만 빠진다', () => {
+    const p = addBundle(start(), 0, 'ci-cd', { roles: true });
+    expect(p.services[0]!.picks.filter((x) => x.preset === 'sa').map((x) => x.role)).toEqual([undefined, 'build']);
+    expect(ids(p, 0)).toEqual([['ci-cd', true]]);
+    expect(optionOn(p, 0, roles('ci-cd'), 'ci-cd')).toBe(true);
+    expect(namesOf(p)).toEqual(expect.arrayContaining(['billing-shop-prod-sa-sync', 'billing-shop-prod-sa-build']));
+    expect(validatePlan(p)).toEqual({ ok: true });
+    const off = setOption(p, 0, roles('ci-cd'), false, 'ci-cd');
+    expect(off.services[0]!.picks.filter((x) => x.preset === 'sa').map((x) => x.role)).toEqual([undefined]);
+    // 꺼진 선택은 평범한 sa 를 자기 것으로 읽지 않는다
+    expect(optionOn(addBundle(start(), 0, 'ci-cd'), 0, roles('ci-cd'), 'ci-cd')).toBe(false);
+  });
+  it('옛 계획(role 없는 sa)의 카드는 그대로 완성 · pick 순서를 뒤집어도([sa@build, sa]) Service account 는 sync 이고 끄면 sync 를 뗀다', () => {
+    for (const id of ['ci-cd', 'batch-job', 'event-pipeline', 'data-warehouse', 'gke']) expect(ids(addBundle(start(), 0, id), 0), id).toEqual([[id, true]]);
+    let p = addBundle(start(), 0, 'ci-cd', { roles: true });
+    p = { ...p, services: [{ ...p.services[0]!, picks: [...p.services[0]!.picks].sort((a, b) => (a.role === 'build' ? -1 : b.role === 'build' ? 1 : 0)) }] };
+    expect(p.services[0]!.picks[0]).toMatchObject({ preset: 'sa', role: 'build' });
+    expect(findPreset(p, 0, 'sa')).toBe(p.services[0]!.picks.findIndex((x) => x.preset === 'sa' && x.role === undefined));
+    expect(ids(p, 0)).toEqual([['ci-cd', true]]);
+    const rest = setPart(p, 0, { preset: 'sa' }, false);
+    expect(rest.services[0]!.picks.filter((x) => x.preset === 'sa').map((x) => x.role)).toEqual(['build']);
+  });
+  it('sa 에 사용자 역할(app)만 있는 옛 링크의 카드도 완성', () => {
+    const p = addBundle(start(), 0, 'batch-job');
+    const q = { ...p, services: [{ ...p.services[0]!, picks: p.services[0]!.picks.map((x) => (x.preset === 'sa' ? { ...x, role: 'app' } : x)) }] };
+    expect(ids(q, 0)).toEqual([['batch-job', true]]);
+  });
+  it('두 카드가 같은 sa@cron 을 함께 쓴다 · 한 카드의 선택을 꺼도 다른 카드가 쓰면 남는다 (D115)', () => {
+    const p = addBundle(addBundle(start(), 0, 'batch-job', { roles: true }), 0, 'data-warehouse', { roles: true });
+    expect(ids(p, 0)).toEqual([['data-warehouse', true], ['batch-job', true]]);
+    expect(p.services[0]!.picks.filter((x) => x.preset === 'sa' && x.role === 'cron')).toHaveLength(1);
+    expect(SHAREABLE_PARTS.has('sa')).toBe(true);
+    const off = setOption(p, 0, roles('batch-job'), false, 'batch-job');
+    expect(off.services[0]!.picks.filter((x) => x.preset === 'sa' && x.role === 'cron')).toHaveLength(1);
+  });
+  it('긴 문맥에서도 역할 계정 이름은 줄거나 실패로 돌아온다 — 유효로 새지 않는다', () => {
+    const p0: WizardPlan = { provider: 'gcp', project: { owner: 'platformengineering', system: 'paymentsettlement', env: 'prod', region: 'asia-northeast3' }, projectPicks: [], services: [{ purpose: 'reconciliation', picks: [] }] };
+    const p = addBundle(addBundle(p0, 0, 'ci-cd', { roles: true }), 0, 'event-pipeline', { roles: true });
+    for (const i of generateProject(expandPlan(p), 'gcp').items.filter((x) => x.resourceType === 'service_account')) {
+      expect(!i.valid || (i.name.length >= 6 && i.name.length <= 30), i.name).toBe(true);
+    }
+  });
+});
+
+

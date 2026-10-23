@@ -1598,6 +1598,11 @@
             "example": [
               "gcp.secret"
             ]
+          },
+          "src": {
+            "type": "string",
+            "description": "Campaign source (D122): the short name of the site whose house_ad link opened the page, from utm_source. Optional on ui_visit, ui_generate and ui_copy. Kept only when it matches ^[a-z0-9-]{1,32}$; any other value is dropped without an error. When kept it is sent to Axiom and adds one to a per-source daily KV counter.",
+            "example": "parking"
           }
         }
       },
@@ -2341,7 +2346,7 @@
             "type": "string",
             "nullable": true,
             "maxLength": 1024,
-            "description": "A preset id: web, was, bastion, intweb, intwas, file, db, object, run, sa, secret, gke, wip, bq, ar, topic, sub, dlq, dlqsub, build, conn, repo, cron, runjob, redis, worker, raw, ingest, appdata, ip, ig, bs, hc, url, cert, thps, fwd, urlredir, thp, fwdredir, neg, bb, vpc, subnet, firewall, router, nat, psa. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
+            "description": "A preset id: web, was, bastion, intweb, intwas, file, db, object, run, sa, secret, gke, wip, bq, ar, topic, sub, dlq, dlqsub, build, conn, repo, cron, runjob, redis, worker, raw, ingest, appdata, queue, fs, ring, key, waf, wafedge, sqldb, sqluser, handler, tpl, mig, as, ip, ig, bs, hc, url, cert, thps, fwd, urlredir, thp, fwdredir, neg, bb, vpc, subnet, firewall, router, nat, psa, dns. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets",
             "example": "web"
           },
           "rule": {
