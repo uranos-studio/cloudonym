@@ -268,9 +268,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — 묶음 스물일곱 · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — 묶음 서른아홉 · 프리셋 id 전부 · HA 규칙', () => {
     const rows = section('## Wizard presets').filter((l) => l.startsWith('- '));
-    expect(rows).toHaveLength(27);
+    expect(rows).toHaveLength(39);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
     expect(rows.join('\n')).toContain('`gcp.run_service`');
@@ -278,17 +278,15 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('「## Wizard cards」 (D93 · D114) — 카드 열 · 서비스 부품과 project 부품 · API 에는 카드가 없다고 말한다', () => {
     const sec = section('## Wizard cards');
     const rows = sec.filter((l) => l.startsWith('- '));
-    expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job']);
-    expect(rows[6]).toContain('project: `vpc`, `subnet`');
-    expect(rows[7]).toContain('`dlq`');
-    // D117 — https-lb 만 아직 묶음으로 만들어 보지 않았다
-    expect(rows[4]).toContain('rules verified, the set not yet applied');
-    for (const r of [...rows.slice(0, 4), ...rows.slice(5)]) expect(r).toContain('built and tested on Google Cloud');
+    expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'website-mig', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job', 'task-queue']);
+    expect(rows[7]).toContain('project: `vpc`, `subnet`');
+    expect(rows[8]).toContain('`dlq`');
+    // D128 — 2026-10-23 실배포로 https-lb · task-queue · website-mig 까지 열둘 전부 만들어 보았다
+    for (const r of rows) expect(r).toContain('built and tested on Google Cloud');
+    expect(rows.join('\n')).not.toContain('rules verified, the set not yet applied');
     expect(rows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `lbhc`');
-    expect(rows[0]).toContain('built and tested on Google Cloud');
-    expect(rows[1]).toContain('built and tested on Google Cloud');
-    expect(rows[2]).toContain('built and tested on Google Cloud');
-    expect(rows[4]).toContain('rules verified, the set not yet applied');
+    // D126 — 역할 부품은 role 을 밝힌다
+    expect(rows[9]).toContain('`sa` role `build`');
     expect(rows[1]).toContain('`neg`');
     expect(rows[1]).not.toContain('`hc`');
     expect(sec.join('\n')).toContain('Cards are not part of `/v1/wizard`');
@@ -454,7 +452,7 @@ describe('API 를 쓰는 데 필요한 나머지 — 한도 · 계획 파일 · 
     expect(body).toContain('`cloudonym.plan.names.json`');
     expect(help.join('\n')).toContain('default cloudonym.plan.json');
     expect(body).toMatch(/writes the file only if every existing name and verdict stays the same/);
-    // 종료 코드 — --help 의 줄과 글자까지 같고(그 줄은 cli/main.test.mjs [6] 이 README · D102 와 대어 본다), 번호는 EXIT 와 같다
+    // 종료 코드 — --help 의 줄과 글자까지 같고(그 줄은 cli/main.test.mjs [6] 이 docs/cli.md · D102 와 대어 본다), 번호는 EXIT 와 같다
     const exitLine = sec.find((l) => l.startsWith('- Exit codes: '))!;
     expect(exitLine).toBe(`- ${help.find((l) => l.startsWith('Exit codes: '))}`);
     const nums = [...exitLine.matchAll(/(?:: | · )(\d+) /g)].map((m) => Number(m[1]));

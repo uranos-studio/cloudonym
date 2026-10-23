@@ -386,7 +386,7 @@ def wizard_scenarios(browser, rules_version, errors):
     expect(settings(page)).to_have_attribute('data-pick-path', 'services[0]')
     expect(page.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-selected', 'true')
     expect(page.locator('[data-row-path="services[0]"]')).to_have_attribute('aria-expanded', 'true')
-    expect(settings(page).locator('[data-card-gallery] [data-card]')).to_have_count(10)
+    expect(settings(page).locator('[data-card-gallery] [data-card]')).to_have_count(12)
     # 미리 채운 네트워크 넷 — 네트워크는 한 줄로 접혀 있다(이름 수 · 부품 제목) · 줄을 누르면 pick 줄이 펴진다 (D93)
     expect(page.locator('[data-row-pick]')).to_have_count(0)
     expect(page.locator('[data-row-path="network"] [data-row-count]')).to_have_text('4 names')
@@ -1335,7 +1335,7 @@ def wizard_cards(browser, errors):
     pg.click('[data-add-service]')
     settings(pg).locator('[data-service-name]').fill('edge')
     settings(pg).locator('[data-card-add="https-lb"]').click()
-    expect(settings(pg).locator('[data-card-warning]')).to_have_text('No backend — add Website, Serverless web or Static site, or a Web server, Cloud Run service or Object storage chip. Internal servers, worker services and landing buckets stay private.')
+    expect(settings(pg).locator('[data-card-warning]')).to_have_text('No backend — add Website, Serverless web or Static site, or a Web server, Cloud Run service, Object storage or Managed instance group chip. Internal servers, worker services and landing buckets stay private.')
     svc(pg, 2).locator('[data-purpose-chip="run"]').click()
     expect(pg.locator('[data-row-path^="services[2].card."]')).to_have_attribute('data-row-card', 'serverless-web')
     select(pg, 'services[2].card.serverless-web').locator('[data-card-fill]').click()
@@ -1657,7 +1657,7 @@ def wizard_narrow(browser, errors):
     expect(pg.locator('[data-wizard-tab="edit"]')).to_have_attribute('aria-selected', 'true')
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[2]')
     expect(settings(pg).locator('[data-service-name]')).to_be_focused()
-    expect(settings(pg).locator('[data-card-gallery] [data-card]')).to_have_count(10)
+    expect(settings(pg).locator('[data-card-gallery] [data-card]')).to_have_count(12)
     no_hscroll(pg, 360, 'Edit 탭 · 카드 갤러리')
     settings(pg).locator('[data-remove-service]').click()
     expect(settings(pg)).to_have_attribute('data-pick-path', 'services[1]')
@@ -1939,7 +1939,7 @@ def wizard_first_visit(browser, rules_version, errors):
     # Next → 첫 서비스(shop)의 카드 갤러리 · 포커스가 설정 칸으로 옮겨 간다
     s.locator('[data-project-next-button]').click()
     expect(s).to_have_attribute('data-pick-path', 'services[0]')
-    expect(s.locator('[data-card-gallery] [data-card]')).to_have_count(10)
+    expect(s.locator('[data-card-gallery] [data-card]')).to_have_count(12)
     pg.wait_for_function("!!document.activeElement.closest('[data-settings]')")
     # 공유 경고는 Share 를 누를 때 (D93 · D97)
     pg.click('[data-copy="share-url"]')
@@ -3078,7 +3078,7 @@ with sync_playwright() as p:
     assert resp28 is not None and resp28.status == 200, resp28 and resp28.status
     expect(page28.locator('h1')).to_have_text('Naming guide')
     expect(page28.locator('[data-naming-doc] > section')).to_have_count(12)
-    for table_id, rows in {'abbreviations': 117, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 27}.items():
+    for table_id, rows in {'abbreviations': 117, 'regions': 43, 'kinds': 19, 'env': 9, 'tokens': 10, 'attached': 4, 'presets': 39}.items():
         expect(page28.locator(f'[data-doc-table="{table_id}"] tbody tr')).to_have_count(rows)
     expect(page28.locator('[data-doc-table] caption')).to_have_count(page28.locator('[data-doc-table]').count())
     expect(page28.locator('[data-doc-list="shrink"] li')).to_have_count(3)

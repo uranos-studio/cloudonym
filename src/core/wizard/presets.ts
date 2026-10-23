@@ -64,13 +64,29 @@ export const PRESETS: readonly Preset[] = [
   { id: 'cron', label: 'Cloud Scheduler job', ruleId: 'gcp.scheduler_job', ...NONE, level: 'service' },
   { id: 'runjob', label: 'Cloud Run job', ruleId: 'gcp.run_job', ...NONE, level: 'service' },
   { id: 'redis', label: 'Memorystore for Redis', ruleId: 'gcp.redis_instance', ...NONE, level: 'service' },
-  // D116 — 한 서비스의 두 카드가 같은 종류의 리소스를 서로 다른 일에 쓸 때 둘째 것. 같은 규칙에 tier 를 달아 이름 · 중복 키가 갈린다(dlq · urlredir 와 같은 꼴).
+  // D116 — 한 서비스의 두 카드가 같은 종류의 리소스를 서로 다른 일에 쓸 때 둘째 것. 같은 규칙에 tier 를 달아 이름 · 중복 키가 나뉜다(dlq · urlredir 와 같은 꼴).
   // worker: Pub/Sub push 를 받는 비공개 Cloud Run(공개 웹의 run 과 별개) · raw: 적재 버킷(정적 사이트의 공개 버킷과 별개) · ingest: 예약 적재 작업(Batch job 의 cron 과 별개 — 작업 하나는 대상 하나) ·
   // appdata: 내부 앱의 버킷(intweb · intwas 는 위 서버형 옆에 둔다)
   { id: 'worker', label: 'Cloud Run worker service', ruleId: 'gcp.run_service', tier: 'worker', ha: null, serverless: null, level: 'service' },
   { id: 'raw', label: 'Landing bucket', ruleId: 'gcp.storage_bucket', tier: 'raw', ha: null, serverless: null, level: 'service' },
   { id: 'ingest', label: 'Scheduled load job', ruleId: 'gcp.scheduler_job', tier: 'ingest', ha: null, serverless: null, level: 'service' },
   { id: 'appdata', label: 'App bucket', ruleId: 'gcp.storage_bucket', tier: 'appdata', ha: null, serverless: null, level: 'service' },
+  // D124 — 규칙은 있으나 마법사에서 고를 수 없던 것. 카드 선택(bundles.ts)과 칩으로 고른다. 위치 범위(project_location)라 프로젝트 자리에 둘 수 없어 서비스 자리다.
+  // waf: Cloud Armor 정책(백엔드 서비스용 — 종류를 고정하지 않아 토큰 없음) · wafedge: 엣지 정책(백엔드 버킷용 — 종류 CLOUD_ARMOR_EDGE 고정 · D88) · sqldb · sqluser: Cloud SQL 인스턴스 안의 데이터베이스 · 사용자
+  { id: 'queue', label: 'Cloud Tasks queue', ruleId: 'gcp.tasks_queue', ...NONE, level: 'service' },
+  { id: 'fs', label: 'Firestore database', ruleId: 'gcp.firestore_database', ...NONE, level: 'service' },
+  { id: 'ring', label: 'KMS key ring', ruleId: 'gcp.kms_key_ring', ...NONE, level: 'service' },
+  { id: 'key', label: 'KMS crypto key', ruleId: 'gcp.kms_crypto_key', ...NONE, level: 'service' },
+  { id: 'waf', label: 'Cloud Armor policy', ruleId: 'gcp.security_policy', ...NONE, level: 'service' },
+  { id: 'wafedge', label: 'Cloud Armor edge policy', ruleId: 'gcp.security_policy', kind: 'CLOUD_ARMOR_EDGE', ...NONE, level: 'service' },
+  { id: 'sqldb', label: 'Cloud SQL database', ruleId: 'gcp.cloud_sql_database', ...NONE, level: 'service' },
+  { id: 'sqluser', label: 'Cloud SQL user', ruleId: 'gcp.cloud_sql_user', ...NONE, level: 'service' },
+  // D125 — Cloud Tasks 가 부르는 Cloud Run 처리 서비스. Pub/Sub 의 worker 와 같은 서비스에 함께 둘 수 있게 tier handler (D116 꼴)
+  { id: 'handler', label: 'Cloud Run task handler', ruleId: 'gcp.run_service', tier: 'handler', ha: null, serverless: null, level: 'service' },
+  // D127 — Website (autoscaling) 카드: 인스턴스 템플릿 · 리전 관리형 인스턴스 그룹 · 리전 자동 확장
+  { id: 'tpl', label: 'Instance template', ruleId: 'gcp.instance_template', ...NONE, level: 'service' },
+  { id: 'mig', label: 'Managed instance group', ruleId: 'gcp.region_instance_group_manager', ...NONE, level: 'service' },
+  { id: 'as', label: 'Autoscaler', ruleId: 'gcp.region_autoscaler', ...NONE, level: 'service' },
   // D73 — HTTPS 로드 밸런서 부품. 칩 하나 = 이름 하나 · 자동 연결 없음
   { id: 'ip', label: 'Global IP address', ruleId: 'gcp.global_address', ...NONE, level: 'service', group: 'lb' },
   { id: 'ig', label: 'Instance group', ruleId: 'gcp.instance_group', ...NONE, level: 'service', group: 'lb' },
@@ -96,6 +112,8 @@ export const PRESETS: readonly Preset[] = [
   { id: 'nat', label: 'Cloud NAT', ruleId: 'gcp.router_nat', ...NONE, level: 'project', group: 'network' },
   // D88 — Private services access 대역: 전역 내부 주소(--global --purpose=VPC_PEERING). purpose 는 종류 표(address_type)와 다른 API 필드라 kind 는 INTERNAL 로 고정한다
   { id: 'psa', label: 'Private services access range', ruleId: 'gcp.global_address', tier: 'psa', kind: 'INTERNAL', ha: null, serverless: null, level: 'project', group: 'network' },
+  // D124 결정 ① — Cloud DNS 영역: 프로젝트 범위 · 지역 토큰 없음 · 보통 프로젝트에 하나라 네트워크 칸 칩이다
+  { id: 'dns', label: 'Cloud DNS zone', ruleId: 'gcp.dns_managed_zone', ...NONE, level: 'project', group: 'network' },
 ];
 
 export function presetOf(id: string): Preset | undefined {

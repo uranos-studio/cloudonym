@@ -24,8 +24,8 @@ describe('첫 화면 — 예시 넷 · 서비스 하나 · 고른 것 없음', (
     expect(r.ok ? [] : r.errors.map((e) => e.code)).toEqual(['wizard.empty']);
   });
   it('칩 데이터 — 서비스 칩은 level service(로드 밸런서 묶음 포함) · 프로젝트 칩은 network 묶음 (D73)', () => {
-    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb']);
-    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa']);
+    expect(SERVICE_PRESETS.map((p) => p.id)).toEqual(['web', 'was', 'bastion', 'intweb', 'intwas', 'file', 'db', 'object', 'run', 'sa', 'secret', 'gke', 'wip', 'bq', 'ar', 'topic', 'sub', 'dlq', 'dlqsub', 'build', 'conn', 'repo', 'cron', 'runjob', 'redis', 'worker', 'raw', 'ingest', 'appdata', 'queue', 'fs', 'ring', 'key', 'waf', 'wafedge', 'sqldb', 'sqluser', 'handler', 'tpl', 'mig', 'as', 'ip', 'ig', 'bs', 'hc', 'url', 'cert', 'thps', 'fwd', 'urlredir', 'thp', 'fwdredir', 'neg', 'bb']);
+    expect(PROJECT_PRESETS.map((p) => p.id)).toEqual(['vpc', 'subnet', 'firewall', 'router', 'nat', 'psa', 'dns']);
   });
   it('서비스 칩을 전부 켜도(로드 밸런서 열하나 포함) 이름은 전부 유효하고 축소되는 이름이 없다 — 칩이 pick 상한보다 많아(D119) 상한을 넘는 칩은 둘째 서비스에 켠다 (D91)', () => {
     const first = SERVICE_PRESETS.slice(0, MAX_PICKS_PER_SERVICE);

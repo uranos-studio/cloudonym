@@ -70,7 +70,7 @@ terraform plan
 ### Whole project: `/v1/wizard` → `locals`
 
 `main.tf` names one VM with `/v1/generate`. To name a whole project, send the wizard request to `POST /v1/wizard`
-(see the main README) and turn the items into one map keyed by the structured item key. Invalid items are left out
+(see [docs/api.md](../../docs/api.md#whole-project-post-v1wizard)) and turn the items into one map keyed by the structured item key. Invalid items are left out
 of the map, so a missing key fails the plan instead of creating a resource with a rejected name:
 
 ```hcl
@@ -124,7 +124,7 @@ uniqueness, permissions, quotas and organisation policy are not checked.
 
 ### 프로젝트 전체 — `/v1/wizard` → `locals`
 
-`main.tf` 는 `/v1/generate` 로 VM 하나에 이름을 붙인다. 프로젝트 전체는 마법사 요청을 `POST /v1/wizard` 로 보내고(본 README 참고)
+`main.tf` 는 `/v1/generate` 로 VM 하나에 이름을 붙인다. 프로젝트 전체는 마법사 요청을 `POST /v1/wizard` 로 보내고([docs/api.md](../../docs/api.md#whole-project-post-v1wizard) 참고)
 항목을 구조 키를 맵 키로 하는 맵 하나로 바꾼다. 무효 항목은 맵에 넣지 않는다 — 키가 없으면 plan 이 실패하므로 거부된 이름으로 리소스가 만들어지지 않는다.
 
 ```hcl

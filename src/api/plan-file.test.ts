@@ -27,8 +27,8 @@ const webNames = (plan: WizardPlan, env: Env) => generateProject(expandPlan(with
 const apiNames = (body: { data: { gcp: { items: { key: string; name: string; valid: boolean }[] } } }) => body.data.gcp.items.map((i) => [i.key, i.name, i.valid]);
 
 describe('계획 파일 → POST /v1/wizard (D100)', () => {
-  it('규칙 버전은 그대로다 — src/core 를 고치지 않았다', () => {
-    expect(RULES_REVISION).toBe('2026-10-17.1');
+  it('규칙 버전 — 0.1.12 의 마법사 카드 표 변경(D123~D127)으로 올랐다 · 이름 변화는 없다', () => {
+    expect(RULES_REVISION).toBe('2026-10-23.1');
     expect(VERSION.rules).toBe(RULES_REVISION);
   });
 

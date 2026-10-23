@@ -5,7 +5,7 @@ import { ChevronRight, CircleCheck, ExternalLink, TriangleAlert, X } from 'lucid
 import type { ProjectResult } from '../core/engine';
 import type { WizardPlan } from '../core/wizard/plan';
 import { MAX_PICKS_PER_SERVICE } from '../core/wizard/plan';
-import { BUNDLES, bundleById, partIsProject, partKey, RUN_PUBLIC_DOC, STATIC_SITE_DOC, type Bundle, type BundlePart } from '../core/wizard/bundles';
+import { BUNDLES, bundleById, partIsProject, partKey, RUN_PUBLIC_DOC, STATIC_SITE_DOC, FIRESTORE_DOC, KMS_LOCATION_DOC, ARMOR_DOC, TASKS_DOC, ROLES_DOC, MIG_DOC, type Bundle, type BundlePart } from '../core/wizard/bundles';
 import { presetOf } from '../core/wizard/presets';
 import * as B from './wizardBundles';
 import { findPreset } from './wizardState';
@@ -21,7 +21,8 @@ const STATE = {
   incomplete: 'rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-950 dark:text-amber-200',
 };
 
-const label = (p: BundlePart) => (p.tier === undefined ? presetOf(p.preset)?.label ?? p.preset : `${presetOf(p.preset)?.label ?? p.preset} · ${p.tier}`);
+// 부품 이름 — tier 칩(방화벽) · 역할(D126 — 서비스 계정)을 `Service account · build` 꼴로 붙인다
+const label = (p: BundlePart) => [presetOf(p.preset)?.label ?? p.preset, ...(p.tier === undefined ? [] : [p.tier]), ...(p.role === undefined ? [] : [p.role])].join(' · ');
 
 /** 카드의 요약 표 — 서비스 부품의 뜻(로드 밸런서 부품은 묶어 수로) · 네트워크 부품 수 */
 function tags(b: Bundle): string[] {
@@ -112,10 +113,21 @@ function GalleryCard({ plan, service, bundle: b, edit, onSelect }: { plan: Wizar
   );
 }
 
-/** 이름이 없는 설정 (D96) — 카드가 이름을 다 줘도 공개 웹이 되려면 손으로 할 것. 점검표에만 둔다(갤러리 카드는 고르는 자리라 짧게 둔다) */
+/** 이름이 없는 설정 (D96) — 카드가 이름을 다 줘도 공개 웹이 되려면 손으로 할 것. 점검표에만 둔다(갤러리 카드는 고르는 자리라 짧게 둔다).
+ *  키는 카드 id 또는 `카드:선택` (D124) — 선택 단위 안내는 그 선택이 켜졌을 때만 보인다 */
 const CARD_SETUP: Readonly<Record<string, { text: UiKey; doc: string }>> = {
   'serverless-web': { text: 'wizard_card_setup_run', doc: RUN_PUBLIC_DOC },
   'static-site': { text: 'wizard_card_setup_static', doc: STATIC_SITE_DOC },
+  'task-queue': { text: 'wizard_card_setup_tasks', doc: TASKS_DOC },
+  'website-mig': { text: 'wizard_card_setup_mig', doc: MIG_DOC },
+  'serverless-web:fs': { text: 'wizard_card_setup_fs', doc: FIRESTORE_DOC },
+  'task-queue:fs': { text: 'wizard_card_setup_fs', doc: FIRESTORE_DOC },
+  'data-warehouse:kms': { text: 'wizard_card_setup_kms', doc: KMS_LOCATION_DOC },
+  'website:armor': { text: 'wizard_card_setup_armor', doc: ARMOR_DOC },
+  'serverless-web:armor': { text: 'wizard_card_setup_armor', doc: ARMOR_DOC },
+  'static-site:armor': { text: 'wizard_card_setup_armor', doc: ARMOR_DOC },
+  'website-mig:armor': { text: 'wizard_card_setup_armor', doc: ARMOR_DOC },
+  ...Object.fromEntries(['ci-cd', 'batch-job', 'data-warehouse', 'event-pipeline', 'task-queue'].map((id) => [`${id}:roles`, { text: 'wizard_card_setup_roles' as UiKey, doc: ROLES_DOC }])),
 };
 
 /** 카드 줄의 설정 — 점검표(부품마다 체크 상자 · 이름 · 고치기), 선택, 네트워크 부품, 빠진 부품 경고, 카드 지우기 */
@@ -125,7 +137,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
   const m = B.cardIn(plan, service, card);
   if (!m) return null;
   const b = m.bundle;
-  const setup = CARD_SETUP[b.id];
+  const setups = [b.id, ...b.options.filter((o) => B.optionOn(plan, service, o.parts, b.id)).map((o) => `${b.id}:${o.id}`)].flatMap((k) => (CARD_SETUP[k] ? [{ key: k, ...CARD_SETUP[k]! }] : []));
   const svcName = plan.services[service]?.purpose || en.ui.wizard_unnamed_service;
   const svcParts = m.parts.filter((p) => !partIsProject(p));
   const netParts = m.parts.filter(partIsProject);
@@ -134,7 +146,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
   const titleId = `wizard-card-panel-${b.id}`;
   const nameOf = (p: BundlePart) => {
     const at = partIsProject(p) ? null : service;
-    const i = findPreset(plan, at, p.preset, p.tier);
+    const i = findPreset(plan, at, p.preset, p.tier, p.role);
     return i < 0 ? undefined : { path: at === null ? `projectPicks[${i}]` : `services[${service}].picks[${i}]`, names: rowNames(plan, { service: at, pick: i }, result) };
   };
   // 켤 수 없는 체크 상자(상한 · 이름 겹침) — 끄고, 까닭 문단을 aria-describedby 로 잇는다
@@ -206,15 +218,17 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
         </div>
       )}
 
-      {setup && (
+      {setups.length > 0 && (
         <div data-card-setup={b.id} className="space-y-1 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_setup}</p>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            {en.ui[setup.text]}{' '}
-            <a href={setup.doc} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-indigo-700 underline-offset-2 hover:underline dark:text-indigo-300">
-              {en.ui.wizard_card_setup_doc}<ExternalLink aria-hidden="true" className="size-3" />
-            </a>
-          </p>
+          {setups.map((x) => (
+            <p key={x.key} data-card-setup-note={x.key} className="text-sm text-zinc-700 dark:text-zinc-300">
+              {en.ui[x.text]}{' '}
+              <a href={x.doc} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-indigo-700 underline-offset-2 hover:underline dark:text-indigo-300">
+                {en.ui.wizard_card_setup_doc}<ExternalLink aria-hidden="true" className="size-3" />
+              </a>
+            </p>
+          ))}
         </div>
       )}
 

@@ -4,6 +4,22 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-10-23
+
+The naming wizard grows without new rules: presets for rules it could not pick, an Async task queue card, a Website (autoscaling) card, per-role service accounts as an option, and a record of what each live build test covered.
+
+Rules revision for this release: 2026-10-23.1. The card table changed, so the revision moves, but no name, verdict or suggestion for an existing input or plan changes: every new option is off by default and the two new cards are new.
+
+### Added
+
+- **Test record on cards** (D123) — each card that says "Built and tested on Google Cloud" now carries, in its data, the date and the options that were part of that test; options added later are not covered until a later record says so.
+- **Presets for rules the wizard could not pick** (D124) — Cloud Tasks queue (`queue`), Firestore database (`fs`), KMS key ring and crypto key (`ring`, `key`), Cloud Armor policy for a backend service (`waf`) and at the edge for a backend bucket (`wafedge`), Cloud DNS zone (`dns`, network group), Cloud SQL database and user (`sqldb`, `sqluser`); new card options **Database (Firestore)**, **Encryption key (KMS)**, **Cloud Armor**, **Cloud Armor (edge)** and **Database name and user**, all off by default, so no existing plan or link changes.
+- **Async task queue card** (D125) — a Cloud Tasks queue, a Cloud Run handler service (preset `handler`, tier `handler`) and a service account; options: the API service that enqueues (on), a bucket, a secret, a Firestore database. Applied on Google Cloud (D128).
+- **Separate service accounts per role** (D126) — an option (off by default) on CI/CD, Batch job, Data warehouse, Event pipeline and Async task queue adds a service account per job (`…-sa-build`, `…-sa-cron`, `…-sa-push`) beside the runtime account; card parts may now name a role. Existing plans and links read back unchanged.
+- **Website (autoscaling) card** (D127) — a regional managed instance group from an instance template with an autoscaler behind the HTTPS front, instead of a web server VM in an unmanaged group (presets `tpl`, `mig`, `as`); the HTTPS load balancer card accepts a managed instance group as its backend. Applied on Google Cloud (D128).
+- **HTTPS load balancer, Async task queue and Website (autoscaling) cards tested** (D128) — built on Google Cloud from each card's own plan and destroyed: the HTTPS load balancer with each of its three backends (a web server VM, a Cloud Run service, a bucket), the Async task queue with its API service, Website (autoscaling), and CI/CD, Batch job and Event pipeline with separate service accounts per role; these cards now say "Built and tested on Google Cloud" like the others.
+- Setup notes on the card checklist for the new options and cards (Firestore named databases, KMS key ring location, the Cloud Armor default rule, Cloud Tasks roles, per-role account roles, the managed group's base instance name), each with its Google Cloud document.
+
 ## [0.1.11] - 2026-10-22
 
 The site shows how many resources it can name. Rules revision for this release: 2026-10-17.1 (unchanged); no name, verdict or suggestion changes.

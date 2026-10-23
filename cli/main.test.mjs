@@ -396,9 +396,9 @@ test('[13] add — FAIL 로 남는 기존 키도 위반 코드가 바뀌면 판�
   assert.equal(planBytes(dir), before);
 });
 
-test('[6] 종료 코드 표 — EXIT · --help · README(영어 · 한국어) · D102 가 같은 코드를 말한다', async () => {
+test('[6] 종료 코드 표 — EXIT · --help · docs/cli.md(영어 · 한국어) · D102 가 같은 코드를 말한다', async () => {
   const root = new URL('../', import.meta.url);
-  const readme = readFileSync(new URL('README.md', root), 'utf-8');
+  const readme = readFileSync(new URL('docs/cli.md', root), 'utf-8'); // CLI 절은 README 에서 docs/cli.md 로 옮겼다
   const decisions = readFileSync(new URL('docs/decisions.md', root), 'utf-8');
   const codes = Object.values(EXIT).sort((a, b) => a - b);
   /** @param {string} line @param {RegExp} re */
@@ -601,9 +601,9 @@ test('[16] names --repin --no-write — 계획의 rules_version 도 보관 파�
   assert.match(r.err, /--no-write/);
 });
 
-test('[16] --no-write 설명 — --help · README(영어 · 한국어) · D102 · llms 가 「두 파일 모두」를 말한다', async () => {
+test('[16] --no-write 설명 — --help · docs/cli.md(영어 · 한국어) · D102 · llms 가 「두 파일 모두」를 말한다', async () => {
   const root = new URL('../', import.meta.url);
-  const readme = readFileSync(new URL('README.md', root), 'utf-8');
+  const readme = readFileSync(new URL('docs/cli.md', root), 'utf-8'); // CLI 절은 README 에서 docs/cli.md 로 옮겼다
   const decisions = readFileSync(new URL('docs/decisions.md', root), 'utf-8');
   const llms = readFileSync(new URL('src/api/llms.ts', root), 'utf-8');
   /** @type {string[]} */ const out = [];
@@ -612,12 +612,12 @@ test('[16] --no-write 설명 — --help · README(영어 · 한국어) · D102 �
   assert.match(help, /--no-write\s+names: write neither the plan nor the names file/);
   assert.match(help, /\.lock/);
   const d102 = decisions.split('\n').find((l) => l.startsWith('| D102 |')) ?? '';
-  for (const [where, text] of /** @type {[string, string][]} */ ([['README', readme], ['D102', d102], ['llms', llms]])) {
+  for (const [where, text] of /** @type {[string, string][]} */ ([['docs/cli.md', readme], ['D102', d102], ['llms', llms]])) {
     assert.match(text, /`--no-write` writes neither the plan nor the names file/, where);
     assert.match(text, /`<plan>\.lock`/, where);
   }
   // 저장은 됐는데 잠금을 못 지운 경우 — 성공(0)으로 숨기지 않고 exit 2 로 알린다
-  for (const [where, text] of /** @type {[string, string][]} */ ([['help', help], ['README', readme], ['D102', d102], ['llms', llms]])) {
+  for (const [where, text] of /** @type {[string, string][]} */ ([['help', help], ['docs/cli.md', readme], ['D102', d102], ['llms', llms]])) {
     assert.match(text, /saved but its lock cannot be removed/, where);
     assert.match(text, /or its lock could not be removed after saving/, where);
   }

@@ -177,6 +177,7 @@ describe('줄 이름 rowNames — 항목 키 머리 접두 일치 (core 변경 �
     p = { ...p, services: p.services.map((s, i) => (i === 1 ? { ...s, picks: [...s.picks, { preset: 'web', serverless: 'gcp.run_service', instances: [{ id: '1', seq: '02' }] }] } : s)) };
     for (const t of presetOf('firewall')!.tierChoices ?? []) p = togglePreset(p, null, 'firewall', t);
     p = togglePreset(p, null, 'psa');
+    p = togglePreset(p, null, 'dns');
     p = addPresetPick(p, null, 'subnet');
     p = setPickField(p, { service: null, pick: p.projectPicks.length - 1 }, 'kind', 'REGIONAL_MANAGED_PROXY');
     p = addPresetPick(p, null, 'subnet');

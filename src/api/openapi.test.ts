@@ -132,8 +132,8 @@ describe('public/openapi.json — 형식', () => {
     expect(schemas['ResourceItem']!.properties!['valid']!.description).toBe(en.ui.pass_meaning);
     expect(schemas['ValidateResponse']!.properties!['valid']!.description).toBe(en.ui.pass_meaning);
     expect(spec.info.description).toContain(en.ui.pass_meaning);
-    // README 도 같은 문장을 옮겨 적는다 — 네 곳(화면 · llms.txt · openapi.json · README)이 어긋나지 않게
-    expect(readFileSync(join(import.meta.dirname, '../../README.md'), 'utf-8')).toContain(en.ui.pass_meaning);
+    // docs/api.md(옛 README 의 API 절)도 같은 문장을 옮겨 적는다 — 네 곳(화면 · llms.txt · openapi.json · docs/api.md)이 어긋나지 않게
+    expect(readFileSync(join(import.meta.dirname, '../../docs/api.md'), 'utf-8')).toContain(en.ui.pass_meaning);
   });
   it('명세 전체에 한글 0 · reason · note 없음 (steps · notes 로 바뀌었다)', () => {
     const raw = JSON.stringify(spec);

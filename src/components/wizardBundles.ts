@@ -39,7 +39,7 @@ export interface CardMatch {
 }
 
 function has(plan: WizardPlan, service: number, p: BundlePart): boolean {
-  return findPreset(plan, partIsProject(p) ? null : service, p.preset, p.tier) >= 0;
+  return findPreset(plan, partIsProject(p) ? null : service, p.preset, p.tier, p.role) >= 0;
 }
 function presentIn(plan: WizardPlan, service: number, id: string): boolean {
   return findPreset(plan, service, id) >= 0;
@@ -61,8 +61,8 @@ function matchOf(plan: WizardPlan, service: number, b: Bundle): CardMatch {
   const missing = parts.filter((p) => !has(plan, service, p));
   const noBackend = b.backends !== undefined && backendFor(plan, service, b) === undefined;
   const svc = parts.filter((p) => !partIsProject(p));
-  const at = (xs: BundlePart[]) => xs.map((p) => findPreset(plan, service, p.preset, p.tier)).filter((i) => i >= 0);
-  return { bundle: b, parts, missing, noBackend, complete: missing.length === 0 && !noBackend, picks: at(svc), own: at(svc.filter((p) => !SHAREABLE_PARTS.has(partKey(p)))) };
+  const at = (xs: BundlePart[]) => xs.map((p) => findPreset(plan, service, p.preset, p.tier, p.role)).filter((i) => i >= 0);
+  return { bundle: b, parts, missing, noBackend, complete: missing.length === 0 && !noBackend, picks: at(svc), own: at(svc.filter((p) => !SHAREABLE_PARTS.has(p.preset))) };
 }
 
 /** 서비스의 카드 (D93) — 표 순서. 가족 lb 는 하나 */
@@ -77,8 +77,10 @@ export function cardsIn(plan: WizardPlan, service: number): CardMatch[] {
     // 점검표에서 부품을 빼도 같은 카드가 「미완성」으로 남는다. 두 카드 이상에 드는 부품(bs)은 어느 카드인지 말해 주지 않으므로 세지 않는다
     const sharedCount = new Map<string, number>();
     for (const b of fixed) for (const k of new Set(b.parts.filter((p) => !partIsProject(p)).map(partKey))) sharedCount.set(k, (sharedCount.get(k) ?? 0) + 1);
-    const own = (b: (typeof BUNDLES)[number]) => b.parts.some((p) => !partIsProject(p) && !LB_FRONT.has(partKey(p)) && sharedCount.get(partKey(p)) === 1 && has(plan, service, p));
-    const candidates = fixed.filter(own);
+    const own = (b: (typeof BUNDLES)[number], most: number) => b.parts.some((p) => !partIsProject(p) && !LB_FRONT.has(partKey(p)) && (sharedCount.get(partKey(p)) ?? 0) <= most && has(plan, service, p));
+    // 한 카드에만 드는 부품이 없으면 두 카드에 드는 부품(hc — website · website-mig, D127)으로 고르고 빠진 수로 가린다. 셋 이상에 드는 bs 는 세지 않는다
+    const unique = fixed.filter((b) => own(b, 1));
+    const candidates = unique.length > 0 ? unique : fixed.filter((b) => own(b, 2));
     // 그런 카드가 하나라도 있으면 https-lb(백엔드 없음)는 비교하지 않는다 — 부품을 둘 빼도 카드가 바뀌지 않는다
     const pool = candidates.length > 0 ? candidates : BUNDLES.filter((x) => x.family === 'lb' && x.backends !== undefined);
     let best: CardMatch | undefined;
@@ -130,7 +132,7 @@ function usersOf(plan: WizardPlan, service: number): Map<number, string[]> {
     for (const j of c.picks) add(j, c.bundle.id);
     for (const o of c.bundle.options) {
       if (!optionOnWith(plan, service, o.parts, c.bundle.id, claims)) continue;
-      for (const p of o.parts) if (!partIsProject(p)) add(findPreset(plan, service, p.preset, p.tier), c.bundle.id);
+      for (const p of o.parts) if (!partIsProject(p)) add(findPreset(plan, service, p.preset, p.tier, p.role), c.bundle.id);
     }
   }
   return out;
@@ -139,7 +141,7 @@ function usersOf(plan: WizardPlan, service: number): Map<number, string[]> {
 /** 서비스 부품 하나를 쓰는 카드 (D115) — 필수 부품 · 켜진 선택 둘 다. except 카드는 뺀다. 프로젝트 공용 부품 · 없는 부품은 빈 목록 */
 export function partUsers(plan: WizardPlan, service: number, part: BundlePart, except?: string): string[] {
   if (partIsProject(part)) return [];
-  const i = findPreset(plan, service, part.preset, part.tier);
+  const i = findPreset(plan, service, part.preset, part.tier, part.role);
   if (i < 0) return [];
   return (usersOf(plan, service).get(i) ?? []).filter((id) => id !== except);
 }
@@ -151,8 +153,8 @@ function optionPicks(plan: WizardPlan, service: number, cards: readonly CardMatc
     for (const o of c.bundle.options) {
       if (!optionOn(plan, service, o.parts, c.bundle.id)) continue;
       for (const p of o.parts) {
-        if (partIsProject(p) || SHAREABLE_PARTS.has(partKey(p))) continue;
-        const i = findPreset(plan, service, p.preset, p.tier);
+        if (partIsProject(p) || SHAREABLE_PARTS.has(p.preset)) continue;
+        const i = findPreset(plan, service, p.preset, p.tier, p.role);
         if (i >= 0) out.set(i, c.bundle.id);
       }
     }
@@ -222,7 +224,7 @@ export function cardBlocked(plan: WizardPlan, service: number, id: string, optio
 }
 
 function applyParts(plan: WizardPlan, service: number, parts: readonly BundlePart[]): WizardPlan {
-  return parts.reduce((p, part) => addPresetPick(p, partIsProject(part) ? null : service, part.preset, part.tier), plan);
+  return parts.reduce((p, part) => addPresetPick(p, partIsProject(part) ? null : service, part.preset, part.tier, part.role), plan);
 }
 
 /** 카드를 더한다 (D93) — 부품마다 addPresetPick(칩과 같은 pick) · 이미 있는 것은 건너뛴다 · 프로젝트 공용 부품(방화벽 · PSA)은 projectPicks 로.
@@ -263,7 +265,7 @@ export function partBlocked(plan: WizardPlan, service: number, part: BundlePart)
  *  켜져 있으면 undefined(끄는 것은 막지 않는다) */
 export function optionBlocked(plan: WizardPlan, service: number, parts: readonly BundlePart[], card?: string): 'full' | 'duplicate' | 'overlap' | undefined {
   if (optionOn(plan, service, parts, card)) return undefined;
-  if (card !== undefined && parts.some((p) => !SHAREABLE_PARTS.has(partKey(p)) && partUsers(plan, service, p, card).length > 0)) return 'overlap';
+  if (card !== undefined && parts.some((p) => !SHAREABLE_PARTS.has(p.preset) && partUsers(plan, service, p, card).length > 0)) return 'overlap';
   return addProblem(plan, service, parts.filter((p) => !has(plan, service, p)));
 }
 
@@ -272,8 +274,8 @@ export function optionBlocked(plan: WizardPlan, service: number, parts: readonly
  *  card 의 점검표에서 끄면 다른 카드도 쓰는 부품(D115)은 끄지 않는다 — card 없이 부르면 카드 둘 이상이 쓰는 부품을 끄지 않는다 */
 export function setPart(plan: WizardPlan, service: number, part: BundlePart, on: boolean, card?: string): WizardPlan {
   const at = partIsProject(part) ? null : service;
-  const i = findPreset(plan, at, part.preset, part.tier);
-  if (on) return i >= 0 || partBlocked(plan, service, part) !== undefined ? plan : addPresetPick(plan, at, part.preset, part.tier);
+  const i = findPreset(plan, at, part.preset, part.tier, part.role);
+  if (on) return i >= 0 || partBlocked(plan, service, part) !== undefined ? plan : addPresetPick(plan, at, part.preset, part.tier, part.role);
   if (i < 0 || at === null) return plan;
   const users = partUsers(plan, service, part);
   if (card !== undefined ? users.some((u) => u !== card) : users.length > 1) return plan;
@@ -290,7 +292,7 @@ export function optionOn(plan: WizardPlan, service: number, part: readonly Bundl
 function optionOnWith(plan: WizardPlan, service: number, part: readonly BundlePart[], card: string, claims: ReadonlyMap<number, readonly string[]>): boolean {
   const own = part.filter((p) => !partIsProject(p));
   if (own.length === 0 || !own.every((p) => has(plan, service, p))) return false;
-  return own.every((p) => SHAREABLE_PARTS.has(partKey(p)) || (claims.get(findPreset(plan, service, p.preset, p.tier)) ?? []).every((id) => id === card));
+  return own.every((p) => SHAREABLE_PARTS.has(p.preset) || (claims.get(findPreset(plan, service, p.preset, p.tier, p.role)) ?? []).every((id) => id === card));
 }
 
 /** 선택을 켜고 끈다 — 켜면 그 부품(프로젝트 공용 포함)을 한꺼번에 더하고(optionBlocked 면 그대로 — 방화벽만 빠진 Bastion 을 만들지 않는다), 끄면 서비스 부품만 뗀다(공용 부품은 남긴다).
