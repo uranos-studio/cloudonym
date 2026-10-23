@@ -1133,7 +1133,7 @@ def about_page(browser, errors):
         assert resp is not None and resp.status == 200, resp and resp.status
         assert pg.title() == 'Cloudonym — About', pg.title()
         expect(pg.locator('h1')).to_have_text('About')
-        expect(pg.locator('[data-about] h2')).to_have_text(['What it is', 'What goes in and what comes out', 'What it checks and what it does not',
+        expect(pg.locator('[data-about] h2')).to_have_text(['What it is', 'What goes in and what comes out', 'What it checks and what it does not', 'Supported resources',
                                                            'Source and license', 'Project status', 'Versions', 'More pages'])
         expect(pg.locator('[data-about] [data-intro-example-row]')).to_have_count(3)
         expect(pg.locator('[data-about] [data-intro-example-pass]')).to_have_count(3)
