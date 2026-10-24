@@ -80,13 +80,24 @@ function allowedMeta(event: string, meta: Record<string, unknown>): Record<strin
 /** KV 일자 카운터의 수명 — 366일 뒤 Cloudflare 가 지운다 (D56 · /privacy 의 보존 기간) */
 export const KV_TTL_SECONDS = 366 * 86400;
 
-const KST = new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-});
+/** KST 는 UTC+9 고정이다 — Asia/Seoul 의 일광 절약 시간은 1988년이 마지막이다. 9시간을 더한 시각을 UTC 필드로 읽으면 KST 의 연 · 월 · 일 · 시 · 분 · 초다.
+ *  Intl.DateTimeFormat 을 쓰지 않는다 — 모듈에서 만들면 ICU 지역 · 시간대 자료를 읽느라 isolate 기동 CPU 가 약 10 ms 늘었다(CPU 조사 2026-10-24).
+ *  값이 Intl(Asia/Seoul) 과 같은지는 telemetry.test 가 대어 본다. 잘못된 시각은 Intl 처럼 RangeError 를 던진다 */
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const two = (n: number): string => String(n).padStart(2, '0');
+function kstParts(d: Date): Intl.DateTimeFormatPart[] {
+  const t = d.getTime();
+  if (!Number.isFinite(t)) throw new RangeError('Invalid time value');
+  const k = new Date(t + KST_OFFSET_MS);
+  return [
+    { type: 'year', value: String(k.getUTCFullYear()).padStart(4, '0') }, { type: 'month', value: two(k.getUTCMonth() + 1) }, { type: 'day', value: two(k.getUTCDate()) },
+    { type: 'hour', value: two(k.getUTCHours()) }, { type: 'minute', value: two(k.getUTCMinutes()) }, { type: 'second', value: two(k.getUTCSeconds()) },
+  ];
+}
 
-/** KST 일자 키와 +09:00 타임스탬프 — formatToParts 의 부분값으로 조립한다 (format() 의 구분 문자는 ICU 버전마다 다를 수 있다).
- *  부분이 하나라도 없으면 던진다 — 빈값으로 「--T::」 를 만들어 보내지 않는다. 잘못된 시각은 formatToParts 가 RangeError 를 던진다 */
-export function kstStamp(now: Date, formatParts: FormatParts = (d) => KST.formatToParts(d)): { day: string; time: string } {
+/** KST 일자 키와 +09:00 타임스탬프 — formatToParts 꼴의 부분값으로 조립한다 (시험이 부분이 빠진 결과를 주입한다).
+ *  부분이 하나라도 없으면 던진다 — 빈값으로 「--T::」 를 만들어 보내지 않는다. 잘못된 시각은 kstParts 가 RangeError 를 던진다 */
+export function kstStamp(now: Date, formatParts: FormatParts = kstParts): { day: string; time: string } {
   const parts = formatParts(now);
   const get = (type: Intl.DateTimeFormatPartTypes): string => {
     const value = parts.find((p) => p.type === type)?.value;

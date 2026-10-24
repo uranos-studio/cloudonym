@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { classifyClient, constantTimeEqual, isAiAgent, kstStamp, logTelemetry, KV_TTL_SECONDS, TELEMETRY_SKIP_HEADER, META_KEYS, MAX_RULE_IDS, ruleIdList, type FetchLike, type TelemetrySource } from './telemetry';
 import { fakeKv } from './test-support';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 // 고정 시각 — 실제 시계를 쓰지 않는다. UTC 09-28 15:30 = KST 09-29 00:30 (자정 경계)
 const NOW = new Date('2026-09-28T15:30:00Z');
@@ -33,6 +35,26 @@ describe('kstStamp — KST 자정 경계', () => {
   it('14:59:59Z 는 전날 23:59:59 · 15:00:00Z 는 00:00:00 (24:00 이 아니다)', () => {
     expect(kstStamp(new Date('2026-09-28T14:59:59Z'))).toEqual({ day: '2026-09-28', time: '2026-09-28T23:59:59+09:00' });
     expect(kstStamp(new Date('2026-09-28T15:00:00Z'))).toEqual({ day: '2026-09-29', time: '2026-09-29T00:00:00+09:00' });
+  });
+  it('기본 포매터는 Intl Asia/Seoul 과 같은 값이다 — 연 · 월말 · 윤일 경계와 이틀 간격 2년치', () => {
+    const intl = new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+    });
+    const oracle = (d: Date) => kstStamp(d, (x) => intl.formatToParts(x));
+    const edges = ['2026-12-31T14:59:59Z', '2026-12-31T15:00:00Z', '2028-02-28T15:00:00Z', '2028-02-29T14:59:59.999Z', '2027-06-30T15:00:01Z', '1999-12-31T15:00:00Z'];
+    for (const iso of edges) expect(kstStamp(new Date(iso)), iso).toEqual(oracle(new Date(iso)));
+    const start = Date.parse('2026-01-01T00:00:00Z');
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(start + i * 2 * 86_400_000 + i * 3_607_001);
+      expect(kstStamp(d), String(d.getTime())).toEqual(oracle(d));
+    }
+  });
+  it('기본 포매터도 잘못된 시각에는 RangeError 를 던진다 — 「NaN-NaN」 키를 만들지 않는다', () => {
+    expect(() => kstStamp(new Date(Number.NaN))).toThrow(RangeError);
+  });
+  it('기동 때 Intl.DateTimeFormat 을 만들지 않는다 — isolate 기동 CPU 가 약 10 ms 늘었다(CPU 조사 2026-10-24)', () => {
+    const src = readFileSync(join(import.meta.dirname, 'telemetry.ts'), 'utf-8');
+    expect(src).not.toMatch(/new Intl\.DateTimeFormat/);
   });
 });
 
