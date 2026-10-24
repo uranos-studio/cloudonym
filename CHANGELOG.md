@@ -4,32 +4,25 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-### Added
-
-- **Landing page at `/`** (D129) — one sentence, a one-time animated intro (five context values → one name → PASS, read from the build-time example; the last frame only with reduced motion) and three cards: AWS and Google Cloud open the wizard, Azure says **Coming soon**.
-- **Wizard paths `/aws` and `/gcp`** (D129) — each opens its cloud's example plan (AWS: `demo · payment · prod · ap-northeast-2` with the `web`, `lb`, `tg`, `db` and `object` chips, 10 names, all PASS). The sitemap lists eight pages. `/azure` answers 404.
-
-- **RDS Blue/Green deployment** (D131) — `aws.rds_deployment` for `AWS::RDS::Deployment` (`BlueGreenDeploymentName`, 1–60 characters, a letter first, single hyphens between letters and digits), abbreviation `bgd`; 170 AWS rules. Rules revision 2026-10-24.2.
-- **`ui_visit` carries `cloud`** (D130) — `aws` or `gcp` when the tab first opened a wizard path; kept only for an enabled provider, sent to Axiom and counted per cloud and day in KV. `/privacy` and `/openapi.json` list the field.
-
-### Changed
-
-- **Less Worker CPU in a new isolate** — the `/llms.txt` and `/catalog.json` bodies are built before the build instead of at Worker startup (the routes, counters and rate limit are unchanged), the KST timestamp no longer loads ICU time-zone data, and ASCII tag and label values skip the Unicode checks. Responses do not change; the rules revision moved to 2026-10-24.1 only because engine source changed (D26).
-- **The wizard is no longer at `/`** (D129) — the cloud picker switches in place and the address follows; Share URL points at the plan's cloud path. A link's cloud wins over the path; an older `/#state=…` wizard link moves to its cloud's path and a tree link to `/pick` as before.
-
-## [0.2.0] - 2026-10-23
+## [0.2.0] - 2026-10-24
 
 AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-24.2. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
 
 ### Added
 
-- **AWS** (D45) — 169 AWS rules in the resource tree, `/v1/generate`, `/v1/names`, `/v1/validate`, `/llms.txt`, `/openapi.json` and `/catalog.json` (169 rows with `AWS_CATALOG_META`). The provider enums are `["aws", "gcp"]`; Azure stays **Coming soon**. AWS names carry no availability-zone token: a zone name (`ap-northeast-2a`) resolves to its region, as on Google Cloud (D50 revised).
+- **AWS** (D45) — 170 AWS rules in the resource tree, `/v1/generate`, `/v1/names`, `/v1/validate`, `/llms.txt`, `/openapi.json` and `/catalog.json` (170 rows with `AWS_CATALOG_META`). The provider enums are `["aws", "gcp"]`; Azure stays **Coming soon**. AWS names carry no availability-zone token: a zone name (`ap-northeast-2a`) resolves to its region, as on Google Cloud (D50 revised).
 - **AWS wizard presets** — the naming wizard (home page, `POST /v1/wizard`, CLI plan files) takes `provider: "aws"`. 22 AWS presets mirror the Google Cloud ones where an AWS rule exists (`web` · `was` · `bastion` · `intweb` · `intwas` · `file` on EC2 with Lambda as the serverless switch, `db` RDS, `object` S3, `sa` IAM role, `secret`, `eks`, `ecr`, `redis` ElastiCache, `lb` · `tg` · `eip`, and the network `vpc` · `subnet` · `firewall` (security group: `ssh` · `web` · `icmp` · `internal`) · `igw` · `rt` · `nat`); an EC2 server carries `boot` and `data` (EBS), `ip` (Elastic IP) and `ipi` (network interface). An AWS plan has no project ID item (an account has no named project) and rejects `project_id_suffix` with the new code `wizard.project_id_suffix_not_supported`. `/catalog.json` fills `presets` and `attachments` for aws; the wizard's cloud picker enables AWS (Azure stays **Coming soon**), switching clouds clears the picks, and a link or plan file for AWS carries `c: "aws"`, so the plan-file limit grows by 10 bytes to 176,558 bytes. The wizard cards stay Google Cloud only. With two clouds the CLI's guided flow asks which one (Enter keeps gcp). Google Cloud names and links are unchanged.
+- **Landing page at `/`** (D129) — one sentence, an animated intro that loops every 6 seconds (five context values → one name → PASS, read from the build-time example; the last frame only with reduced motion) and three cards: AWS and Google Cloud open the wizard, Azure says **Coming soon**.
+- **Wizard paths `/aws` and `/gcp`** (D129) — each opens its cloud's example plan (AWS: `demo · payment · prod · ap-northeast-2` with the `web`, `lb`, `tg`, `db` and `object` chips, 10 names, all PASS). The sitemap lists eight pages. `/azure` answers 404.
+- **RDS Blue/Green deployment** (D131) — `aws.rds_deployment` for `AWS::RDS::Deployment` (`BlueGreenDeploymentName`, 1–60 characters, a letter first, single hyphens between letters and digits), abbreviation `bgd`; 170 AWS rules. Rules revision 2026-10-24.2.
+- **`ui_visit` carries `cloud`** (D130) — `aws` or `gcp` when the tab first opened a wizard path; kept only for an enabled provider, sent to Axiom and counted per cloud and day in KV. `/privacy` and `/openapi.json` list the field.
 
 ### Changed
 
 - **AWS abbreviations re-derived for all 169 rules** — by the Google Cloud abbreviation principles, with measured frequency in public Terraform: 71 change, among them `s3` (was `bucket`), `ec2` (`vm`), `rds` (`db`), `ebs` (`vol`), `snet` (`subnet`) and the Transit Gateway family under `tgw`. Each catalog row records the basis and the old abbreviation in `slug.previous` and `aliases`. Shared by design: `sng` (RDS · ElastiCache subnet groups), `pg` (parameter groups), `pol` (IAM policies), `st` (API Gateway stages v1 · v2).
 - **`/v1/generate` without `providers`** — names only the clouds whose region table resolves the `region` sent, so a request with a Google Cloud region keeps getting Google Cloud names and no 400 from AWS. A region no enabled cloud resolves still returns every cloud's error.
+- **Less Worker CPU in a new isolate** — the `/llms.txt` and `/catalog.json` bodies are built before the build instead of at Worker startup (the routes, counters and rate limit are unchanged), the KST timestamp no longer loads ICU time-zone data, and ASCII tag and label values skip the Unicode checks. Responses do not change; the rules revision moved to 2026-10-24.1 only because engine source changed (D26).
+- **The wizard is no longer at `/`** (D129) — the cloud picker switches in place and the address follows; Share URL points at the plan's cloud path. A link's cloud wins over the path; an older `/#state=…` wizard link moves to its cloud's path and a tree link to `/pick` as before.
 
 ## [0.1.12] - 2026-10-23
 
