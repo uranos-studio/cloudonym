@@ -27,8 +27,8 @@ const webNames = (plan: WizardPlan, env: Env) => generateProject(expandPlan(with
 const apiNames = (body: { data: { gcp: { items: { key: string; name: string; valid: boolean }[] } } }) => body.data.gcp.items.map((i) => [i.key, i.name, i.valid]);
 
 describe('계획 파일 → POST /v1/wizard (D100)', () => {
-  it('규칙 버전 — 0.1.12 마법사 카드 표(D123~D127)와 0.2.0 AWS 켜기를 합친 값이다(2026-10-24.1 은 라벨 ASCII 빠른 길 — 출력 불변 · 엔진 소스만 바뀜 · 2026-10-24.2 는 RDS Blue/Green 배포 규칙 — D131 · 2026-10-24.3 은 BigQuery 테이블 규칙 — D132 · 2026-10-24.4 는 Logging 규칙 셋 — D133 · 2026-10-24.5 는 Workflows 규칙 — D134)', () => {
-    expect(RULES_REVISION).toBe('2026-10-24.5');
+  it('규칙 버전 — 0.1.12 마법사 카드 표(D123~D127)와 0.2.0 AWS 켜기를 합친 값이다(2026-10-24.1 은 라벨 ASCII 빠른 길 — 출력 불변 · 엔진 소스만 바뀜 · 2026-10-24.2 는 RDS Blue/Green 배포 규칙 — D131 · 2026-10-24.3 은 BigQuery 테이블 규칙 — D132 · 2026-10-24.4 는 Logging 규칙 셋 — D133 · 2026-10-24.5 는 Workflows 규칙 — D134 · 2026-10-24.6 은 태그 키 · 값 규칙 — D135)', () => {
+    expect(RULES_REVISION).toBe('2026-10-24.6');
     expect(VERSION.rules).toBe(RULES_REVISION);
   });
 

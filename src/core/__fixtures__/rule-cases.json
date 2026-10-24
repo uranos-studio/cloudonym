@@ -2085,6 +2085,62 @@
       "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
     ]
   },
+  "gcp.tag_key": {
+    "valid": [
+      "a",
+      "A",
+      "1",
+      "environment",
+      "prod",
+      "a-b",
+      "a_b",
+      "a.b",
+      "Team.Name_01",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc",
+      "shop-prod-tagk-01"
+    ],
+    "invalid": [
+      "-a",
+      "a-",
+      "_a",
+      "a_",
+      ".a",
+      "a.",
+      "a b",
+      "a/b",
+      "a'b",
+      "a\"b",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcd"
+    ]
+  },
+  "gcp.tag_value": {
+    "valid": [
+      "a",
+      "A",
+      "1",
+      "environment",
+      "prod",
+      "a-b",
+      "a_b",
+      "a.b",
+      "Team.Name_01",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc",
+      "shop-prod-tagv-01"
+    ],
+    "invalid": [
+      "-a",
+      "a-",
+      "_a",
+      "a_",
+      ".a",
+      "a.",
+      "a b",
+      "a/b",
+      "a'b",
+      "a\"b",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcd"
+    ]
+  },
   "gcp.run_job": {
     "valid": [
       "a",

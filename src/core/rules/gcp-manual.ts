@@ -59,6 +59,11 @@ const LOGGING_REST = 'https://docs.cloud.google.com/logging/docs/reference/v2/re
 /** Logging 싱크 · 버킷 ID — 영숫자로 시작, 영숫자 · 밑줄 · 하이픈 · 마침표, 100자까지 */
 const LOGGING_ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,99}$/;
 
+const RM_V3 = 'https://docs.cloud.google.com/resource-manager/reference/rest/v3';
+const TAGS_GUIDE = 'https://docs.cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing';
+/** 태그 키 · 값의 shortName — REST 참조의 꼴. 안내서는 따옴표 · 역슬래시 · 슬래시를 뺀 UTF-8 전부라 더 넓다 */
+const TAG_SHORT_NAME = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,254}[A-Za-z0-9])?$/;
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -99,7 +104,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection' | 'gcp:bigquery_dataset';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection' | 'gcp:bigquery_dataset' | 'gcp:tag_key';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -118,6 +123,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:cloudbuild_connection': { id: 'gcp:cloudbuild_connection', provider: 'gcp', displayName: 'Cloud Build connection', parent: 'gcp:project_location', ruleId: 'gcp.cloudbuild_connection', docUrl: CB_REPOSITORIES_CREATE },
   // 안내서 "When you create a table in BigQuery, the table name must be unique per dataset." — 테이블 · 뷰는 데이터세트 아래다 (D132)
   'gcp:bigquery_dataset': { id: 'gcp:bigquery_dataset', provider: 'gcp', displayName: 'BigQuery dataset', parent: 'gcp:project', ruleId: 'gcp.bigquery_dataset', docUrl: BQ_TABLE_NAMING },
+  // TagValue.shortName "The short name should be unique for TagValues within the same parent TagKey." — 값은 키 아래다 (D135)
+  'gcp:tag_key': { id: 'gcp:tag_key', provider: 'gcp', displayName: 'Tag key', parent: 'gcp:project', ruleId: 'gcp.tag_key', docUrl: `${RM_V3}/tagValues#TagValue.FIELDS.short_name` },
 };
 
 const RULES: ResourceRule[] = [
@@ -321,6 +328,19 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.workflow', displayName: 'Workflows Workflow', slug: 'wf', minLength: 1, maxLength: 64, pattern: /^[A-Za-z](?:[A-Za-z0-9_-]{0,62}[A-Za-z0-9])?$/,
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', scope: 'gcp:project_location', entity: 'workflows.workflows', category: 'management',
     docUrl: 'https://docs.cloud.google.com/workflows/docs/reference/rest/v1/projects.locations.workflows/create#body.QUERY_PARAMETERS.workflow_id' }),
+  // ── Resource Manager 태그 (D135 · 프로젝트 아래 키만 — 조직 키는 다루지 않는다) ──
+  // TagKey.shortName "The short name should be unique for TagKeys within the same tag namespace. The short name must be 1-256 characters, beginning and ending with an alphanumeric
+  // character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between." · parent "For a TagKey parented by a Project, its parent can be in the form projects/{project_id}" —
+  // 프로젝트 키의 네임스페이스는 프로젝트다(namespacedName {project_id}/{short_name}). 안내서 "The permitted character set for the shortName includes UTF-8 encoded Unicode characters
+  // except single quotes ('), double quotes ("), backslashes (\), and forward slashes (/)." 는 더 넓다 — 좁은 REST 쪽을 따른다(NARROWER). 위치가 없다
+  rule({ id: 'gcp.tag_key', displayName: 'Tag Key', slug: 'tagk', minLength: 1, maxLength: 256, pattern: TAG_SHORT_NAME,
+    caseRule: 'any', startsWithLetter: false, template: UNPLACED, scope: 'gcp:project', entity: 'cloudresourcemanager.tagKeys', category: 'management',
+    docUrl: `${RM_V3}/tagKeys#TagKey.FIELDS.short_name`, uniquenessDocUrl: `${TAGS_GUIDE}#creating_tag`, notes: [NARROWER] }),
+  // TagValue.shortName "The short name should be unique for TagValues within the same parent TagKey. The short name must be 256 characters or less, beginning and ending with an alphanumeric
+  // character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between." · 안내서 "A shortName must begin with an alphanumeric character." 외에는 키와 같은 넓은 글자 — 좁은 REST 쪽(NARROWER)
+  rule({ id: 'gcp.tag_value', displayName: 'Tag Value', slug: 'tagv', minLength: 1, maxLength: 256, pattern: TAG_SHORT_NAME,
+    caseRule: 'any', startsWithLetter: false, scope: 'gcp:tag_key', entity: 'cloudresourcemanager.tagValues', category: 'management',
+    docUrl: `${RM_V3}/tagValues#TagValue.FIELDS.short_name`, uniquenessDocUrl: `${TAGS_GUIDE}#add_tag_values`, notes: [NARROWER] }),
   // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
   // Must end with a number or a letter. Must be unique within the customer project / location"
   rule({ id: 'gcp.redis_instance', displayName: 'Memorystore for Redis Instance', slug: 'redis', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,

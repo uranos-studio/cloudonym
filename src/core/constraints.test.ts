@@ -223,9 +223,9 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.cloud_function']!.entity).toBe('cloudfunctions.functions');
   });
 
-  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 21(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 포함) · D79 의 3 포함', () => {
+  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 22(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(67);
+    expect(none).toHaveLength(69);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -456,5 +456,24 @@ describe('Workflows (D134)', () => {
   it('글자로 시작 · 영숫자로 끝 · 그 사이 영숫자 · 밑줄 · 하이픈', () => {
     for (const name of ['a', 'A', 'a1', 'my_workflow', 'my-workflow', `a${'b'.repeat(63)}`]) expect(ok(name), name).toBe(true);
     for (const name of ['1a', '_a', '-a', 'a-', 'a_', 'a.b', 'a b', `a${'b'.repeat(64)}`, '']) expect(ok(name), name).toBe(false);
+  });
+});
+
+describe('Resource Manager 태그 키 · 값 (D135)', () => {
+  const ok = (id: string, name: string) => { const r = RULES[id]!; return r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength; };
+  it('키는 프로젝트 네임스페이스에 하나 · 값은 키 안에서 하나 — 둘 다 위치가 없다', () => {
+    const pick = (id: string) => { const r = RULES[id]!; return { scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength }; };
+    expect(pick('gcp.tag_key')).toEqual({ scope: 'gcp:project', entity: 'cloudresourcemanager.tagKeys', regionToken: 'none', slug: 'tagk', min: 1, max: 256 });
+    expect(pick('gcp.tag_value')).toEqual({ scope: 'gcp:tag_key', entity: 'cloudresourcemanager.tagValues', regionToken: 'none', slug: 'tagv', min: 1, max: 256 });
+    expect(RULES['gcp.tag_key']!.docUrl).toBe('https://docs.cloud.google.com/resource-manager/reference/rest/v3/tagKeys#TagKey.FIELDS.short_name');
+    expect(RULES['gcp.tag_value']!.docUrl).toBe('https://docs.cloud.google.com/resource-manager/reference/rest/v3/tagValues#TagValue.FIELDS.short_name');
+  });
+  it('REST 참조의 꼴 — 양 끝 영숫자 · 사이에 영숫자 · 하이픈 · 밑줄 · 마침표 · 256자. 안내서의 넓은 UTF-8 글자는 받지 않는다(NARROWER)', () => {
+    const longest = `a${'b'.repeat(254)}c`;
+    for (const id of ['gcp.tag_key', 'gcp.tag_value']) {
+      for (const name of ['a', '1', 'environment', 'Team.Name_01', 'a-b', longest]) expect(ok(id, name), `${id} ${name}`).toBe(true);
+      for (const name of ['-a', 'a-', '_a', '.a', 'a.', 'a b', 'a/b', "a'b", 'é', `${longest}d`, '']) expect(ok(id, name), `${id} ${name}`).toBe(false);
+      expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.narrower_source_used']);
+    }
   });
 });

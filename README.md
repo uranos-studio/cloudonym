@@ -51,7 +51,7 @@ Point your agent at `/llms.txt` (every rule and formula in plain text). Machine-
 
 ## Supported resources
 
-170 AWS and 143 Google Cloud rules are enabled. Azure (377) rules exist but are not enabled yet. Every rule links to the provider's official document. The list and the known limitations: [docs/rules.md](docs/rules.md).
+170 AWS and 145 Google Cloud rules are enabled. Azure (377) rules exist but are not enabled yet. Every rule links to the provider's official document. The list and the known limitations: [docs/rules.md](docs/rules.md).
 
 ## Telemetry and privacy
 
@@ -120,7 +120,7 @@ AI 에이전트는 `/llms.txt` 를 읽게 한다. 명세는 `/openapi.json` · `
 
 ### 지원 리소스
 
-AWS 규칙 170개 · Google Cloud 규칙 143개를 켰다. Azure(377) 규칙은 있지만 아직 켜지 않았다. 목록과 한계: [docs/rules.md](docs/rules.md#한국어)
+AWS 규칙 170개 · Google Cloud 규칙 145개를 켰다. Azure(377) 규칙은 있지만 아직 켜지 않았다. 목록과 한계: [docs/rules.md](docs/rules.md#한국어)
 
 ### 계측 · 개인정보
 

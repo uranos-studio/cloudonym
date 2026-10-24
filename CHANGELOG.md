@@ -4,13 +4,14 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-24.5. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-24.6. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
 
 ### Added
 
 - **BigQuery table** (D132) — `gcp.bigquery_table` (`tbl`, `google_bigquery_table.table_id`, tables and views), unique per dataset under a new `gcp:bigquery_dataset` scope, no region token. Validation takes the ASCII letters, digits, `_`, `-` and spaces of the documented Unicode categories, at most 1,024 characters, because the guide limits the name to 1,024 UTF-8 bytes; generated names are joined with underscores like the dataset. 139 Google Cloud rules.
 - **Cloud Logging sink, log bucket and log-based metric** (D133) — `gcp.logging_sink` (`sink`, `google_logging_project_sink.name`), `gcp.logging_bucket` (`log`, `google_logging_project_bucket_config.bucket_id`, with a region token) and `gcp.logging_metric` (`lbm`, `google_logging_metric.name`): 1–100 characters each; sinks and buckets take letters, digits, `_`, `-` and `.` with a letter or digit first, metrics also `,+!*'()%/` but not `/` first. 142 Google Cloud rules.
 - **Workflows** (D134) — `gcp.workflow` (`wf`, `google_workflows_workflow.name`): letters, digits, `_` and `-`, a letter first and a letter or digit last, 1–64 characters, unique per location and project, with a region token. 143 Google Cloud rules.
+- **Tag key and tag value** (D135) — `gcp.tag_key` (`tagk`, `google_tags_tag_key.short_name`, a key created under the project) and `gcp.tag_value` (`tagv`, `google_tags_tag_value.short_name`, unique within its key under a new `gcp:tag_key` scope): 1–256 characters, letters, digits, `-`, `_` and `.`, a letter or digit at both ends, no region token. 145 Google Cloud rules.
 
 ## [0.2.0] - 2026-10-24
 
