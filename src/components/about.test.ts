@@ -87,7 +87,9 @@ describe('/about (D109)', () => {
     const m = markup();
     const links = /<ul[^>]*data-about-links[^>]*>([\s\S]*?)<\/ul>/.exec(m)?.[1] ?? '';
     expect([...links.matchAll(/href="([^"]+)"/g)].map((x) => x[1])).toEqual(['/privacy#state=abc', '/docs/naming#state=abc', '/docs/api#state=abc', '/llms.txt']);
-    expect(/<a [^>]*data-about-intro-again[^>]*>/.exec(m)?.[0]).toContain('href="/#state=abc"');
+    // abc 는 깨진 꼴 — 실을 hash 가 없다. 소개 상자는 마법사에 있으므로 Google Cloud 마법사로 간다(D129 — 소개 페이지에는 소개 상자가 없다)
+    expect(/<a [^>]*data-about-intro-again[^>]*>/.exec(m)?.[0]).toContain('href="/gcp"');
+    expect(/<a [^>]*data-back-to-app[^>]*>/.exec(m)?.[0]).toContain('href="/"');
     // 문서 쪽 푸터에도 About 이 있다 — 문서 쪽에는 More 메뉴가 없다
     expect(/<a [^>]*data-footer-about[^>]*>/.exec(m)?.[0]).toContain('href="/about#state=abc"');
   });
@@ -101,5 +103,37 @@ describe('More 메뉴의 About (D109) — 두 화면 모두 /about 링크', () =
     expect(item).toMatch(/tabindex="-1"/);
     expect(item).toContain('href="/about#state=abc"');
     expect(m).not.toMatch(/<button[^>]*data-nav-about/);
+  });
+});
+
+import { NotFound } from './NotFound';
+import { encodeState, encodeWizardState } from './urlState';
+import { samplePlan } from './wizardSample';
+
+describe('문서 쪽에서 돌아가는 링크 (D129) — hash 의 종류가 갈 화면을 고른다', () => {
+  const gcpHash = `#state=${encodeWizardState(samplePlan('gcp'), VERSION.rules, ['prod'])}`;
+  const awsHash = `#state=${encodeWizardState(samplePlan('aws'), VERSION.rules, ['prod'])}`;
+  const treeHash = `#state=${encodeState({ owner: 'a', system: 'b', purpose: 'c', env: 'prod', region: 'ane3' }, VERSION.rules, { provider: 'gcp', selection: [] })}`;
+  afterAll(() => { vi.unstubAllGlobals(); });
+  const at = (hash: string, el: Parameters<typeof createElement>[0]) => {
+    vi.stubGlobal('window', { location: { hash } });
+    return renderToStaticMarkup(createElement(el));
+  };
+  const href = (m: string, attr: string) => new RegExp(`<a [^>]*${attr}[^>]*>`).exec(m)?.[0].match(/href="([^"]*)"/)?.[1];
+  it.each([
+    ['gcp 링크', () => gcpHash, () => `/gcp${gcpHash}`, () => `/gcp${gcpHash}`],
+    ['aws 링크', () => awsHash, () => `/aws${awsHash}`, () => `/aws${awsHash}`],
+    ['트리 링크', () => treeHash, () => `/pick${treeHash}`, () => '/gcp'],
+    ['hash 없음', () => '', () => '/', () => '/gcp'],
+  ])('%s — Back · 소개 다시 보기', (_name, hash, back, intro) => {
+    const m = at(hash(), About);
+    expect(href(m, 'data-back-to-app')).toBe(back());
+    expect(href(m, 'data-about-intro-again')).toBe(intro());
+  });
+  it('404 쪽도 같은 틀 — 링크 hash 를 들고 오면 그 화면으로, 아니면 소개 페이지 · 문장은 소개 페이지에서 클라우드를 고르라고 한다', () => {
+    expect(href(at(awsHash, NotFound), 'data-back-to-app')).toBe(`/aws${awsHash}`);
+    expect(href(at('', NotFound), 'data-back-to-app')).toBe('/');
+    expect(en.ui.page_not_found_body).toBe('There is no page at this address. Pick a cloud on the home page to open the naming wizard.');
+    expect(en.ui.about_intro_again).toBe('Show the intro in the wizard again');
   });
 });

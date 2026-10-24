@@ -419,7 +419,7 @@ export const en: Catalog = {
     about_versions_title: 'Versions',
     about_versions_body: 'This site runs engine {engine} with rules revision {rules}. The rules revision changes whenever the same input could produce a different name, verdict, suggestion or label.',
     about_links_title: 'More pages',
-    about_intro_again: 'Show the intro on the home page again',
+    about_intro_again: 'Show the intro in the wizard again',
     names_summary: '{resources} resources · {names} names · {pass}/{names} PASS',
     names_empty_selection: 'Pick resources in step 3 to generate their names.',
     copy_all_names: 'Copy all names',
@@ -690,6 +690,6 @@ export const en: Catalog = {
     page_about_description: 'What Cloudonym is, what its PASS checks and does not check, where the source code is, the Apache License 2.0 terms and the current versions.',
     page_not_found_title: 'Page not found',
     page_not_found_description: 'There is no page at this address.',
-    page_not_found_body: 'There is no page at this address. The naming wizard is on the home page.',
+    page_not_found_body: 'There is no page at this address. Pick a cloud on the home page to open the naming wizard.',
   },
 };

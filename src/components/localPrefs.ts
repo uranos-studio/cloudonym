@@ -28,7 +28,7 @@ export function introDismissed(): boolean {
   return readPref(INTRO_KEY) === '1';
 }
 
-/** 소개 상자의 닫힘을 기억하거나(닫기) 지운다(/about 의 「Show the intro on the home page again」 · D109 — 다시 닫을 때까지 보인다) */
+/** 소개 상자의 닫힘을 기억하거나(닫기) 지운다(/about 의 「Show the intro in the wizard again」 · D109 · D129 — 다시 닫을 때까지 보인다) */
 export function rememberIntroDismissed(dismissed: boolean): void {
   writePref(INTRO_KEY, dismissed ? '1' : null);
 }

@@ -17,7 +17,7 @@ import { applyChange, clearForCloudSwitch, toItems, totalNames, type Picked } fr
 import { encodeState, hashKind, shareUrl } from './components/urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './components/linkRevision';
 import { openHash } from './components/openHash';
-import { ABOUT_PATH, API_PATH, HOME_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, withStateHash } from './components/route';
+import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, wizardPath, withStateHash } from './components/route';
 import { AppHeader } from './components/AppHeader';
 import { Wizard } from './components/Wizard';
 import { DEFAULT_FORM, formForCloudSwitch, type FormContext } from './components/formContext';
@@ -159,7 +159,7 @@ function TreeScreen({ rules }: { rules?: readonly ResourceRule[] }) {
     <div className="min-h-screen">
       {/* Share URL 은 항상 지금 규칙 버전이다 — 보이는 이름이 지금 규칙의 것이다 (D27 ⑵). 새 트리 링크의 자리는 /pick 이다 (D68) */}
       <AppHeader
-        screen="tree" otherHref={HOME_PATH} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} aboutHref={withStateHash(ABOUT_PATH, addressHash)}
+        screen="tree" otherHref={wizardPath(provider)} namingHref={withStateHash(NAMING_PATH, addressHash)} apiHref={withStateHash(API_PATH, addressHash)} aboutHref={withStateHash(ABOUT_PATH, addressHash)}
         share={treeShare && <CopyButton text={treeShare} label={en.ui.share_button_label} copyKey="share-url">{en.ui.share_button}</CopyButton>}
         {...(treeShare ? { shareText: treeShare } : {})}
       />

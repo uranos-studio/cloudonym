@@ -4,8 +4,7 @@ import type { ReactNode } from 'react';
 import { DocPage } from './DocPage';
 import { IntroExample } from './IntroExample';
 import { rememberIntroDismissed } from './localPrefs';
-import { API_PATH, HOME_PATH, NAMING_PATH, PRIVACY_PATH, withStateHash } from './route';
-import { hashKind } from './urlState';
+import { API_PATH, NAMING_PATH, PRIVACY_PATH, WIZARD_PATHS, appPathFor, withStateHash } from './route';
 import { repositoryFileUrl, repositoryLabel, SOURCE_REPOSITORY_URL } from './aboutModel';
 import { en } from '../messages/en';
 import { fillUi } from '../messages/catalog';
@@ -24,6 +23,13 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
+/** 「Show the intro in the wizard again」 의 목적지 (D129) — 소개 상자는 마법사에 있다. 마법사 링크면 그 클라우드의 마법사로 hash 를 실어 가고,
+ *  그 밖(트리 링크 · 빈 · 깨진 hash)은 Google Cloud 마법사로 hash 없이 간다(소개 페이지 · 트리 화면에는 소개 상자가 없다) */
+function introAgainHref(hash: string): string {
+  const path = appPathFor(hash);
+  return path === WIZARD_PATHS.aws || path === WIZARD_PATHS.gcp ? withStateHash(path, hash) : WIZARD_PATHS.gcp;
+}
+
 export function About() {
   const ui = en.ui;
   // 앱에서 실어 온 상태 hash 를 다른 쪽 링크에도 싣는다 — 돌아가도 입력 · 선택이 남는다
@@ -36,10 +42,9 @@ export function About() {
         </Section>
         <Section id="about-example" title={ui.about_example_title}>
           <IntroExample phone={false} />
-          {/* 닫은 소개 상자를 첫 화면에 다시 보인다 — 닫힘 기억을 지우고 첫 화면으로 간다(누른 click 안에서 지운 뒤 링크가 옮긴다).
-              트리 꼴 hash 는 뿌리에서 /pick 으로 옮겨져 소개가 안 보이므로 hash 없이 간다 */}
+          {/* 닫은 소개 상자를 마법사에 다시 보인다 — 닫힘 기억을 지우고 마법사로 간다(누른 click 안에서 지운 뒤 링크가 옮긴다) */}
           <p>
-            <a href={hashKind(hash) === 'tree' ? HOME_PATH : withStateHash(HOME_PATH, hash)} data-about-intro-again className={LINK} onClick={() => rememberIntroDismissed(false)}>{ui.about_intro_again}</a>
+            <a href={introAgainHref(hash)} data-about-intro-again className={LINK} onClick={() => rememberIntroDismissed(false)}>{ui.about_intro_again}</a>
           </p>
         </Section>
         <Section id="about-checks" title={ui.about_checks_title}>
