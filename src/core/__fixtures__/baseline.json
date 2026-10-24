@@ -2834,6 +2834,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -9116,6 +9125,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -15404,6 +15422,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -21686,6 +21713,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -27974,6 +28010,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "windows-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "windows-trade-prod-ane3-redis-01",
             "valid": true,
@@ -34256,6 +34301,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "google-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -40544,6 +40598,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "azure-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "azure-trade-prod-ane3-redis-01",
             "valid": true,
@@ -46826,6 +46889,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-lbm-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "workflow": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-wf-01",
             "violations": 1,
             "steps": 1
           },
@@ -53114,6 +53186,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "paymentsettlement-reconciliation-dev-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "paymentsettle-reconciliatio-dev-redis-01",
             "valid": true,
@@ -59396,6 +59477,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "a-long-longpurpose-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -65684,6 +65774,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "3tier-trade-prod-ane3-wf-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-wf-01",
+            "violations": 1,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "3tier-trade-prod-ane3-redis-01",
             "valid": false,
@@ -71966,6 +72065,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -78254,6 +78362,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -84539,6 +84656,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -90821,6 +90947,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -97133,6 +97268,15 @@
             "violations": 0,
             "steps": 0
           },
+          "workflow": {
+            "name": "billing-trade-uat-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-uat-ane3-redis-01",
             "valid": true,
@@ -101906,6 +102050,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-lbm-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "workflow": {
+            "name": "billing-trade-prod-ane3-wf-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-wf-01",
             "violations": 0,
             "steps": 0
           },
@@ -227476,6 +227629,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "workflow",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "zone_vm_extension_policy",
         "name": "",
         "known": true,
@@ -228437,6 +228698,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -229159,6 +229421,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -229875,6 +230138,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -230598,6 +230862,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -231320,6 +231585,7 @@
           "gcp_logging_sink = \"windows-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"windows-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"windows-trade-prod-lbm-01\"",
+          "gcp_workflow = \"windows-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"windows-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"windows-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -232038,6 +232304,7 @@
           "gcp_logging_sink = \"google-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"google-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"google-trade-prod-lbm-01\"",
+          "gcp_workflow = \"google-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"google-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"google-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -232764,6 +233031,7 @@
           "gcp_logging_sink = \"azure-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"azure-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"azure-trade-prod-lbm-01\"",
+          "gcp_workflow = \"azure-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"azure-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"azure-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -233505,6 +233773,7 @@
           "# INVALID: gcp_logging_sink",
           "# INVALID: gcp_logging_bucket",
           "# INVALID: gcp_logging_metric",
+          "# INVALID: gcp_workflow",
           "# INVALID: gcp_redis_instance",
           "# INVALID: gcp_tasks_queue",
           "# INVALID: azure_resource_group",
@@ -234208,6 +234477,7 @@
           "gcp_logging_sink = \"paymentsettlement-reconciliation-dev-sink-01\"",
           "gcp_logging_bucket = \"paymentsettlement-reconciliation-dev-log-01\"",
           "gcp_logging_metric = \"paymentsettlement-reconciliation-dev-lbm-01\"",
+          "gcp_workflow = \"paymentsettlement-reconciliation-dev-wf-01\"",
           "gcp_redis_instance = \"paymentsettle-reconciliatio-dev-redis-01\"",
           "gcp_tasks_queue = \"paymentsettlement-reconciliation-dev-queue-01\"",
           "gcp_labels = {",
@@ -234930,6 +235200,7 @@
           "gcp_logging_sink = \"a-long-longpurpose-prod-sink-01\"",
           "gcp_logging_bucket = \"a-long-longpurpose-prod-ane3-log-01\"",
           "gcp_logging_metric = \"a-long-longpurpose-prod-lbm-01\"",
+          "gcp_workflow = \"a-long-longpurpose-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"a-long-longpurpose-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"a-long-longpurpose-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -235991,6 +236262,7 @@
           "# INVALID: gcp_pubsub_topic",
           "# INVALID: gcp_pubsub_subscription",
           "# INVALID: gcp_dns_managed_zone",
+          "# INVALID: gcp_workflow",
           "# INVALID: gcp_redis_instance",
           "# INVALID: azure_virtual_machine_windows",
           "# INVALID: azure_api_management_service",
@@ -236374,6 +236646,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
@@ -237085,6 +237358,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
@@ -237792,6 +238066,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -238515,6 +238790,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -239237,6 +239513,7 @@
           "gcp_logging_sink = \"billing-trade-uat-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-uat-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-uat-lbm-01\"",
+          "gcp_workflow = \"billing-trade-uat-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-uat-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-uat-ane3-queue-01\"",
           "gcp_labels = {",
@@ -239783,6 +240060,7 @@
           "gcp_logging_sink = \"billing-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
+          "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",

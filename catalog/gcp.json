@@ -4717,6 +4717,40 @@
         "logging metrics",
         "log metric"
       ]
+    },
+    {
+      "key": "gcp.workflow",
+      "displayName": "Workflows Workflow",
+      "category": "management",
+      "rules": {
+        "gcp.workflow": {
+          "scope": "location",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "wf",
+        "basis": "Common short form of workflow; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+        "previous": []
+      },
+      "entity": null,
+      "kind": null,
+      "info": "A Workflows workflow that runs a series of steps; letters, digits, underscores and hyphens, a letter first and a letter or digit last, at most 64 characters, unique per location and project.",
+      "enterNameAt": {
+        "gcloud": [
+          "gcloud workflows deploy"
+        ],
+        "terraform": [
+          "google_workflows_workflow.name"
+        ],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "google_workflows_workflow",
+        "workflows"
+      ]
     }
   ]
 }
