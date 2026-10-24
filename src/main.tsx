@@ -12,7 +12,7 @@ import { Privacy } from './components/Privacy'
 import { About } from './components/About'
 import { NotFound } from './components/NotFound'
 import { Landing } from './components/Landing'
-import { entryRedirect, routeOf } from './components/route'
+import { entryRedirect, routeOf, watchHomeHash } from './components/route'
 import { pageText } from './site/copy'
 import { captureCampaign, stripUtm } from './components/campaign'
 import { sessionStore } from './components/beacon'
@@ -32,6 +32,7 @@ async function start() {
     window.location.replace(redirect)
     return
   }
+  if (route === 'home') watchHomeHash(window)
   const fixture = new URLSearchParams(window.location.search).get('fixture')
   let rules: readonly ResourceRule[] | undefined
   if (import.meta.env.DEV && fixture) rules = (await import('./dev/fixtureRules')).fixtureRules(fixture)

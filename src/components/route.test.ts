@@ -99,3 +99,33 @@ describe('moveToCloud (D129) — 선택기로 클라우드를 바꾸면 주소�
     expect(doc.title).toBe(pageText('gcp').title);
   });
 });
+
+import { watchHomeHash } from './route';
+
+describe('watchHomeHash (D129) — 소개 페이지가 떠 있는 동안 hash 만 바뀌어도 진입과 같은 규칙으로 옮긴다', () => {
+  const fakeWindow = (hash: string) => {
+    let listener: (() => void) | undefined;
+    const replaced: string[] = [];
+    const win = {
+      location: { search: '', hash, replace: (u: string) => { replaced.push(u); } },
+      addEventListener: (_t: string, f: () => void) => { listener = f; },
+      removeEventListener: () => { listener = undefined; },
+    };
+    return { win, replaced, fire: () => listener?.(), has: () => listener !== undefined };
+  };
+  it('마법사 · 트리 링크로 바뀌면 그 경로로 · 옮길 곳 없는 hash 는 머문다 · 떼면 더는 듣지 않는다', () => {
+    const awsHash = `#state=${encodeWizardState(samplePlan('aws'), VERSION.rules, ['prod'])}`;
+    const f = fakeWindow('');
+    const stop = watchHomeHash(f.win as unknown as Parameters<typeof watchHomeHash>[0]);
+    f.fire();
+    expect(f.replaced).toEqual([]);
+    f.win.location.hash = awsHash;
+    f.fire();
+    expect(f.replaced).toEqual([`/aws${awsHash}`]);
+    f.win.location.hash = '#state=broken';
+    f.fire();
+    expect(f.replaced).toHaveLength(1);
+    stop();
+    expect(f.has()).toBe(false);
+  });
+});

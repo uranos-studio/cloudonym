@@ -19,7 +19,7 @@ import * as S from './wizardState';
 import { addedRow, expandedAfterRemove, firstSelection, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
-import { samplePlan } from './wizardSample';
+import { clearedPlan, samplePlan } from './wizardSample';
 import { startFrom } from './wizardStart';
 import { WizardList } from './WizardList';
 import { lastAddedPath, selectionAfterCustomRemove } from './wizardCustom';
@@ -379,7 +379,7 @@ export function Wizard({ provider = 'gcp', brokenLink = false }: { provider?: Wi
     setExtraEnvs([]);
     setTouched(new Set());
     setToggled(new Map());
-    setState({ plan: S.startPlan(), selected: PROJECT_ROW });
+    setState({ plan: clearedPlan(plan.provider), selected: PROJECT_ROW });
     requestAnimationFrame(() => document.getElementById('wizard-project')?.focus());
   };
 

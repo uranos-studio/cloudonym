@@ -34,6 +34,17 @@ export function backToAppHref(hash: string): string {
 /** 진입 때 옮길 곳 (D76 · D129) — main.tsx 한 곳에서만 부른다(마법사는 받은 클라우드를 믿는다 — 두 곳에서 옮기면 두 번 뛴다).
  *  소개 페이지 · 마법사 경로에서: 트리 꼴 hash 는 /pick, 온전한 마법사 hash 는 그 클라우드의 경로(지금 경로와 같으면 머문다).
  *  빈 · 깨진 hash 는 머문다 — 소개 페이지는 hash 를 보지 않고, 마법사는 깨진 링크 안내를 띄운다. 옮길 곳이 없으면 undefined */
+/** 소개 페이지가 떠 있는 동안 같은 문서 안에서 hash 만 바뀌면(옛 공유 링크를 주소창에 붙여 넣기 등) start() 가 다시 돌지 않는다 —
+ *  그때도 진입과 같은 규칙으로 옮긴다. 옮길 곳이 없는 hash 는 그대로 둔다. 떼는 함수를 돌려준다 */
+export function watchHomeHash(win: Pick<Window, 'addEventListener' | 'removeEventListener'> & { location: Pick<Location, 'search' | 'hash' | 'replace'> }): () => void {
+  const onHash = () => {
+    const target = entryRedirect('home', win.location.search, win.location.hash);
+    if (target !== undefined) win.location.replace(target);
+  };
+  win.addEventListener('hashchange', onHash);
+  return () => win.removeEventListener('hashchange', onHash);
+}
+
 export function entryRedirect(route: Route, search: string, hash: string): string | undefined {
   if (route !== 'home' && wizardRouteOf(route) === undefined) return undefined;
   const kind = hashKind(hash);

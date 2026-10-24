@@ -114,3 +114,14 @@ describe('Project 칸의 「Example」 표시 · Clear (D108)', () => {
     expect(form()).not.toContain('data-sample-marker');
   });
 });
+
+import { clearedPlan } from './wizardSample';
+import { startPlan as startPlanOf } from './wizardState';
+
+describe('clearedPlan — 예시를 지워도 클라우드는 그대로다 (/aws 의 Clear 가 GCP 로 바뀌던 회귀)', () => {
+  it('aws 는 aws 의 빈 계획 · gcp 는 gcp 의 빈 계획', () => {
+    expect(clearedPlan('aws').provider).toBe('aws');
+    expect(clearedPlan('aws')).toEqual(startPlanOf(undefined, 'aws'));
+    expect(clearedPlan('gcp')).toEqual(startPlanOf(undefined, 'gcp'));
+  });
+});
