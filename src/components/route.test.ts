@@ -35,6 +35,7 @@ import { encodeState, encodeWizardState, hashKind } from './urlState';
 import { samplePlan } from './wizardSample';
 import { startPlan } from './wizardState';
 import { VERSION } from '../version';
+import { pageText } from '../site/copy';
 
 describe('appPathFor · backToAppHref (D129) — 문서 쪽에서 돌아갈 화면을 hash 의 종류로 고른다', () => {
   const gcpHash = `#state=${encodeWizardState(samplePlan(), VERSION.rules, ['prod'])}`;
@@ -56,5 +57,45 @@ describe('appPathFor · backToAppHref (D129) — 문서 쪽에서 돌아갈 화�
     expect(backToAppHref('')).toBe('/');
     expect(backToAppHref('#state=abc')).toBe('/');
     expect(backToAppHref('#state=a"><script>')).toBe('/');
+  });
+});
+
+import { entryRedirect, moveToCloud } from './route';
+
+describe('entryRedirect (D76 · D129) — 진입 때 한 번, hash 가 경로를 이긴다 · 옮길 곳이 없으면 undefined', () => {
+  const gcpHash = `#state=${encodeWizardState(samplePlan(), VERSION.rules, ['prod'])}`;
+  const awsHash = `#state=${encodeWizardState(samplePlan('aws'), VERSION.rules, ['prod'])}`;
+  const treeHash = `#state=${encodeState({ owner: 'a', system: 'b', purpose: 'c', env: 'prod', region: 'ane3' }, VERSION.rules, { provider: 'gcp', selection: [] })}`;
+  it('소개 페이지 — 트리 꼴은 /pick · 마법사 꼴은 그 클라우드의 경로(query 를 실어 간다) · 빈 · 깨진 hash 는 머문다', () => {
+    expect(entryRedirect('home', '?x=1', treeHash)).toBe(`/pick?x=1${treeHash}`);
+    expect(entryRedirect('home', '', gcpHash)).toBe(`/gcp${gcpHash}`);
+    expect(entryRedirect('home', '?x=1', awsHash)).toBe(`/aws?x=1${awsHash}`);
+    for (const h of ['', '#state=abc', '#other']) expect(entryRedirect('home', '', h), h).toBeUndefined();
+  });
+  it('마법사 경로 — hash 의 클라우드가 다르면 그 경로로 · 같으면 머문다 · 트리 꼴은 /pick · 깨진 hash 는 머문다(마법사가 안내한다)', () => {
+    expect(entryRedirect('aws', '', gcpHash)).toBe(`/gcp${gcpHash}`);
+    expect(entryRedirect('gcp', '?q', awsHash)).toBe(`/aws?q${awsHash}`);
+    expect(entryRedirect('aws', '', awsHash)).toBeUndefined();
+    expect(entryRedirect('gcp', '', gcpHash)).toBeUndefined();
+    expect(entryRedirect('gcp', '', treeHash)).toBe(`/pick${treeHash}`);
+    for (const r of ['aws', 'gcp'] as const) for (const h of ['', '#state=abc']) expect(entryRedirect(r, '', h), `${r} ${h}`).toBeUndefined();
+  });
+  it('그 밖의 쪽은 옮기지 않는다 — 트리 화면 · 문서 · 404', () => {
+    for (const r of ['pick', 'naming', 'api', 'privacy', 'about', 'notFound'] as const) {
+      for (const h of [gcpHash, awsHash, treeHash]) expect(entryRedirect(r, '', h), r).toBeUndefined();
+    }
+  });
+});
+
+describe('moveToCloud (D129) — 선택기로 클라우드를 바꾸면 주소창의 경로와 제목이 따라간다(다시 불러오지 않는다)', () => {
+  it('replaceState 로 경로만 바꾼다 — query · hash 는 그대로 · 제목은 그 경로의 것', () => {
+    const calls: unknown[][] = [];
+    const doc = { title: 'x' };
+    moveToCloud('aws', { location: { search: '?a=1', hash: '#state=abc' }, history: { replaceState: (...a: unknown[]) => { calls.push(a); } }, document: doc });
+    expect(calls).toEqual([[null, '', '/aws?a=1#state=abc']]);
+    expect(doc.title).toBe(pageText('aws').title);
+    moveToCloud('gcp', { location: { search: '', hash: '' }, history: { replaceState: (...a: unknown[]) => { calls.push(a); } }, document: doc });
+    expect(calls.at(-1)).toEqual([null, '', '/gcp']);
+    expect(doc.title).toBe(pageText('gcp').title);
   });
 });

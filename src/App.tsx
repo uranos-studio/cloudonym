@@ -33,12 +33,12 @@ const NO_PICK: Picked = new Map();
 const PANEL = 'rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-800 dark:bg-zinc-900';
 const NOTICE = 'rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200';
 
-/** 화면 고르기 (D68 · D76) — `/pick` 은 늘 트리, 뿌리 `/` 는 늘 마법사다. 트리 꼴 hash 로 뿌리를 열면 main.tsx 가 `/pick` 으로 옮긴다.
- *  어느 꼴로도 풀리지 않는 뿌리 hash 면 마법사 + 한 줄 안내.
+/** 화면 고르기 (D68 · D76 · D129) — `/pick` 은 늘 트리, `/aws` · `/gcp` 는 그 클라우드의 마법사다. 경로와 다른 hash(트리 꼴 · 다른 클라우드의 링크)는 main.tsx 가 진입 때 옮긴다.
+ *  어느 꼴로도 풀리지 않는 hash 면 마법사 + 한 줄 안내.
  *  rules — 시험 전용 fixture(src/dev · DEV 빌드에서만)가 넘긴다. 없으면 규칙 표 */
-function App({ rules, route = 'gcp' }: { rules?: readonly ResourceRule[]; route?: 'home' | 'aws' | 'gcp' | 'pick' }) {
+function App({ rules, route = 'gcp' }: { rules?: readonly ResourceRule[]; route?: 'aws' | 'gcp' | 'pick' }) {
   const [broken] = useState(() => route !== 'pick' && hashKind(window.location.hash) === 'broken');
-  return route === 'pick' ? <TreeScreen rules={rules} /> : <Wizard brokenLink={broken} />;
+  return route === 'pick' ? <TreeScreen rules={rules} /> : <Wizard provider={route} brokenLink={broken} />;
 }
 
 /** 네 단계 트리 화면 (`/pick`) */

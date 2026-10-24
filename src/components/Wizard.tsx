@@ -5,21 +5,22 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { generateProject, parseProjectContext } from '../core/engine';
-import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan } from '../core/wizard/plan';
+import { checkProjectIdSuffix, expandPlan, validatePlan, type PlanError, type WizardPlan, type WizardProvider } from '../core/wizard/plan';
 import type { Env, Provider } from '../core/types';
 import { canonicalRegion } from '../core/regions';
 import { CloudPicker } from './CloudPicker';
 import { AppHeader, PLAN_FILE_BUTTON, PLAN_FILE_TEXT } from './AppHeader';
 import { CopyButton } from './CopyButton';
-import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
+import { encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
-import { ABOUT_PATH, API_PATH, HOME_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, withStateHash } from './route';
+import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, moveToCloud, wizardPath, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
 import { addedRow, expandedAfterRemove, firstSelection, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
 import { CardPanel } from './WizardCards';
 import { serviceLayout } from './wizardBundles';
 import { samplePlan } from './wizardSample';
+import { startFrom } from './wizardStart';
 import { WizardList } from './WizardList';
 import { lastAddedPath, selectionAfterCustomRemove } from './wizardCustom';
 import { CustomDialog, ExtrasSettings, NetworkSettings, PickPanel, ProjectForm, ServiceSettings } from './WizardSettings';
@@ -38,22 +39,7 @@ import { VERSION } from '../version';
 import { readPlanFile, savePlan } from './planFile';
 import { PLAN_MAX_BODY_BYTES } from '../plan/wire';
 
-// ── 첫 상태 — hash 가 마법사 링크면 그것, hash 가 없으면 예시 계획(D108 — 예시 값 넷 · 네트워크 미리 채움(D90) · serverless-web 카드), 깨진 링크면 빈 예시 ──
-/** firstRun — hash 없이 처음 온 사람(D97 · D108). Project(「Example」 표시 · Clear)를 먼저 고른다 · 폰은 Edit 탭으로 연다 */
-interface Start { plan: WizardPlan; envs: Env[]; notices?: WizardNotices; broken: boolean; link?: LinkState; firstRun?: boolean }
-function startFrom(hash: string, brokenAtRoot: boolean): Start {
-  if (hashKind(hash) === 'wizard') {
-    const d = decodeWizardState(hash);
-    if (!d) return { plan: S.initialPlan(), envs: [], broken: true };
-    const plan = d.plan ?? S.initialPlan(d.project, d.provider);
-    const envs = d.envs ?? [];
-    const key = encodeWizardState(plan, VERSION.rules, envs) ?? '';
-    return { plan, envs, notices: d.notices, broken: false, link: { key, hash, ...(d.rulesVersion === undefined ? {} : { rulesVersion: d.rulesVersion }) } };
-  }
-  // 미리 채움은 hash 가 없을 때만 — 링크에서 떨어진 경로(깨진 링크)는 링크가 누구에게나 같도록 빈 예시로 연다
-  const firstRun = !brokenAtRoot && hash === '';
-  return { plan: firstRun ? samplePlan() : S.initialPlan(), envs: [], broken: brokenAtRoot, firstRun };
-}
+// 첫 상태(startFrom)는 wizardStart.ts 에 있다 — 시험이 직접 부른다
 
 /** 링크 · 계획 파일(D100)을 열며 고친 것의 안내 — 둘은 같은 복구를 지나 같은 문장을 쓰고, 계획을 통째로 버린 경우만 문장이 다르다 */
 function noticeLines(n: WizardNotices | undefined, source: 'link' | 'file' = 'link'): string[] {
@@ -73,9 +59,9 @@ const VIEWS: readonly View[] = ['plan', 'edit', 'names'];
 
 const FOCUSABLE = 'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
-/** brokenLink — 뿌리에 온 hash 가 어느 꼴로도 풀리지 않았다(한 줄 안내 · 예시로 연다) */
-export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
-  const [start] = useState(() => startFrom(window.location.hash, brokenLink));
+/** provider — 경로(/aws · /gcp)의 클라우드 (D129). brokenLink — 경로에 온 hash 가 어느 꼴로도 풀리지 않았다(한 줄 안내 · 빈 예시로 연다) */
+export function Wizard({ provider = 'gcp', brokenLink = false }: { provider?: WizardProvider; brokenLink?: boolean }) {
+  const [start] = useState(() => startFrom(window.location.hash, brokenLink, provider));
   // 모델과 고른 줄은 한 상태다 — 바꾸는 함수 하나가 둘을 함께 정한다(선택 규칙은 wizardSelection.selectionAfter)
   // 첫 방문은 Project 를 고른다 (D108) — 예시 값이 맞아 첫 오류 규칙은 첫 서비스를 고르겠지만, 「Example」 표시와 Clear 가 Project 칸에 있다
   const [state, setState] = useState<{ plan: WizardPlan; selected: RowPath }>(() => ({ plan: start.plan, selected: start.firstRun ? PROJECT_ROW : firstSelection(start.plan) }));
@@ -111,13 +97,24 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       return { plan: next, selected: selectionAfter(o, resolveSelection(s.plan, s.selected), s.plan, next) };
     });
   };
-  /** 클라우드를 바꾼다 (0.2) — pick 은 다른 CSP 의 것이라 지운다. 고른 것이 있으면 먼저 묻는다 */
+  /** 클라우드를 바꾼다 (0.2 · D129) — pick 은 다른 CSP 의 것이라 지운다. 고른 것이 있으면 먼저 묻는다.
+   *  손대지 않은 예시면 그 클라우드의 예시 계획으로 바꾸고 예시 상태를 남긴다 — 「AWS 카드 → GCP 선택」이 「GCP 카드」와 같은 화면이다.
+   *  어느 쪽이든 주소창의 경로 · 제목을 그 클라우드의 마법사로 맞춘다(다시 불러오지 않는다 — 적어 둔 값이 남는다) */
   const onCloud = (p: Provider) => {
     if (p !== 'gcp' && p !== 'aws') return;
     const cur = state.plan;
     if (cur.provider === p) return;
+    if (sample) {
+      refocus.current = false;
+      setToggled(new Map());
+      setTouched(new Set());
+      setState({ plan: samplePlan(p), selected: PROJECT_ROW });
+      moveToCloud(p);
+      return;
+    }
     if (S.switchLoses(cur) && !window.confirm(en.ui.wizard_cloud_switch_confirm)) return;
     edit((x) => S.switchProvider(x, p, (r) => canonicalRegion(r, p) !== undefined), { type: 'select', path: PROJECT_ROW });
+    moveToCloud(p);
   };
   const select = (path: RowPath) => {
     refocus.current = false;
@@ -222,8 +219,10 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
       // 트리 꼴 hash 는 트리 경로에서 연다 (D76)
       if (kind === 'tree') { window.location.replace(PICK_PATH + window.location.search + window.location.hash); return; }
       if (kind === 'wizard') {
-        const s = startFrom(window.location.hash, false);
+        const s = startFrom(window.location.hash, false, provider);
         if (!s.broken) {
+          // 같은 탭에서 다른 클라우드의 링크로 옮겼으면 경로 · 제목을 그 클라우드로 맞춘다(다시 불러오지 않는다)
+          if (window.location.pathname !== wizardPath(s.plan.provider)) moveToCloud(s.plan.provider);
           lastSent.current = s.link?.key ?? '';
           refocus.current = false;
           setSample(false);
@@ -240,9 +239,9 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
-  }, []);
+  }, [provider]);
 
-  const shareText = stateKey ? `${window.location.origin}${HOME_PATH}#${HASH_KEY}=${stateKey}` : undefined;
+  const shareText = stateKey ? `${window.location.origin}${wizardPath(plan.provider)}#${HASH_KEY}=${stateKey}` : undefined;
   // 첫 방문 안내 한 줄 (D93) — 닫으면 이 브라우저에 기억한다(저장소가 막혀 있으면 이 화면에서만 닫힌다)
   const [introOpen, setIntroOpen] = useState(() => !introDismissed());
   const closeIntro = () => {

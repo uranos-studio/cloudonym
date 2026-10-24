@@ -11,8 +11,7 @@ import { ApiDoc } from './components/ApiDoc'
 import { Privacy } from './components/Privacy'
 import { About } from './components/About'
 import { NotFound } from './components/NotFound'
-import { PICK_PATH, routeOf } from './components/route'
-import { hashKind } from './components/urlState'
+import { entryRedirect, routeOf } from './components/route'
 import { pageText } from './site/copy'
 import { captureCampaign, stripUtm } from './components/campaign'
 import { sessionStore } from './components/beacon'
@@ -25,9 +24,11 @@ async function start() {
   const clean = stripUtm(window.location.pathname, window.location.search, window.location.hash)
   if (clean !== undefined) window.history.replaceState(window.history.state, '', clean)
   document.title = pageText(route).title
-  // 뿌리는 늘 마법사다 (D76) — 트리 꼴 hash 로 열면 트리 경로로 옮긴다(query 도 실어 간다)
-  if (route === 'home' && hashKind(window.location.hash) === 'tree') {
-    window.location.replace(PICK_PATH + window.location.search + window.location.hash)
+  // 경로와 다른 hash 는 진입 때 한 번 옮긴다 (D76 · D129) — 트리 꼴은 /pick, 다른 클라우드의 마법사 링크는 그 클라우드의 경로(query 도 실어 간다).
+  // 옮기는 곳은 여기 하나다 — 마법사는 받은 클라우드를 믿는다
+  const redirect = entryRedirect(route, window.location.search, window.location.hash)
+  if (redirect !== undefined) {
+    window.location.replace(redirect)
     return
   }
   const fixture = new URLSearchParams(window.location.search).get('fixture')
@@ -35,7 +36,7 @@ async function start() {
   if (import.meta.env.DEV && fixture) rules = (await import('./dev/fixtureRules')).fixtureRules(fixture)
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      {route === 'naming' ? <NamingDoc /> : route === 'api' ? <ApiDoc /> : route === 'privacy' ? <Privacy /> : route === 'about' ? <About /> : route === 'notFound' ? <NotFound /> : <App rules={rules} route={route} />}
+      {route === 'naming' ? <NamingDoc /> : route === 'api' ? <ApiDoc /> : route === 'privacy' ? <Privacy /> : route === 'about' ? <About /> : route === 'notFound' ? <NotFound /> : <App rules={rules} route={route === 'home' ? 'gcp' : route} />}
     </StrictMode>,
   )
 }
