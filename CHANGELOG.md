@@ -13,11 +13,12 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ### Changed
 
+- **Less Worker CPU in a new isolate** — the `/llms.txt` and `/catalog.json` bodies are built before the build instead of at Worker startup (the routes, counters and rate limit are unchanged), the KST timestamp no longer loads ICU time-zone data, and ASCII tag and label values skip the Unicode checks. Responses do not change; the rules revision moved to 2026-10-24.1 only because engine source changed (D26).
 - **The wizard is no longer at `/`** (D129) — the cloud picker switches in place and the address follows; Share URL points at the plan's cloud path. A link's cloud wins over the path; an older `/#state=…` wizard link moves to its cloud's path and a tree link to `/pick` as before.
 
 ## [0.2.0] - 2026-10-23
 
-AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-23.2. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
+AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-24.1. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
 
 ### Added
 
