@@ -30,7 +30,7 @@ import { IntroExample } from './IntroExample';
 import { FileDown, ListChecks, X } from 'lucide-react';
 import { introDismissed, rememberIntroDismissed } from './localPrefs';
 import { initialView, projectGate, showsNext, visibleProjectErrors, type ProjectField } from './wizardProjectGate';
-import { NOTICE, PANEL, headlineFor } from './wizardStyles';
+import { NOTICE, PANEL } from './wizardStyles';
 import { debounce, sendBeacon, sessionStore, visitOnce, wizardGenerateMeta, GENERATE_DEBOUNCE_MS } from './beacon';
 import { fillUi } from '../messages/catalog';
 import { en } from '../messages/en';
@@ -492,7 +492,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
             「무엇을 안 하나」는 이름 칸 아래 PASS 문단 곁에 있다 — 이름을 본 사람에게 필요한 말이다 */}
         {/* 머리글 (D113) — 무엇을 하는 도구인지 한 줄 · 무엇을 넣고 무엇을 받는지 한 줄. 소개 상자를 닫아도 남고 폰에서도 보인다(머리의 작은 부제를 대신한다) */}
         <div data-wizard-headline className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">{headlineFor(plan.provider)}</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">{en.ui.headline}</h2>
           <p data-wizard-headline-sub className="text-sm text-pretty text-zinc-600 sm:text-base dark:text-zinc-400">{en.ui.headline_sub}</p>
         </div>
         {introOpen && (

@@ -53,6 +53,6 @@ export function networkText(provider: Provider): { resourcesHint: string; firewa
 }
 
 /** 마법사 머리글 — CSP 별 (0.2). GCP 는 옛 문구 그대로 */
-export const headlineFor = (provider: Provider): string => (provider === 'aws' ? en.ui.headline_aws : en.ui.headline);
+
 /** 이름 칸의 「만들지 않는다」 문장 — CSP 별 (0.2) */
 export const nothingCreatedFor = (provider: Provider): string => (provider === 'aws' ? en.ui.wizard_nothing_created_aws : en.ui.wizard_nothing_created);

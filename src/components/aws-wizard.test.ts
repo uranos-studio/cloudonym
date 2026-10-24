@@ -115,11 +115,9 @@ describe('네트워크 칸 문구 — CSP 별 (0.2)', () => {
     expect(networkText('gcp')).toEqual({ resourcesHint: 'VPC, subnets, router, NAT, firewall rules and the private services access range every service shares', firewallTiers: 'Firewall rules for' });
     const aws = networkText('aws');
     expect(aws.firewallTiers).toBe('Security groups for');
-    const { headlineFor, nothingCreatedFor } = await import('./wizardStyles');
+    const { nothingCreatedFor } = await import('./wizardStyles');
     expect(nothingCreatedFor('gcp')).toMatch(/nothing is created in Google Cloud/);
     expect(nothingCreatedFor('aws')).not.toMatch(/Google|GCP|bucket Check/);
-    expect(headlineFor('gcp')).toBe('Generate valid Google Cloud resource names.');
-    expect(headlineFor('aws')).toBe('Generate valid AWS resource names.');
     for (const t of Object.values(aws)) expect(t).not.toMatch(/Google|GCP|gcloud|project ID|router|firewall|private services/i);
   });
 });
