@@ -270,7 +270,7 @@ describe('영어 사전 (D24)', () => {
     expect(`${en.ui.intro_example} ${en.ui.intro_example_note}`).toMatch(/^Example output .*not your inputs$/);
     expect(en.ui.intro_example_label).toMatch(/not generated from your inputs/);
     expect(en.ui.intro_example_label).not.toMatch(/\b(three|four|five)\b/);
-    expect(en.ui.meta_description).toMatch(/AWS and Azure coming\./);
+    expect(en.ui.meta_description).toMatch(/AWS and Google Cloud .* Azure coming\./);
     // 소개 한 문장 (D107) — 순서: 프로젝트 값 → 무엇을 만드나 → 받는 것(이름 · JSON · Terraform locals).
     // 값의 수를 말하지 않는다 — 머리글은 서비스 이름까지 「다섯」이고(D113) 프로젝트 칸은 넷이라 숫자가 엇갈린다
     expect(en.ui.wizard_intro).toMatch(/project values/);
