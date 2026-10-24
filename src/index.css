@@ -23,23 +23,29 @@
   details > summary::-webkit-details-marker { display: none; }
   details[open] > summary > [data-chevron] { transform: rotate(90deg); }
 
-  /* 소개 페이지의 움직이는 소개 (D129 · LandingMotion) — 한 번만 돈다(약 3.5초). 쉬는 상태가 마지막 장면이고 animation 은 처음 상태에서 시작한다(fill-mode both).
-     값 다섯이 차례로 오르고(0.15~1.4초) → 화살표가 그려지고(1.5초) → 이름이 왼쪽부터 드러나고(1.9초) → PASS 가 튀어나온다(3.1초) */
-  .landing-rise { animation: landing-rise 0.45s ease-out both; }
-  .landing-d1 { animation-delay: 0.15s; }
-  .landing-d2 { animation-delay: 0.35s; }
-  .landing-d3 { animation-delay: 0.55s; }
-  .landing-d4 { animation-delay: 0.75s; }
-  .landing-d5 { animation-delay: 0.95s; }
-  .landing-arrow path { stroke-dasharray: 60; animation: landing-draw 0.5s ease-out 1.5s both; }
-  .landing-type { animation: landing-type 1.1s steps(29, end) 1.9s both; }
-  .landing-pop { animation: landing-pop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3) 3.1s both; }
+  /* 소개 페이지의 움직이는 소개 (D129 · LandingMotion) — 6초마다 되풀이한다(공작 지시 2026-10-24). 한 바퀴 안에서
+     값 다섯이 차례로 오르고(0~1.4초) → 화살표가 그려지고(1.5초) → 이름이 왼쪽부터 드러나고(1.9초) → PASS 가 튀어나오고(3.1초) →
+     5.4초까지 마지막 장면을 보인 뒤 함께 사라진다. 되풀이마다 엇갈림이 같도록 지연 대신 keyframes 의 백분율로 시각을 적는다 */
+  .landing-rise { animation: landing-rise-0 6s linear infinite both; }
+  .landing-rise.landing-d1 { animation-name: landing-rise-1; }
+  .landing-rise.landing-d2 { animation-name: landing-rise-2; }
+  .landing-rise.landing-d3 { animation-name: landing-rise-3; }
+  .landing-rise.landing-d4 { animation-name: landing-rise-4; }
+  .landing-rise.landing-d5 { animation-name: landing-rise-5; }
+  .landing-arrow path { stroke-dasharray: 60; animation: landing-draw 6s linear infinite both; }
+  .landing-type { animation: landing-type 6s linear infinite both; }
+  .landing-pop { animation: landing-pop 6s linear infinite both; }
   /* 움직임을 줄인 기기는 마지막 장면만 — 값 다섯 → 이름 → PASS */
   @media (prefers-reduced-motion: reduce) {
     .landing-rise, .landing-arrow path, .landing-type, .landing-pop { animation: none; }
   }
-  @keyframes landing-rise { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
-  @keyframes landing-draw { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
-  @keyframes landing-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-  @keyframes landing-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+  @keyframes landing-rise-0 { 0%, 0% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 7.5%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-rise-1 { 0%, 2.5% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 10%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-rise-2 { 0%, 5% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 12.5%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-rise-3 { 0%, 7.5% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 15%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-rise-4 { 0%, 10% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 17.5%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-rise-5 { 0%, 12.5% { opacity: 0; transform: translateY(0.5rem); animation-timing-function: ease-out; } 20%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: translateY(0.5rem); } }
+  @keyframes landing-draw { 0%, 25% { stroke-dashoffset: 60; animation-timing-function: ease-out; } 33.33%, 90% { stroke-dashoffset: 0; } 96%, 100% { stroke-dashoffset: 60; } }
+  @keyframes landing-type { 0%, 31.67% { clip-path: inset(0 100% 0 0); animation-timing-function: steps(29, end); } 50%, 90% { clip-path: inset(0 0 0 0); } 96%, 100% { clip-path: inset(0 100% 0 0); } }
+  @keyframes landing-pop { 0%, 51.67% { opacity: 0; transform: scale(0.6); animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.3); } 58.33%, 90% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; transform: scale(0.6); } }
 }
