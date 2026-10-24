@@ -9,7 +9,8 @@ import { VERSION } from '../version';
 
 /** 줄 하나 — id 는 화면이 폰에서 남길 줄(run)을 고르는 자리 */
 export interface IntroExampleRow { id: 'project' | 'run' | 'fwd'; label: string; key: string; name: string; valid: boolean }
-export interface IntroExample { rules: string; input: string[]; rows: IntroExampleRow[] }
+/** purpose — 예시 서비스 이름(EXAMPLE_SERVICE). 소개 페이지의 움직이는 그림이 input 넷과 함께 다섯 문맥값으로 보인다 (D129) */
+export interface IntroExample { rules: string; input: string[]; purpose: string; rows: IntroExampleRow[] }
 
 /** 항목 키로 고른다 — url_map · global_forwarding_rule 은 HTTPS 와 리다이렉트(redir) 둘이라 ruleId 로는 하나가 정해지지 않는다 */
 const ROW_KEYS = {
@@ -36,6 +37,7 @@ export function buildIntroExample(): IntroExample {
   return {
     rules: VERSION.rules,
     input: [owner, system, env, region],
+    purpose: plan.services[0]!.purpose,
     rows: [row('project', en.ui.wizard_project_id), row('run', en.ui.intro_example_run), row('fwd', en.ui.intro_example_fwd)],
   };
 }

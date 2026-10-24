@@ -28,6 +28,11 @@ describe('소개 상자의 예시 (D107) — 엔진이 만든 값만 · PASS 는
     // 검사기 — rules 2026-10-13.3 에서 엔진이 낸 값(전달 규칙은 리다이렉트(redir)가 아니라 HTTPS 쪽)
     expect(committed.rows.map((r) => r.name)).toEqual(['demo-payment-prod', 'payment-shop-prod-ane3-run-01', 'payment-shop-prod-fwd-01']);
   });
+  it('purpose 는 예시 서비스 이름 — 소개 페이지의 움직이는 그림이 다섯 문맥값을 보인다 (D129) · 손으로 적지 않는다', () => {
+    expect(committed.purpose).toBe(S.EXAMPLE_SERVICE);
+    expect(samplePlan().services[0]!.purpose).toBe(committed.purpose);
+    expect(INTRO_EXAMPLE.purpose).toBe(committed.purpose);
+  });
   it('세 줄은 첫 방문 화면(samplePlan)의 이름에 그대로 있다 — 소개와 화면이 갈라지지 않는다', () => {
     const items = generateProject(expandPlan(samplePlan()), 'gcp').items;
     for (const r of committed.rows) expect(items.find((i) => i.key === r.key)?.name, r.key).toBe(r.name);

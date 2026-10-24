@@ -6,6 +6,7 @@
     "prod",
     "asia-northeast3"
   ],
+  "purpose": "shop",
   "rows": [
     {
       "id": "project",

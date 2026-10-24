@@ -7,7 +7,7 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import data from './introExamples.json';
 import { en } from '../messages/en';
 
-export interface IntroExampleData { rules: string; input: string[]; rows: { id: string; label: string; key: string; name: string; valid: boolean }[] }
+export interface IntroExampleData { rules: string; input: string[]; purpose: string; rows: { id: string; label: string; key: string; name: string; valid: boolean }[] }
 
 export const INTRO_EXAMPLE: IntroExampleData = data;
 
