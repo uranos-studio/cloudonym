@@ -10,6 +10,7 @@ import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_
 import { PROVIDERS } from './types';
 import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
 import { rowOf } from './catalog';
+import { GCP_CATALOG } from './rules/gcp-catalog';
 import { locationsFor } from './regions';
 
 describe('RULES 표 무결성', () => {
@@ -504,5 +505,11 @@ describe('네트워크 방화벽 정책 — 전역 · 지역 (D136)', () => {
       for (const name of ['A', '1a', '-a', 'a-', 'a_b', 'a.b', `a${'b'.repeat(63)}`, '']) expect(ok(id, name), `${id} ${name}`).toBe(false);
     }
     expect(RULES['gcp.network_firewall_policy']!.template).not.toContain('region');
+  });
+  it('catalog 안내 문구가 규칙과 같은 끝 조건을 말한다 — 글자로 시작 · 영숫자로 끝 · 지표 글자 목록에 쉼표가 한 번', () => {
+    const info = (key: string) => GCP_CATALOG.find((r) => r.key === key)!.info;
+    expect(info('gcp.network_firewall_policy')).toContain('a letter first and a letter or digit last');
+    expect(info('gcp.logging_metric')).toContain("_ - . , + ! * ' ( ) % /");
+    expect(info('gcp.logging_metric')).not.toContain("',()");
   });
 });

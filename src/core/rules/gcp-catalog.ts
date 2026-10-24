@@ -436,7 +436,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "entity": null,
     "kind": null,
-    "info": "A global or regional network firewall policy that holds firewall rules and is associated with VPC networks in the project; lowercase letters, digits and hyphens, a letter first, at most 63 characters (the Compute Engine resource name format).",
+    "info": "A global or regional network firewall policy that holds firewall rules and is associated with VPC networks in the project; lowercase letters, digits and hyphens, a letter first and a letter or digit last, at most 63 characters (the Compute Engine resource name format).",
     "enterNameAt": {
       "gcloud": [
         "gcloud compute network-firewall-policies create"
