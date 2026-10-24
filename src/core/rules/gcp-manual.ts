@@ -55,6 +55,10 @@ const CB_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
 const BQ_TABLE_ID = 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id';
 const BQ_TABLE_NAMING = 'https://docs.cloud.google.com/bigquery/docs/tables#table_naming';
 
+const LOGGING_REST = 'https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2';
+/** Logging 싱크 · 버킷 ID — 영숫자로 시작, 영숫자 · 밑줄 · 하이픈 · 마침표, 100자까지 */
+const LOGGING_ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,99}$/;
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -295,6 +299,22 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.bigquery_table', displayName: 'BigQuery Table', slug: 'tbl', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_ -]{1,1024}$/, ...UNDERSCORE,
     caseRule: 'any', startsWithLetter: false, scope: 'gcp:bigquery_dataset', entity: 'bigquery.tables', category: 'database',
     docUrl: BQ_TABLE_ID, uniquenessDocUrl: BQ_TABLE_NAMING, notes: [NARROWER] }),
+  // ── Cloud Logging (D133) ──
+  // LogSink.name "The client-assigned sink identifier, unique within the project. … Sink identifiers are limited to 100 characters and can include only the following characters:
+  // upper and lower-case alphanumeric characters, underscores, hyphens, periods. First character has to be alphanumeric." — 위치가 없다(projects/[PROJECT_ID]/sinks/[SINK_NAME])
+  rule({ id: 'gcp.logging_sink', displayName: 'Cloud Logging Sink', slug: 'sink', minLength: 1, maxLength: 100, pattern: LOGGING_ID,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'logging.sinks', category: 'management',
+    docUrl: `${LOGGING_REST}/projects.sinks#LogSink.FIELDS.name` }),
+  // buckets.create bucketId "Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. Bucket identifiers must start with an alphanumeric character." ·
+  // parent "projects/[PROJECT_ID]/locations/[LOCATION_ID]" — 위치 아래다. 유일 범위 문장은 없다(notes). _Default · _Required 는 밑줄로 시작해 이미 받지 않는다
+  rule({ id: 'gcp.logging_bucket', displayName: 'Cloud Logging Bucket', slug: 'log', minLength: 1, maxLength: 100, pattern: LOGGING_ID,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'logging.buckets', category: 'management',
+    docUrl: `${LOGGING_REST}/projects.locations.buckets/create#body.QUERY_PARAMETERS.bucket_id`, notes: [SCOPE] }),
+  // LogMetric.name "Metric identifiers are limited to 100 characters and can include only the following characters: A-Z, a-z, 0-9, and the special characters _-.,+!*',()%/.
+  // The forward-slash character (/) denotes a hierarchy of name pieces, and it cannot be the first character of the name." · "projects/[PROJECT_ID]/metrics/[METRIC_ID]" 꼴이라 프로젝트 안 유일. 생성은 영숫자 · - · _ 만 쓴다
+  rule({ id: 'gcp.logging_metric', displayName: 'Log-based Metric', slug: 'lbm', minLength: 1, maxLength: 100, pattern: /^[A-Za-z0-9_.,+!*'()%-][A-Za-z0-9_.,+!*'()%/-]{0,99}$/,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'logging.metrics', category: 'management',
+    docUrl: `${LOGGING_REST}/projects.metrics#LogMetric.FIELDS.name` }),
   // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
   // Must end with a number or a letter. Must be unique within the customer project / location"
   rule({ id: 'gcp.redis_instance', displayName: 'Memorystore for Redis Instance', slug: 'redis', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,

@@ -124,7 +124,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
   it('켜진 CSP 만 — GCP · AWS 절이 있고 공식 줄 수는 두 CSP 규칙 수 · Azure 는 「planned」 한 줄 (D45)', () => {
     expect(lines.filter((l) => /^- `[a-z]+\.[a-z0-9_]+`: `/.test(l))).toHaveLength(enabledRules.length);
     expect(enabledRules).toHaveLength(rulesFor('gcp').length + rulesFor('aws').length);
-    expect(rulesFor('gcp')).toHaveLength(139);
+    expect(rulesFor('gcp')).toHaveLength(142);
     expect(lines.filter((l) => l.startsWith('### ')).every((l) => l === '### GCP' || l === '### AWS' || l === '### env' || l === '### region')).toBe(true);
     expect(lines.filter((l) => l === '### GCP')).toHaveLength(5); // 공식 · 지역 · 종류 · 제약 · 트리
     expect(lines.filter((l) => l === '### AWS')).toHaveLength(4); // 공식 · 지역 · 제약 · 트리 — AWS 는 종류 표가 아직 없다
