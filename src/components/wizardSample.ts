@@ -19,6 +19,11 @@ export const SAMPLE_CARD = 'serverless-web';
 /** AWS 예시 서비스의 칩 — EC2(web) · ALB · 대상 그룹 · RDS · S3. 이름 10개가 전부 valid:true 다(wizardSample.test) */
 export const SAMPLE_CHIPS_AWS: readonly string[] = ['web', 'lb', 'tg', 'db', 'object'];
 
+/** 예시를 지운 계획 — 지금 클라우드의 빈 Project 값과 네트워크 미리 채움. 클라우드를 넘겨야 /aws 에서 Clear 가 GCP 로 바뀌지 않는다 */
+export function clearedPlan(provider: WizardProvider): WizardPlan {
+  return startPlan(undefined, provider);
+}
+
 /** 첫 방문 계획 — D90 의 네트워크 미리 채움 위에 첫 서비스(EXAMPLE_SERVICE)의 카드 하나(GCP) 또는 칩 다섯(AWS) */
 export function samplePlan(provider: WizardProvider = 'gcp'): WizardPlan {
   if (provider === 'aws') return SAMPLE_CHIPS_AWS.reduce((p, chip) => togglePreset(p, 0, chip), startPlan(SAMPLE_PROJECTS.aws, 'aws'));
