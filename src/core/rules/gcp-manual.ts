@@ -314,8 +314,10 @@ const RULES: ResourceRule[] = [
   // 테이블 · 뷰 (D132) — TableReference.tableId "The ID can contain Unicode characters in category L (letter), M (mark), N (number), Pc (connector, including underscore),
   // Pd (dash), and Zs (space). … The maximum length is 1,024 characters." · 안내서 "the table name must be unique per dataset." · "Contain characters with a total of up to 1,024 UTF-8 bytes."
   // 두 원문의 길이 단위가 다르다(글자 · 바이트). 엔진은 글자 수로 세므로 글자 수와 바이트 수가 같은 ASCII 부분 — 영숫자 · 밑줄(Pc) · 하이픈(Pd) · 공백(Zs) — 만 받는다(NARROWER).
+  // 공백은 이름 안에만 둔다 — 앞뒤 공백 · 공백만인 이름은 원문이 금하지 않지만 받지 않는다(보수적, D20). 안내서의 「reserved」 이름 · 접두는 목록이 없어 넣지 않는다
+  // (_TABLE_ · _FILE_ · _PARTITION … 은 스키마 안내서의 열 이름 접두다 — 테이블 이름이 아니다).
   // 뷰도 tables.insert 로 만들고 같은 tableId 를 쓴다. 생성은 데이터세트와 같이 밑줄로 잇는다(SQL 에서 따옴표 없이 부른다). 위치는 부모 데이터세트의 것이다 — 지역 토큰이 없다(D77)
-  rule({ id: 'gcp.bigquery_table', displayName: 'BigQuery Table', slug: 'tbl', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_ -]{1,1024}$/, ...UNDERSCORE,
+  rule({ id: 'gcp.bigquery_table', displayName: 'BigQuery Table', slug: 'tbl', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_-](?:[A-Za-z0-9_ -]{0,1022}[A-Za-z0-9_-])?$/, ...UNDERSCORE,
     caseRule: 'any', startsWithLetter: false, scope: 'gcp:bigquery_dataset', entity: 'bigquery.tables', category: 'database',
     docUrl: BQ_TABLE_ID, uniquenessDocUrl: BQ_TABLE_NAMING, notes: [NARROWER] }),
   // ── Cloud Logging (D133) ──
