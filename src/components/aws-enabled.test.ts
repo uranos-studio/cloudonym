@@ -14,3 +14,4 @@ await import('./wizardCustom.test');
 await import('./wizardProjectGate.test');
 await import('./wizardSelection.test');
 await import('./namingDoc.test');
+await import('./wizardSample.test');
