@@ -75,7 +75,8 @@ export function CloudPicker({ value, onPick, numbered = true, compact = false }:
               className={compact ? COMPACT : BUTTON}
             >
               {providerShort(p)}
-              {on && <span data-resource-count className="whitespace-nowrap text-[0.7rem] font-normal opacity-80">{fillUi(en, 'cloud_resource_count', { count: resourceCount(p) })}</span>}
+              {/* 머리의 좁은 단추 줄(compact)은 폰에서 수를 감춘다 — 켜진 CSP 가 둘이면 360px 머리를 넘친다. 수는 소개 페이지 카드 · /about 에도 있다 */}
+              {on && <span data-resource-count className={`whitespace-nowrap text-[0.7rem] font-normal opacity-80${compact ? ' hidden sm:inline' : ''}`}>{fillUi(en, 'cloud_resource_count', { count: resourceCount(p) })}</span>}
               {!on && <span data-coming-soon className={compact ? 'sr-only' : "whitespace-nowrap rounded bg-zinc-200 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"}>{en.ui.cloud_coming_soon}</span>}
             </button>
           );
