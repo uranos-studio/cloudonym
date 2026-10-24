@@ -411,6 +411,9 @@ describe('BigQuery 테이블 · 뷰 (D132)', () => {
   it('글자 — 원문 범주(L · M · N · Pc · Pd · Zs) 가운데 ASCII 만: 영숫자 · 밑줄 · 하이픈 · 공백. 그 밖은 받지 않는다(NARROWER)', () => {
     for (const name of ['a', 'A', '1abc', '_a', 'table 01', 'sample_table', 'my-table']) expect(ok(name), name).toBe(true);
     for (const name of ['étudiant-01', 'a.b', 'sample_table$20190123', 'a/b', 'a@b', '']) expect(ok(name), name).toBe(false);
+    // 앞뒤 공백 · 공백만인 이름은 받지 않는다(보수적, D20) — 안의 공백은 원문 예(table 01)대로 받는다
+    for (const name of [' a', 'a ', ' ', '  ']) expect(ok(name), JSON.stringify(name)).toBe(false);
+    expect(ok(`a${' '.repeat(1022)}b`)).toBe(true);
     expect(r.notes?.map((n) => n.code)).toEqual(['note.narrower_source_used']);
   });
   it('길이 1-1024 — 안내서의 1,024 UTF-8 바이트와 같다(ASCII 는 한 글자가 한 바이트)', () => {
