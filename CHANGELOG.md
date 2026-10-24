@@ -4,6 +4,12 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
+Rules revision for this release: 2026-10-24.3. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
+
+### Added
+
+- **BigQuery table** (D132) — `gcp.bigquery_table` (`tbl`, `google_bigquery_table.table_id`, tables and views), unique per dataset under a new `gcp:bigquery_dataset` scope, no region token. Validation takes the ASCII letters, digits, `_`, `-` and spaces of the documented Unicode categories, at most 1,024 characters, because the guide limits the name to 1,024 UTF-8 bytes; generated names are joined with underscores like the dataset. 139 Google Cloud rules.
+
 ## [0.2.0] - 2026-10-24
 
 AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-24.2. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.

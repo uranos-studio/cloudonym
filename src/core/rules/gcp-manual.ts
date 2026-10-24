@@ -52,6 +52,9 @@ const CB_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
     quote: 'Malformed name: … once repository + connection + location name pass 180 characters (164 with a 1-character connection in asia-northeast3, 155 with a 10-character one, 171 in us-east1) — wider than the create limit' },
 ];
 
+const BQ_TABLE_ID = 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id';
+const BQ_TABLE_NAMING = 'https://docs.cloud.google.com/bigquery/docs/tables#table_naming';
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -92,7 +95,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection' | 'gcp:bigquery_dataset';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -109,6 +112,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   'gcp:router': { id: 'gcp:router', provider: 'gcp', displayName: 'Cloud Router', parent: 'gcp:project_region', ruleId: 'gcp.router', docUrl: ROUTERS_REST },
   // repositories.create repositoryId "This ID should be unique in the connection." — 저장소는 연결 아래다 (D119)
   'gcp:cloudbuild_connection': { id: 'gcp:cloudbuild_connection', provider: 'gcp', displayName: 'Cloud Build connection', parent: 'gcp:project_location', ruleId: 'gcp.cloudbuild_connection', docUrl: CB_REPOSITORIES_CREATE },
+  // 안내서 "When you create a table in BigQuery, the table name must be unique per dataset." — 테이블 · 뷰는 데이터세트 아래다 (D132)
+  'gcp:bigquery_dataset': { id: 'gcp:bigquery_dataset', provider: 'gcp', displayName: 'BigQuery dataset', parent: 'gcp:project', ruleId: 'gcp.bigquery_dataset', docUrl: BQ_TABLE_NAMING },
 };
 
 const RULES: ResourceRule[] = [
@@ -283,6 +288,13 @@ const RULES: ResourceRule[] = [
     // 지역 자리 (D78) — 리전 · 멀티 리전(us · eu) 코드
     caseRule: 'any', startsWithLetter: false, template: ['system', 'purpose', 'env', 'region', 'slug'], scope: 'gcp:project', entity: 'bigquery.datasets', category: 'database',
     docUrl: 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets#DatasetReference.FIELDS.dataset_id', uniquenessDocUrl: 'https://docs.cloud.google.com/bigquery/docs/datasets#dataset-naming' }),
+  // 테이블 · 뷰 (D132) — TableReference.tableId "The ID can contain Unicode characters in category L (letter), M (mark), N (number), Pc (connector, including underscore),
+  // Pd (dash), and Zs (space). … The maximum length is 1,024 characters." · 안내서 "the table name must be unique per dataset." · "Contain characters with a total of up to 1,024 UTF-8 bytes."
+  // 두 원문의 길이 단위가 다르다(글자 · 바이트). 엔진은 글자 수로 세므로 글자 수와 바이트 수가 같은 ASCII 부분 — 영숫자 · 밑줄(Pc) · 하이픈(Pd) · 공백(Zs) — 만 받는다(NARROWER).
+  // 뷰도 tables.insert 로 만들고 같은 tableId 를 쓴다. 생성은 데이터세트와 같이 밑줄로 잇는다(SQL 에서 따옴표 없이 부른다). 위치는 부모 데이터세트의 것이다 — 지역 토큰이 없다(D77)
+  rule({ id: 'gcp.bigquery_table', displayName: 'BigQuery Table', slug: 'tbl', minLength: 1, maxLength: 1024, pattern: /^[A-Za-z0-9_ -]{1,1024}$/, ...UNDERSCORE,
+    caseRule: 'any', startsWithLetter: false, scope: 'gcp:bigquery_dataset', entity: 'bigquery.tables', category: 'database',
+    docUrl: BQ_TABLE_ID, uniquenessDocUrl: BQ_TABLE_NAMING, notes: [NARROWER] }),
   // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
   // Must end with a number or a letter. Must be unique within the customer project / location"
   rule({ id: 'gcp.redis_instance', displayName: 'Memorystore for Redis Instance', slug: 'redis', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,
