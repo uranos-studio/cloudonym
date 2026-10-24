@@ -8,6 +8,8 @@ You give it five context values — **owner · system · purpose · env · regio
 
 **Try it:** <https://cloudonym.uranos.dev>
 
+The home page introduces the tool; the naming wizard is at `/aws` and `/gcp` (see [docs/web-ui.md](docs/web-ui.md)).
+
 ![Cloudonym naming wizard — the plan list, the Website card checklist with each part's name, and the generated names](docs/screenshots/09-wizard-card.png)
 
 ## Example
