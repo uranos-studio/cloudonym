@@ -174,7 +174,7 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     const body = section.join('\n');
     expect(body).toContain('`kr` and `jp` are rejected');
     // 멀티 · 이중 리전 위치 (D78) — 줄마다 받는 resourceType 과 공식 위치 문서
-    expect(body).toContain('- `US` · `us` — multi-region · Data centers in the United States · for `storage_bucket`, `bigquery_dataset` · https://docs.cloud.google.com/storage/docs/locations#location-mr · https://docs.cloud.google.com/bigquery/docs/locations#multi-regions');
+    expect(body).toContain('- `US` · `us` — multi-region · Data centers in the United States · for `storage_bucket`, `bigquery_dataset`, `logging_bucket` · https://docs.cloud.google.com/storage/docs/locations#location-mr · https://docs.cloud.google.com/bigquery/docs/locations#multi-regions · https://docs.cloud.google.com/logging/docs/region-support#eu-and-us');
     expect(body).toContain('- `NAM4` · `nam4` — dual-region · Iowa + South Carolina (us-central1 + us-east1) · for `storage_bucket` · https://docs.cloud.google.com/storage/docs/locations#predefined');
     expect(body).toContain('`global` puts no region token');
     expect(body).toContain('a zone name is accepted and resolved to its region');

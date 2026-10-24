@@ -117,7 +117,7 @@ describe('멀티 · 이중 리전 위치 (D78)', () => {
   const bucket = RULES['gcp.storage_bucket']!;
   const bq = RULES['gcp.bigquery_dataset']!;
   const vm = RULES['gcp.compute_instance']!;
-  it('GCS 멀티 셋 · 이중(사전 정의) 여섯 · BigQuery 멀티 둘 — 규칙마다 공식 위치 문서 URL', () => {
+  it('GCS 멀티 셋 · 이중(사전 정의) 여섯 · BigQuery · Logging 버킷 멀티 둘(D133) — 규칙마다 공식 위치 문서 URL', () => {
     expect(LOCATIONS.gcp.map((l) => l.location)).toEqual(['US', 'EU', 'ASIA', 'ASIA1', 'EUR4', 'EUR5', 'EUR7', 'EUR8', 'NAM4']);
     expect(LOCATIONS.aws).toEqual([]);
     expect(LOCATIONS.azure).toEqual([]);
@@ -126,11 +126,13 @@ describe('멀티 · 이중 리전 위치 (D78)', () => {
       for (const [id, url] of Object.entries(l.rules)) {
         expect(RULES[id], id).toBeDefined();
         expect(RULES[id]!.regionToken, id).toBe('region');
-        expect(url, id).toMatch(id === 'gcp.bigquery_dataset' ? /^https:\/\/docs\.cloud\.google\.com\/bigquery\/docs\/locations#/ : /^https:\/\/docs\.cloud\.google\.com\/storage\/docs\/locations#/);
+        expect(url, id).toMatch(id === 'gcp.bigquery_dataset' ? /^https:\/\/docs\.cloud\.google\.com\/bigquery\/docs\/locations#/
+          : id === 'gcp.logging_bucket' ? /^https:\/\/docs\.cloud\.google\.com\/logging\/docs\/region-support#eu-and-us$/ : /^https:\/\/docs\.cloud\.google\.com\/storage\/docs\/locations#/);
       }
     }
     expect(locationsFor(bucket).map((l) => l.code)).toEqual(['us', 'eu', 'asia', 'asia1', 'eur4', 'eur5', 'eur7', 'eur8', 'nam4']);
     expect(locationsFor(bq).map((l) => l.code)).toEqual(['us', 'eu']);
+    expect(locationsFor(RULES['gcp.logging_bucket']!).map((l) => l.code)).toEqual(['us', 'eu']);
     expect(locationsFor(vm)).toEqual([]);
     expect(locationsFor(RULES['gcp.vpc_network']!)).toEqual([]);
   });
@@ -148,7 +150,7 @@ describe('멀티 · 이중 리전 위치 (D78)', () => {
     expect(locationMismatch('asia', bq)?.location).toBe('ASIA');
     expect(locationMismatch('us', RULES['gcp.vpc_network']!)).toBeUndefined();
     expect(locationError('eu', [bucket, bq])).toBeUndefined();
-    expect(locationError('eu', [bucket, vm])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'EU', supported: ['storage_bucket', 'bigquery_dataset'] } });
+    expect(locationError('eu', [bucket, vm])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'EU', supported: ['storage_bucket', 'bigquery_dataset', 'logging_bucket'] } });
     expect(locationError('nam4', [bq])).toEqual({ code: 'context.location_unsupported', field: 'region', params: { value: 'NAM4', supported: ['storage_bucket'] } });
   });
 });

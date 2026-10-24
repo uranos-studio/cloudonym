@@ -2086,10 +2086,10 @@
       "a-b.c,d+e!f*g'h(i)j%k",
       "_a",
       "-a",
-      "a/",
       "Metric01",
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "shop-prod-lbm-01"
+      "shop-prod-lbm-01",
+      "a/b/c"
     ],
     "invalid": [
       "/a",
@@ -2098,7 +2098,10 @@
       "a@b",
       "a#b",
       "a\"b",
-      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "a/",
+      "a//b",
+      "a/b/"
     ]
   },
   "gcp.workflow": {

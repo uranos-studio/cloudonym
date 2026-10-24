@@ -1407,7 +1407,8 @@ export const LOCATIONS: Readonly<Record<Provider, readonly LocationEntry[]>> = {
       "label": "Data centers in the United States",
       "rules": {
         "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#location-mr",
-        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions"
+        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions",
+        "gcp.logging_bucket": "https://docs.cloud.google.com/logging/docs/region-support#eu-and-us"
       }
     },
     {
@@ -1417,7 +1418,8 @@ export const LOCATIONS: Readonly<Record<Provider, readonly LocationEntry[]>> = {
       "label": "Data centers within member states of the European Union",
       "rules": {
         "gcp.storage_bucket": "https://docs.cloud.google.com/storage/docs/locations#location-mr",
-        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions"
+        "gcp.bigquery_dataset": "https://docs.cloud.google.com/bigquery/docs/locations#multi-regions",
+        "gcp.logging_bucket": "https://docs.cloud.google.com/logging/docs/region-support#eu-and-us"
       }
     },
     {
