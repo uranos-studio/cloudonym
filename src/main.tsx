@@ -11,6 +11,7 @@ import { ApiDoc } from './components/ApiDoc'
 import { Privacy } from './components/Privacy'
 import { About } from './components/About'
 import { NotFound } from './components/NotFound'
+import { Landing } from './components/Landing'
 import { entryRedirect, routeOf } from './components/route'
 import { pageText } from './site/copy'
 import { captureCampaign, stripUtm } from './components/campaign'
@@ -36,7 +37,7 @@ async function start() {
   if (import.meta.env.DEV && fixture) rules = (await import('./dev/fixtureRules')).fixtureRules(fixture)
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      {route === 'naming' ? <NamingDoc /> : route === 'api' ? <ApiDoc /> : route === 'privacy' ? <Privacy /> : route === 'about' ? <About /> : route === 'notFound' ? <NotFound /> : <App rules={rules} route={route === 'home' ? 'gcp' : route} />}
+      {route === 'naming' ? <NamingDoc /> : route === 'api' ? <ApiDoc /> : route === 'privacy' ? <Privacy /> : route === 'about' ? <About /> : route === 'notFound' ? <NotFound /> : route === 'home' ? <Landing /> : <App rules={rules} route={route} />}
     </StrictMode>,
   )
 }

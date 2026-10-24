@@ -26,6 +26,13 @@ describe('visitOnce — ui_visit 은 탭당 1회 (D17 · sessionStorage 가드)'
     expect(sent).toEqual(['ui_visit']);
     expect(map.get(VISIT_KEY)).toBe('1');
   });
+  it('소개 페이지에서 한 번 보낸 뒤 같은 탭의 마법사는 다시 보내지 않는다 (D129) — 두 쪽이 같은 키를 본다', () => {
+    const { storage } = fakeStorage();
+    const { send, sent } = spy();
+    visitOnce(storage, send); // 소개 페이지 /
+    visitOnce(storage, send); // 카드 → /aws
+    expect(sent).toEqual(['ui_visit']);
+  });
   it('저장소가 없으면(undefined) 가드 없이 보낸다', () => {
     const { send, sent } = spy();
     expect(visitOnce(undefined, send)).toBe(true);

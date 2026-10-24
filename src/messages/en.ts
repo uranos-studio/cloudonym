@@ -672,6 +672,13 @@ export const en: Catalog = {
     meta_description: 'Enter owner, system, environment and region and get AWS and Google Cloud resource names that pass the official naming rules. Web tool and API. Azure coming.',
     // 경로마다 제목 · 설명 (D106) — <title> 은 「Cloudonym — 제목」. 설명은 검색 결과에 보이는 글이라 160자 안
     page_home_title: 'AWS and Google Cloud resource name generator',
+    // 소개 페이지 / (D129) — 한 문장 · 카드 · 움직이는 그림의 글 대체
+    landing_lead: 'Five values in, valid cloud resource names out — for AWS and Google Cloud, with Azure on the way.',
+    landing_cards_label: 'Pick a cloud',
+    landing_card_resources: '{count} resource types',
+    landing_card_open: 'Open the naming wizard',
+    landing_motion_text: 'Example: {values} make the {label} name {name}.',
+    landing_motion_pass: 'It passes the official naming rules.',
     // 클라우드별 마법사 경로 (D129) — /aws · /gcp
     page_aws_title: 'AWS resource name generator',
     page_aws_description: 'Name AWS resources such as VPCs, subnets, EC2 instances, load balancers, RDS and S3 buckets from four values, checked against the official naming rules.',
