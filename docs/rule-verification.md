@@ -195,7 +195,7 @@ The REST reference states the characters and the uniqueness scope but no length,
 - **Characters.** Validation takes the document's set (letters of both cases, digits and `-._~%!$&'()*+,;=@`); the server accepted a leading digit, a leading or trailing hyphen, `_` and `.`. Generated names use lowercase letters, digits and hyphens.
 - **Abbreviation** `conn` — see the catalog row's `slug.basis`.
 
-## Google Cloud rules added on 2026-10-24 (D132–)
+## Google Cloud rules added on 2026-10-24 (D132–D136)
 
 Each rule below states its length and characters in an official REST reference or product guide, read on 2026-10-24. Where two official pages disagree, the rule takes the narrower one and carries `note.narrower_source_used`.
 
