@@ -148,9 +148,9 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (provider enums [\"aws\",\"gcp\"] in generate, names, validate)"; fi
 fi
 
-# 5. 화면 경로 (D106) — Worker 가 경로마다 head 를 넣는다: 200 · 제 <title> · canonical 은 그 경로 · 보안 헤더(CSP · DENY).
+# 5. 화면 경로 (D106 · D129 — 소개 페이지 / · 마법사 /aws · /gcp) — Worker 가 경로마다 head 를 넣는다: 200 · 제 <title> · canonical 은 그 경로 · 보안 헤더(CSP · DENY).
 #    없는 경로 /does-not-exist-<랜덤> 은 404 · noindex · canonical 없음. 쪽의 내용(React 가 그리는 것)은 화면 시험이 본다
-for route in / /pick /docs/naming /docs/api /privacy /about; do
+for route in / /aws /gcp /pick /docs/naming /docs/api /privacy /about; do
   name="GET ${route} head"
   code="$(fetch GET "${route}")"
   if expect_status "${name}" "${code}" 200; then
@@ -188,10 +188,10 @@ name='GET /sitemap.xml'
 code="$(fetch GET /sitemap.xml)"
 if expect_status "${name}" "${code}" 200; then
   locs="$(grep -o '<loc>[^<]*</loc>' "${body}" | sed -e 's#<loc>##' -e 's#</loc>##' | tr '\n' ' ')"
-  want="${base}/ ${base}/pick ${base}/docs/naming ${base}/docs/api ${base}/privacy ${base}/about "
+  want="${base}/ ${base}/aws ${base}/gcp ${base}/pick ${base}/docs/naming ${base}/docs/api ${base}/privacy ${base}/about "
   if [[ "$(header content-type)" != application/xml* ]]; then fail "${name}" "content-type '$(header content-type)'"
   elif [ "${locs}" != "${want}" ]; then fail "${name}" "locs '${locs}', expected '${want}'"
-  else pass "${name} (application/xml, 6 URLs)"; fi
+  else pass "${name} (application/xml, 8 URLs)"; fi
 fi
 
 # 6. POST /v1/names — 이름 셋 글자 그대로

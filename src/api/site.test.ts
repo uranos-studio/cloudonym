@@ -32,7 +32,7 @@ describe('robots.txt · sitemap.xml (D106) — 요청 origin 으로 절대 URL',
     // 상수 본문 — 요청 제한 · 카운터를 걸지 않는다
     expect(promises).toEqual([]);
   });
-  it('sitemap — 경로 표 여섯이 순서대로 · lastmod 없음 · application/xml', async () => {
+  it('sitemap — 경로 표 여덟이 순서대로 · lastmod 없음 · application/xml', async () => {
     const { res, promises } = await req(app, 'https://x.example/sitemap.xml', undefined, { API_LIMITER: fakeLimiter('deny').limiter });
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toMatch(/^application\/xml/);
@@ -42,6 +42,8 @@ describe('robots.txt · sitemap.xml (D106) — 요청 origin 으로 절대 URL',
     expect(body).toMatch(/^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
     expect(body).not.toContain('lastmod');
     expect(promises).toEqual([]);
+    // D129 — 소개 페이지 다음에 클라우드별 마법사 둘. /azure 는 싣지 않는다
+    expect([...body.matchAll(/<loc>https:\/\/x\.example([^<]+)<\/loc>/g)].map((m) => m[1])).toEqual(['/', '/aws', '/gcp', '/pick', '/docs/naming', '/docs/api', '/privacy', '/about']);
   });
 });
 
@@ -77,6 +79,21 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
     expect(html).not.toMatch(HANGUL);
   });
 
+  it('마법사 경로 /aws · /gcp (D129) — 제 제목 · canonical · JSON-LD 와 네이버 meta 없음 · 요약 nav 에 두 경로', async () => {
+    for (const [path, route] of [['/aws', 'aws'], ['/gcp', 'gcp']] as const) {
+      const html = await (await get(path)).res.text();
+      expect(html).toContain(`<title>${pageText(route).title}</title>`);
+      expect(html).toContain(`<link rel="canonical" href="https://example.org${path}">`);
+      expect(html, path).not.toContain('ld+json');
+    }
+    const home = await (await get('/')).res.text();
+    expect(home).toContain(`<title>${pageText('home').title}</title>`);
+    // 스크립트 없는 크롤러가 소개 페이지에서 두 마법사 경로를 찾는다
+    expect(home).toContain(`<a href="/aws">${pageText('aws').heading}</a>`);
+    expect(home).toContain(`<a href="/gcp">${pageText('gcp').heading}</a>`);
+    expect(home).not.toContain('href="/azure"');
+  });
+
   it('canonical 은 경로 표의 자리 — 끝 / · query 를 뗀다', async () => {
     const html = await (await get('/pick/?fixture=x')).res.text();
     expect(html).toContain('<link rel="canonical" href="https://example.org/pick">');
@@ -93,7 +110,7 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
   });
 
   it('모르는 경로 → 404 · 같은 index.html 본문 · noindex · canonical 없음 · 「Page not found」', async () => {
-    for (const path of ['/no-such-page', '/docs', '/pick/x', '/index.html', '/missing.png']) {
+    for (const path of ['/no-such-page', '/docs', '/pick/x', '/index.html', '/missing.png', '/azure', '/azure/', '/aws/x', '/AWS', '/google-cloud']) {
       const { res } = await get(path);
       expect(res.status, path).toBe(404);
       const html = await res.text();

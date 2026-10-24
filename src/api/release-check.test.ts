@@ -60,3 +60,15 @@ describe('release-check.sh — 점검 요청은 세지 않는다', () => {
     expect(withVar).toContain('INFO  telemetry skip header sent — not counted only if it matches the Worker secret');
   }, 60_000);
 });
+
+import { PAGES } from '../site/pages';
+
+describe('release-check.sh — 화면 경로 목록이 경로 표(PAGES)와 같다 (D106 · D129)', () => {
+  it('head 점검 경로 · sitemap 기대 목록 · URL 수가 PAGES 순서 그대로', () => {
+    const loop = /^for route in ([^;]+); do$/m.exec(script);
+    expect(loop?.[1]?.split(' ')).toEqual(PAGES.map((p) => p.path));
+    const want = /^ {2}want="([^"]+)"$/m.exec(script);
+    expect(want?.[1]).toBe(PAGES.map((p) => `\${base}${p.path} `).join(''));
+    expect(script).toContain(`(application/xml, ${PAGES.length} URLs)`);
+  });
+});
