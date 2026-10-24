@@ -877,6 +877,37 @@
       ]
     },
     {
+      "key": "aws.rds_deployment",
+      "displayName": "RDS Blue/Green Deployment",
+      "category": "database",
+      "rules": {
+        "aws.rds_deployment": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bgd",
+        "basis": "Blue/Green Deployment; RDS gives these deployments the ID prefix bgd-. No Terraform resource type to measure.",
+        "previous": []
+      },
+      "entity": "rds.Deployment",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 60 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "rds blue green deployment",
+        "blue green deployment",
+        "rds_deployment"
+      ]
+    },
+    {
       "key": "aws.ecs_capacity_provider",
       "displayName": "ECS Capacity Provider",
       "category": "containers",

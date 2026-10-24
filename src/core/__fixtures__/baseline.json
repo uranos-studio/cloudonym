@@ -1312,6 +1312,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "billing-trade-prod-apne2-cp-01",
             "valid": true,
@@ -7549,6 +7558,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -13792,6 +13810,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "billing-trade-prod-apne2-cp-01",
             "valid": true,
@@ -20029,6 +20056,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -26272,6 +26308,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "windows-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "windows-trade-prod-apne2-cp-01",
             "valid": true,
@@ -32509,6 +32554,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "google-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -38752,6 +38806,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "azure-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "azure-trade-prod-apne2-cp-01",
             "valid": true,
@@ -44989,6 +45052,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-apne2-rdsi-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "rds_deployment": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-apne2-bgd-01",
             "violations": 1,
             "steps": 1
           },
@@ -51232,6 +51304,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "paymentsettlement-reconciliation-dev-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "paymentsettlement-reconciliation-dev-cp-01",
             "valid": true,
@@ -57469,6 +57550,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "a-long-longpurpose-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -63712,6 +63802,15 @@
             "violations": 1,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "3tier-trade-prod-apne2-bgd-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-apne2-bgd-01",
+            "violations": 1,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "3tier-trade-prod-apne2-cp-01",
             "valid": true,
@@ -69949,6 +70048,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -76192,6 +76300,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "billing-trade-prod-apne2-cp-01",
             "valid": true,
@@ -82432,6 +82549,15 @@
             "violations": 0,
             "steps": 0
           },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
+            "violations": 0,
+            "steps": 0
+          },
           "ecs_capacity_provider": {
             "name": "billing-trade-prod-apne2-cp-01",
             "valid": true,
@@ -88669,6 +88795,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "billing-trade-prod-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -94933,6 +95068,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-uat-apne2-rdsi-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "rds_deployment": {
+            "name": "billing-trade-uat-apne2-bgd-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-apne2-bgd-01",
             "violations": 0,
             "steps": 0
           },
@@ -117718,6 +117862,114 @@
         "valid": false,
         "violations": 1,
         "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "ab--cd",
+        "known": true,
+        "valid": false,
+        "violations": 2,
+        "suggestedName": "ab-cd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "aws",
+        "resourceType": "rds_deployment",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6"
       },
       {
         "provider": "aws",
@@ -226972,6 +227224,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -227689,6 +227942,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -228406,6 +228660,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -229118,6 +229373,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -229835,6 +230091,7 @@
           "aws_rds_db_proxy = \"windows-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"windows-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"windows-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"windows-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"windows-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"windows-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"windows-trade-prod-apne2-dmn-01\"",
@@ -230552,6 +230809,7 @@
           "aws_rds_db_proxy = \"google-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"google-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"google-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"google-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"google-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"google-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"google-trade-prod-apne2-dmn-01\"",
@@ -231269,6 +231527,7 @@
           "aws_rds_db_proxy = \"azure-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"azure-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"azure-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"azure-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"azure-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"azure-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"azure-trade-prod-apne2-dmn-01\"",
@@ -232008,6 +232267,7 @@
           "# INVALID: aws_rds_db_proxy",
           "# INVALID: aws_rds_db_proxy_endpoint",
           "# INVALID: aws_rds_integration",
+          "# INVALID: aws_rds_deployment",
           "# INVALID: aws_ecs_capacity_provider",
           "# INVALID: aws_ecs_cluster",
           "# INVALID: aws_ecs_daemon",
@@ -232703,6 +232963,7 @@
           "aws_rds_db_proxy = \"paymentsettlement-reconciliation-dev-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"paymentsettlement-reconciliation-dev-pe-01\"",
           "aws_rds_integration = \"paymentsettlement-reconciliation-dev-rdsi-01\"",
+          "aws_rds_deployment = \"paymentsettlement-reconciliation-dev-bgd-01\"",
           "aws_ecs_capacity_provider = \"paymentsettlement-reconciliation-dev-cp-01\"",
           "aws_ecs_cluster = \"paymentsettlement-reconciliation-dev-ecs-01\"",
           "aws_ecs_daemon = \"paymentsettlement-reconciliation-dev-dmn-01\"",
@@ -233420,6 +233681,7 @@
           "aws_rds_db_proxy = \"a-long-longpurpose-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"a-long-longpurpose-prod-apne2-pe-01\"",
           "aws_rds_integration = \"a-long-longpurpose-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"a-long-longpurpose-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"a-long-longpurpose-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"a-long-longpurpose-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"a-long-longpurpose-prod-apne2-dmn-01\"",
@@ -234528,6 +234790,7 @@
           "# INVALID: aws_rds_db_proxy",
           "# INVALID: aws_rds_db_proxy_endpoint",
           "# INVALID: aws_rds_integration",
+          "# INVALID: aws_rds_deployment",
           "# INVALID: gcp_service_account",
           "# INVALID: gcp_compute_instance",
           "# INVALID: gcp_vpc_network",
@@ -234854,6 +235117,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -235566,6 +235830,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -236268,6 +236533,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -236980,6 +237246,7 @@
           "aws_rds_db_proxy = \"billing-trade-prod-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-prod-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-prod-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-prod-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-prod-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-prod-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-prod-apne2-dmn-01\"",
@@ -237697,6 +237964,7 @@
           "aws_rds_db_proxy = \"billing-trade-uat-apne2-prx-01\"",
           "aws_rds_db_proxy_endpoint = \"billing-trade-uat-apne2-pe-01\"",
           "aws_rds_integration = \"billing-trade-uat-apne2-rdsi-01\"",
+          "aws_rds_deployment = \"billing-trade-uat-apne2-bgd-01\"",
           "aws_ecs_capacity_provider = \"billing-trade-uat-apne2-cp-01\"",
           "aws_ecs_cluster = \"billing-trade-uat-apne2-ecs-01\"",
           "aws_ecs_daemon = \"billing-trade-uat-apne2-dmn-01\"",

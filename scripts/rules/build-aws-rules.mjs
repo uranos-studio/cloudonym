@@ -5,7 +5,7 @@
 //       CloudFormation 템플릿 참조 쪽을 받아 속성 앵커가 있는지 잰다(네트워크)
 //   node scripts/rules/build-aws-rules.mjs <스키마 폴더> --anchors anchors.json
 //       <스키마 폴더> = https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip 을 푼 것
-// 입력 판정 표: scripts/rules/aws-intake-targets.json — 18개 네임스페이스 298 타입의 a(물리 이름) · b(Name 태그뿐) · c · d
+// 입력 판정 표: scripts/rules/aws-intake-targets.json — 18개 네임스페이스 299 타입의 a(물리 이름) · b(Name 태그뿐) · c · d
 // 쓰는 파일:
 //   src/core/rules/aws-intake.ts                     — 규칙 행
 //   src/core/__fixtures__/aws-intake.json            — 원문(스키마) 행 스냅샷(전사 검사의 정답)
@@ -45,6 +45,7 @@ export const MANUAL = {
   'AWS::RDS::DBProxy': 'aws.rds_db_proxy',
   'AWS::RDS::DBProxyEndpoint': 'aws.rds_db_proxy_endpoint',
   'AWS::RDS::Integration': 'aws.rds_integration',
+  'AWS::RDS::Deployment': 'aws.rds_deployment',
   'AWS::EC2::LaunchTemplate': 'aws.ec2_launch_template',
   'AWS::ElasticLoadBalancing::LoadBalancer': 'aws.elb_load_balancer',
   'AWS::ElasticLoadBalancingV2::LoadBalancer': 'aws.elbv2_load_balancer',

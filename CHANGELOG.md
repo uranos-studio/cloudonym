@@ -9,6 +9,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 - **Landing page at `/`** (D129) — one sentence, a one-time animated intro (five context values → one name → PASS, read from the build-time example; the last frame only with reduced motion) and three cards: AWS and Google Cloud open the wizard, Azure says **Coming soon**.
 - **Wizard paths `/aws` and `/gcp`** (D129) — each opens its cloud's example plan (AWS: `demo · payment · prod · ap-northeast-2` with the `web`, `lb`, `tg`, `db` and `object` chips, 10 names, all PASS). The sitemap lists eight pages. `/azure` answers 404.
 
+- **RDS Blue/Green deployment** (D131) — `aws.rds_deployment` for `AWS::RDS::Deployment` (`BlueGreenDeploymentName`, 1–60 characters, a letter first, single hyphens between letters and digits), abbreviation `bgd`; 170 AWS rules. Rules revision 2026-10-24.2.
 - **`ui_visit` carries `cloud`** (D130) — `aws` or `gcp` when the tab first opened a wizard path; kept only for an enabled provider, sent to Axiom and counted per cloud and day in KV. `/privacy` and `/openapi.json` list the field.
 
 ### Changed
@@ -18,7 +19,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [0.2.0] - 2026-10-23
 
-AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-24.1. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
+AWS is enabled next to Google Cloud. Rules revision for this release: 2026-10-24.2. It also carries the 0.1.12 card-table change. Google Cloud names, verdicts and suggestions do not change; AWS names change where the abbreviation changed (see Changed), and a request without `providers` now names only the clouds its region resolves in.
 
 ### Added
 

@@ -6,10 +6,10 @@ import { physicalHold, generationOf, anchorPattern, flagsOf, matchPatternOf, bac
 
 const targets = JSON.parse(readFileSync(new URL('./aws-intake-targets.json', import.meta.url), 'utf-8'));
 
-test('판정 표 — 298 타입 · a 103 · b 99 · c 93 · d 3 · a 는 이름 속성을 적는다', () => {
+test('판정 표 — 299 타입 · a 104 · b 99 · c 93 · d 3 · a 는 이름 속성을 적는다', () => {
   const kinds = Object.values(targets.types).map((t) => t.kind);
-  assert.equal(kinds.length, 298);
-  assert.deepEqual(['a', 'b', 'c', 'd'].map((k) => kinds.filter((x) => x === k).length), [103, 99, 93, 3]);
+  assert.equal(kinds.length, 299);
+  assert.deepEqual(['a', 'b', 'c', 'd'].map((k) => kinds.filter((x) => x === k).length), [104, 99, 93, 3]);
   for (const [t, v] of Object.entries(targets.types)) if (v.kind === 'a') assert.ok(v.property, t);
 });
 

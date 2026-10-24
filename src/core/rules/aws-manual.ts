@@ -116,6 +116,10 @@ const RULES: ResourceRule[] = [
   // CreateIntegration "Minimum length of 1. Maximum length of 63. Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*" — 스키마는 64자 · 유일 범위 문장 없음
   rule({ id: 'aws.rds_integration', displayName: 'RDS Integration', slug: 'int', minLength: 1, maxLength: 63, pattern: RDS_IDENT, noConsecutiveSeparator: true,
     allowed: 'alnum-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::Integration', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateIntegration.html', notes: [SCOPE] }),
+  // CreateBlueGreenDeployment BlueGreenDeploymentName "Constraints: Can't be the same as an existing blue/green deployment name in the same account and AWS Region. … Minimum length of 1. Maximum length of 60. Pattern: [a-zA-Z](?:-?[a-zA-Z0-9]+)*"
+  // CloudFormation AWS::RDS::Deployment 의 같은 속성도 1~60 · ^[a-zA-Z](?:-?[a-zA-Z0-9]+)*$ — 두 문서가 같다 (D131)
+  rule({ id: 'aws.rds_deployment', displayName: 'RDS Blue/Green Deployment', slug: 'bgd', minLength: 1, maxLength: 60, pattern: RDS_IDENT, noConsecutiveSeparator: true,
+    allowed: 'alnum-hyphen', startsWithLetter: true, endsWithAlnum: true, scope: 'aws:region', entity: 'AWS::RDS::Deployment', category: 'database', docUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateBlueGreenDeployment.html' }),
 
   // ── ECS ──
   // "Up to 255 characters are allowed. They include letters (both upper and lowercase letters), numbers, underscores (_), and hyphens (-). The name can't be prefixed with "aws", "ecs", or "fargate"."
