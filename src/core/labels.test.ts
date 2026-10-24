@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { labelsFor } from './labels';
 import { AWS_TAG_VALUE } from './constraints';
+import { INVISIBLE_CLASS } from './invisible.mjs';
 const ctx = { owner: 'infra', system: 'billing', purpose: 'trade', env: 'prod', region: 'ane3' } as const;
 
 describe('labelsFor', () => {
@@ -42,6 +43,38 @@ describe('labelsFor', () => {
     expect(AWS_TAG_VALUE.flags).toBe('u');
     for (const bad of ['#', '<', '>', '\n', '\t', '%', '&', '?', '*']) expect(AWS_TAG_VALUE.test(`a${bad}b`), JSON.stringify(bad)).toBe(false);
     expect(AWS_TAG_VALUE.test('')).toBe(true);
+  });
+});
+
+describe('labelsFor — ASCII 빠른 길 (CPU 조사 2026-10-24)', () => {
+  /** 빠른 길이 없던 때의 판정 그대로 — 유니코드 정규식만 쓴다 */
+  const GCP_STRIP_REF = new RegExp(`[^\\p{L}\\p{N}_-]|[${INVISIBLE_CLASS}]`, 'gu');
+  const refGcp = (v: string): string => v.toLowerCase().replace(GCP_STRIP_REF, '');
+  const refAwsOk = (v: string): boolean => new RegExp(AWS_TAG_VALUE.source, AWS_TAG_VALUE.flags).test(v);
+  const ascii = Array.from({ length: 128 }, (_, i) => String.fromCharCode(i));
+  const samples = [
+    '', 'infra', 'In.Fra', 'a b', 'team#1<x>', 'a_b-c', 'x:y/z=1+2@3', 'ABC', '-_-', ...ascii, ...ascii.map((c) => `ab${c}cd`),
+    '개발', 'café', 'a​b', 'a­b', 'aㅤb', 'a b', 'a b', 'Ａ', '٣', 'a﻿b', 'x\u{E0041}y',
+  ];
+
+  it('GCP 값 · AWS 문자 판정은 유니코드 정규식만 쓴 결과와 같다 — ASCII 128자 전부와 유니코드 표본', () => {
+    for (const v of samples) {
+      expect(labelsFor({ ...ctx, owner: v }, 'gcp').labels.owner, JSON.stringify(v)).toBe(refGcp(v));
+      const awsBad = labelsFor({ ...ctx, owner: v }, 'aws').violations.some((m) => m.code === 'label.aws_invalid_chars');
+      expect(awsBad, JSON.stringify(v)).toBe(!refAwsOk(v));
+    }
+  });
+
+  it('ASCII 값은 유니코드 정규식(AWS_TAG_VALUE)을 돌리지 않는다 — 첫 요청이 그 정규식을 컴파일하지 않는다', () => {
+    const spy = vi.spyOn(AWS_TAG_VALUE, 'test');
+    try {
+      labelsFor({ ...ctx, owner: 'platform team', system: 'a.b:c/d=e+f@g_h-i' }, 'aws');
+      expect(spy).not.toHaveBeenCalled();
+      labelsFor({ ...ctx, owner: 'café' }, 'aws');
+      expect(spy).toHaveBeenCalled();
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 
