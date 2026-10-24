@@ -315,7 +315,7 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     const bare = (rows: Loose[]) => rows.map((row: Loose) => ({ ...row, rules: Object.fromEntries(Object.entries(row.rules as Record<string, Loose>)
       .map(([id, { input: _i, tier: _t, locations: _l, ...spec }]) => [id, spec])) }));
     expect(bare(body.providers.gcp.rows)).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG)));
-    expect(body.providers.gcp.rows).toHaveLength(124);
+    expect(body.providers.gcp.rows).toHaveLength(125);
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
     expect(bare(body.providers.aws.rows)).toEqual(JSON.parse(JSON.stringify(AWS_CATALOG)));

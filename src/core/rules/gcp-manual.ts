@@ -64,6 +64,8 @@ const TAGS_GUIDE = 'https://docs.cloud.google.com/resource-manager/docs/tags/tag
 /** 태그 키 · 값의 shortName — REST 참조의 꼴. 안내서는 따옴표 · 역슬래시 · 슬래시를 뺀 UTF-8 전부라 더 넓다 */
 const TAG_SHORT_NAME = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,254}[A-Za-z0-9])?$/;
 
+const COMPUTE_NAMING = 'https://docs.cloud.google.com/compute/docs/naming-resources';
+
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const OBSERVED: CoreMessage = { code: 'note.observed_server_rule' };
 const NARROWER: CoreMessage = { code: 'note.narrower_source_used' };
@@ -134,6 +136,16 @@ const RULES: ResourceRule[] = [
   // schemas.NodeTemplate.properties.name (같은 문장) · compute.nodeTemplates.insert = regions/{region}
   rule({ id: 'gcp.node_template', displayName: 'Node Template', slug: 'nt', minLength: 1, maxLength: 63, pattern: RFC1035, scope: 'gcp:project_region', entity: 'compute.nodeTemplates', category: 'compute', docUrl: COMPUTE_DISCOVERY }),
   // schemas.NetworkEndpointGroup.properties.name "The name must be 1-63 characters long, and comply withRFC1035. … match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?`" — insert 셋(zone · region · global)
+  // 네트워크 방화벽 정책 (D136) — FirewallPolicy.name 은 "Name of the resource." 뿐이고 shortName · displayName 의 RFC 1035 문장은 "This field is not applicable to network firewall policies." 다.
+  // Compute Engine 이름 쪽 "For resources on Compute Engine, the resource name must meet the following format (unless specified differently in the documentation for creating that resource):
+  // Be 1-63 characters in length. Comply with RFC 1035 conventions. Match the regular expression ^[a-z]([-a-z0-9]*[a-z0-9])?" — 만들기 쪽(networkFirewallPolicies.insert · gcloud)은 다르게 적지 않는다.
+  // "resource names must be unique within a location within a project" · insert = projects/{project}/global/firewallPolicies · regions/{region}/firewallPolicies. 조직(계층) 정책은 다루지 않는다
+  rule({ id: 'gcp.network_firewall_policy', displayName: 'Network Firewall Policy', slug: 'fwp', minLength: 1, maxLength: 63, pattern: RFC1035, template: UNPLACED,
+    scope: 'gcp:project_global', entity: 'compute.networkFirewallPolicies', category: 'networking',
+    docUrl: `${COMPUTE_NAMING}#resource-name-format`, uniquenessDocUrl: `${COMPUTE_NAMING}#name_uniqueness`, notes: [SECONDARY] }),
+  rule({ id: 'gcp.region_network_firewall_policy', displayName: 'Region Network Firewall Policy', slug: 'fwp', minLength: 1, maxLength: 63, pattern: RFC1035,
+    scope: 'gcp:project_region', entity: 'compute.regionNetworkFirewallPolicies', category: 'networking',
+    docUrl: `${COMPUTE_NAMING}#resource-name-format`, uniquenessDocUrl: `${COMPUTE_NAMING}#name_uniqueness`, notes: [SECONDARY] }),
   rule({ id: 'gcp.network_endpoint_group', displayName: 'Network Endpoint Group', slug: 'neg', minLength: 1, maxLength: 63, pattern: RFC1035, scope: 'gcp:project_zone', entity: 'compute.networkEndpointGroups', category: 'networking', docUrl: COMPUTE_DISCOVERY }),
   rule({ id: 'gcp.region_network_endpoint_group', displayName: 'Region Network Endpoint Group', slug: 'neg', minLength: 1, maxLength: 63, pattern: RFC1035, scope: 'gcp:project_region', entity: 'compute.regionNetworkEndpointGroups', category: 'networking', docUrl: COMPUTE_DISCOVERY }),
   rule({ id: 'gcp.global_network_endpoint_group', displayName: 'Global Network Endpoint Group', slug: 'neg', minLength: 1, maxLength: 63, pattern: RFC1035, scope: 'gcp:project_global', entity: 'compute.globalNetworkEndpointGroups', category: 'networking', docUrl: COMPUTE_DISCOVERY }),

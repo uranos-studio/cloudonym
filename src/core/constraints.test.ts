@@ -225,13 +225,13 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
 
   it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 22(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(69);
+    expect(none).toHaveLength(70);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
     }
     const global = rulesFor('gcp').filter((r) => r.scope === 'gcp:project_global');
-    expect(global).toHaveLength(34);
+    expect(global).toHaveLength(35);
     for (const r of global) expect(r.template, r.id).not.toContain('region');
     expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'kind', 'tier', 'seq']);
   });
@@ -475,5 +475,21 @@ describe('Resource Manager 태그 키 · 값 (D135)', () => {
       for (const name of ['-a', 'a-', '_a', '.a', 'a.', 'a b', 'a/b', "a'b", 'é', `${longest}d`, '']) expect(ok(id, name), `${id} ${name}`).toBe(false);
       expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.narrower_source_used']);
     }
+  });
+});
+
+describe('네트워크 방화벽 정책 — 전역 · 지역 (D136)', () => {
+  const ok = (id: string, name: string) => { const r = RULES[id]!; return r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength; };
+  it('Compute Engine 이름 쪽의 일반 꼴(RFC 1035 · 1-63) · 위치 안에서 유일 · 약어 fwp · 보조 출처 note', () => {
+    const pick = (id: string) => { const r = RULES[id]!; return { scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength }; };
+    expect(pick('gcp.network_firewall_policy')).toEqual({ scope: 'gcp:project_global', entity: 'compute.networkFirewallPolicies', regionToken: 'none', slug: 'fwp', min: 1, max: 63 });
+    expect(pick('gcp.region_network_firewall_policy')).toEqual({ scope: 'gcp:project_region', entity: 'compute.regionNetworkFirewallPolicies', regionToken: 'region', slug: 'fwp', min: 1, max: 63 });
+    for (const id of ['gcp.network_firewall_policy', 'gcp.region_network_firewall_policy']) {
+      expect(RULES[id]!.docUrl, id).toBe('https://docs.cloud.google.com/compute/docs/naming-resources#resource-name-format');
+      expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.secondary_source']);
+      for (const name of ['a', 'a1', 'my-policy', `a${'b'.repeat(62)}`]) expect(ok(id, name), `${id} ${name}`).toBe(true);
+      for (const name of ['A', '1a', '-a', 'a-', 'a_b', 'a.b', `a${'b'.repeat(63)}`, '']) expect(ok(id, name), `${id} ${name}`).toBe(false);
+    }
+    expect(RULES['gcp.network_firewall_policy']!.template).not.toContain('region');
   });
 });

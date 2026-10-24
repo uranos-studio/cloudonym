@@ -79,12 +79,12 @@ describe('buildTree — rules 인자 (화면 fixture 진입점)', () => {
 describe('buildTree — 행 (D53)', () => {
   const rows = (p: Parameters<typeof buildTree>[0]) => walk(buildTree(p)).flatMap((n) => n.rows.map((row) => ({ row, node: n.scope.id })));
 
-  it('GCP 행 = catalog 124 · 합친 행 20 은 모두 gcp:project 에 놓인다', () => {
+  it('GCP 행 = catalog 125 · 합친 행 21 은 모두 gcp:project 에 놓인다', () => {
     const all = rows('gcp');
-    expect(all).toHaveLength(124);
+    expect(all).toHaveLength(125);
     expect(all.map((x) => x.row.key)).toEqual([...new Set(all.map((x) => x.row.key))]);
     const merged = all.filter((x) => x.row.rules.length >= 2);
-    expect(merged).toHaveLength(20);
+    expect(merged).toHaveLength(21);
     for (const x of merged) expect(x.node, x.row.key).toBe('gcp:project');
     // 합친 행이 아닌 것은 규칙 범위 그대로 — 모든 행이 gcp:project 로 몰리지 않았다
     expect(new Set(all.filter((x) => x.row.rules.length === 1).map((x) => x.node)).size).toBeGreaterThan(3);
@@ -124,7 +124,7 @@ describe('buildTree — 행 (D53)', () => {
     const all = rows('gcp');
     const ip = all.find((x) => x.row.key === 'gcp.address')!.row;
     expect(scopeChoices(ip)).toEqual([{ scope: 'gcp:project_region', label: 'Region' }, { scope: 'gcp:project_global', label: 'Global' }]);
-    expect(all.filter((x) => scopeChoices(x.row).length >= 2)).toHaveLength(20);
+    expect(all.filter((x) => scopeChoices(x.row).length >= 2)).toHaveLength(21);
     const vm = all.find((x) => x.row.key === 'gcp.compute_instance')!.row;
     expect(scopeChoices(vm)).toEqual([]);
   });
