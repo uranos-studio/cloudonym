@@ -435,6 +435,44 @@
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
   },
+  "gcp.network_firewall_policy": {
+    "valid": [
+      "a",
+      "a1",
+      "a-b",
+      "my-policy",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc",
+      "shop-prod-fwp-01"
+    ],
+    "invalid": [
+      "A",
+      "1a",
+      "-a",
+      "a-",
+      "a_b",
+      "a.b",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcd"
+    ]
+  },
+  "gcp.region_network_firewall_policy": {
+    "valid": [
+      "a",
+      "a1",
+      "a-b",
+      "my-policy",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc",
+      "shop-prod-ane3-fwp-01"
+    ],
+    "invalid": [
+      "A",
+      "1a",
+      "-a",
+      "a-",
+      "a_b",
+      "a.b",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcd"
+    ]
+  },
   "gcp.region_network_endpoint_group": {
     "valid": [
       "neg-01"

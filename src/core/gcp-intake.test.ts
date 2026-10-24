@@ -48,7 +48,7 @@ const SUPPORT_SCOPE: [string, string[] | null][] = [
   ['compute.googleapis.com/CrossSiteNetwork', C('crossSiteNetworks')],
   ['compute.googleapis.com/ExternalVpnGateway', C('externalVpnGateways')],
   ['compute.googleapis.com/Firewall', C('firewalls')],
-  ['compute.googleapis.com/FirewallPolicy', null],
+  ['compute.googleapis.com/FirewallPolicy', C('networkFirewallPolicies', 'regionNetworkFirewallPolicies')],
   ['compute.googleapis.com/ForwardingRule', C('forwardingRules')],
   ['compute.googleapis.com/GlobalAddress', C('globalAddresses')],
   ['compute.googleapis.com/GlobalForwardingRule', C('globalForwardingRules')],
@@ -189,7 +189,9 @@ describe('들인 GCP 행 — 원문 스냅샷과 대조', () => {
 
   it('보류에 KMS 깨진 원문 · 조사 밖 행이 사유와 함께 있다 · 깨진 여섯 칸이 적혀 있다', () => {
     expect(HELD).toMatch(/cloudkms\.projects\.locations\.keyHandles\.create .*reviewed by hand — not imported \(/);
-    expect(HELD.match(/^\| compute \| compute\.\w*[fF]irewallPolicies\.insert .*reviewed by hand — unconfirmed \(/gm)).toHaveLength(3);
+    // 네트워크 방화벽 정책 둘은 손 규칙이 되었고(D136) 조직 · 폴더의 계층 정책만 남는다
+    expect(HELD.match(/^\| compute \| compute\.\w*[fF]irewallPolicies\.insert /gm)).toHaveLength(1);
+    expect(HELD).toMatch(/^\| compute \| compute\.firewallPolicies\.insert .*reviewed by hand — not imported \(hierarchical firewall policy/m);
     expect(HELD).toMatch(/singleTenantHsmInstances\.create .*outside the surveyed/);
     expect(HELD.match(/^\| (spanner|iam) v\d \| /gm)).toHaveLength(6);
   });
@@ -215,7 +217,7 @@ describe('들인 GCP 행 — 원문 스냅샷과 대조', () => {
     expect(missing).toEqual([]);
     // 표에는 지원 범위 밖 유형이 없다
     expect([...tableTypes].filter((t) => !SUPPORT_SCOPE.some(([s]) => s === t))).toEqual([]);
-    expect(SUPPORT_SCOPE.filter(([, e]) => e === null)).toHaveLength(23);
+    expect(SUPPORT_SCOPE.filter(([, e]) => e === null)).toHaveLength(22);
   });
 
   it('resourceType 은 GCP 안에서 유일하고 40자 이하다', () => {

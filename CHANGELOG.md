@@ -4,7 +4,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-24.6. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-24.7. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
 
 ### Added
 
@@ -12,6 +12,7 @@ Rules revision for this release: 2026-10-24.6. New Google Cloud rules; no name, 
 - **Cloud Logging sink, log bucket and log-based metric** (D133) — `gcp.logging_sink` (`sink`, `google_logging_project_sink.name`), `gcp.logging_bucket` (`log`, `google_logging_project_bucket_config.bucket_id`, with a region token) and `gcp.logging_metric` (`lbm`, `google_logging_metric.name`): 1–100 characters each; sinks and buckets take letters, digits, `_`, `-` and `.` with a letter or digit first, metrics also `,+!*'()%/` but not `/` first. 142 Google Cloud rules.
 - **Workflows** (D134) — `gcp.workflow` (`wf`, `google_workflows_workflow.name`): letters, digits, `_` and `-`, a letter first and a letter or digit last, 1–64 characters, unique per location and project, with a region token. 143 Google Cloud rules.
 - **Tag key and tag value** (D135) — `gcp.tag_key` (`tagk`, `google_tags_tag_key.short_name`, a key created under the project) and `gcp.tag_value` (`tagv`, `google_tags_tag_value.short_name`, unique within its key under a new `gcp:tag_key` scope): 1–256 characters, letters, digits, `-`, `_` and `.`, a letter or digit at both ends, no region token. 145 Google Cloud rules.
+- **Network firewall policy** (D136) — `gcp.network_firewall_policy` and `gcp.region_network_firewall_policy` (`fwp`, `google_compute_network_firewall_policy.name`, `google_compute_region_network_firewall_policy.name`) in one catalog row with a scope choice: the Compute Engine resource name format (1–63 characters, RFC 1035), unique per location and project; the regional policy takes the region token. Both insert methods leave the held list; the organization (hierarchical) policy stays held. 147 Google Cloud rules.
 
 ## [0.2.0] - 2026-10-24
 

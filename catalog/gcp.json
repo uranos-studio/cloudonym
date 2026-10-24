@@ -382,6 +382,47 @@
       ]
     },
     {
+      "key": "gcp.network_firewall_policy",
+      "displayName": "Network Firewall Policy",
+      "category": "networking",
+      "rules": {
+        "gcp.network_firewall_policy": {
+          "scope": "global",
+          "regionToken": "none"
+        },
+        "gcp.region_network_firewall_policy": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "fwp",
+        "basis": "fw (the VPC firewall rule) plus p for policy, so a policy and a rule differ in one letter; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+        "previous": []
+      },
+      "entity": null,
+      "kind": null,
+      "info": "A global or regional network firewall policy that holds firewall rules and is associated with VPC networks in the project; lowercase letters, digits and hyphens, a letter first, at most 63 characters (the Compute Engine resource name format).",
+      "enterNameAt": {
+        "gcloud": [
+          "gcloud compute network-firewall-policies create"
+        ],
+        "terraform": [
+          "google_compute_network_firewall_policy.name",
+          "google_compute_region_network_firewall_policy.name"
+        ],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "google_compute_network_firewall_policy",
+        "google_compute_region_network_firewall_policy",
+        "compute network-firewall-policies",
+        "firewall policy"
+      ]
+    },
+    {
       "key": "gcp.disk",
       "displayName": "Persistent Disk",
       "category": "compute",

@@ -2420,6 +2420,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "billing-trade-prod-ane3-neg-01",
             "valid": true,
@@ -8729,6 +8747,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -15044,6 +15080,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "billing-trade-prod-ane3-neg-01",
             "valid": true,
@@ -21353,6 +21407,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -27668,6 +27740,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "windows-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "windows-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "windows-trade-prod-ane3-neg-01",
             "valid": true,
@@ -33977,6 +34067,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "google-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "google-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -40292,6 +40400,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "azure-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "azure-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "azure-trade-prod-ane3-neg-01",
             "valid": true,
@@ -46601,6 +46727,24 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-nt-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "network_firewall_policy": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-fwp-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "region_network_firewall_policy": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-fwp-01",
             "violations": 1,
             "steps": 1
           },
@@ -52916,6 +53060,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "paymentsettlement-reconciliation-dev-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "paymentsettlement-reconciliation-dev-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "paymentsettlement-reconciliation-dev-neg-01",
             "valid": true,
@@ -59225,6 +59387,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "a-long-longpurpose-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "a-long-longpurpose-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -65540,6 +65720,24 @@
             "violations": 1,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "3tier-trade-prod-fwp-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-fwp-01",
+            "violations": 1,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "3tier-trade-prod-ane3-fwp-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-fwp-01",
+            "violations": 1,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "3tier-trade-prod-ane3-neg-01",
             "valid": false,
@@ -71849,6 +72047,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -78164,6 +78380,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "billing-trade-prod-ane3-neg-01",
             "valid": true,
@@ -84476,6 +84710,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "billing-trade-prod-ane3-neg-01",
             "valid": true,
@@ -90785,6 +91037,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -97124,6 +97394,24 @@
             "violations": 0,
             "steps": 0
           },
+          "network_firewall_policy": {
+            "name": "billing-trade-uat-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-uat-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
           "network_endpoint_group": {
             "name": "billing-trade-uat-ane3-neg-01",
             "valid": true,
@@ -101924,6 +102212,24 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-nt-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "network_firewall_policy": {
+            "name": "billing-trade-prod-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-fwp-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "region_network_firewall_policy": {
+            "name": "billing-trade-prod-ane3-fwp-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-fwp-01",
             "violations": 0,
             "steps": 0
           },
@@ -220195,6 +220501,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "network_firewall_policy",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "node_group",
         "name": "",
         "known": true,
@@ -222923,6 +223337,114 @@
       {
         "provider": "gcp",
         "resourceType": "region_network_endpoint_group",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "region_network_firewall_policy",
         "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
         "known": true,
         "valid": false,
@@ -229176,6 +229698,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -229901,6 +230425,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -230620,6 +231146,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -231346,6 +231874,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -232071,6 +232601,8 @@
           "gcp_kms_import_job = \"windows-trade-prod-ij-01\"",
           "gcp_node_group = \"windows-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"windows-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"windows-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"windows-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"windows-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"windows-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"windows-trade-prod-neg-01\"",
@@ -232794,6 +233326,8 @@
           "gcp_kms_import_job = \"google-trade-prod-ij-01\"",
           "gcp_node_group = \"google-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"google-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"google-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"google-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"google-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"google-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"google-trade-prod-neg-01\"",
@@ -233521,6 +234055,8 @@
           "gcp_kms_import_job = \"azure-trade-prod-ij-01\"",
           "gcp_node_group = \"azure-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"azure-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"azure-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"azure-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"azure-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"azure-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"azure-trade-prod-neg-01\"",
@@ -234263,6 +234799,8 @@
           "# INVALID: gcp_kms_import_job",
           "# INVALID: gcp_node_group",
           "# INVALID: gcp_node_template",
+          "# INVALID: gcp_network_firewall_policy",
+          "# INVALID: gcp_region_network_firewall_policy",
           "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_region_network_endpoint_group",
           "# INVALID: gcp_global_network_endpoint_group",
@@ -234971,6 +235509,8 @@
           "gcp_kms_import_job = \"paymentsettlement-reconciliation-dev-ij-01\"",
           "gcp_node_group = \"paymentsettlement-reconciliation-dev-ng-01\"",
           "gcp_node_template = \"paymentsettlement-reconciliation-dev-nt-01\"",
+          "gcp_network_firewall_policy = \"paymentsettlement-reconciliation-dev-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"paymentsettlement-reconciliation-dev-fwp-01\"",
           "gcp_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
           "gcp_region_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
           "gcp_global_network_endpoint_group = \"paymentsettlement-reconciliation-dev-neg-01\"",
@@ -235696,6 +236236,8 @@
           "gcp_kms_import_job = \"a-long-longpurpose-prod-ij-01\"",
           "gcp_node_group = \"a-long-longpurpose-prod-ane3-ng-01\"",
           "gcp_node_template = \"a-long-longpurpose-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"a-long-longpurpose-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"a-long-longpurpose-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"a-long-longpurpose-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"a-long-longpurpose-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"a-long-longpurpose-prod-neg-01\"",
@@ -236781,6 +237323,8 @@
           "# INVALID: gcp_zone_vm_extension_policy",
           "# INVALID: gcp_node_group",
           "# INVALID: gcp_node_template",
+          "# INVALID: gcp_network_firewall_policy",
+          "# INVALID: gcp_region_network_firewall_policy",
           "# INVALID: gcp_network_endpoint_group",
           "# INVALID: gcp_region_network_endpoint_group",
           "# INVALID: gcp_global_network_endpoint_group",
@@ -237146,6 +237690,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -237860,6 +238406,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -238570,6 +239118,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -239296,6 +239846,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",
@@ -240021,6 +240573,8 @@
           "gcp_kms_import_job = \"billing-trade-uat-ij-01\"",
           "gcp_node_group = \"billing-trade-uat-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-uat-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-uat-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-uat-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-uat-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-uat-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-uat-neg-01\"",
@@ -240570,6 +241124,8 @@
           "gcp_kms_import_job = \"billing-trade-prod-ij-01\"",
           "gcp_node_group = \"billing-trade-prod-ane3-ng-01\"",
           "gcp_node_template = \"billing-trade-prod-ane3-nt-01\"",
+          "gcp_network_firewall_policy = \"billing-trade-prod-fwp-01\"",
+          "gcp_region_network_firewall_policy = \"billing-trade-prod-ane3-fwp-01\"",
           "gcp_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_region_network_endpoint_group = \"billing-trade-prod-ane3-neg-01\"",
           "gcp_global_network_endpoint_group = \"billing-trade-prod-neg-01\"",

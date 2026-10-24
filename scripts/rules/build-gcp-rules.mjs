@@ -152,11 +152,9 @@ function kmsRows(doc) {
 
 /** --measure 결과: 메서드 id → 쓸 docUrl (없으면 앵커가 없다) */
 /** 손으로 원문을 다시 읽고도 넣지 않은 행 (D43) — 보류 사유를 이것으로 바꾼다. 넣은 행은 --existing 으로 건너뛴다 */
-const FIREWALL_POLICY_NAME = 'reviewed by hand — unconfirmed (the organization policy shortName is RFC 1035, but no source states a rule for the network firewall policy name)';
+// 네트워크 방화벽 정책 둘(전역 · 지역)은 Compute Engine 이름 쪽의 일반 규칙으로 손 규칙이 되었다(D136 · rules/gcp-manual.ts) — --existing 으로 건너뛴다
 export const HAND_REVIEWED = {
-  'compute.firewallPolicies.insert': FIREWALL_POLICY_NAME,
-  'compute.networkFirewallPolicies.insert': FIREWALL_POLICY_NAME,
-  'compute.regionNetworkFirewallPolicies.insert': FIREWALL_POLICY_NAME,
+  'compute.firewallPolicies.insert': 'reviewed by hand — not imported (hierarchical firewall policy of an organization or folder; its shortName is RFC 1035, but it is not created in a project)',
   'cloudkms.projects.locations.keyHandles.create': 'reviewed by hand — not imported (optional ID; a UUID is used when it is empty, and no source states its characters or length)',
 };
 
@@ -291,7 +289,6 @@ const NO_ID = 'no user-chosen ID: ';
 export const ASSET_TYPES_WITHOUT_RULE = [
   { type: 'container.googleapis.com/NodePool', kind: 'held', reason: 'NodePool.name says only "The name of the node pool." — no length or character rule', confirm: 'a naming sentence for node pools in the GKE REST reference or the add-node-pools guide', checked: CONTAINER_V1 },
   { type: 'run.googleapis.com/WorkerPool', kind: 'held', reason: 'workerPools.create workerPoolId has the serviceId sentence (letter first, no trailing hyphen, fewer than 50 characters); the deploy guide adds "must not share the same name as an existing service name from your project" — the allowed characters are not stated', confirm: 'the character set for worker pool names in the Cloud Run REST reference or the deploy guide', checked: 'https://docs.cloud.google.com/run/docs/deploy-worker-pools' },
-  { type: 'compute.googleapis.com/FirewallPolicy', kind: 'held', reason: 'the firewall policy insert methods are held in the rows above (no source states a rule for the network firewall policy name)', confirm: 'a naming sentence for network firewall policies in the Compute Engine REST reference', checked: COMPUTE_V1 },
   { type: 'compute.googleapis.com/WireGroup', kind: 'held', reason: 'wireGroups.insert is held in the rows above (nested under a cross-site network — no scope node for the parent)', confirm: 'a scope node for the cross-site network parent', checked: COMPUTE_V1 },
   { type: 'cloudkms.googleapis.com/KeyHandle', kind: 'held', reason: 'keyHandles.create is held in the rows above (optional ID; a UUID is used when it is empty)', confirm: 'a length and character sentence for keyHandleId in the Cloud KMS REST reference', checked: KMS_V1 },
   { type: 'compute.googleapis.com/InstanceSettings', kind: 'no name', reason: `${NO_ID}the resource has get and patch methods only, no insert`, checked: COMPUTE_V1 },
