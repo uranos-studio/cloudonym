@@ -671,7 +671,12 @@ export const en: Catalog = {
     plan_file_over_api_limit: 'This plan is {bytes} bytes when sent without indentation, over the API limit of {max} bytes — POST /v1/wizard will answer 413.',
     meta_description: 'Enter owner, system, environment and region and get AWS and Google Cloud resource names that pass the official naming rules. Web tool and API. Azure coming.',
     // 경로마다 제목 · 설명 (D106) — <title> 은 「Cloudonym — 제목」. 설명은 검색 결과에 보이는 글이라 160자 안
-    page_app_title: 'AWS and Google Cloud resource name generator',
+    page_home_title: 'AWS and Google Cloud resource name generator',
+    // 클라우드별 마법사 경로 (D129) — /aws · /gcp
+    page_aws_title: 'AWS resource name generator',
+    page_aws_description: 'Name AWS resources such as VPCs, subnets, EC2 instances, load balancers, RDS and S3 buckets from four values, checked against the official naming rules.',
+    page_gcp_title: 'Google Cloud resource name generator',
+    page_gcp_description: 'Name Google Cloud projects, VPCs, Cloud Run services, load balancers and buckets from four values, checked against the official naming rules.',
     page_pick_title: 'Pick resources',
     page_pick_description: 'Pick AWS and Google Cloud resource types from a tree and get names that pass the official naming rules, ready to copy.',
     page_naming_title: 'Naming guide',

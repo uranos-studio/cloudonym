@@ -26,7 +26,7 @@ async function start() {
   if (clean !== undefined) window.history.replaceState(window.history.state, '', clean)
   document.title = pageText(route).title
   // 뿌리는 늘 마법사다 (D76) — 트리 꼴 hash 로 열면 트리 경로로 옮긴다(query 도 실어 간다)
-  if (route === 'app' && hashKind(window.location.hash) === 'tree') {
+  if (route === 'home' && hashKind(window.location.hash) === 'tree') {
     window.location.replace(PICK_PATH + window.location.search + window.location.hash)
     return
   }

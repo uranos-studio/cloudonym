@@ -89,7 +89,7 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
     const ld = JSON.parse(m![1]!);
     expect(ld).toMatchObject({ '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Cloudonym', url: 'https://example.org/', applicationCategory: 'DeveloperApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, description: en.ui.meta_description });
     expect(Object.keys(ld).filter((k) => /^(?:aggregateRating|review)$/.test(k))).toEqual([]);
-    for (const p of PAGES.filter((x) => x.route !== 'app')) expect(await (await get(p.path)).res.text(), p.path).not.toContain('ld+json');
+    for (const p of PAGES.filter((x) => x.route !== 'home')) expect(await (await get(p.path)).res.text(), p.path).not.toContain('ld+json');
   });
 
   it('모르는 경로 → 404 · 같은 index.html 본문 · noindex · canonical 없음 · 「Page not found」', async () => {
@@ -166,7 +166,7 @@ describe('화면 HTML (D106) — 경로마다 head · 모르는 경로는 404 + 
   });
 
   it('origin 은 이스케이프한다 — 속성 · 본문을 깨지 않는다', () => {
-    const html = renderPage(INDEX, 'app', 'https://a.test"><x');
+    const html = renderPage(INDEX, 'home', 'https://a.test"><x');
     expect(html).toContain('href="https://a.test&quot;&gt;&lt;x/"');
     expect(html).not.toContain('"><x');
   });

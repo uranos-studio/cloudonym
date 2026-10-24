@@ -19,7 +19,9 @@ export function pageText(route: Route, c: Catalog = en): PageText {
   const ui = c.ui;
   const pick = (heading: string, description: string): PageText => ({ title: `${SITE_NAME} — ${heading}`, heading, description });
   switch (route) {
-    case 'app': return pick(ui.page_app_title, ui.meta_description);
+    case 'home': return pick(ui.page_home_title, ui.meta_description);
+    case 'aws': return pick(ui.page_aws_title, ui.page_aws_description);
+    case 'gcp': return pick(ui.page_gcp_title, ui.page_gcp_description);
     case 'pick': return pick(ui.page_pick_title, ui.page_pick_description);
     case 'naming': return pick(ui.page_naming_title, ui.page_naming_description);
     case 'api': return pick(ui.page_api_title, ui.page_api_description);

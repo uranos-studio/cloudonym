@@ -80,7 +80,7 @@ export function headTags(route: Route, origin: string, verify: SiteVerification 
   const url = origin + pathOf(route);
   const tags = [
     // 네이버 서치어드바이저 소유 확인 (D120) — 뿌리 `/` 에만
-    ...(route === 'app' && verify.naver ? [`<meta name="naver-site-verification" content="${escapeHtml(verify.naver)}">`] : []),
+    ...(route === 'home' && verify.naver ? [`<meta name="naver-site-verification" content="${escapeHtml(verify.naver)}">`] : []),
     `<link rel="canonical" href="${escapeHtml(url)}">`,
     '<meta property="og:type" content="website">',
     `<meta property="og:site_name" content="${SITE_NAME}">`,
@@ -97,7 +97,7 @@ export function headTags(route: Route, origin: string, verify: SiteVerification 
     `<meta name="twitter:image" content="${escapeHtml(origin + OG_IMAGE.path)}">`,
     `<meta name="twitter:image:alt" content="${escapeHtml(en.ui.og_image_alt)}">`,
   ];
-  if (route === 'app') {
+  if (route === 'home') {
     const ld = {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -120,7 +120,7 @@ export function headTags(route: Route, origin: string, verify: SiteVerification 
 export function rootFallback(route: Route): string {
   const t = pageText(route);
   if (route === 'notFound') {
-    return `<main class="prerender"><h1>${escapeHtml(t.heading)}</h1><p>${escapeHtml(en.ui.page_not_found_body)}</p><p><a href="/">${escapeHtml(pageText('app').title)}</a></p></main>`;
+    return `<main class="prerender"><h1>${escapeHtml(t.heading)}</h1><p>${escapeHtml(en.ui.page_not_found_body)}</p><p><a href="/">${escapeHtml(pageText('home').title)}</a></p></main>`;
   }
   // AI 에이전트용 두 파일도 건다 — 스크립트 없이 읽는 쪽이 기계용 안내를 찾게
   const links = [...PAGES.map((p) => [p.path, pageText(p.route).heading]), ['/llms.txt', 'llms.txt'], ['/openapi.json', 'OpenAPI']];

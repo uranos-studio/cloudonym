@@ -293,7 +293,7 @@ describe('영어 사전 (D24)', () => {
 describe('경로마다 제목 · 설명 (D106)', () => {
   it('설명은 160자 안 · 비어 있지 않다 · 제목은 60자 안 — 검색 결과에 잘리지 않는 길이', () => {
     const descs = UI_KEYS.filter((k) => k === 'meta_description' || /^page_.*_description$/.test(k));
-    expect(descs.length).toBe(7);
+    expect(descs.length).toBe(9);
     for (const k of descs) {
       expect(en.ui[k].length, k).toBeGreaterThan(20);
       expect(en.ui[k].length, k).toBeLessThanOrEqual(160);

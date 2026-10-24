@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { DocPage } from './DocPage';
 import { IntroExample } from './IntroExample';
 import { rememberIntroDismissed } from './localPrefs';
-import { API_PATH, NAMING_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
+import { API_PATH, HOME_PATH, NAMING_PATH, PRIVACY_PATH, withStateHash } from './route';
 import { hashKind } from './urlState';
 import { repositoryFileUrl, repositoryLabel, SOURCE_REPOSITORY_URL } from './aboutModel';
 import { en } from '../messages/en';
@@ -39,7 +39,7 @@ export function About() {
           {/* 닫은 소개 상자를 첫 화면에 다시 보인다 — 닫힘 기억을 지우고 첫 화면으로 간다(누른 click 안에서 지운 뒤 링크가 옮긴다).
               트리 꼴 hash 는 뿌리에서 /pick 으로 옮겨져 소개가 안 보이므로 hash 없이 간다 */}
           <p>
-            <a href={hashKind(hash) === 'tree' ? WIZARD_PATH : withStateHash(WIZARD_PATH, hash)} data-about-intro-again className={LINK} onClick={() => rememberIntroDismissed(false)}>{ui.about_intro_again}</a>
+            <a href={hashKind(hash) === 'tree' ? HOME_PATH : withStateHash(HOME_PATH, hash)} data-about-intro-again className={LINK} onClick={() => rememberIntroDismissed(false)}>{ui.about_intro_again}</a>
           </p>
         </Section>
         <Section id="about-checks" title={ui.about_checks_title}>

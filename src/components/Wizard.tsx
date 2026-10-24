@@ -13,7 +13,7 @@ import { AppHeader, PLAN_FILE_BUTTON, PLAN_FILE_TEXT } from './AppHeader';
 import { CopyButton } from './CopyButton';
 import { decodeWizardState, encodeWizardState, hashKind, HASH_KEY, type WizardNotices } from './urlState';
 import { hashToRestore, hashToWrite, mismatchedLinkVersion, type LinkState } from './linkRevision';
-import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, WIZARD_PATH, withStateHash } from './route';
+import { ABOUT_PATH, API_PATH, HOME_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, withStateHash } from './route';
 import { envList, namesSummary, toggleEnv, withEnv } from './wizardEnvs';
 import * as S from './wizardState';
 import { addedRow, expandedAfterRemove, firstSelection, parseRow, PROJECT_ROW, resolveSelection, selectionAfter, serviceErrorsOf, serviceRow, type Edit, type EditOp, type RowPath } from './wizardSelection';
@@ -242,7 +242,7 @@ export function Wizard({ brokenLink = false }: { brokenLink?: boolean }) {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const shareText = stateKey ? `${window.location.origin}${WIZARD_PATH}#${HASH_KEY}=${stateKey}` : undefined;
+  const shareText = stateKey ? `${window.location.origin}${HOME_PATH}#${HASH_KEY}=${stateKey}` : undefined;
   // 첫 방문 안내 한 줄 (D93) — 닫으면 이 브라우저에 기억한다(저장소가 막혀 있으면 이 화면에서만 닫힌다)
   const [introOpen, setIntroOpen] = useState(() => !introDismissed());
   const closeIntro = () => {

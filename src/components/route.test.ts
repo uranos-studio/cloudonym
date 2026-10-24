@@ -3,7 +3,8 @@ import { ABOUT_PATH, API_PATH, NAMING_PATH, PICK_PATH, PRIVACY_PATH, routeOf } f
 
 describe('routeOf — pathname 으로 화면 · 이름 안내 · 개인정보를 고르고, 표에 없는 경로는 notFound (D57 · D106)', () => {
   it.each([
-    ['/', 'app'], ['', 'app'], ['//', 'app'], ['/index.html', 'notFound'], ['/docs', 'notFound'], ['/docs/naming/extra', 'notFound'], ['/privacy-policy', 'notFound'],
+    ['/', 'home'], ['', 'home'], ['//', 'home'],
+    ['/aws', 'aws'], ['/aws/', 'aws'], ['/gcp', 'gcp'], ['/gcp/', 'gcp'], ['/azure', 'notFound'], ['/azure/', 'notFound'], ['/aws/x', 'notFound'], ['/gcp/x', 'notFound'], ['/AWS', 'notFound'], ['/Gcp', 'notFound'], ['/google-cloud', 'notFound'], ['/index.html', 'notFound'], ['/docs', 'notFound'], ['/docs/naming/extra', 'notFound'], ['/privacy-policy', 'notFound'],
     [PICK_PATH, 'pick'], ['/pick/', 'pick'], ['/pick/x', 'notFound'], ['/picks', 'notFound'], ['/PICK', 'notFound'],
     [NAMING_PATH, 'naming'], ['/docs/naming/', 'naming'], [PRIVACY_PATH, 'privacy'], ['/privacy/', 'privacy'],
     [API_PATH, 'api'], ['/docs/api/', 'api'], ['/docs/api/x', 'notFound'], ['/docs/apis', 'notFound'], ['/robots.txt', 'notFound'],
