@@ -94,6 +94,12 @@ describe('/privacy', () => {
     expect(text).toContain('sessionStorage for this tab only');
     expect(text).toContain('no cookie, localStorage or identifier is used');
   });
+  it('마법사 경로의 클라우드 cloud (D130) — ui_visit 에만 · aws 또는 gcp · 클라우드별 일자 카운터 · 입력값은 아니다', () => {
+    const text = pageText();
+    expect(text).toContain('cloud is the cloud of the wizard page you opened first in this tab');
+    expect(text).toContain('only aws or gcp is kept');
+    expect(PRIVACY_EVENTS.find((e) => e.event === 'ui_visit')?.fields).toEqual(['src', 'cloud']);
+  });
   it('Workers Logs — 호스팅 제공자로서 요청 메타데이터를 처리할 수 있다 · 로그에는 본문 · 헤더를 쓰지 않는다(오류는 그대로 남는다)', () => {
     const text = pageText();
     expect(text).toContain('As the hosting provider, Cloudflare may process request metadata');
@@ -143,7 +149,7 @@ describe('/privacy', () => {
     expect(text).toContain(footer);
     const body = text.replace(`Last updated: ${PRIVACY_LAST_UPDATED}`, '').replace(footer, '');
     const fingerprint = fnv1a(body);
-    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-22 73ef1e4d');
+    expect(`${PRIVACY_LAST_UPDATED} ${fingerprint}`).toBe('2026-10-24 517413d1');
     // 검사기 — 한 글자만 바뀌어도 지문이 달라진다
     expect(fnv1a(`${body}.`)).not.toBe(fingerprint);
   });

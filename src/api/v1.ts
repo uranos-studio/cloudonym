@@ -114,9 +114,10 @@ v1.post('/events', async (c) => {
   if (!read.ok) return notJson(c);
   const parsed = parseEventBody(read.body);
   if (!parsed.ok) return fail(c, parsed.rejection.status, parsed.rejection.errors, { supported: parsed.rejection.supported });
-  const { event, target, rules, src } = parsed.value;
+  const { event, target, rules, src, cloud } = parsed.value;
   const meta: Record<string, unknown> = target ? { target } : { ...(rules ?? {}) };
   if (src !== undefined) meta.src = src;
+  if (cloud !== undefined) meta.cloud = cloud;
   c.executionCtx.waitUntil(logTelemetry(c, event, meta));
   return c.json({ ok: true });
 });

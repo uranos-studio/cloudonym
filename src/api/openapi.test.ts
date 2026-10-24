@@ -124,6 +124,13 @@ describe('public/openapi.json — 형식', () => {
     expect(t.description).toMatch(/ui_copy/);
     expect(schemas['EventRequest']!.required).toEqual(['event']);
   });
+  it('EventRequest.cloud — 마법사 경로의 클라우드(D130) · 켜진 CSP 값 그대로 · 설명이 ui_visit 에만 쓴다고 말한다', () => {
+    const c = schemas['EventRequest']!.properties!['cloud']!;
+    expect(c.type).toBe('string');
+    expect(c.description).toMatch(/ui_visit/);
+    expect(c.description).toMatch(/D130/);
+    expect((c as { example?: unknown }).example).toBe('aws');
+  });
   it('info.version = package.json version (D26)', () => {
     const pkg = JSON.parse(readFileSync(join(import.meta.dirname, '../../package.json'), 'utf-8')) as { version: string };
     expect(spec.info.version).toBe(pkg.version);

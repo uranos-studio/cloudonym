@@ -36,8 +36,9 @@ export const UI_COPY_TARGETS = ['share-url', 'name', 'all-names', 'names-json', 
 export type UiCopyTarget = (typeof UI_COPY_TARGETS)[number];
 /** 비콘 한 건 — target 은 ui_copy 에만 있다. 다른 이벤트에 온 target 은 버린다 */
 /** chip_rules · custom_rules 는 ui_generate 에서만 그대로 넘긴다 — 거르기는 telemetry.ts 의 ruleIdList 한 곳이 한다 (D71) */
-/** src 는 캠페인 출처(D122) — 세 이벤트 모두 그대로 넘기고 거르기는 telemetry.ts 의 campaignSrc 한 곳이 한다 */
-export interface EventInput { event: UiEvent; target?: UiCopyTarget; rules?: { chip_rules?: unknown; custom_rules?: unknown }; src?: unknown }
+/** src 는 캠페인 출처(D122) — 세 이벤트 모두 그대로 넘기고 거르기는 telemetry.ts 의 campaignSrc 한 곳이 한다.
+ *  cloud 는 마법사 경로의 클라우드(D130) — ui_visit 만 넘기고 거르기는 telemetry.ts 의 visitCloud 한 곳이 한다 */
+export interface EventInput { event: UiEvent; target?: UiCopyTarget; rules?: { chip_rules?: unknown; custom_rules?: unknown }; src?: unknown; cloud?: unknown }
 
 function reject(errors: Message[], supported?: string[], status: 400 | 409 = 400): { ok: false; rejection: Rejection } {
   return { ok: false, rejection: { status, errors, ...(supported ? { supported } : {}) } };
@@ -191,7 +192,7 @@ export function parseEventBody(body: unknown): Parsed<EventInput> {
     for (const k of ['chip_rules', 'custom_rules'] as const) if (Object.hasOwn(body, k)) rules[k] = body[k];
     return { ok: true, value: Object.keys(rules).length > 0 ? { event, rules, ...src } : { event, ...src } };
   }
-  if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent, ...src } };
+  if (event !== 'ui_copy') return { ok: true, value: { event: event as UiEvent, ...src, ...(Object.hasOwn(body, 'cloud') ? { cloud: body.cloud } : {}) } };
   const target = body.target;
   const longTarget = tooLong({ target });
   if (longTarget.length > 0) return reject(longTarget);

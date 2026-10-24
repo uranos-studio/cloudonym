@@ -9,6 +9,8 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 - **Landing page at `/`** (D129) — one sentence, a one-time animated intro (five context values → one name → PASS, read from the build-time example; the last frame only with reduced motion) and three cards: AWS and Google Cloud open the wizard, Azure says **Coming soon**.
 - **Wizard paths `/aws` and `/gcp`** (D129) — each opens its cloud's example plan (AWS: `demo · payment · prod · ap-northeast-2` with the `web`, `lb`, `tg`, `db` and `object` chips, 10 names, all PASS). The sitemap lists eight pages. `/azure` answers 404.
 
+- **`ui_visit` carries `cloud`** (D130) — `aws` or `gcp` when the tab first opened a wizard path; kept only for an enabled provider, sent to Axiom and counted per cloud and day in KV. `/privacy` and `/openapi.json` list the field.
+
 ### Changed
 
 - **The wizard is no longer at `/`** (D129) — the cloud picker switches in place and the address follows; Share URL points at the plan's cloud path. A link's cloud wins over the path; an older `/#state=…` wizard link moves to its cloud's path and a tree link to `/pick` as before.

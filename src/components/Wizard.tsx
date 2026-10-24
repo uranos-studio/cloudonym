@@ -193,9 +193,10 @@ export function Wizard({ provider = 'gcp', brokenLink = false }: { provider?: Wi
     if (hash !== undefined) window.history.replaceState(null, '', hash);
   }, [stateKey, link]);
 
+  // ui_visit — 탭당 1회 · 경로의 클라우드를 싣는다 (D130)
   useEffect(() => {
-    visitOnce(sessionStore());
-  }, []);
+    visitOnce(sessionStore(), undefined, { cloud: provider });
+  }, [provider]);
   // ui_generate — 결과가 바뀐 뒤 1초 디바운스(첫 화면은 세지 않는다). 보낼 때의 모델에서 고른 규칙 id 둘만 싣는다 (D71)
   const lastSent = useRef(stateKey);
   const schedule = useMemo(() => debounce((meta: ReturnType<typeof wizardGenerateMeta>) => sendBeacon('ui_generate', meta), GENERATE_DEBOUNCE_MS), []);

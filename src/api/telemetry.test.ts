@@ -189,7 +189,7 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
   });
   it('이벤트마다 Axiom 한 건의 키 집합 = 공통 다섯 + 그 이벤트의 허용 meta — 모르는 meta 키 · 모르는 이벤트의 meta 는 버린다', async () => {
     const full: Record<string, Record<string, unknown>> = {
-      ui_visit: { src: 'parking' },
+      ui_visit: { src: 'parking', cloud: 'aws' },
       ui_generate: { chip_rules: ['gcp.compute_instance'], custom_rules: ['gcp.subnet'], src: 'parking' },
       ui_copy: { target: 'terraform', src: 'parking' },
       api_generate: { providers: ['gcp'] },
@@ -213,7 +213,7 @@ describe('Axiom · KV 에 싣는 것 — 허용 표 밖은 싣지 않는다 (D56
   });
   it('허용 표는 D56 의 필드 표와 같다', () => {
     expect(META_KEYS).toEqual({
-      ui_visit: ['src'], ui_generate: ['chip_rules', 'custom_rules', 'src'], ui_copy: ['target', 'src'],
+      ui_visit: ['src', 'cloud'], ui_generate: ['chip_rules', 'custom_rules', 'src'], ui_copy: ['target', 'src'],
       api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
       api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid', 'chip_rules', 'custom_rules'],
       llms_txt_accessed: [], catalog_json_accessed: [],

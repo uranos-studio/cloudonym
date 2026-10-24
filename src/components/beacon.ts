@@ -6,12 +6,13 @@ import { pickedRuleIds } from './pickedRules';
 import { storedCampaign } from './campaign';
 
 export type UiBeacon = 'ui_visit' | 'ui_generate' | 'ui_copy';
-export interface BeaconMeta { target?: CopyTarget; chip_rules?: string[]; custom_rules?: string[] }
+/** cloud — ui_visit 만 싣는다: 마법사 경로(/aws · /gcp)의 클라우드 (D130). 소개 페이지 · 트리 화면은 싣지 않는다 */
+export interface BeaconMeta { target?: CopyTarget; chip_rules?: string[]; custom_rules?: string[]; cloud?: string }
 export const EVENTS_PATH = '/v1/events';
 export const VISIT_KEY = 'cloudonym:ui_visit';
 export const GENERATE_DEBOUNCE_MS = 1000;
 
-export type Sender = (event: UiBeacon) => void;
+export type Sender = (event: UiBeacon, meta?: BeaconMeta) => void;
 export interface StorageLike { getItem(key: string): string | null; setItem(key: string, value: string): void }
 
 /** navigator.sendBeacon — 없으면 fetch keepalive. 본문은 문자열이라 text/plain 으로 간다 (API 는 content-type 을 보지 않는다 · events.test) */
@@ -46,15 +47,17 @@ export function sessionStore(): StorageLike | undefined {
   }
 }
 
-/** 같은 탭에서 한 번만 보낸다. 저장소가 없거나 던지면 가드 없이 보낸다(한 번 더 세는 쪽이 안 세는 쪽보다 낫다). 보냈으면 true */
-export function visitOnce(storage: StorageLike | undefined, send: Sender = sendBeacon): boolean {
+/** 같은 탭에서 한 번만 보낸다. 저장소가 없거나 던지면 가드 없이 보낸다(한 번 더 세는 쪽이 안 세는 쪽보다 낫다). 보냈으면 true.
+ *  meta.cloud — 마법사 경로의 클라우드 (D130). 처음 연 쪽이 소개 페이지면 cloud 없이 한 번 세고, 같은 탭의 마법사는 다시 보내지 않는다 */
+export function visitOnce(storage: StorageLike | undefined, send: Sender = sendBeacon, meta?: BeaconMeta): boolean {
   try {
     if (storage?.getItem(VISIT_KEY)) return false;
     storage?.setItem(VISIT_KEY, '1');
   } catch {
     // 저장소가 막혀 있으면 가드 없이 보낸다
   }
-  send('ui_visit');
+  if (meta?.cloud !== undefined) send('ui_visit', { cloud: meta.cloud });
+  else send('ui_visit');
   return true;
 }
 

@@ -33,6 +33,13 @@ describe('visitOnce — ui_visit 은 탭당 1회 (D17 · sessionStorage 가드)'
     visitOnce(storage, send); // 카드 → /aws
     expect(sent).toEqual(['ui_visit']);
   });
+  it('마법사 경로의 클라우드를 싣는다 (D130) — cloud 가 없으면(소개 페이지) meta 없이 예전 그대로', () => {
+    const calls: unknown[][] = [];
+    const send = (...a: unknown[]) => { calls.push(a); };
+    visitOnce(fakeStorage().storage, send, { cloud: 'aws' });
+    visitOnce(fakeStorage().storage, send);
+    expect(calls).toEqual([['ui_visit', { cloud: 'aws' }], ['ui_visit']]);
+  });
   it('저장소가 없으면(undefined) 가드 없이 보낸다', () => {
     const { send, sent } = spy();
     expect(visitOnce(undefined, send)).toBe(true);

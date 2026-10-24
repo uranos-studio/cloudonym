@@ -1,6 +1,7 @@
 // 텔레메트리 — Axiom 이벤트 + KV 일자 카운터 (D16 · D17 · D56 · D99). 반드시 c.executionCtx.waitUntil() 안에서 부른다. 오류는 삼킨다
 import type { Bindings } from './env';
 import { RULES } from '../core/constraints';
+import { ENABLED_PROVIDERS } from '../core/types';
 
 /** Hono Context 가 이 모양을 만족한다 — 시험은 평범한 객체를 넣는다 */
 export interface TelemetrySource { env: Bindings; req: { header: (name: string) => string | undefined } }
@@ -33,7 +34,7 @@ export function classifyClient(userAgent: string | undefined): ClientClass {
 
 /** 이벤트마다 Axiom 에 싣는 meta 키 (D56 필드 표) — 표에 없는 키 · 표에 없는 이벤트의 meta 는 싣지 않는다 */
 export const META_KEYS: Readonly<Record<string, readonly string[]>> = {
-  ui_visit: ['src'], ui_generate: ['chip_rules', 'custom_rules', 'src'], ui_copy: ['target', 'src'],
+  ui_visit: ['src', 'cloud'], ui_generate: ['chip_rules', 'custom_rules', 'src'], ui_copy: ['target', 'src'],
   api_generate: ['providers'], api_names: ['provider', 'resource_count', 'name_count', 'valid'], api_validate: ['provider', 'resource_type', 'valid'],
   api_wizard: ['provider', 'service_count', 'resource_count', 'name_count', 'valid', 'chip_rules', 'custom_rules'],
   llms_txt_accessed: [], catalog_json_accessed: [],
@@ -57,12 +58,18 @@ export function campaignSrc(value: unknown): string | undefined {
   return typeof value === 'string' && CAMPAIGN_SRC_RE.test(value) ? value : undefined;
 }
 
+/** 마법사 경로의 클라우드 (D130) — ui_visit 이 싣는다. 켜진 CSP id(ENABLED_PROVIDERS)일 때만 그 값, 아니면 undefined(칸째 버린다) */
+export function visitCloud(value: unknown): string | undefined {
+  return typeof value === 'string' && (ENABLED_PROVIDERS as readonly string[]).includes(value) ? value : undefined;
+}
+
 function allowedMeta(event: string, meta: Record<string, unknown>): Record<string, unknown> {
   const keys = Object.hasOwn(META_KEYS, event) ? META_KEYS[event]! : [];
   const out: Record<string, unknown> = {};
   for (const k of keys) {
     if (!Object.hasOwn(meta, k)) continue;
     if (k === 'src') { const src = campaignSrc(meta[k]); if (src !== undefined) out[k] = src; continue; }
+    if (k === 'cloud') { const cloud = visitCloud(meta[k]); if (cloud !== undefined) out[k] = cloud; continue; }
     if (!RULE_ID_KEYS.has(k)) { out[k] = meta[k]; continue; }
     const ids = ruleIdList(meta[k]);
     if (ids !== undefined) out[k] = ids;
@@ -99,11 +106,13 @@ async function bump(kv: KVNamespace, key: string): Promise<void> {
   await kv.put(key, String(current + 1), { expirationTtl: KV_TTL_SECONDS });
 }
 
-async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean, src: string | undefined): Promise<void> {
+async function countKv(kv: KVNamespace, event: string, day: string, ai: boolean, src: string | undefined, cloud: string | undefined): Promise<void> {
   try {
     await bump(kv, `stats:${event}:${day}`);
     // 캠페인 출처별 카운터 (D122) — 허용 표에 src 가 있는 이벤트이고 값이 정규식에 맞을 때만
     if (src !== undefined) await bump(kv, `stats:${event}:src:${src}:${day}`);
+    // 클라우드별 카운터 (D130) — 허용 표에 cloud 가 있는 이벤트(ui_visit)이고 켜진 CSP id 일 때만
+    if (cloud !== undefined) await bump(kv, `stats:${event}:cloud:${cloud}:${day}`);
     if (ai) await bump(kv, `stats:ai_agent_hits:${day}`);
   } catch (e) {
     console.error('KV 카운터 실패:', e);
@@ -178,7 +187,8 @@ export async function logTelemetry(c: TelemetrySource, event: string, meta: Reco
     // KV 와 Axiom 은 서로를 기다리지 않는다 — 한쪽이 멈춰도 다른 쪽은 간다. 둘 다 안에서 오류를 삼키므로 reject 하지 않는다
     const parts: Promise<void>[] = [];
     const src = Object.hasOwn(META_KEYS, event) && META_KEYS[event]!.includes('src') ? campaignSrc(meta.src) : undefined;
-    if (kv) parts.push(countKv(kv, event, day, ai, src));
+    const cloud = Object.hasOwn(META_KEYS, event) && META_KEYS[event]!.includes('cloud') ? visitCloud(meta.cloud) : undefined;
+    if (kv) parts.push(countKv(kv, event, day, ai, src, cloud));
     if (apiKey && dataset) {
       // Axiom 은 _time 을 UTC 로 저장한다 — 일자 집계가 KV 키와 같도록 KST 일자를 따로 싣는다.
       // meta 는 허용 표로 거른 뒤 먼저 펼친다 — 서버가 정하는 값(_time · kst_day · event · client_class · is_ai_agent)을 meta 가 덮어쓰지 못한다

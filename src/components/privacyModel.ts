@@ -26,7 +26,7 @@ export const PRIVACY_RATE_LIMIT = { limit: 60, period: 60 } as const;
 
 /** 계측 표 — 이벤트 · 언제 · 덧붙는 필드. telemetry.ts 의 META_KEYS 와 같은 순서 · 같은 필드 */
 export const PRIVACY_EVENTS: readonly { event: string; when: UiKey; fields: readonly string[] }[] = [
-  { event: 'ui_visit', when: 'privacy_when_ui_visit', fields: ['src'] },
+  { event: 'ui_visit', when: 'privacy_when_ui_visit', fields: ['src', 'cloud'] },
   { event: 'ui_generate', when: 'privacy_when_ui_generate', fields: ['chip_rules', 'custom_rules', 'src'] },
   { event: 'ui_copy', when: 'privacy_when_ui_copy', fields: ['target', 'src'] },
   { event: 'api_generate', when: 'privacy_when_api_generate', fields: ['providers'] },
@@ -43,7 +43,7 @@ export function axiomRetentionText(days: number | null): string {
 }
 
 /** 안내를 마지막으로 고친 날(KST). 본문이 바뀌면 privacy.test 의 지문 시험이 깨진다 — 이 날짜와 지문을 같이 고친다 */
-export const PRIVACY_LAST_UPDATED = '2026-10-22';
+export const PRIVACY_LAST_UPDATED = '2026-10-24';
 /** 연락 경로 — 질문은 공개 이슈, 보안 문제는 GitHub 비공개 취약점 신고(SECURITY.md 와 같은 창구). 이메일은 적지 않는다 */
 export const PRIVACY_CONTACT = {
   issues: `${SOURCE_REPOSITORY_URL}/issues`,
