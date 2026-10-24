@@ -4,19 +4,13 @@ import { Hono } from 'hono';
 import { secureHeaders } from 'hono/secure-headers';
 import type { App } from './env';
 import { v1 } from './v1';
-import { RULES } from '../core/constraints';
-import { ENABLED_PROVIDERS } from '../core/types';
-import { buildCatalogJson } from './catalog';
-import { buildLlmsText } from './llms';
-import { VERSION } from '../version';
+import { CATALOG_JSON, LLMS_TEXT } from './static-bodies';
 import { logTelemetry } from './telemetry';
 import { fail, internalError } from './errors';
 import { overLimit, tooManyRequests } from './ratelimit';
 import { indexNowKeyPath, servePage, serveIndexNowKey, serveRobots, serveSitemap } from './site';
 
-// 모듈 로드 때 한 번 만든다 — 요청마다 만들지 않는다
-const LLMS_TEXT = buildLlmsText(Object.values(RULES), VERSION);
-const CATALOG_JSON = buildCatalogJson(ENABLED_PROVIDERS, VERSION);
+// 두 본문은 빌드 전에 만든 상수다(scripts/gen-static-bodies.mjs) — isolate 기동 때 규칙 표로 다시 만들지 않는다(CPU 조사 2026-10-24)
 
 export const app = new Hono<App>();
 app.onError(internalError);

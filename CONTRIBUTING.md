@@ -62,7 +62,7 @@ Rules are typed `const` data in `src/core/rules/` — no rule is parsed from doc
    ```
 
    CI runs `node scripts/check-rules-revision.mjs <main's fingerprint> src/core/rules-fingerprint.json` and fails if the fingerprint changed without a new revision or the other way round.
-7. **Check** — `npm test`, `npm run test:rules`, `npm run typecheck`, `npm run lint` and `npm run build`. `/llms.txt` and the resource tree are generated from the rule table, so a new rule appears there without further edits.
+7. **Check** — `npm test`, `npm run test:rules`, `npm run typecheck`, `npm run lint` and `npm run build`. `/llms.txt` and the resource tree are generated from the rule table, so a new rule appears there without further edits (`npm run build` first rewrites the `/llms.txt` and `/catalog.json` bodies in `src/api/static-bodies.ts`; `npm test` fails until it does).
 
 ## Editing the catalog (abbreviations, kinds, regions, descriptions)
 
