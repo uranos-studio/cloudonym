@@ -4,7 +4,7 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-24.9. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-24.10. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
 
 ### Added
 
