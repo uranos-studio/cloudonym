@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/gen-intro-examples.mjs",
+    "prebuild": "node scripts/gen-intro-examples.mjs && node scripts/gen-static-bodies.mjs",
     "build": "tsc -b && vite build && node scripts/check-bundle.mjs",
     "lint": "oxlint",
     "preview": "npm run build && vite preview",
@@ -22,6 +22,7 @@
     "build:cli-bin": "node scripts/cli-sea.mjs",
     "catalog": "node scripts/catalog/build-catalog.mjs",
     "intro-examples": "node scripts/gen-intro-examples.mjs",
+    "static-bodies": "node scripts/gen-static-bodies.mjs",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
