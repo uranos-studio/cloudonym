@@ -1,6 +1,6 @@
 // 카드 화면 상태 (D93) — 더하기 · 되읽기 · 미완성 · 가족 · 상한 · 지우기(공용 방화벽은 남는다)
 import { describe, it, expect } from 'vitest';
-import { addBundle, cardBlocked, cardIn, cardsIn, fillBlocked, fillMissing, optionBlocked, optionOn, partBlocked, partsToAdd, partUsers, removeBundle, serviceLayout, setOption, setPart, SHAREABLE_PARTS } from './wizardBundles';
+import { addBundle, migBaseName, setupNote, cardBlocked, cardIn, cardsIn, fillBlocked, fillMissing, optionBlocked, optionOn, partBlocked, partsToAdd, partUsers, removeBundle, serviceLayout, setOption, setPart, SHAREABLE_PARTS } from './wizardBundles';
 import { addPresetPick, addService, DEFAULT_PROJECT, findPreset, renameService, startPlan, togglePreset } from './wizardState';
 import { cardRow, parentRow, parseRow, rowExists, rowTitle, selectionAfter, visibleRows } from './wizardSelection';
 import { decodeWizardState, encodeWizardState } from './urlState';
@@ -8,6 +8,8 @@ import { MAX_PICKS_PER_SERVICE, expandPlan, validatePlan, type WizardPlan } from
 import { generateProject } from '../core/engine';
 import { BUNDLES, bundleById, partIsProject, partKey } from '../core/wizard/bundles';
 import { RULES_REVISION } from '../core/revision';
+import { fillUi } from '../messages/catalog';
+import { en } from '../messages/en';
 
 const ids = (plan: WizardPlan, s: number) => cardsIn(plan, s).map((m) => [m.bundle.id, m.complete]);
 const presets = (plan: WizardPlan, s: number | null) => (s === null ? plan.projectPicks : plan.services[s]!.picks).map((p) => (p.tier ? `${p.preset}:${p.tier}` : p.preset));
@@ -601,3 +603,38 @@ describe('역할별 서비스 계정 (D126)', () => {
 });
 
 
+
+describe('website-mig 의 기본 인스턴스 이름 예시 (표시 전용)', () => {
+  const project: WizardPlan['project'] = { owner: 'shop', system: 'auto', env: 'dev', region: 'asia-northeast3' };
+  it('Web server 칩이 만들 이름에서 번호만 뺀다 — 같은 서비스 문맥 · 엔진이 만든 이름', () => {
+    const p = renameService(addBundle(startPlan(project), 0, 'website-mig'), 0, 'auto');
+    const base = migBaseName(p, 0);
+    expect(base).toBeDefined();
+    const web = addPresetPick(renameService(startPlan(project), 0, 'auto'), 0, 'web');
+    const name = generateProject(expandPlan(web), 'gcp').items.find((i) => i.key.startsWith('service/') && i.key.includes('/web/'))!.name;
+    expect(name).toBe(`${base}-01`);
+    expect(base!.endsWith('-gce-web')).toBe(true);
+  });
+  it('계획 · 결과를 바꾸지 않는다', () => {
+    const p = addBundle(startPlan(project), 0, 'website-mig');
+    const before = encodeWizardState(p);
+    migBaseName(p, 0);
+    expect(encodeWizardState(p)).toBe(before);
+  });
+  it('문맥이 틀리면 undefined — 화면은 일반 문장으로 돌아간다', () => {
+    const p = addBundle(startPlan({ ...project, owner: '' }), 0, 'website-mig');
+    expect(migBaseName(p, 0)).toBeUndefined();
+    expect(migBaseName(p, 9)).toBeUndefined();
+  });
+});
+
+describe('website-mig 설정 안내 문장', () => {
+  it('예시 이름을 넣고, 못 만들면 일반 문장', () => {
+    const project: WizardPlan['project'] = { owner: 'shop', system: 'auto', env: 'dev', region: 'asia-northeast3' };
+    const p = addBundle(startPlan(project), 0, 'website-mig');
+    expect(setupNote(p, 0, 'website-mig', 'wizard_card_setup_mig')).toBe(fillUi(en, 'wizard_card_setup_mig_named', { name: migBaseName(p, 0)! }));
+    const bad = addBundle(startPlan({ ...project, owner: '' }), 0, 'website-mig');
+    expect(setupNote(bad, 0, 'website-mig', 'wizard_card_setup_mig')).toBe(en.ui.wizard_card_setup_mig);
+    expect(setupNote(p, 0, 'serverless-web', 'wizard_card_setup_run')).toBe(en.ui.wizard_card_setup_run);
+  });
+});

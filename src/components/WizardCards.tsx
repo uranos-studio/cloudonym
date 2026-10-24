@@ -223,7 +223,7 @@ export function CardPanel({ plan, service, card, result, edit, onSelect }: {
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{en.ui.wizard_card_setup}</p>
           {setups.map((x) => (
             <p key={x.key} data-card-setup-note={x.key} className="text-sm text-zinc-700 dark:text-zinc-300">
-              {en.ui[x.text]}{' '}
+              {B.setupNote(plan, service, x.key, x.text)}{' '}
               <a href={x.doc} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-indigo-700 underline-offset-2 hover:underline dark:text-indigo-300">
                 {en.ui.wizard_card_setup_doc}<ExternalLink aria-hidden="true" className="size-3" />
               </a>
