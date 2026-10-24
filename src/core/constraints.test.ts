@@ -10,6 +10,7 @@ import { RULES, rulesFor, getRule, LABEL_LIMITS, AWS_TAG_VALUE_DOC_URL, WINDOWS_
 import { PROVIDERS } from './types';
 import { GCP_BASE_RULES, GCP_RULES } from './rules/gcp';
 import { rowOf } from './catalog';
+import { locationsFor } from './regions';
 
 describe('RULES 표 무결성', () => {
   it('모든 규칙에 docUrl(https) · 길이 순서 · id 형식이 있다', () => {
@@ -442,6 +443,15 @@ describe('Cloud Logging 싱크 · 버킷 · 로그 기반 지표 (D133)', () => 
   it('지표 — 영숫자와 _-.,+!*\',()%/ · 슬래시로 시작하지 않는다 · 100자', () => {
     for (const name of ['error_count', 'nginx/requests', "a-b.c,d+e!f*g'h(i)j%k", '_a', 'a'.repeat(100)]) expect(ok('gcp.logging_metric', name), name).toBe(true);
     for (const name of ['/a', 'a b', 'a:b', 'a@b', 'a'.repeat(101), '']) expect(ok('gcp.logging_metric', name), name).toBe(false);
+  });
+  it('지표 — 슬래시는 조각 사이에만: 끝 슬래시 · 이어진 슬래시(빈 조각)는 받지 않는다(보수적, D20)', () => {
+    for (const name of ['a/b', 'a/b/c', 'nginx/requests']) expect(ok('gcp.logging_metric', name), name).toBe(true);
+    for (const name of ['a/', 'a//b', 'a/b/', '/']) expect(ok('gcp.logging_metric', name), name).toBe(false);
+    expect(RULES['gcp.logging_metric']!.notes?.map((n) => n.code)).toEqual(['note.scope_unconfirmed', 'note.narrower_source_used']);
+  });
+  it('버킷 — 멀티 리전 us · eu 를 받는다(지역 토큰 자리에 위치 코드)', () => {
+    const r = RULES['gcp.logging_bucket']!;
+    expect(locationsFor(r).map((l) => l.code)).toEqual(['us', 'eu']);
   });
 });
 

@@ -419,6 +419,6 @@ describe('pick 의 위치 (D78)', () => {
     expect(validatePlan(onGlobal())).toEqual({ ok: true });
   });
   it('프로젝트 지역은 단일 리전이다 — 멀티 리전이면 context.location_unsupported', () => {
-    expectError({ ...svc({ preset: 'object' }), project: { ...PROJECT, region: 'US' } }, 'context.location_unsupported', undefined, { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] });
+    expectError({ ...svc({ preset: 'object' }), project: { ...PROJECT, region: 'US' } }, 'context.location_unsupported', undefined, { value: 'US', supported: ['storage_bucket', 'bigquery_dataset', 'logging_bucket'] });
   });
 });

@@ -4775,7 +4775,7 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
     },
     "entity": null,
     "kind": null,
-    "info": "A log-based metric counted from log entries; letters, digits and _-.,+!*',()%/ (not / first), at most 100 characters, unique within the project. Cloudonym generates lowercase letters, digits and hyphens.",
+    "info": "A log-based metric counted from log entries; letters, digits and _ - . , + ! * ' ( ) % /, at most 100 characters, unique within the project; / separates name pieces and is not first, last or doubled. Cloudonym generates lowercase letters, digits and hyphens.",
     "enterNameAt": {
       "gcloud": [
         "gcloud logging metrics create"

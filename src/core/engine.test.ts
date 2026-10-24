@@ -793,7 +793,7 @@ describe('멀티 · 이중 리전 위치 (D78)', () => {
   });
   it('받지 않는 규칙은 valid:false + name.location_unsupported — 지역 토큰이 없는 규칙은 그대로', () => {
     const out = generateMany(at('us'), 'gcp', [pick('compute_instance'), pick('vpc_network')]);
-    expect(out.items[0]).toMatchObject({ valid: false, violations: [{ code: 'name.location_unsupported', params: { location: 'US', supported: ['storage_bucket', 'bigquery_dataset'] } }] });
+    expect(out.items[0]).toMatchObject({ valid: false, violations: [{ code: 'name.location_unsupported', params: { location: 'US', supported: ['storage_bucket', 'bigquery_dataset', 'logging_bucket'] } }] });
     expect(out.items[1]).toMatchObject({ name: 'billing-trade-prod-vpc-01', valid: true });
     expect(generateMany(at('asia'), 'gcp', [pick('bigquery_dataset')]).items[0]).toMatchObject({ valid: false, violations: [{ code: 'name.location_unsupported', params: { location: 'ASIA', supported: ['storage_bucket'] } }] });
   });

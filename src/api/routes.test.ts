@@ -45,8 +45,8 @@ describe('POST /v1/generate (D15 wire)', () => {
     const { res } = await post({ context: { ...ctx, region: 'US' }, providers: ['gcp'] });
     expect(res.status).toBe(400);
     const body = await json(res);
-    expect(body.errors).toEqual([{ code: 'context.location_unsupported', field: 'region', params: { value: 'US', supported: ['storage_bucket', 'bigquery_dataset'] },
-      message: "region 'US' is a multi-region or dual-region location; only storage_bucket, bigquery_dataset take it — use a single region, or ask for those resource types only" }]);
+    expect(body.errors).toEqual([{ code: 'context.location_unsupported', field: 'region', params: { value: 'US', supported: ['storage_bucket', 'bigquery_dataset', 'logging_bucket'] },
+      message: "region 'US' is a multi-region or dual-region location; only storage_bucket, bigquery_dataset, logging_bucket take it — use a single region, or ask for those resource types only" }]);
   });
   it('① 예시 입력 → GCP SA 는 owner · 지역 없이 그대로 들어간다 (D77)', async () => {
     const { res } = await post({ context: ctx, providers: ['gcp'] });

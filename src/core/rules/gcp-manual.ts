@@ -325,15 +325,17 @@ const RULES: ResourceRule[] = [
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'logging.sinks', category: 'management',
     docUrl: `${LOGGING_REST}/projects.sinks#LogSink.FIELDS.name` }),
   // buckets.create bucketId "Identifiers are limited to 100 characters and can include only letters, digits, underscores, hyphens, and periods. Bucket identifiers must start with an alphanumeric character." ·
-  // parent "projects/[PROJECT_ID]/locations/[LOCATION_ID]" — 위치 아래다. 유일 범위 문장은 없다(notes). _Default · _Required 는 밑줄로 시작해 이미 받지 않는다
+  // parent "projects/[PROJECT_ID]/locations/[LOCATION_ID]" — 위치 아래다. 유일 범위 문장은 없다(notes). _Default · _Required 는 밑줄로 시작해 이미 받지 않는다.
+  // 위치 쪽 (https://docs.cloud.google.com/logging/docs/region-support#eu-and-us) — global · 리전 · 멀티 리전 eu · us 를 받는다(멀티 리전은 regions.json locations)
   rule({ id: 'gcp.logging_bucket', displayName: 'Cloud Logging Bucket', slug: 'log', minLength: 1, maxLength: 100, pattern: LOGGING_ID,
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'logging.buckets', category: 'management',
     docUrl: `${LOGGING_REST}/projects.locations.buckets/create#body.QUERY_PARAMETERS.bucket_id`, notes: [SCOPE] }),
   // LogMetric.name "Metric identifiers are limited to 100 characters and can include only the following characters: A-Z, a-z, 0-9, and the special characters _-.,+!*',()%/.
-  // The forward-slash character (/) denotes a hierarchy of name pieces, and it cannot be the first character of the name." · "projects/[PROJECT_ID]/metrics/[METRIC_ID]" 꼴이라 프로젝트 안 유일. 생성은 영숫자 · - · _ 만 쓴다
-  rule({ id: 'gcp.logging_metric', displayName: 'Log-based Metric', slug: 'lbm', minLength: 1, maxLength: 100, pattern: /^[A-Za-z0-9_.,+!*'()%-][A-Za-z0-9_.,+!*'()%/-]{0,99}$/,
+  // The forward-slash character (/) denotes a hierarchy of name pieces, and it cannot be the first character of the name." · "projects/[PROJECT_ID]/metrics/[METRIC_ID]" 꼴 — 유일 범위 문장은 없다(notes).
+  // 슬래시는 조각을 나눈다 — 끝 슬래시 · 이어진 슬래시(빈 조각)는 원문이 금하지 않지만 받지 않는다(보수적, D20 · NARROWER). 생성은 영숫자 · - · _ 만 쓴다
+  rule({ id: 'gcp.logging_metric', displayName: 'Log-based Metric', slug: 'lbm', minLength: 1, maxLength: 100, pattern: /^[A-Za-z0-9_.,+!*'()%-]+(?:\/[A-Za-z0-9_.,+!*'()%-]+)*$/,
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'logging.metrics', category: 'management',
-    docUrl: `${LOGGING_REST}/projects.metrics#LogMetric.FIELDS.name` }),
+    docUrl: `${LOGGING_REST}/projects.metrics#LogMetric.FIELDS.name`, notes: [SCOPE, NARROWER] }),
   // ── Workflows (D134) ──
   // workflows.create workflowId "Must contain only letters, numbers, underscores and hyphens. * Must start with a letter. * Must be between 1-64 characters.
   // * Must end with a number or a letter. * Must be unique within the customer project and location."
