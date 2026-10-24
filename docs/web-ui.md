@@ -74,7 +74,7 @@ Both screens keep their state in the URL hash — the wizard its project values,
   "project": { "owner": "platform", "system": "billing", "env": "prod", "region": "ane3" },
   "project_picks": [{ "preset": "vpc", "instances": [{ "id": "1", "seq": "01" }] }],
   "services": [{ "purpose": "shop", "picks": [{ "preset": "db", "kind": "POSTGRES", "instances": [{ "id": "1", "seq": "01" }] }] }],
-  "rules_version": "2026-10-24.1",
+  "rules_version": "2026-10-24.2",
   "environments": ["prod", "stg"]
 }
 ```

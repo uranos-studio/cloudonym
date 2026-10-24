@@ -1,5 +1,5 @@
 {
- "$comment": "Maintainer classification of the 298 resource types in the 18 namespaces (2026-10-06): a = the resource has a name property a person chooses, b = named only by a Name tag, c = no name, d = an external value such as a DNS name. category is the display group. Input of build-aws-rules.mjs.",
+ "$comment": "Maintainer classification of the 299 resource types in the 18 namespaces (2026-10-06; AWS::RDS::Deployment added 2026-10-24): a = the resource has a name property a person chooses, b = named only by a Name tag, c = no name, d = an external value such as a DNS name. category is the display group. Input of build-aws-rules.mjs.",
  "types": {
   "AWS::ApiGateway::Account": {"kind": "c", "category": "compute"},
   "AWS::ApiGateway::ApiKey": {"kind": "a", "category": "compute", "property": "Name"},
@@ -280,6 +280,7 @@
   "AWS::RDS::DBSecurityGroupIngress": {"kind": "c", "category": "database"},
   "AWS::RDS::DBShardGroup": {"kind": "a", "category": "database", "property": "DBShardGroupIdentifier"},
   "AWS::RDS::DBSnapshot": {"kind": "a", "category": "database", "property": "DBSnapshotIdentifier"},
+  "AWS::RDS::Deployment": {"kind": "a", "category": "database", "property": "BlueGreenDeploymentName"},
   "AWS::RDS::DBSubnetGroup": {"kind": "a", "category": "database", "property": "DBSubnetGroupName"},
   "AWS::RDS::EventSubscription": {"kind": "a", "category": "database", "property": "SubscriptionName"},
   "AWS::RDS::GlobalCluster": {"kind": "a", "category": "database", "property": "GlobalClusterIdentifier"},

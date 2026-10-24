@@ -1698,6 +1698,21 @@
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
   },
+  "aws.rds_deployment": {
+    "valid": [
+      "a",
+      "my-blue-green-deployment",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "invalid": [
+      "",
+      "9bg",
+      "bg-",
+      "b--g",
+      "b_g",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
   "aws.rds_integration": {
     "valid": [
       "a",
