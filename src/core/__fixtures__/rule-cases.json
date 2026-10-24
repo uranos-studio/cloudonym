@@ -2063,6 +2063,28 @@
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
   },
+  "gcp.workflow": {
+    "valid": [
+      "a",
+      "A",
+      "a1",
+      "my_workflow",
+      "my-workflow",
+      "Wf-01",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "shop-prod-ane3-wf-01"
+    ],
+    "invalid": [
+      "1a",
+      "_a",
+      "-a",
+      "a-",
+      "a_",
+      "a.b",
+      "a b",
+      "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc"
+    ]
+  },
   "gcp.run_job": {
     "valid": [
       "a",

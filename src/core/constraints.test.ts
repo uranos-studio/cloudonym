@@ -444,3 +444,17 @@ describe('Cloud Logging 싱크 · 버킷 · 로그 기반 지표 (D133)', () => 
     for (const name of ['/a', 'a b', 'a:b', 'a@b', 'a'.repeat(101), '']) expect(ok('gcp.logging_metric', name), name).toBe(false);
   });
 });
+
+describe('Workflows (D134)', () => {
+  const r = RULES['gcp.workflow']!;
+  const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
+  it('위치마다 유일 · 지역 토큰 · 약어 wf · 길이 1-64', () => {
+    expect({ scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength })
+      .toEqual({ scope: 'gcp:project_location', entity: 'workflows.workflows', regionToken: 'region', slug: 'wf', min: 1, max: 64 });
+    expect(r.docUrl).toBe('https://docs.cloud.google.com/workflows/docs/reference/rest/v1/projects.locations.workflows/create#body.QUERY_PARAMETERS.workflow_id');
+  });
+  it('글자로 시작 · 영숫자로 끝 · 그 사이 영숫자 · 밑줄 · 하이픈', () => {
+    for (const name of ['a', 'A', 'a1', 'my_workflow', 'my-workflow', `a${'b'.repeat(63)}`]) expect(ok(name), name).toBe(true);
+    for (const name of ['1a', '_a', '-a', 'a-', 'a_', 'a.b', 'a b', `a${'b'.repeat(64)}`, '']) expect(ok(name), name).toBe(false);
+  });
+});

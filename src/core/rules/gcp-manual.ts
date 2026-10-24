@@ -315,6 +315,12 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.logging_metric', displayName: 'Log-based Metric', slug: 'lbm', minLength: 1, maxLength: 100, pattern: /^[A-Za-z0-9_.,+!*'()%-][A-Za-z0-9_.,+!*'()%/-]{0,99}$/,
     allowed: 'alnum-hyphen-underscore', caseRule: 'any', startsWithLetter: false, endsWithAlnum: false, template: UNPLACED, scope: 'gcp:project', entity: 'logging.metrics', category: 'management',
     docUrl: `${LOGGING_REST}/projects.metrics#LogMetric.FIELDS.name` }),
+  // ── Workflows (D134) ──
+  // workflows.create workflowId "Must contain only letters, numbers, underscores and hyphens. * Must start with a letter. * Must be between 1-64 characters.
+  // * Must end with a number or a letter. * Must be unique within the customer project and location."
+  rule({ id: 'gcp.workflow', displayName: 'Workflows Workflow', slug: 'wf', minLength: 1, maxLength: 64, pattern: /^[A-Za-z](?:[A-Za-z0-9_-]{0,62}[A-Za-z0-9])?$/,
+    allowed: 'alnum-hyphen-underscore', caseRule: 'any', scope: 'gcp:project_location', entity: 'workflows.workflows', category: 'management',
+    docUrl: 'https://docs.cloud.google.com/workflows/docs/reference/rest/v1/projects.locations.workflows/create#body.QUERY_PARAMETERS.workflow_id' }),
   // instances.create instanceId "Must contain only lowercase letters, numbers, and hyphens. Must start with a letter. Must be between 1-40 characters.
   // Must end with a number or a letter. Must be unique within the customer project / location"
   rule({ id: 'gcp.redis_instance', displayName: 'Memorystore for Redis Instance', slug: 'redis', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,
