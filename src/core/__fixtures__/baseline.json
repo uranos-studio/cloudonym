@@ -2798,6 +2798,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -9044,6 +9053,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -15296,6 +15314,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -21542,6 +21569,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -27794,6 +27830,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "windows_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "windows-trade-prod-ane3-redis-01",
             "valid": true,
@@ -34040,6 +34085,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "google_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -40292,6 +40346,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "azure_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "azure-trade-prod-ane3-redis-01",
             "valid": true,
@@ -46538,6 +46601,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매_trade_prod_ane3_bq",
+            "violations": 1,
+            "steps": 1
+          },
+          "bigquery_table": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매_trade_prod_tbl_01",
             "violations": 1,
             "steps": 1
           },
@@ -52790,6 +52862,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "paymentsettlement_reconciliation_dev_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement_reconciliation_dev_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "paymentsettle-reconciliatio-dev-redis-01",
             "valid": true,
@@ -59036,6 +59117,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "a-long_longpurpose_prod_ane3_bq",
+            "violations": 0,
+            "steps": 1
+          },
+          "bigquery_table": {
+            "name": "a_long_longpurpose_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "a-long_longpurpose_prod_tbl_01",
             "violations": 0,
             "steps": 1
           },
@@ -65288,6 +65378,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "3tier_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "3tier-trade-prod-ane3-redis-01",
             "valid": false,
@@ -71534,6 +71633,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -77786,6 +77894,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -84035,6 +84152,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-prod-ane3-redis-01",
             "valid": true,
@@ -90281,6 +90407,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -96557,6 +96692,15 @@
             "violations": 0,
             "steps": 0
           },
+          "bigquery_table": {
+            "name": "billing_trade_uat_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_uat_tbl_01",
+            "violations": 0,
+            "steps": 0
+          },
           "redis_instance": {
             "name": "billing-trade-uat-ane3-redis-01",
             "valid": true,
@@ -101294,6 +101438,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing_trade_prod_ane3_bq",
+            "violations": 0,
+            "steps": 0
+          },
+          "bigquery_table": {
+            "name": "billing_trade_prod_tbl_01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing_trade_prod_tbl_01",
             "violations": 0,
             "steps": 0
           },
@@ -212032,6 +212185,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "ABC",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st_paymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "bigquery_table",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7_tk8_tk9_tk0_tk1_tk2_tk3_tk4_tk5_tk6_tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "cloud_function",
         "name": "aaa",
         "known": true,
@@ -227389,6 +227650,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -228107,6 +228369,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -228819,6 +229082,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -229538,6 +229802,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -230256,6 +230521,7 @@
           "gcp_dns_managed_zone = \"windows-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"windows-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"windows_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"windows_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"windows-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"windows-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -230970,6 +231236,7 @@
           "gcp_dns_managed_zone = \"google-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"google-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"google_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"google_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"google-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"google-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -231692,6 +231959,7 @@
           "gcp_dns_managed_zone = \"azure-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"azure-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"azure_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"azure_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"azure-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"azure-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -232429,6 +232697,7 @@
           "# INVALID: gcp_dns_managed_zone",
           "# INVALID: gcp_scheduler_job",
           "# INVALID: gcp_bigquery_dataset",
+          "# INVALID: gcp_bigquery_table",
           "# INVALID: gcp_redis_instance",
           "# INVALID: gcp_tasks_queue",
           "# INVALID: azure_resource_group",
@@ -233128,6 +233397,7 @@
           "gcp_dns_managed_zone = \"paymentsettlement-reconciliation-dev-dns-01\"",
           "gcp_scheduler_job = \"paymentsettlement-reconciliation-dev-cron-01\"",
           "gcp_bigquery_dataset = \"paymentsettlement_reconciliation_dev_bq\"",
+          "gcp_bigquery_table = \"paymentsettlement_reconciliation_dev_tbl_01\"",
           "gcp_redis_instance = \"paymentsettle-reconciliatio-dev-redis-01\"",
           "gcp_tasks_queue = \"paymentsettlement-reconciliation-dev-queue-01\"",
           "gcp_labels = {",
@@ -233846,6 +234116,7 @@
           "gcp_dns_managed_zone = \"a-long-longpurpose-prod-dns-01\"",
           "gcp_scheduler_job = \"a-long-longpurpose-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"a_long_longpurpose_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"a_long_longpurpose_prod_tbl_01\"",
           "gcp_redis_instance = \"a-long-longpurpose-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"a-long-longpurpose-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -234440,6 +234711,7 @@
           "gcp_cloudbuild_repository = \"3tier-trade-prod-repo-01\"",
           "gcp_scheduler_job = \"3tier-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"3tier_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"3tier_trade_prod_tbl_01\"",
           "gcp_tasks_queue = \"3tier-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
           "owner = \"platform\"",
@@ -235282,6 +235554,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
@@ -235989,6 +236262,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "azure_resource_group = \"rg-billing-trade-prod\"",
@@ -236692,6 +236966,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -237411,6 +237686,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",
@@ -238129,6 +238405,7 @@
           "gcp_dns_managed_zone = \"billing-trade-uat-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-uat-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_uat_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_uat_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-uat-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-uat-ane3-queue-01\"",
           "gcp_labels = {",
@@ -238671,6 +238948,7 @@
           "gcp_dns_managed_zone = \"billing-trade-prod-dns-01\"",
           "gcp_scheduler_job = \"billing-trade-prod-ane3-cron-01\"",
           "gcp_bigquery_dataset = \"billing_trade_prod_ane3_bq\"",
+          "gcp_bigquery_table = \"billing_trade_prod_tbl_01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
           "gcp_tasks_queue = \"billing-trade-prod-ane3-queue-01\"",
           "gcp_labels = {",

@@ -195,6 +195,16 @@ The REST reference states the characters and the uniqueness scope but no length,
 - **Characters.** Validation takes the document's set (letters of both cases, digits and `-._~%!$&'()*+,;=@`); the server accepted a leading digit, a leading or trailing hyphen, `_` and `.`. Generated names use lowercase letters, digits and hyphens.
 - **Abbreviation** `conn` — see the catalog row's `slug.basis`.
 
+## Google Cloud rules added on 2026-10-24 (D132–)
+
+Each rule below states its length and characters in an official REST reference or product guide, read on 2026-10-24. Where two official pages disagree, the rule takes the narrower one and carries `note.narrower_source_used`.
+
+| ruleId | `docUrl` | Quoted text | Rule |
+|---|---|---|---|
+| `gcp.bigquery_table` | https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id · uniqueness https://docs.cloud.google.com/bigquery/docs/tables#table_naming | "The ID can contain Unicode characters in category L (letter), M (mark), N (number), Pc (connector, including underscore), Pd (dash), and Zs (space). … The maximum length is 1,024 characters." · guide: "the table name must be unique per dataset. The table name can: Contain characters with a total of up to 1,024 UTF-8 bytes." | `^[A-Za-z0-9_ -]{1,1024}$`, 1–1024, `gcp:bigquery_dataset`, no region token, `note.narrower_source_used` |
+
+- **BigQuery table — characters and bytes.** The REST reference counts 1,024 characters, the guide 1,024 UTF-8 bytes. The engine counts characters, so the rule takes only the ASCII members of the five categories (letters, digits, `_`, `-`, space), where one character is one byte; a name such as `étudiant-01`, valid on BigQuery, is reported invalid. `\p{M}` would also admit default-ignorable marks (U+034F, U+FE00–FE0F) that every rule rejects. The guide adds "Some table names and table name prefixes are reserved" without a list, so nothing is encoded for it. A view is created with `tables.insert` and takes the same `tableId`. Generated names are joined with underscores like the dataset (`billing_shop_prod_tbl_01`), so a query names the table without quotes.
+
 ## Azure reserved words (added 2026-09-29)
 
 Source: https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words or trademarks in the name." The naming rules page (`resource-name-rules`) also says: "Resources with a public endpoint can't include reserved words or trademarks in the name." The ⑷ verdicts in the RULES table above were made before this document was consulted; for the rules listed below, this section supersedes ⑷.

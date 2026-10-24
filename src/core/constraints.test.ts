@@ -223,9 +223,9 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.cloud_function']!.entity).toBe('cloudfunctions.functions');
   });
 
-  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 20(D119 의 Cloud Build 저장소 포함) · D79 의 3 포함', () => {
+  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 21(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(64);
+    expect(none).toHaveLength(65);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -395,5 +395,30 @@ describe('Cloud Build 2세대 저장소 (D119)', () => {
     expect([r.minLength, r.maxLength]).toEqual([1, 59]);
     expect(conn.maxLength + r.maxLength + 23).toBeLessThanOrEqual(141);
     expect(r.notes?.map((n) => n.code)).toEqual(expect.arrayContaining(['note.observed_server_rule', 'note.narrower_source_used']));
+  });
+});
+
+describe('BigQuery 테이블 · 뷰 (D132)', () => {
+  const r = RULES['gcp.bigquery_table']!;
+  const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
+  it('데이터세트 안에서 유일 — 부모 범위 gcp:bigquery_dataset · 지역 토큰 없음(D77) · 약어 tbl', () => {
+    expect({ scope: r.scope, entity: r.entity, category: r.category, regionToken: r.regionToken, slug: r.slug })
+      .toEqual({ scope: 'gcp:bigquery_dataset', entity: 'bigquery.tables', category: 'database', regionToken: 'none', slug: 'tbl' });
+    expect(r.docUrl).toBe('https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id');
+    expect(r.uniquenessDocUrl).toBe('https://docs.cloud.google.com/bigquery/docs/tables#table_naming');
+  });
+  it('글자 — 원문 범주(L · M · N · Pc · Pd · Zs) 가운데 ASCII 만: 영숫자 · 밑줄 · 하이픈 · 공백. 그 밖은 받지 않는다(NARROWER)', () => {
+    for (const name of ['a', 'A', '1abc', '_a', 'table 01', 'sample_table', 'my-table']) expect(ok(name), name).toBe(true);
+    for (const name of ['étudiant-01', 'a.b', 'sample_table$20190123', 'a/b', 'a@b', '']) expect(ok(name), name).toBe(false);
+    expect(r.notes?.map((n) => n.code)).toEqual(['note.narrower_source_used']);
+  });
+  it('길이 1-1024 — 안내서의 1,024 UTF-8 바이트와 같다(ASCII 는 한 글자가 한 바이트)', () => {
+    expect([r.minLength, r.maxLength]).toEqual([1, 1024]);
+    expect(ok('a'.repeat(1024))).toBe(true);
+    expect(ok('a'.repeat(1025))).toBe(false);
+  });
+  it('생성은 데이터세트와 같이 밑줄로 잇는다', () => {
+    expect({ allowed: r.allowed, separator: r.separator, caseRule: r.caseRule }).toEqual({ allowed: 'lower-digit-underscore', separator: '_', caseRule: 'any' });
+    expect(r.template).not.toContain('region');
   });
 });

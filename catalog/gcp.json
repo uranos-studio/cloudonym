@@ -4511,6 +4511,40 @@
       ]
     },
     {
+      "key": "gcp.bigquery_table",
+      "displayName": "BigQuery Table",
+      "category": "database",
+      "rules": {
+        "gcp.bigquery_table": {
+          "scope": "in bigquery_dataset",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "tbl",
+        "basis": "Common short form of table, shorter than the word and read the same in SQL; joined with underscores like the dataset so a query can name the table without quotes; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+        "previous": []
+      },
+      "entity": null,
+      "kind": null,
+      "info": "A BigQuery table or view inside a dataset; Cloudonym accepts ASCII letters, digits, underscores, hyphens and spaces, at most 1,024 characters (the limit is 1,024 UTF-8 bytes), unique per dataset. Generated names are joined with underscores.",
+      "enterNameAt": {
+        "gcloud": [],
+        "terraform": [
+          "google_bigquery_table.table_id"
+        ],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "google_bigquery_table",
+        "bigquery tables",
+        "table",
+        "view"
+      ]
+    },
+    {
       "key": "gcp.redis_instance",
       "displayName": "Memorystore for Redis Instance",
       "category": "database",

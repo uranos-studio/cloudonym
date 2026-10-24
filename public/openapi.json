@@ -1254,7 +1254,8 @@
               "azure:tenant",
               "gcp:cloud_sql_instance",
               "gcp:router",
-              "gcp:cloudbuild_connection"
+              "gcp:cloudbuild_connection",
+              "gcp:bigquery_dataset"
             ],
             "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
             "example": "azure:resource_group"
@@ -2658,7 +2659,8 @@
               "azure:tenant",
               "gcp:cloud_sql_instance",
               "gcp:router",
-              "gcp:cloudbuild_connection"
+              "gcp:cloudbuild_connection",
+              "gcp:bigquery_dataset"
             ],
             "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
             "example": "azure:resource_group"
