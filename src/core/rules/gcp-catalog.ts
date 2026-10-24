@@ -4646,6 +4646,111 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       "google_cloud_tasks_queue",
       "tasks queues"
     ]
+  },
+  {
+    "key": "gcp.logging_sink",
+    "displayName": "Cloud Logging Sink",
+    "category": "management",
+    "rules": {
+      "gcp.logging_sink": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "sink",
+      "basis": "The product's own word, already short; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Logging sink that routes log entries to a destination; letters, digits, underscores, hyphens and periods, a letter or digit first, at most 100 characters, unique within the project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud logging sinks create"
+      ],
+      "terraform": [
+        "google_logging_project_sink.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_logging_project_sink",
+      "logging sinks",
+      "log router"
+    ]
+  },
+  {
+    "key": "gcp.logging_bucket",
+    "displayName": "Cloud Logging Bucket",
+    "category": "management",
+    "rules": {
+      "gcp.logging_bucket": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "log",
+      "basis": "Short and read as the log store; bucket would collide in meaning with the Cloud Storage bucket (gcs); principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Cloud Logging bucket that stores log entries in a location; letters, digits, underscores, hyphens and periods, a letter or digit first, at most 100 characters.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud logging buckets create"
+      ],
+      "terraform": [
+        "google_logging_project_bucket_config.bucket_id"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_logging_project_bucket_config",
+      "logging buckets",
+      "log bucket"
+    ]
+  },
+  {
+    "key": "gcp.logging_metric",
+    "displayName": "Log-based Metric",
+    "category": "management",
+    "rules": {
+      "gcp.logging_metric": {
+        "scope": "project",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "lbm",
+      "basis": "Initials of log-based metric; metric alone would read as a Cloud Monitoring metric; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-24)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A log-based metric counted from log entries; letters, digits and _-.,+!*',()%/ (not / first), at most 100 characters, unique within the project. Cloudonym generates lowercase letters, digits and hyphens.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud logging metrics create"
+      ],
+      "terraform": [
+        "google_logging_metric.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_logging_metric",
+      "logging metrics",
+      "log metric"
+    ]
   }
 ];
 

@@ -4,11 +4,12 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-24.3. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-24.4. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.
 
 ### Added
 
 - **BigQuery table** (D132) — `gcp.bigquery_table` (`tbl`, `google_bigquery_table.table_id`, tables and views), unique per dataset under a new `gcp:bigquery_dataset` scope, no region token. Validation takes the ASCII letters, digits, `_`, `-` and spaces of the documented Unicode categories, at most 1,024 characters, because the guide limits the name to 1,024 UTF-8 bytes; generated names are joined with underscores like the dataset. 139 Google Cloud rules.
+- **Cloud Logging sink, log bucket and log-based metric** (D133) — `gcp.logging_sink` (`sink`, `google_logging_project_sink.name`), `gcp.logging_bucket` (`log`, `google_logging_project_bucket_config.bucket_id`, with a region token) and `gcp.logging_metric` (`lbm`, `google_logging_metric.name`): 1–100 characters each; sinks and buckets take letters, digits, `_`, `-` and `.` with a letter or digit first, metrics also `,+!*'()%/` but not `/` first. 142 Google Cloud rules.
 
 ## [0.2.0] - 2026-10-24
 

@@ -1995,6 +1995,74 @@
       "my queue"
     ]
   },
+  "gcp.logging_sink": {
+    "valid": [
+      "a",
+      "A",
+      "1",
+      "my-syslog-errors-to-pubsub",
+      "a_b",
+      "a.b",
+      "a-",
+      "Sink.01_x",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "shop-prod-sink-01"
+    ],
+    "invalid": [
+      "_a",
+      "-a",
+      ".a",
+      "a b",
+      "a/b",
+      "a@b",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.logging_bucket": {
+    "valid": [
+      "a",
+      "A",
+      "1",
+      "my-bucket",
+      "a_b",
+      "a.b",
+      "a-",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "shop-prod-ane3-log-01"
+    ],
+    "invalid": [
+      "_Default",
+      "_Required",
+      "-a",
+      ".a",
+      "a b",
+      "a/b",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
+  "gcp.logging_metric": {
+    "valid": [
+      "a",
+      "error_count",
+      "nginx/requests",
+      "a-b.c,d+e!f*g'h(i)j%k",
+      "_a",
+      "-a",
+      "a/",
+      "Metric01",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "shop-prod-lbm-01"
+    ],
+    "invalid": [
+      "/a",
+      "a b",
+      "a:b",
+      "a@b",
+      "a#b",
+      "a\"b",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  },
   "gcp.run_job": {
     "valid": [
       "a",

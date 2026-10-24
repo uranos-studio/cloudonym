@@ -225,7 +225,7 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
 
   it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 21(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(65);
+    expect(none).toHaveLength(67);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -420,5 +420,27 @@ describe('BigQuery 테이블 · 뷰 (D132)', () => {
   it('생성은 데이터세트와 같이 밑줄로 잇는다', () => {
     expect({ allowed: r.allowed, separator: r.separator, caseRule: r.caseRule }).toEqual({ allowed: 'lower-digit-underscore', separator: '_', caseRule: 'any' });
     expect(r.template).not.toContain('region');
+  });
+});
+
+describe('Cloud Logging 싱크 · 버킷 · 로그 기반 지표 (D133)', () => {
+  const ok = (id: string, name: string) => { const r = RULES[id]!; return r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength; };
+  it('범위 · 지역 토큰 · 약어 — 싱크와 지표는 프로젝트에 하나(위치 없음), 버킷은 위치 아래', () => {
+    const pick = (id: string) => { const r = RULES[id]!; return { scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength }; };
+    expect(pick('gcp.logging_sink')).toEqual({ scope: 'gcp:project', entity: 'logging.sinks', regionToken: 'none', slug: 'sink', min: 1, max: 100 });
+    expect(pick('gcp.logging_bucket')).toEqual({ scope: 'gcp:project_location', entity: 'logging.buckets', regionToken: 'region', slug: 'log', min: 1, max: 100 });
+    expect(pick('gcp.logging_metric')).toEqual({ scope: 'gcp:project', entity: 'logging.metrics', regionToken: 'none', slug: 'lbm', min: 1, max: 100 });
+    expect(RULES['gcp.logging_bucket']!.notes?.map((n) => n.code)).toEqual(['note.scope_unconfirmed']);
+    for (const id of ['gcp.logging_sink', 'gcp.logging_bucket', 'gcp.logging_metric']) expect(RULES[id]!.docUrl, id).toMatch(/^https:\/\/docs\.cloud\.google\.com\/logging\/docs\/reference\/v2\/rest\/v2\//);
+  });
+  it('싱크 · 버킷 — 영숫자로 시작 · 영숫자 · 밑줄 · 하이픈 · 마침표 · 100자', () => {
+    for (const id of ['gcp.logging_sink', 'gcp.logging_bucket']) {
+      for (const name of ['a', 'A1', 'my-syslog-errors-to-pubsub', 'a_b.c-', 'a'.repeat(100)]) expect(ok(id, name), `${id} ${name}`).toBe(true);
+      for (const name of ['_Default', '-a', '.a', 'a b', 'a/b', 'a'.repeat(101), '']) expect(ok(id, name), `${id} ${name}`).toBe(false);
+    }
+  });
+  it('지표 — 영숫자와 _-.,+!*\',()%/ · 슬래시로 시작하지 않는다 · 100자', () => {
+    for (const name of ['error_count', 'nginx/requests', "a-b.c,d+e!f*g'h(i)j%k", '_a', 'a'.repeat(100)]) expect(ok('gcp.logging_metric', name), name).toBe(true);
+    for (const name of ['/a', 'a b', 'a:b', 'a@b', 'a'.repeat(101), '']) expect(ok('gcp.logging_metric', name), name).toBe(false);
   });
 });
