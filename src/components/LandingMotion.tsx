@@ -1,4 +1,4 @@
-// 소개 페이지의 움직이는 소개 (D129) — 3~4초 한 번, 반복 없음. 다섯 문맥값이 차례로 들어오고 → 화살표 → 이름 하나가 조립되고 → PASS.
+// 소개 페이지의 움직이는 소개 (D129) — 6초마다 되풀이한다(시각은 index.css 의 keyframes). 다섯 문맥값이 차례로 들어오고 → 화살표 → 이름 하나가 조립되고 → PASS.
 // 값 · 이름 · 판정은 introExamples.json(빌드 때 엔진이 만든 값)에서만 온다 — 이 파일은 이름을 짓지 않는다. PASS 는 그 줄이 valid:true 일 때만 그린다.
 // 움직임은 CSS @keyframes(src/index.css 의 landing-*)와 인라인 SVG 뿐이다 — 스크립트 타이머 · style 속성이 없다(CSP style-src 'self').
 // 클래스를 뗀 쉬는 상태가 마지막 장면이다 — prefers-reduced-motion: reduce 면 CSS 가 animation 을 끄고 마지막 장면만 보인다.
