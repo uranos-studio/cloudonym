@@ -2880,11 +2880,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -9264,11 +9264,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -15648,11 +15648,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -22032,11 +22032,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -28416,11 +28416,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "windows-trade-prod-ane3-cmap-01",
+            "name": "windows-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "windows-trade-prod-ane3-cmap-01",
+            "original": "windows-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -34800,11 +34800,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "google-trade-prod-ane3-cmap-01",
+            "name": "google-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "google-trade-prod-ane3-cmap-01",
+            "original": "google-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -41184,11 +41184,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "azure-trade-prod-ane3-cmap-01",
+            "name": "azure-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "azure-trade-prod-ane3-cmap-01",
+            "original": "azure-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -47572,7 +47572,7 @@
             "valid": false,
             "isTruncated": false,
             "isTransformed": true,
-            "original": "매매-trade-prod-ane3-cmap-01",
+            "original": "매매-trade-prod-cmap-01",
             "violations": 1,
             "steps": 1
           },
@@ -60336,11 +60336,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "a-long-longpurpose-prod-ane3-cmap-01",
+            "name": "a-long-longpurpose-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "a-long-longpurpose-prod-ane3-cmap-01",
+            "original": "a-long-longpurpose-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -66720,11 +66720,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "3tier-trade-prod-ane3-cmap-01",
+            "name": "3tier-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "3tier-trade-prod-ane3-cmap-01",
+            "original": "3tier-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -73104,11 +73104,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -79488,11 +79488,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -85872,11 +85872,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -92256,11 +92256,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -98664,11 +98664,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-uat-ane3-cmap-01",
+            "name": "billing-trade-uat-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-uat-ane3-cmap-01",
+            "original": "billing-trade-uat-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -103539,11 +103539,11 @@
             "steps": 0
           },
           "certificate_map": {
-            "name": "billing-trade-prod-ane3-cmap-01",
+            "name": "billing-trade-prod-cmap-01",
             "valid": true,
             "isTruncated": false,
             "isTransformed": false,
-            "original": "billing-trade-prod-ane3-cmap-01",
+            "original": "billing-trade-prod-cmap-01",
             "violations": 0,
             "steps": 0
           },
@@ -231313,7 +231313,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -232046,7 +232046,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -232773,7 +232773,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -233507,7 +233507,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -234240,7 +234240,7 @@
           "gcp_logging_metric = \"windows-trade-prod-lbm-01\"",
           "gcp_workflow = \"windows-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"windows-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"windows-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"windows-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"windows-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"windows-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"windows-trade-prod-ane3-evt-01\"",
@@ -234969,7 +234969,7 @@
           "gcp_logging_metric = \"google-trade-prod-lbm-01\"",
           "gcp_workflow = \"google-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"google-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"google-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"google-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"google-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"google-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"google-trade-prod-ane3-evt-01\"",
@@ -235706,7 +235706,7 @@
           "gcp_logging_metric = \"azure-trade-prod-lbm-01\"",
           "gcp_workflow = \"azure-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"azure-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"azure-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"azure-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"azure-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"azure-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"azure-trade-prod-ane3-evt-01\"",
@@ -237905,7 +237905,7 @@
           "gcp_logging_metric = \"a-long-longpurpose-prod-lbm-01\"",
           "gcp_workflow = \"a-long-longpurpose-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"a-long-longpurpose-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"a-long-longpurpose-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"a-long-longpurpose-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"a-long-longpurpose-prod-cme-01\"",
           "gcp_dns_authorization = \"a-long-longpurpose-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"a-long-longpurpose-prod-ane3-evt-01\"",
@@ -238510,7 +238510,7 @@
           "gcp_logging_bucket = \"3tier-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"3tier-trade-prod-lbm-01\"",
           "gcp_certificate_manager_certificate = \"3tier-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"3tier-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"3tier-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"3tier-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"3tier-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"3tier-trade-prod-tagk-01\"",
@@ -239371,7 +239371,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -240093,7 +240093,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -240811,7 +240811,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -241545,7 +241545,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
@@ -242278,7 +242278,7 @@
           "gcp_logging_metric = \"billing-trade-uat-lbm-01\"",
           "gcp_workflow = \"billing-trade-uat-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-uat-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-uat-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-uat-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-uat-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-uat-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-uat-ane3-evt-01\"",
@@ -242835,7 +242835,7 @@
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
           "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
-          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",

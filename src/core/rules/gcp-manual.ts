@@ -57,24 +57,36 @@ const GKE_NODE_POOL = 'https://docs.cloud.google.com/kubernetes-engine/docs/refe
 const GKE_NODE_POOL_EVIDENCE: readonly RuleEvidence[] = [
   { kind: 'api_error', source: 'POST https://container.googleapis.com/v1/projects/<project>/locations/asia-northeast3-a/clusters/<cluster>/nodePools', date: '2026-10-25',
     quote: "Invalid value for field \"node_pool.name\": \"<id>\". Must be a match of regex '(?:[a-z](?:[-a-z0-9]{0,38}[a-z0-9])?)' (only lowercase alphanumerics and '-' allowed, must start with a letter and end with an alphanumeric, and must be no longer than 40 characters). — for A, a_b, a.b, -a, a- and 1a; 41 characters answer Node_pool.name must be less than 40 characters.; a and 40 characters were created (0 nodes) and deleted with the cluster" },
+  { kind: 'api_error', source: 'POST https://container.googleapis.com/v1/projects/<project>/locations/asia-northeast3-a/clusters/<cluster>/nodePools', date: '2026-10-25',
+    quote: 'Already exists: projects/<project>/zones/asia-northeast3-a/clusters/<cluster>/nodePools/np. (409) — a second pool np in the same cluster; a pool np in a second cluster of the same zone was created' },
 ];
 
 const CM_REST = 'https://docs.cloud.google.com/certificate-manager/docs/reference/certificate-manager/rest/v1/projects.locations';
 /** Certificate Manager ID 넷 (D138) — create 의 ID 칸은 "A user-provided name of the …" 뿐이다. 서버가 넷에 같은 문장으로 답한다 */
 const CM_ID = /^[a-z0-9-]{1,63}$/;
 const CM_MESSAGE = 'resource id must consists of no more than 63 characters: lower case letters, digits and hyphens';
-const cmEvidence = (path: string, body: string, outcome: string): readonly RuleEvidence[] => [
+const cmEvidence = (path: string, body: string, outcome: string, ...more: RuleEvidence[]): readonly RuleEvidence[] => [
   { kind: 'api_error', source: `POST https://certificatemanager.googleapis.com/v1/projects/<project>/locations/global/${path}`, date: '2026-10-25',
     quote: `${CM_MESSAGE} — body ${body}; ${outcome}` },
+  ...more,
 ];
+const cmMore = (location: string, path: string, quote: string): RuleEvidence =>
+  ({ kind: 'api_error', source: `POST https://certificatemanager.googleapis.com/v1/projects/<project>/locations/${location}/${path}`, date: '2026-10-25', quote });
 const CM_CERTIFICATE_EVIDENCE = cmEvidence('certificates?certificateId=<id>', '{"managed":{"domains":[…]}}',
-  'for A, a_b, a.b and 64 characters; -, -a, a-, 1a and 63 characters were created and deleted');
+  'for A, a_b, a.b and 64 characters; -, -a, a-, 1a and 63 characters were created and deleted',
+  cmMore('asia-northeast3', 'certificates?certificateId=<id>', `${CM_MESSAGE} — the same for A, a_b and 64 characters in a region; -, -a, a-, 1a and 63 characters were created with a regional DNS authorization and deleted`),
+  cmMore('asia-northeast3', 'certificates?certificateId=-a', "Resource 'projects/<project>/locations/asia-northeast3/certificates/-a' already exists (409) — a second -a in the same location; -a in global was created"));
 const CM_MAP_EVIDENCE = cmEvidence('certificateMaps?certificateMapId=<id>', '{}',
-  'for A, a_b, a.b, _a and 64 characters; -, 9, -a, a-, 1a, a--b and 63 characters were created and deleted; an empty ID answers Malformed name');
+  'for A, a_b, a.b, _a and 64 characters; -, 9, -a, a-, 1a, a--b and 63 characters were created and deleted; an empty ID answers Malformed name',
+  cmMore('asia-northeast3', 'certificateMaps?certificateMapId=<id>', "Malformed name: 'projects/<project>/locations/asia-northeast3/certificateMaps/<id>' for every ID, and listing maps there answers Invalid location in resource URL path — maps exist in global only"),
+  cmMore('global', 'certificateMaps?certificateMapId=u1', "Resource 'projects/<project>/locations/global/certificateMaps/u1' already exists (409) — a second map u1"));
 const CM_MAP_ENTRY_EVIDENCE = cmEvidence('certificateMaps/<map>/certificateMapEntries?certificateMapEntryId=<id>', '{"matcher":"PRIMARY","certificates":[…]}',
-  'for A and a_b; a.b and 64 characters answered Validation failed; -, 1, -a, a- and 63 characters were created and deleted');
+  'for A and a_b; a.b and 64 characters answered Validation failed; -, 1, -a, a- and 63 characters were created and deleted',
+  cmMore('global', 'certificateMaps/u1/certificateMapEntries?certificateMapEntryId=e', "Resource 'projects/<project>/locations/global/certificateMaps/u1/certificateMapEntries/e' already exists (409) — a second entry e in map u1; an entry e in map u2 was created"));
 const CM_DNS_AUTHORIZATION_EVIDENCE = cmEvidence('dnsAuthorizations?dnsAuthorizationId=<id>', '{"domain":"…"}',
-  'for A, a_b and 64 characters; -, 9, -a, a- and 63 characters were created and deleted');
+  'for A, a_b and 64 characters; -, 9, -a, a- and 63 characters were created and deleted',
+  cmMore('asia-northeast3', 'dnsAuthorizations?dnsAuthorizationId=<id>', `${CM_MESSAGE} — the same for A, a_b and 64 characters in a region; -, -a, a-, 1a and 63 characters were created and deleted`),
+  cmMore('asia-northeast3', 'dnsAuthorizations?dnsAuthorizationId=-a', 'DNS Authorization "projects/<number>/locations/asia-northeast3/dnsAuthorizations/-a" already exists (409) — a second -a in the same location; -a in global was created'));
 
 const EVENTARC_TRIGGERS = 'https://docs.cloud.google.com/eventarc/docs/reference/rest/v1/projects.locations.triggers';
 /** Eventarc 트리거 (D139) — triggerId 는 "The user-provided ID to be assigned to the trigger." 뿐이다. 서버가 정규식과 길이를 답한다 */
@@ -157,10 +169,10 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // 안내서 "When you create a table in BigQuery, the table name must be unique per dataset." — 테이블 · 뷰는 데이터세트 아래다 (D132)
   'gcp:bigquery_dataset': { id: 'gcp:bigquery_dataset', provider: 'gcp', displayName: 'BigQuery dataset', parent: 'gcp:project', ruleId: 'gcp.bigquery_dataset', docUrl: BQ_TABLE_NAMING },
   // TagValue.shortName "The short name should be unique for TagValues within the same parent TagKey." — 값은 키 아래다 (D135)
-  // 노드 풀은 clusters/{cluster}/nodePools 아래다 — 유일 범위 문장은 없다(규칙 notes) (D137)
+  // 노드 풀은 clusters/{cluster}/nodePools 아래다 — 같은 클러스터의 같은 이름은 409, 다른 클러스터는 만들어진다(evidence) (D137)
   'gcp:gke_cluster': { id: 'gcp:gke_cluster', provider: 'gcp', displayName: 'GKE cluster', parent: 'gcp:project_location', ruleId: 'gcp.gke_cluster', docUrl: GKE_NODE_POOL },
-  // 맵 항목은 certificateMaps/{map}/certificateMapEntries 아래다 — 유일 범위 문장은 없다(규칙 notes) (D138)
-  'gcp:certificate_map': { id: 'gcp:certificate_map', provider: 'gcp', displayName: 'Certificate map', parent: 'gcp:project_location', ruleId: 'gcp.certificate_map', docUrl: `${CM_REST}.certificateMaps.certificateMapEntries/create#body.QUERY_PARAMETERS.certificate_map_entry_id` },
+  // 맵 항목은 certificateMaps/{map}/certificateMapEntries 아래다 — 같은 맵의 같은 이름은 409, 다른 맵은 만들어진다(evidence) (D138)
+  'gcp:certificate_map': { id: 'gcp:certificate_map', provider: 'gcp', displayName: 'Certificate map', parent: 'gcp:project_global', ruleId: 'gcp.certificate_map', docUrl: `${CM_REST}.certificateMaps.certificateMapEntries/create#body.QUERY_PARAMETERS.certificate_map_entry_id` },
   'gcp:tag_key': { id: 'gcp:tag_key', provider: 'gcp', displayName: 'Tag key', parent: 'gcp:project', ruleId: 'gcp.tag_key', docUrl: `${RM_V3}/tagValues#TagValue.FIELDS.short_name` },
 };
 
@@ -212,7 +224,7 @@ const RULES: ResourceRule[] = [
   // 노드 풀 (D137) — NodePool.name "The name of the node pool." 뿐이다. 2026-10-25 탐침(nodePools.create, 노드 0개): A · a_b · a.b · -a · a- · 1a 는 정규식 오류,
   // 41자는 "must be less than 40 characters", a · 40자는 만들어졌다(클러스터와 함께 지웠다). 서버 규칙 = 클러스터와 같은 꼴 1-40. 위치는 부모 클러스터의 것이다 — 지역 토큰이 없다(D77)
   rule({ id: 'gcp.gke_node_pool', displayName: 'GKE Node Pool', slug: 'np', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,
-    scope: 'gcp:gke_cluster', entity: 'container.nodePools', category: 'containers', docUrl: GKE_NODE_POOL, evidence: GKE_NODE_POOL_EVIDENCE, notes: [OBSERVED, SCOPE] }),
+    scope: 'gcp:gke_cluster', entity: 'container.nodePools', category: 'containers', docUrl: GKE_NODE_POOL, evidence: GKE_NODE_POOL_EVIDENCE, notes: [OBSERVED] }),
 
   // ── Artifact Registry ──
   // 저장소 (D80) — 안내서 · REST 참조 · gcloud 어디에도 길이 · 문자 문장이 없다("Required. The repository id to use for this repository."). 유일 범위만 있다:
@@ -385,20 +397,21 @@ const RULES: ResourceRule[] = [
     docUrl: 'https://docs.cloud.google.com/workflows/docs/reference/rest/v1/projects.locations.workflows/create#body.QUERY_PARAMETERS.workflow_id' }),
   // ── Certificate Manager (D138) — 문서에 길이 · 글자 문장이 없다. 2026-10-25 탐침(locations/global): 넷 모두 대문자 · 밑줄 · 마침표 · 64자를 거부하고
   // 하이픈 하나(-) · 하이픈으로 시작 · 끝 · 숫자로 시작 · 63자를 만들었다(만든 것은 모두 지웠다). 서버 규칙 = 소문자 · 숫자 · 하이픈 1-63, 앞뒤 제한 없음.
-  // 위치는 global 또는 리전이다 — 지역 토큰을 둔다(Logging 버킷과 같다). 유일 범위 문장은 없다(notes)
+  // 인증서 · DNS 인증의 위치는 global 또는 리전이다(리전 asia-northeast3 도 같은 규칙) — 지역 토큰을 둔다. 같은 위치의 같은 이름은 409, 다른 위치는 만들어진다(evidence)
   rule({ id: 'gcp.certificate_manager_certificate', displayName: 'Certificate Manager Certificate', slug: 'cmc', minLength: 1, maxLength: 63, pattern: CM_ID,
     startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'certificatemanager.certificates', category: 'networking',
-    docUrl: `${CM_REST}.certificates/create#body.QUERY_PARAMETERS.certificate_id`, evidence: CM_CERTIFICATE_EVIDENCE, notes: [OBSERVED, SCOPE] }),
-  rule({ id: 'gcp.certificate_map', displayName: 'Certificate Map', slug: 'cmap', minLength: 1, maxLength: 63, pattern: CM_ID,
-    startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'certificatemanager.certificateMaps', category: 'networking',
-    docUrl: `${CM_REST}.certificateMaps/create#body.QUERY_PARAMETERS.certificate_map_id`, evidence: CM_MAP_EVIDENCE, notes: [OBSERVED, SCOPE] }),
+    docUrl: `${CM_REST}.certificates/create#body.QUERY_PARAMETERS.certificate_id`, evidence: CM_CERTIFICATE_EVIDENCE, notes: [OBSERVED] }),
+  // 맵은 global 에만 있다 — 리전 위치는 모든 ID 에 Malformed name(evidence). gcp:project_global · 지역 토큰 없음
+  rule({ id: 'gcp.certificate_map', displayName: 'Certificate Map', slug: 'cmap', minLength: 1, maxLength: 63, pattern: CM_ID, template: UNPLACED,
+    startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_global', entity: 'certificatemanager.certificateMaps', category: 'networking',
+    docUrl: `${CM_REST}.certificateMaps/create#body.QUERY_PARAMETERS.certificate_map_id`, evidence: CM_MAP_EVIDENCE, notes: [OBSERVED] }),
   // 맵 항목 — 위치는 부모 맵의 것이다 — 지역 토큰이 없다(D77)
   rule({ id: 'gcp.certificate_map_entry', displayName: 'Certificate Map Entry', slug: 'cme', minLength: 1, maxLength: 63, pattern: CM_ID,
     startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:certificate_map', entity: 'certificatemanager.certificateMapEntries', category: 'networking',
-    docUrl: `${CM_REST}.certificateMaps.certificateMapEntries/create#body.QUERY_PARAMETERS.certificate_map_entry_id`, evidence: CM_MAP_ENTRY_EVIDENCE, notes: [OBSERVED, SCOPE] }),
+    docUrl: `${CM_REST}.certificateMaps.certificateMapEntries/create#body.QUERY_PARAMETERS.certificate_map_entry_id`, evidence: CM_MAP_ENTRY_EVIDENCE, notes: [OBSERVED] }),
   rule({ id: 'gcp.dns_authorization', displayName: 'Certificate Manager DNS Authorization', slug: 'dnsa', minLength: 1, maxLength: 63, pattern: CM_ID,
     startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'certificatemanager.dnsAuthorizations', category: 'networking',
-    docUrl: `${CM_REST}.dnsAuthorizations/create#body.QUERY_PARAMETERS.dns_authorization_id`, evidence: CM_DNS_AUTHORIZATION_EVIDENCE, notes: [OBSERVED, SCOPE] }),
+    docUrl: `${CM_REST}.dnsAuthorizations/create#body.QUERY_PARAMETERS.dns_authorization_id`, evidence: CM_DNS_AUTHORIZATION_EVIDENCE, notes: [OBSERVED] }),
   // ── Eventarc (D139) — 문서에 길이 · 글자 문장이 없다. Trigger.name "Must be unique within the location of the project" 만 있다.
   // 2026-10-25 탐침: 서버가 "^[a-z][a-z0-9-]*[a-z0-9]$" · "min allowed length is 2" · "max allowed length is 63" 으로 답했다. ab · a1 · 63자를 만들고 지웠다
   rule({ id: 'gcp.eventarc_trigger', displayName: 'Eventarc Trigger', slug: 'evt', minLength: 2, maxLength: 63, pattern: /^[a-z][a-z0-9-]{0,61}[a-z0-9]$/,

@@ -4880,7 +4880,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "A node pool of a GKE Standard cluster; lowercase letters, digits and hyphens, a letter first and a letter or digit last, at most 40 characters (measured on the API, no documented rule).",
+      "info": "A node pool of a GKE Standard cluster; lowercase letters, digits and hyphens, a letter first and a letter or digit last, at most 40 characters, unique within the cluster (measured on the API, no documented rule).",
       "enterNameAt": {
         "gcloud": [
           "gcloud container node-pools create"
@@ -4914,7 +4914,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "A Certificate Manager certificate (Google-managed or uploaded) used through a certificate map or directly by a load balancer; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+      "info": "A Certificate Manager certificate (Google-managed or uploaded) used through a certificate map or directly by a load balancer; lowercase letters, digits and hyphens in any position, at most 63 characters, unique per location and project (measured on the API, no documented rule).",
       "enterNameAt": {
         "gcloud": [
           "gcloud certificate-manager certificates create"
@@ -4937,8 +4937,8 @@
       "category": "networking",
       "rules": {
         "gcp.certificate_map": {
-          "scope": "location",
-          "regionToken": "region"
+          "scope": "global",
+          "regionToken": "none"
         }
       },
       "slug": {
@@ -4948,7 +4948,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "A Certificate Manager certificate map that a target HTTPS or SSL proxy points to; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+      "info": "A Certificate Manager certificate map that a target HTTPS or SSL proxy points to, global only; lowercase letters, digits and hyphens in any position, at most 63 characters, unique in the project (measured on the API, no documented rule).",
       "enterNameAt": {
         "gcloud": [
           "gcloud certificate-manager maps create"
@@ -4982,7 +4982,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "An entry of a certificate map that binds a host name (or the primary matcher) to certificates; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+      "info": "An entry of a certificate map that binds a host name (or the primary matcher) to certificates; lowercase letters, digits and hyphens in any position, at most 63 characters, unique within the map (measured on the API, no documented rule).",
       "enterNameAt": {
         "gcloud": [
           "gcloud certificate-manager maps entries create"
@@ -5016,7 +5016,7 @@
       },
       "entity": null,
       "kind": null,
-      "info": "A Certificate Manager DNS authorization that proves domain control for Google-managed certificates; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+      "info": "A Certificate Manager DNS authorization that proves domain control for Google-managed certificates; lowercase letters, digits and hyphens in any position, at most 63 characters, unique per location and project (measured on the API, no documented rule).",
       "enterNameAt": {
         "gcloud": [
           "gcloud certificate-manager dns-authorizations create"

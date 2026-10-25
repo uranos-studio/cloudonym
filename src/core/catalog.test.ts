@@ -102,13 +102,13 @@ describe('regionToken 불변식 (§4-1)', () => {
   const D79 = ['gcp.iam_policy_binding', 'gcp.iam_principal_access_boundary_policy', 'gcp.iam_workforce_pool'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 35 + 10 + 24 + 3 · region 81 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
+  it('none 36 + 10 + 24 + 3 · region 80 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([72, 0, 81]);
-    // none 의 내역 — gcp:project_global 35(D136 의 네트워크 방화벽 정책 포함) · 그 밖 9(Project ID · Project name · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘 · Logging 싱크 · 로그 기반 지표 — D133 · 태그 키 — D135) — 버킷 · BigQuery 데이터세트는 D78 로 region
+    expect([count('none'), count('zone'), count('region')]).toEqual([73, 0, 80]);
+    // none 의 내역 — gcp:project_global 36(D136 의 네트워크 방화벽 정책 · D138 의 인증서 맵 포함) · 그 밖 9(Project ID · Project name · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘 · Logging 싱크 · 로그 기반 지표 — D133 · 태그 키 — D135) — 버킷 · BigQuery 데이터세트는 D78 로 region
     // · D77 의 24(위치가 없는 리소스 · 부모의 위치를 물려받는 자식 — D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 · D138 의 인증서 맵 항목 포함) · D79 의 3(위치가 global 하나인 IAM)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
-    expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(35);
+    expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(36);
     expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global' && !D77.includes(id) && !D79.includes(id)).sort()).toEqual(['gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.logging_metric', 'gcp.logging_sink', 'gcp.project_id', 'gcp.project_name', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.tag_key']);
     for (const id of [...D77, ...D79]) expect(none, id).toContain(id);
   });

@@ -227,13 +227,13 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
 
   it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 24(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 · D138 의 인증서 맵 항목 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(72);
+    expect(none).toHaveLength(73);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
     }
     const global = rulesFor('gcp').filter((r) => r.scope === 'gcp:project_global');
-    expect(global).toHaveLength(35);
+    expect(global).toHaveLength(36);
     for (const r of global) expect(r.template, r.id).not.toContain('region');
     expect(RULES['gcp.global_network_endpoint_group']!.template).toEqual(['system', 'purpose', 'env', 'slug', 'kind', 'tier', 'seq']);
   });
@@ -518,11 +518,13 @@ describe('네트워크 방화벽 정책 — 전역 · 지역 (D136)', () => {
 describe('GKE 노드 풀 (D137) — 문서에 규칙이 없어 서버 응답으로 정했다', () => {
   const r = RULES['gcp.gke_node_pool']!;
   const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
-  it('클러스터 안에서 · 지역 토큰 없음 · 약어 np · 길이 1-40 · 근거는 api_error', () => {
+  it('클러스터 안에서(409 로 잼) · 지역 토큰 없음 · 약어 np · 길이 1-40 · 근거는 api_error', () => {
     expect({ scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength })
       .toEqual({ scope: 'gcp:gke_cluster', entity: 'container.nodePools', regionToken: 'none', slug: 'np', min: 1, max: 40 });
-    expect(r.evidence?.map((e) => [e.kind, e.date])).toEqual([['api_error', '2026-10-25']]);
-    expect(r.notes?.map((n) => n.code)).toEqual(['note.observed_server_rule', 'note.scope_unconfirmed']);
+    expect(r.evidence?.map((e) => [e.kind, e.date])).toEqual([['api_error', '2026-10-25'], ['api_error', '2026-10-25']]);
+    // 같은 클러스터의 같은 이름은 409, 다른 클러스터는 만들어졌다 — 범위를 쟀다
+    expect(r.evidence?.[1]?.quote).toContain('(409)');
+    expect(r.notes?.map((n) => n.code)).toEqual(['note.observed_server_rule']);
   });
   it('소문자로 시작 · 영숫자로 끝 · 그 사이 소문자 · 숫자 · 하이픈 — 서버가 거부한 이름은 거부한다', () => {
     for (const name of ['a', 'a1', 'a--b', 'm'.repeat(40)]) expect(ok(name), name).toBe(true);
@@ -533,14 +535,15 @@ describe('GKE 노드 풀 (D137) — 문서에 규칙이 없어 서버 응답으�
 describe('Certificate Manager 인증서 · 맵 · 맵 항목 · DNS 인증 (D138) — 문서에 규칙이 없어 서버 응답으로 정했다', () => {
   const ids = ['gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry', 'gcp.dns_authorization'];
   const ok = (id: string, name: string) => { const r = RULES[id]!; return r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength; };
-  it('맵 항목만 맵 안에서 · 지역 토큰 없음 — 나머지 셋은 위치마다 · 지역 토큰 · 근거는 api_error', () => {
+  it('맵은 global 하나 · 맵 항목은 맵 안 — 둘 다 지역 토큰 없음 · 인증서 · DNS 인증은 위치마다 · 지역 토큰 · 범위는 409 로 쟀다', () => {
     const pick = (id: string) => { const r = RULES[id]!; return [r.scope, r.regionToken, r.slug, r.minLength, r.maxLength]; };
     expect(ids.map(pick)).toEqual([
-      ['gcp:project_location', 'region', 'cmc', 1, 63], ['gcp:project_location', 'region', 'cmap', 1, 63],
+      ['gcp:project_location', 'region', 'cmc', 1, 63], ['gcp:project_global', 'none', 'cmap', 1, 63],
       ['gcp:certificate_map', 'none', 'cme', 1, 63], ['gcp:project_location', 'region', 'dnsa', 1, 63]]);
     for (const id of ids) {
-      expect(RULES[id]!.evidence?.map((e) => [e.kind, e.date]), id).toEqual([['api_error', '2026-10-25']]);
-      expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.observed_server_rule', 'note.scope_unconfirmed']);
+      expect(RULES[id]!.evidence?.every((e) => e.kind === 'api_error' && e.date === '2026-10-25'), id).toBe(true);
+      expect(RULES[id]!.evidence?.some((e) => e.quote.includes('(409)')), id).toBe(true);
+      expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.observed_server_rule']);
     }
   });
   it('소문자 · 숫자 · 하이픈만 · 앞뒤 제한 없음 · 63자 — 서버가 만든 이름은 받고 거부한 이름은 거부한다', () => {

@@ -27,8 +27,8 @@ const webNames = (plan: WizardPlan, env: Env) => generateProject(expandPlan(with
 const apiNames = (body: { data: { gcp: { items: { key: string; name: string; valid: boolean }[] } } }) => body.data.gcp.items.map((i) => [i.key, i.name, i.valid]);
 
 describe('계획 파일 → POST /v1/wizard (D100)', () => {
-  it('규칙 버전 — 0.1.12 마법사 카드 표(D123~D127)와 0.2.0 AWS 켜기를 합친 값이다(2026-10-24.1 은 라벨 ASCII 빠른 길 — 출력 불변 · 엔진 소스만 바뀜 · 2026-10-24.2 는 RDS Blue/Green 배포 규칙 — D131 · 2026-10-24.3 은 BigQuery 테이블 규칙 — D132 · 2026-10-24.4 는 Logging 규칙 셋 — D133 · 2026-10-24.5 는 Workflows 규칙 — D134 · 2026-10-24.6 은 태그 키 · 값 규칙 — D135 · 2026-10-24.7 은 네트워크 방화벽 정책 규칙 — D136 · 2026-10-24.8 은 리뷰 반영 — D133 지표 · 버킷 위치 · 2026-10-24.9 는 D132 테이블 앞뒤 공백 · 2026-10-24.10 은 D136 안내 문구 · 2026-10-25.1 은 GKE 노드 풀 규칙 — D137 · 2026-10-25.2 는 Certificate Manager 규칙 넷 — D138 · 2026-10-25.3 은 Eventarc 트리거 규칙 — D139)', () => {
-    expect(RULES_REVISION).toBe('2026-10-25.3');
+  it('규칙 버전 — 0.1.12 마법사 카드 표(D123~D127)와 0.2.0 AWS 켜기를 합친 값이다(2026-10-24.1 은 라벨 ASCII 빠른 길 — 출력 불변 · 엔진 소스만 바뀜 · 2026-10-24.2 는 RDS Blue/Green 배포 규칙 — D131 · 2026-10-24.3 은 BigQuery 테이블 규칙 — D132 · 2026-10-24.4 는 Logging 규칙 셋 — D133 · 2026-10-24.5 는 Workflows 규칙 — D134 · 2026-10-24.6 은 태그 키 · 값 규칙 — D135 · 2026-10-24.7 은 네트워크 방화벽 정책 규칙 — D136 · 2026-10-24.8 은 리뷰 반영 — D133 지표 · 버킷 위치 · 2026-10-24.9 는 D132 테이블 앞뒤 공백 · 2026-10-24.10 은 D136 안내 문구 · 2026-10-25.1 은 GKE 노드 풀 규칙 — D137 · 2026-10-25.2 는 Certificate Manager 규칙 넷 — D138 · 2026-10-25.3 은 Eventarc 트리거 규칙 — D139 · 2026-10-25.4 는 D137 · D138 유일 범위 실측 — 인증서 맵은 global 하나)', () => {
+    expect(RULES_REVISION).toBe('2026-10-25.4');
     expect(VERSION.rules).toBe(RULES_REVISION);
   });
 
