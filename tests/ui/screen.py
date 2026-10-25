@@ -1136,14 +1136,17 @@ def wizard_scenarios(browser, rules_version, errors):
     print('OK — 마법사 시나리오 ㉚~㊼ · 화면 모드 ㊽ · 첫 방문 ㊾ ㊿ · API 안내 (51) · 계획 파일 (52) · More 메뉴 (53) · 첫 방문 예시 (54) · About (55) · 소개 페이지 (56) 통과')
 
 
-# AWS 예시 계획의 이름 (D129) — src/components/wizardSample.test 가 엔진에서 같은 열 개를 단언한다
+# AWS 예시 계획의 이름 (D129 · D141 — Website 카드 · db 켬) — src/components/wizardSample.test 가 엔진에서 같은 열다섯을 단언한다
 AWS_SAMPLE_NAMES = ['payment-prod-apne2-vpc-01', 'payment-prod-apne2-snet-01', 'payment-prod-apne2-igw-01', 'payment-prod-apne2-rt-01', 'payment-prod-apne2-nat-01',
-                    'payment-shop-prod-apne2-ec2-web-01', 'payment-shop-prod-apne2-lb-01', 'payment-shop-prod-apne2-tg-01', 'payment-shop-prod-apne2-rds-01', 'demo-payment-shop-prod-s3']
+                    'payment-prod-apne2-sg-web-01', 'payment-prod-apne2-sg-internal-01',
+                    'payment-shop-prod-apne2-ec2-web-01', 'payment-shop-prod-apne2-tg-01', 'payment-shop-prod-apne2-lb-01', 'payment-shop-prod-apne2-lsnr-https-01', 'payment-shop-prod-apne2-lsnr-redir-01',
+                    'payment-shop-prod-cert-01', 'payment-shop-prod-apne2-rds-01', 'payment-shop-prod-apne2-sng-01']
+AWS_SAMPLE_COUNT = len(AWS_SAMPLE_NAMES)
 
 
 def landing_page(browser, errors):
     """(56) 소개 페이지 `/` (D129) — 카드 셋(AWS · Google Cloud 는 링크, Azure 는 aria-disabled 이고 눌러도 URL 이 안 바뀐다) ·
-    AWS 카드 → /aws 의 예시(이름 열 개 전부 PASS · Example 표시 · hash 없음) · GCP 카드 → /gcp 의 예시(열여섯) · 선택기로 AWS → URL 이 /aws 로 바뀌고 AWS 예시 ·
+    AWS 카드 → /aws 의 예시(이름 열다섯 전부 PASS · Example 표시 · hash 없음) · GCP 카드 → /gcp 의 예시(열여섯) · 선택기로 AWS → URL 이 /aws 로 바뀌고 AWS 예시 ·
     움직임이 한 번 돌고 멈춘다 · 움직임을 줄이면 정지 화면 · /azure 는 404 · 스크린샷 landing-360 · landing-1280 · wizard-aws-1280"""
     ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page()
@@ -1179,13 +1182,13 @@ def landing_page(browser, errors):
     no_hscroll(pg, 1280, '소개 페이지')
     pg.mouse.move(0, 0)
     pg.screenshot(path=str(OUT / 'landing-1280.png'), full_page=True)
-    # AWS 카드 → /aws 의 예시 — 이름 열 개 전부 PASS · Example 표시 · hash 없음 · 제목은 AWS 마법사
+    # AWS 카드 → /aws 의 예시 — 이름 열다섯 전부 PASS · Example 표시 · hash 없음 · 제목은 AWS 마법사
     pg.locator('a[data-landing-card="aws"]').click()
     pg.wait_for_url(BASE + AWS)
     expect(pg.locator('[data-wizard]')).to_be_visible()
     assert pg.title() == 'Cloudonym — AWS resource name generator', pg.title()
-    expect(pg.locator('#names article[data-key]')).to_have_count(10)
-    expect(pg.locator('[data-names-summary]')).to_have_text('10 names · 10/10 PASS')
+    expect(pg.locator('#names article[data-key]')).to_have_count(AWS_SAMPLE_COUNT)
+    expect(pg.locator('[data-names-summary]')).to_have_text(f'{AWS_SAMPLE_COUNT} names · {AWS_SAMPLE_COUNT}/{AWS_SAMPLE_COUNT} PASS')
     assert [n for _, n, _ in screen_names(pg)] == AWS_SAMPLE_NAMES, screen_names(pg)
     expect(settings(pg).locator('[data-sample-marker]')).to_be_visible()
     assert pg.evaluate('location.hash') == '', pg.url
@@ -1200,7 +1203,7 @@ def landing_page(browser, errors):
     # 다시 AWS — /aws 와 AWS 예시
     pg.click('[data-wizard-cloud] [data-cloud="aws"]')
     pg.wait_for_url(BASE + AWS)
-    expect(pg.locator('[data-names-summary]')).to_have_text('10 names · 10/10 PASS')
+    expect(pg.locator('[data-names-summary]')).to_have_text(f'{AWS_SAMPLE_COUNT} names · {AWS_SAMPLE_COUNT}/{AWS_SAMPLE_COUNT} PASS')
     # 값을 고친 뒤 Share URL 은 /aws#state=… · 새로고침해도 /aws 그대로
     s = settings(pg)
     s.locator('#wizard-owner').fill('acme')
@@ -1211,7 +1214,7 @@ def landing_page(browser, errors):
     expect(pg.locator('[data-wizard]')).to_be_visible()
     st = hash_state(pg.url)
     assert st['owner'] == 'acme' and st['c'] == 'aws', st
-    expect(pg.locator('#names article[data-key]')).to_have_count(10)
+    expect(pg.locator('#names article[data-key]')).to_have_count(AWS_SAMPLE_COUNT)
     # GCP 카드 → /gcp 의 예시 열여섯
     pg.goto(BASE + '/', wait_until='networkidle')
     pg.locator('a[data-landing-card="gcp"]').click()
@@ -1248,7 +1251,7 @@ def landing_page(browser, errors):
         assert resp is not None and resp.status == 404, (path, resp and resp.status)
         expect(pg.locator('[data-not-found]')).to_be_visible()
     ctx.close()
-    print('(56) 소개 페이지 — 카드 셋 · AWS 예시 10/10 PASS · 선택기 경로 따라감 · 정지 화면 · /azure 404')
+    print('(56) 소개 페이지 — 카드 셋 · AWS 예시 15/15 PASS · 선택기 경로 따라감 · 정지 화면 · /azure 404')
 
 
 def about_page(browser, errors):

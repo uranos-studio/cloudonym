@@ -137,8 +137,25 @@ export const AWS_PRESETS: readonly Preset[] = [
   { id: 'eks', label: 'EKS cluster', ruleId: 'aws.eks_cluster', ...NONE, level: 'service' },
   { id: 'ecr', label: 'ECR repository', ruleId: 'aws.ecr_repository', ...NONE, level: 'service' },
   { id: 'redis', label: 'ElastiCache replication group', ruleId: 'aws.elasticache_replication_group', ...NONE, level: 'service' },
+  // D141 — AWS 카드(bundles.ts AWS_BUNDLES)의 서비스 부품. 규칙은 표에 있고(D43 · D131) 칩 하나 = 이름 하나다.
+  // fn: Lambda 함수(GCP run 자리) · prof: EC2 에 역할을 붙이는 인스턴스 프로파일 · sng: RDS 가 요구하는 DB 서브넷 그룹 · kms: KMS 키(Name 태그) · ddb: DynamoDB 테이블(GCP fs 자리) ·
+  // lg: CloudWatch Logs 로그 그룹 · ecs · svc · td: ECS 클러스터 · 서비스 · 작업 정의 · ng: EKS 관리형 노드 그룹
+  { id: 'fn', label: 'Lambda function', ruleId: 'aws.lambda_function', ...NONE, level: 'service' },
+  { id: 'prof', label: 'Instance profile', ruleId: 'aws.iam_instance_profile', ...NONE, level: 'service' },
+  { id: 'sng', label: 'DB subnet group', ruleId: 'aws.rds_db_subnet_group', ...NONE, level: 'service' },
+  { id: 'kms', label: 'KMS key', ruleId: 'aws.kms_key', ...NONE, level: 'service' },
+  { id: 'ddb', label: 'DynamoDB table', ruleId: 'aws.dynamodb_table', ...NONE, level: 'service' },
+  { id: 'lg', label: 'Log group', ruleId: 'aws.logs_log_group', ...NONE, level: 'service' },
+  { id: 'ecs', label: 'ECS cluster', ruleId: 'aws.ecs_cluster', ...NONE, level: 'service' },
+  { id: 'svc', label: 'ECS service', ruleId: 'aws.ecs_service', ...NONE, level: 'service' },
+  { id: 'td', label: 'ECS task definition', ruleId: 'aws.ecs_task_definition', ...NONE, level: 'service' },
+  { id: 'ng', label: 'EKS node group', ruleId: 'aws.eks_nodegroup', ...NONE, level: 'service' },
   { id: 'lb', label: 'Load balancer (ALB/NLB)', ruleId: 'aws.elbv2_load_balancer', ...NONE, level: 'service', group: 'lb' },
   { id: 'tg', label: 'Target group', ruleId: 'aws.elbv2_target_group', ...NONE, level: 'service', group: 'lb' },
+  // D141 — ALB 앞쪽: HTTPS 리스너(443) · HTTP 리스너(80 → 443 전환 — GCP urlredir 꼴로 tier redir) · IAM 서버 인증서(ACM 인증서는 이름이 없다 — 이름 있는 인증서는 IAM 의 것)
+  { id: 'lis', label: 'HTTPS listener (port 443)', ruleId: 'aws.elbv2_listener', tier: 'https', ha: null, serverless: null, level: 'service', group: 'lb' },
+  { id: 'lisredir', label: 'HTTP listener (port 80, redirect to HTTPS)', ruleId: 'aws.elbv2_listener', tier: 'redir', ha: null, serverless: null, level: 'service', group: 'lb' },
+  { id: 'cert', label: 'Server certificate (IAM)', ruleId: 'aws.iam_server_certificate', ...NONE, level: 'service', group: 'lb' },
   { id: 'eip', label: 'Elastic IP', ruleId: 'aws.ec2_eip', ...NONE, level: 'service', group: 'lb' },
   { id: 'vpc', label: 'VPC', ruleId: 'aws.vpc', ...NONE, level: 'project', group: 'network' },
   { id: 'subnet', label: 'Subnet', ruleId: 'aws.subnet', ...NONE, level: 'project', group: 'network' },

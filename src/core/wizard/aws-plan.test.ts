@@ -33,7 +33,8 @@ const svc = (...picks: Pick[]): WizardPlan => ({ provider: 'aws', project: PROJE
 describe('AWS 프리셋 데이터', () => {
   it('모든 프리셋 · serverless · 딸린 것이 있는 AWS 규칙을 가리킨다', () => {
     const aws = presetsFor('aws');
-    expect(aws.length).toBe(22);
+    // D141 — 카드 부품 열셋(cert · lis · lisredir · fn · prof · sng · kms · ddb · lg · ecs · svc · td · ng)을 더해 35
+    expect(aws.length).toBe(35);
     for (const p of aws) {
       expect(RULES[p.ruleId]?.provider, p.id).toBe('aws');
       for (const s of p.serverless?.ruleIds ?? []) expect(RULES[s]?.provider, s).toBe('aws');

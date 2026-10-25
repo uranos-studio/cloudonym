@@ -20,6 +20,7 @@ import { SERVERLESS_SHORT } from './urlState';
 import * as S from './wizardState';
 import { selectAdded, type Edit, type RowPath } from './wizardSelection';
 import { CardGallery } from './WizardCards';
+import { bundlesFor } from '../core/wizard/bundles';
 import { BTN, CHIP, CONTROL, ENV_NAMES, ERR, HINT, ICON_BTN, LABEL, PRIMARY, RULES, SMALL_INPUT, inline, networkText } from './wizardStyles';
 import { EXAMPLE_REGIONS } from './formContext';
 import type { ProjectField } from './wizardProjectGate';
@@ -261,12 +262,12 @@ export function ServiceSettings({ index, plan, errors, contextErrors, edit, onCu
       </div>
       <ErrorList id={`${id}-error`} errors={own} />
 
-      {/* 카드(묶음)는 GCP 표뿐이다 — AWS 는 칩으로 고른다 */}
-      {plan.provider === 'gcp' && <CardGallery plan={plan} service={index} edit={edit} onSelect={onSelect} />}
+      {/* 카드(묶음) — CSP 마다 표가 있다(GCP · AWS — D141). 표가 없는 CSP 는 칩으로 고른다 */}
+      {bundlesFor(plan.provider).length > 0 && <CardGallery plan={plan} service={index} edit={edit} onSelect={onSelect} />}
 
       {/* 하나씩 고르기 (D93) — 칩 · 로드 밸런서 부품 · Custom 은 접힌 칸 안이다. 카드가 주 경로이고 칩은 세부 조정이다.
-          AWS 는 카드가 없어 칩이 주 경로다 — 펼친 채로 그린다 */}
-      <details data-add-more open={plan.provider !== 'gcp' || undefined} className="rounded-lg border border-dashed border-zinc-300 px-3 py-2 dark:border-zinc-700">
+          카드 표가 없는 CSP 는 칩이 주 경로다 — 펼친 채로 그린다 */}
+      <details data-add-more open={bundlesFor(plan.provider).length === 0 || undefined} className="rounded-lg border border-dashed border-zinc-300 px-3 py-2 dark:border-zinc-700">
         <summary className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
           <ChevronRight data-chevron aria-hidden="true" className="size-4 shrink-0 transition-transform" />
           <span><span className="font-semibold">{en.ui.wizard_add_more}</span> <span className={HINT}>— {en.ui.wizard_add_more_hint}</span></span>

@@ -3,7 +3,7 @@ import { ENABLED_PROVIDERS, MIN_TOKEN, PROTECTED, PROVIDERS, TIER_PATTERN, type 
 import { RESERVED_TIERS } from '../core/tier';
 import { MAX_PICKS_PER_SERVICE, MAX_SERVICES } from '../core/wizard/plan';
 import { PRESETS, PRESET_TIERS, presetsFor, type Preset } from '../core/wizard/presets';
-import { BUNDLES, partIsProject, partKey } from '../core/wizard/bundles';
+import { bundlesFor, partIsProject, partKey, type Bundle } from '../core/wizard/bundles';
 import { ATTACHMENTS, MAX_DATA_DISKS } from '../core/wizard/attachments';
 import { buildTree, inputKind, type TreeNode } from '../core/tree';
 import { rulesFor } from '../core/constraints';
@@ -152,7 +152,7 @@ function presetLines(): string[] {
     '', '## Wizard presets', '',
     `\`preset\` on a \`/v1/wizard\` pick. Each preset is one rule; \`preset: null\` with \`rule\` picks any other rule. Network presets (VPC, subnet, firewall, Cloud Router, Cloud NAT) are usually project-level (\`project_picks\`); the load balancer parts are separate presets, one name each. A working set of them is listed under "Wizard cards" below. At most ${MAX_SERVICES} services and ${MAX_PICKS_PER_SERVICE} picks per service or in \`project_picks\`.`,
     ...presetGroups().map(groupLine),
-    '', 'On `provider: "aws"` (0.2) the same ids name AWS rules, and some are AWS only. There is no project ID item and no `project_id_suffix` (400 `wizard.project_id_suffix_not_supported`); `project_picks` hold account-wide parts (rules scoped to the partition, account, region or a VPC). A server (`aws.ec2_instance`) can carry `boot` and `data` (EBS volumes), `ip` (Elastic IP) and `ipi` (network interface). The wizard cards below are Google Cloud only.',
+    '', 'On `provider: "aws"` (0.2) the same ids name AWS rules, and some are AWS only. There is no project ID item and no `project_id_suffix` (400 `wizard.project_id_suffix_not_supported`); `project_picks` hold account-wide parts (rules scoped to the partition, account, region or a VPC). A server (`aws.ec2_instance`) can carry `boot` and `data` (EBS volumes), `ip` (Elastic IP) and `ipi` (network interface). Each enabled cloud has its own wizard cards (below).',
     ...presetGroups(presetsFor('aws')).map(groupLine),
   ];
   function groupLine(g: Preset[]): string {
@@ -161,26 +161,32 @@ function presetLines(): string[] {
   }
 }
 
-/** 「## Wizard cards」 절 (D93) — 카드마다 한 줄: 서비스 picks · project_picks · 선택. 카드는 화면의 동작이고 API 에는 없다 — 같은 picks 를 보내면 같은 이름이다 */
+/** 「## Wizard cards」 절 (D93 · D141) — 카드마다 한 줄: 서비스 picks · project_picks · 선택. 카드는 화면의 동작이고 API 에는 없다 — 같은 picks 를 보내면 같은 이름이다.
+ *  GCP 표 뒤에 `provider: "aws"` 절과 AWS 표(D141)가 온다 — 「built and tested on …」 도 그 클라우드 이름이다 */
 function cardLines(): string[] {
   // D126 — 역할 부품(sa@build)은 role 을 밝힌다 — pick 의 role 로 보내면 같은 이름이다
   const list = (ps: readonly { preset: string; tier?: string; role?: string }[]) => ps.map((p) => `\`${p.preset}\`${p.tier === undefined ? '' : ` tier \`${p.tier}\``}${p.role === undefined ? '' : ` role \`${p.role}\``}`).join(', ');
+  const cloud: Record<string, string> = { gcp: 'Google Cloud', aws: 'AWS' };
+  const line = (b: Bundle, provider: Provider): string => {
+    const svc = b.parts.filter((p) => !partIsProject(p, provider));
+    const prj = b.parts.filter((p) => partIsProject(p, provider));
+    const bits = [`\`${b.id}\` (${b.label}): ${svc.length > 0 ? list(svc) : 'no service parts'}`];
+    if (b.backends) bits.push(`plus one backend by what the service has: ${b.backends.map((x) => `\`${x.needs}\` → ${list(x.parts)}`).join('; ')}`);
+    if (prj.length > 0) bits.push(`project: ${list(prj)}`);
+    if (b.options.length > 0) bits.push(`options: ${b.options.map((o) => `${o.label} (${list(o.parts)}${o.on ? ', on by default' : ''})`).join('; ')}`);
+    bits.push(b.tested ? `built and tested on ${cloud[provider] ?? provider}` : 'rules verified, the set not yet applied');
+    return `- ${bits.join(' · ')}`;
+  };
   return [
     '', '## Wizard cards', '',
     'A card on the wizard screen adds a working set of presets at once. Cards are not part of `/v1/wizard`: send the same picks to get the same names. Project parts go in `project_picks`; the rest in the service.',
-    ...BUNDLES.map((b) => {
-      const svc = b.parts.filter((p) => !partIsProject(p));
-      const prj = b.parts.filter(partIsProject);
-      const bits = [`\`${b.id}\` (${b.label}): ${svc.length > 0 ? list(svc) : 'no service parts'}`];
-      if (b.backends) bits.push(`plus one backend by what the service has: ${b.backends.map((x) => `\`${x.needs}\` → ${list(x.parts)}`).join('; ')}`);
-      if (prj.length > 0) bits.push(`project: ${list(prj)}`);
-      if (b.options.length > 0) bits.push(`options: ${b.options.map((o) => `${o.label} (${list(o.parts)}${o.on ? ', on by default' : ''})`).join('; ')}`);
-      bits.push(b.tested ? 'built and tested on Google Cloud' : 'rules verified, the set not yet applied');
-      return `- ${bits.join(' · ')}`;
-    }),
+    ...bundlesFor('gcp').map((b) => line(b, 'gcp')),
     `One load balancer card per service (shared parts such as \`${partKey({ preset: 'ip' })}\` and \`${partKey({ preset: 'url' })}\` would be duplicate picks); add another service for a second one.`,
     // D115 — 함께 쓰는 부품은 pick 하나로 보낸다(같은 pick 둘은 duplicate_pick)
     `Other cards can share a service: send ${[...SHAREABLE_PARTS].map((x) => `\`${x}\``).join(', ')} once and every card in that service uses it (for example \`event-pipeline\`, \`ci-cd\` and \`batch-job\` with one \`sa\`).`,
+    // D141 — AWS 카드 일곱. 같은 id 는 같은 뜻이고 부품은 AWS 프리셋이다. S3 버킷은 서비스에 하나(순번이 없어 tier 가 붙지 않는다)
+    '', 'On `provider: "aws"` the cards are built from the AWS presets. The same id means the same setup (`website`, `serverless-web`, `static-site`, `vm-app`, `https-lb`); `ecs-service` and `eks` are AWS only. The load balancer front is `tg`, `lb`, `lis`, `lisredir` and `cert`; the backend is `web` (EC2) or `fn` (Lambda). An S3 bucket takes no tier, so a service holds one `object` pick.',
+    ...bundlesFor('aws').map((b) => line(b, 'aws')),
   ];
 }
 

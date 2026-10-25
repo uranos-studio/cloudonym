@@ -638,3 +638,46 @@ describe('website-mig 설정 안내 문장', () => {
     expect(setupNote(p, 0, 'serverless-web', 'wizard_card_setup_run')).toBe(en.ui.wizard_card_setup_run);
   });
 });
+
+describe('AWS 카드 되읽기 (D141) — 표는 plan.provider 가 고른다', () => {
+  const AWS = { owner: 'platform', system: 'billing', env: 'prod', region: 'ap-northeast-2' };
+  const awsIds = (plan: WizardPlan, s: number) => cardsIn(plan, s).map((m) => [m.bundle.id, m.complete, m.noBackend]);
+  it('website — 서비스 부품 6 + 기본 선택 db(RDS · 서브넷 그룹) · 네트워크에 보안 그룹 web · internal · 되읽으면 완성 · 이름 15개 전부 PASS', () => {
+    const p = addBundle(startPlan(AWS, 'aws'), 0, 'website');
+    expect(presets(p, 0)).toEqual(['web', 'tg', 'lb', 'lis', 'lisredir', 'cert', 'db', 'sng']);
+    expect(presets(p, null)).toEqual(['vpc', 'subnet', 'igw', 'rt', 'nat', 'firewall:web', 'firewall:internal']);
+    expect(awsIds(p, 0)).toEqual([['website', true, false]]);
+    const items = generateProject(expandPlan(p), 'aws').items;
+    expect(items.length).toBe(15);
+    expect(items.every((i) => i.valid)).toBe(true);
+    // 카드로 더한 pick 은 칩으로 하나씩 켠 pick 과 같다
+    let chips = startPlan(AWS, 'aws');
+    for (const id of ['web', 'tg', 'lb', 'lis', 'lisredir', 'cert', 'db', 'sng']) chips = togglePreset(chips, 0, id);
+    for (const t of ['web', 'internal']) chips = togglePreset(chips, null, 'firewall', t);
+    expect(p).toEqual(chips);
+  });
+  it('https-lb + Lambda 칩 → serverless-web 으로 되읽힌다(GCP 의 run 과 같은 꼴) · 백엔드 없는 lb 칩은 https-lb 미완성 · ECS 카드의 IAM 역할은 Serverless web 후보가 아니다', () => {
+    const fn = addBundle(togglePreset(startPlan(AWS, 'aws'), 0, 'fn'), 0, 'https-lb');
+    expect(awsIds(fn, 0)).toEqual([['serverless-web', true, false]]);
+    const ecs = togglePreset(addBundle(startPlan(AWS, 'aws'), 0, 'ecs-service'), 0, 'lb');
+    expect(awsIds(ecs, 0)).toEqual([['https-lb', false, true], ['ecs-service', true, false]]);
+    expect(cardBlocked(ecs, 0, 'website', {})).toBeUndefined();
+  });
+  it('static-site 는 object 칩 하나로 완성 · vm-app 과 같은 서비스에 함께 선다 · eks 는 네트워크의 vpc · subnet 을 다시 더하지 않는다', () => {
+    const p = addBundle(addBundle(startPlan(AWS, 'aws'), 0, 'vm-app'), 0, 'static-site');
+    expect(awsIds(p, 0)).toEqual([['static-site', true, false], ['vm-app', true, false]]);
+    const eks = addBundle(startPlan(AWS, 'aws'), 0, 'eks');
+    expect(presets(eks, null)).toEqual(['vpc', 'subnet', 'igw', 'rt', 'nat']);
+    expect(presets(eks, 0)).toEqual(['eks', 'ng', 'ecr', 'sa', 'sa']);
+    expect(awsIds(eks, 0)).toEqual([['eks', true, false]]);
+    // removeBundle — 카드의 필수 서비스 부품만 지우고 네트워크는 남는다
+    const gone = removeBundle(eks, 0, 'eks');
+    expect(presets(gone, 0)).toEqual([]);
+    expect(presets(gone, null)).toEqual(['vpc', 'subnet', 'igw', 'rt', 'nat']);
+  });
+  it('GCP 되읽기는 그대로 — AWS 표가 GCP 계획에 끼지 않는다', () => {
+    const p = addBundle(startPlan(DEFAULT_PROJECT), 0, 'website');
+    expect(cardsIn(p, 0).map((m) => m.bundle.id)).toEqual(['website']);
+    expect(cardBlocked(p, 0, 'eks', {})).toBe('present');
+  });
+});

@@ -1,6 +1,7 @@
 // 카드 (D92 · D93) — 데이터. 카드 하나 = 프리셋 pick 여럿을 한 번에 더하는 표. 엔진 · validatePlan · expandPlan 은 카드를 모른다(프리셋과 같다 — D64).
 // 카드로 더한 pick 은 칩으로 더한 pick 과 바이트까지 같다 — pick 에 카드 표시를 남기지 않는다. 화면은 있는 부품에서 카드를 되읽는다(D93).
 // 부품의 자리는 프리셋의 level 이 정한다 — project 면 프로젝트 공용(projectPicks), service 면 그 서비스
+import type { Provider } from '../types';
 import { presetOf } from './presets';
 
 /** 부품 하나 — 프리셋 id 와(방화벽처럼 tier 칩이 여럿인 프리셋이면) tier · (서비스 계정처럼 role 규칙이면) role (D126). role 이 없으면 기본 역할(sync) */
@@ -25,7 +26,7 @@ export interface Bundle {
   refs: readonly BundleRef[];
   /** 이 조합이 실제로 동작한 근거 — 실제 배포 시험(D91) · 공식 문서 URL */
   evidence: readonly string[];
-  /** 이 조합 그대로 Google Cloud 에 만들어 동작을 본 카드인가 (D91 · D96) — 아니면 「규칙은 확인함 · 묶음 적용은 아직」 */
+  /** 이 조합 그대로 그 클라우드에 만들어 동작을 본 카드인가 (D91 · D96 · D141) — 아니면 「규칙은 확인함 · 묶음 적용은 아직」 */
   tested: boolean;
   /** 실배포 시험 기록 (D123) — tested 가 true 인 카드는 하나 이상. 기록에 없는 선택(뒤에 더한 것)은 시험되지 않은 것이다 */
   testedWith?: readonly TestedRecord[];
@@ -38,9 +39,9 @@ export function partKey(p: BundlePart): string {
   return `${p.preset}${p.tier === undefined ? '' : `:${p.tier}`}${p.role === undefined ? '' : `@${p.role}`}`;
 }
 
-/** 부품이 프로젝트 공용 자리인가 — 프리셋 level 로 정한다 */
-export function partIsProject(p: BundlePart): boolean {
-  return presetOf(p.preset)?.level === 'project';
+/** 부품이 프로젝트 공용 자리인가 — 그 CSP 프리셋 표의 level 로 정한다 (D141 — AWS 의 igw · rt 는 GCP 표에 없다) */
+export function partIsProject(p: BundlePart, provider: Provider = 'gcp'): boolean {
+  return presetOf(p.preset, provider)?.level === 'project';
 }
 
 const P = (preset: string, tier?: string, role?: string): BundlePart => ({ preset, ...(tier === undefined ? {} : { tier }), ...(role === undefined ? {} : { role }) });
@@ -277,6 +278,128 @@ export const BUNDLES: readonly Bundle[] = [
   },
 ];
 
-export function bundleById(id: string): Bundle | undefined {
-  return BUNDLES.find((b) => b.id === id);
+// ── AWS 카드 (D141) — GCP 표의 짝을 AWS 규칙 표로 옮겼다. 카드 id 는 hash 에 들지 않으므로(D93) GCP 와 같은 id 를 쓴다.
+// 부품이 전부 규칙 표에 있는 일곱만 둔다 — Auto Scaling 그룹 · SQS · SNS · Scheduler · CodeBuild · Glue 규칙이 없어 website-mig · event-pipeline · task-queue · batch-job · ci-cd · data-warehouse 의 짝은 아직 없다.
+// AWS 에서 tier 는 순번 규칙에만 붙고(compose.ts) S3 버킷은 순번이 없어 서비스에 하나다 — 버킷을 쓰는 카드는 static-site 하나이고 다른 카드는 버킷 선택을 두지 않는다
+const ATF = 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/';
+const ADOCS = 'https://docs.aws.amazon.com/';
+// ALB 앞쪽 — 대상 그룹 · 로드 밸런서 · HTTPS 리스너 · 80 → 443 전환 리스너 · IAM 서버 인증서. 백엔드(EC2 · Lambda)는 카드마다 다르다
+const ALB_FRONT: readonly BundlePart[] = [P('tg'), P('lb'), P('lis'), P('lisredir'), P('cert')];
+const ALB_FRONT_REFS: readonly BundleRef[] = [
+  { from: 'lis', to: 'lb', attr: 'load_balancer_arn', evidence: `${ATF}lb_listener` },
+  { from: 'lis', to: 'tg', attr: 'default_action.target_group_arn', evidence: `${ATF}lb_listener` },
+  { from: 'lis', to: 'cert', attr: 'certificate_arn', evidence: `${ATF}lb_listener` },
+  { from: 'lisredir', to: 'lb', attr: 'load_balancer_arn', evidence: `${ATF}lb_listener` },
+  { from: 'lb', to: 'firewall:web', attr: 'security_groups', evidence: `${ATF}lb` },
+  { from: 'firewall:web', to: 'vpc', attr: 'vpc_id', evidence: `${ATF}security_group` },
+];
+// 백엔드 둘 — EC2 는 인스턴스 대상 + 인스턴스 보안 그룹(internal — ALB 그룹에서 오는 포트), Lambda 는 대상 종류 lambda + 실행 역할
+const EC2_BACKEND: readonly BundlePart[] = [P('firewall', 'web'), P('firewall', 'internal')];
+const EC2_BACKEND_REFS: readonly BundleRef[] = [
+  { from: 'tg', to: 'web', attr: 'lb_target_group_attachment.target_id', evidence: `${ATF}lb_target_group_attachment` },
+  { from: 'web', to: 'firewall:internal', attr: 'vpc_security_group_ids', evidence: `${ATF}instance` },
+  { from: 'firewall:internal', to: 'vpc', attr: 'vpc_id', evidence: `${ATF}security_group` },
+];
+const LAMBDA_BACKEND: readonly BundlePart[] = [P('sa'), P('firewall', 'web')];
+const LAMBDA_BACKEND_REFS: readonly BundleRef[] = [
+  { from: 'tg', to: 'fn', attr: 'lb_target_group_attachment.target_id', evidence: `${ATF}lb_target_group_attachment` },
+  { from: 'fn', to: 'sa', attr: 'role', evidence: `${ATF}lambda_function` },
+];
+const RDS_OPTION: BundleOption = { id: 'db', label: 'Database (RDS)', on: true, parts: [P('db'), P('sng')] };
+const RDS_REF: BundleRef = { from: 'db', to: 'sng', attr: 'db_subnet_group_name', evidence: `${ATF}db_instance` };
+const ROLE_OPTION: BundleOption = { id: 'role', label: 'IAM role and instance profile', on: false, parts: [P('sa'), P('prof')] };
+const PROF_REF: BundleRef = { from: 'prof', to: 'sa', attr: 'role', evidence: `${ATF}iam_instance_profile` };
+export const ALB_HTTPS_DOC = `${ADOCS}elasticloadbalancing/latest/application/create-https-listener.html`;
+export const ALB_LAMBDA_DOC = `${ADOCS}elasticloadbalancing/latest/application/lambda-functions.html`;
+export const S3_WEBSITE_DOC = `${ADOCS}AmazonS3/latest/userguide/WebsiteHosting.html`;
+export const ECS_EXEC_ROLE_DOC = `${ADOCS}AmazonECS/latest/developerguide/task_execution_IAM_role.html`;
+export const EKS_ROLES_DOC = `${ADOCS}eks/latest/userguide/cluster-iam-role.html`;
+export const RDS_SUBNET_GROUP_DOC = `${ADOCS}AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html`;
+
+/** AWS 카드 일곱 (D141) — 순서가 갤러리 순서이고 되읽기의 동률 순서다 */
+export const AWS_BUNDLES: readonly Bundle[] = [
+  {
+    id: 'website', label: 'Website', family: 'lb', tested: true, testedWith: [{ on: '2026-10-25', options: ['was', 'bastion', 'role'], note: 'Database option not covered here; the same presets were tested on vm-app' }],
+    summary: 'A web server behind an Application Load Balancer with an HTTPS listener. HTTP is redirected to HTTPS.',
+    parts: [P('web'), ...ALB_FRONT, ...EC2_BACKEND],
+    options: [{ ...RDS_OPTION }, { id: 'was', label: 'App server', on: false, parts: [P('was')] }, { id: 'bastion', label: 'Bastion', on: false, parts: [P('bastion'), P('firewall', 'ssh')] }, ROLE_OPTION],
+    refs: [...ALB_FRONT_REFS, ...EC2_BACKEND_REFS, RDS_REF, PROF_REF, { from: 'web', to: 'prof', attr: 'iam_instance_profile', evidence: `${ATF}instance` }],
+    evidence: ['D141', ALB_HTTPS_DOC, `${ATF}lb_target_group_attachment`],
+  },
+  {
+    id: 'serverless-web', label: 'Serverless web', family: 'lb', tested: true, testedWith: [{ on: '2026-10-25', options: ['secret', 'ddb', 'lg'], note: 'Database option not covered' }],
+    summary: 'A Lambda function behind an Application Load Balancer with an HTTPS listener. No servers to manage.',
+    parts: [P('fn'), ...ALB_FRONT, ...LAMBDA_BACKEND],
+    options: [{ ...RDS_OPTION, on: false }, { id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }, { id: 'ddb', label: 'Database (DynamoDB)', on: false, parts: [P('ddb')] }, { id: 'lg', label: 'Log group', on: false, parts: [P('lg')] }],
+    refs: [...ALB_FRONT_REFS, ...LAMBDA_BACKEND_REFS, RDS_REF, { from: 'fn', to: 'lg', attr: 'logging_config.log_group', evidence: `${ATF}lambda_function` }],
+    evidence: ['D141', ALB_LAMBDA_DOC, `${ATF}lb_target_group`],
+  },
+  {
+    // S3 정적 웹 호스팅은 버킷 하나로 돈다(HTTP 웹사이트 엔드포인트). HTTPS 를 주는 CloudFront 배포와 ACM 인증서는 이름이 없어 부품이 아니다 — 설정 안내로 둔다
+    id: 'static-site', label: 'Static site', tested: true, testedWith: [{ on: '2026-10-25', options: ['kms'] }],
+    summary: 'Files in a bucket with static website hosting, served from the bucket website endpoint. A CloudFront distribution adds HTTPS but has no name of its own.',
+    parts: [P('object')],
+    options: [{ id: 'kms', label: 'Encryption key (KMS)', on: false, parts: [P('kms')] }],
+    refs: [{ from: 'object', to: 'kms', attr: 'server_side_encryption_configuration.rule.apply_server_side_encryption_by_default.kms_master_key_id', evidence: `${ATF}s3_bucket_server_side_encryption_configuration` }],
+    evidence: ['D141', S3_WEBSITE_DOC],
+  },
+  {
+    id: 'vm-app', label: 'Internal app on EC2', tested: true, testedWith: [{ on: '2026-10-25', options: ['bastion', 'file', 'role'] }],
+    summary: 'Web, app and database servers reachable only inside the VPC, with a bastion.',
+    // 보안 그룹 — ssh: bastion 의 22 · icmp: VPC 안 ping · internal: 서버끼리의 서비스 포트. S3 버킷 선택은 두지 않는다(AWS 버킷은 서비스에 하나 — Static site 카드와 겹친다)
+    parts: [P('intweb'), P('intwas'), P('db'), P('sng'), P('firewall', 'ssh'), P('firewall', 'icmp'), P('firewall', 'internal')],
+    options: [{ id: 'bastion', label: 'Bastion', on: true, parts: [P('bastion')] }, { id: 'file', label: 'File server', on: false, parts: [P('file')] }, ROLE_OPTION],
+    refs: [RDS_REF, PROF_REF, { from: 'firewall:ssh', to: 'vpc', attr: 'vpc_id', evidence: `${ATF}security_group` }, { from: 'firewall:internal', to: 'vpc', attr: 'vpc_id', evidence: `${ATF}security_group` }],
+    evidence: ['D141', RDS_SUBNET_GROUP_DOC],
+  },
+  {
+    id: 'https-lb', label: 'HTTPS load balancer', family: 'lb', tested: true, testedWith: [{ on: '2026-10-25', options: [], backend: 'web', note: 'The fn backend has the same parts as the serverless-web card, which was built on its own' }],
+    summary: 'An Application Load Balancer with an HTTPS listener in front of what this service already has: a web server or a Lambda function.',
+    parts: ALB_FRONT,
+    backends: [{ needs: 'web', parts: EC2_BACKEND }, { needs: 'fn', parts: LAMBDA_BACKEND }],
+    options: [],
+    refs: [...ALB_FRONT_REFS, ...EC2_BACKEND_REFS, ...LAMBDA_BACKEND_REFS],
+    evidence: ['D141', ALB_HTTPS_DOC],
+  },
+  {
+    // GCP 에 짝이 없는 AWS 카드 — Fargate 작업이 공개 IP 로 응답한다. ALB 는 붙이지 않는다(붙이면 lb 가족 — https-lb 카드를 같은 서비스에 더한다)
+    id: 'ecs-service', label: 'ECS service (Fargate)', tested: true, testedWith: [{ on: '2026-10-25', options: ['roles'] }],
+    summary: 'An ECS cluster running a Fargate service from a task definition, pulling images from an ECR repository, with a task execution role and a log group.',
+    parts: [P('ecs'), P('svc'), P('td'), P('ecr'), P('sa'), P('lg'), P('firewall', 'web')],
+    options: [{ id: 'secret', label: 'Secret', on: false, parts: [P('secret')] }, { id: 'ddb', label: 'Database (DynamoDB)', on: false, parts: [P('ddb')] }, { id: 'roles', label: 'Separate task role', on: false, parts: [P('sa', undefined, 'task')] }],
+    refs: [
+      { from: 'svc', to: 'ecs', attr: 'cluster', evidence: `${ATF}ecs_service` },
+      { from: 'svc', to: 'td', attr: 'task_definition', evidence: `${ATF}ecs_service` },
+      { from: 'svc', to: 'firewall:web', attr: 'network_configuration.security_groups', evidence: `${ATF}ecs_service` },
+      { from: 'td', to: 'sa', attr: 'execution_role_arn', evidence: `${ATF}ecs_task_definition` },
+      { from: 'td', to: 'sa@task', attr: 'task_role_arn', evidence: `${ATF}ecs_task_definition` },
+      { from: 'td', to: 'lg', attr: 'container_definitions.logConfiguration.options.awslogs-group', evidence: `${ADOCS}AmazonECS/latest/developerguide/using_awslogs.html` },
+      { from: 'td', to: 'ecr', attr: 'container_definitions.image', evidence: `${ADOCS}AmazonECS/latest/developerguide/task_definition_parameters.html` },
+    ],
+    evidence: ['D141', ECS_EXEC_ROLE_DOC],
+  },
+  {
+    // 역할 둘 — 클러스터 역할 sa(sync) · 노드 역할 sa@node (D126 꼴). 서브넷 둘(AZ 둘)은 사용자가 슬롯을 더한다 — 설정 안내
+    id: 'eks', label: 'EKS cluster', tested: true, testedWith: [{ on: '2026-10-25', options: [], note: 'Cache option not covered' }],
+    summary: 'An EKS cluster with a managed node group on the VPC, an ECR repository for its images, and IAM roles for the cluster and its nodes.',
+    parts: [P('eks'), P('ng'), P('ecr'), P('sa'), P('sa', undefined, 'node'), P('vpc'), P('subnet')],
+    options: [{ id: 'cache', label: 'Cache (ElastiCache for Redis)', on: false, parts: [P('redis')] }],
+    refs: [
+      { from: 'eks', to: 'sa', attr: 'role_arn', evidence: `${ATF}eks_cluster` },
+      { from: 'eks', to: 'subnet', attr: 'vpc_config.subnet_ids', evidence: `${ATF}eks_cluster` },
+      { from: 'ng', to: 'eks', attr: 'cluster_name', evidence: `${ATF}eks_node_group` },
+      { from: 'ng', to: 'sa@node', attr: 'node_role_arn', evidence: `${ATF}eks_node_group` },
+      { from: 'ng', to: 'subnet', attr: 'subnet_ids', evidence: `${ATF}eks_node_group` },
+    ],
+    evidence: ['D141', EKS_ROLES_DOC],
+  },
+];
+
+/** CSP 의 카드 표 — 마법사가 없는 CSP 는 빈 표 */
+export function bundlesFor(provider: Provider): readonly Bundle[] {
+  return provider === 'gcp' ? BUNDLES : provider === 'aws' ? AWS_BUNDLES : [];
+}
+
+export function bundleById(id: string, provider: Provider = 'gcp'): Bundle | undefined {
+  return bundlesFor(provider).find((b) => b.id === id);
 }

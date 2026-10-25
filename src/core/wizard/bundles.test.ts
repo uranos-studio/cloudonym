@@ -26,7 +26,7 @@ function partsOf(b: Bundle, opts: 'default' | 'all' | 'none' = 'default'): Bundl
   return out;
 }
 function planOf(parts: BundlePart[], withNetwork = true): WizardPlan {
-  const own = parts.filter(partIsProject);
+  const own = parts.filter((p) => partIsProject(p));
   const project = [...(withNetwork ? NETWORK.filter((n) => !own.some((p) => partKey(p) === partKey(n))) : []), ...own];
   return { provider: 'gcp', project: PROJECT, projectPicks: project.map(pickOf), services: [{ purpose: 'site', picks: parts.filter((p) => !partIsProject(p)).map(pickOf) }] };
 }
@@ -55,9 +55,9 @@ describe('카드 데이터 (D93)', () => {
   it('카드마다 서비스 부품 수 — website 12 · serverless-web 11 · static-site 10 · 프로젝트 공용 부품 — website 은 방화벽 web · lbhc', () => {
     const count = (id: string) => partsOf(bundleById(id)!, 'none');
     expect(count('website').filter((p) => !partIsProject(p)).length).toBe(12);
-    expect(count('website').filter(partIsProject).map(partKey)).toEqual(['firewall:web', 'firewall:lbhc']);
+    expect(count('website').filter((p) => partIsProject(p)).map(partKey)).toEqual(['firewall:web', 'firewall:lbhc']);
     expect(count('serverless-web').filter((p) => !partIsProject(p)).length).toBe(11);
-    expect(count('serverless-web').filter(partIsProject)).toEqual([]);
+    expect(count('serverless-web').filter((p) => partIsProject(p))).toEqual([]);
     expect(count('static-site').filter((p) => !partIsProject(p)).length).toBe(10);
     // Cloud Run · 버킷 백엔드에는 헬스 체크가 없다 — 서버리스 NEG 백엔드는 헬스 체크를 둘 수 없다(공식 문서)
     expect(count('serverless-web').map(partKey)).not.toContain('hc');
@@ -221,7 +221,7 @@ describe('카드 데이터 (D93)', () => {
     expect(shape('ci-cd')).toEqual({ parts: ['ar', 'build', 'sa'], options: [['secret', false, ['secret']], ['github', false, ['conn', 'repo']], ['roles', false, ['sa@build']]], tested: true, family: undefined });
     expect(shape('batch-job')).toEqual({ parts: ['runjob', 'cron', 'sa'], options: [['roles', false, ['sa@cron']]], tested: true, family: undefined });
     // 네트워크(vpc · subnet)는 프로젝트 공용 자리다 — 첫 화면에 이미 있으면 카드가 더하지 않는다
-    expect(bundleById('gke')!.parts.filter(partIsProject).map(partKey)).toEqual(['vpc', 'subnet']);
+    expect(bundleById('gke')!.parts.filter((p) => partIsProject(p)).map(partKey)).toEqual(['vpc', 'subnet']);
   });
 
   it('D114 — 카드를 펼친 이름: 데이터셋은 밑줄 · 버킷과 나머지는 하이픈 · 데드레터 토픽은 토픽과 키 · 이름이 다르다', () => {
@@ -268,7 +268,7 @@ describe('카드 데이터 (D93)', () => {
   it('D117 — 데드레터 구독은 데드레터 토픽을 가리킨다 · vm-app 과 website 의 App server 선택에는 internal 방화벽이 있다', () => {
     const ep = bundleById('event-pipeline')!;
     expect(ep.refs).toContainEqual(expect.objectContaining({ from: 'dlqsub', to: 'dlq', attr: 'topic' }));
-    expect(bundleById('vm-app')!.parts.filter(partIsProject).map(partKey)).toContain('firewall:internal');
+    expect(bundleById('vm-app')!.parts.filter((p) => partIsProject(p)).map(partKey)).toContain('firewall:internal');
     // website 의 App server 선택도 같다 — web → was 는 네트워크 안의 통신이라 GFE 대역만 받는 web 방화벽으로는 닿지 않는다(실배포 시험)
     expect(bundleById('website')!.options.find((o) => o.id === 'was')!.parts.map(partKey)).toEqual(['was', 'firewall:internal']);
   });

@@ -4,7 +4,7 @@
 // 소개 상자의 예시(introExampleModel)도 GCP 계획에서 이름을 뽑는다 — 화면의 예시와 소개의 예시가 갈라지지 않게
 import type { WizardPlan, WizardProvider } from '../core/wizard/plan';
 import { addBundle } from './wizardBundles';
-import { startPlan, togglePreset } from './wizardState';
+import { startPlan } from './wizardState';
 import { EXAMPLE_REGIONS } from './formContext';
 
 /** 예시 입력 넷 — 중립 값. region 은 정식 이름(약어는 엔진이 만든다) */
@@ -16,8 +16,8 @@ export const SAMPLE_PROJECTS: Readonly<Record<WizardProvider, WizardPlan['projec
 };
 /** 예시 서비스에 얹는 카드 — Cloud Run 뒤의 HTTPS 부하 분산기 */
 export const SAMPLE_CARD = 'serverless-web';
-/** AWS 예시 서비스의 칩 — EC2(web) · ALB · 대상 그룹 · RDS · S3. 이름 10개가 전부 valid:true 다(wizardSample.test) */
-export const SAMPLE_CHIPS_AWS: readonly string[] = ['web', 'lb', 'tg', 'db', 'object'];
+/** AWS 예시 서비스에 얹는 카드 (D141 — D129 의 칩 다섯을 대신한다) — EC2 web 뒤의 ALB HTTPS · RDS(기본 선택). 이름 15개가 전부 valid:true 다(wizardSample.test) */
+export const SAMPLE_CARD_AWS = 'website';
 
 /** 예시를 지운 계획 — 지금 클라우드의 빈 Project 값과 네트워크 미리 채움. 클라우드를 넘겨야 /aws 에서 Clear 가 GCP 로 바뀌지 않는다 */
 export function clearedPlan(provider: WizardProvider): WizardPlan {
@@ -26,6 +26,6 @@ export function clearedPlan(provider: WizardProvider): WizardPlan {
 
 /** 첫 방문 계획 — D90 의 네트워크 미리 채움 위에 첫 서비스(EXAMPLE_SERVICE)의 카드 하나(GCP) 또는 칩 다섯(AWS) */
 export function samplePlan(provider: WizardProvider = 'gcp'): WizardPlan {
-  if (provider === 'aws') return SAMPLE_CHIPS_AWS.reduce((p, chip) => togglePreset(p, 0, chip), startPlan(SAMPLE_PROJECTS.aws, 'aws'));
+  if (provider === 'aws') return addBundle(startPlan(SAMPLE_PROJECTS.aws, 'aws'), 0, SAMPLE_CARD_AWS);
   return addBundle(startPlan(SAMPLE_PROJECT), 0, SAMPLE_CARD);
 }

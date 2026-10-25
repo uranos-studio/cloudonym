@@ -129,7 +129,7 @@
             "null"
           ],
           "maxLength": 1024,
-          "description": "A preset id: web, was, bastion, intweb, intwas, file, db, object, run, sa, secret, gke, wip, bq, ar, topic, sub, dlq, dlqsub, build, conn, repo, cron, runjob, redis, worker, raw, ingest, appdata, queue, fs, ring, key, waf, wafedge, sqldb, sqluser, handler, tpl, mig, as, ip, ig, bs, hc, url, cert, thps, fwd, urlredir, thp, fwdredir, neg, bb, vpc, subnet, firewall, router, nat, psa, dns. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets"
+          "description": "A preset id: web, was, bastion, intweb, intwas, file, db, object, run, sa, secret, gke, wip, bq, ar, topic, sub, dlq, dlqsub, build, conn, repo, cron, runjob, redis, worker, raw, ingest, appdata, queue, fs, ring, key, waf, wafedge, sqldb, sqluser, handler, tpl, mig, as, ip, ig, bs, hc, url, cert, thps, fwd, urlredir, thp, fwdredir, neg, bb, vpc, subnet, firewall, router, nat, psa, dns. On provider aws the ids are web, was, bastion, intweb, intwas, file, db, object, sa, secret, eks, ecr, redis, fn, prof, sng, kms, ddb, lg, ecs, svc, td, ng, lb, tg, lis, lisredir, cert, eip, vpc, subnet, firewall, igw, rt, nat. null or omitted for a custom pick by rule. The presets are listed in /llms.txt Wizard presets"
         },
         "rule": {
           "type": "string",

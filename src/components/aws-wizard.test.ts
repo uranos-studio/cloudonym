@@ -35,10 +35,17 @@ describe('AWS 시작 계획 · 칩', () => {
     expect(S.canAttach(p.services[0]!.picks[0]!, 'aws')).toBe(true);
     expect(S.projectPreview({ owner: 'a', system: 'b', env: 'prod', region: 'apne2' }, undefined, 'aws')).toEqual({ name: undefined, id: undefined });
   });
-  it('카드(묶음)는 GCP 계획에서만 맞춘다 — AWS 의 web · db 는 카드가 아니다', () => {
+  it('카드(묶음)는 AWS 표로 되읽는다 (D141) — web · db 칩만으로는 카드가 없고 · lb 칩이 들면 미완성 Website · object 칩은 Static site', () => {
     let p = awsPlan();
     p = S.togglePreset(p, 0, 'db');
-    expect(cardsIn(p, 0)).toEqual([]);
+    // object 칩이 있어 Static site 로 되읽힌다(AWS 의 Static site 는 버킷 하나다) · web 만으로는 LB 카드 후보가 아니다
+    expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete])).toEqual([['static-site', true]]);
+    p = S.togglePreset(p, 0, 'lb');
+    expect(cardsIn(p, 0).map((m) => [m.bundle.id, m.complete])).toEqual([['website', false], ['static-site', true]]);
+    const website = cardsIn(p, 0)[0]!;
+    expect(website.missing.map((x) => `${x.preset}${x.tier ? `:${x.tier}` : ''}`)).toEqual(['tg', 'lis', 'lisredir', 'cert', 'firewall:web', 'firewall:internal']);
+    // GCP 카드 id 로는 AWS 계획을 되읽지 않는다 — gke 는 AWS 표에 없다
+    expect(cardsIn(p, 0).some((m) => m.bundle.id === 'gke')).toBe(false);
   });
   it('custom 트리 — AWS 규칙만 · 프로젝트 칸은 계정 · 리전 · VPC 범위', () => {
     const ids = (t: ReturnType<typeof S.customTree>): string[] => JSON.stringify(t).match(/"aws\.[a-z0-9_]+"/g) ?? [];
@@ -122,10 +129,18 @@ describe('네트워크 칸 문구 — CSP 별 (0.2)', () => {
   });
 });
 
-describe('AWS 서비스 칸 — 카드가 없어 칩이 주 경로다', () => {
+describe('AWS 서비스 칸 — 카드 갤러리가 주 경로다 (D141)', () => {
   const markup = (plan: WizardPlan) => renderToStaticMarkup(createElement(ServiceSettings, { index: 0, plan, errors: [], contextErrors: [], edit: () => {}, onCustom: () => {}, onSelect: () => {} }));
-  it('AWS 는 칩 칸(details[data-add-more])이 펼친 채로 그려진다 · GCP 는 카드가 주 경로라 접힌 채다', () => {
-    expect(markup(awsPlan())).toMatch(/<details data-add-more="true" open=""/);
+  it('AWS 도 갤러리(일곱 카드)를 그리고 칩 칸(details[data-add-more])은 GCP 처럼 접힌 채다', () => {
+    const aws = markup(awsPlan());
+    expect(aws).toMatch(/<details data-add-more="true" class=/);
+    expect(aws.match(/data-card="/g)).toHaveLength(7);
+    expect(aws).toContain('data-card="eks"');
+    expect(aws).not.toContain('data-card="gke"');
+    // 시험 문장은 CSP 이름을 넣는다 — GCP 문장이 AWS 화면에 남지 않는다
+    expect(aws).not.toMatch(/Google Cloud/);
+    expect(aws).toContain('Built and tested on Amazon Web Services');
     expect(markup(S.startPlan(PROJECT))).toMatch(/<details data-add-more="true" class=/);
+    expect(markup(S.startPlan(PROJECT)).match(/data-card="/g)).toHaveLength(12);
   });
 });

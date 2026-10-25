@@ -262,7 +262,7 @@ export function rowTitle(plan: WizardPlan, path: RowPath): string {
   if (r.kind === 'network') return en.ui.wizard_project_resources;
   if (r.kind === 'extras') return en.ui.wizard_shared_extras;
   if (r.kind === 'service') return plan.services[r.service]?.purpose || en.ui.wizard_unnamed_service;
-  if (r.kind === 'card') return bundleById(r.card)?.label ?? r.card;
+  if (r.kind === 'card') return bundleById(r.card, plan.provider)?.label ?? r.card;
   const pick = r.ref.service === null ? plan.projectPicks[r.ref.pick] : plan.services[r.ref.service]?.picks[r.ref.pick];
   return pick ? pickTitle(pick, plan.provider).title : en.ui.wizard_step_project;
 }

@@ -272,14 +272,14 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(body).toContain('`name.cannot_fit`');
     expect(body).toMatch(/never shortened/);
   });
-  it('「## Wizard presets」 — GCP 묶음 서른아홉 · AWS 묶음 열하나(0.2) · 프리셋 id 전부 · HA 규칙', () => {
+  it('「## Wizard presets」 — GCP 묶음 서른아홉 · AWS 묶음 스물하나(0.2 · D141 의 카드 부품 열셋) · 프리셋 id 전부 · HA 규칙', () => {
     const sec = section('## Wizard presets');
     const split = sec.findIndex((l) => l.startsWith('On `provider: "aws"`'));
     expect(split).toBeGreaterThan(0);
     const rows = sec.slice(0, split).filter((l) => l.startsWith('- '));
     const awsRows = sec.slice(split).filter((l) => l.startsWith('- '));
     expect(rows).toHaveLength(39);
-    expect(awsRows).toHaveLength(11);
+    expect(awsRows).toHaveLength(21);
     for (const p of PRESETS) expect(rows.join('\n'), p.id).toContain(`\`${p.id}\``);
     for (const p of presetsFor('aws')) expect(awsRows.join('\n'), p.id).toContain(`\`${p.id}\` (${p.label}) → \`${p.ruleId}\``);
     expect(rows.filter((l) => l.includes('HA'))).toHaveLength(1);
@@ -287,9 +287,23 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     expect(rows.join('\n')).toContain('`gcp.run_service`');
     expect(awsRows.join('\n')).toContain('`aws.lambda_function`');
   });
+  it('「## Wizard cards」 — AWS 절 (D141): `provider: "aws"` 뒤에 일곱 카드 · 「built and tested on AWS」 또는 「rules verified」 · GCP 카드가 섞이지 않는다', () => {
+    const sec = section('## Wizard cards');
+    const split = sec.findIndex((l) => l.startsWith('On `provider: "aws"`'));
+    expect(split).toBeGreaterThan(0);
+    const awsRows = sec.slice(split).filter((l) => l.startsWith('- '));
+    expect(awsRows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'vm-app', 'https-lb', 'ecs-service', 'eks']);
+    for (const r of awsRows) expect(r).toMatch(/built and tested on AWS|rules verified, the set not yet applied/);
+    expect(awsRows.join('\n')).not.toContain('Google Cloud');
+    expect(awsRows[0]).toContain('project: `firewall` tier `web`, `firewall` tier `internal`');
+    expect(awsRows[4]).toContain('`web` → `firewall` tier `web`, `firewall` tier `internal`; `fn` → `sa`, `firewall` tier `web`');
+    expect(awsRows[6]).toContain('`sa` role `node`');
+    expect(sec.join('\n')).not.toContain('Google Cloud only');
+  });
   it('「## Wizard cards」 (D93 · D114) — 카드 열 · 서비스 부품과 project 부품 · API 에는 카드가 없다고 말한다', () => {
     const sec = section('## Wizard cards');
-    const rows = sec.filter((l) => l.startsWith('- '));
+    const split = sec.findIndex((l) => l.startsWith('On `provider: "aws"`'));
+    const rows = sec.slice(0, split).filter((l) => l.startsWith('- '));
     expect(rows.map((l) => /^- `([a-z-]+)`/.exec(l)?.[1])).toEqual(['website', 'serverless-web', 'static-site', 'website-mig', 'vm-app', 'https-lb', 'data-warehouse', 'gke', 'event-pipeline', 'ci-cd', 'batch-job', 'task-queue']);
     expect(rows[7]).toContain('project: `vpc`, `subnet`');
     expect(rows[8]).toContain('`dlq`');
