@@ -3,13 +3,15 @@
 // 행마다 위 주석이 근거 URL 과 원문 인용이다. 유일 범위를 적은 문장이 없는 행은 note.scope_unconfirmed 를 싣는다.
 // rules/aws.ts 가 손 규칙 · 들인 행과 합친다.
 import type { CoreMessage } from '../messages';
-import type { ResourceRule, Token } from '../types';
+import type { ResourceRule, RuleEvidence, Token } from '../types';
 import type { ScopeDef } from '../scopes';
 import { NO_INVISIBLE } from '../invisible.mjs';
 
 const SCOPE: CoreMessage = { code: 'note.scope_unconfirmed' };
 const ADVISORY_WARNED: CoreMessage = { code: 'note.advisory_rule_warned' };
 const SECONDARY: CoreMessage = { code: 'note.secondary_source' };
+/** 문서보다 서버가 좁다 — 실요청에서 거부된 값으로 좁힌다 (D140) */
+const NARROWER: CoreMessage = { code: 'note.server_narrower_than_doc' };
 
 const PLACED: Token[] = ['system', 'purpose', 'env', 'region', 'slug', 'seq'];
 /** 계정 범위(IAM)는 지역이 없다 */
@@ -28,7 +30,7 @@ const LOGS_NAME = new RegExp(`${NO_INVISIBLE}^[^:*]{1,512}$`, 'u');
 const RDS_IDENT = /^[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*$/;
 
 type Spec = Pick<ResourceRule, 'id' | 'displayName' | 'slug' | 'minLength' | 'maxLength' | 'pattern' | 'scope' | 'entity' | 'category' | 'docUrl'>
-  & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl' | 'advice'>>;
+  & Partial<Pick<ResourceRule, 'forbidden' | 'noConsecutiveSeparator' | 'allowed' | 'caseRule' | 'startsWithLetter' | 'endsWithAlnum' | 'notes' | 'uniquenessDocUrl' | 'advice' | 'evidence'>>;
 
 /** 기본 — 영숫자 · 하이픈 · 밑줄로 생성, 대소문자 허용, 시작 · 끝 규칙 없음 */
 function rule(s: Spec): ResourceRule {
@@ -49,6 +51,12 @@ export const AWS_MANUAL_SCOPES: Record<AwsManualScopeId, ScopeDef> = {
   // CreateLogStream "Log stream names must be unique within the log group."
   'aws:log_group': { id: 'aws:log_group', provider: 'aws', displayName: 'Log group', parent: 'aws:region', ruleId: 'aws.logs_log_group', docUrl: 'https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_CreateLogStream.html' },
 };
+
+/** Lambda 용량 공급자 (D140) — API 참조는 140자라 적지만 서버는 64자에서 끊는다 */
+const LAMBDA_CP_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'Lambda CreateCapacityProvider in ap-northeast-2 (AWS CLI 2.38.5)', date: '2026-10-25',
+    quote: 'InvalidParameterValueException: Capacity provider name must have length less than or equal to 64: <name> — for 65 and 140 characters; 64 characters, Ab, a_b, 1a, -a, a- and a--b passed the name check and stopped at the operator role permission check; a.b answered "Member must satisfy regular expression pattern"' },
+];
 
 const RULES: ResourceRule[] = [
   // ── EC2 ──
@@ -170,8 +178,10 @@ const RULES: ResourceRule[] = [
     scope: 'aws:region', entity: 'AWS::Lambda::NetworkConnector', category: 'compute', docUrl: CFN_SCHEMA }),
   // CreateCapacityProvider CapacityProviderName "Minimum length of 1. Maximum length of 140. Pattern: (arn:aws…:capacity-provider:[a-zA-Z0-9-_]+)|[a-zA-Z0-9-_]+"
   // ARN 갈래는 기존 공급자를 가리키는 값이다 — 이름 갈래만 쓴다 · 유일 범위 문장 없음
-  rule({ id: 'aws.lambda_capacity_provider', displayName: 'Lambda Capacity Provider', slug: 'cp', minLength: 1, maxLength: 140, pattern: /^[A-Za-z0-9_-]{1,140}$/,
-    scope: 'aws:region', entity: 'AWS::Lambda::CapacityProvider', category: 'compute', docUrl: 'https://docs.aws.amazon.com/lambda/latest/api/API_CreateCapacityProvider.html', notes: [SCOPE] }),
+  // 2026-10-25 실요청(D140): 65자 · 140자는 "Capacity provider name must have length less than or equal to 64", 64자는 이름 검사를 지나 역할 권한 검사까지 갔다 — 서버 한도 64
+  rule({ id: 'aws.lambda_capacity_provider', displayName: 'Lambda Capacity Provider', slug: 'cp', minLength: 1, maxLength: 64, pattern: /^[A-Za-z0-9_-]{1,64}$/,
+    scope: 'aws:region', entity: 'AWS::Lambda::CapacityProvider', category: 'compute', docUrl: 'https://docs.aws.amazon.com/lambda/latest/api/API_CreateCapacityProvider.html',
+    evidence: LAMBDA_CP_EVIDENCE, notes: [NARROWER, SCOPE] }),
 
   // ── IAM — "IAM user, group, role, and policy names must be unique within the account. Names are not distinguished by case." ──
   // CreateGroup "Length Constraints: Minimum length of 1. Maximum length of 128. Pattern: [\w+=,.@-]+"

@@ -61,6 +61,7 @@ export const en: Catalog = {
     'note.unicode_excluded': () => 'Unicode characters that map to Punycode are accepted by the provider but rejected here (conservative, D20)',
     'note.variant_narrowed': () => 'The limit differs by kind or scope; the narrowest limit is used for all of them (conservative, D20)',
     'note.observed_server_rule': () => 'The documentation states no length or characters; the rule is the one the API enforced on a real request, checked on 2026-10-12 (D80)',
+    'note.server_narrower_than_doc': () => 'The documentation states a wider rule; the API refused names that it allows on a real request, so the narrower rule the API enforced is used (D80)',
     'note.secondary_source': () => 'The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)',
     'note.obsolete_source_applied': () => 'Part of this rule comes from a page the provider marks as retired; it is still enforced (conservative, D20)',
     'note.advisory_rule_enforced': () => 'The documentation recommends against this form rather than forbidding it; it is rejected here (conservative, D20)',

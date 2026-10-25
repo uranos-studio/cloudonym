@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { RULES, rulesFor } from './constraints';
-import { AWS_NAME_TAG, AWS_NAME_TAG_GENERAL, anchorSchemaPattern } from './rules/aws';
+import { AWS_NAME_TAG, AWS_NAME_TAG_GENERAL, AWS_OBSERVED, anchorSchemaPattern } from './rules/aws';
 import { AWS_INTAKE_ROWS } from './rules/aws-intake';
 import { AWS_MANUAL_RULES } from './rules/aws-manual';
 import { checkName } from './validate';
@@ -58,7 +58,8 @@ describe('들인 AWS 행 — 원문 스냅샷과 대조', () => {
     if (row.kind === 'a') {
       expect(row.property).toBe(src.property);
       expect(row.schemaPattern).toBe(src.pattern);
-      expect([rule.minLength, rule.maxLength]).toEqual([src.minLength ?? 1, src.maxLength]);
+      // 서버가 스키마보다 좁은 행은 rules/aws.ts 의 AWS_OBSERVED 가 maxLength 를 덮는다 (D140)
+      expect([rule.minLength, rule.maxLength]).toEqual([src.minLength ?? 1, AWS_OBSERVED[id]?.maxLength ?? src.maxLength]);
       // matchPattern — 원문이 지수 백트래킹을 하거나 「[^…]」 꼴이라 보이지 않는 문자를 받을 때만 생성기가 싣는다(좁히는 쪽).
       // 같은 집합 · 좁힘은 build-aws-rules.test.mjs 와 intake-hand.test.ts 가 본다
       if (row.matchPattern === undefined) expect(rule.pattern.source).toBe(anchorSchemaPattern(src.pattern!).source);
@@ -70,7 +71,7 @@ describe('들인 AWS 행 — 원문 스냅샷과 대조', () => {
       expect(rule.scope).toBe(typeName.startsWith('AWS::IAM::') || typeName === 'AWS::S3::MultiRegionAccessPoint' ? 'aws:account' : 'aws:region');
       const [, ns, type] = typeName.split('::').map((x) => x.toLowerCase());
       expect(rule.docUrl).toBe(`https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-${ns}-${type}.html#cfn-${ns}-${type}-${src.property!.toLowerCase()}`);
-      expect(rule.notes).toEqual([{ code: 'note.aws_schema_scope_unconfirmed' }]);
+      expect(rule.notes).toEqual(AWS_OBSERVED[id]?.notes ?? [{ code: 'note.aws_schema_scope_unconfirmed' }]);
     } else {
       expect(rule.uniqueness).toBe('none');
       expect(rule.pattern).toBe(typeName.startsWith('AWS::EC2::') ? AWS_NAME_TAG : AWS_NAME_TAG_GENERAL);

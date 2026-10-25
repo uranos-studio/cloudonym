@@ -332,12 +332,14 @@ describe('Cloud Run 서비스 (D65)', () => {
 
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
-  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) · Eventarc 트리거(D139) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
-    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) · Eventarc 트리거(D139) · AWS 셋(D140) — 안내서 docUrl · 서버 관측 노트를 함께 싣는다', () => {
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['aws.ecr_public_repository', 'aws.lambda_capacity_provider', 'aws.s3_bucket', 'gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
       'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.dns_authorization', 'gcp.eventarc_trigger', 'gcp.gke_node_pool', 'gcp.run_job']);
     for (const r of withEvidence) {
-      expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
-      expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
+      expect(r.docUrl, r.id).toMatch(r.provider === 'aws' ? /^https:\/\/docs\.aws\.amazon\.com\// : /^https:\/\/docs\.cloud\.google\.com\//);
+      // GCP — 문서에 숫자가 없어 서버 규칙을 쓴다 · AWS — 문서보다 서버가 좁다(S3 는 안내서가 적지 않은 금지 꼴 하나라 노트 없이 evidence 만)
+      if (r.provider === 'gcp') expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
+      else if (r.id !== 'aws.s3_bucket') expect(r.notes?.map((n) => n.code), r.id).toContain('note.server_narrower_than_doc');
       expect(r.evidence!.some((e) => e.kind === 'api_error'), r.id).toBe(true);
     }
   });
@@ -347,7 +349,11 @@ describe('문서 문장이 아닌 근거 (D80)', () => {
         expect(['sdk', 'api_error'], r.id).toContain(e.kind);
         expect(e.date, r.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
         expect(e.quote.length, r.id).toBeGreaterThan(10);
-        if (e.kind === 'api_error') expect(e.source, r.id).toMatch(/^(?:POST|GET) https:\/\/[a-z]+\.googleapis\.com\/v\d\/projects\/<project>\/locations\//);
+        if (e.kind === 'api_error') expect(e.source, r.id).toMatch(r.provider === 'aws'
+          // AWS — 서비스 · 작업 · 리전 · CLI 버전. 계정 번호를 싣지 않는다
+          ? /^[A-Za-z0-9 ]+ [A-Z][A-Za-z]+ in [a-z]{2}-[a-z]+-\d \(AWS CLI \d+\.\d+\.\d+\)$/
+          : /^(?:POST|GET) https:\/\/[a-z]+\.googleapis\.com\/v\d\/projects\/<project>\/locations\//);
+        expect(e.quote, r.id).not.toMatch(/\d{12}/);
       }
     }
   });

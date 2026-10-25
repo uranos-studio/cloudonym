@@ -1336,7 +1336,7 @@ export const AWS_CATALOG: readonly AwsCatalogRow[] = [
     },
     "entity": "lambda.CapacityProvider",
     "kind": null,
-    "info": "The resource name set at creation: 1 to 140 characters.",
+    "info": "The resource name set at creation: 1 to 64 characters.",
     "enterNameAt": {
       "awsCli": [],
       "terraform": [],
@@ -3940,7 +3940,7 @@ export const AWS_CATALOG: readonly AwsCatalogRow[] = [
     },
     "entity": "ecr.PublicRepository",
     "kind": null,
-    "info": "The resource name set at creation: 2 to 256 characters.",
+    "info": "The resource name set at creation: 2 to 205 characters.",
     "enterNameAt": {
       "awsCli": [],
       "terraform": [],

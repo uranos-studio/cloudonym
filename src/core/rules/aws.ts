@@ -8,8 +8,13 @@ import { AWS_CATALOG } from './aws-catalog';
 import { withTier } from '../compose';
 
 const AWS_TAGS = 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions';
-/** AWS Name 태그 값 — 아무 문자 1~256 (UTF-16 길이) */
-export const AWS_NAME_TAG = /^[\s\S]{1,256}$/;
+/** AWS Name 태그 값 — 1~256 (UTF-16 길이). 안내서는 "EC2 allows for any character" 라 적지만 요청이 XML 이라
+ *  XML 1.0 이 받지 않는 글자(탭 · LF · CR 밖의 C0 제어 문자 · U+FFFE · U+FFFF)는 서버가 거부한다 — 2026-10-25 실요청(D140):
+ *  U+0001 · U+000B · U+001F · U+FFFE · U+FFFF 는 "InvalidCharacter: Your request contains an invalid XML character", 탭 · LF · CR · U+007F · U+0085 · U+200B 는 통과.
+ *  짝 없는 대리 문자도 XML 이 받지 않는다 — 잴 수 없어(CLI 가 보내지 못한다) 보수적으로 뺀다(D20) */
+// 제어 문자를 빼려고 일부러 쓴다
+// oxlint-disable-next-line no-control-regex
+export const AWS_NAME_TAG = /^(?:[^\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]){1,256}$/;
 const AWS_NAME_TAG_NOTE: CoreMessage = { code: 'note.aws_tag_utf16_length' };
 
 const AWS_HAND_RULES: Record<string, ResourceRule> = {
@@ -18,10 +23,13 @@ const AWS_HAND_RULES: Record<string, ResourceRule> = {
     displayName: 'S3 Bucket', slug: 'bucket', minLength: 3, maxLength: 63,
     pattern: /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/, allowed: 'lower-digit-hyphen', separator: '-', caseRule: 'lower',
     startsWithLetter: false, endsWithAlnum: true,
-    forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..'], ipv4: true },
+    forbidden: { prefixes: ['xn--', 'sthree-', 'amzn-s3-demo-'], suffixes: ['-s3alias', '--ol-s3', '.mrap', '--x-s3', '--table-s3', '-an'], contains: ['..', '.-', '-.'], ipv4: true },
     template: ['owner', 'system', 'purpose', 'env', 'slug'], optional: ['owner'],
     scope: 'aws:partition', entity: 's3.bucket', category: 'storage', uniqueness: 'csp',
     docUrl: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html',
+    // 안내서는 연속 마침표만 적는다. 마침표와 하이픈이 붙은 꼴(.- · -.)은 서버가 거부한다 — 2026-10-25 실요청(D140)
+    evidence: [{ kind: 'api_error', source: 'S3 CreateBucket in ap-northeast-2 (AWS CLI 2.38.5)', date: '2026-10-25',
+      quote: 'InvalidBucketName: The specified bucket is not valid. — for <name>.-<name>, <name>-.<name>, <name>..<name>, a leading or trailing hyphen or period, 64 characters, an uppercase letter, an underscore and an IPv4 address; a leading digit, a--b, a.b and 63 characters were created and deleted' }],
     notes: [{ code: 'note.s3_an_suffix' }],
   },
   'aws.iam_role': {
@@ -173,8 +181,24 @@ function slugFromCatalog(id: string): string {
 
 /** 손으로 쓴 규칙 다음에 들인 행 — 생성기 순서(타입 이름 순).
  *  count 규칙 템플릿에는 seq 바로 앞에 용도 토큰 자리를 둔다 (D60) — 꺼진 CSP 라도 템플릿 꼴을 맞춘다. 빈 토큰이라 이름은 그대로다 */
+/** 생성 행 위에 덮는 실측 값 (D140) — 스키마보다 서버가 좁은 행. 생성기(D43)는 스키마를 그대로 옮기므로 여기서 좁힌다 */
+export const AWS_OBSERVED: Record<string, Pick<ResourceRule, 'maxLength' | 'evidence' | 'notes'>> = {
+  // CreateRepository(ecr-public) repositoryName — 스키마 · API 참조는 2~256. us-east-1 실요청: 206자 · 256자는 "Member must have length less than or equal to 205", 205자는 만들어졌다(지웠다)
+  'aws.ecr_public_repository': {
+    maxLength: 205,
+    evidence: [{ kind: 'api_error', source: 'ECR Public CreateRepository in us-east-1 (AWS CLI 2.38.5)', date: '2026-10-25',
+      quote: "InvalidParameterException: Invalid parameter at 'repositoryName' failed to satisfy constraint: 'Member must have length less than or equal to 205' — for 206 and 256 characters; 205 characters, a/b, a/b/c, a__b and a---b were created and deleted" }],
+    notes: [{ code: 'note.server_narrower_than_doc' }, AWS_SCHEMA_NOTE],
+  },
+};
+
+function withObserved(r: ResourceRule): ResourceRule {
+  const o = AWS_OBSERVED[r.id];
+  return o === undefined ? r : { ...r, ...o };
+}
+
 export const AWS_RULES: Record<string, ResourceRule> = Object.fromEntries(Object.entries({
   ...AWS_HAND_RULES,
-  ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, fromIntakeRow(r)])),
+  ...Object.fromEntries(AWS_INTAKE_ROWS.map((r) => [r.id, withObserved(fromIntakeRow(r))])),
   ...AWS_MANUAL_RULES,
 }).map(([id, r]) => [id, { ...r, slug: slugFromCatalog(id), template: withTier(r.template) }]));

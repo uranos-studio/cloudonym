@@ -1894,11 +1894,15 @@
    "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html#tag-restrictions",
    "valid": [
     "a~ *#(b)",
-    "a~\u0001b"
+    "a~\tb",
+    "a~​b"
    ],
-   "invalid": [],
-   "noInvalid": "EC2 는 태그 값에 어떤 문자든 받는다 — 문자로 거부할 예가 원문에 없다",
-   "invisibleAllowed": "같은 이유"
+   "invalid": [
+    "a~\u0001b",
+    "a~\u000bb",
+    "a~￿b"
+   ],
+   "invisibleAllowed": "EC2 는 태그 값에 어떤 문자든 받는다 — 다만 요청이 XML 이라 XML 이 받지 않는 글자(탭 · LF · CR 밖의 C0 제어 문자 · U+FFFE · U+FFFF)는 서버가 거부한다(2026-10-25 실측 · D140)"
   }
  },
  "gcp": {

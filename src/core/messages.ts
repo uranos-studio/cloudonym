@@ -24,7 +24,7 @@ export const MESSAGE_CODES = [
   'note.gcp_vm_project_unique', 'note.aws_key_pair_scope_unconfirmed', 'note.aws_schema_scope_unconfirmed',
   // rules/*-manual.ts notes (11)
   'note.scope_unconfirmed', 'note.narrower_source_used', 'note.blocklist_narrowed', 'note.parent_length_limit', 'note.unicode_excluded',
-  'note.variant_narrowed', 'note.secondary_source', 'note.observed_server_rule', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
+  'note.variant_narrowed', 'note.secondary_source', 'note.observed_server_rule', 'note.server_narrower_than_doc', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
   'note.advisory_rule_warned',
   // validate.ts checkAdvice (1)
   'warning.arn_suffix_lookalike',
@@ -100,6 +100,7 @@ export type CoreMessage =
   | { code: 'note.variant_narrowed' }
   | { code: 'note.secondary_source' }
   | { code: 'note.observed_server_rule' }
+  | { code: 'note.server_narrower_than_doc' }
   | { code: 'note.obsolete_source_applied' }
   | { code: 'note.advisory_rule_enforced' }
   | { code: 'note.advisory_rule_warned' }

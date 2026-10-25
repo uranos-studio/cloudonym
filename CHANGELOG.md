@@ -4,13 +4,17 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-25.4. New Google Cloud rules measured on the live API, because the official documents give no length or characters; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-25.5. New Google Cloud rules measured on the live API, because the official documents give no length or characters; AWS rules checked against the live API, and four of them narrowed where the server refused names the rules had accepted (D140).
 
 ### Added
 
 - **GKE node pool** (D137) — `gcp.gke_node_pool` (`np`, `google_container_node_pool.name`), unique within its cluster under a new `gcp:gke_cluster` scope (a second pool of the same name in the cluster answers 409, another cluster takes it), no region token: lowercase letters, digits and hyphens, a letter first and a letter or digit last, 1–40 characters — the server's own regex, measured on 2026-10-25 (`note.observed_server_rule`). 148 Google Cloud rules.
 - **Certificate Manager certificate, certificate map, map entry and DNS authorization** (D138) — `gcp.certificate_manager_certificate` (`cmc`) and `gcp.dns_authorization` (`dnsa`) per location (global or a region) with a region token, `gcp.certificate_map` (`cmap`) in `global` only (`gcp:project_global`, no region token — a regional location answers `Malformed name` for every ID), and `gcp.certificate_map_entry` (`cme`) within its map under a new `gcp:certificate_map` scope, no region token; each scope measured with a second create of the same name (409) (`google_certificate_manager_*.name`): lowercase letters, digits and hyphens in any position — a leading or trailing hyphen and a leading digit were accepted — 1–63 characters, measured on 2026-10-25 (`note.observed_server_rule`). 152 Google Cloud rules.
 - **Eventarc trigger** (D139) — `gcp.eventarc_trigger` (`evt`, `google_eventarc_trigger.name`): the server's regex `^[a-z][a-z0-9-]*[a-z0-9]$`, 2–63 characters (a one-letter name is refused), measured on 2026-10-25 (`note.observed_server_rule`); unique per location and project as `Trigger.name` states, with a region token. 153 Google Cloud rules.
+
+### Fixed
+
+- **AWS rules narrowed to what the API enforces** (D140) — every AWS rule was checked against the live API on 2026-10-25 (`docs/rule-verification.md`). Four accepted names the server refuses: EC2 `Name` tags (`aws.vpc`, `aws.ec2_instance` and every other EC2 tag rule) no longer accept C0 control characters other than tab, LF and CR, U+FFFE or U+FFFF — the request is XML and the server answers `InvalidCharacter`; `aws.s3_bucket` refuses a period next to a hyphen (`.-`, `-.`); `aws.lambda_capacity_provider` is 1–64 characters, not 140; `aws.ecr_public_repository` is 2–205, not 256. New note `note.server_narrower_than_doc` on the last two; all four carry `api_error` evidence.
 
 ## [0.2.1] - 2026-10-24
 
