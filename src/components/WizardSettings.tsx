@@ -89,8 +89,8 @@ export function ProjectForm({ plan, envs, onToggleEnv, errors, projectIds, proje
         </div>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
-        {text('owner', 'Owner', en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
-        {text('system', 'System', en.ui.field_system_hint, en.ui.field_system_placeholder)}
+        {text('owner', en.ui.field_owner_label, en.ui.field_owner_hint, en.ui.field_owner_placeholder)}
+        {text('system', en.ui.field_system_label, en.ui.field_system_hint, en.ui.field_system_placeholder)}
         {/* 환경 — 칩 여럿 (D82). 둘 이상 고르면 같은 계획을 env 마다 짓는다 · 마지막 하나는 끌 수 없다 */}
         {/* 칩 묶음을 키보드로 지나쳐 나가도 건드린 것으로 센다 — 빈 환경의 오류가 그때부터 보인다 (D97) */}
         <div role="group" aria-labelledby="wizard-envs-label" aria-describedby={errorFor('env') ? 'wizard-envs-hint wizard-envs-error' : 'wizard-envs-hint'} className="sm:col-span-2"

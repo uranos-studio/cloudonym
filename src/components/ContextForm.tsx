@@ -5,16 +5,16 @@ import { ENV_VALUES, MAX_CONTEXT_CHARS } from '../core/engine';
 import { format } from '../messages/catalog';
 import { en } from '../messages/en';
 import { RegionPicker } from './RegionPicker';
+import { ENV_NAMES } from './wizardStyles';
 import type { FormContext } from './formContext';
 
 type TextKey = 'owner' | 'system' | 'purpose';
 const TEXT_FIELDS: ReadonlyArray<{ key: TextKey; label: string; hint: string; placeholder: string }> = [
-  { key: 'owner', label: 'Owner', hint: en.ui.field_owner_hint, placeholder: en.ui.field_owner_placeholder },
-  { key: 'system', label: 'System', hint: en.ui.field_system_hint, placeholder: en.ui.field_system_placeholder },
-  { key: 'purpose', label: 'Purpose', hint: en.ui.field_purpose_hint, placeholder: en.ui.field_purpose_placeholder },
+  { key: 'owner', label: en.ui.field_owner_label, hint: en.ui.field_owner_hint, placeholder: en.ui.field_owner_placeholder },
+  { key: 'system', label: en.ui.field_system_label, hint: en.ui.field_system_hint, placeholder: en.ui.field_system_placeholder },
+  { key: 'purpose', label: en.ui.field_purpose_label, hint: en.ui.field_purpose_hint, placeholder: en.ui.field_purpose_placeholder },
 ];
-/** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름만 여기 둔다(Record 라 값이 늘면 typecheck 가 잡는다) */
-const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
+/** env 값은 core 의 표준값 목록에서 — 손으로 적지 않는다. 표시 이름은 마법사와 같은 표(ENV_NAMES)다 */
 const ENVS: ReadonlyArray<{ value: Env; label: string }> = ENV_VALUES.map((value) => ({ value, label: `${value} — ${ENV_NAMES[value]}` }));
 
 const LABEL = 'block text-sm font-medium text-zinc-800 dark:text-zinc-200';

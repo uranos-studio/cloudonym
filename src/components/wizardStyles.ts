@@ -35,7 +35,11 @@ export const CHIP =
   'dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:aria-pressed:border-indigo-500 dark:aria-pressed:bg-indigo-500';
 export const ERR = 'text-xs text-rose-700 dark:text-rose-300';
 
-export const ENV_NAMES: Record<Env, string> = { prod: 'Production', stg: 'Staging', dev: 'Development', sbx: 'Sandbox', qa: 'Quality assurance', uat: 'User acceptance', test: 'Test', perf: 'Performance', dr: 'Disaster recovery' };
+/** env 표시 이름 — 문구는 사전(en.ts)에 있다. Record 라 env 값이 늘면 typecheck 가 잡는다 */
+export const ENV_NAMES: Record<Env, string> = {
+  prod: en.ui.env_name_prod, stg: en.ui.env_name_stg, dev: en.ui.env_name_dev, sbx: en.ui.env_name_sbx, qa: en.ui.env_name_qa,
+  uat: en.ui.env_name_uat, test: en.ui.env_name_test, perf: en.ui.env_name_perf, dr: en.ui.env_name_dr,
+};
 /** 규칙 표 — 표시 이름 · 종류 표. 화면 안에서 한 번 만든다 */
 /** 마법사 CSP(gcp · aws)의 규칙 — id 에 CSP 접두가 있어 한 표다 */
 export const RULES = new Map<string, ResourceRule>((['gcp', 'aws'] as const).flatMap((p) => treeRules(buildTree(p))).map((r) => [r.id, r]));
