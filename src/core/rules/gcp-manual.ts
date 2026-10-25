@@ -52,6 +52,13 @@ const CB_REPOSITORY_EVIDENCE: readonly RuleEvidence[] = [
     quote: 'Malformed name: … once repository + connection + location name pass 180 characters (164 with a 1-character connection in asia-northeast3, 155 with a 10-character one, 171 in us-east1) — wider than the create limit' },
 ];
 
+const GKE_NODE_POOL = 'https://docs.cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.name';
+/** GKE 노드 풀 (D137) — NodePool.name 은 "The name of the node pool." 뿐이다. 길이 · 글자는 서버 응답으로 정한다 */
+const GKE_NODE_POOL_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://container.googleapis.com/v1/projects/<project>/locations/asia-northeast3-a/clusters/<cluster>/nodePools', date: '2026-10-25',
+    quote: "Invalid value for field \"node_pool.name\": \"<id>\". Must be a match of regex '(?:[a-z](?:[-a-z0-9]{0,38}[a-z0-9])?)' (only lowercase alphanumerics and '-' allowed, must start with a letter and end with an alphanumeric, and must be no longer than 40 characters). — for A, a_b, a.b, -a, a- and 1a; 41 characters answer Node_pool.name must be less than 40 characters.; a and 40 characters were created (0 nodes) and deleted with the cluster" },
+];
+
 const BQ_TABLE_ID = 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id';
 const BQ_TABLE_NAMING = 'https://docs.cloud.google.com/bigquery/docs/tables#table_naming';
 
@@ -106,7 +113,7 @@ function rule(s: Spec): ResourceRule {
 }
 
 /** 부모 리소스 범위 — 원문이 「이 안에서 유일하다」고 적은 부모 */
-export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection' | 'gcp:bigquery_dataset' | 'gcp:tag_key';
+export type GcpManualScopeId = 'gcp:spanner_instance' | 'gcp:workforce_pool' | 'gcp:workload_identity_pool' | 'gcp:artifact_registry_repository' | 'gcp:cloud_sql_instance' | 'gcp:router' | 'gcp:cloudbuild_connection' | 'gcp:bigquery_dataset' | 'gcp:tag_key' | 'gcp:gke_cluster';
 export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // "The instance partition ID must also be unique within your instance." (Spanner 안내서) · Backup.name 은 instances/<instance>/backups/ 아래
   'gcp:spanner_instance': { id: 'gcp:spanner_instance', provider: 'gcp', displayName: 'Spanner instance', parent: 'gcp:project', ruleId: 'gcp.spanner_instance', docUrl: 'https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.instancePartitions/create' },
@@ -126,6 +133,8 @@ export const GCP_MANUAL_SCOPES: Record<GcpManualScopeId, ScopeDef> = {
   // 안내서 "When you create a table in BigQuery, the table name must be unique per dataset." — 테이블 · 뷰는 데이터세트 아래다 (D132)
   'gcp:bigquery_dataset': { id: 'gcp:bigquery_dataset', provider: 'gcp', displayName: 'BigQuery dataset', parent: 'gcp:project', ruleId: 'gcp.bigquery_dataset', docUrl: BQ_TABLE_NAMING },
   // TagValue.shortName "The short name should be unique for TagValues within the same parent TagKey." — 값은 키 아래다 (D135)
+  // 노드 풀은 clusters/{cluster}/nodePools 아래다 — 유일 범위 문장은 없다(규칙 notes) (D137)
+  'gcp:gke_cluster': { id: 'gcp:gke_cluster', provider: 'gcp', displayName: 'GKE cluster', parent: 'gcp:project_location', ruleId: 'gcp.gke_cluster', docUrl: GKE_NODE_POOL },
   'gcp:tag_key': { id: 'gcp:tag_key', provider: 'gcp', displayName: 'Tag key', parent: 'gcp:project', ruleId: 'gcp.tag_key', docUrl: `${RM_V3}/tagValues#TagValue.FIELDS.short_name` },
 };
 
@@ -174,6 +183,10 @@ const RULES: ResourceRule[] = [
   // ── GKE ──
   // schemas.Cluster.properties.name "The name must be unique within this project and location (e.g. zone or region), and can be up to 40 characters with the following restrictions: * Lowercase letters, numbers, and hyphens only. * Must start with a letter. * Must end with a number or a letter."
   rule({ id: 'gcp.gke_cluster', displayName: 'GKE Cluster', slug: 'gke', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/, scope: 'gcp:project_location', entity: 'container.clusters', category: 'containers', docUrl: 'https://www.googleapis.com/discovery/v1/apis/container/v1/rest' }),
+  // 노드 풀 (D137) — NodePool.name "The name of the node pool." 뿐이다. 2026-10-25 탐침(nodePools.create, 노드 0개): A · a_b · a.b · -a · a- · 1a 는 정규식 오류,
+  // 41자는 "must be less than 40 characters", a · 40자는 만들어졌다(클러스터와 함께 지웠다). 서버 규칙 = 클러스터와 같은 꼴 1-40. 위치는 부모 클러스터의 것이다 — 지역 토큰이 없다(D77)
+  rule({ id: 'gcp.gke_node_pool', displayName: 'GKE Node Pool', slug: 'np', minLength: 1, maxLength: 40, pattern: /^[a-z](?:[a-z0-9-]{0,38}[a-z0-9])?$/,
+    scope: 'gcp:gke_cluster', entity: 'container.nodePools', category: 'containers', docUrl: GKE_NODE_POOL, evidence: GKE_NODE_POOL_EVIDENCE, notes: [OBSERVED, SCOPE] }),
 
   // ── Artifact Registry ──
   // 저장소 (D80) — 안내서 · REST 참조 · gcloud 어디에도 길이 · 문자 문장이 없다("Required. The repository id to use for this repository."). 유일 범위만 있다:

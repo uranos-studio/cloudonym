@@ -4896,6 +4896,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       "resource-manager tags values",
       "tag value"
     ]
+  },
+  {
+    "key": "gcp.gke_node_pool",
+    "displayName": "GKE Node Pool",
+    "category": "containers",
+    "rules": {
+      "gcp.gke_node_pool": {
+        "scope": "in gke_cluster",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "np",
+      "basis": "Initials of node pool; pool alone is generic; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A node pool of a GKE Standard cluster; lowercase letters, digits and hyphens, a letter first and a letter or digit last, at most 40 characters (measured on the API, no documented rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud container node-pools create"
+      ],
+      "terraform": [
+        "google_container_node_pool.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_container_node_pool",
+      "container node-pools"
+    ]
   }
 ];
 

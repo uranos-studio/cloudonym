@@ -2,6 +2,14 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
+## [Unreleased]
+
+Rules revision for this release: 2026-10-25.1. New Google Cloud rules measured on the live API, because the official documents give no length or characters; no name, verdict or suggestion for an existing input changes.
+
+### Added
+
+- **GKE node pool** (D137) — `gcp.gke_node_pool` (`np`, `google_container_node_pool.name`), unique within its cluster under a new `gcp:gke_cluster` scope, no region token: lowercase letters, digits and hyphens, a letter first and a letter or digit last, 1–40 characters — the server's own regex, measured on 2026-10-25 (`note.observed_server_rule`). 148 Google Cloud rules.
+
 ## [0.2.1] - 2026-10-24
 
 Rules revision for this release: 2026-10-24.10. New Google Cloud rules; no name, verdict or suggestion for an existing input changes.

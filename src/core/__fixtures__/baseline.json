@@ -2528,6 +2528,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "billing-trade-prod-ane3-ar-01",
             "valid": true,
@@ -8855,6 +8864,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -15188,6 +15206,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "billing-trade-prod-ane3-ar-01",
             "valid": true,
@@ -21515,6 +21542,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -27848,6 +27884,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "windows-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "windows-trade-prod-ane3-ar-01",
             "valid": true,
@@ -34175,6 +34220,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "google-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -40508,6 +40562,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "azure-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "azure-trade-prod-ane3-ar-01",
             "valid": true,
@@ -46835,6 +46898,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-gke-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "gke_node_pool": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-np-01",
             "violations": 1,
             "steps": 1
           },
@@ -53168,6 +53240,15 @@
             "violations": 0,
             "steps": 1
           },
+          "gke_node_pool": {
+            "name": "paymentsettlem-reconciliation-dev-np-01",
+            "valid": true,
+            "isTruncated": true,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-np-01",
+            "violations": 0,
+            "steps": 1
+          },
           "artifact_registry_repository": {
             "name": "paymentsettlement-reconciliation-dev-ar-01",
             "valid": true,
@@ -59495,6 +59576,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "a-long-longpurpose-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -65828,6 +65918,15 @@
             "violations": 1,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "3tier-trade-prod-np-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-np-01",
+            "violations": 1,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "3tier-trade-prod-ane3-ar-01",
             "valid": false,
@@ -72155,6 +72254,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -78488,6 +78596,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "billing-trade-prod-ane3-ar-01",
             "valid": true,
@@ -84818,6 +84935,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "billing-trade-prod-ane3-ar-01",
             "valid": true,
@@ -91145,6 +91271,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -97502,6 +97637,15 @@
             "violations": 0,
             "steps": 0
           },
+          "gke_node_pool": {
+            "name": "billing-trade-uat-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-np-01",
+            "violations": 0,
+            "steps": 0
+          },
           "artifact_registry_repository": {
             "name": "billing-trade-uat-ane3-ar-01",
             "valid": true,
@@ -102320,6 +102464,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-gke-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "gke_node_pool": {
+            "name": "billing-trade-prod-np-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-np-01",
             "violations": 0,
             "steps": 0
           },
@@ -215677,6 +215830,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "gke_node_pool",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "global_address",
         "name": "",
         "known": true,
@@ -229710,6 +229971,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -230437,6 +230699,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -231158,6 +231421,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -231886,6 +232150,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -232613,6 +232878,7 @@
           "gcp_spanner_database = \"windows-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"windows-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"windows-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"windows-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"windows-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"windows-trade-prod-rule-01\"",
           "gcp_run_service = \"windows-trade-prod-ane3-run-01\"",
@@ -233338,6 +233604,7 @@
           "gcp_spanner_database = \"google-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"google-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"google-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"google-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"google-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"google-trade-prod-rule-01\"",
           "gcp_run_service = \"google-trade-prod-ane3-run-01\"",
@@ -234067,6 +234334,7 @@
           "gcp_spanner_database = \"azure-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"azure-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"azure-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"azure-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"azure-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"azure-trade-prod-rule-01\"",
           "gcp_run_service = \"azure-trade-prod-ane3-run-01\"",
@@ -234811,6 +235079,7 @@
           "# INVALID: gcp_spanner_database",
           "# INVALID: gcp_spanner_backup",
           "# INVALID: gcp_gke_cluster",
+          "# INVALID: gcp_gke_node_pool",
           "# INVALID: gcp_artifact_registry_repository",
           "# INVALID: gcp_artifact_registry_rule",
           "# INVALID: gcp_cloud_function_gen1",
@@ -235521,6 +235790,7 @@
           "gcp_spanner_database = \"payments-reconcil-dev-spdb-01\"",
           "gcp_spanner_backup = \"paymentsettlement-reconciliation-dev-bkp-01\"",
           "gcp_gke_cluster = \"paymentsettlem-reconciliation-dev-gke-01\"",
+          "gcp_gke_node_pool = \"paymentsettlem-reconciliation-dev-np-01\"",
           "gcp_artifact_registry_repository = \"paymentsettlement-reconciliation-dev-ar-01\"",
           "gcp_artifact_registry_rule = \"paymentsettlement-reconciliation-dev-rule-01\"",
           "gcp_run_service = \"paymentsettlement-reconciliation-dev-run-01\"",
@@ -236248,6 +236518,7 @@
           "gcp_spanner_database = \"a-long-longpurp-prod-spdb-01\"",
           "gcp_spanner_backup = \"a-long-longpurpose-prod-bkp-01\"",
           "gcp_gke_cluster = \"a-long-longpurpose-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"a-long-longpurpose-prod-np-01\"",
           "gcp_artifact_registry_repository = \"a-long-longpurpose-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"a-long-longpurpose-prod-rule-01\"",
           "gcp_run_service = \"a-long-longpurpose-prod-ane3-run-01\"",
@@ -237334,6 +237605,7 @@
           "# INVALID: gcp_spanner_database",
           "# INVALID: gcp_spanner_backup",
           "# INVALID: gcp_gke_cluster",
+          "# INVALID: gcp_gke_node_pool",
           "# INVALID: gcp_artifact_registry_repository",
           "# INVALID: gcp_cloud_function_gen1",
           "# INVALID: gcp_cloud_function",
@@ -237702,6 +237974,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -238418,6 +238691,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -239130,6 +239404,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -239858,6 +240133,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",
@@ -240585,6 +240861,7 @@
           "gcp_spanner_database = \"billing-trade-uat-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-uat-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-uat-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-uat-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-uat-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-uat-rule-01\"",
           "gcp_run_service = \"billing-trade-uat-ane3-run-01\"",
@@ -241136,6 +241413,7 @@
           "gcp_spanner_database = \"billing-trade-prod-spdb-01\"",
           "gcp_spanner_backup = \"billing-trade-prod-bkp-01\"",
           "gcp_gke_cluster = \"billing-trade-prod-ane3-gke-01\"",
+          "gcp_gke_node_pool = \"billing-trade-prod-np-01\"",
           "gcp_artifact_registry_repository = \"billing-trade-prod-ane3-ar-01\"",
           "gcp_artifact_registry_rule = \"billing-trade-prod-rule-01\"",
           "gcp_run_service = \"billing-trade-prod-ane3-run-01\"",

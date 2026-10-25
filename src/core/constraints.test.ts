@@ -225,9 +225,9 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.cloud_function']!.entity).toBe('cloudfunctions.functions');
   });
 
-  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 22(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 포함) · D79 의 3 포함', () => {
+  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 23(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(70);
+    expect(none).toHaveLength(71);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -332,8 +332,8 @@ describe('Cloud Run 서비스 (D65)', () => {
 
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
-  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
-    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.run_job']);
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.gke_node_pool', 'gcp.run_job']);
     for (const r of withEvidence) {
       expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
       expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
@@ -511,5 +511,20 @@ describe('네트워크 방화벽 정책 — 전역 · 지역 (D136)', () => {
     expect(info('gcp.network_firewall_policy')).toContain('a letter first and a letter or digit last');
     expect(info('gcp.logging_metric')).toContain("_ - . , + ! * ' ( ) % /");
     expect(info('gcp.logging_metric')).not.toContain("',()");
+  });
+});
+
+describe('GKE 노드 풀 (D137) — 문서에 규칙이 없어 서버 응답으로 정했다', () => {
+  const r = RULES['gcp.gke_node_pool']!;
+  const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
+  it('클러스터 안에서 · 지역 토큰 없음 · 약어 np · 길이 1-40 · 근거는 api_error', () => {
+    expect({ scope: r.scope, entity: r.entity, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength })
+      .toEqual({ scope: 'gcp:gke_cluster', entity: 'container.nodePools', regionToken: 'none', slug: 'np', min: 1, max: 40 });
+    expect(r.evidence?.map((e) => [e.kind, e.date])).toEqual([['api_error', '2026-10-25']]);
+    expect(r.notes?.map((n) => n.code)).toEqual(['note.observed_server_rule', 'note.scope_unconfirmed']);
+  });
+  it('소문자로 시작 · 영숫자로 끝 · 그 사이 소문자 · 숫자 · 하이픈 — 서버가 거부한 이름은 거부한다', () => {
+    for (const name of ['a', 'a1', 'a--b', 'm'.repeat(40)]) expect(ok(name), name).toBe(true);
+    for (const name of ['A', 'a_b', 'a.b', '-a', 'a-', '1a', '', 'm'.repeat(41)]) expect(ok(name), name).toBe(false);
   });
 });

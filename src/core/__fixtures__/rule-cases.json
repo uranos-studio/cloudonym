@@ -2228,5 +2228,26 @@
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ]
+  },
+  "gcp.gke_node_pool": {
+    "valid": [
+      "a",
+      "a1",
+      "a-1",
+      "a--b",
+      "np",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-np-01"
+    ],
+    "invalid": [
+      "A",
+      "a_b",
+      "a.b",
+      "-a",
+      "a-",
+      "1a",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
   }
 }
