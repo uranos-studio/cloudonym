@@ -137,10 +137,11 @@ describe('고유성 부류 · 분류 · 유일성 (D31 · D37 · D38)', () => {
     expect(RULES['azure.aks_nodepool_linux'].entity).toBe('Microsoft.ContainerService/managedClusters/agentPools');
     expect(RULES['azure.aks_nodepool_windows'].entity).toBe(RULES['azure.aks_nodepool_linux'].entity);
   });
-  it("uniqueness 'none' 인 규칙은 AWS Name 태그와 GCP 프로젝트 이름(D85)뿐이다 — 그 역도 같다", () => {
-    for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG || r.pattern === AWS_NAME_TAG_GENERAL || r.id === 'gcp.project_name');
+  it("uniqueness 'none' 인 규칙은 AWS Name 태그 · GCP 프로젝트 이름(D85) · 같은 이름이 만들어진 AWS 넷(D142)뿐이다 — 그 역도 같다", () => {
+    const sameNameCreated = ['aws.appsync_graphql_api', 'aws.cognito_identity_pool', 'aws.cognito_user_pool', 'aws.cognito_user_pool_client'];
+    for (const r of Object.values(RULES)) expect(r.uniqueness === 'none', r.id).toBe(r.pattern === AWS_NAME_TAG || r.pattern === AWS_NAME_TAG_GENERAL || r.id === 'gcp.project_name' || sameNameCreated.includes(r.id));
     const tagIntake = AWS_INTAKE_ROWS.filter((x) => x.kind === 'b').map((x) => x.id);
-    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ebs_volume', 'aws.ec2_instance', 'aws.internet_gateway', 'aws.route_table', 'aws.subnet', 'aws.vpc', 'gcp.project_name', ...tagIntake].sort());
+    expect(Object.values(RULES).filter((r) => r.uniqueness === 'none').map((r) => r.id).sort()).toEqual(['aws.ebs_volume', 'aws.ec2_instance', 'aws.internet_gateway', 'aws.route_table', 'aws.subnet', 'aws.vpc', 'gcp.project_name', ...sameNameCreated, ...tagIntake].sort());
   });
   it('uniquenessDocUrl 이 있으면 https 이고 docUrl 과 다르다', () => {
     for (const r of Object.values(RULES)) {
@@ -333,12 +334,13 @@ describe('Cloud Run 서비스 (D65)', () => {
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
   it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) · Eventarc 트리거(D139) · AWS 셋(D140) — 안내서 docUrl · 서버 관측 노트를 함께 싣는다', () => {
-    expect(withEvidence.map((r) => r.id).sort()).toEqual(['aws.ecr_public_repository', 'aws.lambda_capacity_provider', 'aws.s3_bucket', 'gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['aws.appsync_graphql_api', 'aws.athena_data_catalog', 'aws.athena_workgroup', 'aws.batch_compute_environment', 'aws.batch_job_definition', 'aws.batch_job_queue', 'aws.ecr_public_repository', 'aws.events_event_bus', 'aws.lambda_capacity_provider', 'aws.s3_bucket', 'aws.scheduler_schedule_group', 'gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
       'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.dns_authorization', 'gcp.eventarc_trigger', 'gcp.gke_node_pool', 'gcp.run_job']);
     for (const r of withEvidence) {
       expect(r.docUrl, r.id).toMatch(r.provider === 'aws' ? /^https:\/\/docs\.aws\.amazon\.com\// : /^https:\/\/docs\.cloud\.google\.com\//);
       // GCP — 문서에 숫자가 없어 서버 규칙을 쓴다 · AWS — 문서보다 서버가 좁다(S3 는 안내서가 적지 않은 금지 꼴 하나라 노트 없이 evidence 만)
       if (r.provider === 'gcp') expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
+      else if (r.id === 'aws.appsync_graphql_api') expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
       else if (r.id !== 'aws.s3_bucket') expect(r.notes?.map((n) => n.code), r.id).toContain('note.server_narrower_than_doc');
       expect(r.evidence!.some((e) => e.kind === 'api_error'), r.id).toBe(true);
     }

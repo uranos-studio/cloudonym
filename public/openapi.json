@@ -1258,7 +1258,10 @@
               "gcp:bigquery_dataset",
               "gcp:tag_key",
               "gcp:gke_cluster",
-              "gcp:certificate_map"
+              "gcp:certificate_map",
+              "aws:scheduler_schedule_group",
+              "aws:cognito_user_pool",
+              "aws:glue_database"
             ],
             "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
             "example": "azure:resource_group"
@@ -1269,7 +1272,7 @@
               "csp",
               "none"
             ],
-            "description": "uniqueness \"csp\" means the provider requires the name to be unique within its scope; \"none\" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.",
+            "description": "uniqueness \"csp\" means the provider requires the name to be unique within its scope; \"none\" (AWS Name tags, and AWS names that the provider lets two resources share, such as Cognito user pools and AppSync APIs) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.",
             "example": "csp"
           },
           "name": {
@@ -2666,7 +2669,10 @@
               "gcp:bigquery_dataset",
               "gcp:tag_key",
               "gcp:gke_cluster",
-              "gcp:certificate_map"
+              "gcp:certificate_map",
+              "aws:scheduler_schedule_group",
+              "aws:cognito_user_pool",
+              "aws:glue_database"
             ],
             "description": "scope is the placement scope: the parent the resource is created in (a scope id such as azure:resource_group). It says where the name lives, not that the provider enforces uniqueness there; see uniqueness.",
             "example": "azure:resource_group"
@@ -2677,7 +2683,7 @@
               "csp",
               "none"
             ],
-            "description": "uniqueness \"csp\" means the provider requires the name to be unique within its scope; \"none\" (AWS Name tags) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.",
+            "description": "uniqueness \"csp\" means the provider requires the name to be unique within its scope; \"none\" (AWS Name tags, and AWS names that the provider lets two resources share, such as Cognito user pools and AppSync APIs) means the provider does not enforce uniqueness at all. Cloudonym compares names only with each other inside one request (name.conflict), never with resources that already exist.",
             "example": "csp"
           },
           "name": {

@@ -265,6 +265,33 @@ Every AWS rule was checked in a dedicated test account, Region ap-northeast-2 (E
 - **Logs integration.** `PutIntegration` (OpenSearch) created a collection; it was deleted with its security policies once provisioning ended.
 - **Not measured here:** `aws.rds_db_proxy`, `aws.rds_db_proxy_endpoint`, `aws.rds_global_cluster` (`FreeTierRestrictionError` before the name check; a global cluster refuses 64 characters, a leading digit and a leading hyphen first), `aws.lambda_network_connector`, `aws.lambda_microvm_image` (no command in AWS CLI 2.38.5), `aws.ecs_daemon` (needs a daemon task definition and capacity provider), the 256-character case of `aws.ec2_host`. Their rules are unchanged.
 
+## AWS rules added on 2026-10-25 and checked against the live API (D142)
+
+Each rule below comes from the create operation of the service's API reference (quoted above the rule in `src/core/rules/aws-manual.ts`) and was checked the same day in the test account of D140, with the same boundary names. Services whose resources cost money by the hour were checked only with requests that fail before creation: an invalid instance type (OpenSearch), an over-long tag in the same request (Kinesis: the schema check reports every violation at once, so a valid name leaves only the tag error), a missing IP set (WAF web ACL and rule group), a missing alarm in the rule (composite alarm), an unsupported control (Backup framework), a missing artifact bucket (CodePipeline). Free resources were created and deleted at once.
+
+| Rule(s) | Refused | Accepted | Result |
+|---|---|---|---|
+| `aws.sqs_queue`, `aws.sns_topic` | 81 / 257 characters, `.`, `:`, space; a FIFO name over the limit with `.fifo` counted | 80 / 256, `_-`, leading digit or hyphen, `<75 or 251 characters>.fifo` | matches |
+| `aws.stepfunctions_state_machine`, `aws.stepfunctions_activity` | 81, space, `#`, `:` | 80, `.`, `()`, `+=@`, Hangul | matches (the rule also refuses the rest of the listed characters) |
+| `aws.events_event_bus`, `aws.events_rule`, `aws.events_archive`, `aws.events_connection`, `aws.events_api_destination` | max+1, space, `/`; bus `aws.…` and `default` | max, `.`, `_-` | **server narrower** (bus `aws.` prefix) |
+| `aws.scheduler_schedule_group`, `aws.scheduler_schedule` | 65, space; group `default` | 64, `.`, `_-` (schedules stopped at the role check after the name check) | **server narrower** (`default`) |
+| `aws.kinesis_stream`, `aws.firehose_delivery_stream` | Kinesis 129, space, `:` | Kinesis 128 (schema check only) | Kinesis matches; Firehose not reached (`SubscriptionRequiredException` before any name check) |
+| `aws.cognito_user_pool`, `aws.cognito_user_pool_client`, `aws.cognito_identity_pool` | 129, `/`, `#`, Hangul | 128, space, `+=,.@-_`; a second resource with the same name | matches; `uniqueness` none |
+| `aws.cloudwatch_alarm`, `aws.cloudwatch_composite_alarm`, `aws.cloudwatch_dashboard` | 256, U+0001 (`restricted XML characters` / `ASCII Control characters`); dashboard `.`, space, Hangul | 255; alarm space, Hangul, `!@#$%^&*()/:` | matches |
+| `aws.ssm_parameter`, `aws.ssm_document`, `aws.ssm_maintenance_window` | parameter `a/b` (not fully qualified), `aws…`, `ssm…`, space; document `aws-…`, `amazon…`, `Amazon…`, `amzn…`, two characters; window two characters | parameter `/a/b`, 16 levels; document `awsx…`, `AWSx…`, `AWSEC2x…`, `AWSSupportx…` | matches (document prefixes: the rule is narrower; parameter names over 1010 characters answered `AccessDeniedException` for the test user, so the 1011 limit comes from the reference) |
+| `aws.backup_vault`, `aws.backup_plan`, `aws.backup_framework`, `aws.backup_report_plan` | vault one character, 51, `.`, space; plan space; framework and report plan a leading digit or hyphen, `-`, `.` | vault `_`; plan 51 and `:`; framework and report plan 256 | matches (vault and plan: the rule is narrower) |
+| `aws.opensearch_domain` | 29, uppercase, `_`, `.`, a leading digit or hyphen, space | 28, trailing hyphen, `a--b` (invalid instance type reached) | matches |
+| `aws.glue_job`, `aws.glue_crawler`, `aws.glue_database`, `aws.glue_table`, `aws.glue_connection`, `aws.glue_trigger`, `aws.glue_workflow` | 256 (`connectionName` 256 was created, then `DeleteConnection` refused it); a table named `T` after `t` in the same database | 255, space, Hangul, `/`, `:`, `*`; the same table name in a second database | matches |
+| `aws.athena_workgroup`, `aws.athena_data_catalog` | 129, space, `primary`; catalog 129–256, `.`, space, `AwsDataCatalog` | 128; catalog 128 and `@` | **server narrower** (reserved names); catalog: the rule keeps the reference's 127 |
+| `aws.codebuild_project`, `aws.codepipeline_pipeline` | 151, leading hyphen, `.`; pipeline 101, space | 150, trailing hyphen; pipeline `.@-_` (artifact bucket check reached) | matches |
+| `aws.batch_compute_environment`, `aws.batch_job_queue`, `aws.batch_job_definition` | 129, a leading hyphen, `.`, space | 128, leading digit, trailing hyphen, `a--b` | **server narrower** (leading hyphen) |
+| `aws.wafv2_web_acl`, `aws.wafv2_ip_set`, `aws.wafv2_rule_group` | 129, `.`, space | 128, `_-` | matches |
+| `aws.appsync_graphql_api` | 513 and more | 512, space, Hangul, `/`, `:`, `#`, U+0001; a second API with the same name | observed rule 1–512 (control characters refused by the rule, conservative) |
+| `aws.cloudfront_function`, `aws.cloudfront_key_value_store` | 65, `.`, space | 64, `_-` | matches |
+
+- **Left over:** the 256-character Glue network connection cannot be deleted through the API (every delete call validates the name at 255); it has no cost. A Backup report plan of 256 characters stayed in "pending execution" for a while before it could be deleted.
+- **The generated names** for `acme · billing · api · prd · ap-northeast-2` are letters, digits and hyphens (underscores for the two Backup audit rules) inside each limit — the same character classes that were accepted above.
+
 ## Azure reserved words (added 2026-09-29)
 
 Source: https://learn.microsoft.com/en-us/azure/azure-resource-manager/troubleshooting/error-reserved-resource-name — "Resources with an accessible endpoint, such as a fully qualified domain name, can't use reserved words or trademarks in the name." The naming rules page (`resource-name-rules`) also says: "Resources with a public endpoint can't include reserved words or trademarks in the name." The ⑷ verdicts in the RULES table above were made before this document was consulted; for the rules listed below, this section supersedes ⑷.

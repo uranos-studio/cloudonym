@@ -239,10 +239,10 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 131행 · AWS 170행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 131행 · AWS 217행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
     expect(catalogFor('aws')).toBe(AWS_CATALOG);
-    expect(AWS_CATALOG).toHaveLength(170);
+    expect(AWS_CATALOG).toHaveLength(217);
     expect(catalogFor('azure')).toEqual([]);
   });
 

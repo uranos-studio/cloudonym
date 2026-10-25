@@ -319,7 +319,7 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
     expect(body.providers.gcp.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.gcp)));
     expect(body.providers.gcp.meta).toEqual(JSON.parse(JSON.stringify(GCP_CATALOG_META)));
     expect(bare(body.providers.aws.rows)).toEqual(JSON.parse(JSON.stringify(AWS_CATALOG)));
-    expect(body.providers.aws.rows).toHaveLength(170);
+    expect(body.providers.aws.rows).toHaveLength(217);
     expect(body.providers.aws.regions).toEqual(JSON.parse(JSON.stringify(REGIONS.aws)));
     expect(body.providers.aws.meta).toEqual(JSON.parse(JSON.stringify(AWS_CATALOG_META)));
     expect(body.providers.azure).toBeUndefined();
@@ -330,7 +330,7 @@ describe('GET /catalog.json — Worker 라우트 (D46)', () => {
   it('켜진 CSP 목록을 바꾸면 그 CSP 만 싣는다 — 빌더 직접', () => {
     const doc = JSON.parse(buildCatalogJson(['gcp', 'aws'], VERSION));
     expect(Object.keys(doc.providers)).toEqual(['gcp', 'aws']);
-    expect(doc.providers.aws.rows).toHaveLength(170);
+    expect(doc.providers.aws.rows).toHaveLength(217);
     expect(doc.providers.aws.meta.provider).toBe('aws');
     expect(doc.providers.aws.regions).toHaveLength(REGIONS.aws.length);
     // catalog 가 아직 없는 CSP 는 빈 행 · 리전 표는 싣는다

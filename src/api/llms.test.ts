@@ -340,7 +340,9 @@ describe('buildLlmsText — RULES 에서 만든다 (D9)', () => {
     // 손으로 쓴 규칙은 resource_group(\p{L}) 과 같은 정의를 쓰는 금지형 손 규칙(Logs 둘 · Azure policy 넷 · tagNames · Synapse SQL pool)
     const intake = new Set([...AZURE_INTAKE_ROWS.map((r) => r.id), ...AWS_INTAKE_ROWS.map((r) => r.id)]);
     expect(flagged.filter((r) => !intake.has(r.id)).map((r) => r.id).sort()).toEqual([
-      'aws.logs_log_stream', 'aws.logs_subscription_filter',
+      'aws.appsync_graphql_api', 'aws.cloudwatch_alarm', 'aws.cloudwatch_composite_alarm', 'aws.cognito_identity_pool', 'aws.cognito_user_pool', 'aws.cognito_user_pool_client',
+      'aws.glue_connection', 'aws.glue_crawler', 'aws.glue_database', 'aws.glue_job', 'aws.glue_table', 'aws.glue_trigger', 'aws.glue_workflow',
+      'aws.logs_log_stream', 'aws.logs_subscription_filter', 'aws.stepfunctions_activity', 'aws.stepfunctions_state_machine',
       'azure.authorization_policy_assignments', 'azure.authorization_policy_definitions', 'azure.authorization_policy_exemptions', 'azure.authorization_policy_set_definitions',
       'azure.resource_group', 'azure.resources_tag_names', 'azure.synapse_workspaces_sql_pools',
     ]);

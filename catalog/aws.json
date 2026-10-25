@@ -5319,6 +5319,1467 @@
         "s3 storage lens",
         "s3_storage_lens"
       ]
+    },
+    {
+      "key": "aws.sqs_queue",
+      "displayName": "SQS Queue",
+      "category": "compute",
+      "rules": {
+        "aws.sqs_queue": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "sqs",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "sqs.Queue",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 80 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "sqs queue",
+        "sqs_queue",
+        "queue"
+      ]
+    },
+    {
+      "key": "aws.sns_topic",
+      "displayName": "SNS Topic",
+      "category": "compute",
+      "rules": {
+        "aws.sns_topic": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "sns",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "sns.Topic",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 256 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "sns topic",
+        "sns_topic",
+        "topic"
+      ]
+    },
+    {
+      "key": "aws.stepfunctions_state_machine",
+      "displayName": "Step Functions State Machine",
+      "category": "compute",
+      "rules": {
+        "aws.stepfunctions_state_machine": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "sfn",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "stepfunctions.StateMachine",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 80 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "step functions state machine",
+        "stepfunctions_state_machine",
+        "state machine",
+        "step functions"
+      ]
+    },
+    {
+      "key": "aws.stepfunctions_activity",
+      "displayName": "Step Functions Activity",
+      "category": "compute",
+      "rules": {
+        "aws.stepfunctions_activity": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "act",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "stepfunctions.Activity",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 80 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "step functions activity",
+        "stepfunctions_activity",
+        "activity"
+      ]
+    },
+    {
+      "key": "aws.events_event_bus",
+      "displayName": "EventBridge Event Bus",
+      "category": "compute",
+      "rules": {
+        "aws.events_event_bus": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bus",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "events.EventBus",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 256 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge event bus",
+        "events_event_bus",
+        "event bus",
+        "eventbridge bus"
+      ]
+    },
+    {
+      "key": "aws.events_rule",
+      "displayName": "EventBridge Rule",
+      "category": "compute",
+      "rules": {
+        "aws.events_rule": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "evr",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "events.Rule",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge rule",
+        "events_rule",
+        "event rule"
+      ]
+    },
+    {
+      "key": "aws.events_archive",
+      "displayName": "EventBridge Archive",
+      "category": "compute",
+      "rules": {
+        "aws.events_archive": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "arc",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "events.Archive",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 48 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge archive",
+        "events_archive",
+        "event archive"
+      ]
+    },
+    {
+      "key": "aws.events_connection",
+      "displayName": "EventBridge Connection",
+      "category": "compute",
+      "rules": {
+        "aws.events_connection": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "conn",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "events.Connection",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge connection",
+        "events_connection"
+      ]
+    },
+    {
+      "key": "aws.events_api_destination",
+      "displayName": "EventBridge API Destination",
+      "category": "compute",
+      "rules": {
+        "aws.events_api_destination": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "apid",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "events.ApiDestination",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge api destination",
+        "events_api_destination",
+        "api destination"
+      ]
+    },
+    {
+      "key": "aws.scheduler_schedule",
+      "displayName": "EventBridge Scheduler Schedule",
+      "category": "compute",
+      "rules": {
+        "aws.scheduler_schedule": {
+          "scope": "in scheduler_schedule_group",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "sch",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "scheduler.Schedule",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge scheduler schedule",
+        "scheduler_schedule",
+        "schedule"
+      ]
+    },
+    {
+      "key": "aws.scheduler_schedule_group",
+      "displayName": "EventBridge Scheduler Schedule Group",
+      "category": "compute",
+      "rules": {
+        "aws.scheduler_schedule_group": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "schg",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "scheduler.ScheduleGroup",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "eventbridge scheduler schedule group",
+        "scheduler_schedule_group",
+        "schedule group"
+      ]
+    },
+    {
+      "key": "aws.kinesis_stream",
+      "displayName": "Kinesis Data Stream",
+      "category": "database",
+      "rules": {
+        "aws.kinesis_stream": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "kds",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "kinesis.Stream",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "kinesis data stream",
+        "kinesis_stream",
+        "kinesis stream",
+        "data stream"
+      ]
+    },
+    {
+      "key": "aws.firehose_delivery_stream",
+      "displayName": "Firehose Stream",
+      "category": "database",
+      "rules": {
+        "aws.firehose_delivery_stream": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "fh",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "kinesisfirehose.DeliveryStream",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "firehose stream",
+        "firehose_delivery_stream",
+        "firehose",
+        "delivery stream"
+      ]
+    },
+    {
+      "key": "aws.cognito_user_pool",
+      "displayName": "Cognito User Pool",
+      "category": "identity",
+      "rules": {
+        "aws.cognito_user_pool": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "cup",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cognito.UserPool",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cognito user pool",
+        "cognito_user_pool",
+        "user pool",
+        "cognito"
+      ]
+    },
+    {
+      "key": "aws.cognito_user_pool_client",
+      "displayName": "Cognito User Pool Client",
+      "category": "identity",
+      "rules": {
+        "aws.cognito_user_pool_client": {
+          "scope": "in cognito_user_pool",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "cupc",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cognito.UserPoolClient",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cognito user pool client",
+        "cognito_user_pool_client",
+        "app client",
+        "user pool client"
+      ]
+    },
+    {
+      "key": "aws.cognito_identity_pool",
+      "displayName": "Cognito Identity Pool",
+      "category": "identity",
+      "rules": {
+        "aws.cognito_identity_pool": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "cip",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cognito.IdentityPool",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cognito identity pool",
+        "cognito_identity_pool",
+        "identity pool"
+      ]
+    },
+    {
+      "key": "aws.cloudwatch_alarm",
+      "displayName": "CloudWatch Alarm",
+      "category": "management",
+      "rules": {
+        "aws.cloudwatch_alarm": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "alarm",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cloudwatch.Alarm",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cloudwatch alarm",
+        "cloudwatch_alarm",
+        "alarm",
+        "metric alarm"
+      ]
+    },
+    {
+      "key": "aws.cloudwatch_composite_alarm",
+      "displayName": "CloudWatch Composite Alarm",
+      "category": "management",
+      "rules": {
+        "aws.cloudwatch_composite_alarm": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "calarm",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cloudwatch.CompositeAlarm",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cloudwatch composite alarm",
+        "cloudwatch_composite_alarm",
+        "composite alarm"
+      ]
+    },
+    {
+      "key": "aws.cloudwatch_dashboard",
+      "displayName": "CloudWatch Dashboard",
+      "category": "management",
+      "rules": {
+        "aws.cloudwatch_dashboard": {
+          "scope": "global",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "dash",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cloudwatch.Dashboard",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cloudwatch dashboard",
+        "cloudwatch_dashboard",
+        "dashboard"
+      ]
+    },
+    {
+      "key": "aws.ssm_parameter",
+      "displayName": "SSM Parameter",
+      "category": "management",
+      "rules": {
+        "aws.ssm_parameter": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "param",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "ssm.Parameter",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 1011 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "ssm parameter",
+        "ssm_parameter",
+        "parameter",
+        "parameter store"
+      ]
+    },
+    {
+      "key": "aws.ssm_document",
+      "displayName": "SSM Document",
+      "category": "management",
+      "rules": {
+        "aws.ssm_document": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "ssmdoc",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "ssm.Document",
+      "kind": null,
+      "info": "The resource name set at creation: 3 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "ssm document",
+        "ssm_document"
+      ]
+    },
+    {
+      "key": "aws.ssm_maintenance_window",
+      "displayName": "SSM Maintenance Window",
+      "category": "management",
+      "rules": {
+        "aws.ssm_maintenance_window": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "mw",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "ssm.MaintenanceWindow",
+      "kind": null,
+      "info": "The resource name set at creation: 3 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "ssm maintenance window",
+        "ssm_maintenance_window",
+        "maintenance window"
+      ]
+    },
+    {
+      "key": "aws.backup_vault",
+      "displayName": "Backup Vault",
+      "category": "storage",
+      "rules": {
+        "aws.backup_vault": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bkv",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "backup.BackupVault",
+      "kind": null,
+      "info": "The resource name set at creation: 2 to 50 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "backup vault",
+        "backup_vault"
+      ]
+    },
+    {
+      "key": "aws.backup_plan",
+      "displayName": "Backup Plan",
+      "category": "storage",
+      "rules": {
+        "aws.backup_plan": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bkp",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "backup.BackupPlan",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 50 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "backup plan",
+        "backup_plan"
+      ]
+    },
+    {
+      "key": "aws.backup_framework",
+      "displayName": "Backup Audit Framework",
+      "category": "management",
+      "rules": {
+        "aws.backup_framework": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bkf",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "backup.Framework",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 256 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "backup audit framework",
+        "backup_framework",
+        "backup framework",
+        "audit framework"
+      ]
+    },
+    {
+      "key": "aws.backup_report_plan",
+      "displayName": "Backup Report Plan",
+      "category": "management",
+      "rules": {
+        "aws.backup_report_plan": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "bkr",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "backup.ReportPlan",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 256 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "backup report plan",
+        "backup_report_plan"
+      ]
+    },
+    {
+      "key": "aws.opensearch_domain",
+      "displayName": "OpenSearch Domain",
+      "category": "database",
+      "rules": {
+        "aws.opensearch_domain": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "os",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "opensearchservice.Domain",
+      "kind": null,
+      "info": "The resource name set at creation: 3 to 28 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "opensearch domain",
+        "opensearch_domain",
+        "opensearch",
+        "elasticsearch domain"
+      ]
+    },
+    {
+      "key": "aws.glue_job",
+      "displayName": "Glue Job",
+      "category": "database",
+      "rules": {
+        "aws.glue_job": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gluejob",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Job",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue job",
+        "glue_job"
+      ]
+    },
+    {
+      "key": "aws.glue_crawler",
+      "displayName": "Glue Crawler",
+      "category": "database",
+      "rules": {
+        "aws.glue_crawler": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "crawler",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Crawler",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue crawler",
+        "glue_crawler",
+        "crawler"
+      ]
+    },
+    {
+      "key": "aws.glue_database",
+      "displayName": "Glue Database",
+      "category": "database",
+      "rules": {
+        "aws.glue_database": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gluedb",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Database",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue database",
+        "glue_database",
+        "data catalog database"
+      ]
+    },
+    {
+      "key": "aws.glue_table",
+      "displayName": "Glue Table",
+      "category": "database",
+      "rules": {
+        "aws.glue_table": {
+          "scope": "in glue_database",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gluetbl",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Table",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue table",
+        "glue_table"
+      ]
+    },
+    {
+      "key": "aws.glue_connection",
+      "displayName": "Glue Connection",
+      "category": "database",
+      "rules": {
+        "aws.glue_connection": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "glueconn",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Connection",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue connection",
+        "glue_connection"
+      ]
+    },
+    {
+      "key": "aws.glue_trigger",
+      "displayName": "Glue Trigger",
+      "category": "database",
+      "rules": {
+        "aws.glue_trigger": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gluetrg",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Trigger",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue trigger",
+        "glue_trigger"
+      ]
+    },
+    {
+      "key": "aws.glue_workflow",
+      "displayName": "Glue Workflow",
+      "category": "database",
+      "rules": {
+        "aws.glue_workflow": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gluewf",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "glue.Workflow",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 255 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "glue workflow",
+        "glue_workflow"
+      ]
+    },
+    {
+      "key": "aws.athena_workgroup",
+      "displayName": "Athena Workgroup",
+      "category": "database",
+      "rules": {
+        "aws.athena_workgroup": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "wg",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "athena.WorkGroup",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "athena workgroup",
+        "athena_workgroup",
+        "workgroup"
+      ]
+    },
+    {
+      "key": "aws.athena_data_catalog",
+      "displayName": "Athena Data Catalog",
+      "category": "database",
+      "rules": {
+        "aws.athena_data_catalog": {
+          "scope": "global",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "dc",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "athena.DataCatalog",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 127 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "athena data catalog",
+        "athena_data_catalog",
+        "data catalog",
+        "athena catalog"
+      ]
+    },
+    {
+      "key": "aws.codebuild_project",
+      "displayName": "CodeBuild Project",
+      "category": "management",
+      "rules": {
+        "aws.codebuild_project": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "cb",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "codebuild.Project",
+      "kind": null,
+      "info": "The resource name set at creation: 2 to 150 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "codebuild project",
+        "codebuild_project",
+        "codebuild",
+        "build project"
+      ]
+    },
+    {
+      "key": "aws.codepipeline_pipeline",
+      "displayName": "CodePipeline Pipeline",
+      "category": "management",
+      "rules": {
+        "aws.codepipeline_pipeline": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "pipe",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "codepipeline.Pipeline",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 100 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "codepipeline pipeline",
+        "codepipeline_pipeline",
+        "pipeline",
+        "codepipeline"
+      ]
+    },
+    {
+      "key": "aws.batch_compute_environment",
+      "displayName": "Batch Compute Environment",
+      "category": "compute",
+      "rules": {
+        "aws.batch_compute_environment": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "ce",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "batch.ComputeEnvironment",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "batch compute environment",
+        "batch_compute_environment",
+        "compute environment"
+      ]
+    },
+    {
+      "key": "aws.batch_job_queue",
+      "displayName": "Batch Job Queue",
+      "category": "compute",
+      "rules": {
+        "aws.batch_job_queue": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "jq",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "batch.JobQueue",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "batch job queue",
+        "batch_job_queue",
+        "job queue"
+      ]
+    },
+    {
+      "key": "aws.batch_job_definition",
+      "displayName": "Batch Job Definition",
+      "category": "compute",
+      "rules": {
+        "aws.batch_job_definition": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "jd",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "batch.JobDefinition",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "batch job definition",
+        "batch_job_definition",
+        "job definition"
+      ]
+    },
+    {
+      "key": "aws.wafv2_web_acl",
+      "displayName": "WAF Web ACL",
+      "category": "security",
+      "rules": {
+        "aws.wafv2_web_acl": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "waf",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "wafv2.WebACL",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "waf web acl",
+        "wafv2_web_acl",
+        "web acl",
+        "waf"
+      ]
+    },
+    {
+      "key": "aws.wafv2_ip_set",
+      "displayName": "WAF IP Set",
+      "category": "security",
+      "rules": {
+        "aws.wafv2_ip_set": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "ipset",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "wafv2.IPSet",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "waf ip set",
+        "wafv2_ip_set",
+        "ip set"
+      ]
+    },
+    {
+      "key": "aws.wafv2_rule_group",
+      "displayName": "WAF Rule Group",
+      "category": "security",
+      "rules": {
+        "aws.wafv2_rule_group": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "wafrg",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "wafv2.RuleGroup",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 128 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "waf rule group",
+        "wafv2_rule_group",
+        "rule group"
+      ]
+    },
+    {
+      "key": "aws.appsync_graphql_api",
+      "displayName": "AppSync GraphQL API",
+      "category": "compute",
+      "rules": {
+        "aws.appsync_graphql_api": {
+          "scope": "region",
+          "regionToken": "region"
+        }
+      },
+      "slug": {
+        "value": "gql",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "appsync.GraphQLApi",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 512 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "appsync graphql api",
+        "appsync_graphql_api",
+        "graphql api",
+        "appsync"
+      ]
+    },
+    {
+      "key": "aws.cloudfront_function",
+      "displayName": "CloudFront Function",
+      "category": "networking",
+      "rules": {
+        "aws.cloudfront_function": {
+          "scope": "global",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "cff",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cloudfront.Function",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cloudfront function",
+        "cloudfront_function"
+      ]
+    },
+    {
+      "key": "aws.cloudfront_key_value_store",
+      "displayName": "CloudFront KeyValueStore",
+      "category": "networking",
+      "rules": {
+        "aws.cloudfront_key_value_store": {
+          "scope": "global",
+          "regionToken": "none"
+        }
+      },
+      "slug": {
+        "value": "kvs",
+        "basis": "D142 — service or resource abbreviation chosen when the rule was added (2026-10-25); no usage count measured.",
+        "previous": []
+      },
+      "entity": "cloudfront.KeyValueStore",
+      "kind": null,
+      "info": "The resource name set at creation: 1 to 64 characters.",
+      "enterNameAt": {
+        "awsCli": [],
+        "terraform": [],
+        "apiOnly": false,
+        "preview": false
+      },
+      "badges": [],
+      "aliases": [
+        "cloudfront keyvaluestore",
+        "cloudfront_key_value_store",
+        "key value store"
+      ]
     }
   ]
 }
