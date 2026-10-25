@@ -4930,6 +4930,142 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       "google_container_node_pool",
       "container node-pools"
     ]
+  },
+  {
+    "key": "gcp.certificate_manager_certificate",
+    "displayName": "Certificate Manager Certificate",
+    "category": "networking",
+    "rules": {
+      "gcp.certificate_manager_certificate": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cmc",
+      "basis": "Certificate Manager certificate initials; cert already names the Compute Engine SSL certificate; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Certificate Manager certificate (Google-managed or uploaded) used through a certificate map or directly by a load balancer; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud certificate-manager certificates create"
+      ],
+      "terraform": [
+        "google_certificate_manager_certificate.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_certificate_manager_certificate",
+      "certificate-manager certificates"
+    ]
+  },
+  {
+    "key": "gcp.certificate_map",
+    "displayName": "Certificate Map",
+    "category": "networking",
+    "rules": {
+      "gcp.certificate_map": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "cmap",
+      "basis": "Certificate map shortened; map alone would read as a URL map; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Certificate Manager certificate map that a target HTTPS or SSL proxy points to; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud certificate-manager maps create"
+      ],
+      "terraform": [
+        "google_certificate_manager_certificate_map.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_certificate_manager_certificate_map",
+      "certificate-manager maps"
+    ]
+  },
+  {
+    "key": "gcp.certificate_map_entry",
+    "displayName": "Certificate Map Entry",
+    "category": "networking",
+    "rules": {
+      "gcp.certificate_map_entry": {
+        "scope": "in certificate_map",
+        "regionToken": "none"
+      }
+    },
+    "slug": {
+      "value": "cme",
+      "basis": "Certificate map entry initials; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An entry of a certificate map that binds a host name (or the primary matcher) to certificates; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud certificate-manager maps entries create"
+      ],
+      "terraform": [
+        "google_certificate_manager_certificate_map_entry.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_certificate_manager_certificate_map_entry",
+      "certificate-manager maps entries"
+    ]
+  },
+  {
+    "key": "gcp.dns_authorization",
+    "displayName": "Certificate Manager DNS Authorization",
+    "category": "networking",
+    "rules": {
+      "gcp.dns_authorization": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "dnsa",
+      "basis": "DNS authorization shortened; dns already names the Cloud DNS managed zone; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "A Certificate Manager DNS authorization that proves domain control for Google-managed certificates; lowercase letters, digits and hyphens in any position, at most 63 characters (measured on the API, no documented rule).",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud certificate-manager dns-authorizations create"
+      ],
+      "terraform": [
+        "google_certificate_manager_dns_authorization.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_certificate_manager_dns_authorization",
+      "certificate-manager dns-authorizations"
+    ]
   }
 ];
 

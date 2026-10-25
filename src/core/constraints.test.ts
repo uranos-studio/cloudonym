@@ -225,9 +225,9 @@ describe('catalog 를 GCP 규칙에 덮는다 (D47)', () => {
     expect(RULES['gcp.cloud_function']!.entity).toBe('cloudfunctions.functions');
   });
 
-  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 23(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 포함) · D79 의 3 포함', () => {
+  it('regionToken none 이면 템플릿과 optional 둘 다 region 이 없다 — gcp:project_global 규칙 전부 · 전역 NEG · D77 의 24(D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 · D138 의 인증서 맵 항목 포함) · D79 의 3 포함', () => {
     const none = rulesFor('gcp').filter((r) => r.regionToken === 'none');
-    expect(none).toHaveLength(71);
+    expect(none).toHaveLength(72);
     for (const r of none) {
       expect(r.template, r.id).not.toContain('region');
       expect(r.optional, r.id).not.toContain('region');
@@ -332,8 +332,9 @@ describe('Cloud Run 서비스 (D65)', () => {
 
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
-  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
-    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.gke_node_pool', 'gcp.run_job']);
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
+    expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
+      'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.dns_authorization', 'gcp.gke_node_pool', 'gcp.run_job']);
     for (const r of withEvidence) {
       expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
       expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
@@ -526,5 +527,26 @@ describe('GKE 노드 풀 (D137) — 문서에 규칙이 없어 서버 응답으�
   it('소문자로 시작 · 영숫자로 끝 · 그 사이 소문자 · 숫자 · 하이픈 — 서버가 거부한 이름은 거부한다', () => {
     for (const name of ['a', 'a1', 'a--b', 'm'.repeat(40)]) expect(ok(name), name).toBe(true);
     for (const name of ['A', 'a_b', 'a.b', '-a', 'a-', '1a', '', 'm'.repeat(41)]) expect(ok(name), name).toBe(false);
+  });
+});
+
+describe('Certificate Manager 인증서 · 맵 · 맵 항목 · DNS 인증 (D138) — 문서에 규칙이 없어 서버 응답으로 정했다', () => {
+  const ids = ['gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry', 'gcp.dns_authorization'];
+  const ok = (id: string, name: string) => { const r = RULES[id]!; return r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength; };
+  it('맵 항목만 맵 안에서 · 지역 토큰 없음 — 나머지 셋은 위치마다 · 지역 토큰 · 근거는 api_error', () => {
+    const pick = (id: string) => { const r = RULES[id]!; return [r.scope, r.regionToken, r.slug, r.minLength, r.maxLength]; };
+    expect(ids.map(pick)).toEqual([
+      ['gcp:project_location', 'region', 'cmc', 1, 63], ['gcp:project_location', 'region', 'cmap', 1, 63],
+      ['gcp:certificate_map', 'none', 'cme', 1, 63], ['gcp:project_location', 'region', 'dnsa', 1, 63]]);
+    for (const id of ids) {
+      expect(RULES[id]!.evidence?.map((e) => [e.kind, e.date]), id).toEqual([['api_error', '2026-10-25']]);
+      expect(RULES[id]!.notes?.map((n) => n.code), id).toEqual(['note.observed_server_rule', 'note.scope_unconfirmed']);
+    }
+  });
+  it('소문자 · 숫자 · 하이픈만 · 앞뒤 제한 없음 · 63자 — 서버가 만든 이름은 받고 거부한 이름은 거부한다', () => {
+    for (const id of ids) {
+      for (const name of ['a', '-', '9', '-a', 'a-', '1a', 'a--b', 'm'.repeat(63)]) expect(ok(id, name), `${id} ${name}`).toBe(true);
+      for (const name of ['A', 'a_b', 'a.b', '_a', '', 'm'.repeat(64)]) expect(ok(id, name), `${id} ${name}`).toBe(false);
+    }
   });
 });

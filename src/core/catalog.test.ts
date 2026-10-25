@@ -66,10 +66,10 @@ describe('생성 TS = JSON (D46 ⑵)', () => {
 });
 
 describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
-  it('126행 · 규칙 148 · 행 key 가 겹치지 않는다', () => {
-    expect(GCP_CATALOG).toHaveLength(126);
-    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(126);
-    expect(ruleIdsOfCatalog).toHaveLength(148);
+  it('130행 · 규칙 152 · 행 key 가 겹치지 않는다', () => {
+    expect(GCP_CATALOG).toHaveLength(130);
+    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(130);
+    expect(ruleIdsOfCatalog).toHaveLength(152);
   });
 
   it('모든 GCP 규칙 id 가 catalog 에 정확히 한 번 있고, catalog 의 모든 ruleId 가 규칙 표에 있다', () => {
@@ -97,16 +97,16 @@ describe('regionToken 불변식 (§4-1)', () => {
     'gcp.iam_wip_managed_identity', 'gcp.iam_wip_namespace', 'gcp.iam_wip_provider', 'gcp.iam_wip_provider_key',
     'gcp.iam_workforce_pool_provider', 'gcp.iam_workforce_pool_provider_key', 'gcp.kms_crypto_key', 'gcp.kms_import_job',
     'gcp.spanner_database', 'gcp.spanner_backup', 'gcp.artifact_registry_rule', 'gcp.cloud_sql_database', 'gcp.cloud_sql_user', 'gcp.router_nat', 'gcp.cloudbuild_repository',
-    'gcp.bigquery_table', 'gcp.tag_value', 'gcp.gke_node_pool'];
+    'gcp.bigquery_table', 'gcp.tag_value', 'gcp.gke_node_pool', 'gcp.certificate_map_entry'];
   /** D79 — 위치가 global 하나인 IAM 셋(policy binding 은 탐침: asia-northeast3 403 · global 200) */
   const D79 = ['gcp.iam_policy_binding', 'gcp.iam_principal_access_boundary_policy', 'gcp.iam_workforce_pool'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 35 + 10 + 23 + 3 · region 77 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
+  it('none 35 + 10 + 24 + 3 · region 80 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([71, 0, 77]);
+    expect([count('none'), count('zone'), count('region')]).toEqual([72, 0, 80]);
     // none 의 내역 — gcp:project_global 35(D136 의 네트워크 방화벽 정책 포함) · 그 밖 9(Project ID · Project name · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘 · Logging 싱크 · 로그 기반 지표 — D133 · 태그 키 — D135) — 버킷 · BigQuery 데이터세트는 D78 로 region
-    // · D77 의 23(위치가 없는 리소스 · 부모의 위치를 물려받는 자식 — D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 포함) · D79 의 3(위치가 global 하나인 IAM)
+    // · D77 의 24(위치가 없는 리소스 · 부모의 위치를 물려받는 자식 — D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 · D138 의 인증서 맵 항목 포함) · D79 의 3(위치가 global 하나인 IAM)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
     expect(none.filter((id) => GCP_RULES[id]!.scope === 'gcp:project_global')).toHaveLength(35);
     expect(none.filter((id) => GCP_RULES[id]!.scope !== 'gcp:project_global' && !D77.includes(id) && !D79.includes(id)).sort()).toEqual(['gcp.dns_managed_zone', 'gcp.iam_custom_role', 'gcp.logging_metric', 'gcp.logging_sink', 'gcp.project_id', 'gcp.project_name', 'gcp.pubsub_subscription', 'gcp.pubsub_topic', 'gcp.spanner_instance_config', 'gcp.tag_key']);
@@ -117,7 +117,7 @@ describe('regionToken 불변식 (§4-1)', () => {
     const bad = specs.filter(([id, s]) => s.regionToken === 'none' && (GCP_RULES[id]!.template.includes('region') || GCP_RULES[id]!.optional.includes('region'))).map(([id]) => id);
     expect(bad).toEqual([]);
     const removed = Object.keys(GCP_RULES).filter((id) => GCP_BASE_RULES[id]!.template.includes('region') && !GCP_RULES[id]!.template.includes('region'));
-    // D77 의 23 가운데 서비스 계정은 덮기 전 규칙 표(rules/gcp.ts)에서 이미 region 을 뺐다 — 나머지 22 와 D79 의 3 이 catalog 로 빠진다
+    // D77 의 24 가운데 서비스 계정은 덮기 전 규칙 표(rules/gcp.ts)에서 이미 region 을 뺐다 — 나머지 23 과 D79 의 3 이 catalog 로 빠진다
     expect(removed.sort()).toEqual(['gcp.global_network_endpoint_group', ...D77.filter((id) => id !== 'gcp.service_account'), ...D79].sort());
   });
 
@@ -239,7 +239,7 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 126행 · AWS 170행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 130행 · AWS 170행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
     expect(catalogFor('aws')).toBe(AWS_CATALOG);
     expect(AWS_CATALOG).toHaveLength(170);

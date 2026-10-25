@@ -2870,6 +2870,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -9206,6 +9242,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -15548,6 +15620,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -21884,6 +21992,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -28226,6 +28370,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "windows-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "windows-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "windows-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "windows-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "windows-trade-prod-tagk-01",
             "valid": true,
@@ -34562,6 +34742,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "google-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "google-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "google-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "google-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -40904,6 +41120,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "azure-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "azure-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "azure-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "azure-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "azure-trade-prod-tagk-01",
             "valid": true,
@@ -47240,6 +47492,42 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-wf-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "certificate_manager_certificate": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-cmc-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "certificate_map": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-cmap-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "certificate_map_entry": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-cme-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "dns_authorization": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-dnsa-01",
             "violations": 1,
             "steps": 1
           },
@@ -53582,6 +53870,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "paymentsettlement-reconciliation-dev-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "paymentsettlement-reconciliation-dev-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "paymentsettlement-reconciliation-dev-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "paymentsettlement-reconciliation-dev-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "paymentsettlement-reconciliation-dev-tagk-01",
             "valid": true,
@@ -59918,6 +60242,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "a-long-longpurpose-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "a-long-longpurpose-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "a-long-longpurpose-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "a-long-longpurpose-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -66260,6 +66620,42 @@
             "violations": 1,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "3tier-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "3tier-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "3tier-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "3tier-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "3tier-trade-prod-tagk-01",
             "valid": true,
@@ -72596,6 +72992,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -78938,6 +79370,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -85277,6 +85745,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -91613,6 +92117,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -97979,6 +98519,42 @@
             "violations": 0,
             "steps": 0
           },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-uat-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-uat-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-uat-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-uat-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-uat-tagk-01",
             "valid": true,
@@ -102806,6 +103382,42 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-wf-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_manager_certificate": {
+            "name": "billing-trade-prod-ane3-cmc-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmc-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map": {
+            "name": "billing-trade-prod-ane3-cmap-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-cmap-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "certificate_map_entry": {
+            "name": "billing-trade-prod-cme-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-cme-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "dns_authorization": {
+            "name": "billing-trade-prod-ane3-dnsa-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-dnsa-01",
             "violations": 0,
             "steps": 0
           },
@@ -213670,6 +214282,330 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_manager_certificate",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "certificate_map_entry",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "cloud_function",
         "name": "aaa",
         "known": true,
@@ -215066,6 +216002,114 @@
       {
         "provider": "gcp",
         "resourceType": "disk",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "a",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "19216801"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "1abc",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "abc-",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "dns_authorization",
         "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
         "known": true,
         "valid": false,
@@ -230007,6 +231051,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -230735,6 +231783,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -231457,6 +232509,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -232186,6 +233242,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -232914,6 +233974,10 @@
           "gcp_logging_bucket = \"windows-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"windows-trade-prod-lbm-01\"",
           "gcp_workflow = \"windows-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"windows-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"windows-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"windows-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"windows-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"windows-trade-prod-tagk-01\"",
           "gcp_tag_value = \"windows-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"windows-trade-prod-ane3-redis-01\"",
@@ -233638,6 +234702,10 @@
           "gcp_logging_bucket = \"google-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"google-trade-prod-lbm-01\"",
           "gcp_workflow = \"google-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"google-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"google-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"google-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"google-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"google-trade-prod-tagk-01\"",
           "gcp_tag_value = \"google-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"google-trade-prod-ane3-redis-01\"",
@@ -234370,6 +235438,10 @@
           "gcp_logging_bucket = \"azure-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"azure-trade-prod-lbm-01\"",
           "gcp_workflow = \"azure-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"azure-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"azure-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"azure-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"azure-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"azure-trade-prod-tagk-01\"",
           "gcp_tag_value = \"azure-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"azure-trade-prod-ane3-redis-01\"",
@@ -235117,6 +236189,10 @@
           "# INVALID: gcp_logging_bucket",
           "# INVALID: gcp_logging_metric",
           "# INVALID: gcp_workflow",
+          "# INVALID: gcp_certificate_manager_certificate",
+          "# INVALID: gcp_certificate_map",
+          "# INVALID: gcp_certificate_map_entry",
+          "# INVALID: gcp_dns_authorization",
           "# INVALID: gcp_tag_key",
           "# INVALID: gcp_tag_value",
           "# INVALID: gcp_redis_instance",
@@ -235826,6 +236902,10 @@
           "gcp_logging_bucket = \"paymentsettlement-reconciliation-dev-log-01\"",
           "gcp_logging_metric = \"paymentsettlement-reconciliation-dev-lbm-01\"",
           "gcp_workflow = \"paymentsettlement-reconciliation-dev-wf-01\"",
+          "gcp_certificate_manager_certificate = \"paymentsettlement-reconciliation-dev-cmc-01\"",
+          "gcp_certificate_map = \"paymentsettlement-reconciliation-dev-cmap-01\"",
+          "gcp_certificate_map_entry = \"paymentsettlement-reconciliation-dev-cme-01\"",
+          "gcp_dns_authorization = \"paymentsettlement-reconciliation-dev-dnsa-01\"",
           "gcp_tag_key = \"paymentsettlement-reconciliation-dev-tagk-01\"",
           "gcp_tag_value = \"paymentsettlement-reconciliation-dev-tagv-01\"",
           "gcp_redis_instance = \"paymentsettle-reconciliatio-dev-redis-01\"",
@@ -236554,6 +237634,10 @@
           "gcp_logging_bucket = \"a-long-longpurpose-prod-ane3-log-01\"",
           "gcp_logging_metric = \"a-long-longpurpose-prod-lbm-01\"",
           "gcp_workflow = \"a-long-longpurpose-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"a-long-longpurpose-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"a-long-longpurpose-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"a-long-longpurpose-prod-cme-01\"",
+          "gcp_dns_authorization = \"a-long-longpurpose-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"a-long-longpurpose-prod-tagk-01\"",
           "gcp_tag_value = \"a-long-longpurpose-prod-tagv-01\"",
           "gcp_redis_instance = \"a-long-longpurpose-prod-ane3-redis-01\"",
@@ -237154,6 +238238,10 @@
           "gcp_logging_sink = \"3tier-trade-prod-sink-01\"",
           "gcp_logging_bucket = \"3tier-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"3tier-trade-prod-lbm-01\"",
+          "gcp_certificate_manager_certificate = \"3tier-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"3tier-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"3tier-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"3tier-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"3tier-trade-prod-tagk-01\"",
           "gcp_tag_value = \"3tier-trade-prod-tagv-01\"",
           "gcp_tasks_queue = \"3tier-trade-prod-ane3-queue-01\"",
@@ -238010,6 +239098,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -238727,6 +239819,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -239440,6 +240536,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -240169,6 +241269,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -240897,6 +242001,10 @@
           "gcp_logging_bucket = \"billing-trade-uat-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-uat-lbm-01\"",
           "gcp_workflow = \"billing-trade-uat-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-uat-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-uat-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-uat-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-uat-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-uat-tagk-01\"",
           "gcp_tag_value = \"billing-trade-uat-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-uat-ane3-redis-01\"",
@@ -241449,6 +242557,10 @@
           "gcp_logging_bucket = \"billing-trade-prod-ane3-log-01\"",
           "gcp_logging_metric = \"billing-trade-prod-lbm-01\"",
           "gcp_workflow = \"billing-trade-prod-ane3-wf-01\"",
+          "gcp_certificate_manager_certificate = \"billing-trade-prod-ane3-cmc-01\"",
+          "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
+          "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
+          "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",

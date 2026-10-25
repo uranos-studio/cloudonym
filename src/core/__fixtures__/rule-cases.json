@@ -2249,5 +2249,93 @@
       "",
       "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
     ]
+  },
+  "gcp.certificate_manager_certificate": {
+    "valid": [
+      "a",
+      "-",
+      "9",
+      "-a",
+      "a-",
+      "1a",
+      "a--b",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-ane3-cmc-01"
+    ],
+    "invalid": [
+      "A",
+      "a_b",
+      "a.b",
+      "_a",
+      "a b",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
+  },
+  "gcp.certificate_map": {
+    "valid": [
+      "a",
+      "-",
+      "9",
+      "-a",
+      "a-",
+      "1a",
+      "a--b",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-ane3-cmap-01"
+    ],
+    "invalid": [
+      "A",
+      "a_b",
+      "a.b",
+      "_a",
+      "a b",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
+  },
+  "gcp.certificate_map_entry": {
+    "valid": [
+      "a",
+      "-",
+      "9",
+      "-a",
+      "a-",
+      "1a",
+      "a--b",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-cme-01"
+    ],
+    "invalid": [
+      "A",
+      "a_b",
+      "a.b",
+      "_a",
+      "a b",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
+  },
+  "gcp.dns_authorization": {
+    "valid": [
+      "a",
+      "-",
+      "9",
+      "-a",
+      "a-",
+      "1a",
+      "a--b",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-ane3-dnsa-01"
+    ],
+    "invalid": [
+      "A",
+      "a_b",
+      "a.b",
+      "_a",
+      "a b",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
   }
 }

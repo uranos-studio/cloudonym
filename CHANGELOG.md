@@ -4,11 +4,12 @@ All notable changes to Cloudonym are recorded here. The format follows [Keep a C
 
 ## [Unreleased]
 
-Rules revision for this release: 2026-10-25.1. New Google Cloud rules measured on the live API, because the official documents give no length or characters; no name, verdict or suggestion for an existing input changes.
+Rules revision for this release: 2026-10-25.2. New Google Cloud rules measured on the live API, because the official documents give no length or characters; no name, verdict or suggestion for an existing input changes.
 
 ### Added
 
 - **GKE node pool** (D137) — `gcp.gke_node_pool` (`np`, `google_container_node_pool.name`), unique within its cluster under a new `gcp:gke_cluster` scope, no region token: lowercase letters, digits and hyphens, a letter first and a letter or digit last, 1–40 characters — the server's own regex, measured on 2026-10-25 (`note.observed_server_rule`). 148 Google Cloud rules.
+- **Certificate Manager certificate, certificate map, map entry and DNS authorization** (D138) — `gcp.certificate_manager_certificate` (`cmc`), `gcp.certificate_map` (`cmap`) and `gcp.dns_authorization` (`dnsa`) per location with a region token, and `gcp.certificate_map_entry` (`cme`) within its map under a new `gcp:certificate_map` scope, no region token (`google_certificate_manager_*.name`): lowercase letters, digits and hyphens in any position — a leading or trailing hyphen and a leading digit were accepted — 1–63 characters, measured on 2026-10-25 (`note.observed_server_rule`). 152 Google Cloud rules.
 
 ## [0.2.1] - 2026-10-24
 
