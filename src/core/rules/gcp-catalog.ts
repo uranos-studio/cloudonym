@@ -5066,6 +5066,40 @@ export const GCP_CATALOG: readonly CatalogRow[] = [
       "google_certificate_manager_dns_authorization",
       "certificate-manager dns-authorizations"
     ]
+  },
+  {
+    "key": "gcp.eventarc_trigger",
+    "displayName": "Eventarc Trigger",
+    "category": "management",
+    "rules": {
+      "gcp.eventarc_trigger": {
+        "scope": "location",
+        "regionToken": "region"
+      }
+    },
+    "slug": {
+      "value": "evt",
+      "basis": "Short form of event; trigger already names the Cloud Build trigger; principles 1, 3; no overlap with other abbreviations, kind tokens, environment values or region codes (catalog collision tests, 2026-10-25)",
+      "previous": []
+    },
+    "entity": null,
+    "kind": null,
+    "info": "An Eventarc trigger that routes events to Cloud Run, Workflows or another destination; lowercase letters, digits and hyphens, a letter first and a letter or digit last, 2 to 63 characters (measured on the API), unique per location and project.",
+    "enterNameAt": {
+      "gcloud": [
+        "gcloud eventarc triggers create"
+      ],
+      "terraform": [
+        "google_eventarc_trigger.name"
+      ],
+      "apiOnly": false,
+      "preview": false
+    },
+    "badges": [],
+    "aliases": [
+      "google_eventarc_trigger",
+      "eventarc triggers"
+    ]
   }
 ];
 

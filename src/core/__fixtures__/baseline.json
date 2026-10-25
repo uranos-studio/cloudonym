@@ -2906,6 +2906,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -9278,6 +9287,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -15656,6 +15674,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -22028,6 +22055,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -28406,6 +28442,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "windows-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "windows-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "windows-trade-prod-tagk-01",
             "valid": true,
@@ -34778,6 +34823,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "google-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "google-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "google-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -41156,6 +41210,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "azure-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "azure-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "azure-trade-prod-tagk-01",
             "valid": true,
@@ -47528,6 +47591,15 @@
             "isTruncated": false,
             "isTransformed": true,
             "original": "매매-trade-prod-ane3-dnsa-01",
+            "violations": 1,
+            "steps": 1
+          },
+          "eventarc_trigger": {
+            "name": "",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": true,
+            "original": "매매-trade-prod-ane3-evt-01",
             "violations": 1,
             "steps": 1
           },
@@ -53906,6 +53978,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "paymentsettlement-reconciliation-dev-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "paymentsettlement-reconciliation-dev-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "paymentsettlement-reconciliation-dev-tagk-01",
             "valid": true,
@@ -60278,6 +60359,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "a-long-longpurpose-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "a-long-longpurpose-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "a-long-longpurpose-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -66656,6 +66746,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "3tier-trade-prod-ane3-evt-01",
+            "valid": false,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "3tier-trade-prod-ane3-evt-01",
+            "violations": 1,
+            "steps": 0
+          },
           "tag_key": {
             "name": "3tier-trade-prod-tagk-01",
             "valid": true,
@@ -73028,6 +73127,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -79406,6 +79514,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -85781,6 +85898,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-prod-tagk-01",
             "valid": true,
@@ -92153,6 +92279,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -98555,6 +98690,15 @@
             "violations": 0,
             "steps": 0
           },
+          "eventarc_trigger": {
+            "name": "billing-trade-uat-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-uat-ane3-evt-01",
+            "violations": 0,
+            "steps": 0
+          },
           "tag_key": {
             "name": "billing-trade-uat-tagk-01",
             "valid": true,
@@ -103418,6 +103562,15 @@
             "isTruncated": false,
             "isTransformed": false,
             "original": "billing-trade-prod-ane3-dnsa-01",
+            "violations": 0,
+            "steps": 0
+          },
+          "eventarc_trigger": {
+            "name": "billing-trade-prod-ane3-evt-01",
+            "valid": true,
+            "isTruncated": false,
+            "isTransformed": false,
+            "original": "billing-trade-prod-ane3-evt-01",
             "violations": 0,
             "steps": 0
           },
@@ -216226,6 +216379,114 @@
       },
       {
         "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "a",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "aa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "192.168.0.1",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "ab--cd",
+        "known": true,
+        "valid": true,
+        "violations": 0,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "1abc",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": null
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "abc-",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "ABC",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "abc"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "St-Payments-Prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "st-payments-prd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "st_payments.prd",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "stpaymentsprd"
+      },
+      {
+        "provider": "gcp",
+        "resourceType": "eventarc_trigger",
+        "name": "tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7",
+        "known": true,
+        "valid": false,
+        "violations": 1,
+        "suggestedName": "tk2-tk3-tk4-tk5-tk6-tk7-tk8-tk9-tk0-tk1-tk2-tk3-tk4-tk5-tk6-tk7"
+      },
+      {
+        "provider": "gcp",
         "resourceType": "external_vpn_gateway",
         "name": "",
         "known": true,
@@ -231055,6 +231316,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -231787,6 +232049,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -232513,6 +232776,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -233246,6 +233510,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -233978,6 +234243,7 @@
           "gcp_certificate_map = \"windows-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"windows-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"windows-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"windows-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"windows-trade-prod-tagk-01\"",
           "gcp_tag_value = \"windows-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"windows-trade-prod-ane3-redis-01\"",
@@ -234706,6 +234972,7 @@
           "gcp_certificate_map = \"google-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"google-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"google-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"google-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"google-trade-prod-tagk-01\"",
           "gcp_tag_value = \"google-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"google-trade-prod-ane3-redis-01\"",
@@ -235442,6 +235709,7 @@
           "gcp_certificate_map = \"azure-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"azure-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"azure-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"azure-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"azure-trade-prod-tagk-01\"",
           "gcp_tag_value = \"azure-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"azure-trade-prod-ane3-redis-01\"",
@@ -236193,6 +236461,7 @@
           "# INVALID: gcp_certificate_map",
           "# INVALID: gcp_certificate_map_entry",
           "# INVALID: gcp_dns_authorization",
+          "# INVALID: gcp_eventarc_trigger",
           "# INVALID: gcp_tag_key",
           "# INVALID: gcp_tag_value",
           "# INVALID: gcp_redis_instance",
@@ -236906,6 +237175,7 @@
           "gcp_certificate_map = \"paymentsettlement-reconciliation-dev-cmap-01\"",
           "gcp_certificate_map_entry = \"paymentsettlement-reconciliation-dev-cme-01\"",
           "gcp_dns_authorization = \"paymentsettlement-reconciliation-dev-dnsa-01\"",
+          "gcp_eventarc_trigger = \"paymentsettlement-reconciliation-dev-evt-01\"",
           "gcp_tag_key = \"paymentsettlement-reconciliation-dev-tagk-01\"",
           "gcp_tag_value = \"paymentsettlement-reconciliation-dev-tagv-01\"",
           "gcp_redis_instance = \"paymentsettle-reconciliatio-dev-redis-01\"",
@@ -237638,6 +237908,7 @@
           "gcp_certificate_map = \"a-long-longpurpose-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"a-long-longpurpose-prod-cme-01\"",
           "gcp_dns_authorization = \"a-long-longpurpose-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"a-long-longpurpose-prod-ane3-evt-01\"",
           "gcp_tag_key = \"a-long-longpurpose-prod-tagk-01\"",
           "gcp_tag_value = \"a-long-longpurpose-prod-tagv-01\"",
           "gcp_redis_instance = \"a-long-longpurpose-prod-ane3-redis-01\"",
@@ -238711,6 +238982,7 @@
           "# INVALID: gcp_pubsub_subscription",
           "# INVALID: gcp_dns_managed_zone",
           "# INVALID: gcp_workflow",
+          "# INVALID: gcp_eventarc_trigger",
           "# INVALID: gcp_redis_instance",
           "# INVALID: azure_virtual_machine_windows",
           "# INVALID: azure_api_management_service",
@@ -239102,6 +239374,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -239823,6 +240096,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -240540,6 +240814,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -241273,6 +241548,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",
@@ -242005,6 +242281,7 @@
           "gcp_certificate_map = \"billing-trade-uat-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-uat-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-uat-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-uat-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-uat-tagk-01\"",
           "gcp_tag_value = \"billing-trade-uat-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-uat-ane3-redis-01\"",
@@ -242561,6 +242838,7 @@
           "gcp_certificate_map = \"billing-trade-prod-ane3-cmap-01\"",
           "gcp_certificate_map_entry = \"billing-trade-prod-cme-01\"",
           "gcp_dns_authorization = \"billing-trade-prod-ane3-dnsa-01\"",
+          "gcp_eventarc_trigger = \"billing-trade-prod-ane3-evt-01\"",
           "gcp_tag_key = \"billing-trade-prod-tagk-01\"",
           "gcp_tag_value = \"billing-trade-prod-tagv-01\"",
           "gcp_redis_instance = \"billing-trade-prod-ane3-redis-01\"",

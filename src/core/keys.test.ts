@@ -27,8 +27,8 @@ const out = generateProject(SEL, 'gcp');
 const keys = out.items.map((i) => i.key);
 
 describe('구조 키 — 단사 (D69)', () => {
-  it('표본이 넓다 — GCP 규칙 전부(catalog 130행을 다 담는다) · 프로젝트와 서비스 둘 다', () => {
-    expect(GCP_CATALOG).toHaveLength(130);
+  it('표본이 넓다 — GCP 규칙 전부(catalog 131행을 다 담는다) · 프로젝트와 서비스 둘 다', () => {
+    expect(GCP_CATALOG).toHaveLength(131);
     const types = new Set(out.items.map((i) => i.resourceType));
     for (const row of GCP_CATALOG) expect(types.has(row.key.slice('gcp.'.length)), row.key).toBe(true);
     expect(out.items.length).toBeGreaterThan(1000);

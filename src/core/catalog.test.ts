@@ -66,10 +66,10 @@ describe('생성 TS = JSON (D46 ⑵)', () => {
 });
 
 describe('GCP 규칙 ↔ catalog (D46 ⑶)', () => {
-  it('130행 · 규칙 152 · 행 key 가 겹치지 않는다', () => {
-    expect(GCP_CATALOG).toHaveLength(130);
-    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(130);
-    expect(ruleIdsOfCatalog).toHaveLength(152);
+  it('131행 · 규칙 153 · 행 key 가 겹치지 않는다', () => {
+    expect(GCP_CATALOG).toHaveLength(131);
+    expect(new Set(GCP_CATALOG.map((r) => r.key)).size).toBe(131);
+    expect(ruleIdsOfCatalog).toHaveLength(153);
   });
 
   it('모든 GCP 규칙 id 가 catalog 에 정확히 한 번 있고, catalog 의 모든 ruleId 가 규칙 표에 있다', () => {
@@ -102,9 +102,9 @@ describe('regionToken 불변식 (§4-1)', () => {
   const D79 = ['gcp.iam_policy_binding', 'gcp.iam_principal_access_boundary_policy', 'gcp.iam_workforce_pool'];
   const specs = GCP_CATALOG.flatMap((row) => Object.entries(row.rules));
 
-  it('none 35 + 10 + 24 + 3 · region 80 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
+  it('none 35 + 10 + 24 + 3 · region 81 — zone 은 없다 (D50 revised · D77 · D78 · D79)', () => {
     const count = (t: string) => specs.filter(([, s]) => s.regionToken === t).length;
-    expect([count('none'), count('zone'), count('region')]).toEqual([72, 0, 80]);
+    expect([count('none'), count('zone'), count('region')]).toEqual([72, 0, 81]);
     // none 의 내역 — gcp:project_global 35(D136 의 네트워크 방화벽 정책 포함) · 그 밖 9(Project ID · Project name · Spanner 인스턴스 구성 · IAM 커스텀 역할 · DNS 영역 · Pub/Sub 둘 · Logging 싱크 · 로그 기반 지표 — D133 · 태그 키 — D135) — 버킷 · BigQuery 데이터세트는 D78 로 region
     // · D77 의 24(위치가 없는 리소스 · 부모의 위치를 물려받는 자식 — D119 의 Cloud Build 저장소 · D132 의 BigQuery 테이블 · D135 의 태그 값 · D137 의 GKE 노드 풀 · D138 의 인증서 맵 항목 포함) · D79 의 3(위치가 global 하나인 IAM)
     const none = specs.filter(([, s]) => s.regionToken === 'none').map(([id]) => id);
@@ -239,7 +239,7 @@ describe('종류 표 (D52)', () => {
 describe('catalog.ts 순수 함수', () => {
   const rule = (id: string) => GCP_RULES[id]!;
 
-  it('catalogFor — GCP 130행 · AWS 170행 · catalog 가 없는 CSP 는 빈 배열', () => {
+  it('catalogFor — GCP 131행 · AWS 170행 · catalog 가 없는 CSP 는 빈 배열', () => {
     expect(catalogFor('gcp')).toBe(GCP_CATALOG);
     expect(catalogFor('aws')).toBe(AWS_CATALOG);
     expect(AWS_CATALOG).toHaveLength(170);

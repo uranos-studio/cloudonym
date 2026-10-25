@@ -2337,5 +2337,26 @@
       "",
       "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
     ]
+  },
+  "gcp.eventarc_trigger": {
+    "valid": [
+      "ab",
+      "a1",
+      "a--b",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+      "billing-trade-prod-ane3-evt-01"
+    ],
+    "invalid": [
+      "a",
+      "A",
+      "Ab",
+      "a_b",
+      "a.b",
+      "-a",
+      "a-",
+      "1a",
+      "",
+      "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+    ]
   }
 }

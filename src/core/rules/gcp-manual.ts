@@ -76,6 +76,13 @@ const CM_MAP_ENTRY_EVIDENCE = cmEvidence('certificateMaps/<map>/certificateMapEn
 const CM_DNS_AUTHORIZATION_EVIDENCE = cmEvidence('dnsAuthorizations?dnsAuthorizationId=<id>', '{"domain":"…"}',
   'for A, a_b and 64 characters; -, 9, -a, a- and 63 characters were created and deleted');
 
+const EVENTARC_TRIGGERS = 'https://docs.cloud.google.com/eventarc/docs/reference/rest/v1/projects.locations.triggers';
+/** Eventarc 트리거 (D139) — triggerId 는 "The user-provided ID to be assigned to the trigger." 뿐이다. 서버가 정규식과 길이를 답한다 */
+const EVENTARC_TRIGGER_EVIDENCE: readonly RuleEvidence[] = [
+  { kind: 'api_error', source: 'POST https://eventarc.googleapis.com/v1/projects/<project>/locations/asia-northeast3/triggers?triggerId=<id>&validateOnly=true', date: '2026-10-25',
+    quote: 'The request was invalid: <id>: must follow this regex format: "^[a-z][a-z0-9-]*[a-z0-9]$", please see the user guide for details — for a_b, a.b, -a, a- and 1a; A and a: min allowed length is 2; 64 characters: max allowed length is 63; a--b and 63 characters passed (the body must also carry the name, or the answer is trigger.name is empty); ab, a1 and 63 characters were then created with a Workflows destination and deleted' },
+];
+
 const BQ_TABLE_ID = 'https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/TableReference#FIELDS.table_id';
 const BQ_TABLE_NAMING = 'https://docs.cloud.google.com/bigquery/docs/tables#table_naming';
 
@@ -392,6 +399,11 @@ const RULES: ResourceRule[] = [
   rule({ id: 'gcp.dns_authorization', displayName: 'Certificate Manager DNS Authorization', slug: 'dnsa', minLength: 1, maxLength: 63, pattern: CM_ID,
     startsWithLetter: false, endsWithAlnum: false, scope: 'gcp:project_location', entity: 'certificatemanager.dnsAuthorizations', category: 'networking',
     docUrl: `${CM_REST}.dnsAuthorizations/create#body.QUERY_PARAMETERS.dns_authorization_id`, evidence: CM_DNS_AUTHORIZATION_EVIDENCE, notes: [OBSERVED, SCOPE] }),
+  // ── Eventarc (D139) — 문서에 길이 · 글자 문장이 없다. Trigger.name "Must be unique within the location of the project" 만 있다.
+  // 2026-10-25 탐침: 서버가 "^[a-z][a-z0-9-]*[a-z0-9]$" · "min allowed length is 2" · "max allowed length is 63" 으로 답했다. ab · a1 · 63자를 만들고 지웠다
+  rule({ id: 'gcp.eventarc_trigger', displayName: 'Eventarc Trigger', slug: 'evt', minLength: 2, maxLength: 63, pattern: /^[a-z][a-z0-9-]{0,61}[a-z0-9]$/,
+    scope: 'gcp:project_location', entity: 'eventarc.triggers', category: 'management', docUrl: `${EVENTARC_TRIGGERS}/create#body.QUERY_PARAMETERS.trigger_id`,
+    uniquenessDocUrl: `${EVENTARC_TRIGGERS}#Trigger.FIELDS.name`, evidence: EVENTARC_TRIGGER_EVIDENCE, notes: [OBSERVED] }),
   // ── Resource Manager 태그 (D135 · 프로젝트 아래 키만 — 조직 키는 다루지 않는다) ──
   // TagKey.shortName "The short name should be unique for TagKeys within the same tag namespace. The short name must be 1-256 characters, beginning and ending with an alphanumeric
   // character ([a-z0-9A-Z]) with dashes (-), underscores (_), dots (.), and alphanumerics between." · parent "For a TagKey parented by a Project, its parent can be in the form projects/{project_id}" —

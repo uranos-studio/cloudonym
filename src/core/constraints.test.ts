@@ -332,9 +332,9 @@ describe('Cloud Run 서비스 (D65)', () => {
 
 describe('문서 문장이 아닌 근거 (D80)', () => {
   const withEvidence = Object.values(RULES).filter((r) => r.evidence !== undefined);
-  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
+  it('evidence 가 있는 규칙은 Cloud Run job · Artifact Registry 저장소 · Cloud Build 연결 · 저장소(D118 · D119) · GKE 노드 풀(D137) · Certificate Manager 넷(D138) · Eventarc 트리거(D139) — 안내서 docUrl · note.observed_server_rule 을 함께 싣는다', () => {
     expect(withEvidence.map((r) => r.id).sort()).toEqual(['gcp.artifact_registry_repository', 'gcp.certificate_manager_certificate', 'gcp.certificate_map', 'gcp.certificate_map_entry',
-      'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.dns_authorization', 'gcp.gke_node_pool', 'gcp.run_job']);
+      'gcp.cloudbuild_connection', 'gcp.cloudbuild_repository', 'gcp.dns_authorization', 'gcp.eventarc_trigger', 'gcp.gke_node_pool', 'gcp.run_job']);
     for (const r of withEvidence) {
       expect(r.docUrl, r.id).toMatch(/^https:\/\/docs\.cloud\.google\.com\//);
       expect(r.notes?.map((n) => n.code), r.id).toContain('note.observed_server_rule');
@@ -548,5 +548,21 @@ describe('Certificate Manager 인증서 · 맵 · 맵 항목 · DNS 인증 (D138
       for (const name of ['a', '-', '9', '-a', 'a-', '1a', 'a--b', 'm'.repeat(63)]) expect(ok(id, name), `${id} ${name}`).toBe(true);
       for (const name of ['A', 'a_b', 'a.b', '_a', '', 'm'.repeat(64)]) expect(ok(id, name), `${id} ${name}`).toBe(false);
     }
+  });
+});
+
+describe('Eventarc 트리거 (D139) — 길이 · 글자는 서버 응답으로, 유일 범위는 Trigger.name 문장으로', () => {
+  const r = RULES['gcp.eventarc_trigger']!;
+  const ok = (name: string) => r.pattern.test(name) && name.length >= r.minLength && name.length <= r.maxLength;
+  it('위치마다 유일 · 지역 토큰 · 약어 evt · 길이 2-63 · 근거는 api_error', () => {
+    expect({ scope: r.scope, regionToken: r.regionToken, slug: r.slug, min: r.minLength, max: r.maxLength })
+      .toEqual({ scope: 'gcp:project_location', regionToken: 'region', slug: 'evt', min: 2, max: 63 });
+    expect(r.uniquenessDocUrl).toBe('https://docs.cloud.google.com/eventarc/docs/reference/rest/v1/projects.locations.triggers#Trigger.FIELDS.name');
+    expect(r.evidence?.map((e) => [e.kind, e.date])).toEqual([['api_error', '2026-10-25']]);
+    expect(r.notes?.map((n) => n.code)).toEqual(['note.observed_server_rule']);
+  });
+  it('서버의 정규식 ^[a-z][a-z0-9-]*[a-z0-9]$ — 한 글자는 거부한다', () => {
+    for (const name of ['ab', 'a1', 'a--b', 'm'.repeat(63)]) expect(ok(name), name).toBe(true);
+    for (const name of ['a', 'A', 'a_b', 'a.b', '-a', 'a-', '1a', '', 'm'.repeat(64)]) expect(ok(name), name).toBe(false);
   });
 });

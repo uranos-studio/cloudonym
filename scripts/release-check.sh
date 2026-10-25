@@ -124,7 +124,7 @@ if expect_status "${name}" "${code}" 200; then
   else pass "${name} (text/plain, max-age=86400, CORS *, '# Cloudonym', ${sub_aws} '### AWS' · ${sub_gcp} '### GCP' sections, no Azure)"; fi
 fi
 
-# 3. /catalog.json — 200 · provider 는 aws · gcp · aws 170행 · gcp 130행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80 · cloudbuild_connection — D118 · cloudbuild_repository — D119 · bigquery_table — D132 · Logging 셋 — D133 · workflow — D134 · tag_key · tag_value — D135 · network_firewall_policy — D136 · gke_node_pool — D137 · Certificate Manager 넷 — D138)
+# 3. /catalog.json — 200 · provider 는 aws · gcp · aws 170행 · gcp 131행(run_service — D65 · 작은 스택 규칙 11개 — D72 · run_job · artifact_registry_repository — D80 · cloudbuild_connection — D118 · cloudbuild_repository — D119 · bigquery_table — D132 · Logging 셋 — D133 · workflow — D134 · tag_key · tag_value — D135 · network_firewall_policy — D136 · gke_node_pool — D137 · Certificate Manager 넷 — D138 · eventarc_trigger — D139)
 name='GET /catalog.json'
 code="$(fetch GET /catalog.json)"
 if expect_status "${name}" "${code}" 200; then
@@ -132,9 +132,9 @@ if expect_status "${name}" "${code}" 200; then
   rows="$(jq '.providers.gcp.rows | length' "${body}" 2>/dev/null)"
   aws_rows="$(jq '.providers.aws.rows | length' "${body}" 2>/dev/null)"
   if [ "${providers}" != '["aws","gcp"]' ]; then fail "${name}" "providers ${providers:-<not JSON>}"
-  elif [ "${rows}" != "130" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 130"
+  elif [ "${rows}" != "131" ]; then fail "${name}" "gcp rows ${rows:-<none>}, expected 131"
   elif [ "${aws_rows}" != "170" ]; then fail "${name}" "aws rows ${aws_rows:-<none>}, expected 170"
-  else pass "${name} (providers [\"aws\",\"gcp\"], aws 170 · gcp 130 rows)"; fi
+  else pass "${name} (providers [\"aws\",\"gcp\"], aws 170 · gcp 131 rows)"; fi
 fi
 
 # 4. /openapi.json — provider enum 셋이 모두 ["aws","gcp"]
