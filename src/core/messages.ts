@@ -24,7 +24,7 @@ export const MESSAGE_CODES = [
   'note.gcp_vm_project_unique', 'note.aws_key_pair_scope_unconfirmed', 'note.aws_schema_scope_unconfirmed',
   // rules/*-manual.ts notes (11)
   'note.scope_unconfirmed', 'note.narrower_source_used', 'note.blocklist_narrowed', 'note.parent_length_limit', 'note.unicode_excluded',
-  'note.variant_narrowed', 'note.secondary_source', 'note.observed_server_rule', 'note.server_narrower_than_doc', 'note.obsolete_source_applied', 'note.advisory_rule_enforced',
+  'note.variant_narrowed', 'note.secondary_source', 'note.observed_server_rule', 'note.server_narrower_than_doc', 'note.obsolete_source_applied', 'note.advisory_rule_enforced', 'note.delete_limit_255',
   'note.advisory_rule_warned',
   // validate.ts checkAdvice (1)
   'warning.arn_suffix_lookalike',
@@ -103,6 +103,8 @@ export type CoreMessage =
   | { code: 'note.server_narrower_than_doc' }
   | { code: 'note.obsolete_source_applied' }
   | { code: 'note.advisory_rule_enforced' }
+  /** Glue 연결 — 만들 때는 256자도 받지만 DeleteConnection 이 255자를 넘는 이름을 거부한다 (D143) */
+  | { code: 'note.delete_limit_255' }
   | { code: 'note.advisory_rule_warned' }
   /** Secrets Manager — 이름이 「하이픈 + 여섯 글자」로 끝난다. ARN 이 덧붙이는 무작위 접미와 같은 꼴 (D112) */
   | { code: 'warning.arn_suffix_lookalike' }

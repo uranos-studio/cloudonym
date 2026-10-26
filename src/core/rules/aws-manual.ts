@@ -311,7 +311,7 @@ const RULES: ResourceRule[] = [
   // TableInput Name — 같은 길이 · Pattern · 소문자로 접는다. 서버: 다른 데이터베이스에 같은 이름 생성 · 같은 데이터베이스의 T 는 t 뒤 "Table already exists."
   rule({ id: 'aws.glue_table', displayName: 'Glue Table', slug: 'gluetbl', minLength: 1, maxLength: 255, pattern: GLUE_NAME, scope: 'aws:glue_database', entity: 'AWS::Glue::Table', category: 'database', docUrl: 'https://docs.aws.amazon.com/glue/latest/webapi/API_TableInput.html' }),
   // ConnectionInput Name — 같은 길이 · Pattern. 서버는 256자 연결도 만들었지만 DeleteConnection 이 255자를 넘는 이름을 거부해 지울 수 없다 — 255 를 지킨다
-  rule({ id: 'aws.glue_connection', displayName: 'Glue Connection', slug: 'glueconn', minLength: 1, maxLength: 255, pattern: GLUE_NAME, scope: 'aws:region', entity: 'AWS::Glue::Connection', category: 'database', docUrl: 'https://docs.aws.amazon.com/glue/latest/webapi/API_ConnectionInput.html', notes: [SCOPE] }),
+  rule({ id: 'aws.glue_connection', displayName: 'Glue Connection', slug: 'glueconn', minLength: 1, maxLength: 255, pattern: GLUE_NAME, scope: 'aws:region', entity: 'AWS::Glue::Connection', category: 'database', docUrl: 'https://docs.aws.amazon.com/glue/latest/webapi/API_ConnectionInput.html', notes: [SCOPE, { code: 'note.delete_limit_255' }] }),
   // CreateTrigger Name — 같은 길이 · Pattern
   rule({ id: 'aws.glue_trigger', displayName: 'Glue Trigger', slug: 'gluetrg', minLength: 1, maxLength: 255, pattern: GLUE_NAME, scope: 'aws:region', entity: 'AWS::Glue::Trigger', category: 'database', docUrl: 'https://docs.aws.amazon.com/glue/latest/webapi/API_CreateTrigger.html', notes: [SCOPE] }),
   // CreateWorkflow Name — 같은 길이 · Pattern · "It should be unique within your account."

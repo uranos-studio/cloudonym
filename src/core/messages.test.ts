@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { MESSAGE_CODES } from './messages';
 
 describe('엔진 메시지 코드 (D23)', () => {
-  it('104개 — AWS 접미사 거부 (0.2) · name.zone_required 삭제 (D50 revised) · 딸린 것 일곱 (D62) · 마법사 모델 스물다섯 (D64 · D78 · D85 · D88) · 위치 둘 (D78) · 서버 관측 규칙 (D80) · 문서보다 좁은 서버 규칙 (D140) · 지역 Secret (D79) · 권고 경고 둘 (D112) · 중복 없음 · 꼴 영역.이름', () => {
-    expect(MESSAGE_CODES).toHaveLength(104);
+  it('105개 — AWS 접미사 거부 (0.2) · name.zone_required 삭제 (D50 revised) · 딸린 것 일곱 (D62) · 마법사 모델 스물다섯 (D64 · D78 · D85 · D88) · 위치 둘 (D78) · 서버 관측 규칙 (D80) · 문서보다 좁은 서버 규칙 (D140) · 지역 Secret (D79) · 권고 경고 둘 (D112) · 지울 때 255자 (D143) · 중복 없음 · 꼴 영역.이름', () => {
+    expect(MESSAGE_CODES).toHaveLength(105);
     // 마법사 검사 코드는 계획 §5-5 표의 스물여섯 + 위치(D78) + 지역 Secret 의 프로젝트 지역(D79) + 프로젝트 ID 접미사 둘(D85) + 고정 종류 프리셋(D88)
     expect(MESSAGE_CODES.filter((c) => c.startsWith('wizard.'))).toHaveLength(32);
     for (const c of ['name.parent_invalid', 'name.parent_name', 'wizard.children_not_supported', 'wizard.attach_not_object', 'wizard.attach_out_of_range',

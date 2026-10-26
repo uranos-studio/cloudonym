@@ -64,6 +64,7 @@ export const en: Catalog = {
     'note.server_narrower_than_doc': () => 'The documentation states a wider rule; the API refused names that it allows on a real request, so the narrower rule the API enforced is used (D80)',
     'note.secondary_source': () => 'The create request states no limits; length and characters come from another page of the same API reference (conservative, D20)',
     'note.obsolete_source_applied': () => 'Part of this rule comes from a page the provider marks as retired; it is still enforced (conservative, D20)',
+    'note.delete_limit_255': () => 'Keep this name to 255 characters or fewer: the create API accepted a 256-character name, but the delete API refuses names longer than 255, so such a resource cannot be deleted (D143)',
     'note.advisory_rule_enforced': () => 'The documentation recommends against this form rather than forbidding it; it is rejected here (conservative, D20)',
     'note.advisory_rule_warned': () => 'The documentation recommends against one form of name rather than forbidding it; a name in that form passes with a warning (D112)',
     // 같은 요청 안 충돌 (conflict)
