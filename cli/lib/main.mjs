@@ -47,7 +47,7 @@ Commands
   new       [--force]                                                   asks the questions (terminal only), saves the plan and names files
   init      --owner O --system S --env E[,E2…] --region R [--suffix X]   new plan file (rules_version from the server)
             [--provider P]                                              P is gcp (default), aws or azure; one plan file is one provider
-  init      --from <plan.json>                                          copy a plan saved from the web (Save plan); also new --from
+  init      --from <plan.json | share link>                             copy a plan saved from the web (Save plan) or read a wizard share link; also new --from
   add       <preset | rule id | resource> (--service <purpose> | --project)
             [--count N] [--kind K] [--tier T] [--role R] [--ha] [--serverless <rule>] [--location L] [--pick '<json>'] [--dry-run]
             appends a pick (or numbered servers to the same pick); writes the file only if every existing name and verdict stays the same
@@ -274,6 +274,40 @@ export class Ctx {
   }
 }
 
+/** --from 의 값이 공유 링크인가 — URL(scheme://) 이거나 `#` 이 있다. 파일 이름에 `#` 이 든 경우는 ./ 를 붙여도 링크로 읽힌다 — 드물어 받아들인다 @param {string} s */
+export const isLink = (s) => /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || s.includes('#');
+
+/**
+ * 공유 링크 → 계획 파일 — POST /v1/plan/from-link. 성공이면 계획, 아니면 종료 코드. 버린 것 · 규칙 버전 차이는 stderr 에 한 줄씩
+ * @param {Ctx} ctx @param {string} link @returns {Promise<PlanFile | number>}
+ */
+async function planFromLink(ctx, link) {
+  const { d } = ctx;
+  const r = await ctx.client().post('/v1/plan/from-link', { link });
+  const errors = r.kind === 'ok' || !Array.isArray(r.body?.errors) ? [] : r.body.errors;
+  const save = 'Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>';
+  // 링크를 읽지 못하는 옛 서버 — 경로가 없다(404)
+  if (r.kind === 'http' && r.status === 404) { d.stderr(`${ctx.server} cannot read share links yet. ${save}`); return EXIT.UNAVAILABLE; }
+  if (r.kind === 'http' && r.status === 400 && errors[0]?.code === 'request.link_unreadable') { d.stderr(`${errors[0].message ?? 'The link cannot be read.'}. ${save}`); return EXIT.INPUT; }
+  if (r.kind === 'http' && r.status === 413) { d.stderr(`The link is too long for the API. ${save}`); return EXIT.INPUT; }
+  if (r.kind !== 'ok') return ctx.report(r);
+  const plan = r.body?.plan;
+  if (!isRecord(plan) || typeof plan.provider !== 'string' || !isRecord(plan.project)) { d.stderr(`Cannot interpret the server's answer: no plan in it. Is ${ctx.server} a Cloudonym deployment?`); return EXIT.UNAVAILABLE; }
+  const n = isRecord(r.body?.notices) ? r.body.notices : {};
+  // 웹이 링크를 열 때의 안내와 같은 뜻 (src/messages/en.ts wizard_link_*)
+  /** @type {[string, (k: number) => string][]} */
+  const said = [
+    ['dropped', (k) => `${k} invalid item(s) in this link were left out.`],
+    ['ha_off', (k) => `HA turned off for ${k} pick(s): fewer than two servers left, or HA is not offered there.`],
+    ['serverless_off', (k) => `The serverless option was removed for ${k} pick(s).`],
+    ['trimmed', (k) => `${k} pick(s) over the limit were left out.`],
+  ];
+  for (const [k, line] of said) if (typeof n[k] === 'number' && n[k] > 0) d.stderr(line(n[k]));
+  const was = r.body?.link_rules_version;
+  if (typeof was === 'string' && was !== plan.rules_version) d.stderr(`The link was made with rules ${was}; the plan uses the server's rules ${plan.rules_version}. Names may differ from the ones the link showed.`);
+  return /** @type {PlanFile} */ (/** @type {unknown} */ (plan));
+}
+
 /**
  * 켜지지 않은 provider 한 줄 — 400 request.provider_not_enabled 의 supported, 또는 /catalog.json 의 providers 키
  * @param {unknown} provider @param {unknown} supported
@@ -378,10 +412,14 @@ async function init(ctx, rest) {
   // --force 가 아니면 「없던 파일」을 쓴다 — 그 사이 누가 만들었으면 쓰지 않는다
   const expect = v.force ? undefined : null;
   if (v.from !== undefined) {
-    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(v.from) || v.from.includes('#')) {
-      throw new UsageError('--from takes a plan file, not a share link (links are not read yet). Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>');
-    }
-    const { plan } = readPlan(resolve(d.cwd, v.from));
+    /** @type {PlanFile} */
+    let plan;
+    if (isLink(v.from)) {
+      // 공유 링크 (D144) — 서버가 웹의 Save plan 과 같은 파일로 푼다(서버가 정본). 링크의 호스트가 아니라 이 CLI 의 서버로 보낸다
+      const got = await planFromLink(ctx, v.from);
+      if (typeof got === 'number') return got;
+      plan = got;
+    } else plan = readPlan(resolve(d.cwd, v.from)).plan;
     // 계획 파일 하나 = provider 하나 — --provider 가 파일과 다르면 쓰지 않는다(파일의 provider 를 조용히 덮지도 버리지도 않는다)
     if (v.provider !== undefined && providerOf(v.provider) !== plan.provider) throw new UsageError(`--provider ${v.provider} does not match the provider of ${v.from} (${plan.provider}); one plan file is one provider.`);
     const envs = environmentsOf(plan);

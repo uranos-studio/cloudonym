@@ -5,7 +5,7 @@ export const API_CODES = [
   'request.body_not_json', 'request.body_not_object', 'request.body_too_large', 'request.context_not_object',
   'request.field_too_long', 'request.providers_not_array', 'request.providers_empty', 'request.value_unsupported',
   'request.field_not_string', 'request.field_missing', 'request.provider_not_enabled', 'request.same_origin_only', 'request.rate_limited', 'request.rules_version_mismatch',
-  'request.not_found', 'request.errors_truncated', 'server.internal_error',
+  'request.not_found', 'request.link_unreadable', 'request.errors_truncated', 'server.internal_error',
 ] as const;
 
 export type ApiMessage =
@@ -28,6 +28,8 @@ export type ApiMessage =
   | { code: 'request.rules_version_mismatch'; params: { requested: string; current: string } }
   /** /v1 아래 없는 경로 · 메서드. 경로를 되돌려 싣지 않는다 */
   | { code: 'request.not_found' }
+  /** POST /v1/plan/from-link (D144) — 링크에서 계획을 풀 수 없다. kind: none(# 조각 없음) · tree(트리 화면 링크) · broken(풀리지 않는다) */
+  | { code: 'request.link_unreadable'; field: string; params: { kind: 'none' | 'tree' | 'broken' } }
   /** 오류 목록을 앞에서 shown 개로 잘랐다 — total 은 잘리기 전 오류 수. 목록의 마지막 항목이다 (D103 · /v1/wizard · /v1/generate) */
   | { code: 'request.errors_truncated'; params: { shown: number; total: number } }
   | { code: 'server.internal_error' };

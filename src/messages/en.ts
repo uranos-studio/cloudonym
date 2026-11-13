@@ -139,6 +139,7 @@ export const en: Catalog = {
     'request.rate_limited': (m) => `Too many requests; retry after ${m.params.retry_after} seconds`,
     'request.rules_version_mismatch': (m) => `The requested rules_version does not match the current rules revision '${m.params.current}'. Re-run without rules_version to use the current rules, or keep using the names you already created (see the Terraform example's pinned mode).`,
     'request.not_found': () => 'No such endpoint or method; see /openapi.json for the API',
+    'request.link_unreadable': (m) => (m.params.kind === 'none' ? 'The link has no #state= part; copy the whole share link from the wizard' : m.params.kind === 'tree' ? 'The link is a resource-picker link, not a wizard plan; open it in the browser and build the plan in the wizard' : 'The link cannot be read; it may be cut short or edited'),
     'request.errors_truncated': (m) => `Showing the first ${m.params.shown} of ${m.params.total} errors; fix these and send the request again to see the rest`,
     'server.internal_error': () => 'Internal error',
   },

@@ -88,12 +88,13 @@ describe('public/openapi.json — 형식', () => {
     const ruleSpec = providerSchema.properties!['rows']!.items!.properties!['rules']!.additionalProperties as Schema;
     expect(ruleSpec.properties!['regionToken']!.enum).toEqual(['none', 'region']);
   });
-  it('일곱 경로 — generate · names · validate · wizard 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
-    expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/validate', '/wizard']);
+  it('여덟 경로 — plan/from-link 는 200 · 400 · 413 · 429 · 500 (D144), generate · names · validate · wizard 는 200 · 400 · 409 · 413 · 429 · 500, /events 는 403 도, /health 는 GET 200 · 500, /catalog.json 은 뿌리 서버의 GET 200 · 429 · 500 (D25 · D39 · D46)', () => {
+    expect(keys(spec.paths)).toEqual(['/catalog.json', '/events', '/generate', '/health', '/names', '/plan/from-link', '/validate', '/wizard']);
     // servers 가 /v1 이라 /catalog.json 은 경로 단위로 뿌리 서버를 덮어써야 /v1/catalog.json 으로 읽히지 않는다
     expect(spec.paths['/catalog.json']!.servers).toEqual([expect.objectContaining({ url: '/' })]);
     expect(keys(spec.paths['/catalog.json']!.get!.responses)).toEqual(['200', '429', '500']);
-    for (const p of ['/events', '/generate', '/health', '/names', '/validate', '/wizard']) expect(spec.paths[p]!.servers, p).toBeUndefined();
+    for (const p of ['/events', '/generate', '/health', '/names', '/plan/from-link', '/validate', '/wizard']) expect(spec.paths[p]!.servers, p).toBeUndefined();
+    expect(keys(spec.paths['/plan/from-link']!.post!.responses)).toEqual(['200', '400', '413', '429', '500']);
     for (const p of ['/generate', '/names', '/validate', '/wizard']) expect(keys(spec.paths[p]!.post!.responses), p).toEqual(['200', '400', '409', '413', '429', '500']);
     expect(keys(spec.paths['/events']!.post!.responses)).toEqual(['200', '400', '403', '413', '429', '500']);
     expect(keys(spec.paths['/health']!.get!.responses)).toEqual(['200', '500']);

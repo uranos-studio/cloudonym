@@ -122,6 +122,12 @@ export async function collectSamples(app: Requestable, rulesVersion: string): Pr
   };
   const gen = (id: string, body: unknown) => add(id, 'POST', '/v1/generate', jsonPost(body));
   const val = (id: string, body: unknown) => add(id, 'POST', '/v1/validate', jsonPost(body));
+  // 공유 링크 → 계획 파일 (D144) — 짧은 꼴 hash 를 손으로 만든다(화면 코드를 들이지 않는다)
+  const link = (raw: unknown) => `#state=${Buffer.from(JSON.stringify(raw)).toString('base64url')}`;
+  const linkRaw = { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3-a', v: rulesVersion, w: { pp: [{ pr: 'vpc', i: [{ id: '1', q: '01' }] }, { pr: 'subnet', zz: 1 }] } };
+  await add('plan-from-link-ok', 'POST', '/v1/plan/from-link', jsonPost({ link: `https://example.com/${link(linkRaw)}` }));
+  await add('400-plan-from-link-tree', 'POST', '/v1/plan/from-link', jsonPost({ link: link({ ...SAMPLE_CTX }) }));
+  await add('400-plan-from-link-missing', 'POST', '/v1/plan/from-link', jsonPost({}));
   await gen('generate-ok', { context: SAMPLE_CTX });
   await gen('generate-reserved-goog', { context: { ...SAMPLE_CTX, owner: 'goog' }, providers: ['gcp'] });
   await gen('generate-long-values', { context: { owner: 'platformengineering', system: 'paymentsettlement', purpose: 'reconciliation', env: 'dev', region: 'global' } });

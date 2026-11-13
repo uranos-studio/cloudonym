@@ -129,6 +129,10 @@ Response of `/v1/validate`:
 **Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](../examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
 
 <a id="whole-project-post-v1wizard"></a>
+### Share link to plan file: `POST /v1/plan/from-link`
+
+`{ "link": "<a wizard share link, or only its #state= part>" }` answers `{ "plan": { … }, "notices": { "dropped", "ha_off", "serverless_off", "trimmed" }, "link_rules_version"?: "…", "version": { … } }`. `plan` is the file the wizard's **Save plan** writes for the same link — a `POST /v1/wizard` body with `rules_version` (this deployment's) and, with two or more environments, `environments`. Only the part after `#` is read, so a link from any deployment is read with this deployment's rules; `notices` counts what opening the link dropped, as the wizard does. A link with no `#state=` part, a resource-picker link or a link that cannot be decoded is `400 request.link_unreadable` (`params.kind`: `none`, `tree`, `broken`). Nothing from the link is logged. The CLI's `init --from <link>` calls it.
+
 ### Whole project: `POST /v1/wizard`
 
 ```sh

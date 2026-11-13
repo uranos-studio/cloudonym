@@ -17,6 +17,9 @@ import { toWizardExport } from '../components/wizardExport';
 import { expandPlan, type WizardPlan } from '../core/wizard/plan';
 import { generateProject, parseProjectContext } from '../core/engine';
 import { toModelPick } from '../plan/wire';
+import { encodeWizardState } from '../components/urlState';
+import { savePlan } from '../components/planFile';
+import { FULL_PLAN } from '../components/__fixtures__/plan';
 import { catalogPresets } from './catalog';
 
 const SERVER = 'http://cli.test';
@@ -158,7 +161,7 @@ describe('cloudonym add — 기존 키의 이름 · 판정은 그대로, 새 이
 });
 
 describe('cloudonym names · validate · init (D102)', () => {
-  it('init 은 /v1/health 의 규칙 버전으로 빈 계획을 쓴다 · --from 은 웹 파일을 옮기고 환경을 합친다 · 링크는 아직 받지 않는다(64)', async () => {
+  it('init 은 /v1/health 의 규칙 버전으로 빈 계획을 쓴다 · --from 은 웹 파일을 옮기고 환경을 합친다 · 공유 링크는 서버가 Save plan 과 같은 파일로 푼다(D144)', async () => {
     const r = await run(['init', '--owner', 'platform', '--system', 'billing', '--env', 'prod,stg', '--region', 'asia-northeast3']);
     expect(r.code, r.err).toBe(EXIT.OK);
     expect(readPlanFile()).toEqual({ provider: 'gcp', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3' }, project_picks: [], services: [], rules_version: VERSION.rules, environments: ['prod', 'stg'] });
@@ -167,7 +170,15 @@ describe('cloudonym names · validate · init (D102)', () => {
     writeFileSync(src, JSON.stringify({ ...PLAN_A, environments: ['stg', 'prod', 'stg'] }));
     expect((await run(['init', '--from', src, '--force'])).code).toBe(EXIT.OK);
     expect(readPlanFile().environments).toEqual(['prod', 'stg']);
-    expect((await run(['init', '--from', 'https://example.org/#w=abc', '--force'])).code).toBe(EXIT.USAGE);
+    // 실제 Worker 앱에 — 웹이 만든 링크 → 웹의 Save plan 과 같은 파일
+    const key = encodeWizardState(FULL_PLAN, VERSION.rules, ['prod', 'stg'])!;
+    const linked = await run(['init', '--from', `https://example.org/wizard#state=${key}`, '--force']);
+    expect(linked.code, linked.err).toBe(EXIT.OK);
+    expect(readPlanFile()).toEqual(savePlan(key, VERSION.rules)!.file);
+    expect(linked.err).not.toMatch(/left out|turned off|were made with/);
+    const tree = await run(['init', '--from', 'https://example.org/#state=e30', '--force']);
+    expect(tree.code).toBe(EXIT.INPUT);
+    expect(tree.err).toMatch(/press Save plan/);
   });
 
   it('init --provider aws → add(프리셋 · 규칙 id) → names · validate — AWS 계획이 진짜 엔진에서 끝까지 돈다 (0.2)', async () => {

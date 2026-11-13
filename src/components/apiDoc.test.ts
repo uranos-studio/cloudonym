@@ -42,7 +42,7 @@ describe('apiDocModel — 명세(public/openapi.json)에서 만든 엔드포인�
       expect(rows.some((r) => r.method === method && r.path.endsWith(p!)), s).toBe(true);
     }
     expect(rows.map((r) => `${r.method} ${r.path}`)).toEqual([
-      'POST /v1/generate', 'POST /v1/names', 'POST /v1/wizard', 'POST /v1/validate', 'GET /v1/health',
+      'POST /v1/generate', 'POST /v1/names', 'POST /v1/wizard', 'POST /v1/validate', 'POST /v1/plan/from-link', 'GET /v1/health',
       'GET /llms.txt', 'GET /openapi.json', 'GET /catalog.json', 'POST /v1/events',
     ]);
   });
@@ -66,7 +66,7 @@ describe('apiDocModel — 명세(public/openapi.json)에서 만든 엔드포인�
 
   it('요청 제한 표시 — 명세에 429 가 있는 것과 /llms.txt 만. health · openapi.json 은 세지 않는다', () => {
     expect(Object.fromEntries(rows.map((r) => [r.id, r.limited]))).toEqual({
-      generate: true, names: true, wizard: true, validate: true, health: false, llms: true, openapi: false, catalog: true, events: true,
+      generate: true, names: true, wizard: true, validate: true, plan_from_link: true, health: false, llms: true, openapi: false, catalog: true, events: true,
     });
   });
 
@@ -92,7 +92,7 @@ describe('apiDocModel — 명세(public/openapi.json)에서 만든 엔드포인�
   it('선택 필드 표시 — 스키마의 required 에 없는 키만 「"키"?:」 (validate 의 warnings · suggested_name · suggested_warnings)', () => {
     for (const r of rows.filter((x) => x.response)) {
       const optional = [...r.response!.matchAll(/^ {2}"(\w+)"\?:/gm)].map((m) => m[1]);
-      expect(optional, r.id).toEqual(r.id === 'validate' ? ['warnings', 'suggested_name', 'suggested_warnings'] : []);
+      expect(optional, r.id).toEqual(r.id === 'validate' ? ['warnings', 'suggested_name', 'suggested_warnings'] : r.id === 'plan_from_link' ? ['link_rules_version'] : []);
     }
     expect(spec.components.schemas['ValidateResponse']!.required).not.toContain('suggested_name');
     expect(spec.components.schemas['ValidateResponse']!.required).not.toContain('warnings');

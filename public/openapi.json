@@ -709,6 +709,87 @@
           }
         }
       }
+    },
+    "/plan/from-link": {
+      "post": {
+        "summary": "Turn a wizard share link into a plan file",
+        "description": "Reads the #state= part of a wizard share link and answers the plan file that the wizard's Save plan writes for the same link (the WizardRequest body plus rules_version and, with two or more environments, environments). Only the part after # is read: the host, path and query of the link are ignored, so the link is read with this deployment's rules. Parts of the link that no longer pass are dropped the way the wizard drops them when it opens the link, and counted in notices. rules_version in the plan is this deployment's rules revision; link_rules_version is the revision the link was made with, when it carries one. Nothing from the link is logged.",
+        "operationId": "planFromLink",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanFromLinkRequest"
+              },
+              "example": {
+                "link": "#state=eyJvd25lciI6InBsYXRmb3JtIiwic3lzdGVtIjoiYmlsbGluZyIsImVudiI6InByb2QiLCJyZWdpb24iOiJhc2lhLW5vcnRoZWFzdDMtYSIsInciOnsicHAiOlt7InByIjoidnBjIiwiaSI6W3siaWQiOiIxIiwicSI6IjAxIn1dfV19fQ"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The plan file and what was dropped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanFromLinkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "link is missing or not a string, or the link cannot be read (request.link_unreadable; params.kind is none when the link has no #state= part, tree when it is a resource-picker link rather than a wizard plan, broken when it cannot be decoded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body is larger than 32 KB (request.body_too_large)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this client IP (60 per 60 seconds, shared by POST /v1/*, GET /llms.txt and GET /catalog.json). Wait the number of seconds in Retry-After. errors[0].code is request.rate_limited",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before retrying",
+                "schema": {
+                  "type": "integer",
+                  "example": 60
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error (server.internal_error). The stack trace is logged, never returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2851,6 +2932,67 @@
           },
           "metadata": {
             "$ref": "#/components/schemas/WizardMetadata"
+          }
+        }
+      },
+      "PlanFromLinkRequest": {
+        "type": "object",
+        "required": [
+          "link"
+        ],
+        "properties": {
+          "link": {
+            "type": "string",
+            "description": "A wizard share link, or only its #state= part"
+          }
+        }
+      },
+      "PlanFromLinkResponse": {
+        "type": "object",
+        "required": [
+          "plan",
+          "notices",
+          "version"
+        ],
+        "properties": {
+          "plan": {
+            "type": "object",
+            "description": "The plan file (same shape as /plan.schema.json): the WizardRequest body plus rules_version and, with two or more environments, environments"
+          },
+          "notices": {
+            "type": "object",
+            "required": [
+              "dropped",
+              "ha_off",
+              "serverless_off",
+              "trimmed"
+            ],
+            "properties": {
+              "dropped": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ha_off": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "serverless_off": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "trimmed": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "description": "What opening the link changed: entries dropped, high availability turned off, serverless turned off, instances trimmed"
+          },
+          "link_rules_version": {
+            "type": "string",
+            "description": "The rules revision the link was made with, when it carries one"
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
           }
         }
       }

@@ -11,6 +11,7 @@ import { toWireGenerate, toWireNames, toWireValidate, toWireWizard, type Provide
 import { logTelemetry } from './telemetry';
 import { fail, internalError, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { VERSION } from '../version';
+import { planFromLink } from '../components/planFile';
 import { rateLimit } from './ratelimit';
 
 /** 본문 상한 — 32 KiB (D100). 마법사 계획 파일을 그대로 보내도 들어가야 한다 — 이름 200개 최악 계획의 압축 본문이 약 26 KB 다.
@@ -90,6 +91,27 @@ v1.post('/wizard', async (c) => {
     chip_rules: pickedRules.chip, custom_rules: pickedRules.custom,
   }));
   return c.json(toWireWizard(out, labels, transformed, VERSION));
+});
+
+// 공유 링크 → 계획 파일 (D144) — 웹의 Save plan 과 같은 파일. CLI 의 init --from <링크> 가 부른다.
+// 링크에는 owner · system 이 들어 있다 — 원격 기록(Axiom)에 아무것도 보내지 않는다(D17)
+v1.post('/plan/from-link', async (c) => {
+  const read = await readJson(c);
+  if (!read.ok) return notJson(c);
+  const body = read.body;
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) return fail(c, 400, [{ code: 'request.body_not_object' }]);
+  const link = (body as Record<string, unknown>).link;
+  if (link === undefined) return fail(c, 400, [{ code: 'request.field_missing', field: 'link' }]);
+  if (typeof link !== 'string') return fail(c, 400, [{ code: 'request.field_not_string', field: 'link' }]);
+  const r = planFromLink(link, VERSION.rules);
+  if (!r.ok) return fail(c, 400, [{ code: 'request.link_unreadable', field: 'link', params: { kind: r.kind } }]);
+  const n = r.notices;
+  return c.json({
+    plan: r.saved.file,
+    notices: { dropped: n.dropped, ha_off: n.haOff, serverless_off: n.serverlessOff, trimmed: n.trimmed },
+    ...(r.linkRulesVersion === undefined ? {} : { link_rules_version: r.linkRulesVersion }),
+    version: VERSION,
+  });
 });
 
 v1.post('/validate', async (c) => {

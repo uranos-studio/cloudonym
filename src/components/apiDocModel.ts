@@ -30,7 +30,7 @@ export const API_DOC_COUNTED: readonly { event: string; request: string }[] = [
 /** 모든 기록에 서버가 싣는 칸 — 이벤트마다 칸은 PRIVACY_EVENTS(= telemetry 의 META_KEYS) */
 export const API_DOC_COMMON_FIELDS: readonly string[] = ['_time', 'kst_day', 'event', 'client_class', 'is_ai_agent'];
 /** 성공 응답에 version 을 싣는 경로 — 명세의 200 응답과 같은지는 apiDoc.test 가 본다 */
-export const API_DOC_VERSIONED: readonly string[] = ['/v1/generate', '/v1/names', '/v1/wizard', '/v1/validate', '/v1/health', '/catalog.json'];
+export const API_DOC_VERSIONED: readonly string[] = ['/v1/generate', '/v1/names', '/v1/wizard', '/v1/validate', '/v1/plan/from-link', '/v1/health', '/catalog.json'];
 
 /** 영어 나열 — a · a and b · a, b and c */
 export function listText(items: readonly (string | number)[], last: 'and' | 'or' = 'and'): string {
@@ -164,6 +164,7 @@ const ORDER: readonly { id: string; path: string; method: 'get' | 'post' }[] = [
   { id: 'names', path: '/names', method: 'post' },
   { id: 'wizard', path: '/wizard', method: 'post' },
   { id: 'validate', path: '/validate', method: 'post' },
+  { id: 'plan_from_link', path: '/plan/from-link', method: 'post' },
   { id: 'health', path: '/health', method: 'get' },
 ];
 /** 화면 비콘 — 같은 출처(Sec-Fetch-Site)만 받는다 */

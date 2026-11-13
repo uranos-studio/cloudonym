@@ -656,3 +656,65 @@ test('[18] 임시 파일 <대상>.tmp-<PID> 가 이미 있으면 exit 2 이고 �
   unlinkSync(tmp);
   assert.deepEqual(readdirSync(dir).filter((f) => f.endsWith('.lock') || f.includes('.tmp-')), []);
 });
+
+// ── init --from <공유 링크> (D144) ──
+
+const LINK = 'https://example.org/wizard#state=eyJhIjoxfQ';
+/** @param {{ status: number, body?: unknown }} answer */
+const linkServer = (answer) => fake((path) => (path === '/v1/plan/from-link' ? answer : { status: 500, body: {} }));
+
+test('init --from <링크> — 서버가 푼 계획을 그대로 쓴다 · 링크는 이 CLI 의 서버로 보낸다(링크의 호스트가 아니다)', async () => {
+  const dir = tmpDir();
+  const plan = { ...PLAN, environments: ['prod', 'stg'] };
+  const { fetchFn, calls } = linkServer({ status: 200, body: { plan, notices: { dropped: 0, ha_off: 0, serverless_off: 0, trimmed: 0 }, link_rules_version: 'v1', version: { engine: '0.1.0', rules: 'v1' } } });
+  const r = await run(['init', '--from', LINK], fetchFn, dir);
+  assert.equal(r.code, EXIT.OK, r.err);
+  assert.deepEqual(calls.map((c) => c.path), ['/v1/plan/from-link']);
+  assert.deepEqual(calls[0]?.body, { link: LINK });
+  assert.deepEqual(JSON.parse(readFileSync(join(dir, 'cloudonym.plan.json'), 'utf-8')), plan);
+  assert.doesNotMatch(r.err, /left out|turned off|removed|were made with/);
+});
+
+test('init --from <링크> — 버린 것 · 규칙 버전 차이를 stderr 에 한 줄씩 (웹의 안내와 같은 뜻)', async () => {
+  const dir = tmpDir();
+  const { fetchFn } = linkServer({ status: 200, body: { plan: PLAN, notices: { dropped: 2, ha_off: 1, serverless_off: 0, trimmed: 3 }, link_rules_version: 'v0', version: { engine: '0.1.0', rules: 'v1' } } });
+  const r = await run(['init', '--from', '#state=eyJhIjoxfQ'], fetchFn, dir);
+  assert.equal(r.code, EXIT.OK, r.err);
+  assert.match(r.err, /^2 invalid item\(s\) in this link were left out\.$/m);
+  assert.match(r.err, /^HA turned off for 1 pick\(s\)/m);
+  assert.doesNotMatch(r.err, /serverless/);
+  assert.match(r.err, /^3 pick\(s\) over the limit were left out\.$/m);
+  assert.match(r.err, /The link was made with rules v0; the plan uses the server's rules v1\./);
+});
+
+test('init --from <링크> — 읽을 수 없는 링크(400 request.link_unreadable)는 2 · 서버의 문장 + Save plan 안내 · 파일을 쓰지 않는다', async () => {
+  const dir = tmpDir();
+  const { fetchFn } = linkServer({ status: 400, body: { success: false, errors: [{ code: 'request.link_unreadable', field: 'link', params: { kind: 'tree' }, message: 'The link is a resource-picker link, not a wizard plan' }] } });
+  const r = await run(['init', '--from', LINK], fetchFn, dir);
+  assert.equal(r.code, EXIT.INPUT);
+  assert.match(r.err, /^The link is a resource-picker link, not a wizard plan\. Open the link in the browser, press Save plan/);
+  assert.equal(existsSync(join(dir, 'cloudonym.plan.json')), false);
+});
+
+test('init --from <링크> — 너무 긴 링크(413)는 2 · Save plan 안내', async () => {
+  const dir = tmpDir();
+  const { fetchFn } = linkServer({ status: 413, body: { success: false, errors: [{ code: 'request.body_too_large', params: { max_bytes: 32768 }, message: 'x' }] } });
+  const r = await run(['init', '--from', LINK], fetchFn, dir);
+  assert.equal(r.code, EXIT.INPUT);
+  assert.match(r.err, /too long for the API\. Open the link in the browser, press Save plan/);
+});
+
+test('init --from <링크> — 답에 계획이 없으면 4 · --provider 가 다르면 64 · --force 없이 있는 파일은 2', async () => {
+  const dir = tmpDir();
+  const bad = await run(['init', '--from', LINK], linkServer({ status: 200, body: { notices: {} } }).fetchFn, dir);
+  assert.equal(bad.code, EXIT.UNAVAILABLE);
+  assert.match(bad.err, /no plan in it/);
+  const ok = linkServer({ status: 200, body: { plan: PLAN, notices: {}, version: { engine: '0.1.0', rules: 'v1' } } }).fetchFn;
+  const p = await run(['init', '--from', LINK, '--provider', 'aws'], ok, dir);
+  assert.equal(p.code, EXIT.USAGE);
+  assert.match(p.err, /does not match the provider/);
+  assert.equal((await run(['init', '--from', LINK], ok, dir)).code, EXIT.OK);
+  const again = await run(['init', '--from', LINK], ok, dir);
+  assert.equal(again.code, EXIT.INPUT);
+  assert.match(again.err, /already exists/);
+});

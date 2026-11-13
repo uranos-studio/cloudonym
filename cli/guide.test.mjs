@@ -70,7 +70,7 @@ function wizardAnswer(plan) {
   return { status: 200, body: { success: true, version: { engine: '0.1.0', rules: 'v1' }, data: { gcp: { valid: true, items, conflicts: [] } } } };
 }
 
-/** @param {{ envValues?: boolean, big?: boolean, clouds?: boolean }} [o] */
+/** @param {{ envValues?: boolean, big?: boolean, clouds?: boolean, fromLink?: { status: number, body: unknown } }} [o] */
 function server(o = {}) {
   /** @type {{ path: string, body: any }[]} */
   const calls = [];
@@ -82,7 +82,8 @@ function server(o = {}) {
     const cat = catalog(o.envValues ?? true, o.big);
     // 마법사 데이터가 있는 provider 가 둘 — 묻는 흐름이 provider 를 묻는다
     if (o.clouds) /** @type {any} */ (cat.providers).aws = { ...cat.providers.gcp };
-    const r = path === '/catalog.json' ? { status: 200, body: cat }
+    const r = path === '/v1/plan/from-link' && o.fromLink ? o.fromLink
+      : path === '/catalog.json' ? { status: 200, body: cat }
       : path === '/v1/health' ? { status: 200, body: { ok: true, version: { engine: '0.1.0', rules: 'v1' } } }
         : wizardAnswer(body);
     return { status: r.status, headers: { get: () => null }, text: async () => JSON.stringify(r.body) };
@@ -287,12 +288,14 @@ test('인자 없는 add — 같은 pick 에 서버를 더할 때 다르게 답�
   assert.equal(web.instances.length, 2);
 });
 
-test('--from 에 공유 링크를 주면 64 — 브라우저의 Save plan 뒤 new --from <파일> 을 안내한다 (설계 §9 ⑤(c))', async () => {
+test('--from 공유 링크 — 링크를 읽지 못하는 옛 서버(404)면 4 · Save plan 뒤 new --from <파일> 을 안내한다 (D144)', async () => {
   const dir = tmpDir();
-  for (const argv of [['init', '--from', 'https://example.org/#p=abc'], ['new', '--from', 'https://example.org/#p=abc']]) {
-    const r = await term(argv, [], { cwd: dir, fetchFn: server().fetchFn, tty: false });
-    assert.equal(r.code, EXIT.USAGE, argv.join(' '));
-    assert.match(r.err, /^--from takes a plan file, not a share link \(links are not read yet\)\. Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>/);
+  const old = () => server({ fromLink: { status: 404, body: { success: false, errors: [{ code: 'request.not_found', message: 'No such endpoint' }] } } });
+  for (const argv of [['init', '--from', 'https://example.org/#state=abc'], ['new', '--from', 'https://example.org/#state=abc']]) {
+    const r = await term(argv, [], { cwd: dir, fetchFn: old().fetchFn, tty: false });
+    assert.equal(r.code, EXIT.UNAVAILABLE, argv.join(' '));
+    assert.match(r.err, /cannot read share links yet\. Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>/);
+    assert.equal(existsSync(join(dir, 'cloudonym.plan.json')), false);
   }
   // new --from <파일> 은 init --from 과 같다
   const src = join(dir, 'saved.json');

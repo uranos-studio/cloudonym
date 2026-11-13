@@ -4,7 +4,7 @@
 //   모르는 키는 API(parseWizardBody · toModelPick)처럼 무시하고 센다 — 같은 파일이면 웹과 API 가 같은 pick · 같은 이름을 낸다(ignoredKeys · plan-file.test).
 //   attach 안의 모르는 키만 예외다 — API 도 거부하므로(wizard.attach_not_object) 링크처럼 그 attach 를 버리고 센다
 // 브라우저 일(Blob · input[type=file])은 Wizard.tsx 에 둔다 — 이 파일은 순수 함수라 시험이 node 에서 돈다
-import { decodeWizardObject, decodeWizardState, encodeWizardState, HASH_KEY, MAX_WIZARD_JSON_BYTES, SERVERLESS_SHORT, type DecodedWizard } from './urlState';
+import { decodeWizardObject, decodeWizardState, encodeWizardState, hashKind, HASH_KEY, MAX_WIZARD_JSON_BYTES, SERVERLESS_SHORT, type DecodedWizard, type WizardNotices } from './urlState';
 import { initialPlan } from './wizardState';
 import type { WizardPlan } from '../core/wizard/plan';
 import type { Env } from '../core/types';
@@ -40,6 +40,26 @@ export function savePlan(stateKey: string, rulesVersion: string): SavedPlan | un
     file, text: planFileText(file), apiBytes, overApiLimit: apiBytes > PLAN_MAX_BODY_BYTES,
     fileName: `cloudonym-plan-${slug(d.plan.project.system)}-${slug(d.plan.project.env)}.json`,
   };
+}
+
+/** 공유 링크 → 계획 파일 (D144) — POST /v1/plan/from-link 가 쓴다. Save plan 과 같은 길(savePlan)이라 같은 링크면 같은 파일이다.
+ *  `#` 앞(호스트 · 경로 · 쿼리)은 읽지 않는다 — 링크를 연 배포가 어디든 이 서버의 규칙으로 푼다.
+ *  길이는 본문 상한(32 KiB · 413)이 먼저 닫는다 — 링크 디코더의 상한(MAX_ANY_HASH_CHARS)보다 작다.
+ *  풀 수 없으면 kind — none(조각 없음) · tree(트리 화면 링크 — 계획 파일이 없다) · broken(풀리지 않거나 계획을 버렸다) */
+export type LinkPlan =
+  | { ok: true; saved: SavedPlan; notices: Omit<WizardNotices, 'discarded'>; linkRulesVersion?: string }
+  | { ok: false; kind: 'none' | 'tree' | 'broken' };
+export function planFromLink(link: string, rulesVersion: string): LinkPlan {
+  const at = link.indexOf('#');
+  const hash = at < 0 ? '' : link.slice(at);
+  const kind = hashKind(hash);
+  if (kind !== 'wizard') return { ok: false, kind: kind === 'tree' ? 'tree' : kind === 'none' ? 'none' : 'broken' };
+  const d = decodeWizardState(hash);
+  const m = new RegExp(`^#${HASH_KEY}=(.*)$`).exec(hash);
+  const saved = m ? savePlan(m[1] ?? '', rulesVersion) : undefined;
+  if (!d?.plan || !saved) return { ok: false, kind: 'broken' };
+  const { dropped, haOff, serverlessOff, trimmed } = d.notices;
+  return { ok: true, saved, notices: { dropped, haOff, serverlessOff, trimmed }, ...(d.rulesVersion === undefined ? {} : { linkRulesVersion: d.rulesVersion }) };
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
