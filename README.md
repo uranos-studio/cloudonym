@@ -34,7 +34,7 @@ If a name is too long, Cloudonym shortens it step by step. If it still does not 
 
 **Web UI.** Open the site and fill in the naming wizard. It names a whole project and gives Terraform or JSON. `/pick` names single resources. Details: [docs/web-ui.md](docs/web-ui.md).
 
-**API.** Send JSON to `/v1/generate`, `/v1/names`, `/v1/wizard` or `/v1/validate`:
+**API.** Send JSON to `/v1/generate`, `/v1/names`, `/v1/wizard` or `/v1/validate` (and a wizard share link to `/v1/plan/from-link` to get its plan file):
 
 ```sh
 curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: application/json' \
@@ -113,7 +113,7 @@ Cloudonym 은 클라우드가 받아 주는 리소스 이름을 만든다.
 ### 쓰는 법 셋
 
 - **웹 화면** — 사이트에서 이름 마법사를 채운다. 프로젝트 전체 이름과 Terraform · JSON 을 준다. 자세히: [docs/web-ui.md](docs/web-ui.md#한국어)
-- **API** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` 에 JSON 을 보낸다. 자세히: [docs/api.md](docs/api.md#한국어)
+- **API** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` 에 JSON 을 보낸다(마법사 공유 링크는 `/v1/plan/from-link` 가 계획 파일로 바꾼다). 자세히: [docs/api.md](docs/api.md#한국어)
 - **CLI** — 클론에서 `node cli/cloudonym.mjs` 를 돌린다. 터미널에서 몇 가지를 묻고 계획 파일을 저장한 뒤 이름을 보인다. 자세히: [docs/cli.md](docs/cli.md#한국어)
 
 AI 에이전트는 `/llms.txt` 를 읽게 한다. 명세는 `/openapi.json` · `/catalog.json` 이다.

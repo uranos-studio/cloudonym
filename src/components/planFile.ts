@@ -31,7 +31,11 @@ const slug = (v: string): string => v.toLowerCase().replace(/[^a-z0-9-]+/g, '-')
 /** stateKey(encodeWizardState 의 값) → 계획 파일. 풀리지 않으면 undefined(화면은 Save plan 을 그리지 않는다) */
 export function savePlan(stateKey: string, rulesVersion: string): SavedPlan | undefined {
   if (!stateKey) return undefined;
-  const d = decodeWizardState(`#${HASH_KEY}=${stateKey}`);
+  return savedFrom(decodeWizardState(`#${HASH_KEY}=${stateKey}`), rulesVersion);
+}
+
+/** 푼 마법사 상태 → 계획 파일 — savePlan 과 planFromLink 가 같이 쓴다(링크를 한 번만 푼다) */
+function savedFrom(d: DecodedWizard | undefined, rulesVersion: string): SavedPlan | undefined {
   if (!d?.plan) return undefined;
   const envs = d.envs ?? [d.plan.project.env];
   const file = toWirePlan(d.plan, envs, rulesVersion);
@@ -52,12 +56,11 @@ export type LinkPlan =
 export function planFromLink(link: string, rulesVersion: string): LinkPlan {
   const at = link.indexOf('#');
   const hash = at < 0 ? '' : link.slice(at);
-  const kind = hashKind(hash);
-  if (kind !== 'wizard') return { ok: false, kind: kind === 'tree' ? 'tree' : kind === 'none' ? 'none' : 'broken' };
+  if (!hash.startsWith(`#${HASH_KEY}=`)) return { ok: false, kind: 'none' };
+  // 성공 길은 한 번만 푼다 — 실패일 때만 hashKind 로 트리 링크인지 가린다
   const d = decodeWizardState(hash);
-  const m = new RegExp(`^#${HASH_KEY}=(.*)$`).exec(hash);
-  const saved = m ? savePlan(m[1] ?? '', rulesVersion) : undefined;
-  if (!d?.plan || !saved) return { ok: false, kind: 'broken' };
+  const saved = savedFrom(d, rulesVersion);
+  if (!d || !saved) return { ok: false, kind: hashKind(hash) === 'tree' ? 'tree' : 'broken' };
   const { dropped, haOff, serverlessOff, trimmed } = d.notices;
   return { ok: true, saved, notices: { dropped, haOff, serverlessOff, trimmed }, ...(d.rulesVersion === undefined ? {} : { linkRulesVersion: d.rulesVersion }) };
 }

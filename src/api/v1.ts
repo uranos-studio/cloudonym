@@ -12,6 +12,7 @@ import { logTelemetry } from './telemetry';
 import { fail, internalError, MAX_GENERATE_ERRORS, MAX_WIZARD_ERRORS } from './errors';
 import { VERSION } from '../version';
 import { planFromLink } from '../components/planFile';
+import { ENABLED_PROVIDERS, type Provider } from '../core/types';
 import { rateLimit } from './ratelimit';
 
 /** 본문 상한 — 32 KiB (D100). 마법사 계획 파일을 그대로 보내도 들어가야 한다 — 이름 200개 최악 계획의 압축 본문이 약 26 KB 다.
@@ -105,6 +106,9 @@ v1.post('/plan/from-link', async (c) => {
   if (typeof link !== 'string') return fail(c, 400, [{ code: 'request.field_not_string', field: 'link' }]);
   const r = planFromLink(link, VERSION.rules);
   if (!r.ok) return fail(c, 400, [{ code: 'request.link_unreadable', field: 'link', params: { kind: r.kind } }]);
+  // 이 배포에서 꺼진 provider 의 링크 — /v1/wizard 와 같이 거부한다(계획 파일을 쓰고 다음 명령에서 막히지 않게)
+  const provider = r.saved.file.provider as Provider;
+  if (!ENABLED_PROVIDERS.includes(provider)) return fail(c, 400, [{ code: 'request.provider_not_enabled', field: 'link', params: { provider } }], { supported: [...ENABLED_PROVIDERS] });
   const n = r.notices;
   return c.json({
     plan: r.saved.file,

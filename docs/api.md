@@ -126,13 +126,14 @@ Response of `/v1/validate`:
 
 <a id="what-pass-means"></a>**What PASS means.** PASS / `valid: true` means the name satisfies the documented naming checks of this rules revision (length, pattern, reserved words). It does not mean the name is available or that you may create it — uniqueness, permissions, quotas and organisation policy are not checked. Generated names are not guaranteed unique: shortening can map two different contexts to the same name.
 
-**Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](../examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
+**Version and name stability.** Successful responses of `/v1/generate`, `/v1/names`, `/v1/wizard`, `/v1/validate`, `/v1/plan/from-link` and `/v1/health` carry `version: { engine, rules }` (failures and `/v1/events` do not). `rules` (`YYYY-MM-DD.N`) changes whenever the same input could produce a different name, verdict, suggestion or label. Cloudonym does not serve old rules revisions — keep the names you created. Send `"rules_version": "<rules>"` to be told with a `409 request.rules_version_mismatch` instead of silently getting a different name. The [Terraform example](../examples/terraform/README.md) shows `ignore_changes` and a pinned mode that skips the API.
 
-<a id="whole-project-post-v1wizard"></a>
+<a id="share-link-to-plan-file-post-v1planfrom-link"></a>
 ### Share link to plan file: `POST /v1/plan/from-link`
 
 `{ "link": "<a wizard share link, or only its #state= part>" }` answers `{ "plan": { … }, "notices": { "dropped", "ha_off", "serverless_off", "trimmed" }, "link_rules_version"?: "…", "version": { … } }`. `plan` is the file the wizard's **Save plan** writes for the same link — a `POST /v1/wizard` body with `rules_version` (this deployment's) and, with two or more environments, `environments`. Only the part after `#` is read, so a link from any deployment is read with this deployment's rules; `notices` counts what opening the link dropped, as the wizard does. A link with no `#state=` part, a resource-picker link or a link that cannot be decoded is `400 request.link_unreadable` (`params.kind`: `none`, `tree`, `broken`). Nothing from the link is logged. The CLI's `init --from <link>` calls it.
 
+<a id="whole-project-post-v1wizard"></a>
 ### Whole project: `POST /v1/wizard`
 
 ```sh
@@ -228,7 +229,11 @@ curl -s -X POST https://<your-deployment>/v1/validate -H 'content-type: applicat
 - **메시지** — `violations` · `steps` · `rule.notes` · `metadata.transformed` · 라벨 위반 · 라벨 변환 · `errors` 는 전부 `{ code, field?, params?, message }` 목록이다. 분기는 `code`(바뀌지 않는다)로, 사람에게는 `message`(영어 · 문구는 다듬어질 수 있다)를 보인다
 - **오류** — 모든 실패가 `{ "success": false, "errors": [...], "supported"?: [...] }` 한 꼴이다. `supported` 는 provider 가 모르는 값이거나 켜지지 않았을 때, resource type · event · 복사 target 이 모르는 값일 때, `providers` 가 비지 않은 배열이 아닐 때 실린다(모르는 종류는 `params.supported` 에 허용 값이 실린다). 오류에 되돌려 싣는 사용자 값(`params.value` · `params.requested` 와 `message`)은 40자에서 자르고 `…` 를 붙이며 제어 · 양방향 문자는 `\uXXXX` 로 보인다. `supported` 같은 목록은 자르지 않는다. `400` 요청 모양 오류 · `404` `/v1` 아래 없는 경로 · 메서드(`request.not_found`) · `409` `rules_version` 불일치 · `413` 본문 32KB(32,768 바이트) 초과 · `429` 클라이언트 IP 당 60초 60건 초과(POST `/v1/*` · GET `/llms.txt` · GET `/catalog.json` 합산 · `Retry-After: 60`) · `500` 내부 오류. `POST /v1/wizard` · `POST /v1/generate` 의 400 은 오류를 앞에서부터 50개까지만 싣고, 더 있으면 마지막 항목 `request.errors_truncated` 가 `params: { shown, total }` 로 알린다. 다른 경로는 오류를 모두 싣는다. `GET /v1/health` 는 `{ "ok": true, "version": {…} }`
 - **PASS 의 뜻** — 이 규칙 버전의 이름 검사(길이 · 형식 · 예약어)를 통과했다는 뜻이다. 그 이름을 쓸 수 있다는 뜻이 아니다 — 고유성 · 권한 · 할당량 · 조직 정책은 검사하지 않고, 축소 때문에 서로 다른 문맥이 같은 이름이 될 수 있다
-- **버전 · 이름 안정성** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
+- **버전 · 이름 안정성** — `/v1/generate` · `/v1/names` · `/v1/wizard` · `/v1/validate` · `/v1/plan/from-link` · `/v1/health` 의 성공 응답에 `version: { engine, rules }` 가 실린다(실패와 `/v1/events` 에는 없다). `rules`(`YYYY-MM-DD.N`)는 같은 입력에서 이름 · 판정 · 제안 · 라벨이 달라질 수 있는 변경마다 오른다. 옛 규칙 버전은 서빙하지 않는다 — 만든 이름을 그대로 쓴다. 요청에 `"rules_version"` 을 넣으면 규칙이 바뀌었을 때 다른 이름 대신 `409` 를 받는다
+
+### 공유 링크 → 계획 파일 — `POST /v1/plan/from-link`
+
+`{ "link": "<마법사 공유 링크 또는 그 #state= 부분>" }` 를 보내면 웹 마법사의 **Save plan** 이 같은 링크로 내려주는 계획 파일을 `plan` 에 싣고, 링크를 열며 버린 것을 `notices` 에, 링크의 규칙 버전을 `link_rules_version` 에 싣는다. `#` 뒤만 읽는다. 읽을 수 없는 링크는 `400 request.link_unreadable`(`params.kind`: `none` · `tree` · `broken`)이다. 링크의 내용은 기록하지 않는다. CLI 의 `init --from <링크>` 가 부른다.
 
 ### 프로젝트 전체 — `POST /v1/wizard`
 

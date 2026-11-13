@@ -670,9 +670,9 @@ test('init --from <링크> — 서버가 푼 계획을 그대로 쓴다 · 링�
   const r = await run(['init', '--from', LINK], fetchFn, dir);
   assert.equal(r.code, EXIT.OK, r.err);
   assert.deepEqual(calls.map((c) => c.path), ['/v1/plan/from-link']);
-  assert.deepEqual(calls[0]?.body, { link: LINK });
+  assert.deepEqual(calls[0]?.body, { link: '#state=eyJhIjoxfQ' }); // # 앞(호스트 · 쿼리)은 보내지 않는다
   assert.deepEqual(JSON.parse(readFileSync(join(dir, 'cloudonym.plan.json'), 'utf-8')), plan);
-  assert.doesNotMatch(r.err, /left out|turned off|removed|were made with/);
+  assert.doesNotMatch(r.err, /left out|turned off|removed|link was made with/);
 });
 
 test('init --from <링크> — 버린 것 · 규칙 버전 차이를 stderr 에 한 줄씩 (웹의 안내와 같은 뜻)', async () => {
@@ -687,12 +687,12 @@ test('init --from <링크> — 버린 것 · 규칙 버전 차이를 stderr 에 
   assert.match(r.err, /The link was made with rules v0; the plan uses the server's rules v1\./);
 });
 
-test('init --from <링크> — 읽을 수 없는 링크(400 request.link_unreadable)는 2 · 서버의 문장 + Save plan 안내 · 파일을 쓰지 않는다', async () => {
+test('init --from <링크> — 읽을 수 없는 링크(400 request.link_unreadable)는 2 · 서버의 문장만 · 파일을 쓰지 않는다', async () => {
   const dir = tmpDir();
   const { fetchFn } = linkServer({ status: 400, body: { success: false, errors: [{ code: 'request.link_unreadable', field: 'link', params: { kind: 'tree' }, message: 'The link is a resource-picker link, not a wizard plan' }] } });
   const r = await run(['init', '--from', LINK], fetchFn, dir);
   assert.equal(r.code, EXIT.INPUT);
-  assert.match(r.err, /^The link is a resource-picker link, not a wizard plan\. Open the link in the browser, press Save plan/);
+  assert.match(r.err, /^The link is a resource-picker link, not a wizard plan\.$/);
   assert.equal(existsSync(join(dir, 'cloudonym.plan.json')), false);
 });
 
@@ -717,4 +717,25 @@ test('init --from <링크> — 답에 계획이 없으면 4 · --provider 가 �
   const again = await run(['init', '--from', LINK], ok, dir);
   assert.equal(again.code, EXIT.INPUT);
   assert.match(again.err, /already exists/);
+});
+
+test('init --from — 404 가 Cloudonym 의 request.not_found 가 아니면 일반 오류(4) · # 이 든 파일 이름은 파일로 읽는다', async () => {
+  const dir = tmpDir();
+  const proxy = await run(['init', '--from', LINK], linkServer({ status: 404, body: { nope: 1 } }).fetchFn, dir);
+  assert.equal(proxy.code, EXIT.UNAVAILABLE);
+  assert.doesNotMatch(proxy.err, /cannot read share links/);
+  writeFileSync(join(dir, 'a#b.json'), JSON.stringify(PLAN));
+  const { fetchFn, calls } = linkServer({ status: 500, body: {} });
+  const r = await run(['init', '--from', 'a#b.json'], fetchFn, dir);
+  assert.equal(r.code, EXIT.OK, r.err);
+  assert.equal(calls.length, 0);
+});
+
+test('new --from <링크> 도 init --from 과 같다 · 429 는 4', async () => {
+  const dir = tmpDir();
+  const ok = linkServer({ status: 200, body: { plan: PLAN, notices: {}, version: { engine: '0.1.0', rules: 'v1' } } }).fetchFn;
+  assert.equal((await run(['new', '--from', LINK], ok, dir)).code, EXIT.OK);
+  const busy = await run(['init', '--from', LINK, '--force'], linkServer({ status: 429, body: { success: false, errors: [{ code: 'request.rate_limited', params: { retry_after: 60 }, message: 'x' }] } }).fetchFn, dir);
+  assert.equal(busy.code, EXIT.UNAVAILABLE);
+  assert.match(busy.err, /Rate limited/);
 });

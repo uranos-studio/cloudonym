@@ -740,7 +740,7 @@
             }
           },
           "400": {
-            "description": "link is missing or not a string, or the link cannot be read (request.link_unreadable; params.kind is none when the link has no #state= part, tree when it is a resource-picker link rather than a wizard plan, broken when it cannot be decoded)",
+            "description": "link is missing or not a string, or the link cannot be read (request.link_unreadable; params.kind is none when the link has no #state= part, tree when it is a resource-picker link rather than a wizard plan, broken when it cannot be decoded), or the link's provider is not enabled on this deployment (request.provider_not_enabled; supported lists the enabled providers)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2985,7 +2985,7 @@
                 "minimum": 0
               }
             },
-            "description": "What opening the link changed: entries dropped, high availability turned off, serverless turned off, instances trimmed"
+            "description": "What opening the link changed: entries dropped, high availability turned off, serverless turned off, picks over the limit left out"
           },
           "link_rules_version": {
             "type": "string",

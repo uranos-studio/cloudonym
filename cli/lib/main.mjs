@@ -276,6 +276,8 @@ export class Ctx {
 
 /** --from 의 값이 공유 링크인가 — URL(scheme://) 이거나 `#` 이 있다. 파일 이름에 `#` 이 든 경우는 ./ 를 붙여도 링크로 읽힌다 — 드물어 받아들인다 @param {string} s */
 export const isLink = (s) => /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || s.includes('#');
+/** 파일 이름에 `#` 이 들어 있어도 그 파일이 있으면 파일로 읽는다 @param {string} s @param {string} cwd */
+const isLinkArg = (s, cwd) => isLink(s) && !(s.includes('#') && !/^[a-z][a-z0-9+.-]*:\/\//i.test(s) && existsSync(resolve(cwd, s)));
 
 /**
  * 공유 링크 → 계획 파일 — POST /v1/plan/from-link. 성공이면 계획, 아니면 종료 코드. 버린 것 · 규칙 버전 차이는 stderr 에 한 줄씩
@@ -283,12 +285,14 @@ export const isLink = (s) => /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || s.includes('#
  */
 async function planFromLink(ctx, link) {
   const { d } = ctx;
-  const r = await ctx.client().post('/v1/plan/from-link', { link });
+  // 서버는 `#` 뒤만 읽는다 — 호스트 · 경로 · 쿼리(자격이 든 URL 일 수 있다)는 보내지 않는다
+  const r = await ctx.client().post('/v1/plan/from-link', { link: link.slice(link.indexOf('#')) });
   const errors = r.kind === 'ok' || !Array.isArray(r.body?.errors) ? [] : r.body.errors;
   const save = 'Open the link in the browser, press Save plan, then run: cloudonym new --from <the saved file>';
   // 링크를 읽지 못하는 옛 서버 — 경로가 없다(404)
-  if (r.kind === 'http' && r.status === 404) { d.stderr(`${ctx.server} cannot read share links yet. ${save}`); return EXIT.UNAVAILABLE; }
-  if (r.kind === 'http' && r.status === 400 && errors[0]?.code === 'request.link_unreadable') { d.stderr(`${errors[0].message ?? 'The link cannot be read.'}. ${save}`); return EXIT.INPUT; }
+  if (r.kind === 'http' && r.status === 404 && errors[0]?.code === 'request.not_found') { d.stderr(`${ctx.server} cannot read share links yet. ${save}`); return EXIT.UNAVAILABLE; }
+  // 읽지 못하는 링크 — 서버의 문장만(트리 링크 · 깨진 링크에는 Save plan 단추가 없다)
+  if (r.kind === 'http' && r.status === 400 && errors[0]?.code === 'request.link_unreadable') { d.stderr(`${String(errors[0].message ?? 'The link cannot be read').replace(/\.$/, '')}.`); return EXIT.INPUT; }
   if (r.kind === 'http' && r.status === 413) { d.stderr(`The link is too long for the API. ${save}`); return EXIT.INPUT; }
   if (r.kind !== 'ok') return ctx.report(r);
   const plan = r.body?.plan;
@@ -414,7 +418,7 @@ async function init(ctx, rest) {
   if (v.from !== undefined) {
     /** @type {PlanFile} */
     let plan;
-    if (isLink(v.from)) {
+    if (isLinkArg(v.from, d.cwd)) {
       // 공유 링크 (D144) — 서버가 웹의 Save plan 과 같은 파일로 푼다(서버가 정본). 링크의 호스트가 아니라 이 CLI 의 서버로 보낸다
       const got = await planFromLink(ctx, v.from);
       if (typeof got === 'number') return got;
@@ -433,7 +437,7 @@ async function init(ctx, rest) {
     return EXIT.OK;
   }
   const missing = ['owner', 'system', 'env', 'region'].filter((k) => v[/** @type {'owner'} */ (k)] === undefined);
-  if (missing.length > 0) throw new UsageError(`init needs --${missing.join(', --')} (or --from <plan.json>).`);
+  if (missing.length > 0) throw new UsageError(`init needs --${missing.join(', --')} (or --from <plan.json | share link>).`);
   const provider = providerOf(v.provider);
   const envs = [...new Set(String(v.env).split(',').map((s) => s.trim()).filter((s) => s !== ''))];
   if (envs.length === 0) throw new UsageError('--env is empty.');

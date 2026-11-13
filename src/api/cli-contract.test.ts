@@ -175,10 +175,10 @@ describe('cloudonym names · validate · init (D102)', () => {
     const linked = await run(['init', '--from', `https://example.org/wizard#state=${key}`, '--force']);
     expect(linked.code, linked.err).toBe(EXIT.OK);
     expect(readPlanFile()).toEqual(savePlan(key, VERSION.rules)!.file);
-    expect(linked.err).not.toMatch(/left out|turned off|were made with/);
+    expect(linked.err).not.toMatch(/left out|turned off|link was made with/);
     const tree = await run(['init', '--from', 'https://example.org/#state=e30', '--force']);
     expect(tree.code).toBe(EXIT.INPUT);
-    expect(tree.err).toMatch(/press Save plan/);
+    expect(tree.err).toMatch(/cannot be read|resource-picker/);
   });
 
   it('init --provider aws → add(프리셋 · 규칙 id) → names · validate — AWS 계획이 진짜 엔진에서 끝까지 돈다 (0.2)', async () => {

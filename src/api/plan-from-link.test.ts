@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { app } from './index';
 import { req, jsonPost, json } from './test-support';
 import { VERSION } from '../version';
 import { encodeWizardState, encodeState, HASH_KEY } from '../components/urlState';
 import { savePlan } from '../components/planFile';
 import { FULL_PLAN } from '../components/__fixtures__/plan';
-import type { Env } from '../core/types';
+import { ENABLED_PROVIDERS, type Env } from '../core/types';
 
 // 공유 링크 → 계획 파일 (D144) — 웹의 Save plan 과 같은 파일을 서버가 낸다. CLI 의 init --from <링크> 가 부른다
 const post = (body: unknown) => req(app, '/v1/plan/from-link', jsonPost(body));
@@ -45,10 +47,27 @@ describe('POST /v1/plan/from-link', () => {
     ['조각이 없다', 'https://example.com/', 'none'],
     ['트리 화면 링크', `#${HASH_KEY}=${encodeState({ owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3', purpose: 'shop' } as never)}`, 'tree'],
     ['풀리지 않는다', `#${HASH_KEY}=!!!`, 'broken'],
+    ['#state= 가 아닌 조각', '#foo', 'none'],
+    ['계획(w)을 버린 링크', `#${HASH_KEY}=${Buffer.from(JSON.stringify({ owner: 'platform', system: 'billing', env: 'prod', region: 'asia-northeast3-a', w: 1 })).toString('base64url')}`, 'broken'],
   ])('%s → 400 request.link_unreadable (kind %s)', async (_, link, kind) => {
     const { res } = await post({ link });
     expect(res.status).toBe(400);
     expect((await json(res)).errors[0]).toMatchObject({ code: 'request.link_unreadable', field: 'link', params: { kind } });
+  });
+  it('이 배포에서 꺼진 provider 의 링크는 400 request.provider_not_enabled (/v1/wizard 와 같다)', async () => {
+    const off = (['gcp', 'aws', 'azure'] as const).find((p) => !ENABLED_PROVIDERS.includes(p))!;
+    const raw = { c: off, owner: 'platform', system: 'billing', env: 'prod', region: 'koreacentral', w: {} };
+    const { res } = await post({ link: `#${HASH_KEY}=${Buffer.from(JSON.stringify(raw)).toString('base64url')}` });
+    // 마법사가 모르는 CSP 면 디코더가 먼저 깨진 링크로 본다 — 어느 쪽이든 계획을 주지 않는다
+    expect(res.status).toBe(400);
+    expect(['request.provider_not_enabled', 'request.link_unreadable']).toContain((await json(res)).errors[0].code);
+  });
+  it('AWS 링크 → provider aws 계획 파일 · Save plan 과 같다', async () => {
+    const aws = { provider: 'aws', project: { owner: 'platform', system: 'billing', env: 'prod', region: 'ap-northeast-2' }, projectPicks: [{ preset: 'vpc', instances: [{ id: 'a', seq: '01' }] }], services: [{ purpose: 'shop', picks: [{ preset: 'db', instances: [{ id: 'g', seq: '01' }] }] }] } as const;
+    const key = encodeWizardState(aws as never)!;
+    const body = await json((await post({ link: `#${HASH_KEY}=${key}` })).res);
+    expect(body.plan).toEqual(savePlan(key, VERSION.rules)!.file);
+    expect(body.plan.provider).toBe('aws');
   });
   it('link 가 없거나 문자열이 아니면 400', async () => {
     expect((await json((await post({})).res)).errors[0]).toMatchObject({ code: 'request.field_missing', field: 'link' });
@@ -69,8 +88,7 @@ describe('POST /v1/plan/from-link', () => {
 
 describe('openapi 예시', () => {
   it('명세의 요청 예시가 200 으로 풀린다', async () => {
-    const { readFileSync } = await import('node:fs');
-    const spec = JSON.parse(readFileSync(new URL('../../public/openapi.json', import.meta.url), 'utf-8'));
+    const spec = JSON.parse(readFileSync(join(import.meta.dirname, '../../public/openapi.json'), 'utf-8'));
     const example = spec.paths['/plan/from-link'].post.requestBody.content['application/json'].example;
     const { res } = await post(example);
     expect(res.status).toBe(200);
