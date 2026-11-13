@@ -4,8 +4,8 @@
   "cloudkms": "https://www.googleapis.com/discovery/v1/apis/cloudkms/v1/rest"
  },
  "revisions": {
-  "computeRevision": "20261007",
-  "kmsRevision": "20261001"
+  "computeRevision": "20261026",
+  "kmsRevision": "20261022"
  },
  "license": "Fields quoted from Google API discovery documents for transcription tests.",
  "rows": [
