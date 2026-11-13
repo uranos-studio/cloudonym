@@ -2,7 +2,7 @@
 
 All notable changes to Cloudonym are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the engine version follows [Semantic Versioning](https://semver.org/). Every response also carries a **rules revision** (`YYYY-MM-DD.N`), which changes whenever the same input could produce a different name, verdict, suggestion or label. Decision numbers (`D45` …) refer to [docs/decisions.md](docs/decisions.md).
 
-## [Unreleased]
+## [0.2.2] - 2026-11-14
 
 Rules revision for this release: 2026-10-26.1. New Google Cloud rules measured on the live API, because the official documents give no length or characters; AWS rules checked against the live API, and four of them narrowed where the server refused names the rules had accepted (D140).
 
